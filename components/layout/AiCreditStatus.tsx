@@ -23,6 +23,7 @@ type AiCreditOverview = {
 type AiCreditUsage = {
   id: string;
   agentId: string | null;
+  agentName: string | null;
   kind: string;
   provider: string;
   model: string | null;
@@ -258,7 +259,9 @@ export function AiCreditStatus({ variant = 'nav', onNavigate }: Props) {
                     <div key={item.id} className={styles.usageRow}>
                       <div>
                         <span>{normalizeKind(item.kind)}</span>
-                        <small>{item.provider}{item.model ? ` · ${item.model}` : ''}</small>
+                        <small>
+                          {[item.agentName, item.provider, item.model].filter(Boolean).join(' · ')}
+                        </small>
                       </div>
                       <div className={styles.usageValue}>
                         <strong>{item.credits.toLocaleString()}</strong>

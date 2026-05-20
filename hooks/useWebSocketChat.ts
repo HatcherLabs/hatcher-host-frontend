@@ -5,6 +5,7 @@
 
 import { useRef, useCallback, useEffect, useState } from 'react';
 import { API_URL } from '@/lib/config';
+import type { ChatAttachmentPayload } from '@/lib/api/methods';
 
 /** Derive ws:// or wss:// URL from the API base URL */
 function getWsUrl(agentId: string): string {
@@ -61,6 +62,7 @@ interface UseWebSocketChatReturn {
     message: string,
     history?: Array<{ role: 'user' | 'assistant'; content: string }>,
     sessionId?: string | null,
+    attachments?: ChatAttachmentPayload[],
   ) => boolean;
   /** Current connection state */
   connectionState: ConnectionState;
@@ -68,6 +70,8 @@ interface UseWebSocketChatReturn {
   isConnected: boolean;
   /** Manually disconnect */
   disconnect: () => void;
+  /** Ask the backend to stop the current chat stream on this socket. */
+  abort: () => boolean;
   /** Manually reconnect */
   reconnect: () => void;
 }
@@ -174,6 +178,8 @@ export function useWebSocketChat({
         case 'chat_error':
           onErrorRef.current(msg.payload.error as string);
           break;
+        case 'chat_aborted':
+          break;
         case 'chat_tool_event':
           if (onToolEventRef.current) {
             onToolEventRef.current({
@@ -256,6 +262,7 @@ export function useWebSocketChat({
       message: string,
       history?: Array<{ role: 'user' | 'assistant'; content: string }>,
       sessionId?: string | null,
+      attachments?: ChatAttachmentPayload[],
     ): boolean => {
       if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
         return false;
@@ -265,6 +272,7 @@ export function useWebSocketChat({
           message,
           ...(sessionId ? { sessionId } : {}),
           ...(history?.length ? { history } : {}),
+          ...(attachments?.length ? { attachments } : {}),
         }));
         return true;
       } catch {
@@ -279,6 +287,18 @@ export function useWebSocketChat({
     setConnectionState('disconnected');
   }, [cleanup]);
 
+  const abort = useCallback((): boolean => {
+    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+      return false;
+    }
+    try {
+      wsRef.current.send(JSON.stringify({ type: 'abort' }));
+      return true;
+    } catch {
+      return false;
+    }
+  }, []);
+
   const reconnect = useCallback(() => {
     reconnectAttemptsRef.current = 0;
     connect();
@@ -289,6 +309,7 @@ export function useWebSocketChat({
     connectionState,
     isConnected: connectionState === 'connected',
     disconnect,
+    abort,
     reconnect,
   };
 }

@@ -1343,6 +1343,7 @@
         "waitingForAgent": "等待智能体启动...",
         "messagePlaceholder": "给 {agentName} 发消息...",
         "sendMessage": "发送消息",
+        "stopResponse": "停止响应",
         "attachFiles": "附加文件 — 保存到智能体知识库",
         "stopRecording": "停止录音",
         "startVoice": "开始语音输入",

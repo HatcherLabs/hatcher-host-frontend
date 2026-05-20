@@ -54,6 +54,13 @@ export type AuthProfileData = {
   createdAt: string;
 };
 
+export type ChatAttachmentPayload = {
+  name: string;
+  mimeType: string;
+  sizeBytes: number;
+  dataUrl?: string;
+};
+
 export const api = {
   /** Register a new account */
   register: (email: string, username: string, password: string, referralCode?: string) =>
@@ -1353,7 +1360,9 @@ export const api = {
     onDone: (model: string) => void,
     onError: (err: string) => void,
     onMessage?: (content: string) => void,
-    sessionId?: string | null
+    sessionId?: string | null,
+    attachments?: ChatAttachmentPayload[],
+    signal?: AbortSignal,
   ) => {
     const token = getToken();
 
@@ -1367,9 +1376,17 @@ export const api = {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         credentials: 'include',
-        body: JSON.stringify({ message, history, ...(sessionId ? { sessionId } : {}) }),
+        signal,
+        body: JSON.stringify({
+          message,
+          history,
+          ...(sessionId ? { sessionId } : {}),
+          ...(attachments?.length ? { attachments } : {}),
+          abortOnDisconnect: true,
+        }),
       });
-    } catch {
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') throw err;
       // Streaming endpoint failed — fall back to regular chat
       try {
         const fallback = await fetch(`${API_BASE}/agents/${agentId}/chat`, {
@@ -1379,8 +1396,14 @@ export const api = {
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
           credentials: 'include',
-          body: JSON.stringify({ message, history, ...(sessionId ? { sessionId } : {}) }),
-        });
+          signal,
+          body: JSON.stringify({
+            message,
+            history,
+            ...(sessionId ? { sessionId } : {}),
+            ...(attachments?.length ? { attachments } : {}),
+          }),
+          });
         if (!fallback.ok) { onError(`HTTP ${fallback.status}`); return; }
         const data = await fallback.json() as {
           data?: {
@@ -1400,6 +1423,7 @@ export const api = {
           onError('Empty response');
         }
       } catch (fallbackErr) {
+        if (fallbackErr instanceof Error && fallbackErr.name === 'AbortError') throw fallbackErr;
         onError(fallbackErr instanceof Error ? fallbackErr.message : 'Network error');
       }
       return;
@@ -1979,6 +2003,8 @@ export const api = {
       usage: Array<{
         id: string;
         agentId: string | null;
+        agentName: string | null;
+        agent?: { name: string } | null;
         kind: string;
         provider: string;
         model: string | null;

@@ -8,6 +8,7 @@ import styles from './NavDrawer.module.css';
 import { NAV_GROUPS, PRIMARY_CTA, SECONDARY_CTA, SIGN_UP_CTA } from './links';
 import { LocaleSwitcher } from '@/components/layout/LocaleSwitcher';
 import { AiCreditStatus } from '@/components/layout/AiCreditStatus';
+import { HatcherMarketStatus } from '@/components/layout/HatcherMarketStatus';
 import { useAuth } from '@/lib/auth-context';
 
 interface Props {
@@ -57,6 +58,10 @@ export function NavDrawer({ open, onClose }: Props) {
 
         <div className={styles.localeRow}>
           <LocaleSwitcher align="start" side="top" />
+        </div>
+
+        <div className={styles.marketRow}>
+          <HatcherMarketStatus variant="drawer" onNavigate={onClose} />
         </div>
 
         {!authLoading && isAuthenticated && (

@@ -197,6 +197,10 @@
   display: inline-flex;
   align-items: center;
 }
+.marketSlot {
+  display: inline-flex;
+  align-items: center;
+}
 .creditSlot {
   display: inline-flex;
   align-items: center;
@@ -395,11 +399,13 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  flex: 0 0 auto;
   padding: 10px 16px;
   font-family: var(--font-mono);
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.04em;
+  white-space: nowrap;
   text-transform: uppercase;
   background: var(--accent);
   color: var(--bg-base);
@@ -426,11 +432,10 @@
 
 @media (max-width: 600px) {
   .cta {
-    max-width: 116px;
-    padding: 9px 10px;
+    max-width: none;
+    padding: 9px 9px;
     font-size: 10px;
-    line-height: 1.15;
-    white-space: normal;
+    line-height: 1;
   }
 
   .cursor {

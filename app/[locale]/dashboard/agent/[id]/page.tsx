@@ -7,7 +7,7 @@ import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 import { API_URL } from '@/lib/config';
-import type { Agent, AgentFeature, ChatSessionSummary } from '@/lib/api';
+import type { Agent, AgentFeature, ChatAttachmentPayload, ChatSessionSummary } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { useWebSocketChat, type ChatToolEvent } from '@/hooks/useWebSocketChat';
 import { FRAMEWORKS, getBYOKProvider } from '@hatcher/shared';
@@ -247,6 +247,7 @@ export default function AgentManagePage() {
   const wsLogsReconnectRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wsLogsRetryCountRef = useRef(0);
   const wsStreamingMsgRef = useRef(false);
+  const chatAbortControllerRef = useRef<AbortController | null>(null);
   // Tool-call indicators surfaced from the agent container during streaming.
   // Cleared on each new message; populated by ws-chat tool events.
   const [inflightTools, setInflightTools] = useState<Array<{ callId: string; name: string; argsPreview?: string }>>([]);
@@ -761,6 +762,7 @@ export default function AgentManagePage() {
     },
     onDone: (_content, _model) => {
       wsStreamingMsgRef.current = false;
+      chatAbortControllerRef.current = null;
       setInflightTools([]);
       setCompletedTools([]);
       setMessages((prev) => {
@@ -770,7 +772,11 @@ export default function AgentManagePage() {
           if (!last.content) {
             return updated.filter((m) => m.id !== last.id);
           }
-          updated[updated.length - 1] = { ...last, streaming: false };
+          updated[updated.length - 1] = {
+            ...last,
+            content: _content || last.content,
+            streaming: false,
+          };
         }
         return updated;
       });
@@ -786,6 +792,7 @@ export default function AgentManagePage() {
     },
     onError: (errMsg) => {
       wsStreamingMsgRef.current = false;
+      chatAbortControllerRef.current = null;
       const lower = errMsg.toLowerCase();
       if (lower.includes('429') || lower.includes('rate limit') || lower.includes('daily limit') || lower.includes('ai credit') || lower.includes('credit')) {
         setChatErrorType('ratelimit');
@@ -806,6 +813,7 @@ export default function AgentManagePage() {
     },
     onRateLimit: (error, _limit, _used) => {
       wsStreamingMsgRef.current = false;
+      chatAbortControllerRef.current = null;
       setChatErrorType('ratelimit');
       setChatError(error);
       toast.warning('AI Credits exhausted. Top up, upgrade, or bring your own API key.');
@@ -813,10 +821,36 @@ export default function AgentManagePage() {
       setSending(false);
     },
   });
+  const abortWsChat = wsChat.abort;
+
+  const finishAbortedChat = useCallback(() => {
+    wsStreamingMsgRef.current = false;
+    setInflightTools([]);
+    setCompletedTools([]);
+    setChatError(null);
+    setChatErrorType(null);
+    setMessages((prev) => {
+      const updated = [...prev];
+      const last = updated[updated.length - 1];
+      if (!last?.streaming) return prev;
+      if (!last.content.trim()) return updated.slice(0, -1);
+      updated[updated.length - 1] = { ...last, streaming: false };
+      return updated;
+    });
+    setSending(false);
+  }, []);
+
+  const abortChatResponse = useCallback(() => {
+    chatAbortControllerRef.current?.abort();
+    chatAbortControllerRef.current = null;
+    abortWsChat();
+    finishAbortedChat();
+    window.setTimeout(() => void loadChatSessions(), 500);
+  }, [abortWsChat, finishAbortedChat, loadChatSessions]);
 
   // ─── Chat send ────────────────────────────────────────────
 
-  const sendMessage = async (overrideText?: string) => {
+  const sendMessage = async (overrideText?: string, options?: { attachments?: ChatAttachmentPayload[] }) => {
     const text = (overrideText ?? input).trim();
     if (!text || sending || sendCooldown) return;
     if (text.toLowerCase() === '/reset' || text.toLowerCase() === '/new') {
@@ -862,12 +896,15 @@ export default function AgentManagePage() {
     const userMsg: Message = { id: genId(), role: 'user', content: text, timestamp: new Date() };
     setMessages((prev) => [...prev, userMsg]);
     setSending(true);
+    chatAbortControllerRef.current?.abort();
+    const abortController = new AbortController();
+    chatAbortControllerRef.current = abortController;
     const history = selectedHistory;
     setMessages((prev) => [...prev, { id: genId(), role: 'assistant', content: '', streaming: true, timestamp: new Date() }]);
 
     if (wsChat.isConnected) {
       wsStreamingMsgRef.current = true;
-      const sent = wsChat.send(text, history, requestSessionId);
+      const sent = wsChat.send(text, history, requestSessionId, options?.attachments);
       if (sent) {
         return;
       }
@@ -937,13 +974,23 @@ export default function AgentManagePage() {
           ]);
         },
         requestSessionId,
+        options?.attachments,
+        abortController.signal,
       );
     } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        finishAbortedChat();
+        return;
+      }
       const errMessage = err instanceof Error ? err.message : 'Connection error';
       setChatErrorType('generic');
       setChatError(`Error: ${errMessage}`);
       setMessages((prev) => prev.filter((m) => !(m.streaming && m.content === '')));
       setSending(false);
+    } finally {
+      if (chatAbortControllerRef.current === abortController) {
+        chatAbortControllerRef.current = null;
+      }
     }
   };
 
@@ -1018,7 +1065,7 @@ export default function AgentManagePage() {
       filteredLogs: logs.filteredLogs, logsEndRef: logs.logsEndRef, loadLogs: logs.loadLogs, wsLogsConnected,
       messages, setMessages, input, setInput, sending,
       chatError, setChatError, chatErrorType, setChatErrorType,
-      bottomRef, inputRef, sendMessage, handleKeyDown, sendCooldown,
+      bottomRef, inputRef, sendMessage, abortChatResponse, handleKeyDown, sendCooldown,
       wsConnected: wsChat.isConnected,
       chatSessions,
       activeChatSessionId,
@@ -1076,7 +1123,7 @@ export default function AgentManagePage() {
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, agent, stats, tab, logs.logs, logs.logsLoading, logs.logFilter, logs.logSearch, logs.autoScroll, logs.filteredLogs, wsLogsConnected,
-    messages, input, sending, sendCooldown, chatError, chatErrorType,
+    messages, input, sending, sendCooldown, chatError, chatErrorType, abortChatResponse,
     chatSessions, activeChatSessionId, setActiveChatSessionId, startNewChatSession, deleteChatSession, deletingChatSessionId, loadChatSessions,
     inflightTools, completedTools,
     config.configName, config.configDesc, config.configBio, config.configLore, config.configTopics,

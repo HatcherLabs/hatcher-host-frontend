@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { useVoice } from '@/hooks/useVoice';
 import { api } from '@/lib/api';
+import type { ChatAttachmentPayload } from '@/lib/api';
 import {
   useAgentContext,
   tabContentVariants,
@@ -18,6 +19,7 @@ import { ChatInput } from './ChatInput';
 import { VoiceCallOverlay } from './VoiceCallOverlay';
 import { ChatStyles } from './ChatStyles';
 import { AgentPresenceRail } from './AgentPresenceRail';
+import { CHAT_ATTACHMENT_MAX_BYTES, formatAttachmentSize } from './attachmentLimits';
 
 export function ChatTab() {
   const ctx = useAgentContext();
@@ -32,7 +34,7 @@ export function ChatTab() {
     chatError, setChatError,
     chatErrorType, setChatErrorType,
     bottomRef, inputRef,
-    sendMessage, handleKeyDown,
+    sendMessage, abortChatResponse, handleKeyDown,
     setTab,
     wsConnected,
   } = ctx;
@@ -51,20 +53,22 @@ export function ChatTab() {
   //      no tool call required — works across every framework regardless
   //      of what file-reading tools it ships with.
   //
-  //   2. Larger text files OR binary files → we still upload to the agent's
-  //      knowledge/ volume (POST /agents/:id/knowledge) and drop a marker
-  //      in the message with the filename + path. Framework-specific tools
-  //      handle the read on demand. Binary payloads can't be read directly
-  //      anyway — the file lives on disk for whatever reader the agent has.
+  //   2. Larger text files OR binary files → we still upload a lightweight
+  //      marker to the agent's knowledge/ volume and drop a marker in the
+  //      message with the filename. Image bytes travel with chat attachments
+  //      for platform actions such as Pump.fun launch.
   //
-  // Either way, the file is uploaded so it persists across sessions and
-  // shows up in the Knowledge tab for later reuse.
+  // Either way, the attachment is tracked in chat; binary image bytes are
+  // sent with the chat request instead of being stored as full knowledge text.
   const INLINE_MAX_BYTES = 40_000;
   type Attachment = {
     name: string;
+    mimeType: string;
     sizeBytes: number;
     /** Inline text (null for binary / oversize files handled via knowledge dir only). */
     content: string | null;
+    /** Browser-provided image bytes for platform actions such as Pump.fun launch. */
+    dataUrl?: string;
     /** True when the binary/large-file path was used (content is on disk only). */
     diskOnly: boolean;
   };
@@ -80,20 +84,38 @@ export function ChatTab() {
     setUploadingAttachments(true);
     try {
       for (const file of list) {
-        // Knowledge endpoint caps at 700KB of content (routes/agents/files.ts
-        // UploadFileBody). Over that, skip — users should split the file.
-        if (file.size > 700_000) {
-          setAttachmentError(`${file.name} is larger than 700 KB. Upload a smaller file or split it.`);
+        if (file.size > CHAT_ATTACHMENT_MAX_BYTES) {
+          setAttachmentError(`${file.name} is larger than ${formatAttachmentSize(CHAT_ATTACHMENT_MAX_BYTES)}.`);
           continue;
         }
         const looksText = /^(text\/|application\/(json|xml|yaml|x-yaml|csv)(;|$))/i.test(file.type)
           || /\.(md|markdown|txt|json|csv|ya?ml|toml|ini|cfg|log|html|xml|tsv|env|sh|bash|zsh|py|js|ts|jsx|tsx|mjs|cjs|rs|go|java|kt|rb|php|c|cc|cpp|h|hpp|css|scss|sass|sql)$/i.test(file.name)
           || file.type === '';
         const inlineCapable = looksText && file.size <= INLINE_MAX_BYTES;
+        const inferredImageType = /\.(png|jpe?g|webp|gif)$/i.test(file.name)
+          ? file.name.toLowerCase().endsWith('.webp')
+            ? 'image/webp'
+            : file.name.toLowerCase().endsWith('.gif')
+              ? 'image/gif'
+              : file.name.toLowerCase().match(/\.jpe?g$/)
+                ? 'image/jpeg'
+                : 'image/png'
+          : '';
+        const mimeType = file.type || inferredImageType || 'application/octet-stream';
+        const isImage = /^image\/(png|jpe?g|webp|gif)$/i.test(mimeType);
 
         let content: string | null = null;
         if (looksText) {
           try { content = await file.text(); } catch { /* fall back to disk-only */ }
+        }
+        let dataUrl: string | undefined;
+        if (isImage) {
+          dataUrl = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(String(reader.result ?? ''));
+            reader.onerror = () => reject(reader.error ?? new Error('Could not read image attachment'));
+            reader.readAsDataURL(file);
+          });
         }
         // Always persist to the volume so the Knowledge tab reflects it.
         // For binaries we send a placeholder — the agent's read_file /
@@ -113,8 +135,10 @@ export function ChatTab() {
                 ...prev,
                 {
                   name: file.name,
+                  mimeType,
                   sizeBytes: file.size,
                   content: inlineCapable ? content : null,
+                  ...(dataUrl ? { dataUrl } : {}),
                   diskOnly: !inlineCapable,
                 },
               ],
@@ -142,22 +166,33 @@ export function ChatTab() {
     }
     const inlineBlocks: string[] = [];
     const diskOnly: string[] = [];
+    const chatAttachments: ChatAttachmentPayload[] = [];
     for (const a of attachments) {
       if (a.content && !a.diskOnly) {
         inlineBlocks.push(`--- attached file: ${a.name} ---\n${a.content}\n--- end ${a.name} ---`);
+      } else if (a.dataUrl) {
+        diskOnly.push(a.name);
       } else {
         diskOnly.push(a.name);
       }
+      if (a.dataUrl) {
+        chatAttachments.push({
+          name: a.name,
+          mimeType: a.mimeType,
+          sizeBytes: a.sizeBytes,
+          dataUrl: a.dataUrl,
+        });
+      }
     }
     const diskMarker = diskOnly.length > 0
-      ? `[Files saved to knowledge/: ${diskOnly.join(', ')}. Open them from the Knowledge folder if you need to inspect their contents.]`
+      ? `[Attached files: ${diskOnly.join(', ')}. Image attachments are available to Hatcher platform actions such as Pump.fun launch.]`
       : null;
     const finalText = [
       inlineBlocks.join('\n\n'),
       diskMarker,
       base,
     ].filter(Boolean).join('\n\n');
-    sendMessage(finalText);
+    sendMessage(finalText, chatAttachments.length ? { attachments: chatAttachments } : undefined);
     setAttachments([]);
   }, [attachments, input, sendMessage]);
 
@@ -451,6 +486,7 @@ export function ChatTab() {
             isListening={voice.isListening}
             onMicToggle={handleMicToggle}
             onSendMessage={() => sendWithAttachments()}
+            onAbortResponse={abortChatResponse}
             onKeyDown={(e) => {
               // Ctrl/Cmd+Enter (or plain Enter per existing handler) sends —
               // intercept here so attachments merge into the sent text.

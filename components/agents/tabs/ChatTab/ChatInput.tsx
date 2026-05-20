@@ -2,10 +2,11 @@
 
 import { type RefObject, useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
-import { Send, Mic, MicOff, Terminal, Paperclip, X, Loader2, FileText, Zap, ImagePlus, BarChart3, Code2, WandSparkles, Video, AudioLines } from 'lucide-react';
+import { Send, Square, Mic, MicOff, Terminal, Paperclip, X, Loader2, FileText, Zap, ImagePlus, BarChart3, Code2, WandSparkles, Video, AudioLines } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { ActiveModelDisplay } from '@/lib/hosted-model-catalog';
 import { GlassCard } from '../../AgentContext';
+import { formatAttachmentSize } from './attachmentLimits';
 
 /* ── Slash command definitions per framework ── */
 const FRAMEWORK_COMMANDS: Record<string, Array<{ cmd: string; desc: string }>> = {
@@ -46,6 +47,7 @@ interface ChatInputProps {
   isListening: boolean;
   onMicToggle: () => void;
   onSendMessage: () => void;
+  onAbortResponse: () => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   inputRef: RefObject<HTMLTextAreaElement | null>;
   llmProvider: string;
@@ -54,9 +56,8 @@ interface ChatInputProps {
    *  ChatTab parent so sendMessage can prepend the "[Attachments: ...]"
    *  marker before clearing the list. */
   attachments: Array<{ name: string; sizeBytes: number }>;
-  /** Transient upload error, e.g. file over the knowledge endpoint
-   *  size cap. Shown under the chip row; clears on next successful
-   *  attach. */
+  /** Transient upload error, e.g. file over the chat attachment size cap.
+   *  Shown under the chip row; clears on next successful attach. */
   attachmentError: string | null;
   uploadingAttachments: boolean;
   onAttachFiles: (files: FileList | File[]) => Promise<void>;
@@ -75,6 +76,7 @@ export function ChatInput({
   isListening,
   onMicToggle,
   onSendMessage,
+  onAbortResponse,
   onKeyDown,
   inputRef,
   llmProvider,
@@ -217,7 +219,7 @@ export function ChatInput({
             >
               <FileText size={12} className="text-[var(--color-accent)]" />
               <span className="font-medium truncate max-w-[180px]">{a.name}</span>
-              <span className="text-[10px] text-[var(--text-muted)]">{Math.max(1, Math.round(a.sizeBytes / 1024))} KB</span>
+              <span className="text-[10px] text-[var(--text-muted)]">{formatAttachmentSize(a.sizeBytes)}</span>
               <button
                 type="button"
                 onClick={() => onRemoveAttachment(a.name)}
@@ -341,9 +343,8 @@ export function ChatInput({
           }}
         />
 
-        {/* Attach button — uploads to the agent's knowledge/ dir via
-            POST /agents/:id/knowledge. Accepts any file type; the
-            backend caps payload size and the chip row surfaces errors. */}
+        {/* Attach button — accepts any file type and surfaces size errors
+            in the chip row before sending chat attachments. */}
         <div className="relative">
           <button
             type="button"
@@ -434,20 +435,23 @@ export function ChatInput({
           </button>
         )}
 
-        {/* Send button */}
+        {/* Send / stop button */}
         <button
           type="button"
           className={`h-9 w-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 ${
-            input.trim() && !inputDisabled
+            sending
+              ? 'bg-red-500 hover:bg-red-600 shadow-[0_0_12px_rgba(239,68,68,0.25)] hover:shadow-[0_0_20px_rgba(239,68,68,0.35)]'
+              : input.trim() && !inputDisabled
               ? 'bg-[var(--color-accent)] hover:bg-[#0891b2] shadow-[0_0_12px_rgba(6,182,212,0.3)] hover:shadow-[0_0_20px_rgba(6,182,212,0.4)]'
               : 'bg-[var(--color-accent)]/30 opacity-50 cursor-not-allowed'
           }`}
-          onClick={onSendMessage}
-          aria-label={t('sendMessage')}
-          disabled={!input.trim() || inputDisabled}
+          onClick={sending ? onAbortResponse : onSendMessage}
+          aria-label={sending ? t('stopResponse') : t('sendMessage')}
+          title={sending ? t('stopResponse') : t('sendMessage')}
+          disabled={sending ? false : (!input.trim() || inputDisabled)}
         >
           {sending ? (
-            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            <Square size={13} className="fill-white text-white" />
           ) : (
             <Send size={15} className="text-white translate-x-[1px]" />
           )}
