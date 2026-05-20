@@ -34,7 +34,7 @@ export function ChatTab() {
     chatError, setChatError,
     chatErrorType, setChatErrorType,
     bottomRef, inputRef,
-    sendMessage, handleKeyDown,
+    sendMessage, abortChatResponse, handleKeyDown,
     setTab,
     wsConnected,
   } = ctx;
@@ -486,6 +486,7 @@ export function ChatTab() {
             isListening={voice.isListening}
             onMicToggle={handleMicToggle}
             onSendMessage={() => sendWithAttachments()}
+            onAbortResponse={abortChatResponse}
             onKeyDown={(e) => {
               // Ctrl/Cmd+Enter (or plain Enter per existing handler) sends —
               // intercept here so attachments merge into the sent text.

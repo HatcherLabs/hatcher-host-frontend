@@ -1343,6 +1343,7 @@
         "waitingForAgent": "En attente du démarrage de l'agent...",
         "messagePlaceholder": "Message à {agentName}...",
         "sendMessage": "Envoyer le message",
+        "stopResponse": "Arrêter la réponse",
         "attachFiles": "Joindre des fichiers — enregistrés dans les connaissances de l'agent",
         "stopRecording": "Arrêter l'enregistrement",
         "startVoice": "Démarrer la saisie vocale",

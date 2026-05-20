@@ -70,6 +70,8 @@ interface UseWebSocketChatReturn {
   isConnected: boolean;
   /** Manually disconnect */
   disconnect: () => void;
+  /** Ask the backend to stop the current chat stream on this socket. */
+  abort: () => boolean;
   /** Manually reconnect */
   reconnect: () => void;
 }
@@ -175,6 +177,8 @@ export function useWebSocketChat({
           break;
         case 'chat_error':
           onErrorRef.current(msg.payload.error as string);
+          break;
+        case 'chat_aborted':
           break;
         case 'chat_tool_event':
           if (onToolEventRef.current) {
@@ -283,6 +287,18 @@ export function useWebSocketChat({
     setConnectionState('disconnected');
   }, [cleanup]);
 
+  const abort = useCallback((): boolean => {
+    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+      return false;
+    }
+    try {
+      wsRef.current.send(JSON.stringify({ type: 'abort' }));
+      return true;
+    } catch {
+      return false;
+    }
+  }, []);
+
   const reconnect = useCallback(() => {
     reconnectAttemptsRef.current = 0;
     connect();
@@ -293,6 +309,7 @@ export function useWebSocketChat({
     connectionState,
     isConnected: connectionState === 'connected',
     disconnect,
+    abort,
     reconnect,
   };
 }

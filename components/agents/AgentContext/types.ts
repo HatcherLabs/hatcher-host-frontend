@@ -103,6 +103,7 @@ export interface AgentContextValue {
   bottomRef: React.RefObject<HTMLDivElement | null>;
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
   sendMessage: (overrideText?: string, options?: { attachments?: ChatAttachmentPayload[] }) => Promise<void>;
+  abortChatResponse: () => void;
   handleKeyDown: (e: React.KeyboardEvent) => void;
   sendCooldown: boolean;
   wsConnected: boolean;

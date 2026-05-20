@@ -11,6 +11,7 @@ import { NAV_GROUPS, PRIMARY_CTA, SECONDARY_CTA } from './links';
 import { NavDrawer } from './NavDrawer';
 import { LocaleSwitcher } from '@/components/layout/LocaleSwitcher';
 import { AiCreditStatus } from '@/components/layout/AiCreditStatus';
+import { HatcherMarketStatus } from '@/components/layout/HatcherMarketStatus';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
@@ -166,6 +167,9 @@ export function Nav() {
           <div className={styles.spacer} />
 
           <div className={styles.actions}>
+            <span className={styles.marketSlot}>
+              <HatcherMarketStatus />
+            </span>
             <span className={styles.localeSlot}>
               <LocaleSwitcher />
             </span>

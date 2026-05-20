@@ -1362,6 +1362,7 @@ export const api = {
     onMessage?: (content: string) => void,
     sessionId?: string | null,
     attachments?: ChatAttachmentPayload[],
+    signal?: AbortSignal,
   ) => {
     const token = getToken();
 
@@ -1375,14 +1376,17 @@ export const api = {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         credentials: 'include',
+        signal,
         body: JSON.stringify({
           message,
           history,
           ...(sessionId ? { sessionId } : {}),
           ...(attachments?.length ? { attachments } : {}),
+          abortOnDisconnect: true,
         }),
       });
-    } catch {
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') throw err;
       // Streaming endpoint failed — fall back to regular chat
       try {
         const fallback = await fetch(`${API_BASE}/agents/${agentId}/chat`, {
@@ -1392,13 +1396,14 @@ export const api = {
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
           credentials: 'include',
+          signal,
           body: JSON.stringify({
             message,
             history,
             ...(sessionId ? { sessionId } : {}),
             ...(attachments?.length ? { attachments } : {}),
           }),
-        });
+          });
         if (!fallback.ok) { onError(`HTTP ${fallback.status}`); return; }
         const data = await fallback.json() as {
           data?: {
@@ -1418,6 +1423,7 @@ export const api = {
           onError('Empty response');
         }
       } catch (fallbackErr) {
+        if (fallbackErr instanceof Error && fallbackErr.name === 'AbortError') throw fallbackErr;
         onError(fallbackErr instanceof Error ? fallbackErr.message : 'Network error');
       }
       return;
@@ -1997,6 +2003,8 @@ export const api = {
       usage: Array<{
         id: string;
         agentId: string | null;
+        agentName: string | null;
+        agent?: { name: string } | null;
         kind: string;
         provider: string;
         model: string | null;

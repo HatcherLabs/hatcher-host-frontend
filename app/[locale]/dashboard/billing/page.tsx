@@ -116,6 +116,7 @@ type AiCreditHistoryItem = {
   provider: string;
   model: string | null;
   agentId?: string | null;
+  agentName?: string | null;
   credits: number;
   providerCostUsd: string | number;
   inputTokens?: number | null;
@@ -1237,7 +1238,11 @@ export default function BillingPage() {
 	                              in {formatTokenCount(tx.inputTokens)} / out {formatTokenCount(tx.outputTokens)} tokens
 	                            </span>
 	                          ) : null}
-	                          {tx.agentId ? <span className="font-mono">agent {tx.agentId.slice(0, 8)}...</span> : null}
+	                          {tx.agentName ? (
+	                            <span>{tx.agentName}</span>
+	                          ) : tx.agentId ? (
+	                            <span className="font-mono">agent {tx.agentId.slice(0, 8)}...</span>
+	                          ) : null}
 	                        </div>
 	                      </div>
 	                      <span

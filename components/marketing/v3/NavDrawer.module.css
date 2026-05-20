@@ -46,6 +46,10 @@
   padding: 8px 0 16px;
 }
 
+.marketRow {
+  padding: 8px 0 8px;
+}
+
 .bottom {
   position: fixed;
   bottom: 0;

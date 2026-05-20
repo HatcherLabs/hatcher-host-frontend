@@ -1343,6 +1343,7 @@
         "waitingForAgent": "Waiting for agent to start...",
         "messagePlaceholder": "Message {agentName}...",
         "sendMessage": "Send message",
+        "stopResponse": "Stop response",
         "attachFiles": "Attach files — saved to agent’s knowledge",
         "stopRecording": "Stop recording",
         "startVoice": "Start voice input",

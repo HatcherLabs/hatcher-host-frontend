@@ -1343,6 +1343,7 @@
         "waitingForAgent": "Warten auf den Start des Agenten...",
         "messagePlaceholder": "Nachricht an {agentName}...",
         "sendMessage": "Nachricht senden",
+        "stopResponse": "Antwort stoppen",
         "attachFiles": "Dateien anhängen — im Wissen des Agenten gespeichert",
         "stopRecording": "Aufnahme stoppen",
         "startVoice": "Spracheingabe starten",

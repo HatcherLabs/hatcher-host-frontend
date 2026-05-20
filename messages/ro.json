@@ -1343,6 +1343,7 @@
         "waitingForAgent": "Aștept pornirea agentului...",
         "messagePlaceholder": "Mesaj pentru {agentName}...",
         "sendMessage": "Trimite mesaj",
+        "stopResponse": "Oprește răspunsul",
         "attachFiles": "Atașează fișiere — salvate în cunoștințele agentului",
         "stopRecording": "Oprește înregistrarea",
         "startVoice": "Pornește introducerea vocală",
