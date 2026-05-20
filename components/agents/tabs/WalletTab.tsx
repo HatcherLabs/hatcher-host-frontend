@@ -32,6 +32,7 @@ import type {
   AgentWalletsResponse,
 } from '@/lib/api';
 import { buildFallbackPassport, shortAddress } from '@/lib/agent-passport';
+import { KausalayerWalletPanel } from './KausalayerWalletPanel';
 
 interface ReputationState {
   upCount: number;
@@ -389,15 +390,18 @@ export function WalletTab() {
           onOpenNetwork={setActivePanel}
         />
       ) : activeNetwork ? (
-        <ChainWalletPanel
-          network={activeNetwork}
-          reputation={reputation}
-          registeringSkale={registeringSkale}
-          registerMsg={registerMsg}
-          onRegisterSkale={() => void registerSkaleIdentity()}
-          onCopy={copy}
-          onViewPrivateKey={openPrivateKeyModal}
-        />
+        <div className="space-y-4">
+          <ChainWalletPanel
+            network={activeNetwork}
+            reputation={reputation}
+            registeringSkale={registeringSkale}
+            registerMsg={registerMsg}
+            onRegisterSkale={() => void registerSkaleIdentity()}
+            onCopy={copy}
+            onViewPrivateKey={openPrivateKeyModal}
+          />
+          {activeNetwork.id === 'solana' && <KausalayerWalletPanel agentId={agent.id} />}
+        </div>
       ) : (
         <GlassCard className="p-6 text-sm text-[var(--text-muted)]">Wallet not provisioned yet.</GlassCard>
       )}

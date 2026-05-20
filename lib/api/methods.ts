@@ -4,7 +4,7 @@
 
 import { API_URL } from '@/lib/config';
 import { getToken, req } from './core';
-import type { Agent, AgentPassport, AgentPassportNetworkId, AgentWalletPrivateKeyResponse, AgentWalletsResponse, Payment, AgentFeature, ChatMessage, ChatSessionSummary, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse, AdminEgressEventsResponse, AgentEgressEventsResponse, AdminIdleOverviewResponse, GetAgentMailboxResponse, GetAgentMailMessagesResponse, SendAgentMailBody, SendAgentMailResponse, UpdateAgentMailSettingsBody, UpdateAgentMailSettingsResponse, AgentMailDirection, KausalayerCallBody, KausalayerCallResponse, KausalayerConfigBody, KausalayerConfigStatus, KausalayerHealthResponse, KausalayerToolsResponse, SpawnAgentsResponse, SpawnAvatarUploadBody, SpawnAvatarUploadResponse, SpawnCreateAgentBody, SpawnDepositBody, SpawnDepositResponse, SpawnEventsResponse, SpawnPaymentInstructions, SpawnPortfolioResponse, SpawnPositionsResponse, SpawnStatusResponse, SpawnTradesResponse } from './types';
+import type { Agent, AgentPassport, AgentPassportNetworkId, AgentWalletPrivateKeyResponse, AgentWalletsResponse, Payment, AgentFeature, ChatMessage, ChatSessionSummary, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse, AdminEgressEventsResponse, AgentEgressEventsResponse, AdminIdleOverviewResponse, GetAgentMailboxResponse, GetAgentMailMessagesResponse, SendAgentMailBody, SendAgentMailResponse, UpdateAgentMailSettingsBody, UpdateAgentMailSettingsResponse, AgentMailDirection, KausalayerCallBody, KausalayerCallResponse, KausalayerConfigBody, KausalayerConfigStatus, KausalayerHealthResponse, KausalayerResourcesResponse, KausalayerToolsResponse, SpawnAgentsResponse, SpawnAvatarUploadBody, SpawnAvatarUploadResponse, SpawnCreateAgentBody, SpawnDepositBody, SpawnDepositResponse, SpawnEventsResponse, SpawnPaymentInstructions, SpawnPortfolioResponse, SpawnPositionsResponse, SpawnStatusResponse, SpawnTradesResponse } from './types';
 import type { TierConfig, AdminOverviewExtras } from '@hatcher/shared';
 
 const API_BASE = API_URL;
@@ -415,6 +415,9 @@ export const api = {
 
   getAgentKausalayerHealth: (id: string) =>
     req<KausalayerHealthResponse>(`/agents/${id}/kausalayer/health`),
+
+  getAgentKausalayerResources: (id: string) =>
+    req<KausalayerResourcesResponse>(`/agents/${id}/kausalayer/resources`),
 
   getAgentKausalayerTools: (id: string) =>
     req<KausalayerToolsResponse>(`/agents/${id}/kausalayer/tools`),

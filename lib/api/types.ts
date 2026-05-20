@@ -359,6 +359,20 @@ export interface KausalayerCallBody {
 
 export type KausalayerCallResponse = unknown;
 
+export interface KausalayerResourceResult {
+  tool: string;
+  data: unknown | null;
+  error: string | null;
+}
+
+export interface KausalayerResourcesResponse {
+  config: KausalayerConfigStatus;
+  privateResourcesAvailable: boolean;
+  pockets: KausalayerResourceResult;
+  savedWallets: KausalayerResourceResult;
+  contacts: KausalayerResourceResult;
+}
+
 export type AgentPassportNetworkId = 'skale' | 'base' | 'solana';
 export type AgentPassportChainType = 'evm' | 'solana';
 export type AgentPassportSignerMode = 'receive-only' | 'runtime-signing' | 'planned';

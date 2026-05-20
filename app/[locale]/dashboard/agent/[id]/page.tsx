@@ -156,11 +156,6 @@ const SpawnTab = dynamic(
   { loading: () => <TabSkeleton /> },
 );
 
-const KausalayerTab = dynamic(
-  () => import('@/components/agents/tabs/KausalayerTab').then(mod => ({ default: mod.KausalayerTab })),
-  { loading: () => <TabSkeleton /> },
-);
-
 // ─── Main Component ─────────────────────────────────────────
 
 export default function AgentManagePage() {
@@ -195,13 +190,14 @@ export default function AgentManagePage() {
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
   const statusPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const validTabs: Tab[] = ['overview','config','integrations','skills','plugins','files','logs','terminal','memory','sessions','knowledge','schedules','workflows','chat','mail','stats','wallet','spawn','kausalayer'];
+  const validTabs: Tab[] = ['overview','config','integrations','skills','plugins','files','logs','terminal','memory','sessions','knowledge','schedules','workflows','chat','mail','stats','wallet','spawn'];
   // 'skills' kept in validTabs for backwards compat (deep links), but redirects to plugins tab
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
   const rawTab = searchParams.get('tab');
   const normalizeTab = (t: string | null): Tab => {
     if (!t) return 'overview';
     if (t === 'workspace') return 'files';
+    if (t === 'kausalayer') return 'wallet';
     return validTabs.includes(t as Tab) ? (t as Tab) : 'overview';
   };
   const initialTab = normalizeTab(rawTab);
@@ -1402,7 +1398,6 @@ export default function AgentManagePage() {
               {tab === 'knowledge' && <KnowledgeTab />}
               {tab === 'wallet' && <WalletTab />}
               {tab === 'spawn' && <SpawnTab />}
-              {tab === 'kausalayer' && <KausalayerTab />}
               {tab === 'stats' && <StatsTab />}
               {tab === 'schedules' && <SchedulesTab />}
               {tab === 'workflows' && <WorkflowsTab />}

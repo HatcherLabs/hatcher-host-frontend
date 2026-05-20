@@ -36,6 +36,8 @@ export type {
   KausalayerConfigBody,
   KausalayerConfigStatus,
   KausalayerHealthResponse,
+  KausalayerResourceResult,
+  KausalayerResourcesResponse,
   KausalayerTool,
   KausalayerToolsResponse,
   SpawnAgent,
