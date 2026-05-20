@@ -74,6 +74,42 @@ function readImageFileAsDataUrl(file: File): Promise<string> {
   });
 }
 
+function loadImage(dataUrl: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error('Could not decode image file.'));
+    image.src = dataUrl;
+  });
+}
+
+async function readImageFileAsAvatarDataUrl(file: File): Promise<string> {
+  const dataUrl = await readImageFileAsDataUrl(file);
+  const image = await loadImage(dataUrl);
+  const cropSize = Math.min(image.width, image.height);
+  if (cropSize <= 0) throw new Error('Avatar image is empty.');
+
+  const outputSize = 512;
+  const canvas = document.createElement('canvas');
+  canvas.width = outputSize;
+  canvas.height = outputSize;
+  const context = canvas.getContext('2d');
+  if (!context) throw new Error('Could not prepare avatar image.');
+
+  context.drawImage(
+    image,
+    Math.max(0, (image.width - cropSize) / 2),
+    Math.max(0, (image.height - cropSize) / 2),
+    cropSize,
+    cropSize,
+    0,
+    0,
+    outputSize,
+    outputSize,
+  );
+  return canvas.toDataURL('image/jpeg', 0.82);
+}
+
 export function SpawnLaunch({
   onPaymentPrepared,
 }: {
@@ -82,6 +118,7 @@ export function SpawnLaunch({
   const { agent } = useAgentContext();
   const { toast } = useToast();
   const [creating, setCreating] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [predictionOpen, setPredictionOpen] = useState(true);
@@ -397,15 +434,26 @@ export function SpawnLaunch({
       setFormError('Avatar upload must be an image file.');
       return;
     }
-    if (file.size > 2_000_000) {
-      setFormError('Avatar image must be 2MB or smaller.');
+    if (file.size > 50_000_000) {
+      setFormError('Avatar image must be 50MB or smaller.');
       return;
     }
+    setAvatarUploading(true);
     try {
-      setAvatar(await readImageFileAsDataUrl(file));
+      const compressedAvatar = await readImageFileAsAvatarDataUrl(file);
+      setAvatar(compressedAvatar);
+      const uploaded = await api.uploadAgentSpawnAvatar(agent.id, { dataUrl: compressedAvatar });
+      if (uploaded.success) {
+        setAvatar(uploaded.data.avatar);
+      } else {
+        setFormError(`Avatar upload failed: ${uploaded.error}`);
+        return;
+      }
       setFormError(null);
     } catch (e) {
       setFormError(e instanceof Error ? e.message : 'Could not read image file.');
+    } finally {
+      setAvatarUploading(false);
     }
   };
 
@@ -444,14 +492,15 @@ export function SpawnLaunch({
                   <span className="mt-1 flex min-h-[38px] cursor-pointer items-center justify-between gap-2 rounded-md border border-[var(--border-default)] px-3 py-2 text-sm text-[var(--text-primary)] transition-colors hover:border-[var(--border-strong)]">
                     <span className="inline-flex min-w-0 items-center gap-2">
                       <Upload size={14} className="text-[var(--text-muted)]" />
-                      <span className="truncate">Choose image from device</span>
+                      <span className="truncate">{avatarUploading ? 'Uploading avatar...' : 'Choose image from device'}</span>
                     </span>
-                    <span className="text-xs text-[var(--text-muted)]">max 2MB</span>
+                    <span className="text-xs text-[var(--text-muted)]">max 50MB</span>
                   </span>
                   <input
                     type="file"
                     accept="image/*"
                     className="sr-only"
+                    disabled={avatarUploading}
                     onChange={(e) => void handleAvatarFile(e.target.files?.[0] ?? null)}
                   />
                 </label>
@@ -611,11 +660,11 @@ export function SpawnLaunch({
               <button
                 type="button"
                 onClick={() => void createSpawnAgent()}
-                disabled={creating}
+                disabled={creating || avatarUploading}
                 className="btn-primary inline-flex w-full items-center justify-center gap-2"
               >
                 <Rocket size={15} />
-                {creating ? 'Preparing...' : 'Prepare Spawn agent'}
+                {creating ? 'Preparing...' : avatarUploading ? 'Uploading avatar...' : 'Prepare Spawn agent'}
               </button>
             </div>
           </GlassCard>

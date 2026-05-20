@@ -33,6 +33,8 @@ export type {
   SendAgentMailResponse,
   SpawnAgent,
   SpawnAgentsResponse,
+  SpawnAvatarUploadBody,
+  SpawnAvatarUploadResponse,
   SpawnCreateAgentBody,
   SpawnDepositBody,
   SpawnDepositResponse,

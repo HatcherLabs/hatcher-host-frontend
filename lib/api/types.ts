@@ -220,6 +220,14 @@ export interface SpawnCreateAgentBody {
   };
 }
 
+export interface SpawnAvatarUploadBody {
+  dataUrl: string;
+}
+
+export interface SpawnAvatarUploadResponse {
+  avatar: string;
+}
+
 export interface SpawnDepositBody {
   recipient: string;
   amount: number;

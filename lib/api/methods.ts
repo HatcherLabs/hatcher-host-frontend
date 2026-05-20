@@ -4,7 +4,7 @@
 
 import { API_URL } from '@/lib/config';
 import { getToken, req } from './core';
-import type { Agent, AgentPassport, AgentPassportNetworkId, AgentWalletPrivateKeyResponse, AgentWalletsResponse, Payment, AgentFeature, ChatMessage, ChatSessionSummary, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse, AdminEgressEventsResponse, AgentEgressEventsResponse, AdminIdleOverviewResponse, GetAgentMailboxResponse, GetAgentMailMessagesResponse, SendAgentMailBody, SendAgentMailResponse, UpdateAgentMailSettingsBody, UpdateAgentMailSettingsResponse, AgentMailDirection, SpawnAgentsResponse, SpawnCreateAgentBody, SpawnDepositBody, SpawnDepositResponse, SpawnEventsResponse, SpawnPaymentInstructions, SpawnPositionsResponse, SpawnStatusResponse, SpawnTradesResponse } from './types';
+import type { Agent, AgentPassport, AgentPassportNetworkId, AgentWalletPrivateKeyResponse, AgentWalletsResponse, Payment, AgentFeature, ChatMessage, ChatSessionSummary, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse, AdminEgressEventsResponse, AgentEgressEventsResponse, AdminIdleOverviewResponse, GetAgentMailboxResponse, GetAgentMailMessagesResponse, SendAgentMailBody, SendAgentMailResponse, UpdateAgentMailSettingsBody, UpdateAgentMailSettingsResponse, AgentMailDirection, SpawnAgentsResponse, SpawnAvatarUploadBody, SpawnAvatarUploadResponse, SpawnCreateAgentBody, SpawnDepositBody, SpawnDepositResponse, SpawnEventsResponse, SpawnPaymentInstructions, SpawnPositionsResponse, SpawnStatusResponse, SpawnTradesResponse } from './types';
 import type { TierConfig, AdminOverviewExtras } from '@hatcher/shared';
 
 const API_BASE = API_URL;
@@ -349,6 +349,12 @@ export const api = {
 
   createAgentSpawnAgent: (id: string, body: SpawnCreateAgentBody) =>
     req<SpawnPaymentInstructions>(`/agents/${id}/spawn/agents`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+
+  uploadAgentSpawnAvatar: (id: string, body: SpawnAvatarUploadBody) =>
+    req<SpawnAvatarUploadResponse>(`/agents/${id}/spawn/avatar`, {
       method: 'POST',
       body: JSON.stringify(body),
     }),
