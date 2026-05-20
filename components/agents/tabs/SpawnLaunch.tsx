@@ -244,7 +244,7 @@ export function SpawnLaunch({
         dna.pm_price_min = pmPriceMin;
         dna.pm_price_max = pmPriceMax;
       }
-      if (pmSellStrategy === 'target') dna.pm_target_pct = pmTargetPct;
+      if (pmSellStrategy === 'target') dna.pm_target_pct = pmTargetPct / 100;
       if (pmSellStrategy === 'trail') dna.pm_trail_pct = pmTrailPct / 100;
       if (pmStopLossPct > 0) dna.pm_stop_loss_pct = pmStopLossPct / 100;
       if (pmCategories.includes('sports') && pmSportsFilter.length > 0) {
