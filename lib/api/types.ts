@@ -220,6 +220,14 @@ export interface SpawnCreateAgentBody {
   };
 }
 
+export interface SpawnAvatarUploadBody {
+  dataUrl: string;
+}
+
+export interface SpawnAvatarUploadResponse {
+  avatar: string;
+}
+
 export interface SpawnDepositBody {
   recipient: string;
   amount: number;
@@ -259,12 +267,39 @@ export interface SpawnPositionsResponse {
   prediction?: Array<Record<string, unknown>>;
 }
 
+export interface SpawnPortfolioToken {
+  mint: string;
+  symbol?: string | null;
+  amount?: number | null;
+  price_usd?: number | null;
+  value_usd?: number | null;
+  cost_basis_sol?: number | null;
+  cost_basis_usd?: number | null;
+  pnl_usd?: number | null;
+  pnl_pct?: number | null;
+}
+
+export interface SpawnPortfolioResponse {
+  wallet?: string;
+  sol_balance?: number | null;
+  native_sol?: number | null;
+  wsol_balance?: number | null;
+  sol_price?: number | null;
+  sol_value_usd?: number | null;
+  tokens?: SpawnPortfolioToken[];
+  pm_open_value_usd?: number | null;
+  pm_positions?: Array<Record<string, unknown>>;
+  total_value_usd?: number | null;
+  total_pnl_usd?: number | null;
+}
+
 export interface SpawnEvent {
   id: string | number;
   type: string;
   agent_id?: string;
-  data?: Record<string, unknown>;
-  timestamp: number;
+  data?: Record<string, unknown> | string;
+  timestamp?: number;
+  created_at?: string;
 }
 
 export interface SpawnEventsResponse {
@@ -292,6 +327,7 @@ export interface KausalayerConfigStatus {
   enabled: boolean;
   configured: boolean;
   baseUrl: string;
+  keySource?: 'platform' | 'agent' | 'none';
 }
 
 export interface KausalayerConfigBody {

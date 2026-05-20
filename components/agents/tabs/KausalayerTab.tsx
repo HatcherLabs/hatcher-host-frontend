@@ -16,6 +16,27 @@ const DEFAULT_CALL = JSON.stringify({
   },
 }, null, 2);
 
+const PLATFORM_BLOCKED_TOOLS = new Set([
+  'add_contact',
+  'add_saved_wallet',
+  'archive_pocket',
+  'delete_contact',
+  'delete_pocket',
+  'export_pocket_key',
+  'get_route_history',
+  'get_transaction_history',
+  'get_usage_stats',
+  'kausa_gate_list',
+  'kausa_gate_remove',
+  'list_contacts',
+  'list_pockets',
+  'list_saved_wallets',
+  'list_send_links',
+  'remove_saved_wallet',
+  'rename_pocket',
+  'sweep_all_pockets',
+]);
+
 function formatJson(value: unknown): string {
   return JSON.stringify(value, null, 2);
 }
@@ -37,6 +58,19 @@ export function KausalayerTab() {
   const sortedTools = useMemo(() => {
     return [...tools].sort((a, b) => a.name.localeCompare(b.name));
   }, [tools]);
+
+  const currentTool = useMemo(() => {
+    try {
+      const parsed = JSON.parse(callJson) as { tool?: unknown };
+      return typeof parsed.tool === 'string' ? parsed.tool : null;
+    } catch {
+      return null;
+    }
+  }, [callJson]);
+
+  const platformBlocked = config?.keySource === 'platform'
+    && currentTool != null
+    && PLATFORM_BLOCKED_TOOLS.has(currentTool);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -146,7 +180,8 @@ export function KausalayerTab() {
             </div>
             <p className="mt-1 max-w-3xl text-sm text-[var(--text-muted)]">
               Give this agent access to KausaLayer pockets, private SOL routing, pocket swaps, payment links, and
-              proof-of-privacy tools through a Hatcher proxy. The raw KausaLayer API key stays encrypted in Hatcher.
+              proof-of-privacy tools through a Hatcher proxy. The raw KausaLayer API key never reaches the browser or
+              the agent container.
             </p>
           </div>
           <button type="button" onClick={() => void load()} className="btn-secondary inline-flex items-center gap-2" disabled={loading}>
@@ -157,6 +192,7 @@ export function KausalayerTab() {
         <div className="mt-4 flex flex-wrap gap-2 text-xs">
           <StatusPill label="API" value={health?.status ?? 'unknown'} />
           <StatusPill label="Key" value={config?.configured ? 'configured' : 'missing'} tone={config?.configured ? 'good' : 'warn'} />
+          <StatusPill label="Source" value={config?.keySource ?? 'unknown'} tone={config?.keySource === 'none' ? 'warn' : 'neutral'} />
           <StatusPill label="Tools" value={String(tools.length)} />
         </div>
       </GlassCard>
@@ -167,13 +203,13 @@ export function KausalayerTab() {
             <div className="flex items-start gap-3">
               <KeyRound size={17} className="mt-0.5 text-[var(--phosphor)]" />
               <div className="min-w-0 flex-1">
-                <h3 className="text-sm font-semibold text-[var(--text-primary)]">Agent KausaLayer key</h3>
+                <h3 className="text-sm font-semibold text-[var(--text-primary)]">KausaLayer proxy key</h3>
                 <p className="mt-1 text-xs text-[var(--text-muted)]">
-                  Generate a key at{' '}
+                  Hatcher can use a platform KausaLayer key for all agents. Optionally, save a per-agent override from{' '}
                   <a href="https://kausalayer.com/mcp" target="_blank" rel="noreferrer" className="text-[var(--accent)]">
                     kausalayer.com/mcp <ExternalLink size={11} className="inline" />
                   </a>
-                  , then save it here. It is not sent to the frontend after saving.
+                  . Saved keys are encrypted and are not returned to the frontend.
                 </p>
               </div>
             </div>
@@ -182,17 +218,17 @@ export function KausalayerTab() {
                 type="password"
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
-                placeholder={config?.configured ? 'Key configured. Paste a new key to rotate.' : 'kl_...'}
+                placeholder={config?.keySource === 'platform' ? 'Platform key active. Paste a key only to override.' : config?.configured ? 'Agent key configured. Paste a new key to rotate.' : 'kl_...'}
                 className="config-input min-w-0 flex-1 text-sm"
               />
               <button type="button" onClick={() => void saveKey()} disabled={saving || !apiKey.trim()} className="btn-primary inline-flex items-center justify-center gap-2">
                 <KeyRound size={14} />
                 Save
               </button>
-              {config?.configured && (
+              {config?.keySource === 'agent' && (
                 <button type="button" onClick={() => void removeKey()} disabled={saving} className="btn-secondary inline-flex items-center justify-center gap-2">
                   <Trash2 size={14} />
-                  Remove
+                  Remove override
                 </button>
               )}
             </div>
@@ -218,6 +254,11 @@ export function KausalayerTab() {
                 >
                   <div className="font-mono text-xs text-[var(--text-primary)]">{tool.name}</div>
                   {tool.description && <div className="mt-1 line-clamp-2 text-xs text-[var(--text-muted)]">{tool.description}</div>}
+                  {config?.keySource === 'platform' && PLATFORM_BLOCKED_TOOLS.has(tool.name) && (
+                    <div className="mt-2 text-[10px] uppercase tracking-[0.12em] text-amber-200">
+                      Agent key required
+                    </div>
+                  )}
                 </button>
               ))}
             </div>
@@ -228,7 +269,12 @@ export function KausalayerTab() {
           <GlassCard className="p-5">
             <div className="flex items-center justify-between gap-3">
               <h3 className="text-sm font-semibold text-[var(--text-primary)]">Call a KausaLayer tool</h3>
-              <button type="button" onClick={() => void callTool()} disabled={calling || !config?.configured} className="btn-primary inline-flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => void callTool()}
+                disabled={calling || !config?.configured || platformBlocked}
+                className="btn-primary inline-flex items-center gap-2"
+              >
                 <Play size={14} />
                 {calling ? 'Calling...' : 'Call'}
               </button>
@@ -236,7 +282,14 @@ export function KausalayerTab() {
             {!config?.configured && (
               <div className="mt-4 flex items-start gap-2 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
                 <AlertTriangle size={14} className="mt-0.5 shrink-0" />
-                Add a KausaLayer API key before calling tools. Listing tools and health still work without a key.
+                Add the platform KausaLayer key on the server, or save a per-agent override, before calling tools.
+                Listing tools and health still work without a key.
+              </div>
+            )}
+            {platformBlocked && (
+              <div className="mt-4 flex items-start gap-2 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
+                <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+                This tool can expose or manage account-wide KausaLayer resources, so it needs an agent-specific key.
               </div>
             )}
             <textarea
