@@ -79,7 +79,11 @@ export function SpawnMyAgents({
     void loadAgents();
   }, [loadAgents]);
 
-  const refreshStatus = async () => {
+  useEffect(() => {
+    setStatus(null);
+  }, [payment?.reference]);
+
+  const refreshStatus = useCallback(async () => {
     const reference = payment?.reference;
     const spawnAgentId = payment?.agent_id ?? selected?.id;
     if (!reference && !spawnAgentId) return;
@@ -91,7 +95,16 @@ export function SpawnMyAgents({
       setStatus(res.data);
       if (res.data.status === 'confirmed') void loadAgents();
     }
-  };
+  }, [agentId, loadAgents, payment?.agent_id, payment?.reference, selected?.id]);
+
+  useEffect(() => {
+    if (!payment?.reference || status?.status === 'confirmed') return;
+    void refreshStatus();
+    const timer = window.setInterval(() => {
+      void refreshStatus();
+    }, 4_000);
+    return () => window.clearInterval(timer);
+  }, [payment?.reference, refreshStatus, status?.status]);
 
   const fundSpawnDeposit = async () => {
     if (!payment) return;
