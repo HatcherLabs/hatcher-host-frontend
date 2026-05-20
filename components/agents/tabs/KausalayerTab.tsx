@@ -25,6 +25,8 @@ const PLATFORM_BLOCKED_TOOLS = new Set([
   'export_pocket_key',
   'get_route_history',
   'get_transaction_history',
+  'get_maze_preferences',
+  'get_tier_info',
   'get_usage_stats',
   'kausa_gate_list',
   'kausa_gate_remove',
@@ -34,6 +36,7 @@ const PLATFORM_BLOCKED_TOOLS = new Set([
   'list_send_links',
   'remove_saved_wallet',
   'rename_pocket',
+  'save_maze_preferences',
   'sweep_all_pockets',
 ]);
 
