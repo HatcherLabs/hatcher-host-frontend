@@ -36,6 +36,7 @@ export type {
   SpawnCreateAgentBody,
   SpawnDepositBody,
   SpawnDepositResponse,
+  SpawnDna,
   SpawnEvent,
   SpawnEventsResponse,
   SpawnPaymentInstructions,
