@@ -4,7 +4,7 @@ import type { ActiveModelDisplay } from '@/lib/hosted-model-catalog';
 
 // ─── Types ───────────────────────────────────────────────────
 
-export type Tab = 'overview' | 'config' | 'integrations' | 'skills' | 'plugins' | 'files' | 'logs' | 'terminal' | 'memory' | 'sessions' | 'knowledge' | 'schedules' | 'workflows' | 'chat' | 'mail' | 'stats' | 'wallet';
+export type Tab = 'overview' | 'config' | 'integrations' | 'skills' | 'plugins' | 'files' | 'logs' | 'terminal' | 'memory' | 'sessions' | 'knowledge' | 'schedules' | 'workflows' | 'chat' | 'mail' | 'stats' | 'wallet' | 'spawn';
 
 export interface Message {
   id: string;

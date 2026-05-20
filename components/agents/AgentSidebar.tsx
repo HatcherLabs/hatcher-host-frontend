@@ -17,6 +17,7 @@ import {
   ChevronLeft,
   TerminalSquare,
   Wallet,
+  Rocket,
 } from 'lucide-react';
 import type { Tab } from './AgentContext';
 import { STATUS_STYLES, useAgentContext } from './AgentContext';
@@ -39,6 +40,7 @@ function getTabs(framework: string | undefined, tTabs: ReturnType<typeof useTran
     { id: 'chat', label: tTabs('chat'), icon: <MessageSquare size={16} />, group: 'main' },
     { id: 'mail', label: tTabs('mail'), icon: <Mail size={16} />, group: 'main' },
     { id: 'terminal', label: tTabs('terminal'), icon: <TerminalSquare size={16} />, group: 'main' },
+    { id: 'spawn' as const, label: tTabs('spawn'), icon: <Rocket size={16} />, group: 'main' as const },
     { id: 'config', label: tTabs('config'), icon: <Settings size={16} />, group: 'configure' },
     { id: 'integrations', label: tTabs('integrations'), icon: <Puzzle size={16} />, group: 'configure' },
     { id: 'plugins', label: tTabs('plugins'), icon: <Puzzle size={16} />, group: 'configure' },
