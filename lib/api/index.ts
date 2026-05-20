@@ -42,6 +42,8 @@ export type {
   SpawnEvent,
   SpawnEventsResponse,
   SpawnPaymentInstructions,
+  SpawnPortfolioResponse,
+  SpawnPortfolioToken,
   SpawnPositionsResponse,
   SpawnStatusResponse,
   SpawnTrade,

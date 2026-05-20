@@ -1,12 +1,24 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { Activity, Copy, ExternalLink, RefreshCw, Rocket, Send, Wallet } from 'lucide-react';
+import {
+  Activity,
+  BarChart3,
+  Copy,
+  ExternalLink,
+  MessageCircle,
+  Pencil,
+  RefreshCw,
+  Send,
+  UserRound,
+  Wallet,
+} from 'lucide-react';
 import { api } from '@/lib/api';
 import type {
   SpawnAgent,
   SpawnEvent,
   SpawnPaymentInstructions,
+  SpawnPortfolioResponse,
   SpawnPositionsResponse,
   SpawnStatusResponse,
   SpawnTrade,
@@ -25,6 +37,21 @@ function formatSol(value: number | null | undefined): string {
   return `${value.toLocaleString('en-US', { maximumFractionDigits: 4 })} SOL`;
 }
 
+function formatUsd(value: number | null | undefined): string {
+  if (typeof value !== 'number' || Number.isNaN(value)) return '-';
+  return value.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 });
+}
+
+function formatNumber(value: number | null | undefined): string {
+  if (typeof value !== 'number' || Number.isNaN(value)) return '-';
+  return value.toLocaleString('en-US', { maximumFractionDigits: 4 });
+}
+
+function formatPct(value: number | null | undefined): string {
+  if (typeof value !== 'number' || Number.isNaN(value)) return '-';
+  return `${value.toLocaleString('en-US', { maximumFractionDigits: 1 })}%`;
+}
+
 function formatJson(value: unknown): string {
   return JSON.stringify(value, null, 2);
 }
@@ -35,6 +62,74 @@ function solscanTx(signature: string): string {
 
 function solscanAddress(address: string): string {
   return `https://solscan.io/account/${address}`;
+}
+
+function dexscreenerToken(mint: string): string {
+  return `https://dexscreener.com/solana/${mint}`;
+}
+
+function spawnProfile(spawnAgentId: string): string {
+  return `https://spawnagents.fun/agent.html?id=${encodeURIComponent(spawnAgentId)}`;
+}
+
+function spawnChat(spawnAgentId: string): string {
+  return `https://spawnagents.fun/chat.html?agent=${encodeURIComponent(spawnAgentId)}`;
+}
+
+function spawnEdit(spawnAgentId: string): string {
+  return `https://spawnagents.fun/lab?edit=${encodeURIComponent(spawnAgentId)}`;
+}
+
+function eventData(event: SpawnEvent): Record<string, unknown> {
+  if (event.data && typeof event.data === 'object' && !Array.isArray(event.data)) return event.data;
+  if (typeof event.data !== 'string') return {};
+  try {
+    const parsed = JSON.parse(event.data);
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed as Record<string, unknown> : {};
+  } catch {
+    return {};
+  }
+}
+
+function eventTimestamp(event: SpawnEvent): number | null {
+  if (typeof event.timestamp === 'number' && Number.isFinite(event.timestamp)) return event.timestamp;
+  if (!event.created_at) return null;
+  const parsed = Date.parse(event.created_at);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function eventSummary(event: SpawnEvent): string {
+  const data = eventData(event);
+  if (event.type === 'trade') {
+    const action = typeof data.action === 'string' ? data.action : 'trade';
+    const token = typeof data.token === 'string'
+      ? data.token
+      : typeof data.mint === 'string'
+        ? short(data.mint)
+        : 'token';
+    const amount = typeof data.amount === 'number' ? formatSol(data.amount) : '';
+    return [action.toUpperCase(), token, amount].filter(Boolean).join(' ');
+  }
+  if (event.type === 'custom_agent_created') return 'Agent created';
+  if (event.type === 'execute_spawn_funded') return 'Trading capital funded';
+  if (event.type === 'execute_migration') return 'Agent wallet migrated';
+  if (event.type === 'metaplex_minted') return 'Metaplex asset minted';
+  return event.type.replace(/_/g, ' ');
+}
+
+function computeAgeDays(bornAt: string | null | undefined): string {
+  if (!bornAt) return '-';
+  const born = Date.parse(bornAt);
+  if (!Number.isFinite(born)) return '-';
+  const days = Math.max(0, Math.floor((Date.now() - born) / 86_400_000));
+  return `${days}d`;
+}
+
+function computeWinRate(trades: SpawnTrade[]): string {
+  const exits = trades.filter((trade) => String(trade.action).toLowerCase() === 'sell');
+  if (exits.length === 0) return '0%';
+  const wins = exits.filter((trade) => typeof trade.pnl_sol === 'number' && trade.pnl_sol > 0).length;
+  return formatPct((wins / exits.length) * 100);
 }
 
 export function SpawnMyAgents({
@@ -53,6 +148,8 @@ export function SpawnMyAgents({
   const [events, setEvents] = useState<SpawnEvent[]>([]);
   const [trades, setTrades] = useState<SpawnTrade[]>([]);
   const [positions, setPositions] = useState<SpawnPositionsResponse | null>(null);
+  const [portfolio, setPortfolio] = useState<SpawnPortfolioResponse | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
 
   const ownerWallet = useMemo(() => payment?.owner_wallet ?? selected?.owner_wallet ?? null, [payment, selected]);
 
@@ -129,18 +226,25 @@ export function SpawnMyAgents({
 
   const inspectAgent = async (spawnAgent: SpawnAgent) => {
     setSelected(spawnAgent);
-    const [tradesRes, positionsRes, eventsRes] = await Promise.all([
-      api.getAgentSpawnTrades(agentId, spawnAgent.id, { limit: 20 }),
-      api.getAgentSpawnPositions(agentId, spawnAgent.id),
-      api.getAgentSpawnEvents(agentId, {
-        since: Date.now() - 24 * 60 * 60 * 1000,
-        agentId: spawnAgent.id,
-        limit: 50,
-      }),
-    ]);
-    if (tradesRes.success) setTrades(tradesRes.data.trades ?? []);
-    if (positionsRes.success) setPositions(positionsRes.data);
-    if (eventsRes.success) setEvents(eventsRes.data.events ?? []);
+    setDetailLoading(true);
+    setTrades([]);
+    setPositions(null);
+    setPortfolio(null);
+    setEvents([]);
+    try {
+      const [tradesRes, positionsRes, portfolioRes, activityRes] = await Promise.all([
+        api.getAgentSpawnTrades(agentId, spawnAgent.id, { limit: 50 }),
+        api.getAgentSpawnPositions(agentId, spawnAgent.id),
+        api.getAgentSpawnPortfolio(agentId, spawnAgent.id),
+        api.getAgentSpawnActivity(agentId, spawnAgent.id, { limit: 100 }),
+      ]);
+      if (tradesRes.success) setTrades(tradesRes.data.trades ?? []);
+      if (positionsRes.success) setPositions(positionsRes.data);
+      if (portfolioRes.success) setPortfolio(portfolioRes.data);
+      if (activityRes.success) setEvents(activityRes.data.events ?? []);
+    } finally {
+      setDetailLoading(false);
+    }
   };
 
   return (
@@ -234,22 +338,112 @@ export function SpawnMyAgents({
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div>
               <h3 className="text-sm font-semibold text-[var(--text-primary)]">{selected.name}</h3>
-              <p className="mt-1 text-xs text-[var(--text-muted)]">{selected.status} - {selected.agent_type ?? 'spawn agent'}</p>
+              <p className="mt-1 text-xs text-[var(--text-muted)]">
+                {selected.status} - {selected.agent_type ?? 'spawn agent'} - {short(selected.id)}
+              </p>
             </div>
-            {selected.agent_wallet && (
-              <a href={solscanAddress(selected.agent_wallet)} target="_blank" rel="noreferrer" className="btn-secondary inline-flex items-center gap-2">
-                <ExternalLink size={14} />
-                Agent wallet
+            <div className="flex flex-wrap gap-2">
+              <a href={spawnProfile(selected.id)} target="_blank" rel="noreferrer" className="btn-secondary inline-flex items-center gap-2">
+                <UserRound size={14} />
+                Profile
               </a>
-            )}
+              <a href={spawnChat(selected.id)} target="_blank" rel="noreferrer" className="btn-secondary inline-flex items-center gap-2">
+                <MessageCircle size={14} />
+                Chat
+              </a>
+              <a href={spawnEdit(selected.id)} target="_blank" rel="noreferrer" className="btn-secondary inline-flex items-center gap-2">
+                <Pencil size={14} />
+                Edit
+              </a>
+              {selected.agent_wallet && (
+                <a href={solscanAddress(selected.agent_wallet)} target="_blank" rel="noreferrer" className="btn-secondary inline-flex items-center gap-2">
+                  <ExternalLink size={14} />
+                  Wallet
+                </a>
+              )}
+            </div>
           </div>
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <StatTile label="Portfolio value" value={formatUsd(portfolio?.total_value_usd)} />
+            <StatTile
+              label="Total PnL"
+              value={portfolio?.total_pnl_usd != null ? formatUsd(portfolio.total_pnl_usd) : formatSol(selected.total_pnl_sol)}
+              tone={(portfolio?.total_pnl_usd ?? selected.total_pnl_sol ?? 0) < 0 ? 'danger' : 'success'}
+            />
+            <StatTile label="Trades" value={String(selected.total_trades ?? trades.length)} />
+            <StatTile label="Win rate" value={computeWinRate(trades)} />
+            <StatTile label="Age" value={computeAgeDays(selected.born_at)} />
+            <StatTile label="SOL" value={formatSol(portfolio?.sol_balance)} />
+            <StatTile label="Holdings" value={String((portfolio?.tokens?.length ?? 0) + (portfolio?.pm_positions?.length ?? 0))} />
+            <StatTile label="Initial capital" value={formatSol(selected.initial_capital_sol)} />
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button type="button" disabled title="Signed Spawn command proxy not enabled yet" className="btn-secondary opacity-50">
+              Top up
+            </button>
+            <button type="button" disabled title="Signed Spawn command proxy not enabled yet" className="btn-secondary opacity-50">
+              {selected.paused ? 'Activate trading' : 'Pause trading'}
+            </button>
+            <button type="button" disabled title="Signed Spawn command proxy not enabled yet" className="btn-secondary opacity-50">
+              Reproduce
+            </button>
+            <button type="button" disabled title="Signed Spawn command proxy not enabled yet" className="btn-secondary opacity-50">
+              Withdraw
+            </button>
+          </div>
+
           <div className="mt-4 grid gap-4">
-            <DetailPanel title="Positions" empty={!positions || (!positions.memecoin?.length && !positions.prediction?.length)}>
+            <DetailPanel title="Holdings" empty={!portfolio || (!portfolio.sol_balance && !portfolio.tokens?.length && !portfolio.pm_positions?.length)}>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[520px] text-left text-xs">
+                  <thead className="text-[var(--text-muted)]">
+                    <tr className="border-b border-[var(--border-default)]">
+                      <th className="py-2 font-mono uppercase tracking-[0.12em]">Asset</th>
+                      <th className="py-2 font-mono uppercase tracking-[0.12em]">Amount</th>
+                      <th className="py-2 font-mono uppercase tracking-[0.12em]">Value</th>
+                      <th className="py-2 font-mono uppercase tracking-[0.12em]">PnL</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-[var(--border-default)]">
+                      <td className="py-2 font-medium text-[var(--text-primary)]">SOL</td>
+                      <td className="py-2 font-mono text-[var(--text-muted)]">{formatNumber(portfolio?.sol_balance)}</td>
+                      <td className="py-2 font-mono text-[var(--text-primary)]">{formatUsd(portfolio?.sol_value_usd)}</td>
+                      <td className="py-2 font-mono text-[var(--text-muted)]">-</td>
+                    </tr>
+                    {portfolio?.tokens?.map((token) => (
+                      <tr key={token.mint} className="border-b border-[var(--border-default)] last:border-0">
+                        <td className="py-2">
+                          <a href={dexscreenerToken(token.mint)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-medium text-[var(--text-primary)]">
+                            {token.symbol || short(token.mint)}
+                            <ExternalLink size={11} />
+                          </a>
+                          <div className="font-mono text-[var(--text-muted)]">{short(token.mint)}</div>
+                        </td>
+                        <td className="py-2 font-mono text-[var(--text-muted)]">{formatNumber(token.amount)}</td>
+                        <td className="py-2 font-mono text-[var(--text-primary)]">{formatUsd(token.value_usd)}</td>
+                        <td className={`py-2 font-mono ${(token.pnl_usd ?? 0) < 0 ? 'text-red-400' : 'text-emerald-400'}`}>
+                          {formatUsd(token.pnl_usd)} <span className="text-[var(--text-muted)]">{formatPct(token.pnl_pct)}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </DetailPanel>
+
+            <DetailPanel title="DNA profile" empty={!selected.dna}>
+              <DnaProfile dna={selected.dna ?? {}} />
+            </DetailPanel>
+
+            <DetailPanel title="Open strategy positions" empty={!positions || (!positions.memecoin?.length && !positions.prediction?.length)}>
               <pre className="max-h-64 overflow-auto whitespace-pre-wrap text-xs text-[var(--text-muted)]">{formatJson(positions ?? {})}</pre>
             </DetailPanel>
             <DetailPanel title="Trades" empty={trades.length === 0}>
               <div className="space-y-2">
-                {trades.slice(0, 8).map((trade) => (
+                {trades.slice(0, 12).map((trade) => (
                   <div key={String(trade.id)} className="rounded-md border border-[var(--border-default)] p-2 text-xs">
                     <div className="flex items-center justify-between gap-2">
                       <span className="font-medium text-[var(--text-primary)]">{trade.action}</span>
@@ -265,17 +459,41 @@ export function SpawnMyAgents({
                 ))}
               </div>
             </DetailPanel>
-            <DetailPanel title="Events" empty={events.length === 0}>
+            <DetailPanel title="Activity" empty={events.length === 0}>
               <div className="space-y-2">
-                {events.slice(0, 10).map((event) => (
-                  <div key={String(event.id)} className="rounded-md border border-[var(--border-default)] p-2 text-xs">
-                    <div className="font-medium text-[var(--text-primary)]">{event.type}</div>
-                    <div className="mt-1 text-[var(--text-muted)]">{new Date(event.timestamp).toLocaleString()}</div>
-                  </div>
-                ))}
+                {events.slice(0, 12).map((event) => {
+                  const data = eventData(event);
+                  const tx = typeof data.tx === 'string'
+                    ? data.tx
+                    : typeof data.funding_tx === 'string'
+                      ? data.funding_tx
+                      : null;
+                  const timestamp = eventTimestamp(event);
+                  return (
+                    <div key={String(event.id)} className="rounded-md border border-[var(--border-default)] p-2 text-xs">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-medium text-[var(--text-primary)]">{eventSummary(event)}</span>
+                        <span className="text-[var(--text-muted)]">{timestamp ? new Date(timestamp).toLocaleString() : '-'}</span>
+                      </div>
+                      <div className="mt-1 font-mono text-[var(--text-muted)]">{event.type}</div>
+                      {tx && !tx.startsWith('pending') && (
+                        <a href={solscanTx(tx)} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 text-[var(--accent)]">
+                          tx <ExternalLink size={11} />
+                        </a>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </DetailPanel>
           </div>
+
+          {detailLoading && (
+            <div className="mt-4 flex items-center gap-2 text-xs text-[var(--text-muted)]">
+              <RefreshCw size={13} className="animate-spin" />
+              Loading Spawn data...
+            </div>
+          )}
         </GlassCard>
       )}
     </div>
@@ -304,6 +522,75 @@ function InfoRow({
           </button>
         )}
       </span>
+    </div>
+  );
+}
+
+function StatTile({
+  label,
+  value,
+  tone = 'default',
+}: {
+  label: string;
+  value: string;
+  tone?: 'default' | 'success' | 'danger';
+}) {
+  const valueClass = tone === 'success'
+    ? 'text-emerald-400'
+    : tone === 'danger'
+      ? 'text-red-400'
+      : 'text-[var(--text-primary)]';
+  return (
+    <div className="rounded-md border border-[var(--border-default)] px-3 py-3">
+      <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--text-muted)]">{label}</div>
+      <div className={`mt-2 font-mono text-lg font-semibold ${valueClass}`}>{value}</div>
+    </div>
+  );
+}
+
+function DnaProfile({ dna }: { dna: Record<string, unknown> }) {
+  const rows = [
+    { key: 'aggression', label: 'Aggression', max: 1 },
+    { key: 'patience', label: 'Patience', max: 1 },
+    { key: 'risk_tolerance', label: 'Risk', max: 1 },
+    { key: 'max_position_pct', label: 'Max position', max: 100, suffix: '%' },
+    { key: 'sell_profit_pct', label: 'Take profit', max: 500, suffix: '%' },
+    { key: 'sell_loss_pct', label: 'Stop loss', max: 100, suffix: '%' },
+  ];
+  const activeModes = [
+    dna.trades_memecoins === true ? 'memecoin' : null,
+    dna.trades_prediction === true ? 'prediction' : null,
+  ].filter(Boolean);
+
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--text-muted)]">
+        <BarChart3 size={14} />
+        {activeModes.length ? activeModes.join(' + ') : 'custom DNA'}
+      </div>
+      <div className="grid gap-3 md:grid-cols-2">
+        {rows.map((row) => {
+          const raw = dna[row.key];
+          const value = typeof raw === 'number' && Number.isFinite(raw) ? raw : null;
+          const pct = value == null ? 0 : Math.max(0, Math.min(100, (value / row.max) * 100));
+          const display = value == null
+            ? '-'
+            : row.suffix
+              ? `${value.toLocaleString('en-US', { maximumFractionDigits: 2 })}${row.suffix}`
+              : formatPct(value * 100);
+          return (
+            <div key={row.key}>
+              <div className="mb-1 flex items-center justify-between gap-2 text-xs">
+                <span className="text-[var(--text-muted)]">{row.label}</span>
+                <span className="font-mono text-[var(--text-primary)]">{display}</span>
+              </div>
+              <div className="h-1.5 overflow-hidden rounded-full bg-[rgba(255,255,255,0.08)]">
+                <div className="h-full bg-[var(--accent)]" style={{ width: `${pct}%` }} />
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
