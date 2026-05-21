@@ -1275,6 +1275,7 @@
         "addons": "Extras",
         "wallet": "Wallet",
         "spawn": "Spawn",
+        "kausalayer": "KausaLayer",
         "files": "Files",
         "workspace": "Workspace",
         "schedules": "Schedules",

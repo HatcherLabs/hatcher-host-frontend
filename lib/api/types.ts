@@ -323,6 +323,56 @@ export interface SpawnDepositResponse {
   };
 }
 
+export interface KausalayerConfigStatus {
+  enabled: boolean;
+  configured: boolean;
+  baseUrl: string;
+  keySource?: 'platform' | 'agent' | 'none';
+}
+
+export interface KausalayerConfigBody {
+  enabled?: boolean;
+  apiKey?: string;
+}
+
+export interface KausalayerTool {
+  name: string;
+  description?: string;
+  inputSchema?: Record<string, unknown>;
+}
+
+export interface KausalayerToolsResponse {
+  tools: KausalayerTool[];
+}
+
+export interface KausalayerHealthResponse {
+  status?: string;
+  service?: string;
+  version?: string;
+  [key: string]: unknown;
+}
+
+export interface KausalayerCallBody {
+  tool: string;
+  arguments: Record<string, unknown>;
+}
+
+export type KausalayerCallResponse = unknown;
+
+export interface KausalayerResourceResult {
+  tool: string;
+  data: unknown | null;
+  error: string | null;
+}
+
+export interface KausalayerResourcesResponse {
+  config: KausalayerConfigStatus;
+  privateResourcesAvailable: boolean;
+  pockets: KausalayerResourceResult;
+  savedWallets: KausalayerResourceResult;
+  contacts: KausalayerResourceResult;
+}
+
 export type AgentPassportNetworkId = 'skale' | 'base' | 'solana';
 export type AgentPassportChainType = 'evm' | 'solana';
 export type AgentPassportSignerMode = 'receive-only' | 'runtime-signing' | 'planned';
