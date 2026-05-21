@@ -73,6 +73,7 @@ const PUBLIC_PREFIXES = [
   '/blog',
   '/changelog',
   '/help',
+  '/security',
   '/impressum',
   '/privacy',
   '/terms',

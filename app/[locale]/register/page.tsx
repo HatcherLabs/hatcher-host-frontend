@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import { track } from '@/lib/analytics';
 import { sanitizeLocalReturnPath } from '@/lib/safe-redirect';
+import { REFERRAL_REWARD_LABEL } from '@/lib/referral-rewards';
 import { Check, X, Gift, Loader2 } from 'lucide-react';
 import { AuthShell } from '@/components/auth/v3/AuthShell';
 
@@ -186,7 +187,7 @@ export default function RegisterPage() {
             <div className="flex items-center gap-2 px-3 py-2 mb-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
               <Gift size={14} className="text-emerald-400 flex-shrink-0" />
               <p className="text-xs text-emerald-300">
-                {t('referralBadge', { referrer: referrerUsername, credit: '100 AI Credits' })}
+                {t('referralBadge', { referrer: referrerUsername, credit: REFERRAL_REWARD_LABEL })}
               </p>
             </div>
           )}

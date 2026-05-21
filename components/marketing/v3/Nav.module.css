@@ -28,6 +28,14 @@
   color: var(--text-primary);
   text-decoration: none;
 }
+
+.brandCluster {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
 @media (max-width: 360px) {
   .brand {
     gap: 0;

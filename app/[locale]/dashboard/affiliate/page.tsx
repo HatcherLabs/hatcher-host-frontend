@@ -28,10 +28,12 @@ import {
   Flag,
   Shield,
   RefreshCw,
+  Gift,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import { useToast } from '@/components/ui/ToastProvider';
+import { REFERRAL_REWARD_LABEL } from '@/lib/referral-rewards';
 
 // ─── Types ───────────────────────────────────────────────────
 type AffiliateMe = {
@@ -72,6 +74,7 @@ type Referral = {
   referredAt: string;
   maskedEmail: string;
   isPaid: boolean;
+  rewardClaimed: boolean;
   tier: string | null;
   isFlagged: boolean;
   flagReason: string | null;
@@ -306,6 +309,7 @@ export default function AffiliateDashboardPage() {
   const tc = useTranslations('dashboard.common');
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
+  const { toast } = useToast();
 
   const [me, setMe] = useState<AffiliateMe | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
@@ -324,6 +328,7 @@ export default function AffiliateDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [claimingReferralCredits, setClaimingReferralCredits] = useState(false);
 
   // 403 → /affiliate/apply. Every other error goes to a banner so the
   // dashboard can still partially render (stats may load even if one
@@ -400,6 +405,23 @@ export default function AffiliateDashboardPage() {
     setLoading(false);
     setRefreshing(false);
   }, [gateByAffiliate, loadStats, loadReferrals, loadCommissions, loadPayouts]);
+
+  const claimReferralCredits = useCallback(async () => {
+    setClaimingReferralCredits(true);
+    try {
+      const r = await api.claimReferralRewards();
+      if (r.success) {
+        toast.success(r.data.message);
+        await Promise.all([loadStats(), loadReferrals()]);
+      } else {
+        toast.error(r.error ?? 'Could not claim AI Credits.');
+      }
+    } catch {
+      toast.error('Could not claim AI Credits.');
+    } finally {
+      setClaimingReferralCredits(false);
+    }
+  }, [loadStats, loadReferrals, toast]);
 
   useEffect(() => {
     if (isAuthenticated) loadAll();
@@ -518,6 +540,27 @@ export default function AffiliateDashboardPage() {
             <p className="text-xs text-[var(--text-muted)] mt-3">
               {t('referralLinkDesc')}
             </p>
+            <div className="mt-4 flex flex-col gap-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3 min-w-0">
+                <span className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-300">
+                  <Gift size={16} />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-emerald-300">{t('aiCreditRewardTitle')}</p>
+                  <p className="mt-1 text-xs text-[var(--text-muted)]">
+                    {t('aiCreditRewardDesc', { credit: REFERRAL_REWARD_LABEL })}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={claimReferralCredits}
+                disabled={claimingReferralCredits || referrals.length === 0}
+                className="inline-flex items-center justify-center rounded-lg border border-emerald-500/30 px-3 py-2 text-xs font-semibold text-emerald-200 transition-colors hover:bg-emerald-500/10 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {claimingReferralCredits ? t('claimingAiCredits') : t('claimAiCredits')}
+              </button>
+            </div>
           </motion.div>
         ) : null}
 
@@ -575,6 +618,7 @@ export default function AffiliateDashboardPage() {
                 <th className="text-left font-semibold px-5 py-3">Signup</th>
                 <th className="text-left font-semibold px-5 py-3">Email</th>
                 <th className="text-left font-semibold px-5 py-3">Status</th>
+                <th className="text-left font-semibold px-5 py-3">{t('aiCreditsCol')}</th>
                 <th className="text-left font-semibold px-5 py-3">Tier</th>
                 <th className="text-left font-semibold px-5 py-3"></th>
               </tr>
@@ -589,6 +633,16 @@ export default function AffiliateDashboardPage() {
                       style={{ background: r.isPaid ? 'rgba(34,197,94,0.10)' : 'var(--bg-card)' }}
                     >
                       {r.isPaid ? 'Paid' : 'Free'}
+                    </span>
+                  </td>
+                  <td className="px-5 py-3">
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide ${
+                        r.rewardClaimed ? 'text-emerald-300' : 'text-[var(--text-muted)]'
+                      }`}
+                      style={{ background: r.rewardClaimed ? 'rgba(16,185,129,0.10)' : 'var(--bg-card)' }}
+                    >
+                      {r.rewardClaimed ? t('aiCreditsClaimed') : t('aiCreditsPending')}
                     </span>
                   </td>
                   <td className="px-5 py-3 text-xs text-[var(--text-primary)] capitalize">{r.tier ?? '—'}</td>

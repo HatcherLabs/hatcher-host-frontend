@@ -9,6 +9,7 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/components/ui/ToastProvider';
 import { Link } from '@/i18n/routing';
+import { REFERRAL_REWARD_AI_CREDITS } from '@/lib/referral-rewards';
 import Image from 'next/image';
 import {
   User,
@@ -211,6 +212,7 @@ export default function SettingsPage() {
     totalReferred: number; totalEarned: number; rewardPerReferral: number;
     referrals: Array<{ username: string; date: string; rewardClaimed: boolean }>;
   } | null>(null);
+  const referralRewardLabel = `${(referralStats?.rewardPerReferral ?? REFERRAL_REWARD_AI_CREDITS).toLocaleString()} AI Credits`;
   const [claimingRewards, setClaimingRewards] = useState(false);
 
   // ── Danger state ──────────────────────────────────────────
@@ -583,7 +585,7 @@ export default function SettingsPage() {
                     {/* Referral */}
                     <Section title={t('profile.referralTitle')} icon={<Gift size={16} />} iconColor="text-emerald-400" iconBg="bg-emerald-500/15">
                       <p className="text-sm text-[var(--text-secondary)] mb-5 leading-relaxed">
-                        Invite friends to Hatcher. You both get <span className="text-emerald-400 font-semibold">100 AI Credits</span> when they create their first agent.
+                        {t('profile.referralDesc', { credit: referralRewardLabel })}
                       </p>
                       {referralCode && (
                         <div className="space-y-3 mb-5">

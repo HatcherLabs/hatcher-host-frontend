@@ -86,6 +86,7 @@ export function Footer() {
     { label: t('links.blog'),           href: '/blog', external: false },
     { label: t('links.changelog'),      href: '/changelog', external: false },
     { label: t('links.roadmap'),        href: '/roadmap', external: false },
+    { label: t('links.security'),       href: '/security', external: false },
   ];
 
   const COMMUNITY_ICONS = [

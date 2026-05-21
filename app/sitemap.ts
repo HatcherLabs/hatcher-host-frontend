@@ -29,6 +29,7 @@ const LOCALIZED_ROUTES: Array<{
   { path: '/blog', changeFrequency: 'weekly', priority: 0.7 },
   { path: '/changelog', changeFrequency: 'weekly', priority: 0.6 },
   { path: '/help', changeFrequency: 'monthly', priority: 0.5 },
+  { path: '/security', changeFrequency: 'monthly', priority: 0.5 },
   { path: '/docs', changeFrequency: 'weekly', priority: 0.6 },
   { path: '/support', changeFrequency: 'monthly', priority: 0.5 },
   { path: '/city', changeFrequency: 'daily', priority: 0.9 },
