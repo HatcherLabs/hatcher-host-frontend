@@ -259,6 +259,7 @@ export const EXTRA_PLATFORM_INTEGRATIONS: IntegrationDef[] = [
     secretPrefix: 'NOSTR',
     fields: [
       { key: 'NOSTR_PRIVATE_KEY', label: 'Private Key (nsec)', type: 'password', placeholder: 'nsec1...', helper: 'Your Nostr private key — will be encrypted at rest', required: true },
+      { key: 'NOSTR_RELAYS', label: 'Relay URLs', type: 'text', placeholder: 'wss://relay.damus.io, wss://nos.lol', helper: 'Optional comma-separated relays. Defaults are used when empty.' },
     ],
   },
   {
