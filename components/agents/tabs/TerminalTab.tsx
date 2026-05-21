@@ -72,6 +72,16 @@ interface TerminalCredentialMount {
   agentId?: string;
 }
 
+type TerminalScrollState = {
+  canScrollUp: boolean;
+  canScrollDown: boolean;
+};
+
+const EMPTY_TERMINAL_SCROLL_STATE: TerminalScrollState = {
+  canScrollUp: false,
+  canScrollDown: false,
+};
+
 function getWsUrl(agentId: string, sessionId: string, mountCredentials: boolean): string {
   const base = API_URL.replace(/^http/, 'ws');
   const params = new URLSearchParams({
@@ -196,6 +206,8 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
   const tTerminal = useTranslations('dashboard.agentDetail.terminal');
   const { agent, stats } = useAgentContext();
   const termRef = useRef<HTMLDivElement>(null);
+  const terminalFrameRef = useRef<HTMLDivElement>(null);
+  const terminalInteractionRef = useRef<HTMLDivElement>(null);
   const termInstance = useRef<InstanceType<typeof import('@xterm/xterm').Terminal> | null>(null);
   const fitAddonRef = useRef<InstanceType<typeof import('@xterm/addon-fit').FitAddon> | null>(null);
   const terminalInputRef = useRef<{ dispose: () => void } | null>(null);
@@ -208,9 +220,11 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
   const credentialEnvRef = useRef<Array<{ key: string; value: string }>>([]);
   const scrollLinesRef = useRef(loadSavedScrollLines());
   const wheelRemainderRef = useRef(0);
+  const terminalSelectedRef = useRef(false);
   const [state, setState] = useState<ConnectionState>('disconnected');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [scrollLines, setScrollLinesState] = useState(scrollLinesRef.current);
+  const [terminalScrollState, setTerminalScrollState] = useState<TerminalScrollState>(EMPTY_TERMINAL_SCROLL_STATE);
   const [terminalSessions, setTerminalSessions] = useState<TerminalSession[]>(() => [defaultTerminalSession()]);
   const [activeSessionId, setActiveSessionId] = useState(DEFAULT_TERMINAL_SESSION_ID);
   const [credentialMounts, setCredentialMounts] = useState<TerminalCredentialMount[]>([]);
@@ -245,6 +259,51 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
     if (wholeLines === 0) return 0;
     return Math.max(-configuredLines, Math.min(configuredLines, wholeLines));
   }, []);
+
+  const readTerminalScrollState = useCallback((): TerminalScrollState => {
+    const term = termInstance.current;
+    if (!term) return EMPTY_TERMINAL_SCROLL_STATE;
+    const buffer = term.buffer.active;
+    return {
+      canScrollUp: buffer.viewportY > 0,
+      canScrollDown: buffer.viewportY < buffer.baseY,
+    };
+  }, []);
+
+  const refreshTerminalScrollState = useCallback(() => {
+    const next = readTerminalScrollState();
+    setTerminalScrollState((current) => (
+      current.canScrollUp === next.canScrollUp && current.canScrollDown === next.canScrollDown
+        ? current
+        : next
+    ));
+  }, [readTerminalScrollState]);
+
+  const scrollTerminal = useCallback((action: 'line-up' | 'page-up' | 'page-down' | 'bottom') => {
+    const term = termInstance.current;
+    if (!term) return;
+    const scrollState = readTerminalScrollState();
+
+    if ((action === 'line-up' || action === 'page-up') && !scrollState.canScrollUp) return;
+    if ((action === 'page-down' || action === 'bottom') && !scrollState.canScrollDown) return;
+
+    switch (action) {
+      case 'line-up':
+        term.scrollLines(-Math.max(24, scrollLinesRef.current * 4));
+        break;
+      case 'page-up':
+        term.scrollPages(-1);
+        break;
+      case 'page-down':
+        term.scrollPages(1);
+        break;
+      case 'bottom':
+        term.scrollToBottom();
+        break;
+    }
+
+    window.requestAnimationFrame(refreshTerminalScrollState);
+  }, [readTerminalScrollState, refreshTerminalScrollState]);
 
   // Keep ref in sync with state for use inside closures
   useEffect(() => { stateRef.current = state; }, [state]);
@@ -282,24 +341,34 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
     setActiveSessionId(session.id);
   }, [updateTerminalSessions]);
 
-  const renameTerminalSession = useCallback(() => {
-    const name = window.prompt('Terminal session name', activeTerminalSession.name)?.trim();
+  const selectTerminalSession = useCallback((sessionId: string) => {
+    setActiveSessionId(sessionId);
+    updateTerminalSessions((sessions) => sessions.map((session) => (
+      session.id === sessionId ? { ...session, updatedAt: Date.now() } : session
+    )));
+  }, [updateTerminalSessions]);
+
+  const renameTerminalSession = useCallback((targetSession: TerminalSession = activeTerminalSession) => {
+    const name = window.prompt('Terminal session name', targetSession.name)?.trim();
     if (!name) return;
     updateTerminalSessions((sessions) => sessions.map((session) => (
-      session.id === activeTerminalSession.id ? { ...session, name, updatedAt: Date.now() } : session
+      session.id === targetSession.id ? { ...session, name, updatedAt: Date.now() } : session
     )));
-  }, [activeTerminalSession.id, activeTerminalSession.name, updateTerminalSessions]);
+  }, [activeTerminalSession, updateTerminalSessions]);
 
   const forkTerminalSession = useCallback(() => {
     createTerminalSession(`Fork of ${activeTerminalSession.name}`);
   }, [activeTerminalSession.name, createTerminalSession]);
 
-  const deleteTerminalSession = useCallback(() => {
+  const deleteTerminalSession = useCallback((targetSession: TerminalSession = activeTerminalSession) => {
     if (terminalSessions.length <= 1) return;
-    const nextSessions = terminalSessions.filter((session) => session.id !== activeTerminalSession.id);
+    if (!window.confirm(`Delete terminal session "${targetSession.name}"?`)) return;
+    const nextSessions = terminalSessions.filter((session) => session.id !== targetSession.id);
     updateTerminalSessions(() => nextSessions);
-    setActiveSessionId(nextSessions[0]?.id ?? DEFAULT_TERMINAL_SESSION_ID);
-  }, [activeTerminalSession.id, terminalSessions, updateTerminalSessions]);
+    if (activeSessionId === targetSession.id) {
+      setActiveSessionId(nextSessions[0]?.id ?? DEFAULT_TERMINAL_SESSION_ID);
+    }
+  }, [activeSessionId, activeTerminalSession, terminalSessions, updateTerminalSessions]);
 
   const updateCredentialMounts = useCallback((
     updater: (mounts: TerminalCredentialMount[]) => TerminalCredentialMount[],
@@ -409,25 +478,18 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
           convertEol: true,
           disableStdin: false,
         });
-        term.attachCustomWheelEventHandler((event: WheelEvent) => {
-          if (event.ctrlKey) return true;
-          const lines = consumeWheelScrollLines(event);
-          if (lines === 0) return false;
-          event.preventDefault();
-          event.stopPropagation();
-          term.scrollLines(lines);
-          return false;
-        });
-
         const fit = new FitAddon();
         const links = new WebLinksAddon();
         term.loadAddon(fit);
         term.loadAddon(links);
         term.open(termRef.current);
         fit.fit();
+        term.onScroll(refreshTerminalScrollState);
+        term.onWriteParsed(refreshTerminalScrollState);
 
         termInstance.current = term;
         fitAddonRef.current = fit;
+        refreshTerminalScrollState();
       }
 
       const term = termInstance.current;
@@ -549,7 +611,7 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
     agent?.id,
     agent?.name,
     agent?.framework,
-    consumeWheelScrollLines,
+    refreshTerminalScrollState,
     isActive,
     stopKeepAlive,
     stopReconnect,
@@ -595,24 +657,65 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
   }, [isVisible]);
 
   useEffect(() => {
-    const root = termRef.current;
+    const root = terminalInteractionRef.current;
+    if (!root) return;
+
+    const markSelected = () => {
+      terminalSelectedRef.current = true;
+    };
+    const markDeselected = (event: FocusEvent) => {
+      const nextTarget = event.relatedTarget as Node | null;
+      if (!nextTarget || !root.contains(nextTarget)) {
+        terminalSelectedRef.current = false;
+      }
+    };
+
+    root.addEventListener('pointerdown', markSelected, { capture: true });
+    root.addEventListener('focusin', markSelected);
+    root.addEventListener('focusout', markDeselected);
+    return () => {
+      root.removeEventListener('pointerdown', markSelected, { capture: true });
+      root.removeEventListener('focusin', markSelected);
+      root.removeEventListener('focusout', markDeselected);
+    };
+  }, [isActive]);
+
+  useEffect(() => {
+    const root = terminalInteractionRef.current;
     if (!root) return;
 
     const onWheel = (event: WheelEvent) => {
       if (event.ctrlKey) return;
       const term = termInstance.current;
       if (!term) return;
+
       const lines = consumeWheelScrollLines(event);
-      if (lines === 0) return;
-      event.preventDefault();
-      event.stopPropagation();
-      event.stopImmediatePropagation();
-      term.scrollLines(lines);
+      const selected = terminalSelectedRef.current || termRef.current?.contains(document.activeElement);
+      let didScroll = false;
+
+      if (lines !== 0) {
+        const scrollState = readTerminalScrollState();
+        const canScrollDirection = lines < 0 ? scrollState.canScrollUp : scrollState.canScrollDown;
+        if (canScrollDirection) {
+          term.scrollLines(lines);
+          didScroll = true;
+          window.requestAnimationFrame(refreshTerminalScrollState);
+        } else {
+          wheelRemainderRef.current = 0;
+          refreshTerminalScrollState();
+        }
+      }
+
+      if (selected || didScroll) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+      }
     };
 
     root.addEventListener('wheel', onWheel, { passive: false, capture: true });
     return () => root.removeEventListener('wheel', onWheel, { capture: true });
-  }, [consumeWheelScrollLines]);
+  }, [consumeWheelScrollLines, isActive, readTerminalScrollState, refreshTerminalScrollState]);
 
   // ── Handle resize ──
   useEffect(() => {
@@ -664,7 +767,7 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
   }
 
   return (
-    <div className="hatcher-terminal-frame flex h-[calc(100dvh-190px)] min-h-[520px] flex-col overflow-hidden border border-[var(--border-default)] bg-[#0a0a0a] lg:min-h-[620px] 2xl:h-[calc(100dvh-170px)] 2xl:min-h-[720px]">
+    <div ref={terminalFrameRef} className="hatcher-terminal-frame flex h-[calc(100dvh-190px)] min-h-[520px] flex-col overflow-hidden border border-[var(--border-default)] bg-[#0a0a0a] lg:min-h-[620px] 2xl:h-[calc(100dvh-170px)] 2xl:min-h-[720px]">
       {/* Terminal header */}
       <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--border-default)] bg-[var(--bg-elevated)]">
         <div className="flex min-w-0 items-center gap-3">
@@ -682,19 +785,9 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
           <span className="min-w-0 truncate text-xs font-mono text-[var(--text-muted)]">
             {agent.name} ({agent.framework})
           </span>
-          <label className="hidden min-w-0 items-center gap-1.5 text-[10px] font-mono text-[var(--text-muted)] lg:inline-flex">
-            Session
-            <select
-              value={activeTerminalSession.id}
-              onChange={(event) => setActiveSessionId(event.target.value)}
-              className="h-6 max-w-[160px] rounded-md border border-[var(--border-default)] bg-[#0a0a0a] px-1.5 text-[10px] text-[var(--text-secondary)] outline-none transition-colors hover:border-[var(--accent)] focus:border-[var(--accent)]"
-              title="Terminal session"
-            >
-              {terminalSessions.map((session) => (
-                <option key={session.id} value={session.id}>{session.name}</option>
-              ))}
-            </select>
-          </label>
+          <span className="hidden min-w-0 truncate rounded-md border border-[var(--border-default)] bg-[#0a0a0a] px-2 py-1 text-[10px] font-mono text-[var(--text-secondary)] md:inline">
+            {activeTerminalSession.name}
+          </span>
           <span className="hidden xl:inline-flex items-center gap-1.5 rounded-md border border-emerald-500/20 bg-emerald-500/5 px-2 py-0.5 text-[10px] font-mono text-emerald-300">
             <ShieldCheck size={11} />
             Isolated container
@@ -720,39 +813,6 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
         </div>
 
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => createTerminalSession(`Session ${terminalSessions.length + 1}`)}
-            className="hidden rounded-md border border-[var(--border-default)] bg-[var(--bg-card)] p-1.5 text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] md:inline-flex"
-            title="New terminal session"
-          >
-            <Plus size={13} />
-          </button>
-          <button
-            type="button"
-            onClick={renameTerminalSession}
-            className="hidden rounded-md border border-[var(--border-default)] bg-[var(--bg-card)] p-1.5 text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] lg:inline-flex"
-            title="Rename terminal session"
-          >
-            <Pencil size={13} />
-          </button>
-          <button
-            type="button"
-            onClick={forkTerminalSession}
-            className="hidden rounded-md border border-[var(--border-default)] bg-[var(--bg-card)] p-1.5 text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] lg:inline-flex"
-            title="Fork to a new terminal session"
-          >
-            <GitBranch size={13} />
-          </button>
-          <button
-            type="button"
-            onClick={deleteTerminalSession}
-            disabled={terminalSessions.length <= 1}
-            className="hidden rounded-md border border-[var(--border-default)] bg-[var(--bg-card)] p-1.5 text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-hover)] hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-40 lg:inline-flex"
-            title="Delete terminal session"
-          >
-            <Trash2 size={13} />
-          </button>
           <button
             type="button"
             onClick={() => setShowCredentials((current) => !current)}
@@ -870,43 +930,163 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
         </div>
       )}
 
-      {/* Terminal container */}
-      <div className="relative min-h-0 flex-1 overflow-hidden bg-[#0a0a0a] p-1">
-        <div className="absolute left-2 top-2 z-20 flex flex-col overflow-hidden rounded-md border border-[var(--border-default)] bg-black/70 backdrop-blur-sm">
-          <button
-            type="button"
-            onClick={() => termInstance.current?.scrollLines(-Math.max(24, scrollLines * 4))}
-            className="border-b border-[var(--border-default)] p-1.5 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--accent)]"
-            title="Scroll up"
-          >
-            <ChevronUp size={14} />
-          </button>
-          <button
-            type="button"
-            onClick={() => termInstance.current?.scrollLines(-Math.max(80, scrollLines * 12))}
-            className="border-b border-[var(--border-default)] p-1.5 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--accent)]"
-            title="Page up"
-          >
-            <ChevronsUp size={14} />
-          </button>
-          <button
-            type="button"
-            onClick={() => termInstance.current?.scrollLines(Math.max(80, scrollLines * 12))}
-            className="border-b border-[var(--border-default)] p-1.5 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--accent)]"
-            title="Page down"
-          >
-            <ChevronsDown size={14} />
-          </button>
-          <button
-            type="button"
-            onClick={() => termInstance.current?.scrollToBottom()}
-            className="p-1.5 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--accent)]"
-            title="Scroll to bottom"
-          >
-            <ChevronDown size={14} />
-          </button>
+      <div className="flex min-h-0 flex-1 overflow-hidden">
+        <aside className="hidden w-56 flex-shrink-0 flex-col border-r border-[var(--border-default)] bg-[#070707] lg:flex">
+          <div className="flex items-center justify-between gap-2 border-b border-[var(--border-default)] px-3 py-2">
+            <div>
+              <p className="text-[10px] font-mono font-bold uppercase tracking-[0.14em] text-[var(--text-muted)]">
+                Terminal
+              </p>
+              <p className="mt-0.5 text-[10px] font-mono text-[var(--text-muted)]">
+                {terminalSessions.length} session{terminalSessions.length === 1 ? '' : 's'}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => createTerminalSession(`Session ${terminalSessions.length + 1}`)}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[var(--border-default)] bg-[var(--bg-card)] text-[var(--text-secondary)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)]"
+              title="New terminal session"
+            >
+              <Plus size={14} />
+            </button>
+          </div>
+          <div className="min-h-0 flex-1 overflow-y-auto p-2">
+            <div className="space-y-1.5">
+              {terminalSessions.map((session, index) => {
+                const isActiveSession = session.id === activeTerminalSession.id;
+                return (
+                  <div
+                    key={session.id}
+                    className={`group rounded-md border transition-colors ${
+                      isActiveSession
+                        ? 'border-[var(--accent)] bg-[rgba(74,222,128,0.08)]'
+                        : 'border-[var(--border-default)] bg-[#0a0a0a] hover:border-[var(--border-strong)]'
+                    }`}
+                  >
+                    <div className="flex min-w-0 items-center">
+                      <button
+                        type="button"
+                        onClick={() => selectTerminalSession(session.id)}
+                        className="min-w-0 flex-1 px-2.5 py-2 text-left"
+                        title={session.name}
+                      >
+                        <span className={`block truncate text-xs font-mono font-semibold ${isActiveSession ? 'text-[var(--accent)]' : 'text-[var(--text-primary)]'}`}>
+                          {session.name || `Session ${index + 1}`}
+                        </span>
+                        <span className="mt-0.5 block truncate text-[10px] font-mono text-[var(--text-muted)]">
+                          {session.id === DEFAULT_TERMINAL_SESSION_ID ? 'primary shell' : 'isolated shell'}
+                        </span>
+                      </button>
+                      <div className="flex flex-shrink-0 items-center gap-0.5 pr-1.5 opacity-80 transition-opacity group-hover:opacity-100">
+                        <button
+                          type="button"
+                          onClick={() => renameTerminalSession(session)}
+                          className="rounded p-1.5 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"
+                          title="Rename terminal session"
+                        >
+                          <Pencil size={12} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => deleteTerminalSession(session)}
+                          disabled={terminalSessions.length <= 1}
+                          className="rounded p-1.5 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-35"
+                          title="Delete terminal session"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div className="border-t border-[var(--border-default)] p-2">
+            <button
+              type="button"
+              onClick={forkTerminalSession}
+              className="flex w-full items-center justify-center gap-1.5 rounded-md border border-[var(--border-default)] px-2 py-1.5 text-xs font-mono text-[var(--text-secondary)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)]"
+              title="Fork to a new terminal session"
+            >
+              <GitBranch size={13} />
+              Fork active
+            </button>
+          </div>
+        </aside>
+
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+          <div className="flex items-center gap-2 overflow-x-auto border-b border-[var(--border-default)] bg-[#070707] px-2 py-2 lg:hidden">
+            <button
+              type="button"
+              onClick={() => createTerminalSession(`Session ${terminalSessions.length + 1}`)}
+              className="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md border border-[var(--border-default)] bg-[var(--bg-card)] text-[var(--text-secondary)]"
+              title="New terminal session"
+            >
+              <Plus size={14} />
+            </button>
+            {terminalSessions.map((session) => (
+              <button
+                key={session.id}
+                type="button"
+                onClick={() => selectTerminalSession(session.id)}
+                className={`max-w-40 flex-shrink-0 truncate rounded-md border px-2.5 py-1.5 text-xs font-mono ${
+                  session.id === activeTerminalSession.id
+                    ? 'border-[var(--accent)] bg-[rgba(74,222,128,0.08)] text-[var(--accent)]'
+                    : 'border-[var(--border-default)] text-[var(--text-secondary)]'
+                }`}
+                title={session.name}
+              >
+                {session.name}
+              </button>
+            ))}
+          </div>
+
+          {/* Terminal container */}
+          <div ref={terminalInteractionRef} className="min-h-0 flex-1 overflow-hidden bg-[#0a0a0a] p-1">
+            <div className="flex h-full min-h-0 flex-col gap-1 sm:flex-row">
+              <div ref={termRef} className="order-2 min-h-0 min-w-0 flex-1 overflow-hidden sm:order-1 [&_.xterm-viewport]:overflow-y-auto" />
+              <div className="order-1 flex flex-shrink-0 flex-row self-end overflow-hidden rounded-md border border-[var(--border-default)] bg-black/70 backdrop-blur-sm sm:order-2 sm:flex-col sm:self-start">
+                <button
+                  type="button"
+                  onClick={() => scrollTerminal('line-up')}
+                  disabled={!terminalScrollState.canScrollUp}
+                  className="border-r border-[var(--border-default)] p-1.5 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-[var(--text-muted)] sm:border-b sm:border-r-0"
+                  title="Scroll up"
+                >
+                  <ChevronUp size={14} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scrollTerminal('page-up')}
+                  disabled={!terminalScrollState.canScrollUp}
+                  className="border-r border-[var(--border-default)] p-1.5 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-[var(--text-muted)] sm:border-b sm:border-r-0"
+                  title="Page up"
+                >
+                  <ChevronsUp size={14} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scrollTerminal('page-down')}
+                  disabled={!terminalScrollState.canScrollDown}
+                  className="border-r border-[var(--border-default)] p-1.5 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-[var(--text-muted)] sm:border-b sm:border-r-0"
+                  title="Page down"
+                >
+                  <ChevronsDown size={14} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scrollTerminal('bottom')}
+                  disabled={!terminalScrollState.canScrollDown}
+                  className="p-1.5 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-[var(--text-muted)]"
+                  title="Scroll to bottom"
+                >
+                  <ChevronDown size={14} />
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-        <div ref={termRef} className="h-full w-full overflow-hidden [&_.xterm-viewport]:overflow-y-auto" />
       </div>
 
       {/* Info banner */}

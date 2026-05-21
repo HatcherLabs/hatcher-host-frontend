@@ -23,6 +23,7 @@ type ReleaseGroup = {
 };
 
 const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION ?? '0.7.x';
+const COMPACT_APP_VERSION = APP_VERSION.split('.').slice(0, 2).join('.') || APP_VERSION;
 
 const TAG_CLASS: Record<ChangelogTag, string> = {
   frontend: 'border-cyan-500/20 bg-cyan-500/10 text-cyan-300',
@@ -40,14 +41,16 @@ function formatShipDate(value: string): string {
   });
 }
 
-function releaseLabel(index: number): string {
-  if (index === 0) return `v${APP_VERSION}`;
-  const numeric = APP_VERSION.match(/^(\d+)\.(\d+)\.(\d+)$/);
-  if (numeric) {
-    const [, major, minor, patch] = numeric;
-    return `v${major}.${minor}.${Math.max(0, Number(patch) - index)}`;
-  }
-  return index === 1 ? 'Previous release' : 'Earlier release';
+function formatReleaseLabelDate(value: string): string {
+  return new Date(value).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  });
+}
+
+function releaseLabel(index: number, date: string): string {
+  if (index === 0) return `Current v${APP_VERSION}`;
+  return `${formatReleaseLabelDate(date)} ship`;
 }
 
 function groupReleases(commits: ChangelogCommit[]): ReleaseGroup[] {
@@ -61,7 +64,7 @@ function groupReleases(commits: ChangelogCommit[]): ReleaseGroup[] {
     .sort(([a], [b]) => b.localeCompare(a))
     .slice(0, 3)
     .map(([date, items], index) => ({
-      label: releaseLabel(index),
+      label: releaseLabel(index, date),
       date,
       commits: items
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
@@ -207,11 +210,13 @@ export function VersionBadge() {
           setOpen(true);
           void loadChangelog();
         }}
-        className="inline-flex rounded-md border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold leading-none text-emerald-300 transition-colors hover:border-emerald-400/50 hover:bg-emerald-500/15"
+        className="inline-flex min-h-8 min-w-8 items-center justify-center rounded-md border border-emerald-500/25 bg-emerald-500/10 px-2 py-1 text-[10px] font-semibold leading-none text-emerald-300 transition-colors hover:border-emerald-400/50 hover:bg-emerald-500/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40 sm:px-3 sm:text-[11px]"
         style={{ fontFamily: 'var(--font-mono)' }}
-        aria-label="Open latest changelog"
+        aria-label={`Open latest Hatcher changelog, version ${APP_VERSION}`}
       >
-        v{APP_VERSION}
+        <span className="hidden min-[390px]:inline">v{APP_VERSION}</span>
+        <span className="hidden min-[340px]:inline min-[390px]:hidden">v{COMPACT_APP_VERSION}</span>
+        <span className="min-[340px]:hidden" aria-hidden>v</span>
       </button>
       {mounted ? createPortal(modal, document.body) : null}
     </>

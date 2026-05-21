@@ -137,12 +137,12 @@ function AgentSwitcher({
   }, [open]);
 
   const triggerClass = variant === 'desktop'
-    ? 'group flex w-full min-w-0 items-center gap-1.5 text-left text-sm font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--accent)]'
-    : 'group flex min-w-0 flex-1 items-center gap-1.5 text-left text-xs font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--accent)]';
+    ? 'group flex min-h-7 w-full min-w-0 items-center gap-2 rounded-[3px] text-left text-sm font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--accent)]'
+    : 'group flex min-h-7 min-w-0 flex-1 items-center gap-2 rounded-[3px] text-left text-xs font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--accent)]';
 
   const menuClass = variant === 'desktop'
-    ? 'absolute left-0 right-0 top-[calc(100%+8px)] z-50 max-h-[340px] overflow-y-auto rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-elevated)] p-1 shadow-2xl shadow-black/40'
-    : 'absolute left-0 right-0 top-[calc(100%+10px)] z-50 max-h-[60vh] overflow-y-auto rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-elevated)] p-1 shadow-2xl shadow-black/50';
+    ? 'absolute left-0 top-[calc(100%+8px)] z-50 w-[min(28rem,calc(100vw-2rem))] max-h-[340px] overflow-y-auto rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-elevated)] p-1 shadow-2xl shadow-black/40'
+    : 'absolute left-0 top-[calc(100%+10px)] z-50 w-[min(24rem,calc(100vw-1.5rem))] max-h-[60vh] overflow-y-auto rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-elevated)] p-1 shadow-2xl shadow-black/50';
 
   return (
     <div ref={rootRef} className={`relative min-w-0 ${variant === 'mobile' ? 'flex-1' : 'w-full'}`}>
@@ -157,15 +157,23 @@ function AgentSwitcher({
         style={{ fontFamily: 'var(--font-mono)' }}
       >
         <span className="min-w-0 truncate">{agent.name}</span>
-        {agentsLoading ? (
-          <span className="h-3 w-3 flex-shrink-0 rounded-full border border-[var(--border-default)] border-t-[var(--accent)] animate-spin" aria-hidden />
-        ) : (
-          <ChevronDown
-            size={variant === 'desktop' ? 13 : 12}
-            className={`flex-shrink-0 text-[var(--text-muted)] transition-transform ${open ? 'rotate-180 text-[var(--accent)]' : canSwitch ? 'group-hover:text-[var(--accent)]' : 'opacity-30'}`}
-            aria-hidden
-          />
-        )}
+        <span className={`ml-auto inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-[3px] border transition-colors ${
+          open
+            ? 'border-[var(--accent)] bg-[rgba(74,222,128,0.08)] text-[var(--accent)]'
+            : canSwitch
+              ? 'border-[var(--border-default)] text-[var(--text-muted)] group-hover:border-[var(--accent)] group-hover:text-[var(--accent)]'
+              : 'border-[var(--border-default)] text-[var(--text-muted)] opacity-40'
+        }`}>
+          {agentsLoading ? (
+            <span className="h-3 w-3 rounded-full border border-current border-t-transparent animate-spin" aria-hidden />
+          ) : (
+            <ChevronDown
+              size={14}
+              className={`transition-transform ${open ? 'rotate-180' : ''}`}
+              aria-hidden
+            />
+          )}
+        </span>
       </button>
 
       {open && canSwitch && (
@@ -497,7 +505,7 @@ export const AgentSidebar = memo(function AgentSidebar({ agent, agents, agentsLo
       </div>
 
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex flex-col w-56 xl:w-60 flex-shrink-0 border-r border-[var(--border-default)] bg-[var(--bg-base)] min-h-screen sticky top-0 max-h-screen overflow-hidden">
+      <aside className="hidden lg:flex flex-col w-56 xl:w-60 flex-shrink-0 border-r border-[var(--border-default)] bg-[var(--bg-base)] min-h-screen sticky top-0 max-h-screen overflow-visible">
         {navContent}
       </aside>
     </>

@@ -36,6 +36,20 @@
   flex: 0 0 auto;
 }
 
+@media (max-width: 600px) {
+  .brandCluster {
+    gap: 6px;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .brand {
+    font-size: 13px;
+    letter-spacing: 0.12em;
+  }
+}
+
 @media (max-width: 360px) {
   .brand {
     gap: 0;
@@ -440,10 +454,7 @@
 
 @media (max-width: 600px) {
   .cta {
-    max-width: none;
-    padding: 9px 9px;
-    font-size: 10px;
-    line-height: 1;
+    display: none;
   }
 
   .cursor {

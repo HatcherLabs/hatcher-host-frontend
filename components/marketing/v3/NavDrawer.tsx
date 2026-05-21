@@ -37,6 +37,16 @@ export function NavDrawer({ open, onClose }: Props) {
   return (
     <div className={styles.drawer} role="dialog" aria-modal="true" aria-label="Site menu">
       <div className={styles.scroll}>
+        <div className={styles.marketRow}>
+          <HatcherMarketStatus variant="drawer" onNavigate={onClose} />
+        </div>
+
+        {!authLoading && isAuthenticated && (
+          <div className={styles.creditRow}>
+            <AiCreditStatus variant="drawer" onNavigate={onClose} />
+          </div>
+        )}
+
         {NAV_GROUPS.map((g) => (
           <section key={g.key} className={styles.section}>
             <h3 className={styles.head}>{tGroups(g.labelKey)}</h3>
@@ -59,16 +69,6 @@ export function NavDrawer({ open, onClose }: Props) {
         <div className={styles.localeRow}>
           <LocaleSwitcher align="start" side="top" />
         </div>
-
-        <div className={styles.marketRow}>
-          <HatcherMarketStatus variant="drawer" onNavigate={onClose} />
-        </div>
-
-        {!authLoading && isAuthenticated && (
-          <div className={styles.creditRow}>
-            <AiCreditStatus variant="drawer" onNavigate={onClose} />
-          </div>
-        )}
 
         <div className={styles.bottom}>
           {authLoading ? null : isAuthenticated ? (

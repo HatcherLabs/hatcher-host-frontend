@@ -42,12 +42,16 @@
   align-items: center;
 }
 
-.creditRow {
-  padding: 8px 0 16px;
+.marketRow {
+  padding: 0 0 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border-line);
 }
 
-.marketRow {
-  padding: 8px 0 8px;
+.creditRow {
+  padding: 0 0 16px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid var(--border-line);
 }
 
 .bottom {
