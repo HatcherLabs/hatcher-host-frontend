@@ -1103,8 +1103,13 @@ button, a, [role="tab"] {
   .v3-scanline::after { display: none; }
 }
 
+.hatcher-terminal-frame {
+  overscroll-behavior: contain;
+}
+
 .hatcher-terminal-frame .xterm-viewport {
   overflow-y: scroll !important;
+  overscroll-behavior: contain;
   scrollbar-color: rgba(0, 255, 65, 0.55) #050505;
   scrollbar-width: thin;
 }

@@ -5,6 +5,7 @@
 
 .drawerRoot {
   width: 100%;
+  flex-direction: column;
 }
 
 .trigger {
@@ -103,6 +104,7 @@
   right: 0;
   z-index: 10020;
   width: 310px;
+  max-width: calc(100vw - 24px);
   border: 1px solid var(--border-default);
   border-radius: 6px;
   background: color-mix(in srgb, var(--bg-card) 96%, transparent);
@@ -259,5 +261,22 @@
     right: 12px;
     left: 12px;
     width: auto;
+    max-height: calc(100dvh - 84px);
+    overflow-y: auto;
   }
+}
+
+.drawerRoot .popover {
+  position: static;
+  width: 100%;
+  max-width: none;
+  max-height: none;
+  margin-top: 8px;
+  overflow: visible;
+  box-shadow: none;
+  background: color-mix(in srgb, var(--bg-elevated) 74%, transparent);
+}
+
+.drawerRoot .popover::before {
+  display: none;
 }
