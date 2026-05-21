@@ -1,7 +1,9 @@
 'use client';
 
-import { useRef, useEffect, memo } from 'react';
+import { useRef, useEffect, memo, useMemo, useState } from 'react';
 import {
+  Check,
+  ChevronDown,
   Mail,
   MessageSquare,
   Settings,
@@ -70,13 +72,163 @@ const FRAMEWORK_COLOR: Record<string, string> = {
 
 interface AgentSidebarProps {
   agent: Agent;
+  agents?: Agent[];
+  agentsLoading?: boolean;
   activeTab: Tab;
   onTabChange: (tab: Tab) => void;
 }
 
 const EASY_TABS: Tab[] = ['overview', 'chat', 'mail', 'integrations', 'logs', 'stats'];
 
-export const AgentSidebar = memo(function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProps) {
+function agentDashboardHref(agentId: string, activeTab: Tab): string {
+  return activeTab === 'overview'
+    ? `/dashboard/agent/${agentId}`
+    : `/dashboard/agent/${agentId}?tab=${activeTab}`;
+}
+
+function mergeSwitcherAgents(currentAgent: Agent, agents: Agent[] | undefined): Agent[] {
+  const byId = new Map<string, Agent>();
+  for (const item of agents ?? []) {
+    byId.set(item.id, item.id === currentAgent.id ? { ...item, ...currentAgent } : item);
+  }
+  byId.set(currentAgent.id, byId.has(currentAgent.id) ? { ...byId.get(currentAgent.id)!, ...currentAgent } : currentAgent);
+  return Array.from(byId.values()).sort((a, b) => {
+    if (a.id === currentAgent.id) return -1;
+    if (b.id === currentAgent.id) return 1;
+    return a.name.localeCompare(b.name);
+  });
+}
+
+function AgentSwitcher({
+  agent,
+  agents,
+  agentsLoading,
+  activeTab,
+  variant,
+}: {
+  agent: Agent;
+  agents?: Agent[];
+  agentsLoading?: boolean;
+  activeTab: Tab;
+  variant: 'desktop' | 'mobile';
+}) {
+  const tSidebar = useTranslations('dashboard.agentDetail.sidebar');
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const switcherAgents = useMemo(() => mergeSwitcherAgents(agent, agents), [agent, agents]);
+  const canSwitch = switcherAgents.length > 1;
+
+  useEffect(() => {
+    if (!open) return;
+    function onPointerDown(event: MouseEvent | TouchEvent) {
+      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+    }
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') setOpen(false);
+    }
+    document.addEventListener('mousedown', onPointerDown);
+    document.addEventListener('touchstart', onPointerDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown);
+      document.removeEventListener('touchstart', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [open]);
+
+  const triggerClass = variant === 'desktop'
+    ? 'group flex w-full min-w-0 items-center gap-1.5 text-left text-sm font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--accent)]'
+    : 'group flex min-w-0 flex-1 items-center gap-1.5 text-left text-xs font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--accent)]';
+
+  const menuClass = variant === 'desktop'
+    ? 'absolute left-0 right-0 top-[calc(100%+8px)] z-50 max-h-[340px] overflow-y-auto rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-elevated)] p-1 shadow-2xl shadow-black/40'
+    : 'absolute left-0 right-0 top-[calc(100%+10px)] z-50 max-h-[60vh] overflow-y-auto rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-elevated)] p-1 shadow-2xl shadow-black/50';
+
+  return (
+    <div ref={rootRef} className={`relative min-w-0 ${variant === 'mobile' ? 'flex-1' : 'w-full'}`}>
+      <button
+        type="button"
+        className={triggerClass}
+        onClick={() => canSwitch && setOpen((value) => !value)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label={tSidebar('switchAgent')}
+        disabled={!canSwitch}
+        style={{ fontFamily: 'var(--font-mono)' }}
+      >
+        <span className="min-w-0 truncate">{agent.name}</span>
+        {agentsLoading ? (
+          <span className="h-3 w-3 flex-shrink-0 rounded-full border border-[var(--border-default)] border-t-[var(--accent)] animate-spin" aria-hidden />
+        ) : (
+          <ChevronDown
+            size={variant === 'desktop' ? 13 : 12}
+            className={`flex-shrink-0 text-[var(--text-muted)] transition-transform ${open ? 'rotate-180 text-[var(--accent)]' : canSwitch ? 'group-hover:text-[var(--accent)]' : 'opacity-30'}`}
+            aria-hidden
+          />
+        )}
+      </button>
+
+      {open && canSwitch && (
+        <div className={menuClass} role="menu" aria-label={tSidebar('switchAgent')}>
+          <div className="px-2 py-1.5 text-[9px] font-bold uppercase tracking-[0.14em] text-[var(--text-muted)]" style={{ fontFamily: 'var(--font-mono)' }}>
+            {tSidebar('switchAgent')}
+          </div>
+          {switcherAgents.map((item) => {
+            const isCurrent = item.id === agent.id;
+            const itemFrameworkColor = FRAMEWORK_COLOR[item.framework] ?? 'var(--text-muted)';
+            const itemStatus = STATUS_STYLES[item.status] ?? STATUS_STYLES.paused;
+            return (
+              <Link
+                key={item.id}
+                href={agentDashboardHref(item.id, activeTab)}
+                role="menuitem"
+                aria-current={isCurrent ? 'page' : undefined}
+                onClick={() => setOpen(false)}
+                className={`flex min-w-0 items-center gap-2 rounded-[3px] px-2 py-2 text-left transition-colors ${
+                  isCurrent
+                    ? 'bg-[rgba(74,222,128,0.08)] text-[var(--accent)]'
+                    : 'text-[var(--text-secondary)] hover:bg-[var(--bg-base)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                {item.avatarUrl ? (
+                  <Image
+                    src={item.avatarUrl}
+                    alt=""
+                    width={28}
+                    height={28}
+                    unoptimized
+                    className="h-7 w-7 flex-shrink-0 rounded-[3px] border border-[var(--border-default)] object-cover"
+                  />
+                ) : (
+                  <span
+                    className="h-7 w-7 flex-shrink-0 rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-base)] inline-flex items-center justify-center"
+                    style={{ color: itemFrameworkColor, fontFamily: 'var(--font-mono)' }}
+                    aria-hidden
+                  >
+                    {FRAMEWORK_GLYPH[item.framework] ?? '◇'}
+                  </span>
+                )}
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-xs font-bold" style={{ fontFamily: 'var(--font-mono)' }}>
+                    {item.name}
+                  </span>
+                  <span className="mt-0.5 flex min-w-0 items-center gap-1.5 text-[9px] uppercase tracking-[0.06em] text-[var(--text-muted)]" style={{ fontFamily: 'var(--font-mono)' }}>
+                    <span className="truncate">{item.framework}</span>
+                    <span className="h-1 w-1 flex-shrink-0 rounded-full bg-current opacity-40" aria-hidden />
+                    <span className="truncate">{itemStatus.label}</span>
+                  </span>
+                </span>
+                {isCurrent && <Check size={13} className="flex-shrink-0 text-[var(--accent)]" aria-hidden />}
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export const AgentSidebar = memo(function AgentSidebar({ agent, agents, agentsLoading, activeTab, onTabChange }: AgentSidebarProps) {
   const { viewMode } = useAgentContext();
   const tTabs = useTranslations('dashboard.agentDetail.tabs');
   const tSidebarGroups = useTranslations('dashboard.agentDetail.sidebarGroups');
@@ -145,7 +297,13 @@ export const AgentSidebar = memo(function AgentSidebar({ agent, activeTab, onTab
             </span>
           )}
           <div className="min-w-0 flex-1">
-            <h2 className="text-sm font-bold text-[var(--text-primary)] truncate" style={{ fontFamily: 'var(--font-mono)' }}>{agent.name}</h2>
+            <AgentSwitcher
+              agent={agent}
+              agents={agents}
+              agentsLoading={agentsLoading}
+              activeTab={activeTab}
+              variant="desktop"
+            />
             <div className="flex items-center gap-2 mt-1">
               <span
                 className="text-[9px] px-1.5 py-px rounded-[3px] border uppercase font-bold tracking-[0.06em]"
@@ -275,12 +433,13 @@ export const AgentSidebar = memo(function AgentSidebar({ agent, activeTab, onTab
               {frameworkGlyph}
             </span>
           )}
-          <span
-            className="text-xs font-bold text-[var(--text-primary)] truncate min-w-0"
-            style={{ fontFamily: 'var(--font-mono)' }}
-          >
-            {agent.name}
-          </span>
+          <AgentSwitcher
+            agent={agent}
+            agents={agents}
+            agentsLoading={agentsLoading}
+            activeTab={activeTab}
+            variant="mobile"
+          />
           <span
             className={`ml-auto inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-[3px] border uppercase font-bold tracking-[0.06em] ${statusToneClass}`}
             style={{ fontFamily: 'var(--font-mono)' }}

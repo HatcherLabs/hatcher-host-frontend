@@ -87,6 +87,7 @@ export const FOOTER_COLUMNS = [
       { labelKey: 'itemBlog',      href: '/blog' as Href },
       { labelKey: 'itemRoadmap',   href: '/roadmap' as Href },
       { labelKey: 'itemChangelog', href: '/changelog' as Href },
+      { labelKey: 'itemSecurity',  href: '/security' as Href },
     ],
   },
   {

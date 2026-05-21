@@ -17,6 +17,7 @@ import {
 import { DOCS_URL } from '@/lib/config';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
 import { LocaleSwitcher } from './LocaleSwitcher';
+import { VersionBadge } from './VersionBadge';
 
 function isActive(pathname: string, href: string) {
   if (pathname === href) return true;
@@ -244,6 +245,7 @@ export function Header() {
                 </span>
               </span>
             </Link>
+            <VersionBadge />
 
             {isAdmin && (
               <Link

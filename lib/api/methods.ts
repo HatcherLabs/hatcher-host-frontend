@@ -2185,6 +2185,7 @@ export const api = {
         referredAt: string;
         maskedEmail: string;
         isPaid: boolean;
+        rewardClaimed: boolean;
         tier: string | null;
         isFlagged: boolean;
         flagReason: string | null;

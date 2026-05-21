@@ -12,6 +12,7 @@ import { NavDrawer } from './NavDrawer';
 import { LocaleSwitcher } from '@/components/layout/LocaleSwitcher';
 import { AiCreditStatus } from '@/components/layout/AiCreditStatus';
 import { HatcherMarketStatus } from '@/components/layout/HatcherMarketStatus';
+import { VersionBadge } from '@/components/layout/VersionBadge';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
@@ -121,10 +122,13 @@ export function Nav() {
     <>
       <nav className={styles.nav} ref={navRef}>
         <div className={styles.inner}>
-          <Link href="/" className={styles.brand}>
-            <BrandGlyph />
-            HATCHER
-          </Link>
+          <div className={styles.brandCluster}>
+            <Link href="/" className={styles.brand}>
+              <BrandGlyph />
+              HATCHER
+            </Link>
+            <VersionBadge />
+          </div>
 
           <div className={styles.groups}>
             {NAV_GROUPS.map((g) => (

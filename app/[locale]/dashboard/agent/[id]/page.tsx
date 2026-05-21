@@ -188,6 +188,8 @@ export default function AgentManagePage() {
 
   // Core state
   const [agent, setAgent] = useState<Agent | null>(null);
+  const [ownedAgents, setOwnedAgents] = useState<Agent[]>([]);
+  const [ownedAgentsLoading, setOwnedAgentsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const statusPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const validTabs: Tab[] = ['overview','config','integrations','skills','plugins','files','logs','terminal','memory','sessions','knowledge','schedules','workflows','chat','mail','stats','wallet','spawn'];
@@ -304,6 +306,16 @@ export default function AgentManagePage() {
     }
   }, [id, isAuthenticated]);
 
+  const loadOwnedAgents = useCallback(async () => {
+    if (!isAuthenticated) return;
+    setOwnedAgentsLoading(true);
+    const res = await api.getMyAgents();
+    setOwnedAgentsLoading(false);
+    if (res.success && Array.isArray(res.data)) {
+      setOwnedAgents(res.data);
+    }
+  }, [isAuthenticated]);
+
   const loadFeatures = useCallback(async () => {
     setFeaturesLoading(true);
     const res = await api.getAgentFeatures(id);
@@ -350,7 +362,8 @@ export default function AgentManagePage() {
       return;
     }
     loadAgent();
-  }, [authLoading, id, isAuthenticated, loadAgent, router]);
+    loadOwnedAgents();
+  }, [authLoading, id, isAuthenticated, loadAgent, loadOwnedAgents, router]);
 
   useEffect(() => { sendingRef.current = sending; }, [sending]);
 
@@ -1200,7 +1213,13 @@ export default function AgentManagePage() {
         animate="visible"
       >
         {/* ─── Sidebar (desktop) / Horizontal tabs (mobile) ── */}
-        <AgentSidebar agent={agent} activeTab={tab} onTabChange={setTab} />
+        <AgentSidebar
+          agent={agent}
+          agents={ownedAgents}
+          agentsLoading={ownedAgentsLoading}
+          activeTab={tab}
+          onTabChange={setTab}
+        />
 
         {/* ─── Main Content ─────────────────────────────────── */}
         <div className="flex-1 min-w-0 flex flex-col bg-[var(--bg-base)]">

@@ -10,6 +10,7 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
+import { REFERRAL_REWARD_LABEL } from '@/lib/referral-rewards';
 
 const FAQS: Array<{ q: string; a: string }> = [
   {
@@ -35,6 +36,10 @@ const FAQS: Array<{ q: string; a: string }> = [
   {
     q: 'What exactly counts as a commissionable payment?',
     a: 'Every paid tier subscription (Starter, Pro, Business), eligible extra AI Credit purchases, and the one-time Founding Member purchase. Free-tier usage earns nothing. BYOK usage also earns nothing since it is paid directly to the provider.',
+  },
+  {
+    q: 'Do affiliate referrals also get AI Credits?',
+    a: `Yes. Affiliate links use the same referral reward: when a referred user creates their first agent, both accounts receive ${REFERRAL_REWARD_LABEL}. Paid purchases from that user still earn the affiliate cash commissions separately.`,
   },
 ];
 

@@ -14,6 +14,7 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { buildLanguagesMap } from '@/lib/seo';
+import { REFERRAL_REWARD_LABEL } from '@/lib/referral-rewards';
 import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 import {
   ArrowRight,
@@ -31,7 +32,7 @@ import { AffiliateFAQ } from './faq-client';
 export const metadata: Metadata = {
   title: 'Affiliate Program — Hatcher',
   description:
-    'Earn 20% recurring cash commissions referring developers and AI builders to Hatcher. Flat $20 cash bonus on every Founding Member signup.',
+    'Earn 20% recurring cash commissions referring developers and AI builders to Hatcher. Both accounts also get 500 AI Credits after the referred user creates their first agent.',
   alternates: {
     canonical: '/affiliate',
     languages: buildLanguagesMap('/affiliate'),
@@ -39,7 +40,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Affiliate Program — Hatcher',
     description:
-      '20% recurring cash commissions. Flat $20 on every Founding Member. Apply in minutes.',
+      '20% recurring cash commissions plus a 500 AI Credits referral reward for both accounts. Apply in minutes.',
     type: 'website',
   },
 };
@@ -96,7 +97,7 @@ const HOW_IT_WORKS = [
   {
     step: '03',
     title: 'Share your link',
-    body: 'Once approved you get a 6-char referral code and a share link. Anyone who signs up through it is permanently attributed to you.',
+    body: `Once approved you get a 6-char referral code and a share link. Anyone who signs up through it is permanently attributed to you, and both accounts get ${REFERRAL_REWARD_LABEL} after the referred user creates their first agent.`,
     icon: Share2,
   },
   {

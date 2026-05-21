@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSearchParams } from 'next/navigation';
 import {
   Zap,
   Lock,
@@ -11,12 +12,24 @@ import {
   ChevronDown,
   ChevronUp,
   AlertTriangle,
+  Bot,
+  Brain,
+  Code2,
+  DollarSign,
+  Download,
+  Gauge,
   RefreshCw,
   History,
+  Info,
   RotateCcw,
+  ShieldCheck,
+  Star,
+  Trash2,
+  Upload,
   Globe2,
   MessageSquare,
   Search,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { BYOK_PROVIDERS } from '@hatcher/shared';
 import { api } from '@/lib/api';
@@ -24,7 +37,6 @@ import {
   HOSTED_MODEL_PROVIDERS,
   HOSTED_MODELS,
   createSavedHostedModelOption,
-  filterHostedModels,
   getHostedModelOption,
   hostedCostEstimate,
   hostedCostRank,
@@ -79,6 +91,140 @@ type EnvVarEntry = {
   visible: boolean;
 };
 
+type ModelSortKey = 'name' | 'provider' | 'context' | 'cost' | 'privacy';
+type SortDirection = 'asc' | 'desc';
+type ModelPreset = {
+  id: string;
+  name: string;
+  description: string;
+  provider: string;
+  model: string;
+  useCustomModel: boolean;
+  customModelInput: string;
+  favorite: boolean;
+  createdAt: number;
+  updatedAt: number;
+};
+
+type ConfigSubtab = 'general' | 'ai-models' | 'public-access' | 'advanced';
+
+const CONFIG_SUBTABS: Array<{
+  id: ConfigSubtab;
+  label: string;
+  description: string;
+}> = [
+  { id: 'general', label: 'General', description: 'Identity and positioning' },
+  { id: 'ai-models', label: 'AI Models', description: 'Providers, models and keys' },
+  { id: 'public-access', label: 'Public Access', description: 'Profile and public chat' },
+  { id: 'advanced', label: 'Advanced', description: 'Env vars and history' },
+];
+
+const MODEL_PRESETS_STORAGE_KEY = 'hatcher-model-presets-v1';
+
+const HOSTED_TAG_OPTIONS: HostedModelTag[] = [
+  'fast',
+  'low cost',
+  'balanced',
+  'coding',
+  'reasoning',
+  'long context',
+  'fixed price',
+  'privacy',
+];
+
+const COST_GRADES: Array<{
+  rank: number;
+  cost: HostedModelCost;
+  label: string;
+  detail: string;
+}> = [
+  { rank: 1, cost: 'Low', label: 'Low', detail: '1-5 credits' },
+  { rank: 2, cost: 'Medium', label: 'Medium', detail: '5-25 credits' },
+  { rank: 3, cost: 'High', label: 'High', detail: '25-100 credits' },
+  { rank: 4, cost: 'Premium', label: 'Premium', detail: '100+ credits' },
+  { rank: 5, cost: 'Variable', label: 'Variable', detail: 'router priced' },
+];
+
+const PROVIDER_GLYPH: Record<string, string> = {
+  deepseek: 'D',
+  openai: '◎',
+  anthropic: 'A',
+  idle: 'ID',
+  google: 'G',
+  qwen: 'Q',
+  'x-ai': 'X',
+  mistralai: 'M',
+  moonshotai: 'K',
+  'z-ai': 'Z',
+  nvidia: 'N',
+  openrouter: 'OR',
+};
+
+function normalizeConfigSubtab(value: string | null): ConfigSubtab {
+  return CONFIG_SUBTABS.some((tab) => tab.id === value) ? (value as ConfigSubtab) : 'general';
+}
+
+function contextToTokens(context: string): number {
+  const normalized = context.trim().toUpperCase();
+  const match = normalized.match(/^(\d+(?:\.\d+)?)(K|M)$/);
+  if (!match) return 0;
+  const value = Number(match[1]);
+  return value * (match[2] === 'M' ? 1_000_000 : 1_000);
+}
+
+function formatContextTokens(tokens: number): string {
+  if (!Number.isFinite(tokens) || tokens <= 0) return 'provider-defined';
+  if (tokens >= 1_000_000) return `${Number((tokens / 1_000_000).toFixed(2)).toLocaleString()}M`;
+  return `${Math.round(tokens / 1_000).toLocaleString()}K`;
+}
+
+function modelPresetId(): string {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return crypto.randomUUID();
+  return `preset-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function isModelPreset(value: unknown): value is ModelPreset {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const source = value as Record<string, unknown>;
+  return typeof source.id === 'string'
+    && typeof source.name === 'string'
+    && typeof source.provider === 'string'
+    && typeof source.model === 'string';
+}
+
+function sanitizeModelPreset(value: ModelPreset): ModelPreset {
+  return {
+    id: value.id,
+    name: value.name,
+    description: value.description ?? '',
+    provider: value.provider,
+    model: value.model,
+    useCustomModel: Boolean(value.useCustomModel),
+    customModelInput: value.customModelInput ?? '',
+    favorite: Boolean(value.favorite),
+    createdAt: Number(value.createdAt) || Date.now(),
+    updatedAt: Number(value.updatedAt) || Date.now(),
+  };
+}
+
+function tagIcon(tag: HostedModelTag) {
+  switch (tag) {
+    case 'coding':
+      return <Code2 className="h-3 w-3" />;
+    case 'reasoning':
+      return <Brain className="h-3 w-3" />;
+    case 'fast':
+      return <Gauge className="h-3 w-3" />;
+    case 'low cost':
+    case 'fixed price':
+      return <DollarSign className="h-3 w-3" />;
+    case 'privacy':
+      return <ShieldCheck className="h-3 w-3" />;
+    default:
+      return <Bot className="h-3 w-3" />;
+  }
+}
+
 function hostedCostClass(cost: HostedModelCost): string {
   switch (cost) {
     case 'Low':
@@ -95,6 +241,7 @@ function hostedCostClass(cost: HostedModelCost): string {
 }
 
 export function ConfigTab() {
+  const searchParams = useSearchParams();
   const {
     agent,
     configName,
@@ -129,12 +276,18 @@ export function ConfigTab() {
 
   const [commitMessage, setCommitMessage] = useState('');
   const [aiCreditBalance, setAiCreditBalance] = useState<AiCreditBalance | null>(null);
-  const [showAdvancedTools, setShowAdvancedTools] = useState(false);
+  const [activeConfigSubtab, setActiveConfigSubtab] = useState<ConfigSubtab>('general');
   const [modelSearch, setModelSearch] = useState('');
-  const [modelTagFilter, setModelTagFilter] = useState<HostedModelTag | 'all'>('all');
-  const [modelCostFilter, setModelCostFilter] = useState<HostedModelCost | 'all'>('all');
+  const [selectedProviderFilters, setSelectedProviderFilters] = useState<string[]>([]);
+  const [selectedTagFilters, setSelectedTagFilters] = useState<HostedModelTag[]>([]);
+  const [modelCostRange, setModelCostRange] = useState<[number, number]>([1, 5]);
   const [modelPrivacyFilter, setModelPrivacyFilter] = useState<HostedModelPrivacy | 'all'>('all');
-  const [hostedProviderFilter, setHostedProviderFilter] = useState<string>('all');
+  const [modelSort, setModelSort] = useState<{ key: ModelSortKey; direction: SortDirection }>({ key: 'name', direction: 'asc' });
+  const [modelPresets, setModelPresets] = useState<ModelPreset[]>([]);
+  const [presetName, setPresetName] = useState('');
+  const [presetDescription, setPresetDescription] = useState('');
+  const [presetImportError, setPresetImportError] = useState<string | null>(null);
+  const presetImportRef = useRef<HTMLInputElement | null>(null);
 
   const hostedProvider = 'openrouter';
   const isHostedMode = configProvider === hostedProvider;
@@ -153,6 +306,11 @@ export function ConfigTab() {
       },
     [selectedHostedModel.provider, selectedHostedModel.providerKey],
   );
+  const maxHostedContextTokens = useMemo(
+    () => Math.max(...HOSTED_MODELS.map((model) => contextToTokens(model.context)), contextToTokens(selectedHostedModel.context)),
+    [selectedHostedModel.context],
+  );
+  const selectedHostedContextTokens = contextToTokens(selectedHostedModel.context);
   const savedModelConfig = useMemo(
     () => resolveLoadedModelConfig((agent.config ?? {}) as Record<string, unknown>),
     [agent.config],
@@ -167,19 +325,70 @@ export function ConfigTab() {
       : [...HOSTED_MODEL_PROVIDERS, selectedHostedProvider],
     [selectedHostedProvider],
   );
-  const modelCostRankFilter = modelCostFilter === 'all' ? undefined : hostedCostRank(modelCostFilter);
   const filteredHostedModels = useMemo(
-    () => filterHostedModels({
-      provider: hostedProviderFilter === 'all' ? undefined : hostedProviderFilter,
-      tag: modelTagFilter,
-      privacy: modelPrivacyFilter,
-      maxCostRank: modelCostRankFilter,
-      search: modelSearch,
-    }),
-    [hostedProviderFilter, modelCostRankFilter, modelPrivacyFilter, modelSearch, modelTagFilter],
+    () => {
+      const needle = modelSearch.trim().toLowerCase();
+      const [minCost, maxCost] = modelCostRange;
+      return HOSTED_MODELS.filter((model) => {
+        if (selectedProviderFilters.length > 0 && !selectedProviderFilters.includes(model.providerKey)) return false;
+        if (modelPrivacyFilter !== 'all' && hostedModelPrivacy(model) !== modelPrivacyFilter) return false;
+        const rank = hostedCostRank(model.cost);
+        if (rank < minCost || rank > maxCost) return false;
+        const tags = hostedModelTags(model);
+        if (selectedTagFilters.some((tag) => !tags.includes(tag))) return false;
+        if (needle) {
+          const searchable = [
+            model.id,
+            model.name,
+            model.provider,
+            model.category,
+            model.cost,
+            model.context,
+            model.description,
+            ...tags,
+          ].join(' ').toLowerCase();
+          if (!searchable.includes(needle)) return false;
+        }
+        return true;
+      }).sort((a, b) => {
+        let left: string | number;
+        let right: string | number;
+        switch (modelSort.key) {
+          case 'provider':
+            left = `${a.provider} ${a.name}`;
+            right = `${b.provider} ${b.name}`;
+            break;
+          case 'context':
+            left = contextToTokens(a.context);
+            right = contextToTokens(b.context);
+            break;
+          case 'cost':
+            left = hostedCostRank(a.cost);
+            right = hostedCostRank(b.cost);
+            break;
+          case 'privacy':
+            left = hostedModelPrivacy(a);
+            right = hostedModelPrivacy(b);
+            break;
+          case 'name':
+          default:
+            left = a.name;
+            right = b.name;
+            break;
+        }
+        const direction = modelSort.direction === 'asc' ? 1 : -1;
+        if (typeof left === 'number' && typeof right === 'number') return (left - right) * direction;
+        return String(left).localeCompare(String(right)) * direction;
+      });
+    },
+    [modelCostRange, modelPrivacyFilter, modelSearch, modelSort.direction, modelSort.key, selectedProviderFilters, selectedTagFilters],
   );
   const hasPendingHostedModelChange = savedHostedModel !== null && savedHostedModel.id !== selectedHostedModel.id;
   const lowAiCreditBalance = isHostedMode && aiCreditBalance !== null && aiCreditBalance.balance < 100;
+  const sortedModelPresets = useMemo(
+    () => [...modelPresets].sort((a, b) => Number(b.favorite) - Number(a.favorite) || b.updatedAt - a.updatedAt),
+    [modelPresets],
+  );
 
   const byokProvidersWithVenice = useMemo<ByokProviderOption[]>(() => {
     const providers = [...BYOK_PROVIDERS] as ByokProviderOption[];
@@ -218,6 +427,120 @@ export function ConfigTab() {
     setByokKeyInput('');
   }, [setByokKeyInput, setConfigModel, setConfigProvider, setCustomModelInput, setUseCustomModel]);
 
+  const toggleProviderFilter = useCallback((providerKey: string) => {
+    setSelectedProviderFilters((prev) => (
+      prev.includes(providerKey) ? prev.filter((item) => item !== providerKey) : [...prev, providerKey]
+    ));
+  }, []);
+
+  const toggleTagFilter = useCallback((tag: HostedModelTag) => {
+    setSelectedTagFilters((prev) => (
+      prev.includes(tag) ? prev.filter((item) => item !== tag) : [...prev, tag]
+    ));
+  }, []);
+
+  const toggleModelSort = useCallback((key: ModelSortKey) => {
+    setModelSort((prev) => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
+    }));
+  }, []);
+
+  const persistModelPresets = useCallback((next: ModelPreset[]) => {
+    setModelPresets(next);
+    window.localStorage.setItem(MODEL_PRESETS_STORAGE_KEY, JSON.stringify(next.map(sanitizeModelPreset)));
+  }, []);
+
+  const createPresetFromCurrent = useCallback(() => {
+    const modelValue = useCustomModel ? customModelInput.trim() : configModel.trim();
+    if (!modelValue) return;
+    const now = Date.now();
+    const defaultName = isHostedMode
+      ? selectedHostedModel.name
+      : `${selectedByokProvider?.name ?? configProvider} · ${modelValue}`;
+    const preset: ModelPreset = {
+      id: modelPresetId(),
+      name: (presetName.trim() || defaultName).slice(0, 80),
+      description: presetDescription.trim().slice(0, 240),
+      provider: configProvider,
+      model: modelValue,
+      useCustomModel,
+      customModelInput: useCustomModel ? modelValue : '',
+      favorite: false,
+      createdAt: now,
+      updatedAt: now,
+    };
+    persistModelPresets([preset, ...modelPresets]);
+    setPresetName('');
+    setPresetDescription('');
+  }, [
+    configModel,
+    configProvider,
+    customModelInput,
+    isHostedMode,
+    modelPresets,
+    persistModelPresets,
+    presetDescription,
+    presetName,
+    selectedByokProvider?.name,
+    selectedHostedModel.name,
+    useCustomModel,
+  ]);
+
+  const applyModelPreset = useCallback((preset: ModelPreset) => {
+    setConfigProvider(preset.provider);
+    setConfigModel(preset.model);
+    setUseCustomModel(preset.useCustomModel);
+    setCustomModelInput(preset.customModelInput);
+    setByokKeyInput('');
+  }, [setByokKeyInput, setConfigModel, setConfigProvider, setCustomModelInput, setUseCustomModel]);
+
+  const updateModelPreset = useCallback((presetId: string, patch: Partial<ModelPreset>) => {
+    persistModelPresets(modelPresets.map((preset) => (
+      preset.id === presetId ? sanitizeModelPreset({ ...preset, ...patch, updatedAt: Date.now() }) : preset
+    )));
+  }, [modelPresets, persistModelPresets]);
+
+  const deleteModelPreset = useCallback((presetId: string) => {
+    persistModelPresets(modelPresets.filter((preset) => preset.id !== presetId));
+  }, [modelPresets, persistModelPresets]);
+
+  const exportModelPresets = useCallback(() => {
+    const payload = {
+      exportVersion: 1,
+      exportedAt: new Date().toISOString(),
+      presets: modelPresets.map(sanitizeModelPreset),
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'hatcher-model-presets.json';
+    anchor.click();
+    URL.revokeObjectURL(url);
+  }, [modelPresets]);
+
+  const importModelPresets = useCallback(async (file: File | undefined) => {
+    if (!file) return;
+    setPresetImportError(null);
+    try {
+      const text = await file.text();
+      if (/api[_-]?key|secret|token/i.test(text)) {
+        throw new Error('Import rejected because it appears to contain credentials.');
+      }
+      const parsed = JSON.parse(text) as { presets?: unknown };
+      const imported = Array.isArray(parsed.presets)
+        ? parsed.presets.filter(isModelPreset).map((preset) => sanitizeModelPreset({ ...preset, id: modelPresetId() }))
+        : [];
+      if (imported.length === 0) throw new Error('No valid presets found.');
+      persistModelPresets([...imported, ...modelPresets]);
+    } catch (error) {
+      setPresetImportError(error instanceof Error ? error.message : 'Failed to import presets.');
+    } finally {
+      if (presetImportRef.current) presetImportRef.current.value = '';
+    }
+  }, [modelPresets, persistModelPresets]);
+
   useEffect(() => {
     if (!isHostedMode) return;
     if (normalizedHostedModel !== configModel) {
@@ -248,10 +571,71 @@ export function ConfigTab() {
     };
   }, [isHostedMode]);
 
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(MODEL_PRESETS_STORAGE_KEY);
+      const parsed = raw ? JSON.parse(raw) : null;
+      const presets = Array.isArray(parsed)
+        ? parsed.filter(isModelPreset).map(sanitizeModelPreset)
+        : [];
+      setModelPresets(presets);
+    } catch {
+      setModelPresets([]);
+    }
+  }, []);
+
   const handleSave = async () => {
     await saveConfig(commitMessage);
     setCommitMessage('');
   };
+
+  useEffect(() => {
+    setActiveConfigSubtab(normalizeConfigSubtab(searchParams.get('configTab')));
+  }, [searchParams]);
+
+  const setConfigSubtab = useCallback((next: ConfigSubtab) => {
+    setActiveConfigSubtab(next);
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', 'config');
+    url.searchParams.set('configTab', next);
+    window.history.replaceState({}, '', `${url.pathname}${url.search}`);
+  }, []);
+
+  const savePanel = (label = 'Save Configuration') => (
+    <GlassCard className="p-5">
+      <label className="block mb-4">
+        <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Change note</span>
+        <input
+          value={commitMessage}
+          onChange={(e) => setCommitMessage(e.target.value)}
+          className="config-input"
+          placeholder="Optional note for this update"
+        />
+      </label>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-h-[20px]">
+          {saveMsg && (
+            <p className={`text-sm ${saveMsg.includes('saved') ? 'text-green-600' : 'text-red-600'}`}>
+              {saveMsg}
+            </p>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={saving}
+          className="btn-primary inline-flex items-center justify-center gap-2 disabled:opacity-60"
+        >
+          {saving ? (
+            <RefreshCw className="w-4 h-4 animate-spin" />
+          ) : (
+            <CheckCircle className="w-4 h-4" />
+          )}
+          {label}
+        </button>
+      </div>
+    </GlassCard>
+  );
 
   return (
     <motion.div
@@ -260,8 +644,36 @@ export function ConfigTab() {
       initial="initial"
       animate="animate"
       exit="exit"
-      className="space-y-6 max-w-4xl"
+      className="space-y-6 max-w-6xl"
     >
+      <GlassCard className="p-2">
+        <div className="grid gap-1 sm:grid-cols-2 xl:grid-cols-4">
+          {CONFIG_SUBTABS.map((item) => {
+            const active = activeConfigSubtab === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setConfigSubtab(item.id)}
+                className={`rounded-lg px-3 py-3 text-left transition-colors ${
+                  active
+                    ? 'bg-[var(--accent-primary)]/10 text-[var(--text-primary)]'
+                    : 'text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                <span className="flex items-center gap-2 text-sm font-semibold">
+                  <SlidersHorizontal className={`h-4 w-4 ${active ? 'text-[var(--accent-primary)]' : 'text-[var(--text-tertiary)]'}`} />
+                  {item.label}
+                </span>
+                <span className="mt-1 block text-xs text-[var(--text-tertiary)]">{item.description}</span>
+              </button>
+            );
+          })}
+        </div>
+      </GlassCard>
+
+      {activeConfigSubtab === 'general' && (
+        <>
       <GlassCard className="p-5">
         <div className="flex items-start justify-between gap-4 mb-5">
           <div>
@@ -298,7 +710,12 @@ export function ConfigTab() {
           </label>
         </div>
       </GlassCard>
+          {savePanel('Save General')}
+        </>
+      )}
 
+      {activeConfigSubtab === 'public-access' && (
+        <>
       <GlassCard className="p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between mb-5">
           <div>
@@ -386,7 +803,12 @@ export function ConfigTab() {
           )}
         </div>
       </GlassCard>
+          {savePanel('Save Public Access')}
+        </>
+      )}
 
+      {activeConfigSubtab === 'ai-models' && (
+        <>
       <GlassCard className="p-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-5">
           <div>
@@ -407,6 +829,13 @@ export function ConfigTab() {
             </div>
           )}
         </div>
+        <input
+          ref={presetImportRef}
+          type="file"
+          accept="application/json,.json"
+          className="hidden"
+          onChange={(event) => void importModelPresets(event.target.files?.[0])}
+        />
 
         <div className="grid grid-cols-2 gap-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-1 mb-5">
           <button
@@ -444,30 +873,11 @@ export function ConfigTab() {
 
         {isHostedMode ? (
           <div className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-[220px,1fr]">
-              <label className="block">
-                <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Provider filter</span>
-                <div className="relative">
-                  <select
-                    value={hostedProviderFilter}
-                    onChange={(e) => setHostedProviderFilter(e.target.value)}
-                    className="config-input appearance-none pr-10"
-                  >
-                    <option value="all">All providers</option>
-                    {hostedModelProviders.map((provider) => (
-                      <option key={provider.key} value={provider.key}>
-                        {provider.name}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)] pointer-events-none" />
-                </div>
-              </label>
-
+            <div className="grid gap-4 lg:grid-cols-[1fr,0.9fr]">
               <label className="block">
                 <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Search models</span>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-tertiary)]" />
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-tertiary)]" />
                   <input
                     value={modelSearch}
                     onChange={(event) => setModelSearch(event.target.value)}
@@ -477,54 +887,147 @@ export function ConfigTab() {
                   />
                 </div>
               </label>
+
+              <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-3">
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <span className="text-sm font-medium text-[var(--text-secondary)]">Cost range</span>
+                  <span className="text-xs text-[var(--text-tertiary)]">
+                    {COST_GRADES.find((grade) => grade.rank === modelCostRange[0])?.label} - {COST_GRADES.find((grade) => grade.rank === modelCostRange[1])?.label}
+                  </span>
+                </div>
+                <div className="relative h-8">
+                  <div className="absolute left-1 right-1 top-1/2 h-1 -translate-y-1/2 rounded-full bg-[var(--bg-panel)]" />
+                  <div
+                    className="absolute top-1/2 h-1 -translate-y-1/2 rounded-full bg-[var(--accent-primary)]/50"
+                    style={{
+                      left: `${((modelCostRange[0] - 1) / 4) * 100}%`,
+                      right: `${100 - ((modelCostRange[1] - 1) / 4) * 100}%`,
+                    }}
+                  />
+                  <input
+                    type="range"
+                    min={1}
+                    max={5}
+                    step={1}
+                    value={modelCostRange[0]}
+                    onChange={(event) => {
+                      const next = Number(event.target.value);
+                      setModelCostRange(([, max]) => [Math.min(next, max), max]);
+                    }}
+                    className="absolute inset-0 h-8 w-full bg-transparent accent-[var(--accent-primary)]"
+                    aria-label="Minimum model cost"
+                  />
+                  <input
+                    type="range"
+                    min={1}
+                    max={5}
+                    step={1}
+                    value={modelCostRange[1]}
+                    onChange={(event) => {
+                      const next = Number(event.target.value);
+                      setModelCostRange(([min]) => [min, Math.max(next, min)]);
+                    }}
+                    className="absolute inset-0 h-8 w-full bg-transparent accent-[var(--accent-primary)]"
+                    aria-label="Maximum model cost"
+                  />
+                </div>
+                <div className="grid grid-cols-5 gap-1 text-center text-[9px] text-[var(--text-tertiary)]">
+                  {COST_GRADES.map((grade) => (
+                    <span key={grade.rank} title={grade.detail}>{grade.label}</span>
+                  ))}
+                </div>
+              </div>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-3">
-              <label className="block">
-                <span className="block text-xs font-medium text-[var(--text-tertiary)] mb-1.5">Strength</span>
-                <div className="relative">
-                  <select
-                    value={modelTagFilter}
-                    onChange={(event) => setModelTagFilter(event.target.value as HostedModelTag | 'all')}
-                    className="config-input appearance-none pr-10 text-sm"
-                  >
-                    {(['all', 'fast', 'low cost', 'balanced', 'coding', 'reasoning', 'long context', 'fixed price', 'privacy'] as const).map((tag) => (
-                      <option key={tag} value={tag}>{tag === 'all' ? 'All strengths' : tag}</option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)] pointer-events-none" />
+            <div className="space-y-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-3">
+              <div>
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <span className="text-xs font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">Providers</span>
+                  {selectedProviderFilters.length > 0 && (
+                    <button type="button" onClick={() => setSelectedProviderFilters([])} className="text-xs text-[var(--accent-primary)] hover:underline">
+                      Clear
+                    </button>
+                  )}
                 </div>
-              </label>
-              <label className="block">
-                <span className="block text-xs font-medium text-[var(--text-tertiary)] mb-1.5">Max cost</span>
-                <div className="relative">
-                  <select
-                    value={modelCostFilter}
-                    onChange={(event) => setModelCostFilter(event.target.value as HostedModelCost | 'all')}
-                    className="config-input appearance-none pr-10 text-sm"
-                  >
-                    {(['all', 'Low', 'Medium', 'High', 'Premium'] as const).map((cost) => (
-                      <option key={cost} value={cost}>{cost === 'all' ? 'Any cost' : `Up to ${cost}`}</option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)] pointer-events-none" />
+                <div className="flex flex-wrap gap-2">
+                  {hostedModelProviders.map((provider) => {
+                    const active = selectedProviderFilters.includes(provider.key);
+                    return (
+                      <button
+                        key={provider.key}
+                        type="button"
+                        onClick={() => toggleProviderFilter(provider.key)}
+                        title={provider.description}
+                        className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs transition-colors ${
+                          active
+                            ? 'border-[var(--accent-primary)]/50 bg-[var(--accent-primary)]/10 text-[var(--text-primary)]'
+                            : 'border-[var(--border-subtle)] bg-[var(--bg-panel)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)]/30'
+                        }`}
+                      >
+                        <span className="inline-flex h-5 min-w-5 items-center justify-center rounded bg-[var(--bg-muted)] px-1 text-[9px] font-bold">
+                          {PROVIDER_GLYPH[provider.key] ?? provider.name.slice(0, 1)}
+                        </span>
+                        {provider.name}
+                      </button>
+                    );
+                  })}
                 </div>
-              </label>
-              <label className="block">
-                <span className="block text-xs font-medium text-[var(--text-tertiary)] mb-1.5">Privacy route</span>
-                <div className="relative">
-                  <select
-                    value={modelPrivacyFilter}
-                    onChange={(event) => setModelPrivacyFilter(event.target.value as HostedModelPrivacy | 'all')}
-                    className="config-input appearance-none pr-10 text-sm"
-                  >
-                    <option value="all">Any route</option>
-                    <option value="hatcher">Hatcher-hosted</option>
-                    <option value="partner">Partner-hosted</option>
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)] pointer-events-none" />
+              </div>
+
+              <div>
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <span className="text-xs font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">Strengths</span>
+                  {selectedTagFilters.length > 0 && (
+                    <button type="button" onClick={() => setSelectedTagFilters([])} className="text-xs text-[var(--accent-primary)] hover:underline">
+                      Clear
+                    </button>
+                  )}
                 </div>
-              </label>
+                <div className="flex flex-wrap gap-2">
+                  {HOSTED_TAG_OPTIONS.map((tag) => {
+                    const active = selectedTagFilters.includes(tag);
+                    return (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => toggleTagFilter(tag)}
+                        className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs capitalize transition-colors ${
+                          active
+                            ? 'border-[var(--accent-primary)]/50 bg-[var(--accent-primary)]/10 text-[var(--text-primary)]'
+                            : 'border-[var(--border-subtle)] bg-[var(--bg-panel)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)]/30'
+                        }`}
+                      >
+                        {tagIcon(tag)}
+                        {tag}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <span className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">Privacy route</span>
+                <div className="inline-flex overflow-hidden rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-panel)] text-xs">
+                  {([
+                    ['all', 'Any route'],
+                    ['hatcher', 'Hatcher route'],
+                    ['partner', 'Partner route'],
+                  ] as const).map(([value, label]) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setModelPrivacyFilter(value)}
+                      className={`px-3 py-1.5 transition-colors ${
+                        modelPrivacyFilter === value
+                          ? 'bg-[var(--accent-primary)]/10 text-[var(--text-primary)]'
+                          : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-4">
@@ -542,11 +1045,23 @@ export function ConfigTab() {
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2 text-xs text-[var(--text-secondary)]">
-                  <span className="px-2 py-1 rounded bg-[var(--bg-panel)] border border-[var(--border-subtle)]">
-                    {selectedHostedModel.context}
+                  <span
+                    className="px-2 py-1 rounded bg-[var(--bg-panel)] border border-[var(--border-subtle)]"
+                    title="Selected context window compared with the largest window currently listed in Hatcher."
+                  >
+                    {formatContextTokens(selectedHostedContextTokens)} / {formatContextTokens(maxHostedContextTokens)}
                   </span>
                   <span className={`px-2 py-1 rounded border ${hostedCostClass(selectedHostedModel.cost)}`}>
                     {selectedHostedModel.fixedPrice ?? hostedCostEstimate(selectedHostedModel.cost)}
+                  </span>
+                  <span
+                    className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-[var(--bg-panel)] border border-[var(--border-subtle)]"
+                    title={hostedModelPrivacy(selectedHostedModel) === 'partner'
+                      ? 'Inference happens through an explicit partner route such as IDLE. Review partner policy before using sensitive data.'
+                      : 'Inference is routed through Hatcher managed infrastructure, currently UsePod first with OpenRouter fallback.'}
+                  >
+                    <Info className="h-3 w-3" />
+                    {hostedPrivacyLabel(selectedHostedModel)}
                   </span>
                 </div>
               </div>
@@ -559,7 +1074,7 @@ export function ConfigTab() {
               </div>
               {hasPendingHostedModelChange && (
                 <p className="mt-3 rounded-lg border border-[var(--accent-primary)]/20 bg-[var(--accent-primary)]/10 px-3 py-2 text-xs text-[var(--text-secondary)]">
-                  Pending model change. Save Configuration to make {selectedHostedModel.name} active.
+                  Pending model change. Save AI Models to make {selectedHostedModel.name} active.
                 </p>
               )}
               {(selectedHostedModel.warning || lowAiCreditBalance) && (
@@ -570,12 +1085,151 @@ export function ConfigTab() {
               )}
             </div>
 
+            <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-4">
+              <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <h4 className="text-sm font-semibold text-[var(--text-primary)]">Saved Model Presets</h4>
+                  <p className="mt-1 text-xs text-[var(--text-tertiary)]">
+                    Save reusable model choices. Export/import never includes API keys.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={exportModelPresets}
+                    disabled={modelPresets.length === 0}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border-subtle)] px-2.5 py-1.5 text-xs text-[var(--text-secondary)] transition-colors hover:border-[var(--accent-primary)]/40 hover:text-[var(--text-primary)] disabled:opacity-40"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    Export
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => presetImportRef.current?.click()}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border-subtle)] px-2.5 py-1.5 text-xs text-[var(--text-secondary)] transition-colors hover:border-[var(--accent-primary)]/40 hover:text-[var(--text-primary)]"
+                  >
+                    <Upload className="h-3.5 w-3.5" />
+                    Import
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid gap-3 lg:grid-cols-[1fr,1fr,auto]">
+                <input
+                  value={presetName}
+                  onChange={(event) => setPresetName(event.target.value)}
+                  className="config-input text-sm"
+                  placeholder={`Preset name, e.g. ${isHostedMode ? selectedHostedModel.name : 'Research BYOK'}`}
+                />
+                <input
+                  value={presetDescription}
+                  onChange={(event) => setPresetDescription(event.target.value)}
+                  className="config-input text-sm"
+                  placeholder="Optional description"
+                />
+                <button
+                  type="button"
+                  onClick={createPresetFromCurrent}
+                  className="btn-primary inline-flex items-center justify-center gap-2 px-3 py-2 text-sm"
+                >
+                  <Star className="h-4 w-4" />
+                  Save preset
+                </button>
+              </div>
+
+              {presetImportError && (
+                <p className="mt-3 text-xs text-red-400">{presetImportError}</p>
+              )}
+
+              {sortedModelPresets.length > 0 && (
+                <div className="mt-4 grid gap-2 lg:grid-cols-2">
+                  {sortedModelPresets.map((preset) => {
+                    const active = preset.provider === configProvider && preset.model === (useCustomModel ? customModelInput : configModel);
+                    return (
+                      <div
+                        key={preset.id}
+                        className={`rounded-lg border p-3 ${
+                          active
+                            ? 'border-[var(--accent-primary)]/40 bg-[var(--accent-primary)]/10'
+                            : 'border-[var(--border-subtle)] bg-[var(--bg-panel)]'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="flex min-w-0 items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => updateModelPreset(preset.id, { favorite: !preset.favorite })}
+                                className={preset.favorite ? 'text-amber-300' : 'text-[var(--text-tertiary)] hover:text-amber-300'}
+                                aria-label={preset.favorite ? 'Remove favorite' : 'Favorite preset'}
+                              >
+                                <Star className="h-3.5 w-3.5" fill={preset.favorite ? 'currentColor' : 'none'} />
+                              </button>
+                              <span className="truncate text-sm font-medium text-[var(--text-primary)]">{preset.name}</span>
+                            </div>
+                            <p className="mt-1 truncate text-xs text-[var(--text-tertiary)]">
+                              {preset.provider} · {preset.model}
+                            </p>
+                            {preset.description && (
+                              <p className="mt-1 line-clamp-2 text-xs text-[var(--text-secondary)]">{preset.description}</p>
+                            )}
+                          </div>
+                          <div className="flex flex-shrink-0 items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => applyModelPreset(preset)}
+                              className="rounded-md border border-[var(--border-subtle)] px-2 py-1 text-xs text-[var(--text-secondary)] transition-colors hover:border-[var(--accent-primary)]/40 hover:text-[var(--text-primary)]"
+                            >
+                              {active ? 'Active' : 'Apply'}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => deleteModelPreset(preset.id)}
+                              className="rounded-md p-1 text-[var(--text-tertiary)] transition-colors hover:text-red-400"
+                              aria-label="Delete preset"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
             <div className="overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)]">
-              <div className="hidden grid-cols-[1.4fr,0.9fr,0.8fr,0.9fr,auto] gap-3 border-b border-[var(--border-subtle)] px-4 py-2 text-[11px] uppercase tracking-[0.08em] text-[var(--text-tertiary)] md:grid">
-                <span>Provider / Model</span>
+              <div className="hidden grid-cols-[1.35fr,0.72fr,1fr,0.72fr,0.9fr,auto] gap-3 border-b border-[var(--border-subtle)] px-4 py-2 text-[11px] uppercase tracking-[0.08em] text-[var(--text-tertiary)] md:grid">
+                {([
+                  ['name', 'Provider / Model'],
+                  ['context', 'Context Window'],
+                ] as Array<[ModelSortKey, string]>).map(([key, label]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => toggleModelSort(key)}
+                    className="text-left transition-colors hover:text-[var(--text-secondary)]"
+                  >
+                    {label}
+                    {modelSort.key === key && <span className="ml-1">{modelSort.direction === 'asc' ? '↑' : '↓'}</span>}
+                  </button>
+                ))}
                 <span>Strengths</span>
-                <span>Cost</span>
-                <span>Privacy</span>
+                {([
+                  ['cost', 'Cost'],
+                  ['privacy', 'Privacy'],
+                ] as Array<[ModelSortKey, string]>).map(([key, label]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => toggleModelSort(key)}
+                    className="text-left transition-colors hover:text-[var(--text-secondary)]"
+                  >
+                    {label}
+                    {modelSort.key === key && <span className="ml-1">{modelSort.direction === 'asc' ? '↑' : '↓'}</span>}
+                  </button>
+                ))}
                 <span className="text-right">Status</span>
               </div>
               <div className="max-h-[430px] overflow-y-auto">
@@ -592,11 +1246,12 @@ export function ConfigTab() {
                         key={model.id}
                         type="button"
                         onClick={() => selectHostedModel(model.id)}
-                        className={`grid w-full gap-3 border-b border-[var(--border-subtle)] px-4 py-3 text-left transition-colors last:border-b-0 md:grid-cols-[1.4fr,0.9fr,0.8fr,0.9fr,auto] ${
+                        className={`grid w-full gap-3 border-b border-[var(--border-subtle)] px-4 py-3 text-left transition-colors last:border-b-0 md:grid-cols-[1.35fr,0.72fr,1fr,0.72fr,0.9fr,auto] ${
                           selected
                             ? 'bg-[var(--accent-primary)]/10'
                             : 'hover:bg-[var(--bg-panel)]'
                         }`}
+                        title={model.description}
                       >
                         <span className="min-w-0">
                           <span className="flex items-center gap-2">
@@ -608,12 +1263,16 @@ export function ConfigTab() {
                             )}
                           </span>
                           <span className="mt-0.5 block truncate text-xs text-[var(--text-tertiary)]">
-                            {model.provider} · {model.context} · {hostedModelRoute(model)}
+                            {model.provider} · {hostedModelRoute(model)}
                           </span>
+                        </span>
+                        <span className="inline-flex h-fit w-fit items-center gap-1.5 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-panel)] px-2 py-1 text-xs text-[var(--text-secondary)]">
+                          {model.context}
                         </span>
                         <span className="flex flex-wrap gap-1.5">
                           {hostedModelTags(model).slice(0, 3).map((tag) => (
-                            <span key={tag} className="rounded-md border border-[var(--border-subtle)] bg-[var(--bg-panel)] px-1.5 py-0.5 text-[10px] text-[var(--text-secondary)]">
+                            <span key={tag} className="inline-flex items-center gap-1 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-panel)] px-1.5 py-0.5 text-[10px] text-[var(--text-secondary)]">
+                              {tagIcon(tag)}
                               {tag}
                             </span>
                           ))}
@@ -621,7 +1280,13 @@ export function ConfigTab() {
                         <span className={`inline-flex h-fit w-fit rounded-md border px-2 py-1 text-xs ${hostedCostClass(model.cost)}`}>
                           {model.fixedPrice ?? model.cost}
                         </span>
-                        <span className="text-xs text-[var(--text-secondary)]">
+                        <span
+                          className="inline-flex h-fit items-center gap-1.5 text-xs text-[var(--text-secondary)]"
+                          title={hostedModelPrivacy(model) === 'partner'
+                            ? 'Partner-hosted inference. Good for explicit partner routes like IDLE; review partner policy for sensitive data.'
+                            : 'Hatcher-managed route. UsePod primary with OpenRouter fallback where needed.'}
+                        >
+                          <Info className="h-3 w-3" />
                           {hostedModelPrivacy(model) === 'partner' ? 'Partner-hosted' : 'Hatcher-hosted'}
                         </span>
                         <span className={`text-xs font-medium ${selected || savedActive ? 'text-[var(--accent-primary)]' : 'text-[var(--text-tertiary)]'} md:text-right`}>
@@ -636,6 +1301,104 @@ export function ConfigTab() {
           </div>
         ) : (
           <div className="space-y-4">
+            <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-4">
+              <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <h4 className="text-sm font-semibold text-[var(--text-primary)]">Saved Model Presets</h4>
+                  <p className="mt-1 text-xs text-[var(--text-tertiary)]">
+                    Useful for BYOK variations. Presets store provider/model choices, never API keys.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={exportModelPresets}
+                    disabled={modelPresets.length === 0}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border-subtle)] px-2.5 py-1.5 text-xs text-[var(--text-secondary)] transition-colors hover:border-[var(--accent-primary)]/40 hover:text-[var(--text-primary)] disabled:opacity-40"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    Export
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => presetImportRef.current?.click()}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border-subtle)] px-2.5 py-1.5 text-xs text-[var(--text-secondary)] transition-colors hover:border-[var(--accent-primary)]/40 hover:text-[var(--text-primary)]"
+                  >
+                    <Upload className="h-3.5 w-3.5" />
+                    Import
+                  </button>
+                </div>
+              </div>
+              <div className="grid gap-3 lg:grid-cols-[1fr,1fr,auto]">
+                <input
+                  value={presetName}
+                  onChange={(event) => setPresetName(event.target.value)}
+                  className="config-input text-sm"
+                  placeholder="Preset name, e.g. Venice private research"
+                />
+                <input
+                  value={presetDescription}
+                  onChange={(event) => setPresetDescription(event.target.value)}
+                  className="config-input text-sm"
+                  placeholder="Optional description"
+                />
+                <button
+                  type="button"
+                  onClick={createPresetFromCurrent}
+                  className="btn-primary inline-flex items-center justify-center gap-2 px-3 py-2 text-sm"
+                >
+                  <Star className="h-4 w-4" />
+                  Save preset
+                </button>
+              </div>
+              {presetImportError && <p className="mt-3 text-xs text-red-400">{presetImportError}</p>}
+              {sortedModelPresets.length > 0 && (
+                <div className="mt-4 grid gap-2 lg:grid-cols-2">
+                  {sortedModelPresets.map((preset) => {
+                    const active = preset.provider === configProvider && preset.model === (useCustomModel ? customModelInput : configModel);
+                    return (
+                      <div key={preset.id} className={`rounded-lg border p-3 ${active ? 'border-[var(--accent-primary)]/40 bg-[var(--accent-primary)]/10' : 'border-[var(--border-subtle)] bg-[var(--bg-panel)]'}`}>
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="flex min-w-0 items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => updateModelPreset(preset.id, { favorite: !preset.favorite })}
+                                className={preset.favorite ? 'text-amber-300' : 'text-[var(--text-tertiary)] hover:text-amber-300'}
+                                aria-label={preset.favorite ? 'Remove favorite' : 'Favorite preset'}
+                              >
+                                <Star className="h-3.5 w-3.5" fill={preset.favorite ? 'currentColor' : 'none'} />
+                              </button>
+                              <span className="truncate text-sm font-medium text-[var(--text-primary)]">{preset.name}</span>
+                            </div>
+                            <p className="mt-1 truncate text-xs text-[var(--text-tertiary)]">{preset.provider} · {preset.model}</p>
+                            {preset.description && <p className="mt-1 line-clamp-2 text-xs text-[var(--text-secondary)]">{preset.description}</p>}
+                          </div>
+                          <div className="flex flex-shrink-0 items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => applyModelPreset(preset)}
+                              className="rounded-md border border-[var(--border-subtle)] px-2 py-1 text-xs text-[var(--text-secondary)] transition-colors hover:border-[var(--accent-primary)]/40 hover:text-[var(--text-primary)]"
+                            >
+                              {active ? 'Active' : 'Apply'}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => deleteModelPreset(preset.id)}
+                              className="rounded-md p-1 text-[var(--text-tertiary)] transition-colors hover:text-red-400"
+                              aria-label="Delete preset"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
             <label className="block">
               <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Provider</span>
               <div className="relative">
@@ -752,57 +1515,17 @@ export function ConfigTab() {
           </div>
         )}
       </GlassCard>
+          {savePanel('Save AI Models')}
+        </>
+      )}
 
-      <GlassCard className="p-5">
-        <label className="block mb-4">
-          <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Change note</span>
-          <input
-            value={commitMessage}
-            onChange={(e) => setCommitMessage(e.target.value)}
-            className="config-input"
-            placeholder="Optional note for this update"
-          />
-        </label>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="min-h-[20px]">
-            {saveMsg && (
-              <p className={`text-sm ${saveMsg.includes('saved') ? 'text-green-600' : 'text-red-600'}`}>
-                {saveMsg}
-              </p>
-            )}
-          </div>
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={saving}
-            className="btn-primary inline-flex items-center justify-center gap-2 disabled:opacity-60"
-          >
-            {saving ? (
-              <RefreshCw className="w-4 h-4 animate-spin" />
-            ) : (
-              <CheckCircle className="w-4 h-4" />
-            )}
-            Save Configuration
-          </button>
+      {activeConfigSubtab === 'advanced' && (
+        <div className="space-y-6">
+          <EnvVarsEditor agentId={agent?.id} />
+          <ConfigHistory agentId={agent?.id} />
+          {savePanel('Save Advanced')}
         </div>
-      </GlassCard>
-
-      <div>
-        <button
-          type="button"
-          onClick={() => setShowAdvancedTools((value) => !value)}
-          className="inline-flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-        >
-          {showAdvancedTools ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-          Advanced tools
-        </button>
-        {showAdvancedTools && (
-          <div className="mt-4 space-y-6">
-            <EnvVarsEditor agentId={agent?.id} />
-            <ConfigHistory />
-          </div>
-        )}
-      </div>
+      )}
     </motion.div>
   );
 }
