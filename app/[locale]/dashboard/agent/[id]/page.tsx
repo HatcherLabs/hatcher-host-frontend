@@ -151,11 +151,6 @@ const WalletTab = dynamic(
   { loading: () => <TabSkeleton /> },
 );
 
-const SpawnTab = dynamic(
-  () => import('@/components/agents/tabs/SpawnTab').then(mod => ({ default: mod.SpawnTab })),
-  { loading: () => <TabSkeleton /> },
-);
-
 // ─── Main Component ─────────────────────────────────────────
 
 export default function AgentManagePage() {
@@ -192,7 +187,7 @@ export default function AgentManagePage() {
   const [ownedAgentsLoading, setOwnedAgentsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const statusPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const validTabs: Tab[] = ['overview','config','integrations','skills','plugins','files','logs','terminal','memory','sessions','knowledge','schedules','workflows','chat','mail','stats','wallet','spawn'];
+  const validTabs: Tab[] = ['overview','config','integrations','skills','plugins','files','logs','terminal','memory','sessions','knowledge','schedules','workflows','chat','mail','stats','wallet'];
   // 'skills' kept in validTabs for backwards compat (deep links), but redirects to plugins tab
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
   const rawTab = searchParams.get('tab');
@@ -1416,7 +1411,6 @@ export default function AgentManagePage() {
               {tab === 'mail' && <MailTab />}
               {tab === 'knowledge' && <KnowledgeTab />}
               {tab === 'wallet' && <WalletTab />}
-              {tab === 'spawn' && <SpawnTab />}
               {tab === 'stats' && <StatsTab />}
               {tab === 'schedules' && <SchedulesTab />}
               {tab === 'workflows' && <WorkflowsTab />}
