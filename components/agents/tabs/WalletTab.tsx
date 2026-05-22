@@ -33,6 +33,7 @@ import type {
 } from '@/lib/api';
 import { buildFallbackPassport, shortAddress } from '@/lib/agent-passport';
 import { KausalayerWalletPanel } from './KausalayerWalletPanel';
+import { ConduitWalletPanel } from './ConduitWalletPanel';
 
 interface ReputationState {
   upCount: number;
@@ -400,7 +401,12 @@ export function WalletTab() {
             onCopy={copy}
             onViewPrivateKey={openPrivateKeyModal}
           />
-          {activeNetwork.id === 'solana' && <KausalayerWalletPanel agentId={agent.id} />}
+          {activeNetwork.id === 'solana' && (
+            <>
+              <ConduitWalletPanel agentId={agent.id} />
+              <KausalayerWalletPanel agentId={agent.id} />
+            </>
+          )}
         </div>
       ) : (
         <GlassCard className="p-6 text-sm text-[var(--text-muted)]">Wallet not provisioned yet.</GlassCard>

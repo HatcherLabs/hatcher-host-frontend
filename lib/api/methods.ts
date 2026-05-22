@@ -4,7 +4,7 @@
 
 import { API_URL } from '@/lib/config';
 import { getToken, req } from './core';
-import type { Agent, AgentPassport, AgentPassportNetworkId, AgentWalletPrivateKeyResponse, AgentWalletsResponse, Payment, AgentFeature, ChatMessage, ChatSessionSummary, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse, AdminEgressEventsResponse, AgentEgressEventsResponse, AdminIdleOverviewResponse, GetAgentMailboxResponse, GetAgentMailMessagesResponse, SendAgentMailBody, SendAgentMailResponse, UpdateAgentMailSettingsBody, UpdateAgentMailSettingsResponse, AgentMailDirection, KausalayerCallBody, KausalayerCallResponse, KausalayerConfigBody, KausalayerConfigStatus, KausalayerHealthResponse, KausalayerResourcesResponse, KausalayerToolsResponse } from './types';
+import type { Agent, AgentPassport, AgentPassportNetworkId, AgentWalletPrivateKeyResponse, AgentWalletsResponse, Payment, AgentFeature, ChatMessage, ChatSessionSummary, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse, AdminConduitOverviewResponse, AdminEgressEventsResponse, AgentEgressEventsResponse, AdminIdleOverviewResponse, GetAgentMailboxResponse, GetAgentMailMessagesResponse, SendAgentMailBody, SendAgentMailResponse, UpdateAgentMailSettingsBody, UpdateAgentMailSettingsResponse, AgentMailDirection, KausalayerCallBody, KausalayerCallResponse, KausalayerConfigBody, KausalayerConfigStatus, KausalayerHealthResponse, KausalayerResourcesResponse, KausalayerToolsResponse, ConduitConfigBody, ConduitConfigStatus, ConduitManifestResponse, ConduitProviderActionResponse, ConduitProviderPatchBody, ConduitProvidersResponse, ConduitProtocolInfoResponse, ConduitRegisterProviderBody, ConduitRegisterProviderResponse } from './types';
 import type { TierConfig, AdminOverviewExtras } from '@hatcher/shared';
 
 const API_BASE = API_URL;
@@ -369,6 +369,60 @@ export const api = {
     req<KausalayerCallResponse>(`/agents/${id}/kausalayer/call`, {
       method: 'POST',
       body: JSON.stringify(body),
+    }),
+
+  /** Conduit Protocol provider settlement controls. */
+  getAgentConduitConfig: (id: string) =>
+    req<ConduitConfigStatus>(`/agents/${id}/conduit/config`),
+
+  updateAgentConduitConfig: (id: string, body: ConduitConfigBody) =>
+    req<ConduitConfigStatus>(`/agents/${id}/conduit/config`, {
+      method: 'PUT',
+      body: JSON.stringify(body),
+    }),
+
+  getAgentConduitProtocolInfo: (id: string) =>
+    req<ConduitProtocolInfoResponse>(`/agents/${id}/conduit/protocol-info`),
+
+  getAgentConduitManifest: (id: string) =>
+    req<ConduitManifestResponse>(`/agents/${id}/conduit/manifest`),
+
+  registerAgentConduitProvider: (id: string, body: ConduitRegisterProviderBody = {}) =>
+    req<ConduitRegisterProviderResponse>(`/agents/${id}/conduit/register-provider`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+
+  getAgentConduitProviders: (id: string) =>
+    req<ConduitProvidersResponse>(`/agents/${id}/conduit/providers`),
+
+  patchAgentConduitProvider: (id: string, providerId: string, body: ConduitProviderPatchBody) =>
+    req<ConduitProviderActionResponse>(`/agents/${id}/conduit/providers/${encodeURIComponent(providerId)}`, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    }),
+
+  syncAgentConduitProviderSecret: (id: string, providerId: string) =>
+    req<ConduitProviderActionResponse>(`/agents/${id}/conduit/providers/${encodeURIComponent(providerId)}/sync-secret`, {
+      method: 'POST',
+      body: JSON.stringify({}),
+    }),
+
+  rotateAgentConduitProviderSecret: (id: string, providerId: string) =>
+    req<ConduitProviderActionResponse>(`/agents/${id}/conduit/providers/${encodeURIComponent(providerId)}/rotate-secret`, {
+      method: 'POST',
+      body: JSON.stringify({}),
+    }),
+
+  refreshAgentConduitProviderEndpoint: (id: string, providerId: string) =>
+    req<ConduitProviderActionResponse>(`/agents/${id}/conduit/providers/${encodeURIComponent(providerId)}/refresh-endpoint`, {
+      method: 'POST',
+      body: JSON.stringify({}),
+    }),
+
+  archiveAgentConduitProvider: (id: string, providerId: string) =>
+    req<ConduitProviderActionResponse>(`/agents/${id}/conduit/providers/${encodeURIComponent(providerId)}`, {
+      method: 'DELETE',
     }),
 
   /** Get usage analytics for an agent */
@@ -1305,6 +1359,9 @@ export const api = {
 
   /** Admin: IDLE consumer/provider integration overview */
   adminGetIdleOverview: () => req<AdminIdleOverviewResponse>('/admin/idle'),
+
+  /** Admin: Conduit provider registration and settlement overview */
+  adminGetConduitOverview: () => req<AdminConduitOverviewResponse>('/admin/conduit'),
 
   /** List files in agent's running container */
   listContainerFiles: (agentId: string, path?: string) =>

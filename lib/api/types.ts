@@ -205,6 +205,72 @@ export interface KausalayerCallBody {
 
 export type KausalayerCallResponse = unknown;
 
+export type ConduitPayoutMode = 'ai_credits' | 'usdc_wallet';
+
+export interface ConduitConfigBody {
+  payoutMode: ConduitPayoutMode;
+}
+
+export interface ConduitConfigStatus {
+  enabled: boolean;
+  providerEnabled: boolean;
+  baseUrl: string;
+  payoutMode: ConduitPayoutMode;
+  recipientWallet: string;
+  agentWallet: string | null;
+  defaultPriceUsdc: number;
+  providerShareBps: number;
+}
+
+export interface ConduitProviderRegistration {
+  id: string;
+  providerId: string;
+  agentId: string;
+  walletAddress: string;
+  endpointUrl: string;
+  status: string;
+  region: string | null;
+  payoutMode: ConduitPayoutMode;
+  pricePerCallUsdc: number;
+  hmacSecretStored: boolean;
+  hmacSecretStoredAt: string | null;
+  hmacSecretRotatedAt: string | null;
+  metadata: unknown;
+  rawResponse: unknown;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ConduitProvidersResponse {
+  providers: ConduitProviderRegistration[];
+}
+
+export interface ConduitRegisterProviderBody {
+  pricePerCall?: number;
+  payoutMode?: ConduitPayoutMode;
+}
+
+export interface ConduitProviderPatchBody {
+  name?: string;
+  description?: string;
+  endpointUrl?: string;
+  region?: string;
+  status?: 'active' | 'offline';
+}
+
+export interface ConduitRegisterProviderResponse {
+  provider: ConduitProviderRegistration;
+  upstream: unknown;
+}
+
+export interface ConduitProviderActionResponse {
+  provider: ConduitProviderRegistration;
+  upstream?: unknown;
+}
+
+export type ConduitProtocolInfoResponse = unknown;
+export type ConduitManifestResponse = unknown;
+
 export interface KausalayerResourceResult {
   tool: string;
   data: unknown | null;
@@ -617,5 +683,89 @@ export interface AdminIdleOverviewResponse {
       totalEarnedUsd: number;
       stale: boolean;
     }>;
+  };
+}
+
+export interface AdminConduitProviderRow {
+  providerId: string;
+  agentId: string;
+  agentName: string;
+  agentSlug: string | null;
+  ownerId: string;
+  ownerEmail: string | null;
+  walletAddress: string;
+  endpointUrl: string;
+  status: string;
+  region: string | null;
+  payoutMode: ConduitPayoutMode;
+  pricePerCallUsdc: number;
+  hmacSecretStored: boolean;
+  hmacSecretStoredAt: string | null;
+  hmacSecretRotatedAt: string | null;
+  adoptedLegacyProvider: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminConduitSettlementRow {
+  referenceId: string;
+  jobId: string | null;
+  agentId: string;
+  agentName: string;
+  ownerId: string;
+  ownerEmail: string | null;
+  payoutMode: ConduitPayoutMode;
+  amountUsdc: number;
+  providerShareUsdc: number;
+  aiCreditsGranted: number;
+  status: string;
+  txHash: string | null;
+  createdAt: string;
+}
+
+export interface AdminConduitOverviewResponse {
+  generatedAt: string;
+  config: {
+    enabled: boolean;
+    providerEnabled: boolean;
+    baseUrl: string;
+    treasurySignerConfigured: boolean;
+    sharedHmacConfigured: boolean;
+    payoutWalletConfigured: boolean;
+    defaultPriceUsdc: number;
+    providerShareBps: number;
+  };
+  errors: string[];
+  protocol: {
+    status: number | null;
+    error: string | null;
+    programs: Array<{ name: string; id: string }>;
+    body: unknown;
+  };
+  providers: {
+    coverage: {
+      total: number;
+      active: number;
+      archived: number;
+      missingSecret: number;
+      legacyAdopted: number;
+      aiCreditsPayout: number;
+      usdcPayout: number;
+    };
+    byStatus: Array<{ status: string; count: number }>;
+    byPayoutMode: Array<{ status: ConduitPayoutMode; count: number }>;
+    missingSecret: AdminConduitProviderRow[];
+    legacyAdopted: AdminConduitProviderRow[];
+    recent: AdminConduitProviderRow[];
+  };
+  settlements: {
+    totalCount: number;
+    totalAmountUsdc: number;
+    totalProviderShareUsdc: number;
+    aiCreditsGranted: number;
+    last24hCount: number;
+    last24hAmountUsdc: number;
+    byPayoutMode: Array<{ status: ConduitPayoutMode; count: number }>;
+    recent: AdminConduitSettlementRow[];
   };
 }
