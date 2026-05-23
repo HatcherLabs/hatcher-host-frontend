@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAgentContext } from '../AgentContext';
 import { API_URL } from '@/lib/config';
+import { canRunNativeTerminalFork, nativeTerminalForkInput } from '@/components/agents/terminalNativeCommands';
 import {
   ChevronDown,
   ChevronUp,
@@ -357,8 +358,14 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
   }, [activeTerminalSession, updateTerminalSessions]);
 
   const forkTerminalSession = useCallback(() => {
-    createTerminalSession(`Fork of ${activeTerminalSession.name}`);
-  }, [activeTerminalSession.name, createTerminalSession]);
+    const ws = wsRef.current;
+    if (!canRunNativeTerminalFork(stateRef.current) || !ws || ws.readyState !== WebSocket.OPEN) {
+      setErrorMsg('Connect the terminal before running native /fork.');
+      return;
+    }
+    ws.send(JSON.stringify({ type: 'input', data: nativeTerminalForkInput() }));
+    termInstance.current?.focus();
+  }, []);
 
   const deleteTerminalSession = useCallback((targetSession: TerminalSession = activeTerminalSession) => {
     if (terminalSessions.length <= 1) return;
@@ -1006,11 +1013,12 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
             <button
               type="button"
               onClick={forkTerminalSession}
-              className="flex w-full items-center justify-center gap-1.5 rounded-md border border-[var(--border-default)] px-2 py-1.5 text-xs font-mono text-[var(--text-secondary)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)]"
-              title="Fork to a new terminal session"
+              disabled={!canRunNativeTerminalFork(state)}
+              className="flex w-full items-center justify-center gap-1.5 rounded-md border border-[var(--border-default)] px-2 py-1.5 text-xs font-mono text-[var(--text-secondary)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-[var(--border-default)] disabled:hover:text-[var(--text-secondary)]"
+              title="Run native /fork in the active terminal"
             >
               <GitBranch size={13} />
-              Fork active
+              /fork
             </button>
           </div>
         </aside>
@@ -1024,6 +1032,15 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
               title="New terminal session"
             >
               <Plus size={14} />
+            </button>
+            <button
+              type="button"
+              onClick={forkTerminalSession}
+              disabled={!canRunNativeTerminalFork(state)}
+              className="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md border border-[var(--border-default)] bg-[var(--bg-card)] text-[var(--text-secondary)] disabled:cursor-not-allowed disabled:opacity-40"
+              title="Run native /fork in the active terminal"
+            >
+              <GitBranch size={14} />
             </button>
             {terminalSessions.map((session) => (
               <button
