@@ -1521,6 +1521,53 @@ export default function AdminPage() {
     }
   }
 
+  async function handleApproveReferral(referralId: string) {
+    const actionKey = `referral:${referralId}`;
+    if (actionInProgress[actionKey]) return;
+    setActionInProgress((prev) => ({ ...prev, [actionKey]: 'approve' }));
+    try {
+      const res = await api.adminApproveReferral(referralId);
+      if (!res.success) {
+        alert(`Approve referral failed: ${res.error ?? 'Unknown error'}`);
+        return;
+      }
+
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.referredBy?.referralId === referralId
+            ? {
+                ...u,
+                referredBy: {
+                  ...u.referredBy,
+                  isFlagged: false,
+                  flagReason: null,
+                },
+              }
+            : u,
+        ),
+      );
+      setUserDetail((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          referralReceived:
+            prev.referralReceived?.id === referralId
+              ? { ...prev.referralReceived, isFlagged: false, flagReason: null }
+              : prev.referralReceived,
+          referralsGiven: prev.referralsGiven.map((r) =>
+            r.id === referralId ? { ...r, isFlagged: false, flagReason: null } : r,
+          ),
+        };
+      });
+    } finally {
+      setActionInProgress((prev) => {
+        const next = { ...prev };
+        delete next[actionKey];
+        return next;
+      });
+    }
+  }
+
   async function handleUpdateTicketStatus(ticketId: string, status: string) {
     try {
       const res = await api.adminUpdateTicketStatus(ticketId, status);
@@ -3201,10 +3248,20 @@ export default function AdminPage() {
                         <div className="flex items-center justify-between gap-2 mb-1">
                           <span className="font-medium text-[var(--text-primary)]">Referred by</span>
                           {userDetail.referralReceived?.isFlagged && (
-                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-semibold">
-                              <AlertTriangle size={10} />
-                              {userDetail.referralReceived.flagReason || 'flagged'}
-                            </span>
+                            <div className="flex items-center gap-1.5">
+                              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-semibold">
+                                <AlertTriangle size={10} />
+                                {userDetail.referralReceived.flagReason || 'flagged'}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => handleApproveReferral(userDetail.referralReceived!.id)}
+                                disabled={!!actionInProgress[`referral:${userDetail.referralReceived.id}`]}
+                                className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold hover:bg-emerald-500/20 disabled:opacity-50"
+                              >
+                                {actionInProgress[`referral:${userDetail.referralReceived.id}`] ? 'Approving...' : 'Approve'}
+                              </button>
+                            </div>
                           )}
                           {userDetail.referralReceived?.rewardClaimed && !userDetail.referralReceived.isFlagged && (
                             <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold">
@@ -3257,6 +3314,16 @@ export default function AdminPage() {
                                     <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold border ${r.isFlagged ? 'bg-red-500/10 text-red-400 border-red-500/20' : r.rewardClaimed ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'}`}>
                                       {r.isFlagged ? 'flagged' : r.rewardClaimed ? 'claimed' : 'pending'}
                                     </span>
+                                    {r.isFlagged && (
+                                      <button
+                                        type="button"
+                                        onClick={() => handleApproveReferral(r.id)}
+                                        disabled={!!actionInProgress[`referral:${r.id}`]}
+                                        className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold hover:bg-emerald-500/20 disabled:opacity-50"
+                                      >
+                                        {actionInProgress[`referral:${r.id}`] ? '...' : 'Approve'}
+                                      </button>
+                                    )}
                                     <span className="text-[10px] text-[var(--text-muted)]">{r.referred.aiCreditsBalance.toLocaleString()} credits</span>
                                   </div>
                                 </div>

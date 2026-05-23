@@ -1205,6 +1205,13 @@ export const api = {
   adminUnbanUser: (userId: string) =>
     req<{ unbanned: boolean; userId: string }>(`/admin/users/${userId}/unban`, { method: 'POST' }),
 
+  /** Admin: approve a flagged referral so it becomes claimable */
+  adminApproveReferral: (referralId: string) =>
+    req<{ approved: boolean; referral: { id: string; isFlagged: boolean; flagReason: string | null } }>(
+      `/admin/referrals/${referralId}/approve`,
+      { method: 'POST' },
+    ),
+
   /** Admin: list all support tickets */
   adminGetTickets: () =>
     req<{
