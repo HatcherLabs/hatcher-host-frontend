@@ -1521,14 +1521,16 @@ export default function AdminPage() {
     }
   }
 
-  async function handleApproveReferral(referralId: string) {
+  async function handleReferralReview(referralId: string, action: 'approve' | 'unflag') {
     const actionKey = `referral:${referralId}`;
     if (actionInProgress[actionKey]) return;
-    setActionInProgress((prev) => ({ ...prev, [actionKey]: 'approve' }));
+    setActionInProgress((prev) => ({ ...prev, [actionKey]: action }));
     try {
-      const res = await api.adminApproveReferral(referralId);
+      const res = action === 'approve'
+        ? await api.adminApproveReferral(referralId)
+        : await api.adminUnflagReferral(referralId);
       if (!res.success) {
-        alert(`Approve referral failed: ${res.error ?? 'Unknown error'}`);
+        alert(`${action === 'approve' ? 'Approve' : 'Unflag'} referral failed: ${res.error ?? 'Unknown error'}`);
         return;
       }
 
@@ -1566,6 +1568,14 @@ export default function AdminPage() {
         return next;
       });
     }
+  }
+
+  async function handleApproveReferral(referralId: string) {
+    return handleReferralReview(referralId, 'approve');
+  }
+
+  async function handleUnflagReferral(referralId: string) {
+    return handleReferralReview(referralId, 'unflag');
   }
 
   async function handleUpdateTicketStatus(ticketId: string, status: string) {
@@ -2582,10 +2592,23 @@ export default function AdminPage() {
                                     {u.referredBy.referrerUsername || u.referredBy.referrerEmail}
                                   </span>
                                   {u.referredBy.isFlagged && (
-                                    <span title={u.referredBy.flagReason || 'Flagged'} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20 text-[9px] font-bold uppercase">
-                                      <AlertTriangle size={10} />
-                                      Flagged
-                                    </span>
+                                    <>
+                                      <span title={u.referredBy.flagReason || 'Flagged'} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20 text-[9px] font-bold uppercase">
+                                        <AlertTriangle size={10} />
+                                        Flagged
+                                      </span>
+                                      <button
+                                        type="button"
+                                        onClick={(event) => {
+                                          event.stopPropagation();
+                                          void handleUnflagReferral(u.referredBy!.referralId);
+                                        }}
+                                        disabled={!!actionInProgress[`referral:${u.referredBy.referralId}`]}
+                                        className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[9px] font-bold uppercase hover:bg-emerald-500/20 disabled:opacity-50"
+                                      >
+                                        {actionInProgress[`referral:${u.referredBy.referralId}`] ? '...' : 'Unflag'}
+                                      </button>
+                                    </>
                                   )}
                                   {u.referredBy.rewardClaimed && !u.referredBy.isFlagged && (
                                     <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[9px] font-bold uppercase">

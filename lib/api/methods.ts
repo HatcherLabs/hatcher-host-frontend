@@ -1207,8 +1207,15 @@ export const api = {
 
   /** Admin: approve a flagged referral so it becomes claimable */
   adminApproveReferral: (referralId: string) =>
-    req<{ approved: boolean; referral: { id: string; isFlagged: boolean; flagReason: string | null } }>(
+    req<{ approved: boolean; unflagged: boolean; referral: { id: string; isFlagged: boolean; flagReason: string | null } }>(
       `/admin/referrals/${referralId}/approve`,
+      { method: 'POST' },
+    ),
+
+  /** Admin: clear a referral fraud flag without changing reward state */
+  adminUnflagReferral: (referralId: string) =>
+    req<{ approved: boolean; unflagged: boolean; referral: { id: string; isFlagged: boolean; flagReason: string | null } }>(
+      `/admin/referrals/${referralId}/unflag`,
       { method: 'POST' },
     ),
 
