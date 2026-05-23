@@ -1174,8 +1174,25 @@ export const api = {
         emailVerified: boolean;
         agentCount: number;
         paymentCount: number;
+        referralGivenCount?: number;
         aiCreditsBalance: number;
         createdAt: string;
+        referredBy: {
+          referralId: string;
+          referrerId: string;
+          referrerEmail: string;
+          referrerUsername: string | null;
+          referrerReferralCode: string | null;
+          affiliateId: string | null;
+          affiliateCode: string | null;
+          affiliateActive: boolean | null;
+          affiliateFrozen: boolean | null;
+          rewardClaimed: boolean;
+          isFlagged: boolean;
+          flagReason: string | null;
+          signupIp: string | null;
+          createdAt: string;
+        } | null;
       }>;
       pagination: { total: number; limit: number; offset: number; hasMore: boolean };
     }>(`/admin/users?limit=${take}&offset=${skip}`),
@@ -1187,6 +1204,13 @@ export const api = {
   /** Admin: unban a user */
   adminUnbanUser: (userId: string) =>
     req<{ unbanned: boolean; userId: string }>(`/admin/users/${userId}/unban`, { method: 'POST' }),
+
+  /** Admin: approve a flagged referral so it becomes claimable */
+  adminApproveReferral: (referralId: string) =>
+    req<{ approved: boolean; referral: { id: string; isFlagged: boolean; flagReason: string | null } }>(
+      `/admin/referrals/${referralId}/approve`,
+      { method: 'POST' },
+    ),
 
   /** Admin: list all support tickets */
   adminGetTickets: () =>
