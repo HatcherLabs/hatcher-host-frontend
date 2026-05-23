@@ -4,7 +4,7 @@
 
 import { API_URL } from '@/lib/config';
 import { getToken, req } from './core';
-import type { Agent, AgentPassport, AgentPassportNetworkId, AgentWalletPrivateKeyResponse, AgentWalletsResponse, Payment, AgentFeature, ChatMessage, ChatSessionSummary, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse, AdminConduitOverviewResponse, AdminEgressEventsResponse, AgentEgressEventsResponse, AdminIdleOverviewResponse, GetAgentMailboxResponse, GetAgentMailMessagesResponse, SendAgentMailBody, SendAgentMailResponse, UpdateAgentMailSettingsBody, UpdateAgentMailSettingsResponse, AgentMailDirection, KausalayerCallBody, KausalayerCallResponse, KausalayerConfigBody, KausalayerConfigStatus, KausalayerHealthResponse, KausalayerResourcesResponse, KausalayerToolsResponse, ConduitConfigBody, ConduitConfigStatus, ConduitManifestResponse, ConduitProviderActionResponse, ConduitProviderPatchBody, ConduitProvidersResponse, ConduitProtocolInfoResponse, ConduitRegisterProviderBody, ConduitRegisterProviderResponse } from './types';
+import type { Agent, AgentCommLogsResponse, AgentCommPermissionsResponse, AgentPassport, AgentPassportNetworkId, AgentWalletPrivateKeyResponse, AgentWalletsResponse, Payment, AgentFeature, ChatMessage, ChatSessionSummary, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse, AdminConduitOverviewResponse, AdminEgressEventsResponse, AgentEgressEventsResponse, AdminIdleOverviewResponse, GetAgentMailboxResponse, GetAgentMailMessagesResponse, SendAgentMailBody, SendAgentMailResponse, UpdateAgentMailSettingsBody, UpdateAgentMailSettingsResponse, AgentMailDirection, KausalayerCallBody, KausalayerCallResponse, KausalayerConfigBody, KausalayerConfigStatus, KausalayerHealthResponse, KausalayerResourcesResponse, KausalayerToolsResponse, ConduitConfigBody, ConduitConfigStatus, ConduitManifestResponse, ConduitProviderActionResponse, ConduitProviderPatchBody, ConduitProvidersResponse, ConduitProtocolInfoResponse, ConduitRegisterProviderBody, ConduitRegisterProviderResponse } from './types';
 import type { TierConfig, AdminOverviewExtras } from '@hatcher/shared';
 
 const API_BASE = API_URL;
@@ -2114,6 +2114,30 @@ export const api = {
         durationMs: number;
       }>;
     }>(`/agents/${agentId}/workflows/${workflowId}/logs`),
+
+  // ─── Agent-to-Agent Communication ─────────────────────────
+  getAgentCommPermissions: (agentId: string) =>
+    req<AgentCommPermissionsResponse>(`/agents/${agentId}/comm/permissions`),
+
+  updateAgentComm: (agentId: string, commEnabled: boolean) =>
+    req<{ id: string; commEnabled: boolean }>(`/agents/${agentId}/comm`, {
+      method: 'PATCH',
+      body: JSON.stringify({ commEnabled }),
+    }),
+
+  addAgentCommPermission: (agentId: string, allowedAgentId: string) =>
+    req<{ id: string; allowedAgentId?: string; message?: string }>(`/agents/${agentId}/comm/permissions`, {
+      method: 'POST',
+      body: JSON.stringify({ allowedAgentId }),
+    }),
+
+  deleteAgentCommPermission: (agentId: string, permissionId: string) =>
+    req<{ deleted: boolean }>(`/agents/${agentId}/comm/permissions/${permissionId}`, {
+      method: 'DELETE',
+    }),
+
+  getAgentCommLogs: (agentId: string, limit = 50) =>
+    req<AgentCommLogsResponse>(`/agents/${agentId}/comm/logs?limit=${encodeURIComponent(String(limit))}`),
 
   // ─── Credits ──────────────────────────────────────────────────
 

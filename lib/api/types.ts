@@ -80,6 +80,7 @@ export interface Agent {
   config?: Record<string, unknown>;
   features?: Array<{ featureKey: string }>;
   isPublic?: boolean;
+  commEnabled?: boolean;
   inactiveSince?: string | null;
   archivedAt?: string | null;
   archiveDeleteAfter?: string | null;
@@ -92,6 +93,38 @@ export interface Agent {
   skaleRegisteredAt?: string | null;
   createdAt: string;
   updatedAt?: string;
+}
+
+export interface AgentCommPermission {
+  id: string;
+  allowedAgent: {
+    id: string;
+    name: string;
+    framework: AgentFramework | string;
+  };
+  createdAt: string;
+}
+
+export interface AgentCommPermissionsResponse {
+  commEnabled: boolean;
+  permissions: AgentCommPermission[];
+}
+
+export interface AgentCommLog {
+  id: string;
+  sourceAgentId: string;
+  targetAgentId: string;
+  message: string;
+  response: string | null;
+  status: string;
+  latencyMs: number;
+  chainId: string;
+  chainDepth: number;
+  createdAt: string;
+}
+
+export interface AgentCommLogsResponse {
+  logs: AgentCommLog[];
 }
 
 export interface AgentMailboxInfo {

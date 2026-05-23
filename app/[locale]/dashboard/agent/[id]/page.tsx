@@ -141,6 +141,11 @@ const TerminalTab = dynamic(
   { loading: TabSkeleton },
 );
 
+const DevTab = dynamic(
+  () => import('@/components/agents/tabs/DevTab').then(mod => ({ default: mod.DevTab })),
+  { loading: () => <TabSkeleton /> },
+);
+
 const KnowledgeTab = dynamic(
   () => import('@/components/agents/tabs/KnowledgeTab').then(mod => ({ default: mod.KnowledgeTab })),
   { loading: () => <TabSkeleton /> },
@@ -187,7 +192,7 @@ export default function AgentManagePage() {
   const [ownedAgentsLoading, setOwnedAgentsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const statusPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const validTabs: Tab[] = ['overview','config','integrations','skills','plugins','files','logs','terminal','memory','sessions','knowledge','schedules','workflows','chat','mail','stats','wallet'];
+  const validTabs: Tab[] = ['overview','config','integrations','skills','plugins','files','logs','terminal','dev','memory','sessions','knowledge','schedules','workflows','chat','mail','stats','wallet'];
   // 'skills' kept in validTabs for backwards compat (deep links), but redirects to plugins tab
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
   const rawTab = searchParams.get('tab');
@@ -1391,7 +1396,7 @@ export default function AgentManagePage() {
 
           {/* ─── Tab Content ──────────────────────────────────── */}
           <div className="flex-1 min-w-0 bg-[var(--bg-base)]">
-            <div className={`${tab === 'chat' || tab === 'terminal' || tab === 'mail' ? 'w-full max-w-none px-4 sm:px-6 lg:px-8 2xl:px-10' : 'max-w-[1280px] mx-auto px-4 sm:px-6'} py-6`}>
+            <div className={`${tab === 'chat' || tab === 'terminal' || tab === 'mail' || tab === 'dev' ? 'w-full max-w-none px-4 sm:px-6 lg:px-8 2xl:px-10' : 'max-w-[1280px] mx-auto px-4 sm:px-6'} py-6`}>
             <AnimatePresence mode="wait">
               {tab === 'overview' && <OverviewTab />}
               {tab === 'config' && <ConfigTab />}
@@ -1409,6 +1414,7 @@ export default function AgentManagePage() {
               )}
               {tab === 'chat' && <ChatTab />}
               {tab === 'mail' && <MailTab />}
+              {tab === 'dev' && <DevTab />}
               {tab === 'knowledge' && <KnowledgeTab />}
               {tab === 'wallet' && <WalletTab />}
               {tab === 'stats' && <StatsTab />}

@@ -1280,6 +1280,7 @@
         "chat": "Chat",
         "mail": "Mail",
         "terminal": "Terminal",
+        "dev": "Dev",
         "config": "Configurare",
         "integrations": "Integrări",
         "plugins": "Plugin-uri & Abilități",

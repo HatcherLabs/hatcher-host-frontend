@@ -1280,6 +1280,7 @@
         "chat": "Chat",
         "mail": "Mail",
         "terminal": "Terminal",
+        "dev": "Dev",
         "config": "Config",
         "integrations": "Integrations",
         "plugins": "Plugins & Skills",
