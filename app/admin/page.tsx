@@ -168,6 +168,84 @@ function TierBadge({ tier }: { tier: string }) {
 // ── Admin agent type ─────────────────────────────────────────
 type AdminAgent = Agent & { ownerUsername?: string; ownerWallet: string | null };
 
+type AdminReferralUser = {
+  id: string;
+  email: string;
+  username: string | null;
+  referralCode?: string | null;
+};
+
+type AdminUserReferralReceived = {
+  id: string;
+  referrer: AdminReferralUser;
+  affiliate: { id: string; referralCode: string; isActive: boolean; isFrozen: boolean } | null;
+  rewardClaimed: boolean;
+  isFlagged: boolean;
+  flagReason: string | null;
+  signupIp: string | null;
+  signupUserAgent?: string | null;
+  createdAt: string;
+};
+
+type AdminUserReferralGiven = {
+  id: string;
+  referred: AdminReferralUser & {
+    tier: string;
+    emailVerified: boolean;
+    aiCreditsBalance: number;
+    createdAt: string;
+  };
+  affiliate: { id: string; referralCode: string; isActive: boolean; isFrozen: boolean } | null;
+  rewardClaimed: boolean;
+  isFlagged: boolean;
+  flagReason: string | null;
+  signupIp: string | null;
+  signupUserAgent: string | null;
+  createdAt: string;
+};
+
+type AdminReferralCreditGrant = {
+  id: string;
+  creditsGranted: number;
+  creditsRemaining: number;
+  source: string;
+  description: string | null;
+  metadata: unknown;
+  createdAt: string;
+  expiresAt: string | null;
+};
+
+type AdminUserRow = {
+  id: string;
+  email: string;
+  username: string;
+  walletAddress: string | null;
+  tier: string;
+  isAdmin: boolean;
+  agentCount: number;
+  paymentCount: number;
+  referralGivenCount?: number;
+  aiCreditsBalance: number;
+  createdAt: string;
+  emailVerified: boolean;
+  referredBy: {
+    referralId: string;
+    referrerId: string;
+    referrerEmail: string;
+    referrerUsername: string | null;
+    referrerReferralCode: string | null;
+    affiliateId: string | null;
+    affiliateCode: string | null;
+    affiliateActive: boolean | null;
+    affiliateFrozen: boolean | null;
+    rewardClaimed: boolean;
+    isFlagged: boolean;
+    flagReason: string | null;
+    signupIp: string | null;
+    createdAt: string;
+  } | null;
+};
+
 // ═════════════════════════════════════════════════════════════
 // Admin Page
 // ═════════════════════════════════════════════════════════════
@@ -1058,19 +1136,7 @@ export default function AdminPage() {
     tierBreakdown?: Record<string, number>;
   } | null>(null);
   const [agents, setAgents] = useState<AdminAgent[]>([]);
-  const [users, setUsers] = useState<Array<{
-    id: string;
-    email: string;
-    username: string;
-    walletAddress: string | null;
-    tier: string;
-    isAdmin: boolean;
-    agentCount: number;
-    paymentCount: number;
-    aiCreditsBalance: number;
-    createdAt: string;
-    emailVerified: boolean;
-  }>>([]);
+  const [users, setUsers] = useState<AdminUserRow[]>([]);
   const [tickets, setTickets] = useState<Array<{
     id: string;
     subject: string;
@@ -1112,7 +1178,7 @@ export default function AdminPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [userSearchQuery, setUserSearchQuery] = useState('');
   const [userTierFilter, setUserTierFilter] = useState<string>('all');
-  const [userSortBy, setUserSortBy] = useState<'createdAt' | 'agentCount' | 'paymentCount' | 'aiCreditsBalance'>('createdAt');
+  const [userSortBy, setUserSortBy] = useState<'createdAt' | 'agentCount' | 'paymentCount' | 'aiCreditsBalance' | 'referralGivenCount'>('createdAt');
   const [userSortDir, setUserSortDir] = useState<'asc' | 'desc'>('desc');
   const [frameworkFilter, setFrameworkFilter] = useState<string>('all');
 
@@ -1140,6 +1206,9 @@ export default function AdminPage() {
     features: Array<{ id: string; featureKey: string; type: string; expiresAt: string | null; createdAt: string; txSignature: string; usdPrice: number }>;
     payments: Array<{ id: string; featureKey: string; usdAmount: number; txSignature: string; status: string; createdAt: string; agentId: string | null }>;
     agents: Array<{ id: string; name: string; framework: string; status: string; createdAt: string }>;
+    referralReceived: AdminUserReferralReceived | null;
+    referralsGiven: AdminUserReferralGiven[];
+    referralCreditGrants: AdminReferralCreditGrant[];
   };
 
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -1352,7 +1421,11 @@ export default function AdminPage() {
         (u) =>
           u.username.toLowerCase().includes(q) ||
           u.email.toLowerCase().includes(q) ||
-          (u.walletAddress ?? '').toLowerCase().includes(q)
+          (u.walletAddress ?? '').toLowerCase().includes(q) ||
+          (u.referredBy?.referrerEmail ?? '').toLowerCase().includes(q) ||
+          (u.referredBy?.referrerUsername ?? '').toLowerCase().includes(q) ||
+          (u.referredBy?.affiliateCode ?? '').toLowerCase().includes(q) ||
+          (u.referredBy?.flagReason ?? '').toLowerCase().includes(q)
       );
     }
 
@@ -1362,6 +1435,7 @@ export default function AdminPage() {
       if (userSortBy === 'agentCount') return dir * (a.agentCount - b.agentCount);
       if (userSortBy === 'paymentCount') return dir * (a.paymentCount - b.paymentCount);
       if (userSortBy === 'aiCreditsBalance') return dir * (a.aiCreditsBalance - b.aiCreditsBalance);
+      if (userSortBy === 'referralGivenCount') return dir * ((a.referralGivenCount ?? 0) - (b.referralGivenCount ?? 0));
       return 0;
     });
 
@@ -1469,7 +1543,14 @@ export default function AdminPage() {
         credentials: 'include',
       });
       const json = await res.json();
-      if (json.success) setUserDetail(json.data);
+      if (json.success) {
+        setUserDetail({
+          ...json.data,
+          referralReceived: json.data.referralReceived ?? null,
+          referralsGiven: json.data.referralsGiven ?? [],
+          referralCreditGrants: json.data.referralCreditGrants ?? [],
+        });
+      }
     } finally {
       setUserDetailLoading(false);
     }
@@ -2363,7 +2444,7 @@ export default function AdminPage() {
                   <Search size={16} className="text-[var(--text-muted)]" />
                   <input
                     type="text"
-                    placeholder="Search users by name, email, wallet..."
+                    placeholder="Search users by name, email, wallet, referrer..."
                     value={userSearchQuery}
                     onChange={(e) => setUserSearchQuery(e.target.value)}
                     className="bg-transparent outline-none text-sm w-full text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
@@ -2385,11 +2466,13 @@ export default function AdminPage() {
                 </div>
               ) : (
                 <div className="overflow-x-auto -mx-3 sm:-mx-0 px-3 sm:px-0">
-                  <table className="w-full text-left text-xs sm:text-sm" style={{ minWidth: '650px' }}>
+                  <table className="w-full text-left text-xs sm:text-sm" style={{ minWidth: '900px' }}>
                     <thead>
                       <tr className="border-b border-[var(--border-default)]">
                         {[
                           { key: 'user', label: 'User', sortable: false },
+                          { key: 'referredBy', label: 'Referred by', sortable: false },
+                          { key: 'referralGivenCount', label: 'Refs', sortable: true },
                           { key: 'tier', label: 'Tier', sortable: false },
                           { key: 'agentCount', label: 'Agents', sortable: true },
                           { key: 'paymentCount', label: 'Payments', sortable: true },
@@ -2441,6 +2524,43 @@ export default function AdminPage() {
                                 <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 uppercase">Unverified</span>
                               )}
                             </div>
+                          </td>
+
+                          {/* Referred by */}
+                          <td className="py-3.5 pr-4">
+                            {u.referredBy ? (
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-xs font-medium text-[var(--text-primary)] truncate max-w-[150px]">
+                                    {u.referredBy.referrerUsername || u.referredBy.referrerEmail}
+                                  </span>
+                                  {u.referredBy.isFlagged && (
+                                    <span title={u.referredBy.flagReason || 'Flagged'} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20 text-[9px] font-bold uppercase">
+                                      <AlertTriangle size={10} />
+                                      Flagged
+                                    </span>
+                                  )}
+                                  {u.referredBy.rewardClaimed && !u.referredBy.isFlagged && (
+                                    <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[9px] font-bold uppercase">
+                                      Claimed
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="text-[10px] text-[var(--text-muted)] truncate max-w-[220px]">
+                                  {u.referredBy.affiliateCode ? `affiliate ${u.referredBy.affiliateCode}` : u.referredBy.referrerEmail}
+                                  {u.referredBy.signupIp ? ` · ${u.referredBy.signupIp}` : ''}
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="text-xs text-[var(--text-muted)]">—</span>
+                            )}
+                          </td>
+
+                          {/* Referrals given */}
+                          <td className="py-3.5 pr-4">
+                            <span className={`text-sm font-mono ${(u.referralGivenCount ?? 0) >= 5 ? 'text-amber-400' : 'text-[var(--text-primary)]'}`}>
+                              {(u.referralGivenCount ?? 0).toLocaleString()}
+                            </span>
                           </td>
 
                           {/* Tier */}
@@ -3063,6 +3183,119 @@ export default function AdminPage() {
                       <div className="p-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
                         <div className="text-[var(--text-muted)] mb-0.5">Wallet</div>
                         <div className="font-semibold text-[var(--text-primary)] truncate">{userDetail.walletAddress ? `${userDetail.walletAddress.slice(0,6)}…${userDetail.walletAddress.slice(-4)}` : '—'}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Referral Activity */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">Referral Activity</h3>
+                      <span className="text-[10px] text-[var(--text-muted)]">
+                        {userDetail.referralsGiven.length} given · {userDetail.referralCreditGrants.length} grants
+                      </span>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="p-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-xs">
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <span className="font-medium text-[var(--text-primary)]">Referred by</span>
+                          {userDetail.referralReceived?.isFlagged && (
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-semibold">
+                              <AlertTriangle size={10} />
+                              {userDetail.referralReceived.flagReason || 'flagged'}
+                            </span>
+                          )}
+                          {userDetail.referralReceived?.rewardClaimed && !userDetail.referralReceived.isFlagged && (
+                            <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold">
+                              claimed
+                            </span>
+                          )}
+                        </div>
+                        {userDetail.referralReceived ? (
+                          <div className="space-y-1 text-[var(--text-muted)]">
+                            <div>
+                              <span className="text-[var(--text-primary)]">
+                                {userDetail.referralReceived.referrer.username || userDetail.referralReceived.referrer.email}
+                              </span>
+                              <span> · {userDetail.referralReceived.referrer.email}</span>
+                            </div>
+                            <div>
+                              {userDetail.referralReceived.affiliate
+                                ? `Affiliate code ${userDetail.referralReceived.affiliate.referralCode}`
+                                : `User code ${userDetail.referralReceived.referrer.referralCode || 'unknown'}`}
+                              {userDetail.referralReceived.signupIp ? ` · IP ${userDetail.referralReceived.signupIp}` : ''}
+                            </div>
+                            <div>{new Date(userDetail.referralReceived.createdAt).toLocaleString()}</div>
+                          </div>
+                        ) : (
+                          <p className="text-[var(--text-muted)]">No referral attribution.</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <div className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-1.5">Referrals given</div>
+                        {userDetail.referralsGiven.length === 0 ? (
+                          <p className="text-xs text-[var(--text-muted)]">No referred users.</p>
+                        ) : (
+                          <div className="space-y-1.5">
+                            {userDetail.referralsGiven.slice(0, 8).map(r => (
+                              <div key={r.id} className="p-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-xs">
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="min-w-0">
+                                    <div className="font-medium text-[var(--text-primary)] truncate">
+                                      {r.referred.username || r.referred.email}
+                                    </div>
+                                    <div className="text-[var(--text-muted)] truncate">
+                                      {r.referred.email} · {r.referred.tier} · {r.referred.emailVerified ? 'verified' : 'unverified'}
+                                    </div>
+                                    <div className="text-[10px] text-[var(--text-muted)]">
+                                      {timeAgo(r.createdAt)}{r.signupIp ? ` · ${r.signupIp}` : ''}
+                                    </div>
+                                  </div>
+                                  <div className="flex flex-col items-end gap-1 shrink-0">
+                                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold border ${r.isFlagged ? 'bg-red-500/10 text-red-400 border-red-500/20' : r.rewardClaimed ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'}`}>
+                                      {r.isFlagged ? 'flagged' : r.rewardClaimed ? 'claimed' : 'pending'}
+                                    </span>
+                                    <span className="text-[10px] text-[var(--text-muted)]">{r.referred.aiCreditsBalance.toLocaleString()} credits</span>
+                                  </div>
+                                </div>
+                                {r.flagReason && (
+                                  <div className="mt-1.5 text-[10px] text-red-300 bg-red-500/10 rounded px-2 py-1 break-words">
+                                    {r.flagReason}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                            {userDetail.referralsGiven.length > 8 && (
+                              <div className="text-[10px] text-[var(--text-muted)] text-center">
+                                Showing latest 8 of {userDetail.referralsGiven.length}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      <div>
+                        <div className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-1.5">Referral AI Credit grants</div>
+                        {userDetail.referralCreditGrants.length === 0 ? (
+                          <p className="text-xs text-[var(--text-muted)]">No referral grants recorded.</p>
+                        ) : (
+                          <div className="space-y-1.5">
+                            {userDetail.referralCreditGrants.slice(0, 6).map(g => (
+                              <div key={g.id} className="flex items-center justify-between gap-3 p-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-xs">
+                                <div className="min-w-0">
+                                  <div className="font-medium text-[var(--text-primary)] truncate">{g.description || g.source}</div>
+                                  <div className="text-[10px] text-[var(--text-muted)]">{new Date(g.createdAt).toLocaleString()}</div>
+                                </div>
+                                <div className="text-right shrink-0">
+                                  <div className="font-mono text-[var(--text-primary)]">+{g.creditsGranted.toLocaleString()}</div>
+                                  <div className="text-[10px] text-[var(--text-muted)]">{g.creditsRemaining.toLocaleString()} left</div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
