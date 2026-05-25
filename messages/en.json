@@ -736,7 +736,7 @@
       "heading": "All Integrations Free",
       "badge": "every tier",
       "body": "Telegram, Discord, WhatsApp, Slack, Signal, iMessage, and 14+ more platforms are included free on all tiers. No extra charge, ever.",
-      "note": "All prices are listed in USD. Pay by card, SOL, USDC on Solana, or $HATCHER. $HATCHER payments get 10% off; hosted model and web-search usage is metered with AI Credits, while BYOK is paid directly with your own provider key."
+      "note": "All prices are listed in USD. Pay by card, SOL, USDC on Solana, $HATCHER, or $KAUSA. $HATCHER payments get 10% off; hosted model and web-search usage is metered with AI Credits, while BYOK is paid directly with your own provider key."
     },
     "compareTable": {
       "heading": "Compare Plans",
@@ -784,7 +784,7 @@
         },
         {
           "q": "What payment methods are accepted?",
-          "a": "You can pay by card, SOL, USDC on Solana, or $HATCHER. Crypto prices are listed in USD and converted at live rates via Jupiter."
+          "a": "You can pay by card, SOL, USDC on Solana, $HATCHER, or $KAUSA. Crypto prices are listed in USD and converted at live rates via Jupiter."
         },
         {
           "q": "Can I downgrade my tier?",
@@ -816,7 +816,7 @@
       "createAgent": "Create Agent",
       "seeFrameworks": "See Frameworks"
     },
-    "footerNote": "All prices in USD, payable by card, SOL, USDC on Solana, or $HATCHER. Hosted model and web-search usage is metered with AI Credits; BYOK is paid directly with your own provider key."
+    "footerNote": "All prices in USD, payable by card, SOL, USDC on Solana, $HATCHER, or $KAUSA. Hosted model and web-search usage is metered with AI Credits; BYOK is paid directly with your own provider key."
   },
   "dashboard": {
     "common": {
@@ -958,8 +958,12 @@
       "payWithHatcher": "Pay with $HATCHER",
       "hatcherDesc": "HATCHER token on Solana",
       "hatcherDiscountDesc": "10% off with $HATCHER: {price}",
+      "payWithKausa": "Pay with $KAUSA",
+      "kausaDesc": "KausaLayer partner token on Solana",
       "payWithUsdcSolana": "Pay with USDC on Solana",
       "usdcSolanaDesc": "SPL USDC via Solana wallet",
+      "payWithCryptoNow": "Pay via CryptoNow",
+      "cryptnowDesc": "Hosted SOL / USDC checkout",
       "payWithUsdc": "Pay with USDC",
       "usdcDesc": "Stablecoin — 1 USDC = $1",
       "payWithCard": "Pay with Card",

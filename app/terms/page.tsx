@@ -153,7 +153,7 @@ export default function TermsOfServicePage() {
             <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-3">7. Payment Terms</h2>
             <p>
               Paid features are billed as one-time charges for a fixed period. Prices are listed in USD and payable in
-              SOL, USDC, $HATCHER (on-chain), or by credit/debit card via Stripe. Crypto amounts are calculated at
+              SOL, USDC, $HATCHER, $KAUSA (on-chain), or by credit/debit card via Stripe. Crypto amounts are calculated at
               the live Jupiter rate at checkout time. AI Credits are usage credits for hosted AI services and cannot
               be used to buy plans.
             </p>
@@ -213,7 +213,7 @@ export default function TermsOfServicePage() {
               to the original payment method.
             </p>
             <p className="mt-3">
-              <strong className="text-[var(--text-primary)]">On-chain payments (SOL/USDC/$HATCHER)</strong> are
+              <strong className="text-[var(--text-primary)]">On-chain payments (SOL/USDC/$HATCHER/$KAUSA)</strong> are
               technically non-reversible. We do not issue cash-equivalent account credits for these purchases; billing
               errors are handled manually by support.
             </p>

@@ -18,6 +18,7 @@ export interface PaymentRailButtonsProps {
   onPayWithSOL: () => void;
   onPayWithUSDC: () => void;
   onPayWithHATCHER: () => void;
+  onPayWithKAUSA?: (() => void) | undefined;
   /** Stripe is a placeholder unless a handler is provided. */
   onPayWithCard?: (() => void) | undefined;
   /** Disables every button while a payment is mid-flight. */
@@ -25,7 +26,7 @@ export interface PaymentRailButtonsProps {
 }
 
 export function PaymentRailButtons(props: PaymentRailButtonsProps) {
-  const { onPayWithSOL, onPayWithUSDC, onPayWithHATCHER, onPayWithCard, loading } = props;
+  const { onPayWithSOL, onPayWithUSDC, onPayWithHATCHER, onPayWithKAUSA, onPayWithCard, loading } = props;
   const stripeEnabled = !!onPayWithCard;
   return (
     <div className="space-y-2.5">
@@ -73,6 +74,23 @@ export function PaymentRailButtons(props: PaymentRailButtonsProps) {
         </div>
         {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)]" />}
       </button>
+
+      {onPayWithKAUSA && (
+        <button
+          onClick={onPayWithKAUSA}
+          disabled={loading}
+          className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[#22c55e]/25 bg-[#22c55e]/[0.045] hover:border-[#22c55e]/45 hover:bg-[#22c55e]/[0.075] transition-all disabled:opacity-40"
+        >
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#052e16] via-[#16a34a] to-[#86efac] flex items-center justify-center flex-shrink-0 shadow-[0_0_22px_rgba(34,197,94,0.18)]">
+            <span className="text-white font-extrabold text-[9px] tracking-tight drop-shadow-sm">KAUSA</span>
+          </div>
+          <div className="text-left flex-1">
+            <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with $KAUSA</p>
+            <p className="text-[11px] text-[var(--text-muted)]">Partner token on Solana</p>
+          </div>
+          {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)]" />}
+        </button>
+      )}
 
       <button
         onClick={stripeEnabled ? onPayWithCard : undefined}

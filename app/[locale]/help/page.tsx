@@ -127,11 +127,11 @@ const FAQ_SECTIONS: FAQSection[] = [
       },
       {
         q: 'What payment methods are accepted?',
-        a: 'Hatcher accepts payments by card, SOL, USDC on Solana, or $HATCHER. Crypto prices are listed in USD and converted to the equivalent token amount using the live Jupiter Price API rate at the time of purchase. You\'ll sign a Solana transaction from your connected wallet for crypto payments, and the feature is unlocked once the transaction is confirmed on-chain.',
+        a: 'Hatcher accepts payments by card, SOL, USDC on Solana, $HATCHER, or $KAUSA. Crypto prices are listed in USD and converted to the equivalent token amount using the live Jupiter Price API rate at the time of purchase. You\'ll sign a Solana transaction from your connected wallet for crypto payments, and the feature is unlocked once the transaction is confirmed on-chain.',
       },
       {
         q: 'Do I need crypto to use Hatcher?',
-        a: 'No. The free tier requires no payment at all. For paid plans, Hatcher supports crypto payments (SOL, USDC on Solana, or $HATCHER via your Solana wallet) and traditional payments through Stripe (credit/debit card). You can use Hatcher without ever touching cryptocurrency. Connecting a wallet is optional and only needed for crypto-based payments.',
+        a: 'No. The free tier requires no payment at all. For paid plans, Hatcher supports crypto payments (SOL, USDC on Solana, $HATCHER, or $KAUSA via your Solana wallet) and traditional payments through Stripe (credit/debit card). You can use Hatcher without ever touching cryptocurrency. Connecting a wallet is optional and only needed for crypto-based payments.',
       },
     ],
   },

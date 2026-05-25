@@ -2867,6 +2867,12 @@ export default function AdminPage() {
                                 ? `${p.tokenAmount.toFixed(2)} USDC`
                                 : p.paymentToken === 'hatch' && p.tokenAmount != null
                                   ? `${p.tokenAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })} $HATCHER`
+                                  : p.paymentToken === 'kausa' && p.tokenAmount != null
+                                    ? `${p.tokenAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })} $KAUSA`
+                                  : p.paymentToken === 'cryptnow-usdc'
+                                    ? `CryptoNow${p.tokenAmount != null ? ` · ${p.tokenAmount.toFixed(2)} USDC` : ' USDC'}`
+                                  : p.paymentToken === 'cryptnow-sol'
+                                    ? `CryptoNow${p.tokenAmount != null ? ` · $${p.tokenAmount.toFixed(2)}` : ' SOL'}`
                                   : p.paymentToken === 'stripe'
                                     ? 'Stripe'
                                     : p.hatchAmount

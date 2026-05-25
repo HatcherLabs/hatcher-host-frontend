@@ -736,7 +736,7 @@
       "heading": "Toutes les intégrations gratuites",
       "badge": "chaque forfait",
       "body": "Telegram, Discord, WhatsApp, Slack, Signal, iMessage et 14+ autres plateformes sont inclus gratuitement sur tous les forfaits. Sans frais supplémentaires, jamais.",
-      "note": "Tous les prix sont en USD, payables par carte, SOL, USDC sur Solana ou $HATCHER. Les paiements $HATCHER bénéficient de 10 % de réduction; l'usage des modèles hébergés et de la recherche web est mesuré en AI Credits, tandis que BYOK est payé directement avec votre propre clé fournisseur."
+      "note": "Tous les prix sont en USD, payables par carte, SOL, USDC sur Solana, $HATCHER ou $KAUSA. Les paiements $HATCHER bénéficient de 10 % de réduction; l'usage des modèles hébergés et de la recherche web est mesuré en AI Credits, tandis que BYOK est payé directement avec votre propre clé fournisseur."
     },
     "compareTable": {
       "heading": "Comparer les forfaits",
@@ -784,7 +784,7 @@
         },
         {
           "q": "Quels modes de paiement sont acceptés ?",
-          "a": "Vous pouvez payer par carte, SOL, USDC sur Solana ou $HATCHER. Les prix crypto sont affichés en USD et convertis aux taux en temps réel via Jupiter."
+          "a": "Vous pouvez payer par carte, SOL, USDC sur Solana, $HATCHER ou $KAUSA. Les prix crypto sont affichés en USD et convertis aux taux en temps réel via Jupiter."
         },
         {
           "q": "Puis-je rétrograder mon forfait ?",
@@ -816,7 +816,7 @@
       "createAgent": "Créer un agent",
       "seeFrameworks": "Voir les frameworks"
     },
-    "footerNote": "Tous les prix en USD, payables par carte, SOL, USDC sur Solana ou $HATCHER. L'usage des modèles hébergés et de la recherche web est mesuré en AI Credits ; BYOK est payé directement au fournisseur."
+    "footerNote": "Tous les prix en USD, payables par carte, SOL, USDC sur Solana, $HATCHER ou $KAUSA. L'usage des modèles hébergés et de la recherche web est mesuré en AI Credits ; BYOK est payé directement au fournisseur."
   },
   "dashboard": {
     "common": {
@@ -958,8 +958,12 @@
       "payWithHatcher": "Payer avec $HATCHER",
       "hatcherDesc": "Token HATCHER sur Solana",
       "hatcherDiscountDesc": "10 % de réduction avec $HATCHER : {price}",
+      "payWithKausa": "Payer avec $KAUSA",
+      "kausaDesc": "Token partenaire KausaLayer sur Solana",
       "payWithUsdcSolana": "Payer avec USDC sur Solana",
       "usdcSolanaDesc": "SPL USDC via portefeuille Solana",
+      "payWithCryptoNow": "Payer via CryptoNow",
+      "cryptnowDesc": "Checkout hébergé SOL / USDC",
       "payWithUsdc": "Payer avec USDC",
       "usdcDesc": "Stablecoin — 1 USDC = 1$",
       "payWithCard": "Payer par carte",

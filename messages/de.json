@@ -736,7 +736,7 @@
       "heading": "Alle Integrationen kostenlos",
       "badge": "jeder Tarif",
       "body": "Telegram, Discord, WhatsApp, Slack, Signal, iMessage und 14+ weitere Plattformen sind in allen Tarifen kostenlos inklusive. Nie ein Aufpreis.",
-      "note": "Alle Preise sind in USD, zahlbar per Karte, SOL, USDC auf Solana oder $HATCHER. $HATCHER-Zahlungen erhalten 10 % Rabatt; Nutzung gehosteter Modelle und Websuche wird über AI Credits gemessen, BYOK wird direkt mit Ihrem eigenen Provider-Key bezahlt."
+      "note": "Alle Preise sind in USD, zahlbar per Karte, SOL, USDC auf Solana, $HATCHER oder $KAUSA. $HATCHER-Zahlungen erhalten 10 % Rabatt; Nutzung gehosteter Modelle und Websuche wird über AI Credits gemessen, BYOK wird direkt mit Ihrem eigenen Provider-Key bezahlt."
     },
     "compareTable": {
       "heading": "Pläne vergleichen",
@@ -784,7 +784,7 @@
         },
         {
           "q": "Welche Zahlungsmethoden werden akzeptiert?",
-          "a": "Sie können per Karte, SOL, USDC auf Solana oder $HATCHER bezahlen. Crypto-Preise sind in USD angegeben und werden über Jupiter zu Live-Kursen umgerechnet."
+          "a": "Sie können per Karte, SOL, USDC auf Solana, $HATCHER oder $KAUSA bezahlen. Crypto-Preise sind in USD angegeben und werden über Jupiter zu Live-Kursen umgerechnet."
         },
         {
           "q": "Kann ich meinen Tarif herabstufen?",
@@ -816,7 +816,7 @@
       "createAgent": "Agent erstellen",
       "seeFrameworks": "Frameworks ansehen"
     },
-    "footerNote": "Alle Preise in USD, zahlbar per Karte, SOL, USDC auf Solana oder $HATCHER. Gehostete Modell- und Websuche-Nutzung wird über AI Credits gemessen; BYOK wird direkt beim Provider bezahlt."
+    "footerNote": "Alle Preise in USD, zahlbar per Karte, SOL, USDC auf Solana, $HATCHER oder $KAUSA. Gehostete Modell- und Websuche-Nutzung wird über AI Credits gemessen; BYOK wird direkt beim Provider bezahlt."
   },
   "dashboard": {
     "common": {
@@ -958,8 +958,12 @@
       "payWithHatcher": "Mit $HATCHER bezahlen",
       "hatcherDesc": "HATCHER Token auf Solana",
       "hatcherDiscountDesc": "10 % Rabatt mit $HATCHER: {price}",
+      "payWithKausa": "Mit $KAUSA bezahlen",
+      "kausaDesc": "KausaLayer-Partner-Token auf Solana",
       "payWithUsdcSolana": "Mit USDC auf Solana bezahlen",
       "usdcSolanaDesc": "SPL USDC per Solana-Wallet",
+      "payWithCryptoNow": "Mit CryptoNow bezahlen",
+      "cryptnowDesc": "Gehosteter SOL-/USDC-Checkout",
       "payWithUsdc": "Mit USDC bezahlen",
       "usdcDesc": "Stablecoin — 1 USDC = $1",
       "payWithCard": "Mit Karte bezahlen",

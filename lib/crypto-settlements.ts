@@ -7,7 +7,7 @@ import {
   type SettleResult,
 } from '@/lib/solana-x402-client';
 
-export type PendingPaymentRail = 'sol' | 'hatch' | 'usdc';
+export type PendingPaymentRail = 'sol' | 'hatch' | 'usdc' | 'kausa';
 export type PendingPaymentFlow = 'tier' | 'addon';
 
 export interface PendingCryptoSettlement {
@@ -57,7 +57,7 @@ function normalizePending(raw: unknown): PendingCryptoSettlement | null {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
   const item = raw as Partial<PendingCryptoSettlement>;
   if (
-    (item.rail !== 'sol' && item.rail !== 'hatch' && item.rail !== 'usdc') ||
+    (item.rail !== 'sol' && item.rail !== 'hatch' && item.rail !== 'usdc' && item.rail !== 'kausa') ||
     (item.flow !== 'tier' && item.flow !== 'addon') ||
     typeof item.targetKey !== 'string' ||
     typeof item.txSignature !== 'string' ||
