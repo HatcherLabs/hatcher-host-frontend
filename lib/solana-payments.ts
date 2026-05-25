@@ -29,11 +29,42 @@ import {
 } from '@solana/web3.js';
 import { Buffer } from 'buffer';
 import type { WalletContextState } from '@solana/wallet-adapter-react';
-import { TREASURY_WALLET, HATCH_TOKEN_MINT, USDC_TOKEN_MINT } from './config';
+import { TREASURY_WALLET, HATCH_TOKEN_MINT, USDC_TOKEN_MINT, KAUSA_TOKEN_MINT } from './config';
 
 const ASSOCIATED_TOKEN_PROGRAM_ID = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
 const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
 const TOKEN_2022_PROGRAM_ID = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
+export type SplPaymentMint = 'usdc' | 'hatch' | 'kausa';
+
+const SPL_PAYMENT_TOKENS: Record<SplPaymentMint, {
+  mint: string;
+  decimals: number;
+  symbol: string;
+  tokenProgramId: PublicKey;
+  burnBps: number;
+}> = {
+  usdc: {
+    mint: USDC_TOKEN_MINT,
+    decimals: 6,
+    symbol: 'USDC',
+    tokenProgramId: TOKEN_PROGRAM_ID,
+    burnBps: 0,
+  },
+  hatch: {
+    mint: HATCH_TOKEN_MINT,
+    decimals: 6,
+    symbol: '$HATCHER',
+    tokenProgramId: TOKEN_2022_PROGRAM_ID,
+    burnBps: 1000,
+  },
+  kausa: {
+    mint: KAUSA_TOKEN_MINT,
+    decimals: 6,
+    symbol: '$KAUSA',
+    tokenProgramId: TOKEN_2022_PROGRAM_ID,
+    burnBps: 0,
+  },
+};
 
 export interface SolQuote {
   usdAmount: number;
@@ -321,7 +352,7 @@ export async function payWithSol(params: {
 export async function payWithSplToken(params: {
   wallet: WalletContextState;
   connection: Connection;
-  mint: 'usdc' | 'hatch';
+  mint: SplPaymentMint;
   amountHuman: number; // e.g. 4.99 USDC or 100000 HATCH
   recipientWallet?: string;
   onSignature?: PaymentCallbacks['onSignature'];
@@ -332,21 +363,17 @@ export async function payWithSplToken(params: {
     throw new Error('Connect a Solana wallet first');
   }
 
-  // $HATCHER is a Token-2022 token (pump.fun launched it on the 2022 program
-  // for metadata pointer support). USDC is a classic SPL Token. The ATA
-  // derivation and transfer instruction must be issued to the right program
-  // or simulation reverts with "IncorrectProgramId" / "AccountNotOwnedByProgram".
-  const tokenProgramId = mint === 'hatch' ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID;
-
-  const mintPubkey = new PublicKey(mint === 'usdc' ? USDC_TOKEN_MINT : HATCH_TOKEN_MINT);
+  const token = SPL_PAYMENT_TOKENS[mint];
+  const tokenProgramId = token.tokenProgramId;
+  const mintPubkey = new PublicKey(token.mint);
   const treasury = new PublicKey(recipientWallet ?? TREASURY_WALLET);
 
   const fromAta = getAssociatedTokenAddress(mintPubkey, publicKey, tokenProgramId);
   const toAta = getAssociatedTokenAddress(mintPubkey, treasury, tokenProgramId);
 
-  const decimals = mint === 'usdc' ? 6 : 6; // both USDC + $HATCHER use 6 decimals
+  const decimals = token.decimals;
   const totalBaseUnits = BigInt(Math.floor(amountHuman * 10 ** decimals));
-  const symbol = mint === 'usdc' ? 'USDC' : '$HATCHER';
+  const symbol = token.symbol;
   const source = await resolveSourceTokenAccount({
     connection,
     owner: publicKey,
@@ -361,12 +388,9 @@ export async function payWithSplToken(params: {
     );
   }
 
-  // For $HATCHER payments, split the amount 90/10: treasury receives 90%, the
-  // remaining 10% is burned in the same tx. This ties revenue directly to
-  // token supply reduction and is atomically verifiable — the backend sees
-  // BOTH a transfer to treasury AND a burn instruction signed by the user.
-  // USDC is paid in full; buy-and-burn for stablecoins is handled separately.
-  const burnBaseUnits = mint === 'hatch' ? totalBaseUnits / 10n : 0n;
+  // $HATCHER keeps its existing 90/10 treasury/burn split. Partner tokens
+  // such as $KAUSA and stablecoins transfer 100% to treasury.
+  const burnBaseUnits = token.burnBps > 0 ? (totalBaseUnits * BigInt(token.burnBps)) / 10_000n : 0n;
   const transferBaseUnits = totalBaseUnits - burnBaseUnits;
 
   const tx = new Transaction();

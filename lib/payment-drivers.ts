@@ -12,7 +12,7 @@
 //
 // The hook is intentionally thin:
 //   - knows how to connect the wallet-adapter,
-//   - fetches SOL / $HATCHER rates from /prices,
+//   - fetches SOL / $HATCHER / $KAUSA rates from /prices,
 //   - opens the confirm modal via state and awaits the user's click,
 //   - calls payWithSol / payWithSplToken,
 //   - returns the resulting tx signature (or throws on cancel/error).
@@ -29,7 +29,7 @@ import { api } from '@/lib/api';
 import { payWithSol, payWithSplToken, quoteSolForUsd } from '@/lib/solana-payments';
 import type { ConfirmPaymentModalState } from '@/components/payments/ConfirmPaymentModal';
 
-export type PaymentRail = 'sol' | 'usdc' | 'hatch';
+export type PaymentRail = 'sol' | 'usdc' | 'hatch' | 'kausa';
 
 export interface PaymentDriverOptions {
   onSignature?: (signature: string) => void;
@@ -50,6 +50,8 @@ export interface UsePaymentDrivers {
    * buyer before signing (breakdown in the confirm modal).
    */
   driveHatch: (usdAmount: number, label: string, options?: PaymentDriverOptions) => Promise<string>;
+  /** $KAUSA → treasury SPL ATA. Live Jupiter quote with 1% buffer. */
+  driveKausa: (usdAmount: number, label: string, options?: PaymentDriverOptions) => Promise<string>;
   /** Open the wallet-select modal so the user can connect / switch. */
   openWalletModal: () => void;
   /** Disconnect + re-prompt. Use when the wallet is stuck after the
@@ -234,6 +236,34 @@ export function usePaymentDrivers(): UsePaymentDrivers {
     }
   }, [connection, ensureConnected, askConfirm, forceReconnect]);
 
+  const driveKausa = useCallback(async (usdAmount: number, label: string, options: PaymentDriverOptions = {}): Promise<string> => {
+    await ensureConnected();
+    const priceRes = await api.getPrice('kausa');
+    if (!priceRes.success || !priceRes.data?.price) {
+      throw new Error('Could not fetch live $KAUSA price — try again in a moment');
+    }
+    const kausaAmount = (usdAmount / priceRes.data.price) * 1.01;
+    const approved = await askConfirm({
+      token: 'kausa', label, usdAmount,
+      tokenAmount: kausaAmount, rate: priceRes.data.price,
+    });
+    if (!approved) throw new Error('Cancelled');
+    try {
+      const { signature } = await payWithSplToken({
+        wallet: walletRef.current, connection, mint: 'kausa', amountHuman: kausaAmount, onSignature: options.onSignature,
+      });
+      return signature;
+    } catch (e) {
+      if (isUserCancellation(e)) throw new Error('Cancelled');
+      if (!isTrustRevokedError(e)) throw e;
+      await forceReconnect();
+      const { signature } = await payWithSplToken({
+        wallet: walletRef.current, connection, mint: 'kausa', amountHuman: kausaAmount, onSignature: options.onSignature,
+      });
+      return signature;
+    }
+  }, [connection, ensureConnected, askConfirm, forceReconnect]);
+
   const openWalletModal = useCallback(() => {
     setWalletModalVisible(true);
   }, [setWalletModalVisible]);
@@ -259,6 +289,7 @@ export function usePaymentDrivers(): UsePaymentDrivers {
     driveSol,
     driveUsdc,
     driveHatch,
+    driveKausa,
     openWalletModal,
     reconnect: forceReconnect,
     disconnect,

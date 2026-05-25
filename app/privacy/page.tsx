@@ -105,7 +105,7 @@ export default function PrivacyPolicyPage() {
 
             <h3 className="text-base font-medium text-[var(--text-primary)] mt-4 mb-2">Payment Information</h3>
             <ul className="list-disc pl-6 space-y-1.5">
-              <li>Transaction signatures for on-chain payments (SOL, USDC, $HATCHER)</li>
+              <li>Transaction signatures for on-chain payments (SOL, USDC, $HATCHER, $KAUSA)</li>
               <li>Stripe handles all card data — we never see or store card numbers, CVC, or expiry</li>
               <li>Invoice line items (tier, addon, amount, currency, timestamp)</li>
             </ul>

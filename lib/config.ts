@@ -49,6 +49,10 @@ export const HATCH_TOKEN_MINT =
 export const USDC_TOKEN_MINT =
   process.env.NEXT_PUBLIC_USDC_MINT || 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
 
+// $KAUSA SPL mint on Solana mainnet. Partner token payment rail.
+export const KAUSA_TOKEN_MINT =
+  process.env.NEXT_PUBLIC_KAUSA_MINT || 'BWXSNRBKMviG68MqavyssnzDq4qSArcN7eNYjqEfpump';
+
 export const SOCIAL_LINKS = {
   twitter: 'https://x.com/HatcherLabs',
   github: 'https://github.com/HatcherLabs',

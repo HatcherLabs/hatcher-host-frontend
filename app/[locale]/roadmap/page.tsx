@@ -62,7 +62,7 @@ const PHASES: Phase[] = [
     label: 'LAUNCHED',
     items: [
       { text: 'Official public launch — platform live at hatcher.host' },
-      { text: '4 payment methods — SOL, USDC, $HATCHER (10% burn), Stripe Card' },
+      { text: '5 payment methods — SOL, USDC, $HATCHER (10% burn), $KAUSA, Stripe Card' },
       { text: 'Annual billing — 15% off on subscription tiers and recurring extras' },
       { text: 'AI Credits system for hosted LLM usage and web search' },
       { text: 'Add-on stacking for agent slots and AI Credit top-ups' },

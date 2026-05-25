@@ -537,7 +537,7 @@ export default function SettingsPage() {
                       {user?.walletAddress ? (
                         <div className="space-y-3">
                           <p className="text-xs text-[var(--text-muted)]">
-                            Linked automatically from your first on-chain payment. Used when paying with SOL, USDC, or $HATCHER.
+                            Linked automatically from your first on-chain payment. Used when paying with SOL, USDC, $HATCHER, or $KAUSA.
                           </p>
                           <div className="flex items-center gap-2">
                             <div className="flex-1 h-10 px-3 rounded-lg text-sm bg-[var(--bg-card)] border border-[var(--border-default)] flex items-center truncate font-mono tracking-wider text-[var(--text-primary)]">

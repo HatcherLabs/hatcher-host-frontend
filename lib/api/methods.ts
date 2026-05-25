@@ -655,7 +655,7 @@ export const api = {
   /** Subscribe to a tier. Upgrades may grant prorated AI Credits for the
    *  unused portion of the current billing period.
    *  `billingPeriod='annual'` → 12 months at 15% off (server enforces). */
-  subscribe: (tier: string, txSignature: string, paymentToken: 'sol' | 'hatch' | 'usdc' = 'sol', billingPeriod: 'monthly' | 'annual' = 'monthly') =>
+  subscribe: (tier: string, txSignature: string, paymentToken: 'sol' | 'hatch' | 'usdc' | 'kausa' = 'sol', billingPeriod: 'monthly' | 'annual' = 'monthly') =>
     req<{ tier: string; expiresAt: string | null; paymentId: string; proratedAiCredits: number; monthlyAiCreditsGranted?: number }>('/features/subscribe', {
       method: 'POST',
       body: JSON.stringify({ tier, txSignature, paymentToken, billingPeriod }),
@@ -664,7 +664,7 @@ export const api = {
   /** Purchase an add-on (optionally per-agent). Subscription-type addons
    *  honor `billingPeriod='annual'` (15% off, 12 months); one-time addons
    *  always charge the flat price regardless. */
-  purchaseAddon: (addonKey: string, txSignature: string, agentId?: string, paymentToken: 'sol' | 'hatch' | 'usdc' = 'sol', billingPeriod: 'monthly' | 'annual' = 'monthly') =>
+  purchaseAddon: (addonKey: string, txSignature: string, agentId?: string, paymentToken: 'sol' | 'hatch' | 'usdc' | 'kausa' = 'sol', billingPeriod: 'monthly' | 'annual' = 'monthly') =>
     req<{ addonKey: string }>('/features/addon', {
       method: 'POST',
       body: JSON.stringify({ addonKey, txSignature, paymentToken, billingPeriod, ...(agentId ? { agentId } : {}) }),
@@ -674,7 +674,7 @@ export const api = {
    *  This is intentionally fire-and-forget in the UI; payment must continue
    *  even if observability logging fails. */
   logCryptoPaymentIntent: (payload: {
-    rail: 'sol' | 'hatch' | 'usdc';
+    rail: 'sol' | 'hatch' | 'usdc' | 'kausa';
     flow: 'tier' | 'addon';
     targetKey: string;
     billingPeriod?: 'monthly' | 'annual' | 'lifetime';
@@ -706,6 +706,29 @@ export const api = {
     req<{ sessionId: string; url: string }>('/stripe/checkout/addon', {
       method: 'POST',
       body: JSON.stringify({ addonKey, returnUrl, billingPeriod, ...(agentId ? { agentId } : {}) }),
+    }),
+
+  /** Start a CryptoNow hosted checkout for SOL/USDC on Solana. */
+  cryptnowCheckout: (payload: {
+    kind: 'tier' | 'addon';
+    key: string;
+    billingPeriod?: 'monthly' | 'annual';
+    agentId?: string;
+    coin?: 'SOL' | 'USDC' | 'ALL';
+    returnUrl?: string;
+  }) =>
+    req<{
+      paymentId: string | number;
+      sessionKey: string;
+      url: string;
+      amountUsd: number;
+      merchantReceivesUsd?: number | null;
+      feeUsd?: number | null;
+      coin: 'SOL' | 'USDC' | 'ALL';
+      orderId: string;
+    }>('/payments/cryptnow/checkout', {
+      method: 'POST',
+      body: JSON.stringify(payload),
     }),
 
   /** Open Stripe customer portal for billing management */
@@ -1074,7 +1097,7 @@ export const api = {
     }>(`/agents/${id}/logs`),
 
   /** Get token price from Jupiter */
-  getPrice: (token: 'hatch' | 'sol') =>
+  getPrice: (token: 'hatch' | 'kausa' | 'sol') =>
     req<{ price: number; currency: string; source: string; error?: string }>(`/prices/${token}`),
 
   /** Admin: force-kill an agent container */

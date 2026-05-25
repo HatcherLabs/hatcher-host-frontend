@@ -13,7 +13,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 
-export type PayToken = 'sol' | 'usdc' | 'hatch';
+export type PayToken = 'sol' | 'usdc' | 'hatch' | 'kausa';
 
 export type ConfirmPaymentModalState = {
   isOpen: boolean;
@@ -36,9 +36,13 @@ export function ConfirmPaymentModal(props: {
   const { state, onClose } = props;
   if (!state.isOpen) return null;
 
-  const tokenLabel = state.token === 'sol' ? 'SOL' : state.token === 'usdc' ? 'USDC' : '$HATCHER';
+  const tokenLabel = state.token === 'sol' ? 'SOL'
+    : state.token === 'usdc' ? 'USDC'
+    : state.token === 'kausa' ? '$KAUSA'
+    : '$HATCHER';
   const tokenColor = state.token === 'sol' ? 'from-[#9945FF] to-[#14F195]'
     : state.token === 'usdc' ? 'from-[#2775CA] to-[#0B4DA1]'
+    : state.token === 'kausa' ? 'from-[#052e16] via-[#16a34a] to-[#86efac]'
     : 'from-[#f59e0b] to-[#f97316]';
 
   return (
@@ -60,7 +64,9 @@ export function ConfirmPaymentModal(props: {
         >
           <div className="flex items-center gap-3">
             <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${tokenColor} flex items-center justify-center shrink-0`}>
-              <span className="text-white font-bold text-xs">{tokenLabel === '$HATCHER' ? 'HATCH' : tokenLabel}</span>
+              <span className="text-white font-bold text-xs">
+                {tokenLabel === '$HATCHER' ? 'HATCH' : tokenLabel === '$KAUSA' ? 'KAUSA' : tokenLabel}
+              </span>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[11px] uppercase tracking-wider text-[var(--text-muted)]">Review payment</p>

@@ -29,7 +29,7 @@ const PLANNED_USE_CASES: UseCase[] = [
   {
     icon: CreditCard,
     title: 'Token Economy',
-    description: 'Prices listed in USD. Pay by card, SOL, USDC on Solana, or $HATCHER at live rates.',
+    description: 'Prices listed in USD. Pay by card, SOL, USDC on Solana, $HATCHER, or $KAUSA at live rates.',
   },
   {
     icon: Users,
