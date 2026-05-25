@@ -1,0 +1,58 @@
+name: Bump Site Version
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+  pull-requests: read
+
+concurrency:
+  group: bump-site-version-main
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ github.token }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Bump minor version
+        id: bump
+        run: node scripts/bump-site-version.mjs
+
+      - name: Commit version bump
+        run: |
+          git config user.name "hatcher-release-bot"
+          git config user.email "release-bot@hatcher.host"
+          git add package.json package-lock.json
+
+          if git diff --cached --quiet; then
+            echo "No version changes to commit."
+            exit 0
+          fi
+
+          git commit -m "${{ steps.bump.outputs.commit_message }}"
+          git push origin main
+
+      - name: Deploy version bump
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref main
