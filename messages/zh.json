@@ -2205,6 +2205,14 @@
         "description": "连接 Telegram、Discord、Slack、Twitter/X、Signal、Webhook 和每个套餐都包含的其他渠道。"
       },
       {
+        "title": "Hatcher CLI",
+        "description": "安装 @hatcherlabs/cli，运行 hatcher，并在 shell 中创建智能体、聊天、连接终端、配置 GitHub 和 A2A。"
+      },
+      {
+        "title": "开发工作流",
+        "description": "连接 GitHub、管理终端 sessions、启用 agent-to-agent，并编排自己的智能体。"
+      },
+      {
         "title": "Android 应用",
         "description": "安装 Android 应用，登录，管理智能体，并在移动设备上接收推送通知。"
       },
@@ -2516,6 +2524,29 @@
       "ctaGhost": "查看智能体",
       "metaFrameworks": "OpenClaw + Hermes",
       "metaNoCard": "无需信用卡"
+    },
+    "cli": {
+      "boxLabel": "CLI",
+      "title": "在终端中运行 Hatcher",
+      "sub": "安装 Hatcher CLI，创建 API key，然后运行 `hatcher`。用自然语言创建智能体、与它们聊天、进入实时运行环境，并在 shell 中管理开发工作流。",
+      "apiKeyHint": "在 Account → API Keys → Create key 中生成 API key。",
+      "ctaKey": "创建 API key",
+      "ctaDocs": "CLI 文档",
+      "terminalLabel": "Hatcher CLI",
+      "features": {
+        "hatch": {
+          "title": "Chat-to-Hatch",
+          "body": "用一个提示词生成已配置的 OpenClaw 或 Hermes 智能体。"
+        },
+        "terminal": {
+          "title": "实时终端",
+          "body": "使用 `hatcher terminal` 连接到正在运行的 framework session。"
+        },
+        "dev": {
+          "title": "开发工作流",
+          "body": "在一个 CLI 中使用 GitHub、A2A、sessions、logs 和 orchestration。"
+        }
+      }
     }
   }
 }

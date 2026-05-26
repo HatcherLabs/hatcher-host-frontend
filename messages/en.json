@@ -2229,6 +2229,14 @@
         "description": "Connect Telegram, Discord, Slack, Twitter/X, Signal, webhooks, and other channels included on every tier."
       },
       {
+        "title": "Hatcher CLI",
+        "description": "Install @hatcherlabs/cli, run hatcher, create agents, chat, terminal attach, GitHub setup, and A2A calls from your shell."
+      },
+      {
+        "title": "Developer Workflows",
+        "description": "Connect GitHub, manage terminal sessions, enable agent-to-agent communication, and orchestrate owned agents."
+      },
+      {
         "title": "Android App",
         "description": "Install the Android app, sign in, manage agents, and receive push notifications from your mobile device."
       },
@@ -2540,6 +2548,29 @@
       "ctaGhost": "View agents",
       "metaFrameworks": "OpenClaw + Hermes",
       "metaNoCard": "no credit card"
+    },
+    "cli": {
+      "boxLabel": "CLI",
+      "title": "Run Hatcher from your terminal",
+      "sub": "Install the Hatcher CLI, create an API key, then run `hatcher`. Build agents from plain English, chat with them, attach to their live runtime, and manage developer workflows without leaving your shell.",
+      "apiKeyHint": "Generate an API key in Account → API Keys → Create key.",
+      "ctaKey": "Create API key",
+      "ctaDocs": "CLI docs",
+      "terminalLabel": "Hatcher CLI",
+      "features": {
+        "hatch": {
+          "title": "Chat-to-Hatch",
+          "body": "Turn one prompt into a configured OpenClaw or Hermes agent."
+        },
+        "terminal": {
+          "title": "Live terminal",
+          "body": "Attach to the running framework session with `hatcher terminal`."
+        },
+        "dev": {
+          "title": "Dev workflows",
+          "body": "Use GitHub access, A2A calls, sessions, logs, and orchestration from one CLI."
+        }
+      }
     }
   }
 }

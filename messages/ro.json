@@ -2229,6 +2229,14 @@
         "description": "Conectează Telegram, Discord, Slack, Twitter/X, Signal, webhook-uri și alte canale incluse pe fiecare tier."
       },
       {
+        "title": "Hatcher CLI",
+        "description": "Instalează @hatcherlabs/cli, rulează hatcher și creează agenți, chat, terminal, GitHub și A2A din shell."
+      },
+      {
+        "title": "Developer Workflows",
+        "description": "Conectează GitHub, gestionează sesiuni terminal, activează agent-to-agent și orchestrează agenții deținuți."
+      },
+      {
         "title": "Aplicația Android",
         "description": "Instalează aplicația Android, autentifică-te, gestionează agenții și primește notificări push pe mobil."
       },
@@ -2540,6 +2548,29 @@
       "ctaGhost": "Vezi agenții",
       "metaFrameworks": "OpenClaw + Hermes",
       "metaNoCard": "fără card"
+    },
+    "cli": {
+      "boxLabel": "CLI",
+      "title": "Rulează Hatcher din terminal",
+      "sub": "Instalează Hatcher CLI, creează un API key, apoi rulează `hatcher`. Creezi agenți din limbaj natural, vorbești cu ei, intri în runtime-ul live și gestionezi workflow-uri de developer direct din shell.",
+      "apiKeyHint": "Generează un API key din Account → API Keys → Create key.",
+      "ctaKey": "Creează API key",
+      "ctaDocs": "Docs CLI",
+      "terminalLabel": "Hatcher CLI",
+      "features": {
+        "hatch": {
+          "title": "Chat-to-Hatch",
+          "body": "Transformă un prompt într-un agent OpenClaw sau Hermes configurat."
+        },
+        "terminal": {
+          "title": "Terminal live",
+          "body": "Atașează-te la sesiunea framework-ului cu `hatcher terminal`."
+        },
+        "dev": {
+          "title": "Workflow-uri dev",
+          "body": "Folosește GitHub, A2A, sesiuni, logs și orchestration dintr-un singur CLI."
+        }
+      }
     }
   }
 }
