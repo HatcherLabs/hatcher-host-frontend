@@ -231,6 +231,10 @@ export default function AgentManagePage() {
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const sendingRef = useRef(false);
+  const queuedChatMessagesRef = useRef<
+    Array<{ text: string; options?: { attachments?: ChatAttachmentPayload[] } }>
+  >([]);
+  const [queuedChatCount, setQueuedChatCount] = useState(0);
   const [sendCooldown, setSendCooldown] = useState(false);
   const sendCooldownRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [chatError, setChatError] = useState<string | null>(null);
@@ -366,6 +370,67 @@ export default function AgentManagePage() {
   }, [authLoading, id, isAuthenticated, loadAgent, loadOwnedAgents, router]);
 
   useEffect(() => { sendingRef.current = sending; }, [sending]);
+
+  const chatDraftStorageKey = useMemo(
+    () =>
+      id
+        ? `hatcher:agent:${id}:chat:${activeChatSessionId ?? 'current'}:draft`
+        : null,
+    [activeChatSessionId, id]
+  );
+  const hydratedDraftKeyRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!chatDraftStorageKey || typeof window === 'undefined') return;
+    hydratedDraftKeyRef.current = chatDraftStorageKey;
+    try {
+      setInput(window.localStorage.getItem(chatDraftStorageKey) ?? '');
+    } catch {
+      setInput('');
+    }
+  }, [chatDraftStorageKey]);
+
+  useEffect(() => {
+    if (
+      !chatDraftStorageKey ||
+      hydratedDraftKeyRef.current !== chatDraftStorageKey ||
+      typeof window === 'undefined'
+    ) {
+      return;
+    }
+    try {
+      if (input.trim()) {
+        window.localStorage.setItem(chatDraftStorageKey, input);
+      } else {
+        window.localStorage.removeItem(chatDraftStorageKey);
+      }
+    } catch {
+      // Ignore storage quota/private-mode failures; the in-memory draft still works.
+    }
+  }, [chatDraftStorageKey, input]);
+
+  const enqueueChatMessage = useCallback(
+    (text: string, options?: { attachments?: ChatAttachmentPayload[] }) => {
+      const clean = text.trim();
+      if (!clean) return;
+      queuedChatMessagesRef.current = [
+        ...queuedChatMessagesRef.current,
+        { text: clean, options },
+      ];
+      setQueuedChatCount(queuedChatMessagesRef.current.length);
+      setInput('');
+      setChatError(null);
+      setChatErrorType(null);
+    },
+    []
+  );
+
+  const dequeueChatMessage = useCallback(() => {
+    const [next, ...remaining] = queuedChatMessagesRef.current;
+    queuedChatMessagesRef.current = remaining;
+    setQueuedChatCount(remaining.length);
+    return next ?? null;
+  }, []);
 
   // ─── Poll agent status ────────────────────────────────────
 
@@ -871,10 +936,14 @@ export default function AgentManagePage() {
 
   const sendMessage = async (overrideText?: string, options?: { attachments?: ChatAttachmentPayload[] }) => {
     const text = (overrideText ?? input).trim();
-    if (!text || sending || sendCooldown) return;
+    if (!text) return;
     if (text.toLowerCase() === '/reset' || text.toLowerCase() === '/new') {
       setInput('');
       await startNewChatSession();
+      return;
+    }
+    if (sendingRef.current || sendCooldown) {
+      enqueueChatMessage(text, options);
       return;
     }
     if (agent?.status !== 'active') return;
@@ -1021,6 +1090,13 @@ export default function AgentManagePage() {
     }
   };
 
+  useEffect(() => {
+    if (sending || sendCooldown || queuedChatCount === 0 || agent?.status !== 'active') return;
+    const next = dequeueChatMessage();
+    if (next) void sendMessage(next.text, next.options);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [agent?.status, dequeueChatMessage, queuedChatCount, sendCooldown, sending]);
+
   // ─── Clone ────────────────────────────────────────────────
 
   const [cloning, setCloning] = useState(false);
@@ -1082,7 +1158,7 @@ export default function AgentManagePage() {
       setLogFilter: logs.setLogFilter, logSearch: logs.logSearch, setLogSearch: logs.setLogSearch,
       autoScroll: logs.autoScroll, setAutoScroll: logs.setAutoScroll,
       filteredLogs: logs.filteredLogs, logsEndRef: logs.logsEndRef, loadLogs: logs.loadLogs, wsLogsConnected,
-      messages, setMessages, input, setInput, sending,
+      messages, setMessages, input, setInput, sending, queuedChatCount,
       chatError, setChatError, chatErrorType, setChatErrorType,
       bottomRef, inputRef, sendMessage, abortChatResponse, handleKeyDown, sendCooldown,
       wsConnected: wsChat.isConnected,
@@ -1142,7 +1218,7 @@ export default function AgentManagePage() {
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, agent, stats, tab, logs.logs, logs.logsLoading, logs.logFilter, logs.logSearch, logs.autoScroll, logs.filteredLogs, wsLogsConnected,
-    messages, input, sending, sendCooldown, chatError, chatErrorType, abortChatResponse,
+    messages, input, sending, queuedChatCount, sendCooldown, chatError, chatErrorType, abortChatResponse,
     chatSessions, activeChatSessionId, setActiveChatSessionId, startNewChatSession, deleteChatSession, deletingChatSessionId, loadChatSessions,
     inflightTools, completedTools,
     config.configName, config.configDesc, config.configBio, config.configLore, config.configTopics,

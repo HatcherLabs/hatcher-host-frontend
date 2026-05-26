@@ -2,12 +2,20 @@
 // API Client — barrel export
 // ============================================================
 
-export { getToken, setToken, clearToken, isAuthenticated, req } from './core';
-export type { AuthProfileData, ChatAttachmentPayload } from './methods';
+export { getToken, setToken, clearToken, isAuthenticated, req } from "./core";
+export type { AuthProfileData, ChatAttachmentPayload } from "./methods";
 export type {
   Payment,
   AgentFeature,
   Agent,
+  AgentCommCallBody,
+  AgentCommCallResponse,
+  AgentCommCandidate,
+  AgentCommDiscoverResponse,
+  AgentGithubConnectStartResponse,
+  AgentGithubRepoListItem,
+  AgentGithubReposResponse,
+  AgentGithubTestResponse,
   AgentCommLog,
   AgentCommLogsResponse,
   AgentCommPermission,
@@ -75,5 +83,5 @@ export type {
   AdminEgressEventsResponse,
   AgentEgressEventsResponse,
   AdminIdleOverviewResponse,
-} from './types';
-export { api } from './methods';
+} from "./types";
+export { api } from "./methods";

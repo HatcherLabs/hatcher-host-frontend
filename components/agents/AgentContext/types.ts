@@ -96,6 +96,7 @@ export interface AgentContextValue {
   input: string;
   setInput: (value: string) => void;
   sending: boolean;
+  queuedChatCount: number;
   chatError: string | null;
   setChatError: (error: string | null) => void;
   chatErrorType: 'timeout' | 'ratelimit' | 'network' | 'llm_down' | 'generic' | null;

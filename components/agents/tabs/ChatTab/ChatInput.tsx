@@ -42,7 +42,7 @@ interface ChatInputProps {
   input: string;
   setInput: (val: string) => void;
   sending: boolean;
-  sendCooldown: boolean;
+  queuedMessageCount: number;
   sttSupported: boolean;
   isListening: boolean;
   onMicToggle: () => void;
@@ -71,7 +71,7 @@ export function ChatInput({
   input,
   setInput,
   sending,
-  sendCooldown,
+  queuedMessageCount,
   sttSupported,
   isListening,
   onMicToggle,
@@ -197,7 +197,7 @@ export function ChatInput({
     );
   }
 
-  const inputDisabled = sending || sendCooldown || !!agentStarting;
+  const inputDisabled = !!agentStarting;
 
   return (
     <div>
@@ -466,6 +466,11 @@ export function ChatInput({
           {t('poweredBy', { provider: llmProvider })} · {activeModel.name}
         </span>
         <div className="flex items-center gap-3">
+          {queuedMessageCount > 0 && (
+            <span className="text-[10px] font-medium text-[var(--color-accent)]">
+              {queuedMessageCount} queued
+            </span>
+          )}
           {isAuthenticated && (
             <span className="inline-flex items-center gap-1 text-[10px] text-[var(--color-accent)]/80">
               <Zap size={9} />

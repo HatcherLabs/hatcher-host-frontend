@@ -30,11 +30,11 @@ export function ChatTab() {
     activeModelDisplay,
     messages, setMessages,
     input, setInput,
-    sending, sendCooldown,
+    sending, queuedChatCount,
     chatError, setChatError,
     chatErrorType, setChatErrorType,
     bottomRef, inputRef,
-    sendMessage, abortChatResponse, handleKeyDown,
+    sendMessage, abortChatResponse,
     setTab,
     wsConnected,
   } = ctx;
@@ -481,7 +481,7 @@ export function ChatTab() {
             input={input}
             setInput={setInput}
             sending={sending}
-            sendCooldown={sendCooldown}
+            queuedMessageCount={queuedChatCount}
             sttSupported={voice.sttSupported}
             isListening={voice.isListening}
             onMicToggle={handleMicToggle}
@@ -491,11 +491,10 @@ export function ChatTab() {
               // Ctrl/Cmd+Enter (or plain Enter per existing handler) sends —
               // intercept here so attachments merge into the sent text.
               if (e.key === 'Enter' && !e.shiftKey) {
+                if (typeof window !== 'undefined' && window.innerWidth < 768) return;
                 e.preventDefault();
                 sendWithAttachments();
-                return;
               }
-              handleKeyDown(e);
             }}
             inputRef={inputRef}
             llmProvider={llmProvider}
