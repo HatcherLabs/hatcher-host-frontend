@@ -34,7 +34,7 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Bump minor version
+      - name: Bump patch version
         id: bump
         run: node scripts/bump-site-version.mjs
 

@@ -7,7 +7,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '..');
 
-export function bumpMinorVersion(version) {
+export function bumpPatchVersion(version) {
   if (typeof version !== 'string') {
     throw new TypeError('version must be a string');
   }
@@ -19,11 +19,12 @@ export function bumpMinorVersion(version) {
 
   const major = Number(match[1]);
   const minor = Number(match[2]);
-  return `${major}.${minor + 1}.0`;
+  const patch = Number(match[3]);
+  return `${major}.${minor}.${patch + 1}`;
 }
 
 export function updatePackageVersions({ packageJson, packageLockJson }) {
-  const nextVersion = bumpMinorVersion(packageJson.version);
+  const nextVersion = bumpPatchVersion(packageJson.version);
 
   packageJson.version = nextVersion;
   packageLockJson.version = nextVersion;

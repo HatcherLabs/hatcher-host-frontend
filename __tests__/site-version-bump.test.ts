@@ -3,7 +3,7 @@ import { pathToFileURL } from 'node:url';
 import path from 'node:path';
 
 type SiteVersionModule = {
-  bumpMinorVersion: (version: string) => string;
+  bumpPatchVersion: (version: string) => string;
   updatePackageVersions: <T extends Record<string, unknown>, U extends Record<string, unknown>>(input: {
     packageJson: T;
     packageLockJson: U;
@@ -17,11 +17,11 @@ async function loadVersionModule(): Promise<SiteVersionModule> {
 }
 
 describe('site version bump script', () => {
-  it('bumps the minor version and resets patch', async () => {
-    const { bumpMinorVersion } = await loadVersionModule();
+  it('bumps the patch version by default', async () => {
+    const { bumpPatchVersion } = await loadVersionModule();
 
-    expect(bumpMinorVersion('1.1.1')).toBe('1.2.0');
-    expect(bumpMinorVersion('1.9.7')).toBe('1.10.0');
+    expect(bumpPatchVersion('1.1.1')).toBe('1.1.2');
+    expect(bumpPatchVersion('1.9.7')).toBe('1.9.8');
   });
 
   it('updates package and lockfile versions together', async () => {
@@ -38,10 +38,10 @@ describe('site version bump script', () => {
 
     const result = updatePackageVersions({ packageJson, packageLockJson });
 
-    expect(result.nextVersion).toBe('1.2.0');
-    expect(result.packageJson.version).toBe('1.2.0');
-    expect(result.packageLockJson.version).toBe('1.2.0');
-    expect(result.packageLockJson.packages[''].version).toBe('1.2.0');
+    expect(result.nextVersion).toBe('1.1.2');
+    expect(result.packageJson.version).toBe('1.1.2');
+    expect(result.packageLockJson.version).toBe('1.1.2');
+    expect(result.packageLockJson.packages[''].version).toBe('1.1.2');
     expect(result.packageLockJson.packages['node_modules/example'].version).toBe('2.0.0');
   });
 
