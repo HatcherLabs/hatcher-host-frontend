@@ -25,6 +25,7 @@ const LOCALIZED_ROUTES: Array<{
   { path: '/frameworks', changeFrequency: 'weekly', priority: 0.8 },
   { path: '/create', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/token', changeFrequency: 'weekly', priority: 0.7 },
+  { path: '/whitepaper', changeFrequency: 'monthly', priority: 0.65 },
   { path: '/roadmap', changeFrequency: 'weekly', priority: 0.6 },
   { path: '/blog', changeFrequency: 'weekly', priority: 0.7 },
   { path: '/changelog', changeFrequency: 'weekly', priority: 0.6 },
