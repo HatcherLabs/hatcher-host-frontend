@@ -2205,6 +2205,14 @@
         "description": "Connectez Telegram, Discord, Slack, Twitter/X, Signal, webhooks et d'autres canaux inclus dans chaque forfait."
       },
       {
+        "title": "Hatcher CLI",
+        "description": "Installez @hatcherlabs/cli, lancez hatcher, créez des agents, discutez, ouvrez le terminal, GitHub et A2A depuis le shell."
+      },
+      {
+        "title": "Workflows développeur",
+        "description": "Connectez GitHub, gérez les sessions terminal, activez agent-to-agent et orchestrez vos agents."
+      },
+      {
         "title": "Application Android",
         "description": "Installez l'application Android, connectez-vous, gérez vos agents et recevez des notifications push sur mobile."
       },
@@ -2516,6 +2524,29 @@
       "ctaGhost": "Voir les agents",
       "metaFrameworks": "OpenClaw + Hermes",
       "metaNoCard": "pas de carte"
+    },
+    "cli": {
+      "boxLabel": "CLI",
+      "title": "Pilotez Hatcher depuis votre terminal",
+      "sub": "Installez le CLI Hatcher, créez une clé API, puis lancez `hatcher`. Créez des agents en langage naturel, discutez avec eux, ouvrez leur runtime live et gérez les workflows développeur sans quitter le shell.",
+      "apiKeyHint": "Générez une clé API dans Account → API Keys → Create key.",
+      "ctaKey": "Créer une clé API",
+      "ctaDocs": "Docs CLI",
+      "terminalLabel": "Hatcher CLI",
+      "features": {
+        "hatch": {
+          "title": "Chat-to-Hatch",
+          "body": "Transformez un prompt en agent OpenClaw ou Hermes configuré."
+        },
+        "terminal": {
+          "title": "Terminal live",
+          "body": "Attachez-vous à la session du framework avec `hatcher terminal`."
+        },
+        "dev": {
+          "title": "Workflows dev",
+          "body": "Utilisez GitHub, A2A, sessions, logs et orchestration depuis un seul CLI."
+        }
+      }
     }
   }
 }
