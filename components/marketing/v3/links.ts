@@ -54,6 +54,7 @@ export const NAV_GROUPS: ReadonlyArray<NavGroup> = [
     items: [
       { key: 'pricing',     labelKey: 'pricingLabel',     subKey: 'pricingSub',     href: '/pricing',       glyph: '★' },
       { key: 'token',       labelKey: 'tokenLabel',       subKey: 'tokenSub',       href: '/token',         glyph: '◉' },
+      { key: 'whitepaper',  labelKey: 'whitepaperLabel',  subKey: 'whitepaperSub',  href: '/whitepaper',    glyph: '▤' },
       { key: 'blog',        labelKey: 'blogLabel',        subKey: 'blogSub',        href: '/blog',          glyph: '✎' },
       { key: 'roadmap',     labelKey: 'roadmapLabel',     subKey: 'roadmapSub',     href: '/roadmap',       glyph: '𝍌' },
       { key: 'changelog',   labelKey: 'changelogLabel',   subKey: 'changelogSub',   href: '/changelog',     glyph: '⌖' },
@@ -84,6 +85,7 @@ export const FOOTER_COLUMNS = [
     items: [
       { labelKey: 'itemPricing',   href: '/pricing' as Href },
       { labelKey: 'itemToken',     href: '/token' as Href },
+      { labelKey: 'itemWhitepaper', href: '/whitepaper' as Href },
       { labelKey: 'itemBlog',      href: '/blog' as Href },
       { labelKey: 'itemRoadmap',   href: '/roadmap' as Href },
       { labelKey: 'itemChangelog', href: '/changelog' as Href },
