@@ -102,6 +102,43 @@
 }
 .statValue.accent { color: var(--accent); }
 
+/* ── View switch ── */
+.viewSwitch {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  gap: 2px;
+  padding: 3px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  overflow-x: auto;
+}
+.viewTab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 0 14px;
+  background: transparent;
+  border: 0;
+  border-radius: 3px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.viewTab:hover { color: var(--text-secondary); }
+.viewTabActive {
+  color: var(--text-primary);
+  background: var(--bg-card);
+  box-shadow: 0 0 0 1px var(--border-default);
+}
+
 /* ── Toolbar ── */
 .toolbar {
   display: flex;
@@ -217,6 +254,392 @@
 }
 .banner.error { background: rgba(255, 107, 107, 0.08); border-color: rgba(255, 107, 107, 0.3); color: #ff8a8a; }
 .banner.success { background: rgba(74, 222, 128, 0.08); border-color: rgba(74, 222, 128, 0.3); color: var(--accent); }
+
+/* ── Orchestration mesh ── */
+.meshPanel {
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  background: var(--bg-card);
+  overflow: hidden;
+}
+.meshHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 18px;
+  border-bottom: 1px solid var(--border-default);
+}
+.meshTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.meshIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  background: var(--bg-elevated);
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.meshTitle {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.meshSubtitle {
+  margin: 4px 0 0;
+  max-width: 680px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+.meshActions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.meshBody {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) 1fr;
+  gap: 0;
+  border-bottom: 1px solid var(--border-default);
+}
+.meshControl {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border-right: 1px solid var(--border-default);
+  background: var(--bg-elevated);
+}
+.meshField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.meshField label,
+.meshPromptLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.meshMode {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  background: var(--bg-base);
+}
+.meshMode button {
+  min-height: 32px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.meshMode button:hover { color: var(--text-secondary); }
+.meshMode .meshModeActive {
+  color: var(--text-primary);
+  background: var(--bg-card);
+  box-shadow: 0 0 0 1px var(--border-default);
+}
+.meshTaskTemplates {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.meshTaskTemplate {
+  display: flex;
+  min-height: 54px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  background: var(--bg-base);
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 8px 10px;
+  text-align: left;
+  transition: border-color 0.16s ease, color 0.16s ease, background 0.16s ease;
+}
+.meshTaskTemplate:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+  background: var(--bg-card);
+}
+.meshTaskTemplate span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 700;
+}
+.meshTaskTemplate small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.meshPrompt {
+  width: 100%;
+  resize: vertical;
+  min-height: 128px;
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  outline: 0;
+  padding: 10px 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.meshPrompt:focus { border-color: var(--accent); }
+.meshPrompt::placeholder { color: var(--text-muted); }
+.meshSend {
+  width: 100%;
+  justify-content: center;
+}
+.meshSend:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.meshMessage {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(74, 222, 128, 0.24);
+  border-radius: 4px;
+  background: rgba(74, 222, 128, 0.08);
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+.meshMap {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+  align-content: start;
+  padding: 18px;
+}
+.meshNode {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  background: var(--bg-elevated);
+}
+.meshNodeSource {
+  border-color: rgba(74, 222, 128, 0.42);
+  box-shadow: inset 0 0 0 1px rgba(74, 222, 128, 0.08);
+}
+.meshNodeHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.meshNodeMain {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+.meshNodeName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+}
+.meshNodeMeta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+}
+.meshState {
+  flex-shrink: 0;
+  border: 1px solid var(--border-default);
+  border-radius: 3px;
+  padding: 3px 7px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.meshStateOn {
+  border-color: rgba(74, 222, 128, 0.35);
+  background: rgba(74, 222, 128, 0.08);
+  color: var(--accent);
+}
+.meshNodeActions {
+  display: flex;
+  gap: 6px;
+}
+.meshLogs {
+  padding: 18px;
+}
+.meshLogsHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.meshLogsHead h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.meshLogsHead span {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.meshEmpty {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.meshLogList {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.meshLogRow {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) 90px;
+  gap: 10px;
+  align-items: center;
+  min-height: 42px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border-default);
+  background: var(--bg-elevated);
+}
+.meshLogRow:last-child { border-bottom: 0; }
+.meshLogStatus {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.meshLog_success { color: var(--accent); }
+.meshLog_error,
+.meshLog_permission_denied,
+.meshLog_loop_blocked { color: #ff8a8a; }
+.meshLog_accepted { color: #fbbf24; }
+.meshLogBody {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+.meshLogTime {
+  color: var(--text-muted);
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  white-space: nowrap;
+}
+.spin { animation: spin 0.8s linear infinite; }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 900px) {
+  .meshBody {
+    grid-template-columns: 1fr;
+  }
+  .meshControl {
+    border-right: 0;
+    border-bottom: 1px solid var(--border-default);
+  }
+}
+
+@media (max-width: 640px) {
+  .inner {
+    padding: 24px 14px 64px;
+    gap: 20px;
+  }
+  .viewSwitch,
+  .meshActions,
+  .meshNodeActions {
+    width: 100%;
+  }
+  .viewTab,
+  .meshActions .actionBtn,
+  .meshNodeActions .actionBtn {
+    flex: 1;
+  }
+  .meshHeader,
+  .meshControl,
+  .meshMap,
+  .meshLogs {
+    padding: 14px;
+  }
+  .meshTaskTemplates {
+    grid-template-columns: 1fr;
+  }
+  .meshLogRow {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+  .meshLogTime {
+    text-align: left;
+  }
+}
 
 /* ── Grid ── */
 .grid {

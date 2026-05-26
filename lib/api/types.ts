@@ -12,7 +12,7 @@ import type {
   TicketCategory,
   TicketPriority,
   WsChatMessage,
-} from '@hatcher/shared';
+} from "@hatcher/shared";
 
 // Re-export shared types that are used identically in the frontend
 export type { TicketStatus, TicketCategory, TicketPriority };
@@ -41,7 +41,7 @@ export interface Payment {
   usdAmount: number;
   hatchAmount: number;
   txSignature: string;
-  status: 'pending' | 'confirmed' | 'failed' | 'refunded';
+  status: "pending" | "confirmed" | "failed" | "refunded";
   createdAt: string;
   agent?: { name: string };
 }
@@ -53,7 +53,7 @@ export interface Payment {
 export interface AgentFeature {
   id: string;
   featureKey: string;
-  type: 'one_time' | 'subscription';
+  type: "one_time" | "subscription";
   expiresAt: string | null;
   userId: string;
   txSignature: string;
@@ -80,6 +80,7 @@ export interface Agent {
   config?: Record<string, unknown>;
   features?: Array<{ featureKey: string }>;
   isPublic?: boolean;
+  commEnabled?: boolean;
   inactiveSince?: string | null;
   archivedAt?: string | null;
   archiveDeleteAfter?: string | null;
@@ -92,6 +93,111 @@ export interface Agent {
   skaleRegisteredAt?: string | null;
   createdAt: string;
   updatedAt?: string;
+}
+
+export interface AgentCommPermission {
+  id: string;
+  allowedAgent: {
+    id: string;
+    name: string;
+    framework: AgentFramework | string;
+  };
+  createdAt: string;
+}
+
+export interface AgentCommPermissionsResponse {
+  commEnabled: boolean;
+  permissions: AgentCommPermission[];
+}
+
+export interface AgentCommLog {
+  id: string;
+  sourceAgentId: string;
+  targetAgentId: string;
+  message: string;
+  response: string | null;
+  status: string;
+  latencyMs: number;
+  chainId: string;
+  chainDepth: number;
+  createdAt: string;
+}
+
+export interface AgentCommLogsResponse {
+  logs: AgentCommLog[];
+}
+
+export interface AgentCommCandidate {
+  id: string;
+  name: string;
+  framework: AgentFramework | string;
+  status: string;
+  description: string | null;
+  commEnabled: boolean;
+  relation: "same-owner" | "same-team" | "permission";
+  canCall: boolean;
+  canCallReason?: "ready" | "target_disabled" | string;
+}
+
+export interface AgentCommDiscoverResponse {
+  source: { id: string; commEnabled: boolean };
+  agents: AgentCommCandidate[];
+}
+
+export interface AgentCommCallBody {
+  targetAgentId: string;
+  message: string;
+  mode: "sync" | "async";
+}
+
+export interface AgentCommCallResponse {
+  success: boolean;
+  response?: string;
+  error?: string;
+  code?: string;
+  latencyMs?: number;
+  commLogId?: string;
+  targetAgentId?: string;
+}
+
+export interface AgentGithubTestResponse {
+  tokenConfigured: boolean;
+  tokenValid: boolean;
+  githubLogin?: string | null;
+  scopes?: string;
+  repoConfigured: boolean;
+  repoReachable: boolean;
+  repo?: {
+    fullName: string;
+    private: boolean;
+    defaultBranch: string | null;
+    permissions: Record<string, boolean> | null;
+  } | null;
+  message: string;
+}
+
+export interface AgentGithubRepoListItem {
+  fullName: string;
+  private: boolean;
+  defaultBranch: string | null;
+  permissions: Record<string, boolean> | null;
+  selected: boolean;
+  allowed: boolean;
+  pushedAt: string | null;
+}
+
+export interface AgentGithubReposResponse {
+  tokenConfigured: boolean;
+  defaultRepo: string | null;
+  allowedReposConfigured: boolean;
+  allowedRepos: string[];
+  repos: AgentGithubRepoListItem[];
+}
+
+export interface AgentGithubConnectStartResponse {
+  configured: boolean;
+  authUrl: string | null;
+  message: string;
 }
 
 export interface AgentMailboxInfo {
@@ -111,7 +217,7 @@ export interface AgentMailRuntime {
   mailboxUrl: string;
 }
 
-export type AgentMailDirection = 'inbound' | 'outbound';
+export type AgentMailDirection = "inbound" | "outbound";
 
 export interface AgentMailMessage {
   id: string;
@@ -156,7 +262,7 @@ export interface SendAgentMailResponse {
   messageId: string;
   providerMessageId: string | null;
   status: string;
-  mode: 'mock' | 'resend';
+  mode: "mock" | "resend";
   from: string;
   to: string[];
 }
@@ -173,7 +279,7 @@ export interface KausalayerConfigStatus {
   enabled: boolean;
   configured: boolean;
   baseUrl: string;
-  keySource?: 'platform' | 'agent' | 'none';
+  keySource?: "platform" | "agent" | "none";
 }
 
 export interface KausalayerConfigBody {
@@ -205,7 +311,7 @@ export interface KausalayerCallBody {
 
 export type KausalayerCallResponse = unknown;
 
-export type ConduitPayoutMode = 'ai_credits' | 'usdc_wallet';
+export type ConduitPayoutMode = "ai_credits" | "usdc_wallet";
 
 export interface ConduitConfigBody {
   payoutMode: ConduitPayoutMode;
@@ -255,7 +361,7 @@ export interface ConduitProviderPatchBody {
   description?: string;
   endpointUrl?: string;
   region?: string;
-  status?: 'active' | 'offline';
+  status?: "active" | "offline";
 }
 
 export interface ConduitRegisterProviderResponse {
@@ -285,16 +391,19 @@ export interface KausalayerResourcesResponse {
   contacts: KausalayerResourceResult;
 }
 
-export type AgentPassportNetworkId = 'skale' | 'base' | 'solana';
-export type AgentPassportChainType = 'evm' | 'solana';
-export type AgentPassportSignerMode = 'receive-only' | 'runtime-signing' | 'planned';
-export type AgentPassportTradingStatus = 'enabled' | 'disabled';
+export type AgentPassportNetworkId = "skale" | "base" | "solana";
+export type AgentPassportChainType = "evm" | "solana";
+export type AgentPassportSignerMode =
+  | "receive-only"
+  | "runtime-signing"
+  | "planned";
+export type AgentPassportTradingStatus = "enabled" | "disabled";
 export type AgentPassportStatus =
-  | 'registered'
-  | 'wallet-ready'
-  | 'planned'
-  | 'unavailable'
-  | 'server-unconfigured';
+  | "registered"
+  | "wallet-ready"
+  | "planned"
+  | "unavailable"
+  | "server-unconfigured";
 
 export interface AgentPassportNetwork {
   id: AgentPassportNetworkId;
@@ -341,8 +450,8 @@ export interface AgentPassport {
     updatedAt: string;
   };
   avatar: {
-    kind: 'hatcher-room-v2';
-    stationId: 'agentAvatar';
+    kind: "hatcher-room-v2";
+    stationId: "agentAvatar";
     imageUrl: string | null;
     roomUrl: string;
   };
@@ -365,8 +474,8 @@ export interface AgentPassport {
       status: AgentPassportTradingStatus;
       networks: AgentPassportNetworkId[];
       quoteProviders: Array<{
-        id: 'jupiter';
-        network: 'solana';
+        id: "jupiter";
+        network: "solana";
         status: AgentPassportTradingStatus;
         baseUrl: string;
       }>;
@@ -447,7 +556,7 @@ export interface AgentWalletPrivateKeyResponse {
   chainType: AgentPassportChainType;
   address: string;
   privateKey: string;
-  format: 'evm-hex' | 'solana-base58-secret-key';
+  format: "evm-hex" | "solana-base58-secret-key";
   sharedWalletWith?: AgentPassportNetworkId;
 }
 
@@ -470,7 +579,7 @@ export interface AdminPayment {
   paymentToken: string | null;
   tokenAmount: number | null;
   txSignature: string;
-  status: 'pending' | 'confirmed' | 'failed' | 'refunded';
+  status: "pending" | "confirmed" | "failed" | "refunded";
   failureReason: string | null;
   createdAt: string;
 }
@@ -482,7 +591,7 @@ export interface AdminPayment {
 export interface TicketMessage {
   id?: string;
   ticketId?: string;
-  role: 'user' | 'support' | 'admin';
+  role: "user" | "support" | "admin";
   content: string;
   /** API emits `timestamp`; older code paths may use `createdAt`. */
   timestamp?: string;
@@ -516,13 +625,25 @@ export interface FunnelResponse {
 }
 
 export interface ChurnRadarResponse {
-  atRisk: Array<{ userId: string; email: string; tier: string; lastAgentActivity: string | null; createdAt: string }>;
+  atRisk: Array<{
+    userId: string;
+    email: string;
+    tier: string;
+    lastAgentActivity: string | null;
+    createdAt: string;
+  }>;
   thresholdDays: number;
   generatedAt: string;
 }
 
 export interface ReferralLeaderboardResponse {
-  leaderboard: Array<{ userId: string; email: string; username: string | null; referralCode: string | null; referralCount: number }>;
+  leaderboard: Array<{
+    userId: string;
+    email: string;
+    username: string | null;
+    referralCode: string | null;
+    referralCount: number;
+  }>;
   generatedAt: string;
 }
 
@@ -549,7 +670,13 @@ export interface WsCountResponse {
 
 export interface LlmStatsResponse {
   perDay: Array<{ date: string; messages: number }>;
-  topUsers: Array<{ userId: string; email: string; username: string | null; tier: string; messagesLast7d: number }>;
+  topUsers: Array<{
+    userId: string;
+    email: string;
+    username: string | null;
+    tier: string;
+    messagesLast7d: number;
+  }>;
   rateLimitHitsToday: number;
   rateLimitHitsYesterday: number;
   generatedAt: string;
@@ -572,14 +699,22 @@ export interface AdminEgressEventsResponse {
   summary: {
     allowed: number;
     blocked: number;
-    hosts: Array<{ host: string; allowed: number; blocked: number; lastSeenAt: string }>;
+    hosts: Array<{
+      host: string;
+      allowed: number;
+      blocked: number;
+      lastSeenAt: string;
+    }>;
   };
   limit: number;
   agentId: string | null;
   generatedAt: string;
 }
 
-export type AgentEgressEventsResponse = Omit<AdminEgressEventsResponse, 'agentId'> & {
+export type AgentEgressEventsResponse = Omit<
+  AdminEgressEventsResponse,
+  "agentId"
+> & {
   agentId: string;
 };
 
@@ -588,7 +723,7 @@ export interface AdminIdleOverviewResponse {
   config: {
     computeEnabled: boolean;
     providerEnabled: boolean;
-    consumerBillingMode: 'partner_free' | 'ai_credits';
+    consumerBillingMode: "partner_free" | "ai_credits";
     providerCallbackConfigured: boolean;
     payoutWalletConfigured: boolean;
     providerDefaultPriceUsd: number;

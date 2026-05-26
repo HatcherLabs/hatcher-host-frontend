@@ -4,7 +4,7 @@ import type { ActiveModelDisplay } from '@/lib/hosted-model-catalog';
 
 // ─── Types ───────────────────────────────────────────────────
 
-export type Tab = 'overview' | 'config' | 'integrations' | 'skills' | 'plugins' | 'files' | 'logs' | 'terminal' | 'memory' | 'sessions' | 'knowledge' | 'schedules' | 'workflows' | 'chat' | 'mail' | 'stats' | 'wallet';
+export type Tab = 'overview' | 'config' | 'integrations' | 'skills' | 'plugins' | 'files' | 'logs' | 'terminal' | 'dev' | 'memory' | 'sessions' | 'knowledge' | 'schedules' | 'workflows' | 'chat' | 'mail' | 'stats' | 'wallet';
 
 export interface Message {
   id: string;
@@ -96,6 +96,7 @@ export interface AgentContextValue {
   input: string;
   setInput: (value: string) => void;
   sending: boolean;
+  queuedChatCount: number;
   chatError: string | null;
   setChatError: (error: string | null) => void;
   chatErrorType: 'timeout' | 'ratelimit' | 'network' | 'llm_down' | 'generic' | null;
