@@ -52,6 +52,10 @@ import type {
   KausalayerHealthResponse,
   KausalayerResourcesResponse,
   KausalayerToolsResponse,
+  XonaCallBody,
+  XonaCallResponse,
+  XonaConfigStatus,
+  XonaDiscoverResponse,
   ConduitConfigBody,
   ConduitConfigStatus,
   ConduitManifestResponse,
@@ -503,6 +507,21 @@ export const api = {
 
   callAgentKausalayerTool: (id: string, body: KausalayerCallBody) =>
     req<KausalayerCallResponse>(`/agents/${id}/kausalayer/call`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  /** Xona xPay partner resources proxied through Hatcher. */
+  getAgentXonaConfig: (id: string) =>
+    req<XonaConfigStatus>(`/agents/${id}/xona/config`),
+
+  discoverAgentXonaResources: (id: string, query = "xona agent resources", limit = 8) => {
+    const params = new URLSearchParams({ query, limit: String(limit) });
+    return req<XonaDiscoverResponse>(`/agents/${id}/xona/discover?${params.toString()}`);
+  },
+
+  callAgentXonaTool: (id: string, body: XonaCallBody) =>
+    req<XonaCallResponse>(`/agents/${id}/xona/call`, {
       method: "POST",
       body: JSON.stringify(body),
     }),
