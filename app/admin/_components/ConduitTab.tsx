@@ -6,6 +6,7 @@ import {
   AlertTriangle,
   CheckCircle2,
   Coins,
+  Copy,
   Database,
   KeyRound,
   RefreshCw,
@@ -216,6 +217,7 @@ export default function ConduitTab() {
   const [data, setData] = useState<AdminConduitOverviewResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [copiedWallets, setCopiedWallets] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -244,6 +246,21 @@ export default function ConduitTab() {
         : []),
     ];
   }, [data]);
+
+  const exemptionWalletText = useMemo(() => {
+    if (!data) return '';
+    return data.tokenGate?.exemptionWallets.map((row) => row.walletAddress).join('\n') ?? '';
+  }, [data]);
+  const tokenGateNote = data?.tokenGate?.note
+    ?? 'Send active provider recipient wallets to Conduit for token-gate exemption.';
+  const exemptionWallets = data?.tokenGate?.exemptionWallets ?? [];
+
+  const copyExemptionWallets = async () => {
+    if (!exemptionWalletText) return;
+    await navigator.clipboard.writeText(exemptionWalletText);
+    setCopiedWallets(true);
+    setTimeout(() => setCopiedWallets(false), 1600);
+  };
 
   return (
     <div className="space-y-5">
@@ -299,6 +316,48 @@ export default function ConduitTab() {
               </div>
             </div>
           ) : null}
+
+          <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)] p-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Wallet size={15} className="text-[var(--color-accent)]" />
+                  <h3 className="text-sm font-semibold text-[var(--text-primary)]">Token gate exemption wallets</h3>
+                </div>
+                <p className="mt-1 max-w-3xl text-xs leading-relaxed text-[var(--text-muted)]">
+                  {tokenGateNote}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => void copyExemptionWallets()}
+                disabled={!exemptionWalletText}
+                className="btn-secondary h-9 justify-center text-xs"
+              >
+                <Copy size={13} />
+                {copiedWallets ? 'Copied' : 'Copy wallets'}
+              </button>
+            </div>
+            <div className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+              {exemptionWallets.length ? exemptionWallets.map((row) => (
+                <div key={row.walletAddress} className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-3">
+                  <div className="break-all font-mono text-xs text-[var(--text-primary)]">{row.walletAddress}</div>
+                  <div className="mt-2 flex flex-wrap gap-2 text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
+                    <span>{row.activeProviders} active provider{row.activeProviders === 1 ? '' : 's'}</span>
+                    <span>{row.payoutModes.join(', ')}</span>
+                  </div>
+                  <div className="mt-2 truncate text-xs text-[var(--text-muted)]">
+                    {row.agentNames.slice(0, 3).join(', ')}
+                    {row.agentNames.length > 3 ? ` +${row.agentNames.length - 3}` : ''}
+                  </div>
+                </div>
+              )) : (
+                <div className="rounded-lg border border-dashed border-[var(--border-default)] bg-[var(--bg-card)] p-4 text-sm text-[var(--text-muted)]">
+                  No active Conduit provider wallets yet.
+                </div>
+              )}
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <MetricCard

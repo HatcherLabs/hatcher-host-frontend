@@ -475,7 +475,8 @@ export function ConduitWalletPanel({ agentId }: { agentId: string }) {
       <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="text-xs leading-relaxed text-[var(--text-muted)]">
           Provider registration uses Hatcher's server-side Conduit SIWS signer. Agent containers only receive the
-          Hatcher proxy URL, never private keys or Conduit cookies.
+          Hatcher proxy URL, never private keys or Conduit cookies. If Conduit's token gate blocks registration, ask
+          them to exempt this provider recipient wallet: <span className="break-all font-mono text-[var(--text-primary)]">{config?.recipientWallet ?? 'loading'}</span>.
         </div>
         <button
           type="button"
