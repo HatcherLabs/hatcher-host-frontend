@@ -913,6 +913,14 @@ export interface AdminConduitSettlementRow {
   createdAt: string;
 }
 
+export interface AdminConduitExemptionWallet {
+  walletAddress: string;
+  activeProviders: number;
+  providerIds: string[];
+  agentNames: string[];
+  payoutModes: ConduitPayoutMode[];
+}
+
 export interface AdminConduitOverviewResponse {
   generatedAt: string;
   config: {
@@ -931,6 +939,10 @@ export interface AdminConduitOverviewResponse {
     error: string | null;
     programs: Array<{ name: string; id: string }>;
     body: unknown;
+  };
+  tokenGate: {
+    exemptionWallets: AdminConduitExemptionWallet[];
+    note: string;
   };
   providers: {
     coverage: {

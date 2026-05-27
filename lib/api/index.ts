@@ -37,6 +37,7 @@ export type {
   AgentWalletPrivateKeyResponse,
   AgentWalletsResponse,
   AgentWalletTokenBalance,
+  AdminConduitExemptionWallet,
   AdminConduitOverviewResponse,
   AdminConduitProviderRow,
   AdminConduitSettlementRow,
