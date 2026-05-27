@@ -311,6 +311,61 @@ export interface KausalayerCallBody {
 
 export type KausalayerCallResponse = unknown;
 
+export type XonaToolId =
+  | "creative_director"
+  | "generate_flux2_pro_image"
+  | "pumpfun_movers"
+  | "token_signal"
+  | "token_starter_kit";
+
+export interface XonaToolSummary {
+  id: XonaToolId;
+  label: string;
+  description: string;
+  method: "GET" | "POST";
+  path: string;
+  estimatedCostUsd: number;
+  estimatedAiCredits: number;
+  exampleBody?: Record<string, unknown>;
+}
+
+export interface XonaConfigStatus {
+  enabled: boolean;
+  configured: boolean;
+  keySource: "xona" | "conduit" | "none";
+  baseUrl: string;
+  networks: string[];
+  allowedHosts: string[];
+  maxPerTxUsdc: number;
+  maxPerDayUsdc: number;
+  tools: XonaToolSummary[];
+}
+
+export interface XonaDiscoverBody {
+  query?: string;
+  limit?: number;
+  networks?: string[];
+}
+
+export interface XonaCallBody {
+  tool: XonaToolId;
+  body?: Record<string, unknown>;
+}
+
+export interface XonaCallResponse {
+  tool: XonaToolId;
+  resourceUrl: string;
+  status: number;
+  network: string;
+  amountPaid: string;
+  amountPaidUsdc: number;
+  txSig: string | null;
+  aiCreditsCharged: number;
+  data: unknown;
+}
+
+export type XonaDiscoverResponse = unknown[];
+
 export type ConduitPayoutMode = "ai_credits" | "usdc_wallet";
 
 export interface ConduitConfigBody {
