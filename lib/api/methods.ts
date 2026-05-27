@@ -660,6 +660,11 @@ export const api = {
       dailyAiCreditCap: number | null;
       dailyAiCreditsSpent: number | null;
       dailyAiCreditsRemaining: number | null;
+      piqueSignalDailyLimit?: number;
+      piqueSignalSignalsUsed?: number;
+      piqueSignalSignalsRemaining?: number;
+      piqueSignalResetAt?: string;
+      piqueSignalCtaUrl?: string;
       agent: {
         id: string;
         name: string;
@@ -705,6 +710,11 @@ export const api = {
       dailyAiCreditCap: number | null;
       dailyAiCreditsSpent: number | null;
       dailyAiCreditsRemaining: number | null;
+      piqueSignalDailyLimit?: number;
+      piqueSignalSignalsUsed?: number;
+      piqueSignalSignalsRemaining?: number;
+      piqueSignalResetAt?: string;
+      piqueSignalCtaUrl?: string;
     }>(`/agents/${id}/public-chat`, {
       method: "POST",
       body: JSON.stringify(data),
