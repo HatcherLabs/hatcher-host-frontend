@@ -101,7 +101,7 @@ const FAQ_SECTIONS: FAQSection[] = [
       },
       {
         q: 'How do I change the AI model?',
-        a: 'Open your agent\'s Config tab and look for the model settings section. For Hatcher-hosted usage, choose the provider family and model you want from the selector; hosted usage uses UsePod first with OpenRouter fallback and spends AI Credits. If you have BYOK configured, select any model supported by your own provider key. Save the configuration and restart the agent so the runtime loads the new model.',
+        a: 'Open your agent\'s Config tab and look for the model settings section. For Hatcher-hosted usage, choose the provider family and model you want from the selector; most hosted usage uses UsePod first with OpenRouter fallback and spends AI Credits, while direct partner models such as IDLE and Xiaomi MiMo show their own route and pricing. If you have BYOK configured, select any model supported by your own provider key. Save the configuration and restart the agent so the runtime loads the new model.',
       },
       {
         q: 'How do I start, stop, or restart my agent?',

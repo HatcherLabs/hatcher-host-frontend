@@ -150,6 +150,7 @@ const PROVIDER_GLYPH: Record<string, string> = {
   openai: '◎',
   anthropic: 'A',
   idle: 'ID',
+  xiaomi: 'MI',
   google: 'G',
   qwen: 'Q',
   'x-ai': 'X',
@@ -817,7 +818,7 @@ export function ConfigTab() {
               AI Model
             </h3>
             <p className="text-sm text-[var(--text-secondary)] mt-1">
-              Hosted models use UsePod first with OpenRouter fallback. IDLE models stay fixed-price.
+              Hosted models use UsePod first with OpenRouter fallback. IDLE and Xiaomi MiMo models use direct partner routes.
             </p>
           </div>
           {aiCreditBalance && (
@@ -1056,9 +1057,11 @@ export function ConfigTab() {
                   </span>
                   <span
                     className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-[var(--bg-panel)] border border-[var(--border-subtle)]"
-                    title={hostedModelPrivacy(selectedHostedModel) === 'partner'
-                      ? 'Inference happens through an explicit partner route such as IDLE. Review partner policy before using sensitive data.'
-                      : 'Inference is routed through Hatcher managed infrastructure, currently UsePod first with OpenRouter fallback.'}
+                    title={selectedHostedModel.providerKey === 'xiaomi'
+                      ? 'Inference routes directly through Xiaomi MiMo during the launch promo. Avoid sensitive data unless you accept the partner route.'
+                      : hostedModelPrivacy(selectedHostedModel) === 'partner'
+                        ? 'Inference happens through an explicit partner route such as IDLE. Review partner policy before using sensitive data.'
+                        : 'Inference is routed through Hatcher managed infrastructure, currently UsePod first with OpenRouter fallback.'}
                   >
                     <Info className="h-3 w-3" />
                     {hostedPrivacyLabel(selectedHostedModel)}
@@ -1283,7 +1286,7 @@ export function ConfigTab() {
                         <span
                           className="inline-flex h-fit items-center gap-1.5 text-xs text-[var(--text-secondary)]"
                           title={hostedModelPrivacy(model) === 'partner'
-                            ? 'Partner-hosted inference. Good for explicit partner routes like IDLE; review partner policy for sensitive data.'
+                            ? 'Partner-hosted inference. Good for explicit partner routes like IDLE or Xiaomi MiMo; review partner policy for sensitive data.'
                             : 'Hatcher-managed route. UsePod primary with OpenRouter fallback where needed.'}
                         >
                           <Info className="h-3 w-3" />
