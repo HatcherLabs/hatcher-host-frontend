@@ -510,7 +510,7 @@ export default function PricingPage() {
                     [
                       { rowKey: 'agents',         free: '1',         starter: '1',         pro: '3',    business: '5',  founding: '10' },
                       { rowKey: 'aiCredits', label: 'AI Credits / month', free: '500', starter: '3,000', pro: '15,000', business: '40,000', founding: '25,000' },
-                      { rowKey: 'models', label: 'Hosted models', free: 'UsePod/OpenRouter + IDLE', starter: 'UsePod/OpenRouter + IDLE', pro: 'UsePod/OpenRouter + IDLE', business: 'UsePod/OpenRouter + IDLE', founding: 'UsePod/OpenRouter + IDLE' },
+                      { rowKey: 'models', label: 'Hosted models', free: 'UsePod/OpenRouter + IDLE + MiMo', starter: 'UsePod/OpenRouter + IDLE + MiMo', pro: 'UsePod/OpenRouter + IDLE + MiMo', business: 'UsePod/OpenRouter + IDLE + MiMo', founding: 'UsePod/OpenRouter + IDLE + MiMo' },
                       { rowKey: 'webSearch', label: 'Web search', free: 'Uses AI Credits', starter: 'Uses AI Credits', pro: 'Uses AI Credits', business: 'Uses AI Credits', founding: 'Uses AI Credits' },
                       { rowKey: 'byok',            free: 'Provider-paid', starter: 'Provider-paid', pro: 'Provider-paid', business: 'Provider-paid', founding: 'Provider-paid' },
                       { rowKey: 'cpuRam',          free: '1 / 1GB', starter: '1 / 1.5GB', pro: '1.5 / 2GB', business: '2 / 3GB', founding: '2 / 4GB' },

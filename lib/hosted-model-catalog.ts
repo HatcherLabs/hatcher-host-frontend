@@ -53,6 +53,7 @@ export const HOSTED_MODEL_PROVIDERS: HostedModelProvider[] = [
   { key: 'openai', name: 'OpenAI', description: 'General, coding, and frontier models.' },
   { key: 'anthropic', name: 'Anthropic', description: 'Claude models for reasoning and writing.' },
   { key: 'idle', name: 'IDLE', description: 'Partner-hosted Claude models with fixed request pricing.' },
+  { key: 'xiaomi', name: 'Xiaomi MiMo', description: 'Partner-hosted MiMo models with long context and launch-promo usage.' },
   { key: 'google', name: 'Google', description: 'Gemini models with large context windows.' },
   { key: 'qwen', name: 'Qwen', description: 'Efficient coding and agentic tool-use models.' },
   { key: 'x-ai', name: 'xAI', description: 'Grok models for fast reasoning and code.' },
@@ -217,6 +218,50 @@ export const HOSTED_MODELS: HostedModelOption[] = [
     context: '1M',
     description: 'Partner-hosted Claude Sonnet through IDLE. Fixed price per request.',
     fixedPrice: '3 AI Credits per request',
+  },
+  {
+    id: 'xiaomi/mimo-v2.5-pro',
+    name: 'MiMo V2.5 Pro',
+    providerKey: 'xiaomi',
+    provider: 'Xiaomi MiMo',
+    category: 'Partner',
+    cost: 'Low',
+    context: '1M',
+    description: 'Partner-hosted Xiaomi MiMo model for long-context reasoning, coding, and agent workflows.',
+    fixedPrice: 'Free launch promo',
+  },
+  {
+    id: 'xiaomi/mimo-v2.5',
+    name: 'MiMo V2.5',
+    providerKey: 'xiaomi',
+    provider: 'Xiaomi MiMo',
+    category: 'Balanced',
+    cost: 'Low',
+    context: '1M',
+    description: 'Balanced Xiaomi MiMo model for multi-step reasoning, writing, and longer conversations.',
+    fixedPrice: 'Free launch promo',
+  },
+  {
+    id: 'xiaomi/mimo-v2-pro',
+    name: 'MiMo V2 Pro',
+    providerKey: 'xiaomi',
+    provider: 'Xiaomi MiMo',
+    category: 'Partner',
+    cost: 'Low',
+    context: '1M',
+    description: 'Previous-generation MiMo Pro model for long-context coding and agent tasks.',
+    fixedPrice: 'Free launch promo',
+  },
+  {
+    id: 'xiaomi/mimo-v2-omni',
+    name: 'MiMo V2 Omni',
+    providerKey: 'xiaomi',
+    provider: 'Xiaomi MiMo',
+    category: 'Multimodal',
+    cost: 'Low',
+    context: '256K',
+    description: 'Multimodal MiMo model for image-aware analysis, OCR, charts, and visual context.',
+    fixedPrice: 'Free launch promo',
   },
   {
     id: 'anthropic/claude-sonnet-4.5',
@@ -585,15 +630,19 @@ export function getHostedModelOption(model: string | undefined): HostedModelOpti
 }
 
 export function hostedModelRoute(model: HostedModelOption): string {
-  return model.providerKey === 'idle' ? 'IDLE partner' : 'UsePod primary / OpenRouter fallback';
+  if (model.providerKey === 'idle') return 'IDLE partner';
+  if (model.providerKey === 'xiaomi') return 'Xiaomi MiMo direct';
+  return 'UsePod primary / OpenRouter fallback';
 }
 
 export function hostedModelPrivacy(model: HostedModelOption): HostedModelPrivacy {
-  return model.providerKey === 'idle' ? 'partner' : 'hatcher';
+  return model.providerKey === 'idle' || model.providerKey === 'xiaomi' ? 'partner' : 'hatcher';
 }
 
 export function hostedPrivacyLabel(model: HostedModelOption): string {
-  return model.providerKey === 'idle' ? 'Partner-hosted' : 'Hatcher-hosted';
+  if (model.providerKey === 'idle') return 'Partner-hosted';
+  if (model.providerKey === 'xiaomi') return 'Xiaomi-hosted';
+  return 'Hatcher-hosted';
 }
 
 export function hostedCostRank(cost: HostedModelCost): number {

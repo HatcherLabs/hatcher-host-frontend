@@ -10,7 +10,7 @@ const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=host.hatch
 const SOLANA_MOBILE_URL = 'https://solanamobile.com/';
 
 const SIGNALS = [
-  { label: 'Hosted LLM', value: 'UsePod/OpenRouter + IDLE', tone: 'green' },
+  { label: 'Hosted LLM', value: 'UsePod/OpenRouter + IDLE + MiMo', tone: 'green' },
   { label: 'Default model', value: 'DeepSeek V4 Flash', tone: 'cyan' },
   { label: 'Focus frameworks', value: 'OpenClaw + Hermes', tone: 'amber' },
 ] as const;
