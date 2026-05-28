@@ -44,6 +44,7 @@ export const NAV_GROUPS: ReadonlyArray<NavGroup> = [
     labelKey: 'explore',
     items: [
       { key: 'publicAgents', labelKey: 'publicAgentsLabel', subKey: 'publicAgentsSub', href: '/explore', glyph: '◈' },
+      { key: 'features',     labelKey: 'featuresLabel',     subKey: 'featuresSub',     href: '/features',      glyph: '✶' },
       { key: 'city',        labelKey: 'cityLabel',        subKey: 'citySub',        href: '/city',          glyph: '◇' },
       { key: 'frameworks',  labelKey: 'frameworksLabel',  subKey: 'frameworksSub',  href: '/frameworks',    glyph: '◆' },
     ],
@@ -76,6 +77,7 @@ export const FOOTER_COLUMNS = [
     headKey: 'colExplore',
     items: [
       { labelKey: 'itemPublicAgents', href: '/explore' as Href },
+      { labelKey: 'itemFeatures',   href: '/features' as Href },
       { labelKey: 'itemCity',       href: '/city' as Href },
       { labelKey: 'itemFrameworks', href: '/frameworks' as Href },
     ],

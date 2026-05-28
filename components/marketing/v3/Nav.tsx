@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import styles from './Nav.module.css';
-import { NAV_GROUPS, PRIMARY_CTA, SECONDARY_CTA } from './links';
+import { NAV_GROUPS, PRIMARY_CTA, SECONDARY_CTA, SIGN_UP_CTA } from './links';
 import { NavDrawer } from './NavDrawer';
 import { LocaleSwitcher } from '@/components/layout/LocaleSwitcher';
 import { AiCreditStatus } from '@/components/layout/AiCreditStatus';
@@ -302,13 +302,17 @@ export function Nav() {
                 </Link>
               </>
             )}
-            <Link
-              href={PRIMARY_CTA.href}
-              className={`${styles.cta} ${!authLoading && !isAuthenticated ? styles.guestCta : ''}`}
-            >
-              <span className={styles.cursor} aria-hidden>▎</span>
-              {tNav(PRIMARY_CTA.labelKey)}
-            </Link>
+            {authLoading || isAuthenticated ? (
+              <Link href={PRIMARY_CTA.href} className={styles.cta}>
+                <span className={styles.cursor} aria-hidden>▎</span>
+                {tNav(PRIMARY_CTA.labelKey)}
+              </Link>
+            ) : (
+              <Link href={SIGN_UP_CTA.href} className={styles.signupCta}>
+                <span className={styles.cursor} aria-hidden>▎</span>
+                {tNav(SIGN_UP_CTA.labelKey)}
+              </Link>
+            )}
             <button
               className={`${styles.hamburger} ${drawerOpen ? styles.open : ''}`}
               type="button"

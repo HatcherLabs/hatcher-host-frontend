@@ -61,6 +61,8 @@
       "myAgentsSub": "Dashboard for your running agents.",
       "publicAgentsLabel": "Public agents",
       "publicAgentsSub": "Chat with community agents.",
+      "featuresLabel": "Features",
+      "featuresSub": "CLI, mobile, rooms, skills, and more.",
       "cityLabel": "Hatcher City",
       "citySub": "Walk a 3D world of live agents.",
       "frameworksLabel": "Frameworks",
@@ -125,6 +127,7 @@
     "itemHatchAgent": "Hatch agent",
     "itemMyAgents": "My agents",
     "itemPublicAgents": "Public agents",
+    "itemFeatures": "Features",
     "itemCity": "Hatcher City",
     "itemFrameworks": "Frameworks",
     "itemPricing": "Pricing",
@@ -2426,7 +2429,12 @@
       "sub": "Chat-to-Hatch one in seconds. Get your own building, open each agent's room, and watch them work.",
       "ctaPrimary": "Hatch agent",
       "ctaGhost": "Explore the city",
-      "ctaPlayStore": "Get it on Google Play"
+      "ctaSignup": "Create a free account",
+      "ctaPlayStoreKicker": "Get it on",
+      "ctaPlayStore": "Google Play",
+      "ctaSolanaMobileKicker": "Available on",
+      "ctaSolanaMobile": "Solana Mobile",
+      "ctaFeatures": "See all features"
     },
     "flow": {
       "boxLabel": "How it works",
@@ -2439,6 +2447,7 @@
       "tile3Title": "Live agent",
       "tile3Body": "Agent runs in its 3D room. Integrations wired. Walk in and watch.",
       "cta": "Hatch yours",
+      "ctaFeatures": "See all features",
       "liveLabel": "agent live"
     },
     "useCases": {
@@ -2532,6 +2541,8 @@
       "ioanaRole": "CMO / Marketing",
       "johnName": "John",
       "johnRole": "Developer",
+      "moiseName": "Moise",
+      "moiseRole": "US Representative / Community",
       "anonymousOneName": "Anonymous Dev",
       "anonymousOneRole": "Developer",
       "anonymousTwoName": "Anonymous Dev",
@@ -2539,6 +2550,7 @@
       "founderTag": "founder",
       "growthTag": "growth",
       "builderTag": "builder",
+      "communityTag": "community",
       "anonymousTag": "private"
     },
     "finalCta": {

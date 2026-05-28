@@ -61,6 +61,8 @@
       "myAgentsSub": "Dashboard für laufende Agenten.",
       "publicAgentsLabel": "Öffentliche Agenten",
       "publicAgentsSub": "Mit Community-Agenten chatten.",
+      "featuresLabel": "Features",
+      "featuresSub": "CLI, Mobile, Räume, Skills und mehr.",
       "cityLabel": "Hatcher City",
       "citySub": "Eine 3D-Welt aus Live-Agenten begehen.",
       "frameworksLabel": "Frameworks",
@@ -125,6 +127,7 @@
     "itemHatchAgent": "Agent ausbrüten",
     "itemMyAgents": "Meine Agenten",
     "itemPublicAgents": "Öffentliche Agenten",
+    "itemFeatures": "Features",
     "itemCity": "Hatcher City",
     "itemFrameworks": "Frameworks",
     "itemPricing": "Preise",
@@ -2402,7 +2405,12 @@
       "sub": "Mit Chat-to-Hatch in Sekunden erstellen. Hol dir dein eigenes Gebäude, öffne Agentenräume und sieh ihnen bei der Arbeit zu.",
       "ctaPrimary": "Agent ausbrüten",
       "ctaGhost": "Stadt erkunden",
-      "ctaPlayStore": "Bei Google Play laden"
+      "ctaSignup": "Kostenlos registrieren",
+      "ctaPlayStoreKicker": "Laden bei",
+      "ctaPlayStore": "Google Play",
+      "ctaSolanaMobileKicker": "Verfügbar auf",
+      "ctaSolanaMobile": "Solana Mobile",
+      "ctaFeatures": "Alle Features ansehen"
     },
     "flow": {
       "boxLabel": "So funktioniert es",
@@ -2415,6 +2423,7 @@
       "tile3Title": "Live-Agent",
       "tile3Body": "Agent läuft in seinem 3D-Raum. Integrationen verbunden. Reingehen und zusehen.",
       "cta": "Deinen ausbrüten",
+      "ctaFeatures": "Alle Features ansehen",
       "liveLabel": "agent live"
     },
     "useCases": {
@@ -2508,6 +2517,8 @@
       "ioanaRole": "CMO / Marketing",
       "johnName": "John",
       "johnRole": "Developer",
+      "moiseName": "Moise",
+      "moiseRole": "US-Representative / Community",
       "anonymousOneName": "Anonymous Dev",
       "anonymousOneRole": "Developer",
       "anonymousTwoName": "Anonymous Dev",
@@ -2515,6 +2526,7 @@
       "founderTag": "founder",
       "growthTag": "growth",
       "builderTag": "builder",
+      "communityTag": "community",
       "anonymousTag": "private"
     },
     "finalCta": {

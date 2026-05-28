@@ -61,6 +61,8 @@
       "myAgentsSub": "运行中代理的仪表板。",
       "publicAgentsLabel": "公共代理",
       "publicAgentsSub": "与社区代理聊天。",
+      "featuresLabel": "功能",
+      "featuresSub": "CLI、移动端、房间、技能等。",
       "cityLabel": "Hatcher 城市",
       "citySub": "步行 3D 上线代理世界。",
       "frameworksLabel": "框架",
@@ -125,6 +127,7 @@
     "itemHatchAgent": "孵化代理",
     "itemMyAgents": "我的代理",
     "itemPublicAgents": "公共代理",
+    "itemFeatures": "功能",
     "itemCity": "Hatcher 城市",
     "itemFrameworks": "框架",
     "itemPricing": "定价",
@@ -2402,7 +2405,12 @@
       "sub": "用 Chat-to-Hatch 几秒创建代理。获得自己的建筑，打开每个代理房间，看它们工作。",
       "ctaPrimary": "孵化代理",
       "ctaGhost": "探索城市",
-      "ctaPlayStore": "在 Google Play 获取"
+      "ctaSignup": "免费注册账号",
+      "ctaPlayStoreKicker": "获取于",
+      "ctaPlayStore": "Google Play",
+      "ctaSolanaMobileKicker": "可用于",
+      "ctaSolanaMobile": "Solana Mobile",
+      "ctaFeatures": "查看全部功能"
     },
     "flow": {
       "boxLabel": "工作原理",
@@ -2415,6 +2423,7 @@
       "tile3Title": "上线代理",
       "tile3Body": "代理在它的 3D 房间运行。集成已连接。走进来看看。",
       "cta": "孵化你的",
+      "ctaFeatures": "查看全部功能",
       "liveLabel": "代理在线"
     },
     "useCases": {
@@ -2508,6 +2517,8 @@
       "ioanaRole": "CMO / Marketing",
       "johnName": "John",
       "johnRole": "Developer",
+      "moiseName": "Moise",
+      "moiseRole": "美国代表 / 社区",
       "anonymousOneName": "Anonymous Dev",
       "anonymousOneRole": "Developer",
       "anonymousTwoName": "Anonymous Dev",
@@ -2515,6 +2526,7 @@
       "founderTag": "founder",
       "growthTag": "growth",
       "builderTag": "builder",
+      "communityTag": "社区",
       "anonymousTag": "private"
     },
     "finalCta": {

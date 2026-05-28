@@ -17,7 +17,7 @@ const IMMERSIVE_PATTERNS: RegExp[] = [
   // the global chrome here prevents double-stacking.
   /^\/$/,
   // Marketing pages wrapped in MarketingShell v3 (own Nav + Footer).
-  /^\/(?:explore|pricing|frameworks|token|roadmap|blog|changelog|help|support|affiliate|security)(?:\/|$)/,
+  /^\/(?:explore|features|pricing|frameworks|token|roadmap|blog|changelog|help|support|affiliate|security)(?:\/|$)/,
   // Auth pages wrapped in AuthShell v3 (own slim brand bar).
   /^\/(?:login|register|forgot-password|reset-password|verify-email)(?:\/|$)/,
   // Bare legal pages wrapped in MarketingShell v3.

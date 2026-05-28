@@ -61,6 +61,8 @@
       "myAgentsSub": "Tableau de bord pour tes agents en cours.",
       "publicAgentsLabel": "Agents publics",
       "publicAgentsSub": "Discute avec les agents de la communauté.",
+      "featuresLabel": "Features",
+      "featuresSub": "CLI, mobile, rooms, skills, et plus.",
       "cityLabel": "Hatcher City",
       "citySub": "Marche dans un monde 3D d'agents en ligne.",
       "frameworksLabel": "Frameworks",
@@ -125,6 +127,7 @@
     "itemHatchAgent": "Faire éclore",
     "itemMyAgents": "Mes agents",
     "itemPublicAgents": "Agents publics",
+    "itemFeatures": "Features",
     "itemCity": "Hatcher City",
     "itemFrameworks": "Frameworks",
     "itemPricing": "Tarifs",
@@ -2402,7 +2405,12 @@
       "sub": "Crée-en un avec Chat-to-Hatch en quelques secondes. Obtiens ton bâtiment, ouvre les salles d'agents et regarde-les travailler.",
       "ctaPrimary": "Faire éclore un agent",
       "ctaGhost": "Explorer la ville",
-      "ctaPlayStore": "Disponible sur Google Play"
+      "ctaSignup": "Créer un compte gratuit",
+      "ctaPlayStoreKicker": "Disponible sur",
+      "ctaPlayStore": "Google Play",
+      "ctaSolanaMobileKicker": "Disponible sur",
+      "ctaSolanaMobile": "Solana Mobile",
+      "ctaFeatures": "Voir toutes les fonctionnalités"
     },
     "flow": {
       "boxLabel": "Comment ça marche",
@@ -2415,6 +2423,7 @@
       "tile3Title": "Agent en ligne",
       "tile3Body": "L'agent tourne dans sa salle 3D. Intégrations branchées. Entre et regarde.",
       "cta": "Fais éclore le tien",
+      "ctaFeatures": "Voir toutes les fonctionnalités",
       "liveLabel": "agent en ligne"
     },
     "useCases": {
@@ -2508,6 +2517,8 @@
       "ioanaRole": "CMO / Marketing",
       "johnName": "John",
       "johnRole": "Developer",
+      "moiseName": "Moise",
+      "moiseRole": "Représentant US / Communauté",
       "anonymousOneName": "Anonymous Dev",
       "anonymousOneRole": "Developer",
       "anonymousTwoName": "Anonymous Dev",
@@ -2515,6 +2526,7 @@
       "founderTag": "fondateur",
       "growthTag": "growth",
       "builderTag": "builder",
+      "communityTag": "communauté",
       "anonymousTag": "privé"
     },
     "finalCta": {
