@@ -19,7 +19,7 @@ export default function HomePage() {
         strategy="afterInteractive"
         data-widget="qwerti-widget"
         data-campaign="hatcher-792703809-48487"
-        data-auto-open="true"
+        data-auto-open="false"
       />
     </>
   );
