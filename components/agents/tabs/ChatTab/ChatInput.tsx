@@ -4,7 +4,6 @@ import { type RefObject, useState, useMemo, useCallback, useEffect, useRef } fro
 import { useTranslations } from 'next-intl';
 import { Send, Square, Mic, MicOff, Terminal, Paperclip, X, Loader2, FileText, Zap, ImagePlus, BarChart3, Code2, WandSparkles, Video, AudioLines } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import type { ActiveModelDisplay } from '@/lib/hosted-model-catalog';
 import { GlassCard } from '../../AgentContext';
 import { formatAttachmentSize } from './attachmentLimits';
 
@@ -50,8 +49,6 @@ interface ChatInputProps {
   onAbortResponse: () => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   inputRef: RefObject<HTMLTextAreaElement | null>;
-  llmProvider: string;
-  activeModel: ActiveModelDisplay;
   /** Files the user picked/dropped since the last send. Owned by the
    *  ChatTab parent so sendMessage can prepend the "[Attachments: ...]"
    *  marker before clearing the list. */
@@ -79,8 +76,6 @@ export function ChatInput({
   onAbortResponse,
   onKeyDown,
   inputRef,
-  llmProvider,
-  activeModel,
   attachments,
   attachmentError,
   uploadingAttachments,
@@ -458,13 +453,7 @@ export function ChatInput({
         </button>
       </div>
 
-      <div className="flex items-center justify-between mt-1.5 px-1">
-        <span
-          className="min-w-0 truncate text-[10px] text-[var(--text-muted)]"
-          title={`${activeModel.provider} · ${activeModel.name} · ${activeModel.route}`}
-        >
-          {t('poweredBy', { provider: llmProvider })} · {activeModel.name}
-        </span>
+      <div className="flex items-center justify-end mt-1.5 px-1">
         <div className="flex items-center gap-3">
           {queuedMessageCount > 0 && (
             <span className="text-[10px] font-medium text-[var(--color-accent)]">

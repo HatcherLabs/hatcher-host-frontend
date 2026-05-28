@@ -98,7 +98,7 @@ memory:
       { name: 'Social media native', supported: false },
       { name: 'Lightweight deploy', supported: false },
     ],
-    integrations: ['Telegram', 'Discord', 'Slack', 'WhatsApp'],
+    integrations: ['Telegram', 'Discord', 'Slack', 'Signal', 'Matrix', 'Email/SMS'],
     llmSupport: ['OpenRouter', 'OpenAI', 'Anthropic', 'Google', 'xAI', 'BYOK'],
     startupMs: 2800,
     memoryMb: 350,

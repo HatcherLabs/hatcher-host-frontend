@@ -18,6 +18,16 @@ const CHANNEL_TO_FEATURE: Record<string, string> = {
   matrix: 'openclaw.platform.matrix',
 };
 
+function csv(value: string): string[] {
+  return value.split(',').map((s) => s.trim()).filter(Boolean);
+}
+
+function stringArrayToInput(value: unknown): string {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === 'string' && item.length > 0).join(', ')
+    : '';
+}
+
 export function useAgentIntegrations(
   agent: Agent | null,
   id: string,
@@ -63,11 +73,22 @@ export function useAgentIntegrations(
       // into the WhatsApp integration's local state so the saved phone-number
       // list shows in the input on reload.
       const waAllowFrom = config['WHATSAPP_ALLOW_FROM'];
-      if (typeof waAllowFrom === 'string' && waAllowFrom.length > 0) {
+      const waAllowedUsers = config['WHATSAPP_ALLOWED_USERS'];
+      const rawChannelSettings = config.channelSettings as Record<string, Record<string, unknown>> | undefined;
+      const rawChannels = config.channels as Record<string, Record<string, unknown>> | undefined;
+      const channelSettingsAllowFrom = stringArrayToInput(rawChannelSettings?.whatsapp?.allowFrom);
+      const channelAllowFrom = stringArrayToInput(rawChannels?.whatsapp?.allowFrom);
+      const savedWhatsappAllowFrom =
+        typeof waAllowFrom === 'string' && waAllowFrom.length > 0
+          ? waAllowFrom
+          : typeof waAllowedUsers === 'string' && waAllowedUsers.length > 0
+            ? waAllowedUsers
+            : channelSettingsAllowFrom || channelAllowFrom;
+      if (savedWhatsappAllowFrom) {
         const sk = 'openclaw.platform.whatsapp';
         const existing = next[sk]?.['WHATSAPP_ALLOW_FROM'];
         if (!existing) {
-          next[sk] = { ...(next[sk] ?? {}), WHATSAPP_ALLOW_FROM: waAllowFrom };
+          next[sk] = { ...(next[sk] ?? {}), WHATSAPP_ALLOW_FROM: savedWhatsappAllowFrom };
         }
       }
 
@@ -155,7 +176,6 @@ export function useAgentIntegrations(
     if (hasSettings) {
       const channelName = integration.secretPrefix.toLowerCase();
       const mapped: Record<string, unknown> = {};
-      const csv = (value: string) => value.split(',').map((s) => s.trim()).filter(Boolean);
       if (channelSettingsUpdate._CS_DM_POLICY) mapped.dmPolicy = channelSettingsUpdate._CS_DM_POLICY;
       if (channelSettingsUpdate._CS_GROUP_POLICY) mapped.groupPolicy = channelSettingsUpdate._CS_GROUP_POLICY;
       if (channelSettingsUpdate._CS_STREAMING) mapped.streaming = channelSettingsUpdate._CS_STREAMING;
@@ -178,6 +198,24 @@ export function useAgentIntegrations(
       channelSettingsMerge = {
         channelSettings: {
           [channelName]: mapped,
+        },
+      };
+    }
+
+    if (integration.pairingChannel === 'whatsapp' && filteredSecrets.WHATSAPP_ALLOW_FROM) {
+      const savedChannelSettings =
+        typeof channelSettingsMerge.channelSettings === 'object' &&
+        channelSettingsMerge.channelSettings !== null &&
+        !Array.isArray(channelSettingsMerge.channelSettings)
+          ? channelSettingsMerge.channelSettings as Record<string, Record<string, unknown>>
+          : {};
+      channelSettingsMerge = {
+        channelSettings: {
+          ...savedChannelSettings,
+          whatsapp: {
+            ...(savedChannelSettings.whatsapp ?? {}),
+            allowFrom: csv(filteredSecrets.WHATSAPP_ALLOW_FROM),
+          },
         },
       };
     }

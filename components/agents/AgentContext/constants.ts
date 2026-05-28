@@ -104,10 +104,9 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     secretPrefix: 'WHATSAPP',
     docsUrl: 'https://docs.hatcher.host/integrations/whatsapp',
     hasChannelSettings: false,
-    // Hermes WhatsApp pairing requires a TTY-capable flow we don't have in
-    // the dashboard yet — Hermes users can still pair via the agent terminal
-    // (`hermes whatsapp`).
-    frameworks: ['openclaw'],
+    // Hermes uses a dashboard terminal bridge because upstream still runs
+    // WhatsApp setup as the interactive `hermes whatsapp` TTY wizard.
+    frameworks: ['openclaw', 'hermes'],
     pairingRequired: true,
     pairingFields: [
       { key: 'WHATSAPP_ALLOW_FROM', label: 'Allowed Phone Numbers', type: 'text', placeholder: '+123****7890, +0987654321', helper: 'Comma-separated phone numbers (E.164 format). Only these numbers can chat with your agent. Leave empty for everyone.' },
