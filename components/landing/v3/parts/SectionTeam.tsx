@@ -36,20 +36,12 @@ const MEMBERS = [
     accent: '#38BDF8',
   },
   {
-    key: 'anonymous-one',
-    nameKey: 'anonymousOneName',
-    roleKey: 'anonymousOneRole',
-    tagKey: 'anonymousTag',
-    avatar: 'A1',
+    key: 'moise',
+    nameKey: 'moiseName',
+    roleKey: 'moiseRole',
+    tagKey: 'communityTag',
+    avatar: 'M',
     accent: '#FACC15',
-  },
-  {
-    key: 'anonymous-two',
-    nameKey: 'anonymousTwoName',
-    roleKey: 'anonymousTwoRole',
-    tagKey: 'anonymousTag',
-    avatar: 'A2',
-    accent: '#A78BFA',
   },
 ] as const;
 

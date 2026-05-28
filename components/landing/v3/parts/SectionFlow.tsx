@@ -57,6 +57,7 @@ export function SectionFlow() {
 
         <div className={styles.ctaRow}>
           <PhosphorButton href="/create">{t('cta')}</PhosphorButton>
+          <PhosphorButton href="/features" variant="ghost">{t('ctaFeatures')}</PhosphorButton>
         </div>
       </div>
     </section>

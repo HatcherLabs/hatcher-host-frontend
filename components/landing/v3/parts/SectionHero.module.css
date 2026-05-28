@@ -107,17 +107,106 @@
 
 .ctaRow { display: inline-flex; gap: 16px; flex-wrap: wrap; }
 
-.playStoreLabel {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
+.signupHint {
+  width: fit-content;
+  margin-top: -10px;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(57, 255, 136, 0.46);
 }
 
-.playStoreIcon {
-  width: 16px;
-  height: 16px;
+.signupHint::after {
+  content: ' →';
+  color: var(--accent);
+}
+
+.signupHint:hover {
+  color: var(--accent);
+}
+
+.storeBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.storeBadge {
+  width: 150px;
+  min-height: 46px;
+  padding: 7px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(2, 4, 3, 0.86);
+  color: var(--text-primary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.32);
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.storeBadge:hover {
+  transform: translateY(-1px);
+  border-color: rgba(57, 255, 136, 0.42);
+  background: rgba(6, 13, 8, 0.92);
+}
+
+.storeIcon {
+  width: 20px;
+  height: 20px;
   flex: 0 0 auto;
+  color: var(--accent);
+}
+
+.storeCopy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.storeKicker {
+  font-family: var(--font-mono);
+  font-size: 7.5px;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.storeName {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.12;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.featuresLink {
+  width: fit-content;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.featuresLink::after {
+  content: ' →';
+}
+
+.featuresLink:hover {
+  color: var(--text-primary);
 }
 
 .signals {

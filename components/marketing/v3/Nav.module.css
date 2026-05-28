@@ -417,7 +417,8 @@
   color: var(--danger, #ff6b6b);
 }
 
-.cta {
+.cta,
+.signupCta {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -441,20 +442,24 @@
   background: var(--accent-hover);
   box-shadow: 0 0 16px var(--accent-glow);
 }
+.signupCta:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 0 16px var(--accent-glow);
+}
 .cursor {
   font-weight: 400;
   font-size: 14px;
   line-height: 1;
 }
-@media (max-width: 600px) {
-  .guestCta {
-    display: none;
-  }
-}
 
 @media (max-width: 600px) {
   .cta {
     display: none;
+  }
+
+  .signupCta {
+    padding: 9px 12px;
+    font-size: 12px;
   }
 
   .cursor {

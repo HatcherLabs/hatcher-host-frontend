@@ -85,18 +85,18 @@
   white-space: nowrap;
   overflow: hidden;
   border-right: 0;
-  animation: typewriter 4s steps(28) infinite;
+  animation: typewriter 4s steps(34) infinite;
 }
 .typedCursor { color: var(--accent); animation: blink 1.4s steps(2, start) infinite; }
 @keyframes typewriter {
   0%   { width: 0; }
-  60%  { width: 26ch; }
-  90%  { width: 26ch; }
+  60%  { width: min(34ch, 100%); }
+  90%  { width: min(34ch, 100%); }
   100% { width: 0; }
 }
 @keyframes blink { to { visibility: hidden; } }
 @media (prefers-reduced-motion: reduce) {
-  .typedText { animation: none; width: 26ch; }
+  .typedText { animation: none; width: min(34ch, 100%); }
   .typedCursor { animation: none; }
 }
 
@@ -151,4 +151,10 @@
 .check { color: var(--accent); }
 .tileBody { font-size: 14px; color: var(--text-secondary); margin: 0; line-height: 1.5; }
 
-.ctaRow { margin-top: 40px; display: flex; justify-content: center; }
+.ctaRow {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
