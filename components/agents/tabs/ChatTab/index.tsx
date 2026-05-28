@@ -26,7 +26,6 @@ export function ChatTab() {
   const {
     agent,
     isAuthenticated,
-    llmProvider,
     activeModelDisplay,
     messages, setMessages,
     input, setInput,
@@ -497,8 +496,6 @@ export function ChatTab() {
               }
             }}
             inputRef={inputRef}
-            llmProvider={llmProvider}
-            activeModel={activeModelDisplay}
             attachments={attachments}
             attachmentError={attachmentError}
             uploadingAttachments={uploadingAttachments}

@@ -36,9 +36,9 @@ export function getExtraIntegrationsForFramework(framework: string): Integration
     return EXTRA_PLATFORM_INTEGRATIONS.filter(i => i.stateKey && openclawSupported.includes(i.stateKey));
   }
   if (framework === 'hermes') {
-    // Full list of platforms supported by upstream hermes-agent gateway
-    // at the pinned commit. WhatsApp intentionally excluded — pairing
-    // needs a TTY flow the dashboard can't drive yet.
+    // Full list of extra platforms supported by upstream hermes-agent gateway
+    // at the pinned commit. WhatsApp is a main integration above, not an
+    // extra platform, because Hatcher provides a dedicated pairing bridge.
     const hermesSupported = [
       'extra.signal', 'extra.matrix', 'extra.email', 'extra.sms',
       'extra.mattermost', 'extra.bluebubbles', 'extra.homeassistant',

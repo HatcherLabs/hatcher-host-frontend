@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
@@ -39,12 +39,64 @@ import {
 } from '../AgentContext';
 import { api } from '@/lib/api';
 import type { XonaConfigStatus } from '@/lib/api';
+import { API_URL } from '@/lib/config';
 import { DomainsSection } from './DomainsSection';
 
 // ─── Framework compatibility metadata ────────────────────────
 // Defines how well each integration works with each framework
 
 type CompatLevel = 'native' | 'community' | 'planned';
+type PairingTerminalState = 'idle' | 'connecting' | 'connected' | 'restarting' | 'paired' | 'error' | 'closed';
+
+function WhatsAppQrPreview({ qrCode }: { qrCode: string }) {
+  const sourceRows = qrCode.split(/\r?\n/).filter((row) => row.length > 0);
+  const hasHalfBlocks = /[▀▄]/.test(qrCode);
+  const rows = hasHalfBlocks
+    ? sourceRows.flatMap((row) => {
+        let top = '';
+        let bottom = '';
+        for (const char of Array.from(row)) {
+          if (char === '█') {
+            top += '█';
+            bottom += '█';
+          } else if (char === '▀') {
+            top += '█';
+            bottom += ' ';
+          } else if (char === '▄') {
+            top += ' ';
+            bottom += '█';
+          } else if (char === ' ') {
+            top += ' ';
+            bottom += ' ';
+          } else {
+            top += '█';
+            bottom += '█';
+          }
+        }
+        return [top, bottom];
+      })
+    : sourceRows;
+  const width = Math.max(1, ...rows.map((row) => row.length));
+
+  return (
+    <div data-testid="whatsapp-qr-preview" className="max-w-full overflow-auto rounded-xl bg-white p-3">
+      <div
+        className="mx-auto grid w-full max-w-[360px]"
+        style={{ gridTemplateColumns: `repeat(${width}, minmax(0, 1fr))` }}
+      >
+        {rows.flatMap((row, rowIndex) => (
+          Array.from(row.padEnd(width, ' ')).map((cell, cellIndex) => (
+            <span
+              key={`${rowIndex}-${cellIndex}`}
+              className={cell === ' ' ? 'bg-white' : 'bg-black'}
+              style={{ aspectRatio: '1 / 1' }}
+            />
+          ))
+        ))}
+      </div>
+    </div>
+  );
+}
 
 const FRAMEWORK_COMPAT: Record<string, Record<string, CompatLevel>> = {
   openclaw: {
@@ -78,8 +130,13 @@ const FRAMEWORK_COMPAT: Record<string, Record<string, CompatLevel>> = {
 
 // Recommended integrations per framework (best-supported, highlighted)
 const FRAMEWORK_RECOMMENDED: Record<string, string[]> = {
-  openclaw: ['openclaw.platform.telegram', 'openclaw.platform.discord', 'openclaw.platform.twitter'],
-  hermes: ['openclaw.platform.telegram', 'openclaw.platform.discord'],
+  openclaw: [
+    'openclaw.platform.telegram',
+    'openclaw.platform.discord',
+    'openclaw.platform.whatsapp',
+    'openclaw.platform.twitter',
+  ],
+  hermes: ['openclaw.platform.telegram', 'openclaw.platform.discord', 'openclaw.platform.whatsapp'],
 };
 
 // Quick Setup = only needs API token(s), no OAuth flow, no pairing, no complex setup
@@ -114,6 +171,18 @@ function getCompatLevel(framework: string, integration: IntegrationDef): CompatL
 function isRecommended(framework: string, integration: IntegrationDef): boolean {
   const sk = integrationStateKey(integration);
   return FRAMEWORK_RECOMMENDED[framework]?.includes(sk) ?? false;
+}
+
+function getPairingWsUrl(agentId: string, channel: string): string {
+  const base = API_URL.replace(/^http/, 'ws');
+  const params = new URLSearchParams({ channel });
+  return `${base}/agents/${agentId}/pair-channel/ws?${params.toString()}`;
+}
+
+function configStringArrayToInput(value: unknown): string {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === 'string' && item.length > 0).join(', ')
+    : '';
 }
 
 function isQuickSetup(integration: IntegrationDef): boolean {
@@ -293,9 +362,49 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [connected, setConnected] = useState(false);
+  const [terminalOpen, setTerminalOpen] = useState(false);
+  const [terminalState, setTerminalState] = useState<PairingTerminalState>('idle');
+  const [terminalOutput, setTerminalOutput] = useState('');
+  const [terminalInput, setTerminalInput] = useState('');
+  const terminalWsRef = useRef<WebSocket | null>(null);
+  const terminalOutputRef = useRef<HTMLPreElement | null>(null);
+  const terminalKeepAliveRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const qrCodeRef = useRef<string | null>(null);
+  const isWhatsAppPairing = integration.pairingChannel === 'whatsapp';
+  const usesFrameworkWhatsappPairing = isWhatsAppPairing && agent.framework === 'hermes';
+  const isOpenClawWhatsappPairing = isWhatsAppPairing && agent.framework === 'openclaw';
+
+  const closeHermesPairingTerminal = () => {
+    if (terminalKeepAliveRef.current) {
+      clearInterval(terminalKeepAliveRef.current);
+      terminalKeepAliveRef.current = null;
+    }
+    terminalWsRef.current?.close(1000, 'closed');
+    terminalWsRef.current = null;
+    qrCodeRef.current = null;
+    setQrCode(null);
+    setTerminalOpen(false);
+    setLoading(false);
+  };
+
+  useEffect(() => () => {
+    if (terminalKeepAliveRef.current) {
+      clearInterval(terminalKeepAliveRef.current);
+      terminalKeepAliveRef.current = null;
+    }
+    terminalWsRef.current?.close(1000, 'unmount');
+    terminalWsRef.current = null;
+  }, []);
+
+  useEffect(() => {
+    const node = terminalOutputRef.current;
+    if (!node) return;
+    node.scrollTop = node.scrollHeight;
+  }, [terminalOutput]);
 
   // Poll channel status every 5s when QR is showing
   useEffect(() => {
+    if (terminalOpen) return;
     if (!qrCode && !connected) return;
     const channel = integration.pairingChannel;
     if (!channel) return;
@@ -316,7 +425,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
     }, 5000);
 
     return () => clearInterval(poll);
-  }, [qrCode, connected, agent.id, integration.pairingChannel]);
+  }, [terminalOpen, qrCode, connected, agent.id, integration.pairingChannel]);
 
   // Check status on mount
   useEffect(() => {
@@ -333,9 +442,114 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
     if (!integration.pairingChannel) return;
     setLoading(true);
     setQrCode(null);
+    qrCodeRef.current = null;
     setMessage(null);
     setError(null);
     setConnected(false);
+
+    if (usesFrameworkWhatsappPairing) {
+      if (terminalKeepAliveRef.current) {
+        clearInterval(terminalKeepAliveRef.current);
+        terminalKeepAliveRef.current = null;
+      }
+      terminalWsRef.current?.close(1000, 'restart pairing');
+      setTerminalOpen(true);
+      setTerminalState('connecting');
+      setTerminalOutput('');
+
+      const ws = new WebSocket(getPairingWsUrl(agent.id, integration.pairingChannel));
+      terminalWsRef.current = ws;
+      terminalKeepAliveRef.current = setInterval(() => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ type: 'ping' }));
+        }
+      }, 25_000);
+
+      ws.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(String(event.data)) as {
+            type?: string;
+            data?: string;
+            qrCode?: string;
+            message?: string;
+            reason?: string;
+          };
+          if (msg.type === 'connected') {
+            setTerminalState('connected');
+            setLoading(false);
+          } else if (msg.type === 'output' && typeof msg.data === 'string') {
+            setTerminalOutput((prev) => `${prev}${msg.data}`.slice(-24_000));
+          } else if (msg.type === 'qr_ready' && msg.qrCode) {
+            qrCodeRef.current = msg.qrCode;
+            setQrCode(msg.qrCode);
+            setMessage(msg.message ?? null);
+          } else if (msg.type === 'paired') {
+            setTerminalState('restarting');
+            setConnected(false);
+            qrCodeRef.current = null;
+            setQrCode(null);
+            setLoading(true);
+            setMessage('WhatsApp connected. Restarting the agent to load the new session...');
+            setTerminalOutput((prev) => `${prev}\n[hatcher] WhatsApp connected. Restarting agent runtime...\n`.slice(-24_000));
+            void (async () => {
+              try {
+                const restart = await api.restartAgent(agent.id);
+                if (!restart.success) {
+                  throw new Error(restart.error || 'Restart failed');
+                }
+                await ctx.loadAgent();
+                setTerminalState('paired');
+                setConnected(true);
+                setMessage('WhatsApp connected. The agent runtime has restarted with the new session.');
+                setTerminalOutput((prev) => `${prev}[hatcher] Agent runtime restarted.\n`.slice(-24_000));
+              } catch (restartError) {
+                setTerminalState('error');
+                setError((restartError as Error).message || 'WhatsApp paired, but agent restart failed.');
+              } finally {
+                setLoading(false);
+              }
+            })();
+          } else if (msg.type === 'disconnected') {
+            setTerminalState((prev) => {
+              if (prev === 'paired' || prev === 'restarting') return prev;
+              setLoading(false);
+              return 'closed';
+            });
+            if (msg.reason) {
+              if (/pairing ended/i.test(msg.reason) && qrCodeRef.current) {
+                setMessage((prev) => prev ?? 'Scan this QR code with WhatsApp (Linked Devices)');
+              } else {
+                setMessage(msg.reason);
+              }
+            }
+          } else if (msg.type === 'error') {
+            setTerminalState('error');
+            setLoading(false);
+            setError(msg.message || 'Pairing failed');
+          }
+        } catch {
+          // Ignore malformed websocket frames.
+        }
+      };
+      ws.onerror = () => {
+        setTerminalState('error');
+        setLoading(false);
+        setError(`Could not connect to the ${pairingFrameworkLabel} pairing terminal.`);
+      };
+      ws.onclose = () => {
+        if (terminalKeepAliveRef.current) {
+          clearInterval(terminalKeepAliveRef.current);
+          terminalKeepAliveRef.current = null;
+        }
+        terminalWsRef.current = null;
+        setTerminalState((prev) => {
+          if (prev === 'paired' || prev === 'restarting' || prev === 'error') return prev;
+          setLoading(false);
+          return 'closed';
+        });
+      };
+      return;
+    }
 
     try {
       const res = await api.pairChannel(agent.id, integration.pairingChannel);
@@ -360,6 +574,17 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
     }
   };
 
+  const sendHermesPairingInput = (data?: string) => {
+    const payload = data ?? `${terminalInput}\n`;
+    const ws = terminalWsRef.current;
+    if (!ws || ws.readyState !== WebSocket.OPEN || !payload) return;
+    ws.send(JSON.stringify({ type: 'input', data: payload }));
+    if (data === undefined) {
+      setTerminalInput('');
+    }
+  };
+  const pairingFrameworkLabel = agent.framework === 'hermes' ? 'Hermes' : 'OpenClaw';
+
   const isRunning = agent.status === 'active';
   const ctx = useAgentContext();
   const { integrationSecrets, setIntegrationField, saveIntegrationSecrets, savingIntegration, integrationSaveMsg, hasExistingSecret } = ctx;
@@ -372,7 +597,23 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
   const sk = integrationStateKey(integration);
   const secrets = integrationSecrets[sk] ?? {};
   const savedAllowFrom = (agent.config as Record<string, unknown> | undefined)?.[allowFromKey];
-  const allowFromValue = secrets[allowFromKey] ?? (typeof savedAllowFrom === 'string' ? savedAllowFrom : '');
+  const savedHermesAllowedUsers = (agent.config as Record<string, unknown> | undefined)?.['WHATSAPP_ALLOWED_USERS'];
+  const rawChannelSettings = (agent.config as Record<string, unknown> | undefined)?.channelSettings as
+    | Record<string, Record<string, unknown>>
+    | undefined;
+  const rawChannels = (agent.config as Record<string, unknown> | undefined)?.channels as
+    | Record<string, Record<string, unknown>>
+    | undefined;
+  const savedOpenClawChannelUsers =
+    configStringArrayToInput(rawChannelSettings?.whatsapp?.allowFrom) ||
+    configStringArrayToInput(rawChannels?.whatsapp?.allowFrom);
+  const savedAllowFromValue =
+    (typeof savedAllowFrom === 'string' && savedAllowFrom.length > 0)
+      ? savedAllowFrom
+      : typeof savedHermesAllowedUsers === 'string' && savedHermesAllowedUsers.length > 0
+        ? savedHermesAllowedUsers
+        : savedOpenClawChannelUsers;
+  const allowFromValue = secrets[allowFromKey] ?? savedAllowFromValue;
   const existingAllowFrom = hasExistingSecret(allowFromKey);
 
   const handleSaveAllowFrom = async () => {
@@ -472,6 +713,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
                 await api.disconnectChannel(agent.id, ch);
                 setConnected(false);
                 setQrCode(null);
+                qrCodeRef.current = null;
               }}
               className="text-xs px-2 py-1 rounded border border-red-500/20 text-red-400 hover:bg-red-500/10 transition-colors"
             >
@@ -522,14 +764,17 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
         </div>
       )}
 
-      {qrCode && (() => {
+      {qrCode && !terminalOpen && !usesFrameworkWhatsappPairing && (() => {
         return (
         <div className="space-y-3">
           {/* QR Modal — portaled to body so nothing can overlap it */}
           {typeof document !== 'undefined' && createPortal(
             <div
               className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
-              onClick={() => setQrCode(null)}
+              onClick={() => {
+                qrCodeRef.current = null;
+                setQrCode(null);
+              }}
             >
               <div
                 className="bg-[#111] rounded-2xl p-6 max-w-[95vw] max-h-[95vh] overflow-auto border border-white/10"
@@ -539,16 +784,11 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
                   {message || `Scan with ${integration.name}`}
                 </p>
                 <pre
-                  className="text-green-400 whitespace-pre leading-none mx-auto select-none"
-                  style={{
-                    fontFamily: '"Courier New", Courier, monospace',
-                    fontSize: 'min(1.4vw, 7px)',
-                    lineHeight: '1.15',
-                    width: 'fit-content',
-                  }}
+                  className="sr-only"
                 >
                   {qrCode}
                 </pre>
+                <WhatsAppQrPreview qrCode={qrCode} />
                 <p className="text-xs text-center text-[var(--text-muted)] mt-4">{t('pairing.tapOutsideToClose')}</p>
               </div>
             </div>,
@@ -565,6 +805,176 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
         </div>
         );
       })()}
+
+      {terminalOpen && typeof document !== 'undefined' && createPortal(
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+          onClick={closeHermesPairingTerminal}
+        >
+          <div
+            className={`${isOpenClawWhatsappPairing ? 'max-w-xl' : 'max-w-5xl'} w-full max-h-[95vh] overflow-hidden rounded-2xl border border-white/10 bg-[#0b0d12] shadow-2xl`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
+              <div>
+                <p className="text-sm font-medium text-[var(--text-primary)]">{pairingFrameworkLabel} WhatsApp pairing</p>
+                <p className="text-xs text-[var(--text-muted)]">
+                  {terminalState === 'paired'
+                    ? 'WhatsApp connected'
+                    : terminalState === 'restarting'
+                      ? 'Restarting agent'
+                    : terminalState === 'connecting'
+                      ? 'Starting terminal'
+                      : terminalState === 'error'
+                        ? 'Error'
+                        : terminalState === 'connected'
+                          ? 'Terminal ready'
+                          : qrCode
+                            ? 'QR ready'
+                            : 'Interactive terminal'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={closeHermesPairingTerminal}
+                className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-[var(--text-secondary)] hover:bg-white/5 hover:text-[var(--text-primary)]"
+              >
+                Close
+              </button>
+            </div>
+
+            {isOpenClawWhatsappPairing ? (
+              <div className="max-h-[calc(95vh-64px)] space-y-4 overflow-auto p-6">
+                {qrCode ? (
+                  <div>
+                    <p className="mb-3 text-center text-sm font-medium text-[var(--text-primary)]">
+                      {message || 'Scan with WhatsApp'}
+                    </p>
+                    <WhatsAppQrPreview qrCode={qrCode} />
+                  </div>
+                ) : (
+                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                    <p className="text-sm font-medium text-[var(--text-primary)]">
+                      {message || `Waiting for ${pairingFrameworkLabel}`}
+                    </p>
+                    <p className="mt-1 text-xs text-[var(--text-muted)]">
+                      {terminalState === 'paired'
+                        ? 'The session is linked.'
+                        : terminalState === 'restarting'
+                          ? 'The session is linked. Waiting for the runtime restart to finish.'
+                        : 'Follow the prompts shown in the terminal.'}
+                    </p>
+                  </div>
+                )}
+
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={handlePair}
+                    disabled={loading}
+                    className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs text-[var(--text-secondary)] hover:bg-white/5 hover:text-[var(--text-primary)] disabled:opacity-40"
+                  >
+                    {loading ? <Loader2 size={13} className="animate-spin" /> : <RotateCcw size={13} />}
+                    Restart pairing
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="grid max-h-[calc(95vh-64px)] gap-0 overflow-auto lg:grid-cols-[minmax(0,1fr)_420px]">
+                <div className="min-h-[360px] border-b border-white/10 lg:border-b-0 lg:border-r">
+                  <pre
+                    ref={terminalOutputRef}
+                    className="h-[52vh] min-h-[360px] overflow-auto whitespace-pre bg-black p-4 font-mono text-xs leading-relaxed text-emerald-100"
+                  >
+                    {terminalOutput || `Starting ${pairingFrameworkLabel} WhatsApp pairing...`}
+                  </pre>
+                  <form
+                    className="flex gap-2 border-t border-white/10 bg-[#0f131a] p-3"
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      sendHermesPairingInput();
+                    }}
+                  >
+                    <input
+                      value={terminalInput}
+                      onChange={(event) => setTerminalInput(event.target.value)}
+                      className="min-w-0 flex-1 rounded-lg border border-white/10 bg-black px-3 py-2 text-sm text-[var(--text-primary)] outline-none placeholder:text-[var(--text-muted)] focus:border-cyan-500/50"
+                      placeholder="Input"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => sendHermesPairingInput('\n')}
+                      className="rounded-lg border border-white/10 px-3 py-2 text-xs text-[var(--text-secondary)] hover:bg-white/5 hover:text-[var(--text-primary)]"
+                    >
+                      Enter
+                    </button>
+                    <button
+                      type="submit"
+                      className="inline-flex items-center gap-2 rounded-lg bg-[var(--color-accent)] px-3 py-2 text-xs font-medium text-[var(--text-primary)] hover:opacity-90"
+                    >
+                      <Send size={13} />
+                      Send
+                    </button>
+                  </form>
+                </div>
+
+                <div className="space-y-4 p-4">
+                  {qrCode ? (
+                    <div>
+                      <p className="mb-3 text-sm font-medium text-[var(--text-primary)]">
+                        {message || 'Scan with WhatsApp'}
+                      </p>
+                      <WhatsAppQrPreview qrCode={qrCode} />
+                    </div>
+                  ) : (
+                    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                      <p className="text-sm font-medium text-[var(--text-primary)]">
+                        {message || `Waiting for ${pairingFrameworkLabel}`}
+                      </p>
+                      <p className="mt-1 text-xs text-[var(--text-muted)]">
+                        {terminalState === 'paired'
+                          ? 'The session is linked.'
+                          : terminalState === 'restarting'
+                            ? 'The session is linked. Waiting for the runtime restart to finish.'
+                            : 'Follow the prompts shown in the terminal.'}
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={handlePair}
+                      disabled={loading}
+                      className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs text-[var(--text-secondary)] hover:bg-white/5 hover:text-[var(--text-primary)] disabled:opacity-40"
+                    >
+                      {loading ? <Loader2 size={13} className="animate-spin" /> : <RotateCcw size={13} />}
+                      Restart pairing
+                    </button>
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => sendHermesPairingInput('y\n')}
+                        className="rounded-lg border border-white/10 px-3 py-2 text-xs text-[var(--text-secondary)] hover:bg-white/5 hover:text-[var(--text-primary)]"
+                      >
+                        Yes
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => sendHermesPairingInput('n\n')}
+                        className="rounded-lg border border-white/10 px-3 py-2 text-xs text-[var(--text-secondary)] hover:bg-white/5 hover:text-[var(--text-primary)]"
+                      >
+                        No
+                      </button>
+                    </>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>,
+        document.body
+      )}
 
       {error && (
         <div className="flex items-start gap-2 p-3 rounded-lg border border-red-500/20 bg-red-500/5">

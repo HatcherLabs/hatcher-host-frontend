@@ -87,9 +87,9 @@ const PLATFORMS = [
     icon: Phone,
     color: '#25D366',
     difficulty: 'Medium',
-    cost: 'Free (1K msgs/mo)',
-    setupTime: '15 min',
-    description: 'Connect via the WhatsApp Cloud API. Requires a Meta Business account and app setup.',
+    cost: 'Free',
+    setupTime: '2 min',
+    description: 'Pair an OpenClaw or Hermes agent with WhatsApp by scanning a Linked Devices QR code from the dashboard.',
   },
   {
     id: 'slack',
