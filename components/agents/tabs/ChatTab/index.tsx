@@ -19,7 +19,11 @@ import { ChatInput } from './ChatInput';
 import { VoiceCallOverlay } from './VoiceCallOverlay';
 import { ChatStyles } from './ChatStyles';
 import { AgentPresenceRail } from './AgentPresenceRail';
-import { CHAT_ATTACHMENT_MAX_BYTES, formatAttachmentSize } from './attachmentLimits';
+import {
+  CHAT_ATTACHMENT_MAX_BYTES,
+  formatAttachmentSize,
+  isChatDataUrlAttachmentMimeType,
+} from './attachmentLimits';
 
 function readFileAsDataUrl(file: File): Promise<string> {
   return new Promise<string>((resolve, reject) => {
@@ -115,7 +119,7 @@ export function ChatTab() {
                 : 'image/png'
           : '';
         const mimeType = file.type || inferredImageType || 'application/octet-stream';
-        const isImage = /^image\/(png|jpe?g|webp|gif)$/i.test(mimeType);
+        const isImage = isChatDataUrlAttachmentMimeType(mimeType);
 
         let content: string | null = null;
         if (looksText) {
@@ -150,7 +154,7 @@ export function ChatTab() {
                   mimeType,
                   sizeBytes: file.size,
                   content: inlineCapable ? content : null,
-                  ...(dataUrl ? { dataUrl } : {}),
+                  ...(isImage && dataUrl ? { dataUrl } : {}),
                   diskOnly: !inlineCapable,
                 },
               ],
@@ -197,7 +201,7 @@ export function ChatTab() {
       }
     }
     const diskMarker = diskOnly.length > 0
-      ? `[Attached files: ${diskOnly.join(', ')}. Image attachments are available to Hatcher platform actions such as Pump.fun launch.]`
+      ? `[Attached files uploaded to the agent knowledge/workspace: ${diskOnly.join(', ')}. Image attachments are also available to Hatcher platform actions such as Pump.fun launch.]`
       : null;
     const finalText = [
       inlineBlocks.join('\n\n'),
