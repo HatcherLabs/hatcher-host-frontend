@@ -432,6 +432,110 @@ export interface ConduitProviderActionResponse {
 export type ConduitProtocolInfoResponse = unknown;
 export type ConduitManifestResponse = unknown;
 
+export interface OobeCapability {
+  id: string;
+  description: string | null;
+  protocol_id?: string | null;
+  protocolId?: string | null;
+  version: string | null;
+}
+
+export interface OobeSapRegistration {
+  registered: boolean;
+  walletAddress: string;
+  agentPda: string;
+  txSignature: string | null;
+  indexTxSignatures?: string[];
+  registeredAt: string;
+  indexedAt?: string | null;
+  name: string;
+  description: string;
+  capabilities: OobeCapability[];
+  protocols: string[];
+  agentUri: string | null;
+  x402Endpoint: string | null;
+  pricePerCallUsdc: number;
+}
+
+export interface OobeConfigStatus {
+  enabled: boolean;
+  rpcConfigured: boolean;
+  rpcUrl: string;
+  cluster: "mainnet-beta" | "devnet" | "localnet";
+  sapEnabled: boolean;
+  sapRegistrationEnabled: boolean;
+  sapProgramId: string;
+  agentWallet: string | null;
+  registration: OobeSapRegistration | null;
+  defaultPriceUsdc: number;
+  x402Enabled: boolean;
+  x402ProviderEndpoint: string | null;
+  x402DefaultPriceLamports: number;
+}
+
+export interface OobeRpcBody {
+  method:
+    | "getHealth"
+    | "getSlot"
+    | "getBalance"
+    | "getAccountInfo"
+    | "getTokenAccountBalance"
+    | "getLatestBlockhash"
+    | "getSignaturesForAddress"
+    | "getTransaction"
+    | "getParsedTransaction";
+  params?: unknown[];
+}
+
+export interface OobeRegisterSapBody {
+  name?: string;
+  description?: string;
+  capabilities?: Array<{
+    id: string;
+    description?: string | null;
+    protocolId?: string | null;
+    version?: string | null;
+  }>;
+  protocols?: string[];
+  pricePerCallUsdc?: number;
+  x402Endpoint?: string | null;
+  force?: boolean;
+}
+
+export interface OobeRegisterSapResponse {
+  registration: OobeSapRegistration;
+  upstream: {
+    txSignature: string | null;
+    skipped?: boolean;
+    indexTxSignatures?: string[];
+    updateTxSignature?: string | null;
+  };
+}
+
+export type OobeDiscoveryResponse = unknown;
+export type OobeNetworkStatusResponse = unknown;
+
+export interface OobeX402CallBody {
+  endpointUrl: string;
+  agentWallet: string;
+  method?: "GET" | "POST";
+  body?: unknown;
+  headers?: Record<string, string>;
+  calls?: number;
+  maxCalls?: number;
+  pricePerCallLamports?: number;
+  depositLamports?: number;
+  timeoutMs?: number;
+}
+
+export interface OobeX402BalanceBody {
+  agentWallet: string;
+  depositorWallet?: string;
+}
+
+export type OobeX402CallResponse = unknown;
+export type OobeX402BalanceResponse = unknown;
+
 export interface KausalayerResourceResult {
   tool: string;
   data: unknown | null;
@@ -970,4 +1074,38 @@ export interface AdminConduitOverviewResponse {
     byPayoutMode: Array<{ status: ConduitPayoutMode; count: number }>;
     recent: AdminConduitSettlementRow[];
   };
+}
+
+export interface AdminOobeOverviewResponse {
+  generatedAt: string;
+  config: {
+    enabled: boolean;
+    rpcConfigured: boolean;
+    rpcUrl: string;
+    cluster: "mainnet-beta" | "devnet" | "localnet";
+    sapEnabled: boolean;
+    sapRegistrationEnabled: boolean;
+    sapProgramId: string;
+    defaultPriceUsdc: number;
+    maxDiscoveryResults: number;
+    x402Enabled: boolean;
+    x402DefaultPriceLamports: number;
+  };
+  totals: {
+    sampledAgents: number;
+    registeredSapAgents: number;
+    solanaWalletsInSample: number;
+    unregisteredWithSolanaWallet: number;
+  };
+  registrations: Array<{
+    agentId: string;
+    agentName: string;
+    framework: string;
+    status: string;
+    owner: { username: string | null; email: string | null };
+    walletAddress: string | null;
+    registration: OobeSapRegistration | null;
+    updatedAt: string;
+  }>;
+  networkStatus: unknown;
 }
