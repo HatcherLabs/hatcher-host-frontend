@@ -21,6 +21,20 @@ import { ChatStyles } from './ChatStyles';
 import { AgentPresenceRail } from './AgentPresenceRail';
 import { CHAT_ATTACHMENT_MAX_BYTES, formatAttachmentSize } from './attachmentLimits';
 
+function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result ?? ''));
+    reader.onerror = () => reject(reader.error ?? new Error('Could not read attachment'));
+    reader.readAsDataURL(file);
+  });
+}
+
+function dataUrlToBase64(dataUrl: string): string {
+  const commaIndex = dataUrl.indexOf(',');
+  return commaIndex >= 0 ? dataUrl.slice(commaIndex + 1) : dataUrl;
+}
+
 export function ChatTab() {
   const ctx = useAgentContext();
   const {
@@ -52,10 +66,10 @@ export function ChatTab() {
   //      no tool call required — works across every framework regardless
   //      of what file-reading tools it ships with.
   //
-  //   2. Larger text files OR binary files → we still upload a lightweight
-  //      marker to the agent's knowledge/ volume and drop a marker in the
-  //      message with the filename. Image bytes travel with chat attachments
-  //      for platform actions such as Pump.fun launch.
+  //   2. Larger text files OR binary files → upload the real bytes to the
+  //      agent's knowledge/ volume and drop a marker in the message with
+  //      the filename. Image bytes also travel with chat attachments for
+  //      platform actions such as Pump.fun launch.
   //
   // Either way, the attachment is tracked in chat; binary image bytes are
   // sent with the chat request instead of being stored as full knowledge text.
@@ -108,20 +122,19 @@ export function ChatTab() {
           try { content = await file.text(); } catch { /* fall back to disk-only */ }
         }
         let dataUrl: string | undefined;
-        if (isImage) {
-          dataUrl = await new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(String(reader.result ?? ''));
-            reader.onerror = () => reject(reader.error ?? new Error('Could not read image attachment'));
-            reader.readAsDataURL(file);
-          });
+        const needsBinaryUpload = !inlineCapable || content === null;
+        if (isImage || needsBinaryUpload) {
+          dataUrl = await readFileAsDataUrl(file);
         }
         // Always persist to the volume so the Knowledge tab reflects it.
-        // For binaries we send a placeholder — the agent's read_file /
-        // attachment tools read the real file from the volume, not via this
-        // endpoint.
-        const payload = content ?? `[binary file: ${file.name}, ${file.size} bytes]`;
-        const res = await api.uploadKnowledge(agent.id, file.name, payload);
+        const uploadPayload = inlineCapable && content !== null
+          ? content
+          : {
+              dataBase64: dataUrlToBase64(dataUrl ?? ''),
+              mimeType,
+              sizeBytes: file.size,
+            };
+        const res = await api.uploadKnowledge(agent.id, file.name, uploadPayload);
         if (!res.success) {
           setAttachmentError(res.error ?? `Upload failed for ${file.name}`);
           continue;

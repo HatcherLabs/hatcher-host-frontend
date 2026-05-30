@@ -128,6 +128,15 @@ export type ChatAttachmentPayload = {
   dataUrl?: string;
 };
 
+export type KnowledgeUploadPayload =
+  | string
+  | {
+      content?: string;
+      dataBase64?: string;
+      mimeType?: string;
+      sizeBytes?: number;
+    };
+
 export const api = {
   /** Register a new account */
   register: (
@@ -2858,14 +2867,20 @@ export const api = {
       totalFiles: number;
     }>(`/agents/${agentId}/knowledge`),
 
-  uploadKnowledge: (agentId: string, filename: string, content: string) =>
-    req<{ written: boolean; filename: string; size: number }>(
+  uploadKnowledge: (agentId: string, filename: string, payload: KnowledgeUploadPayload) => {
+    const body =
+      typeof payload === "string"
+        ? { filename, content: payload }
+        : { filename, ...payload };
+
+    return req<{ written: boolean; filename: string; size: number }>(
       `/agents/${agentId}/knowledge`,
       {
         method: "POST",
-        body: JSON.stringify({ filename, content }),
+        body: JSON.stringify(body),
       },
-    ),
+    );
+  },
 
   readKnowledge: (agentId: string, filename: string) =>
     req<{ filename: string; content: string }>(
