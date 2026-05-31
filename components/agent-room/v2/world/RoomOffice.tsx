@@ -3,7 +3,7 @@
 import { Html } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import type { ReactNode } from 'react';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { LiveBuildings } from '@/components/city/v3/LiveBuildings';
 import { deriveHandoffBuildingVisual } from '@/components/city/v3/liveCityHandoff';
@@ -19,6 +19,7 @@ interface Props {
   messagesToday?: number;
   uptimeSec?: number;
   logLines?: string[];
+  eyesSnapshotDataUrl?: string;
   connectedIntegrations: Set<string>;
   hasMemory: boolean;
   nearest: StationId | null;
@@ -111,6 +112,7 @@ export function RoomOffice({
   messagesToday,
   uptimeSec,
   logLines = [],
+  eyesSnapshotDataUrl,
   connectedIntegrations,
   hasMemory,
   nearest,
@@ -146,6 +148,15 @@ export function RoomOffice({
         status={status}
         logLines={logLines}
         isNear={nearest === 'statusConsole'}
+        onStationClick={onStationClick}
+      />
+      <EyesConsoleStation
+        stationId="eyesConsole"
+        layout={layout}
+        accent={accent}
+        status={status}
+        snapshotDataUrl={eyesSnapshotDataUrl}
+        isNear={nearest === 'eyesConsole'}
         onStationClick={onStationClick}
       />
       <DeskStation
@@ -197,12 +208,21 @@ function OfficeShell({
         <boxGeometry args={[ROOM_SIZE, 0.11, ROOM_SIZE]} />
       </mesh>
       <FloorPlanks />
-      <mesh position={[0, 0.032, 0]} rotation={[-Math.PI / 2, 0, 0]} material={RUG}>
+      <mesh
+        position={[0, 0.032, 0]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        material={RUG}
+      >
         <circleGeometry args={[2.55, 44]} />
       </mesh>
       <mesh position={[0, 0.038, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[1.74, 1.86, 48]} />
-        <meshBasicMaterial color="#e7c981" transparent opacity={0.8} toneMapped={false} />
+        <meshBasicMaterial
+          color="#e7c981"
+          transparent
+          opacity={0.44}
+          toneMapped={false}
+        />
       </mesh>
       <mesh position={[0, ROOM_HEIGHT + 0.04, 0]} material={CEILING}>
         <boxGeometry args={[ROOM_SIZE, 0.1, ROOM_SIZE]} />
@@ -232,7 +252,8 @@ function FloorPlanks() {
       {Array.from({ length: rows }, (_, row) =>
         Array.from({ length: cols }, (_, col) => {
           const x = -ROOM_HALF + plankW / 2 + col * plankW;
-          const z = -ROOM_HALF + ROOM_SIZE / rows / 2 + row * (ROOM_SIZE / rows);
+          const z =
+            -ROOM_HALF + ROOM_SIZE / rows / 2 + row * (ROOM_SIZE / rows);
           const stagger = row % 2 === 0 ? 0 : plankW / 2;
           return (
             <mesh
@@ -241,7 +262,9 @@ function FloorPlanks() {
               receiveShadow
               material={(row + col) % 2 === 0 ? FLOOR_PLANK_A : FLOOR_PLANK_B}
             >
-              <boxGeometry args={[plankW - 0.035, 0.018, ROOM_SIZE / rows - 0.035]} />
+              <boxGeometry
+                args={[plankW - 0.035, 0.018, ROOM_SIZE / rows - 0.035]}
+              />
             </mesh>
           );
         }),
@@ -260,7 +283,13 @@ function FloorPlanks() {
   );
 }
 
-function RoomWalls({ accent, secondary }: { accent: string; secondary: string }) {
+function RoomWalls({
+  accent,
+  secondary,
+}: {
+  accent: string;
+  secondary: string;
+}) {
   const winW = 5.9;
   const winH = 2.68;
   const sill = 0.26;
@@ -278,7 +307,11 @@ function RoomWalls({ accent, secondary }: { accent: string; secondary: string })
       </mesh>
 
       <mesh
-        position={[-ROOM_HALF, sill + winH + (ROOM_HEIGHT - sill - winH) / 2, 0]}
+        position={[
+          -ROOM_HALF,
+          sill + winH + (ROOM_HEIGHT - sill - winH) / 2,
+          0,
+        ]}
         material={WALL}
       >
         <boxGeometry args={[0.22, ROOM_HEIGHT - sill - winH, ROOM_SIZE]} />
@@ -286,14 +319,26 @@ function RoomWalls({ accent, secondary }: { accent: string; secondary: string })
       <mesh position={[-ROOM_HALF, sill / 2, 0]} material={WALL}>
         <boxGeometry args={[0.22, sill, ROOM_SIZE]} />
       </mesh>
-      <mesh position={[-ROOM_HALF, sill + winH / 2, -ROOM_HALF + sideZ / 2]} material={WALL}>
+      <mesh
+        position={[-ROOM_HALF, sill + winH / 2, -ROOM_HALF + sideZ / 2]}
+        material={WALL}
+      >
         <boxGeometry args={[0.22, winH, sideZ]} />
       </mesh>
-      <mesh position={[-ROOM_HALF, sill + winH / 2, ROOM_HALF - sideZ / 2]} material={WALL}>
+      <mesh
+        position={[-ROOM_HALF, sill + winH / 2, ROOM_HALF - sideZ / 2]}
+        material={WALL}
+      >
         <boxGeometry args={[0.22, winH, sideZ]} />
       </mesh>
 
-      <WindowFrame winW={winW} winH={winH} sill={sill} accent={accent} secondary={secondary} />
+      <WindowFrame
+        winW={winW}
+        winH={winH}
+        sill={sill}
+        accent={accent}
+        secondary={secondary}
+      />
     </group>
   );
 }
@@ -313,10 +358,16 @@ function WindowFrame({
 }) {
   return (
     <group>
-      <mesh position={[-ROOM_HALF + 0.08, sill + winH + 0.05, 0]} material={WALL_TRIM}>
+      <mesh
+        position={[-ROOM_HALF + 0.08, sill + winH + 0.05, 0]}
+        material={WALL_TRIM}
+      >
         <boxGeometry args={[0.08, 0.14, winW + 0.28]} />
       </mesh>
-      <mesh position={[-ROOM_HALF + 0.08, sill - 0.035, 0]} material={WALL_TRIM}>
+      <mesh
+        position={[-ROOM_HALF + 0.08, sill - 0.035, 0]}
+        material={WALL_TRIM}
+      >
         <boxGeometry args={[0.08, 0.14, winW + 0.28]} />
       </mesh>
       {[-1, 1].map((side) => (
@@ -331,10 +382,16 @@ function WindowFrame({
       <mesh position={[-ROOM_HALF + 0.18, sill - 0.095, 0]} material={WOOD}>
         <boxGeometry args={[0.34, 0.08, winW + 0.42]} />
       </mesh>
-      <mesh position={[-ROOM_HALF + 0.02, sill + winH / 2, 0]} material={WALL_TRIM}>
+      <mesh
+        position={[-ROOM_HALF + 0.02, sill + winH / 2, 0]}
+        material={WALL_TRIM}
+      >
         <boxGeometry args={[0.045, winH, 0.045]} />
       </mesh>
-      <mesh position={[-ROOM_HALF + 0.02, sill + winH / 2, 0]} material={WALL_TRIM}>
+      <mesh
+        position={[-ROOM_HALF + 0.02, sill + winH / 2, 0]}
+        material={WALL_TRIM}
+      >
         <boxGeometry args={[0.045, 0.045, winW]} />
       </mesh>
       <pointLight
@@ -380,7 +437,10 @@ function WindowViewBackdrop({
 
   return (
     <group>
-      <mesh position={[-ROOM_HALF - 0.052, sill + winH / 2, 0]} rotation={[0, Math.PI / 2, 0]}>
+      <mesh
+        position={[-ROOM_HALF - 0.052, sill + winH / 2, 0]}
+        rotation={[0, Math.PI / 2, 0]}
+      >
         <planeGeometry args={[winW, winH]} />
         <meshBasicMaterial
           color={skyColor}
@@ -389,7 +449,10 @@ function WindowViewBackdrop({
           side={THREE.DoubleSide}
         />
       </mesh>
-      <mesh position={[-ROOM_HALF - 0.048, sill + 0.78, 0]} rotation={[0, Math.PI / 2, 0]}>
+      <mesh
+        position={[-ROOM_HALF - 0.048, sill + 0.78, 0]}
+        rotation={[0, Math.PI / 2, 0]}
+      >
         <planeGeometry args={[winW, 0.92]} />
         <meshBasicMaterial
           color={horizonColor}
@@ -420,7 +483,10 @@ function WindowViewBackdrop({
           </mesh>
         );
       })}
-      <mesh position={[-ROOM_HALF - 0.036, sill + 0.33, 0]} rotation={[0, Math.PI / 2, 0]}>
+      <mesh
+        position={[-ROOM_HALF - 0.036, sill + 0.33, 0]}
+        rotation={[0, Math.PI / 2, 0]}
+      >
         <planeGeometry args={[winW, 1.02]} />
         <meshBasicMaterial
           color={groundColor}
@@ -429,7 +495,10 @@ function WindowViewBackdrop({
           side={THREE.DoubleSide}
         />
       </mesh>
-      <mesh position={[-ROOM_HALF - 0.034, sill + 0.44, -0.98]} rotation={[0, Math.PI / 2, 0]}>
+      <mesh
+        position={[-ROOM_HALF - 0.034, sill + 0.44, -0.98]}
+        rotation={[0, Math.PI / 2, 0]}
+      >
         <planeGeometry args={[winW * 0.92, 0.13]} />
         <meshBasicMaterial
           color={roadColor}
@@ -438,7 +507,10 @@ function WindowViewBackdrop({
           side={THREE.DoubleSide}
         />
       </mesh>
-      <mesh position={[-ROOM_HALF - 0.032, sill + 0.05, 0]} rotation={[0, Math.PI / 2, 0]}>
+      <mesh
+        position={[-ROOM_HALF - 0.032, sill + 0.05, 0]}
+        rotation={[0, Math.PI / 2, 0]}
+      >
         <planeGeometry args={[winW, 0.16]} />
         <meshBasicMaterial
           color={groundAlt}
@@ -447,7 +519,10 @@ function WindowViewBackdrop({
           side={THREE.DoubleSide}
         />
       </mesh>
-      <mesh position={[-ROOM_HALF - 0.033, sill + 0.16, 1.0]} rotation={[0, Math.PI / 2, 0]}>
+      <mesh
+        position={[-ROOM_HALF - 0.033, sill + 0.16, 1.0]}
+        rotation={[0, Math.PI / 2, 0]}
+      >
         <planeGeometry args={[winW * 0.82, 0.32]} />
         <meshBasicMaterial
           color={groundAlt}
@@ -457,8 +532,14 @@ function WindowViewBackdrop({
         />
       </mesh>
       {buildings.map((building, i) => (
-        <group key={`window-building-${i}`} position={[-ROOM_HALF - 0.03, sill + 0.5, building.z]}>
-          <mesh position={[0, building.h / 2, 0]} rotation={[0, Math.PI / 2, 0]}>
+        <group
+          key={`window-building-${i}`}
+          position={[-ROOM_HALF - 0.03, sill + 0.5, building.z]}
+        >
+          <mesh
+            position={[0, building.h / 2, 0]}
+            rotation={[0, Math.PI / 2, 0]}
+          >
             <planeGeometry args={[building.w, building.h]} />
             <meshBasicMaterial
               color={building.color}
@@ -470,7 +551,10 @@ function WindowViewBackdrop({
         </group>
       ))}
       {timeMode === 'day' && (
-        <mesh position={[-ROOM_HALF - 0.028, sill + winH - 0.42, -1.72]} rotation={[0, Math.PI / 2, 0]}>
+        <mesh
+          position={[-ROOM_HALF - 0.028, sill + winH - 0.42, -1.72]}
+          rotation={[0, Math.PI / 2, 0]}
+        >
           <circleGeometry args={[0.18, 18]} />
           <meshBasicMaterial
             color="#fff1c0"
@@ -500,7 +584,13 @@ function Baseboard() {
   );
 }
 
-function CeilingLights({ accent, secondary }: { accent: string; secondary: string }) {
+function CeilingLights({
+  accent,
+  secondary,
+}: {
+  accent: string;
+  secondary: string;
+}) {
   void accent;
   void secondary;
   const positions: Array<[number, number]> = [
@@ -517,11 +607,20 @@ function CeilingLights({ accent, secondary }: { accent: string; secondary: strin
         <group key={`${x}-${z}`} position={[x, ROOM_HEIGHT - 0.035, z]}>
           <mesh>
             <boxGeometry args={[1.22, 0.045, 0.34]} />
-            <meshLambertMaterial color="#f5d79e" emissive="#ffdca8" emissiveIntensity={0.55} />
+            <meshLambertMaterial
+              color="#f5d79e"
+              emissive="#ffdca8"
+              emissiveIntensity={0.55}
+            />
           </mesh>
           <mesh position={[0, -0.03, 0]}>
             <boxGeometry args={[1.34, 0.012, 0.46]} />
-            <meshBasicMaterial color="#ffe9bf" toneMapped={false} transparent opacity={0.72} />
+            <meshBasicMaterial
+              color="#ffe9bf"
+              toneMapped={false}
+              transparent
+              opacity={0.72}
+            />
           </mesh>
           <pointLight color="#ffd9a0" intensity={0.1} distance={4.4} />
         </group>
@@ -532,7 +631,9 @@ function CeilingLights({ accent, secondary }: { accent: string; secondary: strin
 
 function integrationCatalog(framework: string) {
   const key = framework.toLowerCase();
-  return key === 'hermes' ? INTEGRATION_CATALOG.hermes : INTEGRATION_CATALOG.openclaw;
+  return key === 'hermes'
+    ? INTEGRATION_CATALOG.hermes
+    : INTEGRATION_CATALOG.openclaw;
 }
 
 function wrapTextLine(value: string, maxChars: number): string[] {
@@ -598,13 +699,16 @@ function drawTvLogCanvas(
     .flatMap((line) => wrapTextLine(line.replace(/\u001b\[[0-9;]*m/g, ''), 92));
   const visible = 14;
   const scrollRange = Math.max(0, wrapped.length - visible);
-  const offset = scrollRange > 0 ? Math.floor(elapsed * 0.62) % (scrollRange + 1) : 0;
+  const offset =
+    scrollRange > 0 ? Math.floor(elapsed * 0.62) % (scrollRange + 1) : 0;
   const visibleLines = wrapped.slice(offset, offset + visible);
 
   ctx.font = '500 20px ui-monospace, SFMono-Regular, Menlo, monospace';
   visibleLines.forEach((line, index) => {
     const y = 104 + index * 28;
-    const level = line.match(/\b(ERROR|ERR|WARN|OK|INFO|DEBUG)\b/i)?.[1]?.toUpperCase();
+    const level = line
+      .match(/\b(ERROR|ERR|WARN|OK|INFO|DEBUG)\b/i)?.[1]
+      ?.toUpperCase();
     ctx.fillStyle =
       level === 'ERROR' || level === 'ERR'
         ? '#fb7185'
@@ -623,13 +727,7 @@ function drawTvLogCanvas(
   ctx.fillRect(0, scanY, w, 3);
 }
 
-function TvLogScreen({
-  lines,
-  accent,
-}: {
-  lines: string[];
-  accent: string;
-}) {
+function TvLogScreen({ lines, accent }: { lines: string[]; accent: string }) {
   const canvas = useMemo(() => {
     const next = document.createElement('canvas');
     next.width = 1024;
@@ -654,12 +752,163 @@ function TvLogScreen({
   return (
     <mesh position={[0, 0, 0.098]}>
       <planeGeometry args={[3.92, 1.72]} />
-      <meshBasicMaterial map={texture} toneMapped={false} side={THREE.DoubleSide} />
+      <meshBasicMaterial
+        map={texture}
+        toneMapped={false}
+        side={THREE.DoubleSide}
+      />
     </mesh>
   );
 }
 
-function drawLaptopCanvas(canvas: HTMLCanvasElement, accent: string, elapsed: number) {
+function drawEyesCanvas(
+  canvas: HTMLCanvasElement,
+  status: string,
+  accent: string,
+  elapsed: number,
+  snapshotImage?: HTMLImageElement | null,
+) {
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const w = canvas.width;
+  const h = canvas.height;
+  ctx.fillStyle = '#05070c';
+  ctx.fillRect(0, 0, w, h);
+
+  const statusColor =
+    status === 'error' || status === 'crashed'
+      ? '#fb7185'
+      : ['active', 'running', 'restarting'].includes(status)
+        ? '#68ff8a'
+        : accent;
+  const gradient = ctx.createLinearGradient(0, 0, w, h);
+  gradient.addColorStop(0, `${accent}22`);
+  gradient.addColorStop(0.62, 'rgba(15, 23, 42, 0.16)');
+  gradient.addColorStop(1, 'rgba(16, 185, 129, 0.12)');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, w, h);
+
+  if (snapshotImage) {
+    const scale = Math.min(w / snapshotImage.width, h / snapshotImage.height);
+    const drawW = snapshotImage.width * scale;
+    const drawH = snapshotImage.height * scale;
+    ctx.drawImage(
+      snapshotImage,
+      (w - drawW) / 2,
+      (h - drawH) / 2,
+      drawW,
+      drawH,
+    );
+  }
+
+  ctx.fillStyle = accent;
+  ctx.font = '700 26px ui-monospace, SFMono-Regular, Menlo, monospace';
+  ctx.fillText('EYES LIVE', 28, 42);
+  ctx.fillStyle = statusColor;
+  ctx.beginPath();
+  ctx.arc(w - 115, 33, 9 + Math.sin(elapsed * 4) * 2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#d8c3a3';
+  ctx.font = '700 18px ui-monospace, SFMono-Regular, Menlo, monospace';
+  ctx.fillText(status.toUpperCase().slice(0, 14), w - 96, 40);
+
+  ctx.strokeStyle = `${accent}66`;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(28, 58);
+  ctx.lineTo(w - 28, 58);
+  ctx.stroke();
+
+  if (!snapshotImage) {
+    ctx.fillStyle = '#f6ead8';
+    ctx.font = '700 32px Inter, system-ui, sans-serif';
+    ctx.fillText('PIP-1 VISUAL PREVIEW', 28, 142);
+    ctx.fillStyle = '#d8c3a3';
+    ctx.font = '500 20px Inter, system-ui, sans-serif';
+    ctx.fillText('Open Eyes to start a live browser workspace.', 28, 178);
+  }
+
+  const scanY = 68 + ((elapsed * 34) % 236);
+  ctx.fillStyle = 'rgba(255,255,255,0.07)';
+  ctx.fillRect(0, scanY, w, 3);
+}
+
+function EyesLiveScreen({
+  status,
+  accent,
+  snapshotDataUrl,
+}: {
+  status: string;
+  accent: string;
+  snapshotDataUrl?: string;
+}) {
+  const canvas = useMemo(() => {
+    const next = document.createElement('canvas');
+    next.width = 640;
+    next.height = 360;
+    return next;
+  }, []);
+  const texture = useMemo(() => {
+    const next = new THREE.CanvasTexture(canvas);
+    next.colorSpace = THREE.SRGBColorSpace;
+    next.minFilter = THREE.LinearFilter;
+    next.magFilter = THREE.LinearFilter;
+    return next;
+  }, [canvas]);
+  const [snapshotImage, setSnapshotImage] = useState<HTMLImageElement | null>(
+    null,
+  );
+
+  useEffect(() => () => texture.dispose(), [texture]);
+
+  useEffect(() => {
+    if (!snapshotDataUrl) {
+      setSnapshotImage(null);
+      return;
+    }
+    let cancelled = false;
+    const image = new Image();
+    image.onload = () => {
+      if (!cancelled) setSnapshotImage(image);
+    };
+    image.onerror = () => {
+      if (!cancelled) setSnapshotImage(null);
+    };
+    image.src = snapshotDataUrl;
+    return () => {
+      cancelled = true;
+    };
+  }, [snapshotDataUrl]);
+
+  useFrame(({ clock }) => {
+    drawEyesCanvas(
+      canvas,
+      status,
+      accent,
+      clock.getElapsedTime(),
+      snapshotImage,
+    );
+    texture.needsUpdate = true;
+  });
+
+  return (
+    <mesh position={[0, 0, 0.098]}>
+      <planeGeometry args={[2.24, 1.18]} />
+      <meshBasicMaterial
+        map={texture}
+        toneMapped={false}
+        side={THREE.DoubleSide}
+      />
+    </mesh>
+  );
+}
+
+function drawLaptopCanvas(
+  canvas: HTMLCanvasElement,
+  accent: string,
+  elapsed: number,
+) {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
@@ -689,7 +938,8 @@ function drawLaptopCanvas(canvas: HTMLCanvasElement, accent: string, elapsed: nu
   ctx.font = '600 15px ui-monospace, SFMono-Regular, Menlo, monospace';
   tabs.forEach((tab, i) => {
     const x = 28 + i * 118;
-    ctx.fillStyle = i === Math.floor(elapsed / 2) % tabs.length ? accent : '#bfa88b';
+    ctx.fillStyle =
+      i === Math.floor(elapsed / 2) % tabs.length ? accent : '#bfa88b';
     ctx.fillText(tab, x, 74);
   });
 
@@ -782,7 +1032,10 @@ function FlatBoardLabel({
   width?: number;
   height?: number;
 }) {
-  const texture = useMemo(() => createFlatLabelTexture(text, color), [color, text]);
+  const texture = useMemo(
+    () => createFlatLabelTexture(text, color),
+    [color, text],
+  );
   useEffect(() => () => texture.dispose(), [texture]);
   return (
     <mesh renderOrder={5}>
@@ -813,7 +1066,9 @@ function pseudoUnit(seed: number): number {
   return x - Math.floor(x);
 }
 
-function createWindowTerrainGeometry(timeMode: WindowTimeMode): THREE.PlaneGeometry {
+function createWindowTerrainGeometry(
+  timeMode: WindowTimeMode,
+): THREE.PlaneGeometry {
   const terrain = new THREE.PlaneGeometry(76, 54, 56, 40);
   terrain.rotateX(-Math.PI / 2);
   const positions = terrain.attributes.position as THREE.BufferAttribute;
@@ -844,7 +1099,10 @@ function createWindowTerrainGeometry(timeMode: WindowTimeMode): THREE.PlaneGeome
 }
 
 function WindowTerrain({ timeMode }: { timeMode: WindowTimeMode }) {
-  const geometry = useMemo(() => createWindowTerrainGeometry(timeMode), [timeMode]);
+  const geometry = useMemo(
+    () => createWindowTerrainGeometry(timeMode),
+    [timeMode],
+  );
   useEffect(() => () => geometry.dispose(), [geometry]);
   return (
     <mesh geometry={geometry} position={[-36, -0.16, 0]} receiveShadow>
@@ -936,7 +1194,11 @@ function WindowSkyline({ timeMode }: { timeMode: WindowTimeMode }) {
       {timeMode === 'day' ? (
         <mesh position={[-33, 7.5, -12.8]} rotation={[0, Math.PI / 2, 0]}>
           <circleGeometry args={[0.55, 24]} />
-          <meshBasicMaterial color="#fff1c0" toneMapped={false} depthWrite={false} />
+          <meshBasicMaterial
+            color="#fff1c0"
+            toneMapped={false}
+            depthWrite={false}
+          />
         </mesh>
       ) : (
         <group>
@@ -1057,11 +1319,22 @@ function SofaAndTable() {
         <mesh position={[0, 0.3, 0]} castShadow receiveShadow material={FABRIC}>
           <boxGeometry args={[2.35, 0.42, 0.9]} />
         </mesh>
-        <mesh position={[0, 0.72, -0.35]} castShadow receiveShadow material={FABRIC}>
+        <mesh
+          position={[0, 0.72, -0.35]}
+          castShadow
+          receiveShadow
+          material={FABRIC}
+        >
           <boxGeometry args={[2.35, 0.64, 0.2]} />
         </mesh>
         {[-1.12, 1.12].map((x) => (
-          <mesh key={x} position={[x, 0.55, 0]} castShadow receiveShadow material={FABRIC}>
+          <mesh
+            key={x}
+            position={[x, 0.55, 0]}
+            castShadow
+            receiveShadow
+            material={FABRIC}
+          >
             <boxGeometry args={[0.22, 0.56, 0.92]} />
           </mesh>
         ))}
@@ -1092,11 +1365,35 @@ function SofaAndTable() {
   );
 }
 
-function CentralPedestal({ stationId, layout, accent, isNear, onStationClick }: StationProps) {
-  void accent;
-  void isNear;
+function CentralPedestal({
+  stationId,
+  layout,
+  accent,
+  isNear,
+  onStationClick,
+}: StationProps) {
   return (
     <group position={layout[stationId].position}>
+      <mesh position={[0, 0.08, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.86, 1.02, 56]} />
+        <meshBasicMaterial
+          color={accent}
+          transparent
+          opacity={isNear ? 0.58 : 0.22}
+          depthWrite={false}
+          toneMapped={false}
+        />
+      </mesh>
+      <mesh position={[0, 0.12, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[1.17, 1.2, 64]} />
+        <meshBasicMaterial
+          color="#fff1c0"
+          transparent
+          opacity={isNear ? 0.34 : 0.1}
+          depthWrite={false}
+          toneMapped={false}
+        />
+      </mesh>
       <ClickHotspot
         stationId={stationId}
         layout={layout}
@@ -1146,7 +1443,12 @@ function TvStation({
         </mesh>
         <TvLogScreen lines={logLines} accent={accent} />
       </group>
-      <mesh position={[0, 0.29, -ROOM_HALF + 0.45]} castShadow receiveShadow material={WOOD}>
+      <mesh
+        position={[0, 0.29, -ROOM_HALF + 0.45]}
+        castShadow
+        receiveShadow
+        material={WOOD}
+      >
         <boxGeometry args={[4.8, 0.58, 0.68]} />
       </mesh>
       <group position={[0, 1.02, -ROOM_HALF + 0.14]}>
@@ -1156,7 +1458,11 @@ function TvStation({
         </mesh>
         <pointLight color={indicatorColor} intensity={0.28} distance={2.1} />
       </group>
-      <StationNearGlow position={layout[stationId].position} color={accent} active={isNear} />
+      <StationNearGlow
+        position={layout[stationId].position}
+        color={accent}
+        active={isNear}
+      />
       <ClickHotspot
         stationId={stationId}
         layout={layout}
@@ -1168,7 +1474,13 @@ function TvStation({
   );
 }
 
-function DeskStation({ stationId, layout, accent, isNear, onStationClick }: StationProps) {
+function DeskStation({
+  stationId,
+  layout,
+  accent,
+  isNear,
+  onStationClick,
+}: StationProps) {
   return (
     <group>
       <group position={[3.2, 0, ROOM_HALF - 0.82]} rotation={[0, Math.PI, 0]}>
@@ -1214,20 +1526,93 @@ function DeskStation({ stationId, layout, accent, isNear, onStationClick }: Stat
         <mesh position={[0, 0.5, 0]} castShadow receiveShadow material={FABRIC}>
           <boxGeometry args={[0.62, 0.1, 0.62]} />
         </mesh>
-        <mesh position={[0, 0.88, -0.29]} castShadow receiveShadow material={FABRIC}>
+        <mesh
+          position={[0, 0.88, -0.29]}
+          castShadow
+          receiveShadow
+          material={FABRIC}
+        >
           <boxGeometry args={[0.62, 0.72, 0.08]} />
         </mesh>
         <mesh position={[0, 0.26, 0]} castShadow receiveShadow material={METAL}>
           <cylinderGeometry args={[0.045, 0.045, 0.5, 10]} />
         </mesh>
       </group>
-      <StationNearGlow position={layout[stationId].position} color={accent} active={isNear} />
+      <StationNearGlow
+        position={layout[stationId].position}
+        color={accent}
+        active={isNear}
+      />
       <ClickHotspot
         stationId={stationId}
         layout={layout}
         onStationClick={onStationClick}
         radius={1.45}
         height={2.2}
+      />
+    </group>
+  );
+}
+
+function EyesConsoleStation({
+  stationId,
+  layout,
+  accent,
+  status,
+  snapshotDataUrl,
+  isNear,
+  onStationClick,
+}: StationProps & {
+  status: string;
+  snapshotDataUrl?: string;
+}) {
+  return (
+    <group>
+      <group position={[-5.1, 1.72, -ROOM_HALF + 0.16]}>
+        <mesh castShadow receiveShadow material={BLACK}>
+          <boxGeometry args={[2.45, 1.38, 0.12]} />
+        </mesh>
+        <EyesLiveScreen
+          status={status}
+          accent={accent}
+          snapshotDataUrl={snapshotDataUrl}
+        />
+        <group position={[0, -0.8, 0.09]}>
+          <FlatBoardLabel
+            text="EYES"
+            color="#f6ead8"
+            width={0.78}
+            height={0.18}
+          />
+        </group>
+      </group>
+      <mesh
+        position={[-5.1, 0.58, -ROOM_HALF + 0.42]}
+        castShadow
+        receiveShadow
+        material={METAL}
+      >
+        <boxGeometry args={[0.18, 1.16, 0.18]} />
+      </mesh>
+      <mesh
+        position={[-5.1, 0.08, -ROOM_HALF + 0.45]}
+        castShadow
+        receiveShadow
+        material={WOOD_DARK}
+      >
+        <boxGeometry args={[1.86, 0.16, 0.72]} />
+      </mesh>
+      <StationNearGlow
+        position={layout[stationId].position}
+        color={accent}
+        active={isNear}
+      />
+      <ClickHotspot
+        stationId={stationId}
+        layout={layout}
+        onStationClick={onStationClick}
+        radius={1.25}
+        height={2.3}
       />
     </group>
   );
@@ -1248,7 +1633,10 @@ function CorkboardStation({
   const integrations = integrationCatalog(framework);
   return (
     <group>
-      <group position={[-3.65, 1.92, ROOM_HALF - 0.14]} rotation={[0, Math.PI, 0]}>
+      <group
+        position={[-3.65, 1.92, ROOM_HALF - 0.14]}
+        rotation={[0, Math.PI, 0]}
+      >
         <mesh material={WOOD_DARK}>
           <boxGeometry args={[4.35, 2.52, 0.06]} />
         </mesh>
@@ -1291,7 +1679,11 @@ function CorkboardStation({
           );
         })}
       </group>
-      <StationNearGlow position={layout[stationId].position} color={accent} active={isNear} />
+      <StationNearGlow
+        position={layout[stationId].position}
+        color={accent}
+        active={isNear}
+      />
       <ClickHotspot
         stationId={stationId}
         layout={layout}
@@ -1315,8 +1707,22 @@ function BookshelfStation({
   hasMemory: boolean;
   canEdit: boolean;
 }) {
-  const bookColors = ['#8a3a4a', '#4a6a8a', '#6b8a4a', '#8a6e3a', '#6b4a6e', '#3a6b6e'];
-  const memoryFiles = ['soul.md', 'memory.md', 'goals.md', 'style.md', 'tools.md', 'sessions.md'];
+  const bookColors = [
+    '#8a3a4a',
+    '#4a6a8a',
+    '#6b8a4a',
+    '#8a6e3a',
+    '#6b4a6e',
+    '#3a6b6e',
+  ];
+  const memoryFiles = [
+    'soul.md',
+    'memory.md',
+    'goals.md',
+    'style.md',
+    'tools.md',
+    'sessions.md',
+  ];
   return (
     <group>
       <group position={[ROOM_HALF - 0.3, 0, 0]}>
@@ -1383,13 +1789,22 @@ function BookshelfStation({
                     side={THREE.DoubleSide}
                   />
                 </mesh>
-                <FlatBoardLabel text={name} color="#f8ead0" width={0.44} height={0.095} />
+                <FlatBoardLabel
+                  text={name}
+                  color="#f8ead0"
+                  width={0.44}
+                  height={0.095}
+                />
               </group>
             );
           })}
         <SmallShelfPlant position={[-0.58, 1.02, 3.23]} />
       </group>
-      <StationNearGlow position={layout[stationId].position} color={accent} active={isNear} />
+      <StationNearGlow
+        position={layout[stationId].position}
+        color={accent}
+        active={isNear}
+      />
       <ClickHotspot
         stationId={stationId}
         layout={layout}
@@ -1401,11 +1816,29 @@ function BookshelfStation({
   );
 }
 
-function ExitDoor({ stationId, layout, accent, isNear, onStationClick }: StationProps) {
+function ExitDoor({
+  stationId,
+  layout,
+  accent,
+  isNear,
+  onStationClick,
+}: StationProps) {
   return (
     <group>
-      <group position={[ROOM_HALF - 2, 0, ROOM_HALF - 0.13]} rotation={[0, Math.PI, 0]}>
-        <mesh position={[0, 1.08, 0]} castShadow receiveShadow material={WOOD_DARK}>
+      <group
+        position={[ROOM_HALF - 2, 0, ROOM_HALF - 0.13]}
+        rotation={[0, Math.PI, 0]}
+        onClick={(event) => {
+          event.stopPropagation();
+          onStationClick(stationId);
+        }}
+      >
+        <mesh
+          position={[0, 1.08, 0]}
+          castShadow
+          receiveShadow
+          material={WOOD_DARK}
+        >
           <boxGeometry args={[1.12, 2.16, 0.07]} />
         </mesh>
         <mesh position={[0, 1.18, -0.03]} material={WALL_TRIM}>
@@ -1418,10 +1851,19 @@ function ExitDoor({ stationId, layout, accent, isNear, onStationClick }: Station
           <boxGeometry args={[0.86, 0.24, 0.035]} />
         </mesh>
         <group position={[0, 2.42, -0.105]}>
-          <FlatBoardLabel text="BUILDING" color="#f6ead8" width={0.72} height={0.13} />
+          <FlatBoardLabel
+            text="BUILDING"
+            color="#f6ead8"
+            width={0.72}
+            height={0.13}
+          />
         </group>
       </group>
-      <StationNearGlow position={layout[stationId].position} color={accent} active={isNear} />
+      <StationNearGlow
+        position={layout[stationId].position}
+        color={accent}
+        active={isNear}
+      />
       <ClickHotspot
         stationId={stationId}
         layout={layout}
@@ -1488,7 +1930,10 @@ function FlowerPot({
       {[0, 1, 2, 3, 4, 5].map((i) => {
         const a = (i / 6) * Math.PI * 2;
         return (
-          <group key={i} position={[Math.cos(a) * 0.16, 0.52, Math.sin(a) * 0.16]}>
+          <group
+            key={i}
+            position={[Math.cos(a) * 0.16, 0.52, Math.sin(a) * 0.16]}
+          >
             <mesh>
               <sphereGeometry args={[0.08, 8, 6]} />
               <meshLambertMaterial color={color} />
@@ -1504,7 +1949,13 @@ function FlowerPot({
   );
 }
 
-function Tree({ position, scale = 1 }: { position: [number, number, number]; scale?: number }) {
+function Tree({
+  position,
+  scale = 1,
+}: {
+  position: [number, number, number];
+  scale?: number;
+}) {
   return (
     <group position={position} scale={scale}>
       <mesh position={[0, 0.34, 0]}>
@@ -1523,7 +1974,13 @@ function Tree({ position, scale = 1 }: { position: [number, number, number]; sca
   );
 }
 
-function Plant({ position, scale = 1 }: { position: [number, number, number]; scale?: number }) {
+function Plant({
+  position,
+  scale = 1,
+}: {
+  position: [number, number, number];
+  scale?: number;
+}) {
   return (
     <group position={position} scale={scale}>
       <mesh position={[0, 0.23, 0]} castShadow receiveShadow>
@@ -1535,7 +1992,11 @@ function Plant({ position, scale = 1 }: { position: [number, number, number]; sc
         return (
           <mesh
             key={i}
-            position={[Math.cos(a) * 0.16, 0.62 + (i % 3) * 0.08, Math.sin(a) * 0.16]}
+            position={[
+              Math.cos(a) * 0.16,
+              0.62 + (i % 3) * 0.08,
+              Math.sin(a) * 0.16,
+            ]}
             scale={[0.72, 1.45, 0.55]}
             rotation={[0.2, a, 0.35]}
             castShadow
@@ -1567,11 +2028,18 @@ function SceneLabel({
   children: ReactNode;
 }) {
   return (
-    <Html position={position} rotation={rotation} transform distanceFactor={7} zIndexRange={[8, 0]}>
+    <Html
+      position={position}
+      rotation={rotation}
+      transform
+      distanceFactor={7}
+      zIndexRange={[8, 0]}
+    >
       <div
         style={{
           color,
-          fontFamily: 'var(--font-mono), ui-monospace, SFMono-Regular, monospace',
+          fontFamily:
+            'var(--font-mono), ui-monospace, SFMono-Regular, monospace',
           fontSize: `${Math.max(7, fontSize * 82)}px`,
           fontWeight: 700,
           lineHeight: 1.05,
@@ -1598,10 +2066,57 @@ function StationNearGlow({
   color: string;
   active: boolean;
 }) {
-  void position;
-  void color;
-  void active;
-  return null;
+  const ringRef = useRef<THREE.Mesh>(null);
+  const coreRef = useRef<THREE.Mesh>(null);
+
+  useFrame(({ clock }) => {
+    const t = clock.elapsedTime;
+    if (ringRef.current) {
+      const scale = active
+        ? 1 + Math.sin(t * 3.2) * 0.12
+        : 0.84 + Math.sin(t * 1.4) * 0.035;
+      ringRef.current.scale.set(scale, scale, scale);
+      const material = ringRef.current.material as THREE.MeshBasicMaterial;
+      material.opacity = active ? 0.34 + Math.sin(t * 3.2) * 0.08 : 0.08;
+    }
+    if (coreRef.current) {
+      const material = coreRef.current.material as THREE.MeshBasicMaterial;
+      material.opacity = active ? 0.42 : 0.12;
+    }
+  });
+
+  return (
+    <group position={[position[0], 0.065, position[2]]}>
+      <mesh ref={ringRef} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.54, 0.64, 42]} />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={active ? 0.34 : 0.08}
+          depthWrite={false}
+          toneMapped={false}
+        />
+      </mesh>
+      <mesh ref={coreRef} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[0.42, 32]} />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={active ? 0.42 : 0.12}
+          depthWrite={false}
+          toneMapped={false}
+        />
+      </mesh>
+      {active && (
+        <pointLight
+          position={[0, 0.45, 0]}
+          color={color}
+          intensity={0.34}
+          distance={2.8}
+        />
+      )}
+    </group>
+  );
 }
 
 function ClickHotspot({

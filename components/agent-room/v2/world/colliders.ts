@@ -6,6 +6,7 @@ const VISIBLE_ROOM_COLLIDERS: ReadonlySet<StationId> = new Set<StationId>([
   'agentAvatar',
   'integrationsRack',
   'statusConsole',
+  'eyesConsole',
   'memoryShelves',
   'configTerminal',
 ]);

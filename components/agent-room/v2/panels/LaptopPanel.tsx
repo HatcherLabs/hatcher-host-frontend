@@ -2,10 +2,12 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type { StationId } from '../world/layout';
+import { normalizeRoomEyesConfig, type RoomEyesAction, type RoomEyesConfig, type RoomEyesLiveFeed } from '../eyes';
+import { EyesControlSurface } from './EyesPanel';
 import { api, type AgentMailMessage, type AgentMailboxInfo, type AgentPassport } from '@/lib/api';
 import { networkStatusLabel, shortAddress } from '@/lib/agent-passport';
 
-export type LaptopTab = 'status' | 'config' | 'mail' | 'passport';
+export type LaptopTab = 'status' | 'config' | 'eyes' | 'mail' | 'passport';
 
 export interface LaptopConfigPatch {
   name: string;
@@ -26,7 +28,12 @@ interface Props {
   initialTab?: LaptopTab;
   mailAttentionCount: number;
   passport: AgentPassport;
+  liveFeed?: RoomEyesLiveFeed;
   onSaveConfig?: (patch: LaptopConfigPatch) => Promise<void>;
+  onSaveEyes?: (config: RoomEyesConfig) => Promise<void>;
+  onStartEyesLive?: (url: string) => Promise<void>;
+  onEyesAction?: (action: RoomEyesAction) => Promise<void>;
+  onStopEyesLive?: () => Promise<void>;
   onClose: () => void;
   onOpenStation: (id: StationId) => void;
   onOpenChat: () => void;
@@ -63,6 +70,7 @@ interface ConfigDraft {
 const TABS: { id: LaptopTab; label: string }[] = [
   { id: 'status', label: 'Status' },
   { id: 'config', label: 'Config' },
+  { id: 'eyes', label: 'Eyes' },
   { id: 'mail', label: 'Mail' },
   { id: 'passport', label: 'Passport' },
 ];
@@ -250,7 +258,12 @@ export function LaptopPanel({
   initialTab = 'status',
   mailAttentionCount,
   passport,
+  liveFeed,
   onSaveConfig,
+  onSaveEyes,
+  onStartEyesLive,
+  onEyesAction,
+  onStopEyesLive,
   onClose,
   onOpenStation,
   onOpenChat,
@@ -264,6 +277,11 @@ export function LaptopPanel({
   );
   const [configSaving, setConfigSaving] = useState(false);
   const [configMessage, setConfigMessage] = useState<string | null>(null);
+  const [eyesDraft, setEyesDraft] = useState<RoomEyesConfig>(() =>
+    normalizeRoomEyesConfig(agentConfig?.eyes, agentName),
+  );
+  const [eyesSaving, setEyesSaving] = useState(false);
+  const [eyesMessage, setEyesMessage] = useState<string | null>(null);
   const isHermes = framework.toLowerCase() === 'hermes';
   const accent = isHermes ? '#9fc1c7' : '#d6b177';
   const clock = useMemo(
@@ -281,6 +299,8 @@ export function LaptopPanel({
   useEffect(() => {
     setDraft(buildDraft(agentName, agentDescription, agentConfig));
     setConfigMessage(null);
+    setEyesDraft(normalizeRoomEyesConfig(agentConfig?.eyes, agentName));
+    setEyesMessage(null);
   }, [agentConfig, agentDescription, agentName, agentId]);
 
   useEffect(() => {
@@ -331,6 +351,20 @@ export function LaptopPanel({
     }
   };
 
+  const saveEyes = async () => {
+    if (!onSaveEyes) return;
+    setEyesSaving(true);
+    setEyesMessage(null);
+    try {
+      await onSaveEyes(eyesDraft);
+      setEyesMessage('Eyes workspace saved.');
+    } catch (error) {
+      setEyesMessage(error instanceof Error ? error.message : 'Could not save Eyes workspace.');
+    } finally {
+      setEyesSaving(false);
+    }
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-[#100b07]/76 p-4 text-[#f6ead8] backdrop-blur-md"
@@ -364,13 +398,13 @@ export function LaptopPanel({
             </button>
           </div>
 
-          <div className="flex overflow-x-auto border-b border-[#5a3a20] bg-[#21150c] px-4">
+          <div className="flex overflow-x-auto border-b border-[#5a3a20] bg-[#21150c] px-2 sm:px-4">
             {TABS.map((item) => (
               <button
                 key={item.id}
                 type="button"
                 onClick={() => setTab(item.id)}
-                className="shrink-0 border-b-2 px-4 py-3 text-sm transition"
+                className="shrink-0 border-b-2 px-3 py-3 text-sm transition sm:px-4"
                 style={{
                   borderColor: tab === item.id ? accent : 'transparent',
                   color: tab === item.id ? '#fff7e8' : '#bfa88b',
@@ -405,6 +439,9 @@ export function LaptopPanel({
                 <LaptopCard title="Quick actions">
                   <ActionButton onClick={() => openStation('statusConsole')} accent={accent}>
                     Open status console
+                  </ActionButton>
+                  <ActionButton onClick={() => setTab('eyes')} accent={accent}>
+                    Open Eyes workspace
                   </ActionButton>
                 </LaptopCard>
               </LaptopGrid>
@@ -568,7 +605,7 @@ export function LaptopPanel({
                   </LaptopCard>
                 </LaptopGrid>
 
-                <div className="sticky bottom-0 flex flex-col gap-3 rounded-lg border border-[#5a3a20] bg-[#21150c]/96 p-4 shadow-[0_-18px_32px_rgba(28,19,12,0.72)] backdrop-blur sm:flex-row sm:items-center">
+                <div className="flex flex-col gap-3 rounded-lg border border-[#5a3a20] bg-[#21150c]/96 p-4 shadow-[0_-18px_32px_rgba(28,19,12,0.72)] backdrop-blur sm:sticky sm:bottom-0 sm:flex-row sm:items-center">
                   <div className="text-sm text-[#d8c3a3]">
                     {configMessage ?? 'Changes save directly to this agent.'}
                   </div>
@@ -591,6 +628,22 @@ export function LaptopPanel({
                   </div>
                 </div>
               </div>
+            )}
+
+            {tab === 'eyes' && (
+              <EyesControlSurface
+                agentName={agentName}
+                accent={accent}
+                draft={eyesDraft}
+                liveFeed={liveFeed}
+                saving={eyesSaving}
+                message={eyesMessage}
+                onDraftChange={setEyesDraft}
+                onSave={() => void saveEyes()}
+                onStartLive={onStartEyesLive}
+                onAction={onEyesAction}
+                onStopLive={onStopEyesLive}
+              />
             )}
 
             {tab === 'mail' && (

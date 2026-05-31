@@ -1,5 +1,6 @@
 'use client';
-import { useEffect, useMemo } from 'react';
+import { useFrame } from '@react-three/fiber';
+import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import {
   createSeededRng,
@@ -26,10 +27,7 @@ interface GridProps {
   grid: LiveCityGrid;
 }
 
-export function LiveCityInfrastructure({
-  grid,
-  timeMode,
-}: InfrastructureProps) {
+export function LiveCityInfrastructure({ grid, timeMode }: InfrastructureProps) {
   return (
     <group>
       <SkyDome timeMode={timeMode} />
@@ -37,6 +35,7 @@ export function LiveCityInfrastructure({
       <Terrain grid={grid} timeMode={timeMode} />
       <MountainRing timeMode={timeMode} />
       <StreetGrid grid={grid} />
+      <CitySignalBackbone grid={grid} timeMode={timeMode} />
       <StreetLights grid={grid} timeMode={timeMode} />
       <TreeRing grid={grid} timeMode={timeMode} />
     </group>
@@ -243,6 +242,74 @@ function StreetGrid({ grid }: GridProps) {
   );
 }
 
+function CitySignalBackbone({ grid, timeMode }: InfrastructureProps) {
+  const packetRefs = useRef<(THREE.Mesh | null)[]>([]);
+  const packetCount = Math.min(18, Math.max(6, grid.Nsb * 3));
+  const travelLength = Math.max(20, grid.totalW - LIVE_CITY_GUTTER * 2);
+  const glowColor = timeMode === 'night' ? '#65e7ff' : '#0b5f47';
+  const packetA = timeMode === 'night' ? '#65e7ff' : '#0f766e';
+  const packetB = timeMode === 'night' ? '#39ff88' : '#047857';
+
+  useFrame(({ clock }) => {
+    const t = clock.elapsedTime;
+    packetRefs.current.forEach((packet, index) => {
+      if (!packet) return;
+      const lane = index % 2 === 0 ? -0.55 : 0.55;
+      const forward = index % 3 !== 0;
+      const phase = (t * 0.075 + index / packetCount) % 1;
+      packet.position.x = forward
+        ? -travelLength / 2 + phase * travelLength
+        : travelLength / 2 - phase * travelLength;
+      packet.position.z = lane;
+      const material = packet.material as THREE.MeshBasicMaterial;
+      material.opacity = 0.3 + Math.sin(t * 3 + index) * 0.12;
+    });
+  });
+
+  return (
+    <group position={[0, 0.035, 0]}>
+      <mesh>
+        <boxGeometry args={[travelLength, 0.012, 0.09]} />
+        <meshBasicMaterial
+          color={glowColor}
+          transparent
+          opacity={timeMode === 'night' ? 0.18 : 0.1}
+          depthWrite={false}
+          toneMapped={false}
+        />
+      </mesh>
+      <mesh rotation={[0, Math.PI / 2, 0]}>
+        <boxGeometry args={[travelLength, 0.012, 0.09]} />
+        <meshBasicMaterial
+          color={glowColor}
+          transparent
+          opacity={timeMode === 'night' ? 0.14 : 0.08}
+          depthWrite={false}
+          toneMapped={false}
+        />
+      </mesh>
+      {Array.from({ length: packetCount }, (_, index) => (
+        <mesh
+          key={index}
+          ref={(packet) => {
+            packetRefs.current[index] = packet;
+          }}
+          position={[0, 0.018, index % 2 === 0 ? -0.55 : 0.55]}
+        >
+          <boxGeometry args={[1.4, 0.025, 0.13]} />
+          <meshBasicMaterial
+            color={index % 2 ? packetA : packetB}
+            transparent
+            opacity={0.34}
+            depthWrite={false}
+            toneMapped={false}
+          />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
 function StreetLights({ grid, timeMode }: InfrastructureProps) {
   return (
     <group>
@@ -255,9 +322,7 @@ function StreetLights({ grid, timeMode }: InfrastructureProps) {
             </mesh>
             <mesh position={[0, 1.6, 0]}>
               <sphereGeometry args={[0.11, 6, 5]} />
-              <meshBasicMaterial
-                color={timeMode === 'night' ? 0xffe0a8 : 0x8b9096}
-              />
+              <meshBasicMaterial color={timeMode === 'night' ? 0xffe0a8 : 0x8b9096} />
             </mesh>
           </group>
         )),
@@ -282,20 +347,13 @@ function TreeRing({ grid, timeMode }: InfrastructureProps) {
             <cylinderGeometry args={[0.18, 0.22, 1.2, 5]} />
             <meshLambertMaterial color={0x4a3624} />
           </mesh>
-          <mesh
-            position={[0, tree.cone ? 1.9 : 1.6, 0]}
-            castShadow
-            receiveShadow
-          >
+          <mesh position={[0, tree.cone ? 1.9 : 1.6, 0]} castShadow receiveShadow>
             {tree.cone ? (
               <coneGeometry args={[0.9, 2.2, 6]} />
             ) : (
               <icosahedronGeometry args={[1, 0]} />
             )}
-            <meshLambertMaterial
-              color={foliageColor(tree.materialIndex, timeMode)}
-              flatShading
-            />
+            <meshLambertMaterial color={foliageColor(tree.materialIndex, timeMode)} flatShading />
           </mesh>
         </group>
       ))}
@@ -332,10 +390,7 @@ function MountainRing({ timeMode }: { timeMode: LiveCityTimeMode }) {
           receiveShadow
         >
           <coneGeometry args={[mountain.width, mountain.height, 4]} />
-          <meshLambertMaterial
-            color={timeMode === 'day' ? 0x8ea2c5 : 0x202840}
-            flatShading
-          />
+          <meshLambertMaterial color={timeMode === 'day' ? 0x8ea2c5 : 0x202840} flatShading />
         </mesh>
       ))}
     </group>

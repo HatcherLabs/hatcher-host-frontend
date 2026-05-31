@@ -2,18 +2,31 @@
 
 import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useState } from 'react';
-import { ChevronDown, ChevronRight, Clock, Loader2, Plus, RefreshCw, Trash2 } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronRight,
+  Clock,
+  Loader2,
+  Plus,
+  RefreshCw,
+  Trash2,
+} from 'lucide-react';
 import {
   AVATAR_VARIANTS,
+  SELECTABLE_AVATAR_VARIANTS,
   normalizeAvatarVariant,
   type AvatarVariant,
   type RoomEmoteId,
 } from '@/components/agent-room/v2/stations/AgentBody';
 import { api } from '@/lib/api';
 import { useAgentContext } from '../../AgentContext';
+import { AgentEyesLiveCard } from './AgentEyesLiveCard';
+
+const AVATAR_SELECT_OPTION_CLASS = 'bg-[#0b1018] text-[var(--text-primary)]';
 
 const AgentRoomAvatarPreview = dynamic(
-  () => import('./AgentRoomAvatarPreview').then((m) => m.AgentRoomAvatarPreview),
+  () =>
+    import('./AgentRoomAvatarPreview').then((m) => m.AgentRoomAvatarPreview),
   {
     ssr: false,
     loading: () => (
@@ -34,10 +47,16 @@ function formatRelative(ts?: number): string {
   if (diff < 3600_000) return `${Math.floor(diff / 60_000)}m`;
   if (diff < 86_400_000) return `${Math.floor(diff / 3600_000)}h`;
   if (diff < 7 * 86_400_000) return `${Math.floor(diff / 86_400_000)}d`;
-  return new Date(ts).toLocaleDateString([], { month: 'short', day: 'numeric' });
+  return new Date(ts).toLocaleDateString([], {
+    month: 'short',
+    day: 'numeric',
+  });
 }
 
-export function AgentPresenceRail({ className = '', onSessionSelect }: AgentPresenceRailProps) {
+export function AgentPresenceRail({
+  className = '',
+  onSessionSelect,
+}: AgentPresenceRailProps) {
   const {
     agent,
     isAuthenticated,
@@ -70,9 +89,11 @@ export function AgentPresenceRail({ className = '', onSessionSelect }: AgentPres
   }, [agent.id]);
 
   const lastMessage = messages[messages.length - 1];
-  const thinking = sending || inflightTools.length > 0 || Boolean(lastMessage?.streaming);
+  const thinking =
+    sending || inflightTools.length > 0 || Boolean(lastMessage?.streaming);
   const mood = greeting ? 'greeting' : thinking ? 'thinking' : 'idle';
-  const activeEmote: RoomEmoteId | null = mood === 'greeting' ? 'wave' : mood === 'thinking' ? 'think' : null;
+  const activeEmote: RoomEmoteId | null =
+    mood === 'greeting' ? 'wave' : mood === 'thinking' ? 'think' : null;
 
   useEffect(() => {
     setEmoteNonce((value) => value + 1);
@@ -97,30 +118,35 @@ export function AgentPresenceRail({ className = '', onSessionSelect }: AgentPres
     onSessionSelect?.();
   }, [onSessionSelect, startNewChatSession]);
 
-  const handleAvatarChange = useCallback(async (value: string) => {
-    const nextVariant = normalizeAvatarVariant(value);
-    const previous = selectedVariant;
+  const handleAvatarChange = useCallback(
+    async (value: string) => {
+      const nextVariant = normalizeAvatarVariant(value);
+      const previous = selectedVariant;
 
-    setSelectedVariant(nextVariant);
-    setSavingVariant(true);
-    setVariantError(null);
-    setEmoteNonce((current) => current + 1);
+      setSelectedVariant(nextVariant);
+      setSavingVariant(true);
+      setVariantError(null);
+      setEmoteNonce((current) => current + 1);
 
-    const res = await api.updateAgent(agent.id, {
-      config: { roomAvatarVariant: nextVariant || null },
-      commitMessage: 'Update room avatar variant from chat',
-    });
-    setSavingVariant(false);
-    if (!res.success) {
-      setSelectedVariant(previous);
-      setVariantError(res.error ?? 'Could not update avatar');
-      return;
-    }
-    await loadAgent();
-  }, [agent.id, loadAgent, selectedVariant]);
+      const res = await api.updateAgent(agent.id, {
+        config: { roomAvatarVariant: nextVariant || null },
+        commitMessage: 'Update room avatar variant from chat',
+      });
+      setSavingVariant(false);
+      if (!res.success) {
+        setSelectedVariant(previous);
+        setVariantError(res.error ?? 'Could not update avatar');
+        return;
+      }
+      await loadAgent();
+    },
+    [agent.id, loadAgent, selectedVariant],
+  );
 
   return (
-    <aside className={`flex max-h-full w-full shrink-0 flex-col overflow-hidden rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)]/60 md:w-72 lg:w-[22rem] 2xl:w-96 ${className}`}>
+    <aside
+      className={`flex max-h-full w-full shrink-0 flex-col overflow-hidden rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)]/60 md:w-72 lg:w-[22rem] 2xl:w-96 ${className}`}
+    >
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-3 py-3 md:px-4">
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
           <div className="flex shrink-0 items-center justify-between gap-2">
@@ -130,7 +156,11 @@ export function AgentPresenceRail({ className = '', onSessionSelect }: AgentPres
               className="flex min-w-0 items-center gap-2 text-left text-xs font-semibold text-[var(--text-primary)] transition-colors hover:text-[var(--color-accent)]"
               aria-expanded={sessionsOpen}
             >
-              {sessionsOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+              {sessionsOpen ? (
+                <ChevronDown size={14} />
+              ) : (
+                <ChevronRight size={14} />
+              )}
               <span className="truncate">Chats</span>
               {chatSessions.length > 0 && (
                 <span className="truncate text-[10px] font-normal text-[var(--text-muted)]">
@@ -146,7 +176,10 @@ export function AgentPresenceRail({ className = '', onSessionSelect }: AgentPres
                 aria-label="Refresh chat sessions"
                 title="Refresh"
               >
-                <RefreshCw size={12} className={refreshingSessions ? 'animate-spin' : ''} />
+                <RefreshCw
+                  size={12}
+                  className={refreshingSessions ? 'animate-spin' : ''}
+                />
               </button>
               <button
                 type="button"
@@ -168,7 +201,9 @@ export function AgentPresenceRail({ className = '', onSessionSelect }: AgentPres
                 </div>
               ) : (
                 chatSessions.map((session) => {
-                  const selected = session.id === activeChatSessionId || (!activeChatSessionId && session.current);
+                  const selected =
+                    session.id === activeChatSessionId ||
+                    (!activeChatSessionId && session.current);
                   return (
                     <div
                       key={session.id}
@@ -223,13 +258,22 @@ export function AgentPresenceRail({ className = '', onSessionSelect }: AgentPres
       </div>
 
       <div className="shrink-0 border-t border-[var(--border-default)] px-3 py-3 md:px-4">
+        <AgentEyesLiveCard
+          agentId={agent.id}
+          agentName={agent.name}
+          framework={agent.framework}
+          status={agent.status}
+        />
+
         <div className="relative h-44 overflow-hidden rounded-lg border border-white/10 bg-[radial-gradient(circle_at_50%_20%,rgba(34,211,238,0.14),rgba(0,0,0,0.45)_58%,rgba(0,0,0,0.72))] md:h-[clamp(12rem,24dvh,16rem)]">
           <AgentRoomAvatarPreview
             agentId={agent.id}
             framework={agent.framework}
             status={agent.status}
             avatarVariant={selectedVariant}
-            avatarTraits={agent.config?.roomAvatarTraits ?? agent.config?.avatarTraits}
+            avatarTraits={
+              agent.config?.roomAvatarTraits ?? agent.config?.avatarTraits
+            }
             activeEmote={activeEmote}
             emoteNonce={emoteNonce}
             isStreaming={thinking}
@@ -245,16 +289,39 @@ export function AgentPresenceRail({ className = '', onSessionSelect }: AgentPres
             onChange={(event) => void handleAvatarChange(event.target.value)}
             disabled={!isAuthenticated || savingVariant}
             className="h-9 w-full rounded-md border border-[var(--border-default)] bg-black/25 px-2 text-xs text-[var(--text-primary)] outline-none transition-colors hover:border-[var(--color-accent)]/40 focus:border-[var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-60"
+            style={{ colorScheme: 'dark' }}
           >
-            <option value="">Auto</option>
-            {AVATAR_VARIANTS.map((variant) => (
-              <option key={variant.id} value={variant.id}>
+            <option value="" className={AVATAR_SELECT_OPTION_CLASS}>
+              Auto
+            </option>
+            {selectedVariant &&
+              !SELECTABLE_AVATAR_VARIANTS.some(
+                (variant) => variant.id === selectedVariant,
+              ) && (
+                <option
+                  value={selectedVariant}
+                  className={AVATAR_SELECT_OPTION_CLASS}
+                >
+                  {AVATAR_VARIANTS.find(
+                    (variant) => variant.id === selectedVariant,
+                  )?.name ?? 'Legacy avatar'}{' '}
+                  (legacy)
+                </option>
+              )}
+            {SELECTABLE_AVATAR_VARIANTS.map((variant) => (
+              <option
+                key={variant.id}
+                value={variant.id}
+                className={AVATAR_SELECT_OPTION_CLASS}
+              >
                 {variant.name}
               </option>
             ))}
           </select>
           {variantError && (
-            <span className="text-[11px] leading-tight text-red-300">{variantError}</span>
+            <span className="text-[11px] leading-tight text-red-300">
+              {variantError}
+            </span>
           )}
         </label>
       </div>

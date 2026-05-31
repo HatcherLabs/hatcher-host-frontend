@@ -1,10 +1,18 @@
 'use client';
 
-import { createContext, useCallback, useContext, useState, useRef, useMemo } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Toast, type ToastData, type ToastType } from './Toast';
 
 const MAX_VISIBLE = 3;
+
+let toastSequence = 0;
 
 /** Base callable signature: toast('success', 'message') */
 type ToastFn = (type: ToastType, message: string, duration?: number) => void;
@@ -22,6 +30,11 @@ export type ToastAPI = ToastFn & ToastMethods;
 
 interface ToastContextValue {
   toast: ToastAPI;
+}
+
+interface ToastState {
+  visible: ToastData[];
+  queue: ToastData[];
 }
 
 const ToastContext = createContext<ToastContextValue | null>(null);
@@ -42,41 +55,35 @@ export function useToast(): ToastContextValue {
 }
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
-  const [toasts, setToasts] = useState<ToastData[]>([]);
-  const queueRef = useRef<ToastData[]>([]);
-  const counterRef = useRef(0);
+  const [toastState, setToastState] = useState<ToastState>({
+    visible: [],
+    queue: [],
+  });
 
-  const promoteFromQueue = useCallback(() => {
-    if (queueRef.current.length === 0) return;
-    setToasts((prev) => {
-      const slots = MAX_VISIBLE - prev.length;
-      if (slots <= 0) return prev;
-      const promoted = queueRef.current.splice(0, slots);
-      return [...prev, ...promoted];
+  const dismiss = useCallback((id: string) => {
+    setToastState((prev) => {
+      const visible = prev.visible.filter((toast) => toast.id !== id);
+      if (visible.length === prev.visible.length) return prev;
+      const slots = MAX_VISIBLE - visible.length;
+      if (slots <= 0 || prev.queue.length === 0) return { ...prev, visible };
+      return {
+        visible: [...visible, ...prev.queue.slice(0, slots)],
+        queue: prev.queue.slice(slots),
+      };
     });
   }, []);
 
-  const dismiss = useCallback(
-    (id: string) => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-      // Allow state to settle before promoting queued toasts
-      setTimeout(promoteFromQueue, 50);
-    },
-    [promoteFromQueue],
-  );
-
   const addToast = useCallback(
     (type: ToastType, message: string, duration = 5000) => {
-      const id = `toast-${++counterRef.current}-${Date.now()}`;
+      toastSequence += 1;
+      const id = `toast-${Date.now().toString(36)}-${toastSequence.toString(36)}`;
       const newToast: ToastData = { id, type, message, duration };
 
-      setToasts((prev) => {
-        if (prev.length >= MAX_VISIBLE) {
-          queueRef.current.push(newToast);
-          return prev;
-        }
-        return [...prev, newToast];
-      });
+      setToastState((prev) =>
+        prev.visible.length >= MAX_VISIBLE
+          ? { ...prev, queue: [...prev.queue, newToast] }
+          : { ...prev, visible: [...prev.visible, newToast] },
+      );
     },
     [],
   );
@@ -87,10 +94,14 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       addToast(type, message, duration);
     }) as ToastAPI;
 
-    fn.success = (message: string, duration?: number) => addToast('success', message, duration);
-    fn.error = (message: string, duration?: number) => addToast('error', message, duration);
-    fn.info = (message: string, duration?: number) => addToast('info', message, duration);
-    fn.warning = (message: string, duration?: number) => addToast('warning', message, duration);
+    fn.success = (message: string, duration?: number) =>
+      addToast('success', message, duration);
+    fn.error = (message: string, duration?: number) =>
+      addToast('error', message, duration);
+    fn.info = (message: string, duration?: number) =>
+      addToast('info', message, duration);
+    fn.warning = (message: string, duration?: number) =>
+      addToast('warning', message, duration);
 
     return fn;
   }, [addToast]);
@@ -107,7 +118,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         aria-label="Notifications"
       >
         <AnimatePresence mode="popLayout">
-          {toasts.map((t) => (
+          {toastState.visible.map((t) => (
             <div key={t.id} className="pointer-events-auto">
               <Toast toast={t} onDismiss={dismiss} />
             </div>
