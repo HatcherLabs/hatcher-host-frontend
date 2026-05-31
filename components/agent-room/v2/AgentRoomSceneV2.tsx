@@ -25,6 +25,7 @@ interface Props {
   messagesToday?: number;
   uptimeSec?: number;
   logLines?: string[];
+  eyesSnapshotDataUrl?: string;
   connectedIntegrations: Set<string>;
   nearest: StationId | null;
   canEdit: boolean;
@@ -60,6 +61,7 @@ export function AgentRoomSceneV2({
   messagesToday,
   uptimeSec,
   logLines = [],
+  eyesSnapshotDataUrl,
   connectedIntegrations,
   nearest,
   canEdit,
@@ -112,6 +114,7 @@ export function AgentRoomSceneV2({
             messagesToday={messagesToday}
             uptimeSec={uptimeSec}
             logLines={logLines}
+            eyesSnapshotDataUrl={eyesSnapshotDataUrl}
             connectedIntegrations={connectedIntegrations}
             nearest={nearest}
             canEdit={canEdit}

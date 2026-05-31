@@ -78,6 +78,7 @@ import {
   Calendar,
   Cpu,
   Activity,
+  Camera,
   Clock,
   BarChart3,
   Rocket,
@@ -131,10 +132,143 @@ type PublicChatUsage = {
   piqueSignalCtaUrl?: string;
 };
 
+type PublicEyesSnapshot = {
+  capturedAt: number;
+  dataUrl: string;
+  size: number;
+};
+
+type PublicEyesState = {
+  status: 'idle' | 'starting' | 'live' | 'error' | 'stopped';
+  mode: 'browser' | 'artifact' | 'desktop' | 'terminal' | 'unknown';
+  action: string | null;
+  title: string | null;
+  url: string | null;
+  updatedAt: number;
+  frame: number | null;
+};
+
 function formatAiCredits(value: number | null | undefined): string {
   return typeof value === 'number' && Number.isFinite(value)
     ? Math.max(0, Math.floor(value)).toLocaleString()
     : '--';
+}
+
+function PublicAgentEyesPanel({
+  agentId,
+  agentName,
+  framework,
+  status,
+}: {
+  agentId: string;
+  agentName: string;
+  framework: string;
+  status: string;
+}) {
+  const supportsEyes = framework === 'openclaw' || framework === 'hermes';
+  const [screenshot, setScreenshot] = useState<PublicEyesSnapshot | null>(null);
+  const [state, setState] = useState<PublicEyesState | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const load = useCallback(async () => {
+    if (!supportsEyes) return;
+    setLoading(true);
+    try {
+      const res = await api.getAgentPublicEyesLive(agentId, 'pip-1');
+      setState(res.success ? res.data.state : null);
+      if (res.success && res.data.screenshot) {
+        setScreenshot(res.data.screenshot);
+        setMessage(res.data.message ?? null);
+      } else {
+        setScreenshot(null);
+        setMessage(res.success ? res.data.message : res.error ?? 'No visual feed yet.');
+      }
+    } catch (error) {
+      setScreenshot(null);
+      setState(null);
+      setMessage(error instanceof Error ? error.message : 'No visual feed yet.');
+    } finally {
+      setLoading(false);
+    }
+  }, [agentId, supportsEyes]);
+
+  useEffect(() => {
+    if (!supportsEyes) return;
+    void load();
+    const timer = window.setInterval(() => void load(), 2_500);
+    return () => window.clearInterval(timer);
+  }, [load, supportsEyes]);
+
+  if (!supportsEyes) return null;
+
+  const ageSeconds = screenshot
+    ? Math.max(0, Math.floor((Date.now() - screenshot.capturedAt) / 1000))
+    : null;
+  const stopped = state?.status === 'stopped';
+  const liveLabel = stopped ? 'stopped' : ageSeconds !== null ? `${ageSeconds}s` : null;
+  const isAgentRunning = status === 'active' || status === 'running' || status === 'restarting';
+
+  return (
+    <aside className="flex min-h-0 flex-col border-b border-[var(--border-default)] bg-black/20 lg:border-b-0 lg:border-r">
+      <div className="flex items-center justify-between gap-3 border-b border-[var(--border-default)] px-4 py-3">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 text-xs font-semibold text-[var(--text-primary)]">
+            <Camera className="h-4 w-4 text-[var(--color-accent)]" />
+            <span>Agent Screen</span>
+            {liveLabel && (
+              <span
+                className={`rounded-full px-1.5 py-0.5 text-[9px] uppercase tracking-wide ${
+                  stopped ? 'bg-white/10 text-[var(--text-muted)]' : 'bg-emerald-500/10 text-emerald-300'
+                }`}
+              >
+                {liveLabel}
+              </span>
+            )}
+          </div>
+          <p className="mt-0.5 truncate text-[11px] text-[var(--text-muted)]">
+            {message || state?.action || state?.title || agentName}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => void load()}
+          disabled={loading}
+          className="inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--text-muted)] transition-colors hover:bg-white/5 hover:text-[var(--text-primary)] disabled:opacity-50"
+          title="Refresh visual feed"
+        >
+          <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
+        </button>
+      </div>
+
+      <div className="flex min-h-0 flex-1 flex-col p-4">
+        <div className="relative aspect-video overflow-hidden rounded-lg border border-[var(--border-default)] bg-[#05070a] lg:aspect-auto lg:h-full lg:min-h-[11rem]">
+          {screenshot ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={screenshot.dataUrl}
+              alt={`${agentName} live visual feed`}
+              className="h-full w-full object-contain"
+            />
+          ) : (
+            <div className="flex h-full min-h-[11rem] flex-col items-center justify-center px-4 text-center">
+              <Camera className="h-6 w-6 text-[var(--text-muted)]" />
+              <p className="mt-2 text-xs leading-relaxed text-[var(--text-muted)]">
+                {isAgentRunning
+                  ? message || 'Public-safe visual work appears here automatically.'
+                  : 'The agent must be running before a visual feed can appear.'}
+              </p>
+            </div>
+          )}
+        </div>
+        <p className="mt-2 truncate text-[10px] text-[var(--text-muted)]">
+          {screenshot
+            ? `${state?.mode ?? 'visual'} · ${Math.round(screenshot.size / 1024)} KB`
+            : 'Read-only public Agent Screen'}
+        </p>
+      </div>
+    </aside>
+  );
 }
 
 function loadPublicChatMessages(agentId: string, sessionId: string): PublicChatMessage[] {
@@ -162,12 +296,16 @@ function loadPublicChatMessages(agentId: string, sessionId: string): PublicChatM
 function PublicAgentChat({
   agentId,
   agentName,
+  agentFramework,
+  agentStatus,
   autoFocus,
   usage,
   onUsageChange,
 }: {
   agentId: string;
   agentName: string;
+  agentFramework: string;
+  agentStatus: string;
   autoFocus: boolean;
   usage: PublicChatUsage | null;
   onUsageChange: (usage: PublicChatUsage) => void;
@@ -392,85 +530,94 @@ function PublicAgentChat({
           {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
         </div>
       ) : (
-        <div className="flex h-[560px] flex-col">
-          <div className="flex-1 space-y-4 overflow-y-auto px-4 py-5 sm:px-5">
-            {messages.length === 0 && (
-              <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] p-4">
-                <p className="text-sm text-[var(--text-secondary)]">{t('empty')}</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {PUBLIC_CHAT_SUGGESTIONS.map((suggestion) => (
-                    <button
-                      key={suggestion}
-                      type="button"
-                      onClick={() => {
-                        setDraft(suggestion);
-                        window.setTimeout(() => inputRef.current?.focus(), 20);
-                      }}
-                      className="rounded-lg border border-[var(--border-default)] px-3 py-2 text-left text-xs text-[var(--text-secondary)] transition-colors hover:border-[var(--color-accent)]/40 hover:text-[var(--color-accent)]"
-                    >
-                      {suggestion}
-                    </button>
-                  ))}
+        <div className="grid h-[700px] min-h-0 grid-cols-1 lg:h-[560px] lg:grid-cols-[18rem_minmax(0,1fr)]">
+          <PublicAgentEyesPanel
+            agentId={agentId}
+            agentName={agentName}
+            framework={agentFramework}
+            status={agentStatus}
+          />
+
+          <div className="flex min-h-0 flex-col">
+            <div className="flex-1 space-y-4 overflow-y-auto px-4 py-5 sm:px-5">
+              {messages.length === 0 && (
+                <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] p-4">
+                  <p className="text-sm text-[var(--text-secondary)]">{t('empty')}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {PUBLIC_CHAT_SUGGESTIONS.map((suggestion) => (
+                      <button
+                        key={suggestion}
+                        type="button"
+                        onClick={() => {
+                          setDraft(suggestion);
+                          window.setTimeout(() => inputRef.current?.focus(), 20);
+                        }}
+                        className="rounded-lg border border-[var(--border-default)] px-3 py-2 text-left text-xs text-[var(--text-secondary)] transition-colors hover:border-[var(--color-accent)]/40 hover:text-[var(--color-accent)]"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
+              )}
+              {messages.map((message) => (
                 <div
-                  className={`max-w-[86%] rounded-lg px-4 py-3 text-sm leading-relaxed ${
-                    message.role === 'user'
-                      ? 'bg-[var(--color-accent)] text-white'
-                      : 'border border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-primary)]'
-                  }`}
+                  key={message.id}
+                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
-                  {message.role === 'assistant' ? (
-                    <RichMarkdown content={message.content} agentId={agentId} />
-                  ) : (
-                    <span className="whitespace-pre-wrap">{message.content}</span>
-                  )}
+                  <div
+                    className={`max-w-[86%] rounded-lg px-4 py-3 text-sm leading-relaxed ${
+                      message.role === 'user'
+                        ? 'bg-[var(--color-accent)] text-white'
+                        : 'border border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-primary)]'
+                    }`}
+                  >
+                    {message.role === 'assistant' ? (
+                      <RichMarkdown content={message.content} agentId={agentId} />
+                    ) : (
+                      <span className="whitespace-pre-wrap">{message.content}</span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-            {busy && (
-              <div className="flex justify-start">
-                <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-4 py-3 text-sm text-[var(--text-muted)]">
-                  {t('thinking')}
+              ))}
+              {busy && (
+                <div className="flex justify-start">
+                  <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-4 py-3 text-sm text-[var(--text-muted)]">
+                    {t('thinking')}
+                  </div>
                 </div>
+              )}
+              <div ref={bottomRef} />
+            </div>
+
+            {error && (
+              <div className="border-t border-[var(--border-default)] px-5 py-3 text-sm text-red-400">
+                {error}
               </div>
             )}
-            <div ref={bottomRef} />
-          </div>
 
-          {error && (
-            <div className="border-t border-[var(--border-default)] px-5 py-3 text-sm text-red-400">
-              {error}
-            </div>
-          )}
-
-          <div className="border-t border-[var(--border-default)] p-4">
-            <div className="flex items-end gap-3">
-              <textarea
-                ref={inputRef}
-                value={draft}
-                onChange={(event) => setDraft(event.target.value)}
-                onKeyDown={handleKeyDown}
-                maxLength={4000}
-                rows={1}
-                placeholder={t('messagePlaceholder', { username: session.username })}
-                className="min-h-[44px] flex-1 resize-none rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-3 text-sm text-[var(--text-primary)] outline-none transition-colors placeholder:text-[var(--text-muted)] focus:border-[var(--color-accent)]/50"
-              />
-              <button
-                type="button"
-                onClick={() => void sendMessage()}
-                disabled={busy || !draft.trim()}
-                className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg bg-[var(--color-accent)] text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
-                aria-label={t('send')}
-              >
-                <Send className="h-4 w-4" />
-              </button>
+            <div className="border-t border-[var(--border-default)] p-4">
+              <div className="flex items-end gap-3">
+                <textarea
+                  ref={inputRef}
+                  value={draft}
+                  onChange={(event) => setDraft(event.target.value)}
+                  onKeyDown={handleKeyDown}
+                  maxLength={4000}
+                  rows={1}
+                  placeholder={t('messagePlaceholder', { username: session.username })}
+                  className="min-h-[44px] flex-1 resize-none rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-3 text-sm text-[var(--text-primary)] outline-none transition-colors placeholder:text-[var(--text-muted)] focus:border-[var(--color-accent)]/50"
+                />
+                <button
+                  type="button"
+                  onClick={() => void sendMessage()}
+                  disabled={busy || !draft.trim()}
+                  className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg bg-[var(--color-accent)] text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
+                  aria-label={t('send')}
+                >
+                  <Send className="h-4 w-4" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -618,7 +765,7 @@ export function AgentPageClient() {
 
   return (
     <motion.div
-      className="mx-auto max-w-2xl px-4 py-12"
+      className={`mx-auto px-4 py-12 ${!isOwner && publicChatEnabled ? 'max-w-6xl' : 'max-w-2xl'}`}
       variants={containerVariants}
       initial="hidden"
       animate="visible"
@@ -747,6 +894,8 @@ export function AgentPageClient() {
             <PublicAgentChat
               agentId={id}
               agentName={agent.name}
+              agentFramework={agent.framework}
+              agentStatus={agent.status}
               autoFocus={publicChatAutoFocus}
               usage={publicChatUsage}
               onUsageChange={setPublicChatUsage}

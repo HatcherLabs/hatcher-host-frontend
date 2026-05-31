@@ -3,21 +3,21 @@
    here so this page works standalone (the wrapper is only on /). */
 
 .page {
-  --bg: #03110A;
-  --bg-2: #06180F;
-  --bg-3: #0A2316;
-  --bg-4: #0F3220;
-  --ink: #E8FFEF;
-  --ink-soft: #9FD4B2;
-  --mute: #5C8A6E;
-  --line: #0E3D24;
+  --bg: #03110a;
+  --bg-2: #06180f;
+  --bg-3: #0a2316;
+  --bg-4: #0f3220;
+  --ink: #e8ffef;
+  --ink-soft: #9fd4b2;
+  --mute: #5c8a6e;
+  --line: #0e3d24;
   --line-bright: #175438;
-  --accent: #39FF88;
-  --accent-2: #7CFFB0;
+  --accent: #39ff88;
+  --accent-2: #7cffb0;
   --accent-glow: rgba(57, 255, 136, 0.5);
-  --amber: #E8FF6B;
-  --red: #FF6B8A;
-  --card: #061F0E;
+  --amber: #e8ff6b;
+  --red: #ff6b8a;
+  --card: #061f0e;
 
   background: var(--bg);
   color: var(--ink);
@@ -26,7 +26,9 @@
   padding: 28px;
 }
 @media (max-width: 700px) {
-  .page { padding: 18px 14px; }
+  .page {
+    padding: 18px 14px;
+  }
 }
 
 .wrap {
@@ -52,7 +54,9 @@
   gap: 8px;
   transition: color 0.15s;
 }
-.backLink:hover { color: var(--accent); }
+.backLink:hover {
+  color: var(--accent);
+}
 
 .brand {
   font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
@@ -115,7 +119,9 @@
   align-items: start;
 }
 @media (max-width: 1000px) {
-  .grid { grid-template-columns: 1fr; }
+  .grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .col {
@@ -201,8 +207,13 @@
   animation: blink 1.4s infinite;
 }
 @keyframes blink {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0.4; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
 .log {
@@ -215,8 +226,13 @@
   gap: 14px;
   min-height: 0;
 }
-.log::-webkit-scrollbar { width: 6px; }
-.log::-webkit-scrollbar-thumb { background: var(--line-bright); border-radius: 3px; }
+.log::-webkit-scrollbar {
+  width: 6px;
+}
+.log::-webkit-scrollbar-thumb {
+  background: var(--line-bright);
+  border-radius: 3px;
+}
 
 .msg {
   max-width: 90%;
@@ -269,13 +285,18 @@
   text-transform: uppercase;
 }
 .thinking::before {
-  content: "▸";
+  content: '▸';
   color: var(--accent);
   animation: pulse 1.2s ease-in-out infinite;
 }
 @keyframes pulse {
-  0%, 100% { opacity: 0.4; }
-  50%      { opacity: 1; }
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 .inputWrap {
@@ -306,14 +327,23 @@
   min-height: 92px;
   max-height: 320px;
   outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
 }
 .input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent), 0 0 14px var(--accent-glow);
+  box-shadow:
+    0 0 0 1px var(--accent),
+    0 0 14px var(--accent-glow);
 }
-.input::placeholder { color: var(--mute); }
-.input:disabled { opacity: 0.5; cursor: not-allowed; }
+.input::placeholder {
+  color: var(--mute);
+}
+.input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 .inputActions {
   display: flex;
   flex-direction: column;
@@ -339,7 +369,7 @@
   appearance: none;
   border: 1px solid var(--accent);
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color: #06180F;
+  color: #06180f;
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
   letter-spacing: 0.1em;
@@ -347,7 +377,9 @@
   padding: 12px 18px;
   border-radius: 10px;
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
 }
 .send:hover:not(:disabled) {
   transform: translateY(-1px);
@@ -399,8 +431,18 @@
   text-transform: uppercase;
   text-align: center;
   background-image:
-    linear-gradient(0deg,  transparent 49.5%, var(--line) 50%, transparent 50.5%),
-    linear-gradient(90deg, transparent 49.5%, var(--line) 50%, transparent 50.5%);
+    linear-gradient(
+      0deg,
+      transparent 49.5%,
+      var(--line) 50%,
+      transparent 50.5%
+    ),
+    linear-gradient(
+      90deg,
+      transparent 49.5%,
+      var(--line) 50%,
+      transparent 50.5%
+    );
   background-size: 30px 30px;
   background-position: center;
   border-radius: 8px;
@@ -427,7 +469,11 @@
   border: 1px solid var(--line-bright);
   border-radius: 10px;
   background:
-    radial-gradient(circle at 50% 18%, rgba(57, 255, 136, 0.18), transparent 48%),
+    radial-gradient(
+      circle at 50% 18%,
+      rgba(57, 255, 136, 0.18),
+      transparent 48%
+    ),
     linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(0, 0, 0, 0.24)),
     var(--bg-2);
 }
@@ -441,7 +487,11 @@
   height: 100%;
   min-height: 206px;
   background:
-    radial-gradient(circle at 50% 34%, rgba(57, 255, 136, 0.16), transparent 44%),
+    radial-gradient(
+      circle at 50% 34%,
+      rgba(57, 255, 136, 0.16),
+      transparent 44%
+    ),
     var(--bg-2);
 }
 
@@ -514,7 +564,9 @@
   gap: 8px;
 }
 @media (max-width: 620px) {
-  .frameworkChooser { grid-template-columns: 1fr; }
+  .frameworkChooser {
+    grid-template-columns: 1fr;
+  }
 }
 .frameworkOption {
   appearance: none;
@@ -530,12 +582,16 @@
   color: var(--ink-soft);
   text-align: left;
   cursor: pointer;
-  transition: border-color 0.15s, box-shadow 0.15s, color 0.15s;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s,
+    color 0.15s;
 }
 .frameworkOption:hover,
 .frameworkOptionActive {
   border-color: var(--fw, var(--accent));
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--fw, var(--accent)) 35%, transparent);
+  box-shadow: 0 0 0 1px
+    color-mix(in srgb, var(--fw, var(--accent)) 35%, transparent);
   color: var(--ink);
 }
 .frameworkOptionMark {
@@ -596,6 +652,7 @@
 
 .selectInput {
   appearance: none;
+  color-scheme: dark;
   width: 100%;
   min-width: 0;
   border: 1px solid var(--line-bright);
@@ -609,6 +666,11 @@
   letter-spacing: 0;
   text-transform: none;
   outline: none;
+}
+
+.selectInput option {
+  background: var(--bg-2);
+  color: var(--ink);
 }
 
 .selectInput:focus {
@@ -756,7 +818,7 @@
   appearance: none;
   border: 1px solid var(--accent);
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color: #06180F;
+  color: #06180f;
   font-family: 'JetBrains Mono', monospace;
   font-size: 13px;
   letter-spacing: 0.12em;
@@ -765,7 +827,9 @@
   padding: 14px 20px;
   border-radius: 10px;
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
 }
 .hatchBtn:hover:not(:disabled) {
   transform: translateY(-1px);
@@ -803,7 +867,9 @@
   text-transform: uppercase;
   color: var(--ink-soft);
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
 }
 .resetBtn:hover {
   color: var(--accent);
@@ -843,7 +909,9 @@
   letter-spacing: 0;
   text-transform: none;
   resize: vertical;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
 }
 .fieldInput {
   font-family: 'JetBrains Mono', monospace;
@@ -883,7 +951,9 @@
   border-radius: 6px;
   background: var(--bg-2);
 }
-.collapsible[open] { background: var(--bg-3); }
+.collapsible[open] {
+  background: var(--bg-3);
+}
 .collapsibleHead {
   cursor: pointer;
   list-style: none;
@@ -898,7 +968,9 @@
   justify-content: space-between;
   gap: 8px;
 }
-.collapsibleHead::-webkit-details-marker { display: none; }
+.collapsibleHead::-webkit-details-marker {
+  display: none;
+}
 .collapsibleHead::before {
   content: '▸';
   display: inline-block;
@@ -906,7 +978,9 @@
   color: var(--accent);
   transition: transform 0.15s;
 }
-.collapsible[open] .collapsibleHead::before { transform: rotate(90deg); }
+.collapsible[open] .collapsibleHead::before {
+  transform: rotate(90deg);
+}
 .collapsible textarea {
   margin: 0 12px 12px;
   width: calc(100% - 24px);
@@ -931,7 +1005,9 @@
   appearance: none;
   font: inherit;
   letter-spacing: 0;
-  transition: border-color 0.15s, color 0.15s;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
 }
 .skillRemovable:hover {
   border-color: var(--red);
@@ -943,7 +1019,9 @@
   font-size: 13px;
   line-height: 1;
 }
-.skillRemovable:hover .chipX { color: var(--red); }
+.skillRemovable:hover .chipX {
+  color: var(--red);
+}
 
 .chipInputWrap {
   display: inline-flex;
@@ -964,7 +1042,9 @@
   color: var(--ink);
   width: 100px;
 }
-.chipInput::placeholder { color: var(--mute); }
+.chipInput::placeholder {
+  color: var(--mute);
+}
 .chipAddBtn {
   appearance: none;
   background: transparent;

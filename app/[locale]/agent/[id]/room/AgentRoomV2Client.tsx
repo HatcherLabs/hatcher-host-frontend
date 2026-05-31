@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { api } from '@/lib/api';
+import { API_URL } from '@/lib/config';
 import { useToast } from '@/components/ui/ToastProvider';
 import { Link, useRouter } from '@/i18n/routing';
 import { BackToCity } from '@/components/agent-room/v2/hud/BackToCity';
@@ -17,21 +18,38 @@ import {
   AvatarEmoteControls,
   AvatarEmoteHud,
 } from '@/components/agent-room/v2/hud/AvatarEmoteHud';
-import { getStationLayout, type StationId } from '@/components/agent-room/v2/world/layout';
+import {
+  getStationLayout,
+  type StationId,
+} from '@/components/agent-room/v2/world/layout';
 import { usePanelState } from '@/components/agent-room/v2/hooks/usePanelState';
 import { useStationProximity } from '@/components/agent-room/v2/hooks/useStationProximity';
-import { ChatPanel, type ChatMessage } from '@/components/agent-room/v2/panels/ChatPanel';
+import {
+  ChatPanel,
+  type ChatMessage,
+} from '@/components/agent-room/v2/panels/ChatPanel';
 import { SkillsPanel } from '@/components/agent-room/v2/panels/SkillsPanel';
 import { IntegrationsPanel } from '@/components/agent-room/v2/panels/IntegrationsPanel';
 import { StatusPanel } from '@/components/agent-room/v2/panels/StatusPanel';
 import { MemoryPanel } from '@/components/agent-room/v2/panels/MemoryPanel';
 import { ConfigPanel } from '@/components/agent-room/v2/panels/ConfigPanel';
 import { PluginsPanel } from '@/components/agent-room/v2/panels/PluginsPanel';
+import { EyesPanel } from '@/components/agent-room/v2/panels/EyesPanel';
 import {
   LaptopPanel,
   type LaptopConfigPatch,
   type LaptopTab,
 } from '@/components/agent-room/v2/panels/LaptopPanel';
+import {
+  normalizeRoomEyesLiveFeed,
+  normalizeRoomEyesConfig,
+  normalizeEyesCaptureTarget,
+  DEFAULT_EYES_CAPTURE_URL,
+  type RoomEyesLiveScreenshot,
+  type RoomEyesLiveState,
+  type RoomEyesConfig,
+  type RoomEyesAction,
+} from '@/components/agent-room/v2/eyes';
 import { detectDefaultQuality } from '@/components/agent-room/v2/quality';
 import {
   normalizeAvatarVariant,
@@ -47,7 +65,10 @@ import type { AgentPassport } from '@/lib/api';
 import { buildFallbackPassport } from '@/lib/agent-passport';
 
 const AgentRoomSceneV2 = dynamic(
-  () => import('@/components/agent-room/v2/AgentRoomSceneV2').then((m) => m.AgentRoomSceneV2),
+  () =>
+    import('@/components/agent-room/v2/AgentRoomSceneV2').then(
+      (m) => m.AgentRoomSceneV2,
+    ),
   {
     ssr: false,
     loading: () => (
@@ -85,16 +106,23 @@ interface AgentWithExtras {
 // Same extraction the legacy /room uses — integrations live inside config
 // under several shapes depending on framework. Returns a Set of lowercase
 // channel keys ('telegram', 'discord', 'twitter', etc.) that look wired up.
-function extractConnectedIntegrations(config: Record<string, unknown> | undefined): Set<string> {
+function extractConnectedIntegrations(
+  config: Record<string, unknown> | undefined,
+): Set<string> {
   const enabled = new Set<string>();
   if (!config) return enabled;
   for (const field of ['platforms', 'integrations'] as const) {
     const v = config[field];
     if (Array.isArray(v)) {
-      for (const item of v) if (typeof item === 'string') enabled.add(item.toLowerCase());
+      for (const item of v)
+        if (typeof item === 'string') enabled.add(item.toLowerCase());
     } else if (v && typeof v === 'object') {
       for (const [k, cv] of Object.entries(v as Record<string, unknown>)) {
-        if (cv && typeof cv === 'object' && (cv as { enabled?: boolean }).enabled)
+        if (
+          cv &&
+          typeof cv === 'object' &&
+          (cv as { enabled?: boolean }).enabled
+        )
           enabled.add(k.toLowerCase());
       }
     }
@@ -115,14 +143,20 @@ function normalizeLogLine(entry: unknown): string | null {
   if (typeof entry === 'string') return entry;
   if (!entry || typeof entry !== 'object') return null;
   const record = entry as Record<string, unknown>;
-  const timestamp = typeof record.timestamp === 'string' ? record.timestamp : '';
-  const level = typeof record.level === 'string' ? record.level.toUpperCase() : 'INFO';
+  const timestamp =
+    typeof record.timestamp === 'string' ? record.timestamp : '';
+  const level =
+    typeof record.level === 'string' ? record.level.toUpperCase() : 'INFO';
   const message = typeof record.message === 'string' ? record.message : '';
   if (!message) return null;
   const time = timestamp ? new Date(timestamp) : null;
   const stamp =
     time && !Number.isNaN(time.getTime())
-      ? time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+      ? time.toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        })
       : '';
   return `${stamp ? `${stamp} ` : ''}${level} ${message}`;
 }
@@ -130,7 +164,10 @@ function normalizeLogLine(entry: unknown): string | null {
 function normalizeLogLines(payload: unknown): string[] {
   const logs = (payload as { logs?: unknown })?.logs;
   if (!Array.isArray(logs)) return [];
-  return logs.map(normalizeLogLine).filter((line): line is string => !!line).slice(-80);
+  return logs
+    .map(normalizeLogLine)
+    .filter((line): line is string => !!line)
+    .slice(-80);
 }
 
 // Stations that need edit rights. StatsHologram stays public because it only
@@ -140,6 +177,7 @@ const OWNER_ONLY: Set<StationId> = new Set([
   'skillWorkbench',
   'integrationsRack',
   'statusConsole',
+  'eyesConsole',
   'memoryShelves',
   'configTerminal',
   'mailInbox',
@@ -173,22 +211,33 @@ export function AgentRoomV2Client({ agentId }: Props) {
   const [emoteNonce, setEmoteNonce] = useState(0);
   const [mailAttentionCount, setMailAttentionCount] = useState(0);
   const [tvLogLines, setTvLogLines] = useState<string[]>([]);
+  const [eyesSnapshot, setEyesSnapshot] = useState<
+    RoomEyesLiveScreenshot | undefined
+  >();
+  const [eyesState, setEyesState] = useState<RoomEyesLiveState | undefined>();
   const [quality] = useState(() => detectDefaultQuality());
   const posRef = useRef(new THREE.Vector3());
   const saveChatTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const initialPassportRequestRef = useRef(false);
+  const logsWsRef = useRef<WebSocket | null>(null);
+  const logsWsReconnectRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const logsWsRetryCountRef = useRef(0);
   const { openPanel, setOpenPanel, close } = usePanelState();
 
   // GET /agents/:id strips ownerId for non-owners (backend decides based on
   // auth cookie/token). The mere presence of ownerId = you are the owner —
   // no client-side comparison needed. Matches the legacy /room logic.
-  const canEdit = typeof agent?.ownerId === 'string' && agent.ownerId.length > 0;
+  const canEdit =
+    typeof agent?.ownerId === 'string' && agent.ownerId.length > 0;
 
   // URL param may be slug OR id; downstream API calls (memory, plugins, chat
   // history) use only id-keyed lookups, so resolve to canonical id once the
   // agent is loaded. Fall back to URL param while loading.
   const apiId = agent?.id ?? agentId;
-  const fallbackPassport = useMemo(() => buildFallbackPassport(agent, apiId), [agent, apiId]);
+  const fallbackPassport = useMemo(
+    () => buildFallbackPassport(agent, apiId),
+    [agent, apiId],
+  );
   const activePassport = passport ?? fallbackPassport;
 
   const loadAgent = useCallback(async () => {
@@ -217,7 +266,13 @@ export function AgentRoomV2Client({ agentId }: Props) {
       setTvLogLines([]);
       return;
     }
+
     let cancelled = false;
+    let pollTimer: ReturnType<typeof setInterval> | null = null;
+    const streamCapable = ['active', 'running', 'restarting'].includes(
+      agent?.status ?? '',
+    );
+
     const loadLogs = () => {
       api
         .getAgentLogs(apiId)
@@ -229,13 +284,90 @@ export function AgentRoomV2Client({ agentId }: Props) {
           if (!cancelled) setTvLogLines([]);
         });
     };
+
+    const startPollingFallback = (intervalMs = 5_000) => {
+      if (pollTimer) return;
+      loadLogs();
+      pollTimer = setInterval(loadLogs, intervalMs);
+    };
+
+    const stopPollingFallback = () => {
+      if (!pollTimer) return;
+      clearInterval(pollTimer);
+      pollTimer = null;
+    };
+
+    const connectLogsStream = () => {
+      if (cancelled || !streamCapable) return;
+      const wsBase = API_URL.replace(/^http/, 'ws');
+      const ws = new WebSocket(`${wsBase}/agents/${apiId}/logs/ws`);
+      logsWsRef.current = ws;
+
+      ws.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data as string) as {
+            type?: string;
+            timestamp?: string;
+            level?: string;
+            message?: string;
+          };
+          if (msg.type === 'connected') {
+            logsWsRetryCountRef.current = 0;
+            stopPollingFallback();
+            return;
+          }
+          if (msg.type === 'log') {
+            const line = normalizeLogLine({
+              timestamp: msg.timestamp,
+              level: msg.level,
+              message: msg.message,
+            });
+            if (!line) return;
+            setTvLogLines((prev) => [...prev, line].slice(-80));
+            return;
+          }
+          if (msg.type === 'error' || msg.type === 'disconnected') {
+            startPollingFallback();
+          }
+        } catch {
+          // Ignore malformed stream frames; the polling fallback keeps the wall alive.
+        }
+      };
+
+      ws.onerror = () => {
+        if (logsWsRef.current === ws) logsWsRef.current = null;
+        startPollingFallback();
+      };
+
+      ws.onclose = () => {
+        if (logsWsRef.current === ws) logsWsRef.current = null;
+        if (cancelled) return;
+        startPollingFallback();
+        const retries = logsWsRetryCountRef.current;
+        const delay = Math.min(1_000 * Math.pow(2, retries), 30_000);
+        logsWsRetryCountRef.current = retries + 1;
+        logsWsReconnectRef.current = setTimeout(connectLogsStream, delay);
+      };
+    };
+
     loadLogs();
-    const timer = setInterval(loadLogs, 5_000);
+    logsWsRetryCountRef.current = 0;
+    if (streamCapable) connectLogsStream();
+    else startPollingFallback(10_000);
+
     return () => {
       cancelled = true;
-      clearInterval(timer);
+      stopPollingFallback();
+      if (logsWsReconnectRef.current) {
+        clearTimeout(logsWsReconnectRef.current);
+        logsWsReconnectRef.current = null;
+      }
+      if (logsWsRef.current) {
+        logsWsRef.current.close();
+        logsWsRef.current = null;
+      }
     };
-  }, [apiId, canEdit]);
+  }, [agent?.status, apiId, canEdit]);
 
   useEffect(() => {
     let cancelled = false;
@@ -251,6 +383,103 @@ export function AgentRoomV2Client({ agentId }: Props) {
       cancelled = true;
     };
   }, [apiId]);
+
+  const refreshEyesSnapshot = useCallback(() => {
+    if (!apiId || !canEdit) {
+      setEyesSnapshot(undefined);
+      setEyesState(undefined);
+      return;
+    }
+    return api
+      .getAgentEyesLive(apiId, 'pip-1')
+      .then((res) => {
+        setEyesSnapshot(
+          res.success && res.data.screenshot ? res.data.screenshot : undefined,
+        );
+        setEyesState(
+          res.success && res.data.state ? res.data.state : undefined,
+        );
+      })
+      .catch(() => {
+        setEyesSnapshot(undefined);
+        setEyesState(undefined);
+      });
+  }, [apiId, canEdit]);
+
+  useEffect(() => {
+    if (!apiId || !canEdit) {
+      setEyesSnapshot(undefined);
+      setEyesState(undefined);
+      return;
+    }
+    let cancelled = false;
+    const loadSnapshot = () => {
+      api
+        .getAgentEyesLive(apiId, 'pip-1')
+        .then((res) => {
+          if (cancelled) return;
+          setEyesSnapshot(
+            res.success && res.data.screenshot
+              ? res.data.screenshot
+              : undefined,
+          );
+          setEyesState(
+            res.success && res.data.state ? res.data.state : undefined,
+          );
+        })
+        .catch(() => {
+          if (!cancelled) {
+            setEyesSnapshot(undefined);
+            setEyesState(undefined);
+          }
+        });
+    };
+    loadSnapshot();
+    const timer = setInterval(loadSnapshot, 2_500);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, [apiId, canEdit]);
+
+  const handleEyesStartLive = useCallback(
+    async (targetUrl = DEFAULT_EYES_CAPTURE_URL) => {
+      if (!canEdit) throw new Error('Owner-only Eyes workspace.');
+      const url = normalizeEyesCaptureTarget(targetUrl);
+      const res = await api.startAgentEyesLive(apiId, {
+        url,
+        pipId: 'pip-1',
+        intervalMs: 1_000,
+        durationMs: 30 * 60_000,
+      });
+      if (!res.success)
+        throw new Error(res.error || 'Could not start live capture.');
+      window.setTimeout(() => void refreshEyesSnapshot(), 1_500);
+      return undefined;
+    },
+    [apiId, canEdit, refreshEyesSnapshot],
+  );
+
+  const handleEyesAction = useCallback(
+    async (action: RoomEyesAction) => {
+      if (!canEdit) throw new Error('Owner-only Eyes workspace.');
+      const res = await api.sendAgentEyesAction(apiId, action);
+      if (!res.success)
+        throw new Error(res.error || 'Could not queue Eyes action.');
+      window.setTimeout(() => void refreshEyesSnapshot(), 900);
+      return undefined;
+    },
+    [apiId, canEdit, refreshEyesSnapshot],
+  );
+
+  const handleEyesStopLive = useCallback(async () => {
+    if (!canEdit) throw new Error('Owner-only Eyes workspace.');
+    const res = await api.stopAgentEyesLive(apiId, { pipId: 'pip-1' });
+    if (!res.success)
+      throw new Error(res.error || 'Could not stop Eyes workspace.');
+    window.setTimeout(() => void refreshEyesSnapshot(), 500);
+    return undefined;
+  }, [apiId, canEdit, refreshEyesSnapshot]);
 
   const refreshMailSummary = useCallback(() => {
     if (!canEdit) {
@@ -292,7 +521,8 @@ export function AgentRoomV2Client({ agentId }: Props) {
         }
         const m = res.data as { memoryMd?: string; dailyLogs?: unknown[] };
         const anything =
-          !!(m?.memoryMd && m.memoryMd.length > 20) || !!(m?.dailyLogs && m.dailyLogs.length);
+          !!(m?.memoryMd && m.memoryMd.length > 20) ||
+          !!(m?.dailyLogs && m.dailyLogs.length);
         setHasMemory(anything);
       })
       .catch(() => setHasMemory(false));
@@ -369,15 +599,22 @@ export function AgentRoomV2Client({ agentId }: Props) {
     };
   }, [chatMessages, apiId, canEdit]);
 
-  const layout = useMemo(() => (framework ? getStationLayout(framework) : null), [framework]);
+  const layout = useMemo(
+    () => (framework ? getStationLayout(framework) : null),
+    [framework],
+  );
 
   const nearest = useStationProximity(posRef, layout);
-  const selectedAvatarVariant = normalizeAvatarVariant(agent?.config?.roomAvatarVariant);
-  const selectedAvatarTraits = agent?.config?.roomAvatarTraits ?? agent?.config?.avatarTraits;
+  const selectedAvatarVariant = normalizeAvatarVariant(
+    agent?.config?.roomAvatarVariant,
+  );
+  const selectedAvatarTraits =
+    agent?.config?.roomAvatarTraits ?? agent?.config?.avatarTraits;
   const mobileBackTarget = useMemo(
     () => resolveMobileBackTarget(searchParams.get('from'), apiId),
     [apiId, searchParams],
   );
+  const dashboardHref = `/dashboard/agent/${apiId}`;
 
   const openLaptop = useCallback(
     (tab: LaptopTab = 'status') => {
@@ -395,7 +632,9 @@ export function AgentRoomV2Client({ agentId }: Props) {
         return;
       }
       if (OWNER_ONLY.has(id) && !canEdit) {
-        toast.info('Owner-only — sign in as the owner or a team member to use this station.');
+        toast.info(
+          'Owner-only — sign in as the owner or a team member to use this station.',
+        );
         return;
       }
       if (id === 'mailInbox') {
@@ -457,17 +696,40 @@ export function AgentRoomV2Client({ agentId }: Props) {
     [agent, apiId, canEdit, toast],
   );
 
+  const handleEyesSave = useCallback(
+    async (config: RoomEyesConfig) => {
+      if (!canEdit) throw new Error('Owner-only Eyes workspace.');
+      const previous = agent;
+      const nextConfig = { ...(agent?.config ?? {}), eyes: config };
+      setAgent((prev) => (prev ? { ...prev, config: nextConfig } : prev));
+      const res = await api.updateAgent(apiId, { config: nextConfig });
+      if (!res.success) {
+        if (previous) setAgent(previous);
+        throw new Error(res.error || 'Could not save Eyes workspace.');
+      }
+      setAgent(res.data as unknown as AgentWithExtras);
+      toast.success('Eyes workspace saved');
+    },
+    [agent, apiId, canEdit, toast],
+  );
+
   const handleAvatarChange = useCallback(
     async (variant: AvatarVariant) => {
       if (!canEdit) return;
-      const nextConfig = { ...(agent?.config ?? {}), roomAvatarVariant: variant };
+      const nextConfig = {
+        ...(agent?.config ?? {}),
+        roomAvatarVariant: variant,
+      };
       setAgent((prev) => (prev ? { ...prev, config: nextConfig } : prev));
       try {
         const res = await api.updateAgent(apiId, { config: nextConfig });
-        if (!res.success) throw new Error(res.error || 'Could not save avatar.');
+        if (!res.success)
+          throw new Error(res.error || 'Could not save avatar.');
         toast.success('Avatar updated');
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : 'Could not save avatar.');
+        toast.error(
+          error instanceof Error ? error.message : 'Could not save avatar.',
+        );
         void loadAgent();
       }
     },
@@ -502,6 +764,26 @@ export function AgentRoomV2Client({ agentId }: Props) {
     () => extractConnectedIntegrations(agent?.config),
     [agent?.config],
   );
+  const roomEyesLiveFeed = useMemo(
+    () =>
+      normalizeRoomEyesLiveFeed({
+        status: agent?.status ?? 'unknown',
+        lines: tvLogLines,
+        updatedAt: eyesSnapshot?.capturedAt ?? Date.now(),
+        messagesToday: agent?.messageCountToday,
+        uptimeSec: agent?.uptimeSec,
+        state: eyesState,
+        screenshot: eyesSnapshot,
+      }),
+    [
+      agent?.messageCountToday,
+      agent?.status,
+      agent?.uptimeSec,
+      eyesSnapshot,
+      eyesState,
+      tvLogLines,
+    ],
+  );
 
   if (!framework || !layout) {
     return (
@@ -522,6 +804,7 @@ export function AgentRoomV2Client({ agentId }: Props) {
         messagesToday={agent?.messageCountToday}
         uptimeSec={agent?.uptimeSec}
         logLines={tvLogLines}
+        eyesSnapshotDataUrl={roomEyesLiveFeed.screenshot?.dataUrl}
         connectedIntegrations={connectedIntegrations}
         nearest={nearest}
         canEdit={canEdit}
@@ -553,6 +836,7 @@ export function AgentRoomV2Client({ agentId }: Props) {
         canEdit={canEdit}
         mailAttentionCount={mailAttentionCount}
         backTarget={mobileBackTarget}
+        dashboardHref={dashboardHref}
         selectedAvatarVariant={selectedAvatarVariant}
         onAvatarChange={handleAvatarChange}
         onEmote={handleEmote}
@@ -594,7 +878,12 @@ export function AgentRoomV2Client({ agentId }: Props) {
           initialTab={laptopInitialTab}
           mailAttentionCount={mailAttentionCount}
           passport={activePassport}
+          liveFeed={roomEyesLiveFeed}
           onSaveConfig={handleLaptopConfigSave}
+          onSaveEyes={handleEyesSave}
+          onStartEyesLive={handleEyesStartLive}
+          onEyesAction={handleEyesAction}
+          onStopEyesLive={handleEyesStopLive}
           onClose={() => setLaptopOpen(false)}
           onOpenStation={setOpenPanel}
           onOpenChat={handleOpenChatFromPassport}
@@ -623,6 +912,19 @@ export function AgentRoomV2Client({ agentId }: Props) {
           onClose={close}
         />
       )}
+      {openPanel === 'eyesConsole' && canEdit && (
+        <EyesPanel
+          agentName={agent?.name}
+          framework={framework}
+          eyesConfig={normalizeRoomEyesConfig(agent?.config?.eyes, agent?.name)}
+          liveFeed={roomEyesLiveFeed}
+          onSaveEyes={handleEyesSave}
+          onStartLive={handleEyesStartLive}
+          onAction={handleEyesAction}
+          onStopLive={handleEyesStopLive}
+          onClose={close}
+        />
+      )}
       {openPanel === 'memoryShelves' && canEdit && (
         <MemoryPanel agentId={apiId} framework={framework} onClose={close} />
       )}
@@ -636,7 +938,10 @@ export function AgentRoomV2Client({ agentId }: Props) {
   );
 }
 
-function resolveMobileBackTarget(from: string | null, agentId: string): { href: string; label: string } {
+function resolveMobileBackTarget(
+  from: string | null,
+  agentId: string,
+): { href: string; label: string } {
   if ((from === 'dashboard' || from === 'hatch') && agentId) {
     return { href: `/dashboard/agent/${agentId}`, label: 'Dashboard' };
   }
@@ -655,10 +960,14 @@ function mobileStationButtonLabel(station: StationId): string {
       return 'Talk';
     case 'configTerminal':
       return 'Laptop';
+    case 'eyesConsole':
+      return 'Eyes';
     case 'mailInbox':
       return 'Mail';
     default:
-      return stationActionLabel(station).replace('manage ', '').replace('view ', 'Open ');
+      return stationActionLabel(station)
+        .replace('manage ', '')
+        .replace('view ', 'Open ');
   }
 }
 
@@ -669,6 +978,7 @@ function AgentRoomMobileMenu({
   canEdit,
   mailAttentionCount,
   backTarget,
+  dashboardHref,
   selectedAvatarVariant,
   onAvatarChange,
   onEmote,
@@ -681,14 +991,21 @@ function AgentRoomMobileMenu({
   canEdit: boolean;
   mailAttentionCount: number;
   backTarget: { href: string; label: string };
+  dashboardHref: string;
   selectedAvatarVariant: AvatarVariant | null;
   onAvatarChange: (variant: AvatarVariant) => void | Promise<void>;
   onEmote: (emote: RoomEmoteId) => void;
   onOpenLaptop: (tab?: LaptopTab) => void;
   onOpenChat: () => void;
 }) {
+  const showDashboardLink = backTarget.href !== dashboardHref;
+
   return (
-    <MobileSceneMenu title={agentName} subtitle={`${framework} · ${status}`} tone="warm">
+    <MobileSceneMenu
+      title={agentName}
+      subtitle={`${framework} · ${status}`}
+      tone="warm"
+    >
       <div className="grid grid-cols-2 gap-2">
         <Link
           href={backTarget.href}
@@ -696,11 +1013,21 @@ function AgentRoomMobileMenu({
         >
           {backTarget.label}
         </Link>
+        {showDashboardLink && (
+          <Link
+            href={dashboardHref}
+            className="rounded-[7px] border border-[#d6b177]/25 bg-[#2b1d12] px-3 py-2 text-sm font-semibold text-[#f6ead8]"
+          >
+            Dashboard
+          </Link>
+        )}
         <button
           type="button"
           onClick={() => onOpenLaptop('status')}
           disabled={!canEdit}
-          className="rounded-[7px] border border-[#d6b177]/25 bg-[#d6b177] px-3 py-2 text-sm font-semibold text-[#20140b] disabled:border-white/10 disabled:bg-white/10 disabled:text-white/35"
+          className={`rounded-[7px] border border-[#d6b177]/25 bg-[#d6b177] px-3 py-2 text-sm font-semibold text-[#20140b] disabled:border-white/10 disabled:bg-white/10 disabled:text-white/35 ${
+            showDashboardLink ? 'col-span-2' : ''
+          }`}
         >
           Laptop
         </button>
@@ -722,6 +1049,13 @@ function AgentRoomMobileMenu({
               className="rounded-[7px] border border-[#d6b177]/25 bg-[#2b1d12] px-3 py-2 text-sm font-semibold text-[#f6ead8]"
             >
               Passport
+            </button>
+            <button
+              type="button"
+              onClick={() => onOpenLaptop('eyes')}
+              className="rounded-[7px] border border-[#d6b177]/25 bg-[#2b1d12] px-3 py-2 text-sm font-semibold text-[#f6ead8]"
+            >
+              Eyes
             </button>
             <button
               type="button"

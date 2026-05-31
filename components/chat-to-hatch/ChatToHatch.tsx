@@ -76,13 +76,19 @@ interface Msg {
   isError?: boolean;
 }
 
-const FW_VISUAL: Record<Framework, { color: string; mark: string; label: string }> = {
+const FW_VISUAL: Record<
+  Framework,
+  { color: string; mark: string; label: string }
+> = {
   openclaw: { color: '#FFD23F', mark: 'OC', label: 'OpenClaw' },
-  hermes:   { color: '#9B5BFF', mark: 'HE', label: 'Hermes' },
+  hermes: { color: '#9B5BFF', mark: 'HE', label: 'Hermes' },
 };
 
 const AgentRoomAvatarPreview = dynamic(
-  () => import('@/components/agents/tabs/ChatTab/AgentRoomAvatarPreview').then((m) => m.AgentRoomAvatarPreview),
+  () =>
+    import('@/components/agents/tabs/ChatTab/AgentRoomAvatarPreview').then(
+      (m) => m.AgentRoomAvatarPreview,
+    ),
   {
     ssr: false,
     loading: () => <div className={styles.avatarFallback} aria-hidden />,
@@ -91,18 +97,54 @@ const AgentRoomAvatarPreview = dynamic(
 
 const AVATAR_OPTIONS = [
   { id: '', name: 'Auto' },
-  { id: 'openclaw-mech', name: 'OpenClaw mech' },
-  { id: 'openclaw-scout', name: 'OpenClaw scout' },
-  { id: 'openclaw-heavy', name: 'OpenClaw heavy' },
-  { id: 'openclaw-drone', name: 'OpenClaw drone' },
-  { id: 'hermes-oracle', name: 'Hermes oracle' },
-  { id: 'hermes-scribe', name: 'Hermes scribe' },
-  { id: 'ready-player', name: 'Humanoid' },
-  { id: 'fox-companion', name: 'Companion' },
-  { id: 'blob', name: 'Orb' },
-  { id: 'cat', name: 'Cat' },
-  { id: 'crab', name: 'Crab' },
+  { id: 'animated-robot', name: 'Service Robot' },
+  { id: 'freepixel-robot', name: 'Alpha Robot' },
+  { id: 'service-robot', name: 'Stealth Service Bot' },
+  { id: 'rusty-mecha', name: 'Rusty Mecha' },
+  { id: 'abandoned-mecha', name: 'Abandoned Mecha' },
+  { id: 'scout-drone', name: 'Scout Drone' },
+  { id: 'cyber-drone', name: 'Cyber Drone' },
+  { id: 'buzz-droid', name: 'Buzz Droid' },
+  { id: 'xbot-agent', name: 'Blocky Cyborg' },
+  { id: 'cybernetic-warrior', name: 'Cybernetic Warrior' },
+  { id: 'alien-analyst', name: 'Alien Intelligence' },
+  { id: 'space-analyst', name: 'Space Analyst' },
+  { id: 'stealth-operator', name: 'Stealth Operator' },
+  { id: 'rogue-operator', name: 'Rogue Operator' },
+  { id: 'space-operator', name: 'Astronaut Operator' },
+  { id: 'ready-player', name: 'Studio Human' },
+  { id: 'street-scout', name: 'Street Scout Agent' },
+  { id: 'field-operator', name: 'Field Operator' },
+  { id: 'studio-operator', name: 'Lab Analyst' },
+  { id: 'shadow-operator', name: 'Shadow Operator' },
 ];
+
+function avatarOptionName(id: string): string {
+  return AVATAR_OPTIONS.find((avatar) => avatar.id === id)?.name ?? id;
+}
+
+const AVATAR_OPTION_IDS = new Set(AVATAR_OPTIONS.map((avatar) => avatar.id));
+const AVATAR_LEGACY_ALIASES: Record<string, string> = {
+  'openclaw-mech': 'animated-robot',
+  'openclaw-scout': 'xbot-agent',
+  'openclaw-heavy': 'abandoned-mecha',
+  'openclaw-drone': 'scout-drone',
+  'hermes-oracle': 'freepixel-robot',
+  'hermes-scribe': 'studio-operator',
+  'fox-companion': 'street-scout',
+  blob: 'buzz-droid',
+  cat: 'street-scout',
+  crab: 'scout-drone',
+  humanoid: 'ready-player',
+  robot: 'animated-robot',
+};
+
+function sanitizeAvatarVariant(value: string | undefined): string {
+  const trimmed = value?.trim();
+  if (!trimmed) return '';
+  if (AVATAR_OPTION_IDS.has(trimmed)) return trimmed;
+  return AVATAR_LEGACY_ALIASES[trimmed] ?? '';
+}
 
 const MODEL_PROVIDERS: HostedModelProvider[] = [
   { key: 'deepseek', name: 'DeepSeek' },
@@ -121,65 +163,425 @@ const MODEL_PROVIDERS: HostedModelProvider[] = [
 ];
 
 const HOSTED_MODELS: HostedModel[] = [
-  ['deepseek/deepseek-v4-flash', 'DeepSeek V4 Flash', 'deepseek', 'DeepSeek', 'Default', 'Low', '1M'],
-  ['deepseek/deepseek-v4-pro', 'DeepSeek V4 Pro', 'deepseek', 'DeepSeek', 'Balanced', 'Medium', '1M'],
-  ['deepseek/deepseek-v3.2', 'DeepSeek V3.2', 'deepseek', 'DeepSeek', 'Fast', 'Low', '128K'],
-  ['openai/gpt-5-nano', 'GPT-5 Nano', 'openai', 'OpenAI', 'Fast', 'Low', '400K'],
-  ['openai/gpt-5-mini', 'GPT-5 Mini', 'openai', 'OpenAI', 'Balanced', 'Medium', '400K'],
-  ['openai/gpt-5.1-codex-mini', 'GPT-5.1 Codex Mini', 'openai', 'OpenAI', 'Coding', 'Medium', '400K'],
-  ['openai/gpt-5.3-codex', 'GPT-5.3 Codex', 'openai', 'OpenAI', 'Coding', 'High', '400K'],
-  ['openai/gpt-5.4-nano', 'GPT-5.4 Nano', 'openai', 'OpenAI', 'Fast', 'Low', '400K'],
-  ['openai/gpt-5.4-mini', 'GPT-5.4 Mini', 'openai', 'OpenAI', 'Balanced', 'Medium', '400K'],
+  [
+    'deepseek/deepseek-v4-flash',
+    'DeepSeek V4 Flash',
+    'deepseek',
+    'DeepSeek',
+    'Default',
+    'Low',
+    '1M',
+  ],
+  [
+    'deepseek/deepseek-v4-pro',
+    'DeepSeek V4 Pro',
+    'deepseek',
+    'DeepSeek',
+    'Balanced',
+    'Medium',
+    '1M',
+  ],
+  [
+    'deepseek/deepseek-v3.2',
+    'DeepSeek V3.2',
+    'deepseek',
+    'DeepSeek',
+    'Fast',
+    'Low',
+    '128K',
+  ],
+  [
+    'openai/gpt-5-nano',
+    'GPT-5 Nano',
+    'openai',
+    'OpenAI',
+    'Fast',
+    'Low',
+    '400K',
+  ],
+  [
+    'openai/gpt-5-mini',
+    'GPT-5 Mini',
+    'openai',
+    'OpenAI',
+    'Balanced',
+    'Medium',
+    '400K',
+  ],
+  [
+    'openai/gpt-5.1-codex-mini',
+    'GPT-5.1 Codex Mini',
+    'openai',
+    'OpenAI',
+    'Coding',
+    'Medium',
+    '400K',
+  ],
+  [
+    'openai/gpt-5.3-codex',
+    'GPT-5.3 Codex',
+    'openai',
+    'OpenAI',
+    'Coding',
+    'High',
+    '400K',
+  ],
+  [
+    'openai/gpt-5.4-nano',
+    'GPT-5.4 Nano',
+    'openai',
+    'OpenAI',
+    'Fast',
+    'Low',
+    '400K',
+  ],
+  [
+    'openai/gpt-5.4-mini',
+    'GPT-5.4 Mini',
+    'openai',
+    'OpenAI',
+    'Balanced',
+    'Medium',
+    '400K',
+  ],
   ['openai/gpt-5.4', 'GPT-5.4', 'openai', 'OpenAI', 'Premium', 'High', '1.05M'],
-  ['openai/gpt-5.5', 'GPT-5.5', 'openai', 'OpenAI', 'Premium', 'Premium', '1.05M'],
-  ['openai/gpt-5.5-pro', 'GPT-5.5 Pro', 'openai', 'OpenAI', 'Premium', 'Premium', '1.05M'],
-  ['anthropic/claude-haiku-4.5', 'Claude Haiku 4.5', 'anthropic', 'Anthropic', 'Balanced', 'Medium', '200K'],
-  ['idle/claude-haiku-4-5', 'Claude Haiku 4.5 (IDLE)', 'idle', 'IDLE', 'Partner', 'Low', '200K', '1 AI Credit/request'],
-  ['idle/claude-sonnet-4-6', 'Claude Sonnet 4.6 (IDLE)', 'idle', 'IDLE', 'Partner', 'Medium', '1M', '3 AI Credits/request'],
-  ['xiaomi/mimo-v2.5-pro', 'MiMo V2.5 Pro', 'xiaomi', 'Xiaomi MiMo', 'Partner', 'Low', '1M', 'Free launch promo'],
-  ['xiaomi/mimo-v2.5', 'MiMo V2.5', 'xiaomi', 'Xiaomi MiMo', 'Balanced', 'Low', '1M', 'Free launch promo'],
-  ['xiaomi/mimo-v2-pro', 'MiMo V2 Pro', 'xiaomi', 'Xiaomi MiMo', 'Partner', 'Low', '1M', 'Free launch promo'],
-  ['xiaomi/mimo-v2-omni', 'MiMo V2 Omni', 'xiaomi', 'Xiaomi MiMo', 'Multimodal', 'Low', '256K', 'Free launch promo'],
-  ['anthropic/claude-sonnet-4.5', 'Claude Sonnet 4.5', 'anthropic', 'Anthropic', 'Premium', 'High', '1M'],
-  ['anthropic/claude-sonnet-4.6', 'Claude Sonnet 4.6', 'anthropic', 'Anthropic', 'Premium', 'High', '1M'],
-  ['anthropic/claude-opus-4.7', 'Claude Opus 4.7', 'anthropic', 'Anthropic', 'Premium', 'Premium', '1M'],
-  ['google/gemini-3.1-flash-lite', 'Gemini 3.1 Flash Lite', 'google', 'Google', 'Fast', 'Low', '1M'],
-  ['google/gemini-2.5-flash', 'Gemini 2.5 Flash', 'google', 'Google', 'Balanced', 'Medium', '1M'],
-  ['google/gemini-3-flash-preview', 'Gemini 3 Flash Preview', 'google', 'Google', 'Balanced', 'Medium', '1M'],
-  ['google/gemini-3.1-pro-preview', 'Gemini 3.1 Pro Preview', 'google', 'Google', 'Premium', 'High', '1M'],
-  ['qwen/qwen3.5-flash-02-23', 'Qwen3.5 Flash', 'qwen', 'Qwen', 'Fast', 'Low', '1M'],
-  ['qwen/qwen3-coder-flash', 'Qwen3 Coder Flash', 'qwen', 'Qwen', 'Coding', 'Low', '1M'],
-  ['qwen/qwen3.6-flash', 'Qwen3.6 Flash', 'qwen', 'Qwen', 'Fast', 'Medium', '1M'],
-  ['qwen/qwen3.6-35b-a3b', 'Qwen3.6 35B A3B', 'qwen', 'Qwen', 'Balanced', 'Medium', '256K'],
-  ['qwen/qwen3.5-35b-a3b', 'Qwen3.5 35B A3B', 'qwen', 'Qwen', 'Balanced', 'Medium', '256K'],
-  ['qwen/qwen3-coder', 'Qwen3 Coder', 'qwen', 'Qwen', 'Coding', 'Medium', '256K'],
-  ['qwen/qwen3-coder-next', 'Qwen3 Coder Next', 'qwen', 'Qwen', 'Coding', 'Medium', '1M'],
-  ['qwen/qwen3-coder-plus', 'Qwen3 Coder Plus', 'qwen', 'Qwen', 'Coding', 'High', '1M'],
-  ['qwen/qwen3.6-plus', 'Qwen3.6 Plus', 'qwen', 'Qwen', 'Premium', 'High', '1M'],
+  [
+    'openai/gpt-5.5',
+    'GPT-5.5',
+    'openai',
+    'OpenAI',
+    'Premium',
+    'Premium',
+    '1.05M',
+  ],
+  [
+    'openai/gpt-5.5-pro',
+    'GPT-5.5 Pro',
+    'openai',
+    'OpenAI',
+    'Premium',
+    'Premium',
+    '1.05M',
+  ],
+  [
+    'anthropic/claude-haiku-4.5',
+    'Claude Haiku 4.5',
+    'anthropic',
+    'Anthropic',
+    'Balanced',
+    'Medium',
+    '200K',
+  ],
+  [
+    'idle/claude-haiku-4-5',
+    'Claude Haiku 4.5 (IDLE)',
+    'idle',
+    'IDLE',
+    'Partner',
+    'Low',
+    '200K',
+    '1 AI Credit/request',
+  ],
+  [
+    'idle/claude-sonnet-4-6',
+    'Claude Sonnet 4.6 (IDLE)',
+    'idle',
+    'IDLE',
+    'Partner',
+    'Medium',
+    '1M',
+    '3 AI Credits/request',
+  ],
+  [
+    'xiaomi/mimo-v2.5-pro',
+    'MiMo V2.5 Pro',
+    'xiaomi',
+    'Xiaomi MiMo',
+    'Partner',
+    'Low',
+    '1M',
+    'Free launch promo',
+  ],
+  [
+    'xiaomi/mimo-v2.5',
+    'MiMo V2.5',
+    'xiaomi',
+    'Xiaomi MiMo',
+    'Balanced',
+    'Low',
+    '1M',
+    'Free launch promo',
+  ],
+  [
+    'xiaomi/mimo-v2-pro',
+    'MiMo V2 Pro',
+    'xiaomi',
+    'Xiaomi MiMo',
+    'Partner',
+    'Low',
+    '1M',
+    'Free launch promo',
+  ],
+  [
+    'xiaomi/mimo-v2-omni',
+    'MiMo V2 Omni',
+    'xiaomi',
+    'Xiaomi MiMo',
+    'Multimodal',
+    'Low',
+    '256K',
+    'Free launch promo',
+  ],
+  [
+    'anthropic/claude-sonnet-4.5',
+    'Claude Sonnet 4.5',
+    'anthropic',
+    'Anthropic',
+    'Premium',
+    'High',
+    '1M',
+  ],
+  [
+    'anthropic/claude-sonnet-4.6',
+    'Claude Sonnet 4.6',
+    'anthropic',
+    'Anthropic',
+    'Premium',
+    'High',
+    '1M',
+  ],
+  [
+    'anthropic/claude-opus-4.7',
+    'Claude Opus 4.7',
+    'anthropic',
+    'Anthropic',
+    'Premium',
+    'Premium',
+    '1M',
+  ],
+  [
+    'google/gemini-3.1-flash-lite',
+    'Gemini 3.1 Flash Lite',
+    'google',
+    'Google',
+    'Fast',
+    'Low',
+    '1M',
+  ],
+  [
+    'google/gemini-2.5-flash',
+    'Gemini 2.5 Flash',
+    'google',
+    'Google',
+    'Balanced',
+    'Medium',
+    '1M',
+  ],
+  [
+    'google/gemini-3-flash-preview',
+    'Gemini 3 Flash Preview',
+    'google',
+    'Google',
+    'Balanced',
+    'Medium',
+    '1M',
+  ],
+  [
+    'google/gemini-3.1-pro-preview',
+    'Gemini 3.1 Pro Preview',
+    'google',
+    'Google',
+    'Premium',
+    'High',
+    '1M',
+  ],
+  [
+    'qwen/qwen3.5-flash-02-23',
+    'Qwen3.5 Flash',
+    'qwen',
+    'Qwen',
+    'Fast',
+    'Low',
+    '1M',
+  ],
+  [
+    'qwen/qwen3-coder-flash',
+    'Qwen3 Coder Flash',
+    'qwen',
+    'Qwen',
+    'Coding',
+    'Low',
+    '1M',
+  ],
+  [
+    'qwen/qwen3.6-flash',
+    'Qwen3.6 Flash',
+    'qwen',
+    'Qwen',
+    'Fast',
+    'Medium',
+    '1M',
+  ],
+  [
+    'qwen/qwen3.6-35b-a3b',
+    'Qwen3.6 35B A3B',
+    'qwen',
+    'Qwen',
+    'Balanced',
+    'Medium',
+    '256K',
+  ],
+  [
+    'qwen/qwen3.5-35b-a3b',
+    'Qwen3.5 35B A3B',
+    'qwen',
+    'Qwen',
+    'Balanced',
+    'Medium',
+    '256K',
+  ],
+  [
+    'qwen/qwen3-coder',
+    'Qwen3 Coder',
+    'qwen',
+    'Qwen',
+    'Coding',
+    'Medium',
+    '256K',
+  ],
+  [
+    'qwen/qwen3-coder-next',
+    'Qwen3 Coder Next',
+    'qwen',
+    'Qwen',
+    'Coding',
+    'Medium',
+    '1M',
+  ],
+  [
+    'qwen/qwen3-coder-plus',
+    'Qwen3 Coder Plus',
+    'qwen',
+    'Qwen',
+    'Coding',
+    'High',
+    '1M',
+  ],
+  [
+    'qwen/qwen3.6-plus',
+    'Qwen3.6 Plus',
+    'qwen',
+    'Qwen',
+    'Premium',
+    'High',
+    '1M',
+  ],
   ['qwen/qwen3-max', 'Qwen3 Max', 'qwen', 'Qwen', 'Premium', 'High', '1M'],
-  ['qwen/qwen3-max-thinking', 'Qwen3 Max Thinking', 'qwen', 'Qwen', 'Reasoning', 'Premium', '1M'],
+  [
+    'qwen/qwen3-max-thinking',
+    'Qwen3 Max Thinking',
+    'qwen',
+    'Qwen',
+    'Reasoning',
+    'Premium',
+    '1M',
+  ],
   ['x-ai/grok-4.1-fast', 'Grok 4.1 Fast', 'x-ai', 'xAI', 'Fast', 'Low', '2M'],
-  ['x-ai/grok-code-fast-1', 'Grok Code Fast 1', 'x-ai', 'xAI', 'Coding', 'Medium', '256K'],
+  [
+    'x-ai/grok-code-fast-1',
+    'Grok Code Fast 1',
+    'x-ai',
+    'xAI',
+    'Coding',
+    'Medium',
+    '256K',
+  ],
   ['x-ai/grok-4.3', 'Grok 4.3', 'x-ai', 'xAI', 'Premium', 'High', '1M'],
-  ['mistralai/mistral-small-2603', 'Mistral Small 4', 'mistralai', 'Mistral', 'Fast', 'Low', '256K'],
-  ['mistralai/codestral-2508', 'Codestral 2508', 'mistralai', 'Mistral', 'Coding', 'Medium', '256K'],
-  ['mistralai/mistral-large-2512', 'Mistral Large 3', 'mistralai', 'Mistral', 'Premium', 'Medium', '256K'],
-  ['moonshotai/kimi-k2-thinking', 'Kimi K2 Thinking', 'moonshotai', 'Moonshot AI', 'Reasoning', 'Medium', '256K'],
-  ['moonshotai/kimi-k2.6', 'Kimi K2.6', 'moonshotai', 'Moonshot AI', 'Balanced', 'High', '256K'],
-  ['z-ai/glm-4.7-flash', 'GLM 4.7 Flash', 'z-ai', 'Z.ai', 'Fast', 'Low', '200K'],
+  [
+    'mistralai/mistral-small-2603',
+    'Mistral Small 4',
+    'mistralai',
+    'Mistral',
+    'Fast',
+    'Low',
+    '256K',
+  ],
+  [
+    'mistralai/codestral-2508',
+    'Codestral 2508',
+    'mistralai',
+    'Mistral',
+    'Coding',
+    'Medium',
+    '256K',
+  ],
+  [
+    'mistralai/mistral-large-2512',
+    'Mistral Large 3',
+    'mistralai',
+    'Mistral',
+    'Premium',
+    'Medium',
+    '256K',
+  ],
+  [
+    'moonshotai/kimi-k2-thinking',
+    'Kimi K2 Thinking',
+    'moonshotai',
+    'Moonshot AI',
+    'Reasoning',
+    'Medium',
+    '256K',
+  ],
+  [
+    'moonshotai/kimi-k2.6',
+    'Kimi K2.6',
+    'moonshotai',
+    'Moonshot AI',
+    'Balanced',
+    'High',
+    '256K',
+  ],
+  [
+    'z-ai/glm-4.7-flash',
+    'GLM 4.7 Flash',
+    'z-ai',
+    'Z.ai',
+    'Fast',
+    'Low',
+    '200K',
+  ],
   ['z-ai/glm-5.1', 'GLM 5.1', 'z-ai', 'Z.ai', 'Balanced', 'High', '200K'],
-  ['nvidia/nemotron-3-nano-30b-a3b', 'Nemotron 3 Nano', 'nvidia', 'NVIDIA', 'Fast', 'Low', '256K'],
-  ['openrouter/auto', 'OpenRouter Auto', 'openrouter', 'OpenRouter', 'Advanced', 'Variable', '2M'],
-].map(([id, name, providerKey, provider, category, cost, context, fixedPrice]) => ({
-  id,
-  name,
-  providerKey,
-  provider,
-  category,
-  cost: cost as ModelCost,
-  context,
-  fixedPrice,
-}));
+  [
+    'nvidia/nemotron-3-nano-30b-a3b',
+    'Nemotron 3 Nano',
+    'nvidia',
+    'NVIDIA',
+    'Fast',
+    'Low',
+    '256K',
+  ],
+  [
+    'openrouter/auto',
+    'OpenRouter Auto',
+    'openrouter',
+    'OpenRouter',
+    'Advanced',
+    'Variable',
+    '2M',
+  ],
+].map(
+  ([id, name, providerKey, provider, category, cost, context, fixedPrice]) => ({
+    id,
+    name,
+    providerKey,
+    provider,
+    category,
+    cost: cost as ModelCost,
+    context,
+    fixedPrice,
+  }),
+);
 
 const DEFAULT_HOSTED_MODEL = 'deepseek/deepseek-v4-flash';
 const HOSTED_PROXY_PROVIDER_PREFIX = 'hatcher-llm-proxy/';
@@ -228,7 +630,10 @@ function uniq(values: string[], max: number): string[] {
   return out;
 }
 
-function filterPluginsForFramework(values: string[], framework: Framework): string[] {
+function filterPluginsForFramework(
+  values: string[],
+  framework: Framework,
+): string[] {
   return values.filter((plugin) => {
     if (framework === 'hermes') return !OPENCLAW_PLUGIN_IDS.has(plugin);
     return !HERMES_PLUGIN_IDS.has(plugin);
@@ -264,7 +669,11 @@ function syncInstallPlan(
     const key = `plugin:${plugin.toLowerCase()}`;
     if (seen.has(key)) continue;
     seen.add(key);
-    out.push({ type: 'plugin', name: plugin, reason: 'Install on first start.' });
+    out.push({
+      type: 'plugin',
+      name: plugin,
+      reason: 'Install on first start.',
+    });
   }
 
   return out.slice(0, 12);
@@ -285,11 +694,13 @@ function providerKeyFromModel(modelId: string): string {
 }
 
 function providerNameFromKey(providerKey: string): string {
-  return MODEL_PROVIDERS.find((provider) => provider.key === providerKey)?.name
-    ?? providerKey
+  return (
+    MODEL_PROVIDERS.find((provider) => provider.key === providerKey)?.name ??
+    providerKey
       .split('-')
-      .map((part) => part ? part[0]!.toUpperCase() + part.slice(1) : part)
-      .join(' ');
+      .map((part) => (part ? part[0]!.toUpperCase() + part.slice(1) : part))
+      .join(' ')
+  );
 }
 
 function createSavedHostedModelOption(modelId: string): HostedModel {
@@ -306,11 +717,17 @@ function createSavedHostedModelOption(modelId: string): HostedModel {
   };
 }
 
-function sanitizeAvatarTraits(value: AvatarTraits | undefined, fallbackSeed: string): AvatarTraits {
-  const trim = (raw: string | undefined, max = 48) => raw?.trim().replace(/\s+/g, ' ').slice(0, max) || undefined;
+function sanitizeAvatarTraits(
+  value: AvatarTraits | undefined,
+  fallbackSeed: string,
+): AvatarTraits {
+  const trim = (raw: string | undefined, max = 48) =>
+    raw?.trim().replace(/\s+/g, ' ').slice(0, max) || undefined;
   const hex = (raw: string | undefined) => {
     const value = raw?.trim();
-    return value && /^#[0-9a-f]{6}$/i.test(value) ? value.toUpperCase() : undefined;
+    return value && /^#[0-9a-f]{6}$/i.test(value)
+      ? value.toUpperCase()
+      : undefined;
   };
   return {
     seed: trim(value?.seed, 80) ?? fallbackSeed,
@@ -325,24 +742,38 @@ function sanitizeAvatarTraits(value: AvatarTraits | undefined, fallbackSeed: str
 
 function normalizeConfig(config: ParsedConfig): ParsedConfig {
   const selectedSkills = uniq(
-    config.selectedSkills?.length ? config.selectedSkills : config.suggestedSkills ?? [],
+    config.selectedSkills?.length
+      ? config.selectedSkills
+      : (config.suggestedSkills ?? []),
     10,
   );
   const selectedPlugins = filterPluginsForFramework(
-    uniq(config.selectedPlugins?.length ? config.selectedPlugins : config.suggestedPlugins ?? [], 10),
+    uniq(
+      config.selectedPlugins?.length
+        ? config.selectedPlugins
+        : (config.suggestedPlugins ?? []),
+      10,
+    ),
     config.framework,
   );
-  const installPlan = syncInstallPlan(selectedSkills, selectedPlugins, config.installPlan ?? []);
+  const installPlan = syncInstallPlan(
+    selectedSkills,
+    selectedPlugins,
+    config.installPlan ?? [],
+  );
   return {
     ...config,
     model: normalizeHostedModelForUi(config.model),
     frameworkReason: config.frameworkReason ?? '',
-    suggestedSkills: uniq(config.suggestedSkills?.length ? config.suggestedSkills : selectedSkills, 10),
+    suggestedSkills: uniq(
+      config.suggestedSkills?.length ? config.suggestedSkills : selectedSkills,
+      10,
+    ),
     suggestedPlugins: selectedPlugins,
     selectedSkills,
     selectedPlugins,
     installPlan,
-    avatarVariant: config.avatarVariant ?? '',
+    avatarVariant: sanitizeAvatarVariant(config.avatarVariant),
     avatarTraits: sanitizeAvatarTraits(
       config.avatarTraits,
       `${config.framework}:${config.name}:${config.avatarHint || config.description}`,
@@ -387,7 +818,10 @@ export function ChatToHatch() {
 
   // Auto-scroll the chat log on every new message.
   useEffect(() => {
-    logRef.current?.scrollTo({ top: logRef.current.scrollHeight, behavior: 'smooth' });
+    logRef.current?.scrollTo({
+      top: logRef.current.scrollHeight,
+      behavior: 'smooth',
+    });
   }, [messages, thinking]);
 
   async function handleSend() {
@@ -395,9 +829,16 @@ export function ChatToHatch() {
     if (description.length < 8 || thinking) return;
 
     const myReqId = ++reqIdRef.current;
-    const userMsg: Msg = { id: crypto.randomUUID(), who: 'user', text: description };
+    const userMsg: Msg = {
+      id: crypto.randomUUID(),
+      who: 'user',
+      text: description,
+    };
     const history = messages
-      .filter((m): m is Msg & { who: 'user' | 'assistant' } => (m.who === 'user' || m.who === 'assistant') && !m.isError)
+      .filter(
+        (m): m is Msg & { who: 'user' | 'assistant' } =>
+          (m.who === 'user' || m.who === 'assistant') && !m.isError,
+      )
       .slice(-MAX_HISTORY_TURNS)
       .map((m) => ({ role: m.who, content: m.text }));
     setMessages((m) => [...m, userMsg]);
@@ -474,8 +915,10 @@ export function ChatToHatch() {
       // suggestedSkills/Plugins into installable pending skills and writes
       // persona files during first container init.
       const configBody: Record<string, unknown> = {};
-      if (draft.personality.trim()) configBody.personality = draft.personality.trim();
-      if (draft.systemPrompt.trim()) configBody.systemPrompt = draft.systemPrompt.trim();
+      if (draft.personality.trim())
+        configBody.personality = draft.personality.trim();
+      if (draft.systemPrompt.trim())
+        configBody.systemPrompt = draft.systemPrompt.trim();
       if (draft.selectedSkills.length) {
         configBody.selectedSkills = draft.selectedSkills;
         configBody.suggestedSkills = draft.selectedSkills;
@@ -484,11 +927,13 @@ export function ChatToHatch() {
         configBody.selectedPlugins = draft.selectedPlugins;
         configBody.suggestedPlugins = draft.selectedPlugins;
       }
-      if (draft.frameworkReason.trim()) configBody.frameworkReason = draft.frameworkReason.trim();
+      if (draft.frameworkReason.trim())
+        configBody.frameworkReason = draft.frameworkReason.trim();
       if (draft.installPlan.length) configBody.installPlan = draft.installPlan;
       if (draft.model) configBody.model = draft.model;
       if (draft.greeting.trim()) configBody.greeting = draft.greeting.trim();
-      if (draft.avatarHint.trim()) configBody.avatarHint = draft.avatarHint.trim();
+      if (draft.avatarHint.trim())
+        configBody.avatarHint = draft.avatarHint.trim();
       if (draft.avatarVariant.trim()) {
         configBody.avatarVariant = draft.avatarVariant.trim();
         configBody.roomAvatarVariant = draft.avatarVariant.trim();
@@ -498,16 +943,19 @@ export function ChatToHatch() {
         configBody.roomAvatarTraits = draft.avatarTraits;
       }
 
-      const created = await req<{ id: string; slug?: string | null }>('/agents', {
-        method: 'POST',
-        body: JSON.stringify({
-          name: draft.name.trim(),
-          description: draft.description.trim() || undefined,
-          framework: draft.framework,
-          template: 'custom',
-          config: Object.keys(configBody).length ? configBody : undefined,
-        }),
-      });
+      const created = await req<{ id: string; slug?: string | null }>(
+        '/agents',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            name: draft.name.trim(),
+            description: draft.description.trim() || undefined,
+            framework: draft.framework,
+            template: 'custom',
+            config: Object.keys(configBody).length ? configBody : undefined,
+          }),
+        },
+      );
       if (created.success) {
         const started = await api.startAgent(created.data.id);
         if (!started.success) {
@@ -516,7 +964,9 @@ export function ChatToHatch() {
             {
               id: crypto.randomUUID(),
               who: 'assistant',
-              text: started.error || 'Agent created, but automatic start failed. Open the agent and start it manually.',
+              text:
+                started.error ||
+                'Agent created, but automatic start failed. Open the agent and start it manually.',
               isError: true,
             },
           ]);
@@ -616,16 +1066,26 @@ export function ChatToHatch() {
 
   const fwVisual = draft ? FW_VISUAL[draft.framework] : null;
   const slug = draft ? slugify(draft.name) : '';
-  const selectedModelId = draft ? normalizeHostedModelForUi(draft.model) : DEFAULT_HOSTED_MODEL;
-  const selectedModel = HOSTED_MODELS.find((model) => model.id === selectedModelId)
-    ?? createSavedHostedModelOption(selectedModelId);
-  const selectedProvider = MODEL_PROVIDERS.find((provider) => provider.key === selectedModel.providerKey)
-    ?? { key: selectedModel.providerKey, name: selectedModel.provider };
-  const modelProviders = MODEL_PROVIDERS.some((provider) => provider.key === selectedProvider.key)
+  const selectedModelId = draft
+    ? normalizeHostedModelForUi(draft.model)
+    : DEFAULT_HOSTED_MODEL;
+  const selectedModel =
+    HOSTED_MODELS.find((model) => model.id === selectedModelId) ??
+    createSavedHostedModelOption(selectedModelId);
+  const selectedProvider = MODEL_PROVIDERS.find(
+    (provider) => provider.key === selectedModel.providerKey,
+  ) ?? { key: selectedModel.providerKey, name: selectedModel.provider };
+  const modelProviders = MODEL_PROVIDERS.some(
+    (provider) => provider.key === selectedProvider.key,
+  )
     ? MODEL_PROVIDERS
     : [...MODEL_PROVIDERS, selectedProvider];
-  const modelsForProvider = HOSTED_MODELS.filter((model) => model.providerKey === selectedProvider.key);
-  const hostedModelsForProvider = modelsForProvider.some((model) => model.id === selectedModel.id)
+  const modelsForProvider = HOSTED_MODELS.filter(
+    (model) => model.providerKey === selectedProvider.key,
+  );
+  const hostedModelsForProvider = modelsForProvider.some(
+    (model) => model.id === selectedModel.id,
+  )
     ? modelsForProvider
     : [selectedModel, ...modelsForProvider];
 
@@ -730,13 +1190,15 @@ export function ChatToHatch() {
             <div className={styles.previewHead}>
               <h2 className={styles.previewTitle}>{t('previewTitle')}</h2>
               <span className={styles.previewTag}>
-                {draft ? (draftError ? t('previewNeedsFix') : t('previewReady')) : t('previewEmpty')}
+                {draft
+                  ? draftError
+                    ? t('previewNeedsFix')
+                    : t('previewReady')
+                  : t('previewEmpty')}
               </span>
             </div>
 
-            {!draft && (
-              <div className={styles.empty}>{t('emptyHint')}</div>
-            )}
+            {!draft && <div className={styles.empty}>{t('emptyHint')}</div>}
 
             {draft && fwVisual && (
               <div className={styles.previewBody}>
@@ -753,7 +1215,9 @@ export function ChatToHatch() {
                       isStreaming={thinking}
                     />
                     <span className={styles.avatarBadge}>
-                      {draft.avatarVariant || 'auto avatar'}
+                      {draft.avatarVariant
+                        ? avatarOptionName(draft.avatarVariant)
+                        : 'auto avatar'}
                     </span>
                   </div>
 
@@ -761,9 +1225,13 @@ export function ChatToHatch() {
                     <div className={styles.previewTopRow}>
                       <span
                         className={styles.fwBadge}
-                        style={{ '--fw': fwVisual.color } as React.CSSProperties}
+                        style={
+                          { '--fw': fwVisual.color } as React.CSSProperties
+                        }
                       >
-                        <span className={styles.fwGlyph} aria-hidden>{fwVisual.mark}</span>
+                        <span className={styles.fwGlyph} aria-hidden>
+                          {fwVisual.mark}
+                        </span>
                         {fwVisual.label}
                       </span>
                       {original && (
@@ -779,7 +1247,10 @@ export function ChatToHatch() {
                       )}
                     </div>
 
-                    <div className={styles.frameworkChooser} aria-label={t('labelFramework')}>
+                    <div
+                      className={styles.frameworkChooser}
+                      aria-label={t('labelFramework')}
+                    >
                       {(['openclaw', 'hermes'] as const).map((framework) => {
                         const visual = FW_VISUAL[framework];
                         const active = draft.framework === framework;
@@ -788,14 +1259,22 @@ export function ChatToHatch() {
                             key={framework}
                             type="button"
                             className={`${styles.frameworkOption} ${active ? styles.frameworkOptionActive : ''}`}
-                            style={{ '--fw': visual.color } as React.CSSProperties}
+                            style={
+                              { '--fw': visual.color } as React.CSSProperties
+                            }
                             onClick={() => patchDraft({ framework })}
                           >
-                            <span className={styles.frameworkOptionMark}>{visual.mark}</span>
+                            <span className={styles.frameworkOptionMark}>
+                              {visual.mark}
+                            </span>
                             <span>
-                              <span className={styles.frameworkOptionName}>{visual.label}</span>
+                              <span className={styles.frameworkOptionName}>
+                                {visual.label}
+                              </span>
                               <span className={styles.frameworkOptionDesc}>
-                                {framework === 'openclaw' ? t('frameworkOpenClaw') : t('frameworkHermes')}
+                                {framework === 'openclaw'
+                                  ? t('frameworkOpenClaw')
+                                  : t('frameworkHermes')}
                               </span>
                             </span>
                           </button>
@@ -813,7 +1292,8 @@ export function ChatToHatch() {
                             const firstModel = HOSTED_MODELS.find(
                               (model) => model.providerKey === e.target.value,
                             );
-                            if (firstModel) patchDraft({ model: firstModel.id });
+                            if (firstModel)
+                              patchDraft({ model: firstModel.id });
                           }}
                         >
                           {modelProviders.map((provider) => (
@@ -829,11 +1309,14 @@ export function ChatToHatch() {
                         <select
                           className={styles.selectInput}
                           value={selectedModel.id}
-                          onChange={(e) => patchDraft({ model: e.target.value })}
+                          onChange={(e) =>
+                            patchDraft({ model: e.target.value })
+                          }
                         >
                           {hostedModelsForProvider.map((model) => (
                             <option key={model.id} value={model.id}>
-                              {model.name} · {model.category} · {model.fixedPrice ?? model.cost}
+                              {model.name} · {model.category} ·{' '}
+                              {model.fixedPrice ?? model.cost}
                             </option>
                           ))}
                         </select>
@@ -843,7 +1326,9 @@ export function ChatToHatch() {
                     <div className={styles.modelSummary}>
                       <span>{selectedModel.provider}</span>
                       <span>{selectedModel.context}</span>
-                      <span>{selectedModel.fixedPrice ?? selectedModel.cost}</span>
+                      <span>
+                        {selectedModel.fixedPrice ?? selectedModel.cost}
+                      </span>
                     </div>
 
                     <label className={styles.selectLabel}>
@@ -851,7 +1336,9 @@ export function ChatToHatch() {
                       <select
                         className={styles.selectInput}
                         value={draft.avatarVariant}
-                        onChange={(e) => patchDraft({ avatarVariant: e.target.value })}
+                        onChange={(e) =>
+                          patchDraft({ avatarVariant: e.target.value })
+                        }
                       >
                         {AVATAR_OPTIONS.map((avatar) => (
                           <option key={avatar.id || 'auto'} value={avatar.id}>
@@ -867,9 +1354,14 @@ export function ChatToHatch() {
                         <input
                           className={styles.traitInput}
                           value={draft.avatarTraits.palette ?? ''}
-                          onChange={(e) => patchDraft({
-                            avatarTraits: { ...draft.avatarTraits, palette: e.target.value },
-                          })}
+                          onChange={(e) =>
+                            patchDraft({
+                              avatarTraits: {
+                                ...draft.avatarTraits,
+                                palette: e.target.value,
+                              },
+                            })
+                          }
                           maxLength={48}
                         />
                       </label>
@@ -878,9 +1370,14 @@ export function ChatToHatch() {
                         <input
                           className={styles.traitInput}
                           value={draft.avatarTraits.emblem ?? ''}
-                          onChange={(e) => patchDraft({
-                            avatarTraits: { ...draft.avatarTraits, emblem: e.target.value },
-                          })}
+                          onChange={(e) =>
+                            patchDraft({
+                              avatarTraits: {
+                                ...draft.avatarTraits,
+                                emblem: e.target.value,
+                              },
+                            })
+                          }
                           maxLength={48}
                         />
                       </label>
@@ -889,9 +1386,14 @@ export function ChatToHatch() {
                         <input
                           className={styles.traitInput}
                           value={draft.avatarTraits.accessory ?? ''}
-                          onChange={(e) => patchDraft({
-                            avatarTraits: { ...draft.avatarTraits, accessory: e.target.value },
-                          })}
+                          onChange={(e) =>
+                            patchDraft({
+                              avatarTraits: {
+                                ...draft.avatarTraits,
+                                accessory: e.target.value,
+                              },
+                            })
+                          }
                           maxLength={48}
                         />
                       </label>
@@ -900,9 +1402,14 @@ export function ChatToHatch() {
                         <input
                           className={styles.traitInput}
                           value={draft.avatarTraits.mood ?? ''}
-                          onChange={(e) => patchDraft({
-                            avatarTraits: { ...draft.avatarTraits, mood: e.target.value },
-                          })}
+                          onChange={(e) =>
+                            patchDraft({
+                              avatarTraits: {
+                                ...draft.avatarTraits,
+                                mood: e.target.value,
+                              },
+                            })
+                          }
                           maxLength={48}
                         />
                       </label>
@@ -912,7 +1419,9 @@ export function ChatToHatch() {
 
                 {draft.frameworkReason && (
                   <div className={styles.reasonBox}>
-                    <span className={styles.reasonLabel}>{t('labelFrameworkReason')}</span>
+                    <span className={styles.reasonLabel}>
+                      {t('labelFrameworkReason')}
+                    </span>
                     <p>{draft.frameworkReason}</p>
                   </div>
                 )}
@@ -937,11 +1446,16 @@ export function ChatToHatch() {
 
                 {/* Description */}
                 <label className={styles.fieldLabel}>
-                  {t('labelDescription')} <span className={styles.fieldHint}>{draft.description.length}/140</span>
+                  {t('labelDescription')}{' '}
+                  <span className={styles.fieldHint}>
+                    {draft.description.length}/140
+                  </span>
                   <textarea
                     className={styles.fieldTextarea}
                     value={draft.description}
-                    onChange={(e) => patchDraft({ description: e.target.value })}
+                    onChange={(e) =>
+                      patchDraft({ description: e.target.value })
+                    }
                     maxLength={140}
                     rows={2}
                     placeholder={t('placeholderDescription')}
@@ -952,16 +1466,22 @@ export function ChatToHatch() {
                 <details
                   className={styles.collapsible}
                   open={showPersonality}
-                  onToggle={(e) => setShowPersonality((e.target as HTMLDetailsElement).open)}
+                  onToggle={(e) =>
+                    setShowPersonality((e.target as HTMLDetailsElement).open)
+                  }
                 >
                   <summary className={styles.collapsibleHead}>
                     {t('labelPersonality')}
-                    <span className={styles.fieldHint}>{draft.personality.length}/2000</span>
+                    <span className={styles.fieldHint}>
+                      {draft.personality.length}/2000
+                    </span>
                   </summary>
                   <textarea
                     className={styles.fieldTextarea}
                     value={draft.personality}
-                    onChange={(e) => patchDraft({ personality: e.target.value })}
+                    onChange={(e) =>
+                      patchDraft({ personality: e.target.value })
+                    }
                     maxLength={2000}
                     rows={3}
                     placeholder={t('placeholderPersonality')}
@@ -972,118 +1492,165 @@ export function ChatToHatch() {
                 <details
                   className={styles.collapsible}
                   open={showSystemPrompt}
-                  onToggle={(e) => setShowSystemPrompt((e.target as HTMLDetailsElement).open)}
+                  onToggle={(e) =>
+                    setShowSystemPrompt((e.target as HTMLDetailsElement).open)
+                  }
                 >
-	                  <summary className={styles.collapsibleHead}>
-	                    {t('labelSystemPrompt')}
-	                    <span className={styles.fieldHint}>{draft.systemPrompt.length}/{MAX_SYSTEM_PROMPT}</span>
-	                  </summary>
+                  <summary className={styles.collapsibleHead}>
+                    {t('labelSystemPrompt')}
+                    <span className={styles.fieldHint}>
+                      {draft.systemPrompt.length}/{MAX_SYSTEM_PROMPT}
+                    </span>
+                  </summary>
                   <textarea
                     className={`${styles.fieldTextarea} ${styles.fieldMono}`}
-	                    value={draft.systemPrompt}
-	                    onChange={(e) => patchDraft({ systemPrompt: e.target.value })}
-	                    maxLength={MAX_SYSTEM_PROMPT}
+                    value={draft.systemPrompt}
+                    onChange={(e) =>
+                      patchDraft({ systemPrompt: e.target.value })
+                    }
+                    maxLength={MAX_SYSTEM_PROMPT}
                     rows={10}
                     placeholder={t('placeholderSystemPrompt')}
                   />
                 </details>
 
-	                {/* Skills */}
-	                <div className={styles.chipsBlock}>
-	                  <div className={styles.chipsHead}>
-	                    {t('labelSkills')}
-	                    <span className={styles.fieldHint}>{draft.selectedSkills.length}/10</span>
-	                  </div>
-	                  <div className={styles.skillsList}>
-	                    {draft.selectedSkills.map((s) => (
-	                      <button
-	                        key={s}
-	                        type="button"
-	                        className={`${styles.skill} ${styles.skillRemovable}`}
-	                        onClick={() => removeSkill(s)}
-	                        aria-label={t('removeChip', { name: s })}
-	                      >
-	                        {s} <span className={styles.chipX} aria-hidden>×</span>
-	                      </button>
-	                    ))}
-	                    {draft.selectedSkills.length < 10 && (
-	                      <span className={styles.chipInputWrap}>
-	                        <input
-	                          type="text"
-	                          className={styles.chipInput}
-	                          placeholder={t('addSkill')}
-	                          value={skillInput}
-	                          maxLength={80}
-	                          onChange={(e) => setSkillInput(e.target.value)}
-	                          onKeyDown={(e) => {
-	                            if (e.key === 'Enter') { e.preventDefault(); addSkill(); }
-	                          }}
-	                        />
-	                        {skillInput && (
-	                          <button type="button" className={styles.chipAddBtn} onClick={addSkill}>+</button>
-	                        )}
-	                      </span>
-	                    )}
-	                  </div>
-	                </div>
+                {/* Skills */}
+                <div className={styles.chipsBlock}>
+                  <div className={styles.chipsHead}>
+                    {t('labelSkills')}
+                    <span className={styles.fieldHint}>
+                      {draft.selectedSkills.length}/10
+                    </span>
+                  </div>
+                  <div className={styles.skillsList}>
+                    {draft.selectedSkills.map((s) => (
+                      <button
+                        key={s}
+                        type="button"
+                        className={`${styles.skill} ${styles.skillRemovable}`}
+                        onClick={() => removeSkill(s)}
+                        aria-label={t('removeChip', { name: s })}
+                      >
+                        {s}{' '}
+                        <span className={styles.chipX} aria-hidden>
+                          ×
+                        </span>
+                      </button>
+                    ))}
+                    {draft.selectedSkills.length < 10 && (
+                      <span className={styles.chipInputWrap}>
+                        <input
+                          type="text"
+                          className={styles.chipInput}
+                          placeholder={t('addSkill')}
+                          value={skillInput}
+                          maxLength={80}
+                          onChange={(e) => setSkillInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              addSkill();
+                            }
+                          }}
+                        />
+                        {skillInput && (
+                          <button
+                            type="button"
+                            className={styles.chipAddBtn}
+                            onClick={addSkill}
+                          >
+                            +
+                          </button>
+                        )}
+                      </span>
+                    )}
+                  </div>
+                </div>
 
-	                <div className={styles.chipsBlock}>
-	                  <div className={styles.chipsHead}>
-	                    {t('labelPlugins')}
-	                    <span className={styles.fieldHint}>{draft.selectedPlugins.length}/10</span>
-	                  </div>
-	                  <div className={styles.skillsList}>
-	                    {draft.selectedPlugins.map((p) => (
-	                      <button
-	                        key={p}
-	                        type="button"
-	                        className={`${styles.skill} ${styles.skillRemovable}`}
-	                        onClick={() => removePlugin(p)}
-	                        aria-label={t('removeChip', { name: p })}
-	                      >
-	                        {p} <span className={styles.chipX} aria-hidden>×</span>
-	                      </button>
-	                    ))}
-	                    {draft.selectedPlugins.length < 10 && (
-	                      <span className={styles.chipInputWrap}>
-	                        <input
-	                          type="text"
-	                          className={styles.chipInput}
-	                          placeholder={t('addPlugin')}
-	                          value={pluginInput}
-	                          maxLength={80}
-	                          onChange={(e) => setPluginInput(e.target.value)}
-	                          onKeyDown={(e) => {
-	                            if (e.key === 'Enter') { e.preventDefault(); addPlugin(); }
-	                          }}
-	                        />
-	                        {pluginInput && (
-	                          <button type="button" className={styles.chipAddBtn} onClick={addPlugin}>+</button>
-	                        )}
-	                      </span>
-	                    )}
-	                  </div>
-	                </div>
+                <div className={styles.chipsBlock}>
+                  <div className={styles.chipsHead}>
+                    {t('labelPlugins')}
+                    <span className={styles.fieldHint}>
+                      {draft.selectedPlugins.length}/10
+                    </span>
+                  </div>
+                  <div className={styles.skillsList}>
+                    {draft.selectedPlugins.map((p) => (
+                      <button
+                        key={p}
+                        type="button"
+                        className={`${styles.skill} ${styles.skillRemovable}`}
+                        onClick={() => removePlugin(p)}
+                        aria-label={t('removeChip', { name: p })}
+                      >
+                        {p}{' '}
+                        <span className={styles.chipX} aria-hidden>
+                          ×
+                        </span>
+                      </button>
+                    ))}
+                    {draft.selectedPlugins.length < 10 && (
+                      <span className={styles.chipInputWrap}>
+                        <input
+                          type="text"
+                          className={styles.chipInput}
+                          placeholder={t('addPlugin')}
+                          value={pluginInput}
+                          maxLength={80}
+                          onChange={(e) => setPluginInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              addPlugin();
+                            }
+                          }}
+                        />
+                        {pluginInput && (
+                          <button
+                            type="button"
+                            className={styles.chipAddBtn}
+                            onClick={addPlugin}
+                          >
+                            +
+                          </button>
+                        )}
+                      </span>
+                    )}
+                  </div>
+                </div>
 
-	                {draft.installPlan.length > 0 && (
-	                  <div className={styles.installPlan}>
-	                    <div className={styles.installPlanHead}>{t('labelInstallPlan')}</div>
-	                    <div className={styles.installPlanList}>
-	                      {draft.installPlan.slice(0, 8).map((item) => (
-	                        <div key={`${item.type}:${item.name}`} className={styles.installPlanItem}>
-	                          <span className={styles.installPlanType}>{item.type}</span>
-	                          <span className={styles.installPlanName}>{item.name}</span>
-	                          <span className={styles.installPlanReason}>{item.reason}</span>
-	                        </div>
-	                      ))}
-	                    </div>
-	                  </div>
-	                )}
+                {draft.installPlan.length > 0 && (
+                  <div className={styles.installPlan}>
+                    <div className={styles.installPlanHead}>
+                      {t('labelInstallPlan')}
+                    </div>
+                    <div className={styles.installPlanList}>
+                      {draft.installPlan.slice(0, 8).map((item) => (
+                        <div
+                          key={`${item.type}:${item.name}`}
+                          className={styles.installPlanItem}
+                        >
+                          <span className={styles.installPlanType}>
+                            {item.type}
+                          </span>
+                          <span className={styles.installPlanName}>
+                            {item.name}
+                          </span>
+                          <span className={styles.installPlanReason}>
+                            {item.reason}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Greeting (read-only display) */}
                 {draft.greeting && (
                   <div className={styles.greetingBox}>
-                    <span className={styles.greetingLabel}>{t('labelGreeting')}</span>
+                    <span className={styles.greetingLabel}>
+                      {t('labelGreeting')}
+                    </span>
                     <p className={styles.greetingText}>“{draft.greeting}”</p>
                   </div>
                 )}
@@ -1091,8 +1658,12 @@ export function ChatToHatch() {
                 {draft.avatarHint && (
                   <div className={styles.metaRow}>
                     <span className={styles.metaItem}>
-                      <span className={styles.metaLabel}>{t('labelAvatar')}</span>
-                      <span className={styles.metaValue}>{draft.avatarHint}</span>
+                      <span className={styles.metaLabel}>
+                        {t('labelAvatar')}
+                      </span>
+                      <span className={styles.metaValue}>
+                        {draft.avatarHint}
+                      </span>
                     </span>
                   </div>
                 )}
@@ -1124,7 +1695,16 @@ export function ChatToHatch() {
 function BrandGlyph() {
   return (
     <svg width="22" height="22" viewBox="0 0 26 26" aria-hidden>
-      <rect x="2" y="2" width="22" height="22" rx="5" fill="none" stroke="currentColor" strokeWidth="1.5" />
+      <rect
+        x="2"
+        y="2"
+        width="22"
+        height="22"
+        rx="5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
       <rect x="7" y="7" width="12" height="12" rx="2" fill="var(--accent)" />
     </svg>
   );

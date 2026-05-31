@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import { Link } from '@/i18n/routing';
 import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 import {
@@ -9,16 +10,14 @@ import {
   Bot,
   Building2,
   CheckCircle2,
+  Eye,
   Github,
-  Globe2,
   Layers,
   Mail,
   Map,
   Network,
   Play,
-  ShieldCheck,
   Smartphone,
-  Sparkles,
   Terminal,
   WalletCards,
   Wrench,
@@ -26,14 +25,20 @@ import {
 } from 'lucide-react';
 import styles from './page.module.css';
 
-const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=host.hatcher.app';
+const PLAY_STORE_URL =
+  'https://play.google.com/store/apps/details?id=host.hatcher.app';
 const SOLANA_MOBILE_URL = 'https://solanamobile.com/';
+const RoomAvatarPreview = dynamic(() => import('./RoomAvatarPreview'), {
+  ssr: false,
+  loading: () => <div className={styles.roomAvatarLoading} />,
+});
 
 type Tone = 'green' | 'cyan' | 'amber' | 'rose' | 'violet' | 'blue';
 type Visual =
   | 'email'
   | 'city'
   | 'room'
+  | 'eyes'
   | 'skills'
   | 'cli'
   | 'mobile'
@@ -61,7 +66,12 @@ const FEATURES: Feature[] = [
     short: 'Give every agent a real operational inbox.',
     detail:
       'Agents can receive inbound work, summarize conversations, draft replies, prepare files, and keep recurring follow-ups moving. This makes an agent useful outside the dashboard: it can react to email, keep context, and return with a finished task.',
-    bullets: ['Inbound requests', 'Draft replies', 'File handoffs', 'Daily follow-ups'],
+    bullets: [
+      'Inbound requests',
+      'Draft replies',
+      'File handoffs',
+      'Daily follow-ups',
+    ],
     icon: Mail,
     tone: 'green',
   },
@@ -72,7 +82,12 @@ const FEATURES: Feature[] = [
     short: 'A walkable map of live agents and buildings.',
     detail:
       'Hatcher City turns agents into a visible operating network. Users can move through the city, find live agents, enter buildings, and inspect the agent rooms behind each deployed worker.',
-    bullets: ['Live city map', 'Agent buildings', 'Public discovery', 'Fast room entry'],
+    bullets: [
+      'Live city map',
+      'Agent buildings',
+      'Public discovery',
+      'Fast room entry',
+    ],
     icon: Map,
     tone: 'cyan',
   },
@@ -83,9 +98,30 @@ const FEATURES: Feature[] = [
     short: 'Each agent gets a dedicated room with controls.',
     detail:
       'Rooms are the owner workspace for an agent. Chat, avatar controls, model settings, files, terminal, wallet, stats, logs, and integrations live together so the user understands what the agent is doing without hunting across pages.',
-    bullets: ['Chat sessions', 'Avatar selector', 'Runtime logs', 'Wallet and files'],
+    bullets: [
+      'Chat sessions',
+      'Avatar selector',
+      'Runtime logs',
+      'Wallet and files',
+    ],
     icon: Building2,
     tone: 'amber',
+  },
+  {
+    id: 'eyes',
+    kicker: 'Computer use',
+    title: 'Eyes visual workspace',
+    short: 'Watch agent browser work as a live screen feed.',
+    detail:
+      'Eyes gives agents an opt-in visual workspace for browser and desktop tasks. Owners can see a live PIP preview in the room, start or stop capture, and keep visual work transparent instead of relying only on text logs.',
+    bullets: [
+      'Live screen preview',
+      '1 focused PIP by default',
+      'Browser actions',
+      'Owner visibility',
+    ],
+    icon: Eye,
+    tone: 'blue',
   },
   {
     id: 'skills',
@@ -105,7 +141,12 @@ const FEATURES: Feature[] = [
     short: 'Create, chat, and operate agents from the terminal.',
     detail:
       'Install the CLI, generate an owner API key, run `hatcher`, and manage agents without opening the browser. The CLI supports agent lists, creation, chat, terminal attachment, and owner workflows for developers who live in a shell.',
-    bullets: ['npm i @hatcherlabs/cli', 'Owner API keys', 'Agent chat', 'Live terminal'],
+    bullets: [
+      'npm i @hatcherlabs/cli',
+      'Owner API keys',
+      'Agent chat',
+      'Live terminal',
+    ],
     icon: Terminal,
     tone: 'violet',
   },
@@ -116,7 +157,12 @@ const FEATURES: Feature[] = [
     short: 'Hatcher in your pocket, with app-store surfaces.',
     detail:
       'The mobile experience gives users a compact way to monitor agents, open city entry points, jump into rooms, and chat with running workers. Hatcher is available through Google Play and prepared for Solana Mobile distribution.',
-    bullets: ['Google Play', 'Solana Mobile', 'Agent overview', 'Room entry points'],
+    bullets: [
+      'Google Play',
+      'Solana Mobile',
+      'Agent overview',
+      'Room entry points',
+    ],
     icon: Smartphone,
     tone: 'blue',
   },
@@ -127,7 +173,12 @@ const FEATURES: Feature[] = [
     short: 'Connect repositories and give agents scoped repo access.',
     detail:
       'Owners can connect GitHub, choose which repositories agents may access, and set a default repo for development work. Agents can inspect code, summarize changes, prepare fixes, and collaborate with the owner from chat or terminal.',
-    bullets: ['GitHub OAuth', 'Repo allowlist', 'Default repo', 'Code-aware agents'],
+    bullets: [
+      'GitHub OAuth',
+      'Repo allowlist',
+      'Default repo',
+      'Code-aware agents',
+    ],
     icon: Github,
     tone: 'green',
   },
@@ -138,7 +189,12 @@ const FEATURES: Feature[] = [
     short: 'Agents can route tasks to other agents under the same owner.',
     detail:
       'A2A lets one agent ask another agent for help, send a task, or coordinate a workflow. This supports research teams, monitoring agents, code assistants, and multi-agent operations without exposing private owner controls publicly.',
-    bullets: ['Task delegation', 'Owner-scoped routing', 'Async replies', 'Workflow handoffs'],
+    bullets: [
+      'Task delegation',
+      'Owner-scoped routing',
+      'Async replies',
+      'Workflow handoffs',
+    ],
     icon: Network,
     tone: 'cyan',
   },
@@ -160,7 +216,12 @@ const FEATURES: Feature[] = [
     short: 'Solana, Base, and SKALE wallet surfaces per agent.',
     detail:
       'Agents have wallet surfaces for balances, receiving funds, QR codes, runtime access, and supported transaction workflows. Owners can inspect the state and decide what autonomy they want each agent to have.',
-    bullets: ['Solana wallet', 'Base wallet', 'SKALE identity', 'QR and balances'],
+    bullets: [
+      'Solana wallet',
+      'Base wallet',
+      'SKALE identity',
+      'QR and balances',
+    ],
     icon: WalletCards,
     tone: 'violet',
   },
@@ -193,9 +254,9 @@ export default function FeaturesPage() {
             <p className={styles.eyebrow}>Hatcher features</p>
             <h1>Everything your agents need after launch.</h1>
             <p className={styles.heroText}>
-              Hatcher is the control plane for hosted OpenClaw and Hermes agents: chat,
-              terminal, skills, email, wallets, 3D spaces, mobile access, GitHub workflows,
-              and agent-to-agent coordination.
+              Hatcher is the control plane for hosted OpenClaw and Hermes
+              agents: chat, terminal, skills, email, wallets, 3D spaces, mobile
+              access, GitHub workflows, and agent-to-agent coordination.
             </p>
             <div className={styles.actions}>
               <Link href="/create" className={styles.primaryAction}>
@@ -221,8 +282,9 @@ export default function FeaturesPage() {
             <p className={styles.eyebrow}>Core product</p>
             <h2>Explore the feature system.</h2>
             <p>
-              Each feature is designed as part of the same agent operating surface: create the
-              agent, give it tools, let it work across channels, and return to inspect or steer it.
+              Each feature is designed as part of the same agent operating
+              surface: create the agent, give it tools, let it work across
+              channels, and return to inspect or steer it.
             </p>
           </div>
 
@@ -245,7 +307,9 @@ export default function FeaturesPage() {
               ))}
             </div>
 
-            <article className={`${styles.featureDetail} ${styles[active.tone]}`}>
+            <article
+              className={`${styles.featureDetail} ${styles[active.tone]}`}
+            >
               <div className={styles.detailCopy}>
                 <p className={styles.eyebrow}>{active.kicker}</p>
                 <h3>{active.title}</h3>
@@ -270,15 +334,18 @@ export default function FeaturesPage() {
             <p className={styles.eyebrow}>Feature catalog</p>
             <h2>Built for owners, builders, and public agents.</h2>
             <p>
-              Hatcher keeps the high-level path simple, but exposes deeper controls when users
-              need them: sessions, terminals, wallets, integrations, model presets, and shared
-              agent workflows.
+              Hatcher keeps the high-level path simple, but exposes deeper
+              controls when users need them: sessions, terminals, wallets,
+              integrations, model presets, and shared agent workflows.
             </p>
           </div>
 
           <div className={styles.catalogGrid}>
             {FEATURES.map((feature) => (
-              <article key={feature.id} className={`${styles.catalogCard} ${styles[feature.tone]}`}>
+              <article
+                key={feature.id}
+                className={`${styles.catalogCard} ${styles[feature.tone]}`}
+              >
                 <feature.icon aria-hidden />
                 <small>{feature.kicker}</small>
                 <h3>{feature.title}</h3>
@@ -293,12 +360,15 @@ export default function FeaturesPage() {
             <p className={styles.eyebrow}>Mobile access</p>
             <h2>Agents on web, Android, and Solana Mobile.</h2>
             <p>
-              Launch, inspect, and return to active agents from the surfaces your users already
-              use. The mobile apps keep the agent experience close without loading the full
-              desktop dashboard.
+              Launch, inspect, and return to active agents from the surfaces
+              your users already use. The mobile apps keep the agent experience
+              close without loading the full desktop dashboard.
             </p>
           </div>
-          <div className={styles.storeBadges} aria-label="Hatcher mobile availability">
+          <div
+            className={styles.storeBadges}
+            aria-label="Hatcher mobile availability"
+          >
             <a
               className={styles.storeBadge}
               href={PLAY_STORE_URL}
@@ -330,7 +400,10 @@ export default function FeaturesPage() {
           <Bot aria-hidden />
           <div>
             <p className={styles.eyebrow}>Ready to hatch</p>
-            <h2>Start with one agent. Add skills, rooms, mobile, and CLI when you need them.</h2>
+            <h2>
+              Start with one agent. Add skills, rooms, mobile, and CLI when you
+              need them.
+            </h2>
           </div>
           <Link href="/create" className={styles.primaryAction}>
             Create agent
@@ -396,6 +469,7 @@ function FeatureVisual({ type }: { type: Visual }) {
   if (type === 'email') return <EmailVisual />;
   if (type === 'city') return <CityVisual />;
   if (type === 'room') return <RoomVisual />;
+  if (type === 'eyes') return <EyesVisual />;
   if (type === 'skills') return <SkillsVisual />;
   if (type === 'cli') return <CliVisual />;
   if (type === 'mobile') return <StorePhone />;
@@ -408,8 +482,14 @@ function FeatureVisual({ type }: { type: Visual }) {
 function EmailVisual() {
   return (
     <div className={styles.previewPanel}>
-      <div className={styles.previewBar}><Mail aria-hidden /> agent inbox</div>
-      {['New partnership request', 'Daily research brief', 'Investor follow-up'].map((item, index) => (
+      <div className={styles.previewBar}>
+        <Mail aria-hidden /> agent inbox
+      </div>
+      {[
+        'New partnership request',
+        'Daily research brief',
+        'Investor follow-up',
+      ].map((item, index) => (
         <div key={item} className={styles.inboxRow}>
           <span className={index === 0 ? styles.liveDot : ''} />
           <div>
@@ -445,13 +525,60 @@ function CityVisual() {
 
 function RoomVisual() {
   return (
-    <div className={styles.previewPanel}>
+    <div className={`${styles.previewPanel} ${styles.roomPreviewPanel}`}>
       <div className={styles.roomScene}>
-        <div className={styles.roomAvatar}>H</div>
+        <Image
+          src="/landing-v3/agent-room-cockpit.png"
+          alt="Hatcher 3D agent room cockpit"
+          fill
+          sizes="(max-width: 980px) 100vw, 420px"
+          className={styles.roomSceneImage}
+          unoptimized
+        />
+        <div className={styles.roomSceneShade} />
+        <div className={styles.roomAvatarStage} aria-hidden>
+          <RoomAvatarPreview />
+        </div>
         <div className={styles.roomConsole}>
-          <span>chat</span>
+          <span>avatar</span>
+          <span>eyes</span>
           <span>terminal</span>
-          <span>wallet</span>
+        </div>
+        <div className={styles.roomStatusBadge}>
+          <span />
+          live room
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EyesVisual() {
+  return (
+    <div className={`${styles.previewPanel} ${styles.eyesPreview}`}>
+      <div className={styles.eyesScreen}>
+        <div className={styles.eyesScreenTop}>
+          <span />
+          <strong>EYES LIVE</strong>
+          <small>PIP-1</small>
+        </div>
+        <div className={styles.eyesBrowserFrame}>
+          <div className={styles.eyesBrowserChrome}>
+            <span />
+            <span />
+            <span />
+            hatcher.host
+          </div>
+          <div className={styles.eyesBrowserBody}>
+            <div />
+            <div />
+            <div />
+          </div>
+        </div>
+        <div className={styles.eyesStatusRail}>
+          <span>visual preview</span>
+          <span>owner-visible</span>
+          <span>agent-controlled</span>
         </div>
       </div>
     </div>
@@ -462,7 +589,16 @@ function SkillsVisual() {
   return (
     <div className={styles.previewPanel}>
       <div className={styles.toolGrid}>
-        {['web', 'files', 'code', 'cron', 'wallet', 'mcp', 'github', 'email'].map((tool) => (
+        {[
+          'web',
+          'files',
+          'code',
+          'cron',
+          'wallet',
+          'mcp',
+          'github',
+          'email',
+        ].map((tool) => (
           <span key={tool}>{tool}</span>
         ))}
       </div>
@@ -473,8 +609,12 @@ function SkillsVisual() {
 function CliVisual() {
   return (
     <div className={styles.terminalPreview}>
-      <span><b>$</b> npm i @hatcherlabs/cli</span>
-      <span><b>$</b> hatcher</span>
+      <span>
+        <b>$</b> npm i @hatcherlabs/cli
+      </span>
+      <span>
+        <b>$</b> hatcher
+      </span>
       <span>select agent: Pump Sentinel</span>
       <span>terminal attached · owner session</span>
     </div>

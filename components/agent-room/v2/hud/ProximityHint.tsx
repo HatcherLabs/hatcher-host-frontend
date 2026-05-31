@@ -6,6 +6,7 @@ export const STATION_ACTION_LABELS: Record<StationId, string> = {
   skillWorkbench: 'manage skills',
   integrationsRack: 'manage integrations',
   statusConsole: 'open status',
+  eyesConsole: 'open Eyes',
   logWall: 'view logs',
   statsHologram: 'view stats',
   memoryShelves: 'browse memory',

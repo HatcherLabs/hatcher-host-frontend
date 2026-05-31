@@ -55,6 +55,7 @@ export function ChatPanel({
     onStreamingChange?.(v);
   }, [onStreamingChange]);
   const [input, setInput] = useState('');
+  const [queuedMessages, setQueuedMessages] = useState<string[]>([]);
   const [inflightTools, setInflightTools] = useState<InflightTool[]>([]);
   const [completedTools, setCompletedTools] = useState<InflightTool[]>([]);
   const bufferRef = useRef('');
@@ -90,7 +91,7 @@ export function ChatPanel({
     }
   }, []);
 
-  const { send, isConnected } = useWebSocketChat({
+  const { send, isConnected, connectionState, abort, reconnect } = useWebSocketChat({
     agentId,
     enabled: true,
     onToken: (tok) => {
@@ -119,10 +120,7 @@ export function ChatPanel({
     },
   });
 
-  const submit = useCallback((e: FormEvent) => {
-    e.preventDefault();
-    const text = input.trim();
-    if (!text || streaming) return;
+  const startMessage = useCallback((text: string) => {
     onAppend({ role: 'user', content: text, ts: Date.now() });
     onAppend({ role: 'assistant', content: '', ts: Date.now() });
     bufferRef.current = '';
@@ -134,8 +132,40 @@ export function ChatPanel({
       onUpdateLast("Can't reach the agent right now.");
       setStreaming(false);
     }
+  }, [onAppend, onUpdateLast, send, setStreaming]);
+
+  const submit = useCallback((e: FormEvent) => {
+    e.preventDefault();
+    const text = input.trim();
+    if (!text) return;
+    if (streaming) {
+      setQueuedMessages((prev) => [...prev, text].slice(-6));
+      setInput('');
+      return;
+    }
+    startMessage(text);
     setInput('');
-  }, [input, streaming, send, onAppend, onUpdateLast, setStreaming]);
+  }, [input, startMessage, streaming]);
+
+  const stop = useCallback(() => {
+    setQueuedMessages([]);
+    const ok = abort();
+    if (!ok) {
+      reconnect();
+    }
+    bufferRef.current = '';
+    setInflightTools([]);
+    setCompletedTools([]);
+    setStreaming(false);
+  }, [abort, reconnect, setStreaming]);
+
+  useEffect(() => {
+    if (streaming || queuedMessages.length === 0 || !isConnected) return;
+    const [next, ...rest] = queuedMessages;
+    if (!next) return;
+    setQueuedMessages(rest);
+    startMessage(next);
+  }, [isConnected, queuedMessages, startMessage, streaming]);
 
   // Auto-scroll to bottom when messages change or stream.
   useEffect(() => {
@@ -147,13 +177,19 @@ export function ChatPanel({
   return (
     <PanelShell title="Chat" framework={framework} onClose={onClose}>
       <ChatStyles />
-      <div className="mb-3 flex items-center gap-2 text-xs text-neutral-400">
+      <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-neutral-400">
         <span className={`inline-block h-2 w-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-neutral-600'}`} />
-        {isConnected ? 'connected' : 'connecting…'}
+        {isConnected ? 'connected' : connectionState}
+        {streaming && <span className="rounded-full bg-neutral-800 px-2 py-0.5">responding</span>}
+        {queuedMessages.length > 0 && (
+          <span className="rounded-full bg-neutral-800 px-2 py-0.5">
+            queue {queuedMessages.length}
+          </span>
+        )}
       </div>
       <div
         ref={scrollRef}
-        className="mb-3 h-[50vh] space-y-2 overflow-y-auto rounded-lg bg-neutral-950 p-3 text-sm"
+        className="mb-3 h-[min(54vh,560px)] space-y-2 overflow-y-auto rounded-lg bg-neutral-950 p-3 text-sm"
       >
         {messages.length === 0 && (
           <div className="text-center text-neutral-500">Say something to your agent.</div>
@@ -199,22 +235,40 @@ export function ChatPanel({
             ))}
           </div>
         )}
+        {queuedMessages.length > 0 && (
+          <div className="space-y-1 rounded-md border border-neutral-800 bg-neutral-900/70 p-2 text-xs text-neutral-400">
+            {queuedMessages.map((queued, index) => (
+              <div key={`${queued}-${index}`} className="truncate">
+                next {index + 1}: {queued}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
       <form onSubmit={submit} className="flex gap-2">
         <input
           value={input}
           onChange={e => setInput(e.target.value)}
-          placeholder="Talk to your agent…"
-          disabled={streaming}
-          className="flex-1 rounded-lg bg-neutral-800 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-white/30 disabled:opacity-60"
+          placeholder={streaming ? 'Queue another message...' : 'Talk to your agent...'}
+          className="min-w-0 flex-1 rounded-lg bg-neutral-800 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-white/30"
         />
-        <button
-          type="submit"
-          disabled={streaming || !input.trim()}
-          className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-black hover:bg-neutral-200 disabled:opacity-50"
-        >
-          Send
-        </button>
+        {streaming ? (
+          <button
+            type="button"
+            onClick={stop}
+            className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-400"
+          >
+            Stop
+          </button>
+        ) : (
+          <button
+            type="submit"
+            disabled={!input.trim()}
+            className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-black hover:bg-neutral-200 disabled:opacity-50"
+          >
+            Send
+          </button>
+        )}
       </form>
     </PanelShell>
   );

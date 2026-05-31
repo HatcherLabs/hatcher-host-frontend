@@ -1476,6 +1476,111 @@ export const api = {
       note: string;
     }>(`/agents/${id}/logs`),
 
+  /** Get the current Agent Room Eyes snapshot for a PIP, if the runtime has published one. */
+  getAgentEyesLive: (id: string, pipId = "pip-1") =>
+    req<{
+      status: "live" | "unavailable" | "stopped";
+      source: "container" | "none";
+      message: string | null;
+      state: null | {
+        status: "idle" | "starting" | "live" | "error" | "stopped";
+        mode: "browser" | "artifact" | "desktop" | "terminal" | "unknown";
+        action: string | null;
+        title: string | null;
+        url: string | null;
+        pipId: string;
+        publicSafe: boolean;
+        startedAt: number | null;
+        updatedAt: number;
+        frame: number | null;
+      };
+      screenshot: null | {
+        capturedAt: number;
+        dataUrl: string;
+        mimeType: "image/png" | "image/jpeg" | "image/webp";
+        path: string;
+        size: number;
+      };
+    }>(`/agents/${id}/eyes/live?pipId=${encodeURIComponent(pipId)}`),
+
+  /** Get a read-only Eyes snapshot for a public chat agent, if one has been published. */
+  getAgentPublicEyesLive: (id: string, pipId = "pip-1") =>
+    req<{
+      status: "live" | "unavailable" | "stopped";
+      source: "container" | "none";
+      message: string | null;
+      state: null | {
+        status: "idle" | "starting" | "live" | "error" | "stopped";
+        mode: "browser" | "artifact" | "desktop" | "terminal" | "unknown";
+        action: string | null;
+        title: string | null;
+        url: string | null;
+        pipId: string;
+        publicSafe: boolean;
+        startedAt: number | null;
+        updatedAt: number;
+        frame: number | null;
+      };
+      screenshot: null | {
+        capturedAt: number;
+        dataUrl: string;
+        mimeType: "image/png" | "image/jpeg" | "image/webp";
+        path: string;
+        size: number;
+      };
+    }>(`/agents/${id}/public-chat/eyes/live?pipId=${encodeURIComponent(pipId)}`),
+
+  /** Start an Agent Room Eyes browser capture loop inside the runtime container. */
+  startAgentEyesLive: (
+    id: string,
+    body?: { url?: string; pipId?: string; intervalMs?: number; durationMs?: number },
+  ) =>
+    req<{
+      status: "started";
+      source: "container";
+      pid: number | null;
+      pipId: string;
+      url: string;
+      message: string;
+    }>(`/agents/${id}/eyes/start`, {
+      method: "POST",
+      body: JSON.stringify(body ?? {}),
+    }),
+
+  /** Queue an owner-controlled action inside the live Eyes browser workspace. */
+  sendAgentEyesAction: (
+    id: string,
+    body:
+      | { type: "navigate"; url: string; pipId?: string }
+      | { type: "click"; x: number; y: number; pipId?: string }
+      | { type: "type"; text: string; pipId?: string }
+      | { type: "key"; key?: string; pipId?: string }
+      | { type: "scroll"; deltaX?: number; deltaY?: number; pipId?: string }
+      | { type: "stop"; pipId?: string },
+  ) =>
+    req<{
+      status: "queued";
+      source: "container";
+      actionId: string;
+      type: string;
+      pipId: string;
+      message: string;
+    }>(`/agents/${id}/eyes/action`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  /** Stop the live Eyes visual workspace process inside the runtime container. */
+  stopAgentEyesLive: (id: string, body?: { pipId?: string }) =>
+    req<{
+      status: "stopped";
+      source: "container";
+      message: string;
+    }>(`/agents/${id}/eyes/stop`, {
+      method: "POST",
+      body: JSON.stringify(body ?? {}),
+    }),
+
   /** Get token price from Jupiter */
   getPrice: (token: "hatch" | "kausa" | "sol") =>
     req<{ price: number; currency: string; source: string; error?: string }>(

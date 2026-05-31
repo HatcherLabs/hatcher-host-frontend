@@ -21,6 +21,7 @@ type Target = { href: string; label: string };
  */
 export function BackToCity({ agentId }: Props = {}) {
   const t = useTranslations('agentRoom.back');
+  const dashboardHref = agentId ? `/dashboard/agent/${agentId}` : null;
 
   // Compute initial target on first render so there's no flicker
   // between "Back to City" and the real destination.
@@ -31,13 +32,25 @@ export function BackToCity({ agentId }: Props = {}) {
   }, [agentId, t]);
 
   return (
-    <Link
-      href={target.href}
-      className="fixed left-4 top-4 z-30 hidden rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-base)]/80 px-3 py-2 text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--text-primary)] backdrop-blur transition hover:border-[var(--accent)] hover:bg-[rgba(74,222,128,0.06)] hover:text-[var(--accent)] md:inline-flex"
+    <div
+      className="fixed left-4 top-4 z-30 hidden items-center gap-2 md:flex"
       style={{ fontFamily: 'var(--font-mono)' }}
     >
-      ← {target.label}
-    </Link>
+      <Link
+        href={target.href}
+        className="rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-base)]/80 px-3 py-2 text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--text-primary)] backdrop-blur transition hover:border-[var(--accent)] hover:bg-[rgba(74,222,128,0.06)] hover:text-[var(--accent)]"
+      >
+        ← {target.label}
+      </Link>
+      {dashboardHref && target.href !== dashboardHref && (
+        <Link
+          href={dashboardHref}
+          className="rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-base)]/70 px-3 py-2 text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--text-muted)] backdrop-blur transition hover:border-[var(--accent)] hover:bg-[rgba(74,222,128,0.06)] hover:text-[var(--accent)]"
+        >
+          {t('toDashboard')}
+        </Link>
+      )}
+    </div>
   );
 }
 
@@ -74,7 +87,10 @@ function resolve(
       if (url.pathname.includes('/dashboard/agent/') && agentId) {
         return { href: `/dashboard/agent/${agentId}`, label: t('toDashboard') };
       }
-      if (url.pathname.endsWith('/dashboard/agents') || url.pathname.endsWith('/dashboard')) {
+      if (
+        url.pathname.endsWith('/dashboard/agents') ||
+        url.pathname.endsWith('/dashboard')
+      ) {
         return { href: '/dashboard/agents', label: t('toAgents') };
       }
     } catch {
