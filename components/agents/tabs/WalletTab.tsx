@@ -34,6 +34,7 @@ import type {
 import { buildFallbackPassport, shortAddress } from '@/lib/agent-passport';
 import { KausalayerWalletPanel } from './KausalayerWalletPanel';
 import { ConduitWalletPanel } from './ConduitWalletPanel';
+import { OobeWalletPanel } from './OobeWalletPanel';
 
 interface ReputationState {
   upCount: number;
@@ -404,6 +405,7 @@ export function WalletTab() {
           {activeNetwork.id === 'solana' && (
             <>
               <ConduitWalletPanel agentId={agent.id} />
+              <OobeWalletPanel agentId={agent.id} />
               <KausalayerWalletPanel agentId={agent.id} />
             </>
           )}

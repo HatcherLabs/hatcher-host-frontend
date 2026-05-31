@@ -125,6 +125,7 @@ const FRAMEWORK_COMPAT: Record<string, Record<string, CompatLevel>> = {
     'openclaw.platform.whatsapp': 'native',
     'openclaw.platform.slack': 'native',
     'openclaw.feature.webhooks': 'native',
+    'extra.nostr': 'native',
   },
 };
 
@@ -136,7 +137,7 @@ const FRAMEWORK_RECOMMENDED: Record<string, string[]> = {
     'openclaw.platform.whatsapp',
     'openclaw.platform.twitter',
   ],
-  hermes: ['openclaw.platform.telegram', 'openclaw.platform.discord', 'openclaw.platform.whatsapp'],
+  hermes: ['openclaw.platform.telegram', 'openclaw.platform.discord', 'openclaw.platform.whatsapp', 'extra.nostr'],
 };
 
 // Quick Setup = only needs API token(s), no OAuth flow, no pairing, no complex setup
