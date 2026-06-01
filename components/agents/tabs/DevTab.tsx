@@ -30,6 +30,7 @@ import {
   type AgentGithubRepoListItem,
   type AgentGithubTestResponse,
 } from "@/lib/api";
+import { API_URL } from "@/lib/config";
 import { tabContentVariants, useAgentContext } from "../AgentContext";
 import {
   buildGithubEnvWrites,
@@ -109,6 +110,7 @@ export function DevTab() {
   );
   const [githubTesting, setGithubTesting] = useState(false);
   const [githubConnecting, setGithubConnecting] = useState(false);
+  const [githubDisconnecting, setGithubDisconnecting] = useState(false);
   const [githubMessage, setGithubMessage] = useState<string | null>(null);
   const [githubTestResult, setGithubTestResult] =
     useState<AgentGithubTestResponse | null>(null);
@@ -131,11 +133,15 @@ export function DevTab() {
   );
   const hasGithubToken = envKeys.has("GH_TOKEN") || envKeys.has("GITHUB_TOKEN");
   const hasGithubRepo = envKeys.has("GITHUB_DEFAULT_REPO");
+  const hasGithubAllowedRepos = envKeys.has("GITHUB_ALLOWED_REPOS");
+  const hasGithubConfig =
+    hasGithubToken || hasGithubRepo || hasGithubAllowedRepos;
   const githubUi = useMemo(
     () => getGithubConnectionUi(hasGithubToken, hasGithubRepo, githubTestResult),
     [githubTestResult, hasGithubRepo, hasGithubToken],
   );
   const githubRepoError = getGithubRepoInputError(githubRepo);
+  const githubOAuthCallback = `${API_URL.replace(/\/+$/, "")}/agents/dev/github/connect/callback`;
 
   const toggleGithubRepoAccess = useCallback(
     (repoName: string) => {
@@ -313,11 +319,35 @@ export function DevTab() {
       return;
     }
     if (!res.data.configured || !res.data.authUrl) {
-      setGithubMessage(res.data.message);
+      setGithubMessage(
+        res.data.redirectUri
+          ? `${res.data.message} OAuth callback: ${res.data.redirectUri}`
+          : res.data.message,
+      );
       return;
     }
 
     window.location.assign(res.data.authUrl);
+  };
+
+  const disconnectGithub = async () => {
+    setGithubDisconnecting(true);
+    setGithubMessage(null);
+    setGithubTestResult(null);
+    setError(null);
+    const res = await api.disconnectAgentGithub(agentId);
+    setGithubDisconnecting(false);
+    if (!res.success) {
+      setGithubMessage(`Error: ${res.error ?? "Failed to remove GitHub credentials"}`);
+      return;
+    }
+
+    setGithubToken("");
+    setGithubRepo("");
+    setGithubRepos([]);
+    setAllowedGithubRepos(new Set());
+    setGithubMessage(res.data.message);
+    await loadDevState();
   };
 
   const addPermission = async () => {
@@ -547,19 +577,24 @@ export function DevTab() {
                 {method.body}
               </p>
               {method.id === "github-connect" && (
-                <button
-                  type="button"
-                  onClick={() => void startGithubConnect()}
-                  disabled={githubConnecting}
-                  className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-[3px] border border-[var(--border-default)] px-3 py-2 text-xs font-mono text-[var(--text-secondary)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  {githubConnecting ? (
-                    <Loader2 size={13} className="animate-spin" />
-                  ) : (
-                    <Github size={13} />
-                  )}
-                  {githubUi.connectButtonLabel}
-                </button>
+                <>
+                  <p className="mt-3 break-all rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-elevated)] px-2 py-1 text-[10px] leading-4 text-[var(--text-muted)]">
+                    OAuth callback: {githubOAuthCallback}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => void startGithubConnect()}
+                    disabled={githubConnecting}
+                    className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-[3px] border border-[var(--border-default)] px-3 py-2 text-xs font-mono text-[var(--text-secondary)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    {githubConnecting ? (
+                      <Loader2 size={13} className="animate-spin" />
+                    ) : (
+                      <Github size={13} />
+                    )}
+                    {githubUi.connectButtonLabel}
+                  </button>
+                </>
               )}
             </div>
           ))}
@@ -662,7 +697,7 @@ export function DevTab() {
               </div>
             </div>
           )}
-          <div className="grid gap-2 sm:grid-cols-3">
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
             <button
               type="button"
               onClick={() => void saveGithubConnection()}
@@ -701,6 +736,19 @@ export function DevTab() {
                 <ShieldCheck size={13} />
               )}
               Test access
+            </button>
+            <button
+              type="button"
+              onClick={() => void disconnectGithub()}
+              disabled={githubDisconnecting || !hasGithubConfig}
+              className="inline-flex items-center justify-center gap-2 rounded-[3px] border border-red-500/25 px-3 py-2 text-xs font-mono text-red-300 transition-colors hover:border-red-400 hover:text-red-200 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {githubDisconnecting ? (
+                <Loader2 size={13} className="animate-spin" />
+              ) : (
+                <Trash2 size={13} />
+              )}
+              Remove token
             </button>
           </div>
           {githubMessage && (

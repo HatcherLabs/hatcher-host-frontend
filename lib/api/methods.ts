@@ -10,6 +10,7 @@ import type {
   AgentCommCallResponse,
   AgentCommDiscoverResponse,
   AgentGithubConnectStartResponse,
+  AgentGithubDisconnectResponse,
   AgentGithubReposResponse,
   AgentGithubTestResponse,
   AgentCommLogsResponse,
@@ -2956,6 +2957,11 @@ export const api = {
       `/agents/${agentId}/dev/github/connect/start`,
       { method: "POST" },
     ),
+
+  disconnectAgentGithub: (agentId: string) =>
+    req<AgentGithubDisconnectResponse>(`/agents/${agentId}/dev/github`, {
+      method: "DELETE",
+    }),
 
   // ─── Credits ──────────────────────────────────────────────────
 

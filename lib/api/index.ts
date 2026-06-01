@@ -13,6 +13,7 @@ export type {
   AgentCommCandidate,
   AgentCommDiscoverResponse,
   AgentGithubConnectStartResponse,
+  AgentGithubDisconnectResponse,
   AgentGithubRepoListItem,
   AgentGithubReposResponse,
   AgentGithubTestResponse,

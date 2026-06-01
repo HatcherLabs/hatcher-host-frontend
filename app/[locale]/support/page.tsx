@@ -202,10 +202,15 @@ export default function SupportPage() {
         const ticketRes = await api.getTickets();
         if (ticketRes.success) setTickets(ticketRes.data);
       } else {
-        setFormError(res.error || 'Failed to submit ticket');
+        const message = res.error || 'Failed to submit ticket';
+        setFormError(
+          message.includes('Network error')
+            ? `${message} If this persists, email support@hatcher.host directly.`
+            : message,
+        );
       }
     } catch {
-      setFormError(t('failedSubmit'));
+      setFormError(`${t('failedSubmit')} You can also email support@hatcher.host directly.`);
     } finally {
       setSubmitting(false);
     }
