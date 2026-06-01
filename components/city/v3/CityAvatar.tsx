@@ -31,11 +31,18 @@ function pickWalkClip(
  * Suspends while the model loads — callers wrap it in <Suspense> with a generic
  * robot fallback. drei's useGLTF caches by URL, so N walkers sharing a model
  * download it once; per-walker cost is a clone + AnimationMixer.
+ *
+ * Many avatars (drones, mechs, some imports) ship with NO animation clips. For
+ * those we drive procedural locomotion so they don't slide along frozen: a walk
+ * hop + waddle for grounded models, a gentle float for hover models. `phase`
+ * (per-agent) desyncs the motion so a crowd doesn't move in lockstep.
  */
-export function CityAvatar({ variant }: { variant: string }) {
+export function CityAvatar({ variant, phase = 0 }: { variant: string; phase?: number }) {
   const config = getGlbAvatarModel(variant);
   const url = config?.url ?? '';
   const gltf = useGLTF(url);
+  const hover = config?.hover === true;
+  const baseY = hover ? 0.55 : 0;
 
   const root = useMemo(() => {
     if (!config) return null;
@@ -79,6 +86,11 @@ export function CityAvatar({ variant }: { variant: string }) {
   }, [gltf.scene, config]);
 
   const mixer = useMemo(() => (root ? new THREE.AnimationMixer(root) : null), [root]);
+  // True once a real clip is playing — gates the procedural fallback off.
+  const hasClip = useMemo(
+    () => (root ? pickWalkClip(gltf.animations, config?.clip) !== null : false),
+    [root, gltf.animations, config?.clip],
+  );
 
   useEffect(() => {
     if (!mixer || !root) return;
@@ -92,8 +104,22 @@ export function CityAvatar({ variant }: { variant: string }) {
     };
   }, [mixer, root, gltf.animations, config?.clip]);
 
-  useFrame((_, delta) => {
-    mixer?.update(delta);
+  useFrame(({ clock }, delta) => {
+    if (hasClip) {
+      mixer?.update(delta);
+      return;
+    }
+    if (!root) return;
+    const t = clock.elapsedTime + phase;
+    if (hover) {
+      // Drones / floaters: bob in place + slow yaw drift.
+      root.position.y = baseY + Math.sin(t * 1.6) * 0.12;
+      root.rotation.y = Math.sin(t * 0.6) * 0.25;
+    } else {
+      // Grounded static models: fake a walk cadence so they read as moving.
+      root.position.y = baseY + Math.abs(Math.sin(t * 6.2)) * 0.07;
+      root.rotation.z = Math.sin(t * 6.2) * 0.05;
+    }
   });
 
   if (!root) return null;

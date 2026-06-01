@@ -10,7 +10,7 @@ export function ShortcutHud({ canEdit }: Props) {
   void canEdit;
   return (
     <div
-      className="pointer-events-none fixed bottom-4 right-4 z-30 hidden rounded-lg border border-[#d6b177]/30 bg-[#1c130c]/78 px-3 py-2 text-[11px] text-[#e8d3b4] backdrop-blur md:block"
+      className="pointer-events-none fixed bottom-20 right-4 z-30 hidden rounded-lg border border-[#d6b177]/30 bg-[#1c130c]/78 px-3 py-2 text-[11px] text-[#e8d3b4] backdrop-blur md:block"
       style={{ fontFamily: 'var(--font-mono)' }}
     >
       <div className="flex items-center gap-2">

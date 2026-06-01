@@ -290,7 +290,7 @@ function LiveRobotAgent({
         </mesh>
         {useRealAvatar && marker.avatar && (
           <Suspense fallback={null}>
-            <CityAvatar variant={marker.avatar} />
+            <CityAvatar variant={marker.avatar} phase={marker.phase} />
           </Suspense>
         )}
         <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>

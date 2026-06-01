@@ -1038,14 +1038,16 @@ function FloatingChatButton({
     <button
       onClick={onClick}
       aria-label="Chat with your agent"
-      className="fixed bottom-4 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full border text-2xl shadow-xl backdrop-blur transition hover:scale-105 active:scale-95"
+      title="Chat with your agent"
+      className="fixed bottom-4 right-4 z-40 flex items-center gap-2 rounded-full border px-4 py-3 text-sm font-semibold text-[#f6ead8] shadow-xl backdrop-blur transition hover:scale-105 active:scale-95"
       style={{
         borderColor: `${accent}aa`,
         background: 'rgba(21,16,11,0.92)',
         boxShadow: `0 10px 30px ${accent}55`,
       }}
     >
-      <span aria-hidden>💬</span>
+      <span className="text-lg leading-none" aria-hidden>💬</span>
+      <span>Chat</span>
       {unread > 0 && (
         <span className="absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-bold text-white">
           {unread > 9 ? '9+' : unread}
