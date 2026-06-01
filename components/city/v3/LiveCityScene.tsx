@@ -49,6 +49,8 @@ import { LiveAgentMarkers } from './LiveAgentMarkers';
 import { LiveActivityPulses } from './LiveActivityPulses';
 import { LiveBuildings } from './LiveBuildings';
 import { LiveCityHud } from './LiveCityHud';
+import { DispatchCouriers } from './dispatch/DispatchCouriers';
+import { DispatchHud } from './dispatch/DispatchHud';
 import { LiveCityInfrastructure } from './LiveCityInfrastructure';
 import {
   makeLiveAgentLoopPath,
@@ -380,6 +382,9 @@ function LiveCitySceneBody({
             setSelectedAgentId(agentId);
           }}
         />
+        <SceneErrorBoundary label="DispatchCouriers">
+          <DispatchCouriers />
+        </SceneErrorBoundary>
         {viewMode === 'survey' ? (
           <SurveyCamera grid={layout.grid} focusTarget={focusTarget} />
         ) : null}
@@ -427,6 +432,11 @@ function LiveCitySceneBody({
         onMyBuildingClick={onBuildingEnterClick}
         onFindMyBuildingClick={myBuilding ? focusMyBuilding : undefined}
         onAgentViewClick={focusAgentMarker}
+      />
+      <DispatchHud
+        grid={layout.grid}
+        ownedAgents={layout.ownedAgents}
+        agentPosesRef={agentPosesRef}
       />
       {selectedBuilding && (
         <LiveBuildingPanel
