@@ -38,6 +38,16 @@ interface Props {
   onUpdateLast: (content: string) => void;
   onStreamingChange?: (streaming: boolean) => void;
   onClose: () => void;
+  /**
+   * 'modal' (default) = full-screen PanelShell, opened from the agent station.
+   * 'dock' = compact panel pinned bottom-right that does NOT cover the room,
+   * so you can watch the agent live while chatting from anywhere. In 'dock'
+   * mode the component stays mounted while `collapsed` (display:none) so the
+   * websocket — and live async messages — keep flowing in the background.
+   */
+  variant?: 'modal' | 'dock';
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
 export function ChatPanel({
@@ -48,6 +58,9 @@ export function ChatPanel({
   onUpdateLast,
   onStreamingChange,
   onClose,
+  variant = 'modal',
+  collapsed = false,
+  onToggleCollapse,
 }: Props) {
   const [streaming, setStreamingLocal] = useState(false);
   const setStreaming = useCallback((v: boolean) => {
@@ -174,8 +187,19 @@ export function ChatPanel({
     }
   }, [messages, streaming]);
 
-  return (
-    <PanelShell title="Chat" framework={framework} onClose={onClose}>
+  const accent =
+    framework === 'openclaw'
+      ? '#e3b765'
+      : framework === 'hermes'
+        ? '#b9a4e6'
+        : framework === 'elizaos'
+          ? '#8fb6e0'
+          : framework === 'milady'
+            ? '#f0a8cf'
+            : '#9fc1c7';
+
+  const body = (
+    <>
       <ChatStyles />
       <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-neutral-400">
         <span className={`inline-block h-2 w-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-neutral-600'}`} />
@@ -189,7 +213,7 @@ export function ChatPanel({
       </div>
       <div
         ref={scrollRef}
-        className="mb-3 h-[min(54vh,560px)] space-y-2 overflow-y-auto rounded-lg bg-neutral-950 p-3 text-sm"
+        className={`mb-3 ${variant === 'dock' ? 'h-[min(46vh,440px)]' : 'h-[min(54vh,560px)]'} space-y-2 overflow-y-auto rounded-lg bg-neutral-950 p-3 text-sm`}
       >
         {messages.length === 0 && (
           <div className="text-center text-neutral-500">Say something to your agent.</div>
@@ -270,6 +294,37 @@ export function ChatPanel({
           </button>
         )}
       </form>
+    </>
+  );
+
+  if (variant === 'dock') {
+    // Pinned, non-blocking dock. Stays mounted (display:none) while collapsed
+    // so the websocket — and any live async replies — keep flowing.
+    return (
+      <div
+        className={`fixed bottom-3 right-3 z-50 flex max-h-[82vh] w-[min(380px,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-2xl border bg-[#15100b]/95 p-4 text-[#f6ead8] shadow-2xl backdrop-blur ${collapsed ? 'hidden' : ''}`}
+        style={{ borderColor: `${accent}88`, boxShadow: '0 18px 50px rgba(0,0,0,0.5)' }}
+      >
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-sm font-semibold tracking-wide" style={{ color: accent }}>
+            Chat
+          </h2>
+          <button
+            onClick={onToggleCollapse ?? onClose}
+            aria-label="Minimize chat"
+            className="rounded-md px-2 py-1 text-[#d8c3a3] hover:bg-[#3a281a] hover:text-white"
+          >
+            ▾
+          </button>
+        </div>
+        {body}
+      </div>
+    );
+  }
+
+  return (
+    <PanelShell title="Chat" framework={framework} onClose={onClose}>
+      {body}
     </PanelShell>
   );
 }

@@ -204,6 +204,10 @@ export function AgentRoomV2Client({ agentId }: Props) {
   const [pluginsInstalled, setPluginsInstalled] = useState(0);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [isChatStreaming, setIsChatStreaming] = useState(false);
+  // Floating chat dock — talk to the agent from anywhere in the room without
+  // walking up to it; stays live so async replies surface as an unread badge.
+  const [floatingChatOpen, setFloatingChatOpen] = useState(false);
+  const [chatUnread, setChatUnread] = useState(0);
   const [passport, setPassport] = useState<AgentPassport | null>(null);
   const [laptopOpen, setLaptopOpen] = useState(false);
   const [laptopInitialTab, setLaptopInitialTab] = useState<LaptopTab>('status');
@@ -645,6 +649,13 @@ export function AgentRoomV2Client({ agentId }: Props) {
         openLaptop('config');
         return;
       }
+      if (id === 'agentAvatar') {
+        // Chat now lives in the floating dock — no need to camp by the avatar.
+        setLaptopOpen(false);
+        setFloatingChatOpen(true);
+        setChatUnread(0);
+        return;
+      }
       setLaptopOpen(false);
       setOpenPanel(id);
     },
@@ -664,8 +675,11 @@ export function AgentRoomV2Client({ agentId }: Props) {
 
   const handleOpenChatFromPassport = useCallback(() => {
     setLaptopOpen(false);
-    if (canEdit) setOpenPanel('agentAvatar');
-  }, [canEdit, setOpenPanel]);
+    if (canEdit) {
+      setFloatingChatOpen(true);
+      setChatUnread(0);
+    }
+  }, [canEdit]);
 
   const handleLaptopConfigSave = useCallback(
     async (patch: LaptopConfigPatch) => {
@@ -740,6 +754,60 @@ export function AgentRoomV2Client({ agentId }: Props) {
     setActiveEmote(emote);
     setEmoteNonce((value) => value + 1);
   }, []);
+
+  const openFloatingChat = useCallback(() => {
+    setLaptopOpen(false);
+    setFloatingChatOpen(true);
+    setChatUnread(0);
+  }, []);
+
+  // ── Auto-emote: the agent visibly reacts to its own real activity ────────
+  // The robot used to only emote when you clicked a button. Now it comes alive
+  // off real signals: thinking while it streams, waving when it replies,
+  // working when its eyes go live, alerting on error.
+  const prevStreamingRef = useRef(false);
+  useEffect(() => {
+    if (isChatStreaming && !prevStreamingRef.current) {
+      handleEmote('think');
+    } else if (!isChatStreaming && prevStreamingRef.current) {
+      handleEmote('wave');
+    }
+    prevStreamingRef.current = isChatStreaming;
+  }, [isChatStreaming, handleEmote]);
+
+  // Async push (integration / cron reply) arrives over the chat socket with an
+  // id; streamed + history messages have none, so an id is a clean "live reply"
+  // signal — wave, and bump the unread badge if the dock is closed.
+  const seenPushIdsRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    let fresh = false;
+    for (const m of chatMessages) {
+      if (m.role === 'assistant' && m.id && !seenPushIdsRef.current.has(m.id)) {
+        seenPushIdsRef.current.add(m.id);
+        fresh = true;
+      }
+    }
+    if (fresh) {
+      handleEmote('wave');
+      if (!floatingChatOpen) setChatUnread((n) => n + 1);
+    }
+  }, [chatMessages, floatingChatOpen, handleEmote]);
+
+  // Eyes go live → the agent is actively browsing/operating → work pose.
+  const prevEyesLiveRef = useRef(false);
+  useEffect(() => {
+    const live = eyesState?.status === 'live';
+    if (live && !prevEyesLiveRef.current) handleEmote('work');
+    prevEyesLiveRef.current = live;
+  }, [eyesState?.status, handleEmote]);
+
+  // Container error → alert flinch (fires once on entering the error state).
+  const prevErrorRef = useRef(false);
+  useEffect(() => {
+    const errored = agent?.status === 'error';
+    if (errored && !prevErrorRef.current) handleEmote('alert');
+    prevErrorRef.current = errored;
+  }, [agent?.status, handleEmote]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -841,10 +909,7 @@ export function AgentRoomV2Client({ agentId }: Props) {
         onAvatarChange={handleAvatarChange}
         onEmote={handleEmote}
         onOpenLaptop={openLaptop}
-        onOpenChat={() => {
-          setLaptopOpen(false);
-          setOpenPanel('agentAvatar');
-        }}
+        onOpenChat={openFloatingChat}
       />
       {nearest && !openPanel && !laptopOpen && (
         <MobileSceneActionButton
@@ -853,7 +918,9 @@ export function AgentRoomV2Client({ agentId }: Props) {
         />
       )}
 
-      {openPanel === 'agentAvatar' && canEdit && (
+      {/* Floating chat: always mounted for owners so the socket stays live and
+          async replies surface even when the dock is minimized. */}
+      {canEdit && (
         <ChatPanel
           agentId={apiId}
           framework={framework}
@@ -861,7 +928,17 @@ export function AgentRoomV2Client({ agentId }: Props) {
           onAppend={appendChatMessage}
           onUpdateLast={updateLastChatMessage}
           onStreamingChange={setIsChatStreaming}
-          onClose={close}
+          onClose={() => setFloatingChatOpen(false)}
+          variant="dock"
+          collapsed={!floatingChatOpen}
+          onToggleCollapse={() => setFloatingChatOpen(false)}
+        />
+      )}
+      {canEdit && !floatingChatOpen && (
+        <FloatingChatButton
+          unread={chatUnread}
+          framework={framework}
+          onClick={openFloatingChat}
         />
       )}
       {laptopOpen && canEdit && (
@@ -935,6 +1012,46 @@ export function AgentRoomV2Client({ agentId }: Props) {
         <PluginsPanel agentId={apiId} framework={framework} onClose={close} />
       )}
     </div>
+  );
+}
+
+function FloatingChatButton({
+  unread,
+  framework,
+  onClick,
+}: {
+  unread: number;
+  framework: string;
+  onClick: () => void;
+}) {
+  const accent =
+    framework === 'openclaw'
+      ? '#e3b765'
+      : framework === 'hermes'
+        ? '#b9a4e6'
+        : framework === 'elizaos'
+          ? '#8fb6e0'
+          : framework === 'milady'
+            ? '#f0a8cf'
+            : '#9fc1c7';
+  return (
+    <button
+      onClick={onClick}
+      aria-label="Chat with your agent"
+      className="fixed bottom-4 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full border text-2xl shadow-xl backdrop-blur transition hover:scale-105 active:scale-95"
+      style={{
+        borderColor: `${accent}aa`,
+        background: 'rgba(21,16,11,0.92)',
+        boxShadow: `0 10px 30px ${accent}55`,
+      }}
+    >
+      <span aria-hidden>💬</span>
+      {unread > 0 && (
+        <span className="absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-bold text-white">
+          {unread > 9 ? '9+' : unread}
+        </span>
+      )}
+    </button>
   );
 }
 
