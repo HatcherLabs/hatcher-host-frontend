@@ -10,10 +10,6 @@ function playerColor(framework: string): number {
       return 0xffc21f;
     case 'hermes':
       return 0xb88bff;
-    case 'elizaos':
-      return 0x6fc0ff;
-    case 'milady':
-      return 0xff86c2;
     default:
       return 0x9fd9c4;
   }

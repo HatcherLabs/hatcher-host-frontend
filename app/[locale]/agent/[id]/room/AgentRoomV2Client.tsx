@@ -1040,15 +1040,7 @@ function FloatingChatButton({
   onClick: () => void;
 }) {
   const accent =
-    framework === 'openclaw'
-      ? '#e3b765'
-      : framework === 'hermes'
-        ? '#b9a4e6'
-        : framework === 'elizaos'
-          ? '#8fb6e0'
-          : framework === 'milady'
-            ? '#f0a8cf'
-            : '#9fc1c7';
+    framework === 'openclaw' ? '#e3b765' : framework === 'hermes' ? '#b9a4e6' : '#9fc1c7';
   return (
     <button
       onClick={onClick}

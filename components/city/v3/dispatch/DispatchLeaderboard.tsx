@@ -6,8 +6,6 @@ const TABS = [
   { id: 'overall', label: 'Overall' },
   { id: 'openclaw', label: 'OpenClaw' },
   { id: 'hermes', label: 'Hermes' },
-  { id: 'elizaos', label: 'ElizaOS' },
-  { id: 'milady', label: 'Milady' },
 ];
 
 const RANK_COLOR = ['#ffd24a', '#cfd6e0', '#cd7f32'];

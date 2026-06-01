@@ -81,7 +81,7 @@ const EMPTY_COUNTS: CityResponse['counts'] = {
   total: 0,
   running: 0,
   users: 0,
-  byFramework: { openclaw: 0, hermes: 0, elizaos: 0, milady: 0 },
+  byFramework: { openclaw: 0, hermes: 0 },
   byCategory: {} as CityResponse['counts']['byCategory'],
 };
 

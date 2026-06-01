@@ -217,10 +217,6 @@ function moteColor(framework: string): string {
       return '#ffc21f';
     case 'hermes':
       return '#b88bff';
-    case 'elizaos':
-      return '#6fc0ff';
-    case 'milady':
-      return '#ff86c2';
     default:
       return '#9fd9c4';
   }
