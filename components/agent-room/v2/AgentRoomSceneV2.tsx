@@ -2,7 +2,7 @@
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Environment, Lightformer, ContactShadows } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
-import { Suspense, useMemo, useRef } from 'react';
+import { Suspense, useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import {
   CharacterController,
@@ -158,6 +158,11 @@ export function AgentRoomSceneV2({
             activeEmote={activeEmote}
             emoteNonce={emoteNonce}
           />
+          <WorkMotes
+            active={!!isChatStreaming || !!eyesLive}
+            framework={framework}
+            position={layout.agentAvatar.position}
+          />
           <CharacterController
             state={charState}
             analog={analogRef.current}
@@ -184,5 +189,117 @@ export function AgentRoomSceneV2({
         }}
       />
     </>
+  );
+}
+
+function moteColor(framework: string): string {
+  switch (framework) {
+    case 'openclaw':
+      return '#ffc21f';
+    case 'hermes':
+      return '#b88bff';
+    case 'elizaos':
+      return '#6fc0ff';
+    case 'milady':
+      return '#ff86c2';
+    default:
+      return '#9fd9c4';
+  }
+}
+
+function makeSoftCircleTexture(): THREE.Texture {
+  const c = document.createElement('canvas');
+  c.width = 64;
+  c.height = 64;
+  const ctx = c.getContext('2d')!;
+  const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+  g.addColorStop(0, 'rgba(255,255,255,1)');
+  g.addColorStop(0.4, 'rgba(255,255,255,0.55)');
+  g.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 64, 64);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+const MOTE_COUNT = 26;
+
+// Glowing motes that spiral up around the agent while it's actively working
+// (streaming a reply or eyes-live). Eases in/out so it's calm at rest. Cheap:
+// one additive Points cloud, no per-mote draw calls.
+function WorkMotes({
+  active,
+  framework,
+  position,
+}: {
+  active: boolean;
+  framework: string;
+  position: [number, number, number];
+}) {
+  const pointsRef = useRef<THREE.Points>(null);
+  const matRef = useRef<THREE.PointsMaterial>(null);
+  const levelRef = useRef(0);
+  const motes = useMemo(
+    () =>
+      Array.from({ length: MOTE_COUNT }, (_, i) => ({
+        angle: (i / MOTE_COUNT) * Math.PI * 2,
+        radius: 0.42 + (i % 5) * 0.11,
+        speed: 0.5 + (i % 7) * 0.13,
+        offset: (i * 0.137) % 1,
+      })),
+    [],
+  );
+  const geometry = useMemo(() => {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(MOTE_COUNT * 3), 3));
+    return g;
+  }, []);
+  const texture = useMemo(() => makeSoftCircleTexture(), []);
+  const color = useMemo(() => moteColor(framework), [framework]);
+
+  useEffect(
+    () => () => {
+      geometry.dispose();
+      texture.dispose();
+    },
+    [geometry, texture],
+  );
+
+  useFrame(({ clock }, delta) => {
+    levelRef.current += ((active ? 1 : 0) - levelRef.current) * Math.min(1, delta * 2.5);
+    const lvl = levelRef.current;
+    if (pointsRef.current) pointsRef.current.visible = lvl > 0.02;
+    if (lvl <= 0.02) return;
+    const t = clock.elapsedTime;
+    const attr = geometry.attributes.position as THREE.BufferAttribute;
+    for (let i = 0; i < MOTE_COUNT; i++) {
+      const m = motes[i]!;
+      const cycle = (t * m.speed * 0.24 + m.offset) % 1; // 0..1 rising
+      const y = 0.45 + cycle * 1.95;
+      const a = m.angle + t * 0.35;
+      const r = m.radius * (1 - cycle * 0.25);
+      attr.setXYZ(i, Math.cos(a) * r, y, Math.sin(a) * r);
+    }
+    attr.needsUpdate = true;
+    if (matRef.current) matRef.current.opacity = 0.62 * lvl;
+  });
+
+  return (
+    <points ref={pointsRef} position={position} visible={false}>
+      <primitive object={geometry} attach="geometry" />
+      <pointsMaterial
+        ref={matRef}
+        color={color}
+        map={texture}
+        size={0.13}
+        transparent
+        opacity={0}
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+        sizeAttenuation
+        toneMapped={false}
+      />
+    </points>
   );
 }
