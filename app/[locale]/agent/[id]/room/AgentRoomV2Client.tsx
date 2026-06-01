@@ -879,6 +879,7 @@ export function AgentRoomV2Client({ agentId }: Props) {
         hasMemory={hasMemory}
         quality={quality}
         isChatStreaming={isChatStreaming}
+        eyesLive={eyesState?.status === 'live'}
         avatarVariant={selectedAvatarVariant}
         avatarTraits={selectedAvatarTraits}
         activeEmote={activeEmote}

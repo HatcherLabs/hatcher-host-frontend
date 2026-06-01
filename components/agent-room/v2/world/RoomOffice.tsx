@@ -25,6 +25,7 @@ interface Props {
   nearest: StationId | null;
   canEdit: boolean;
   isChatStreaming?: boolean;
+  eyesLive?: boolean;
   onStationClick: (id: StationId) => void;
 }
 
@@ -119,6 +120,7 @@ export function RoomOffice({
   nearest,
   canEdit,
   isChatStreaming,
+  eyesLive,
   onStationClick,
 }: Props) {
   void tier;
@@ -159,6 +161,7 @@ export function RoomOffice({
         accent={accent}
         status={status}
         snapshotDataUrl={eyesSnapshotDataUrl}
+        eyesLive={eyesLive}
         isNear={nearest === 'eyesConsole'}
         onStationClick={onStationClick}
       />
@@ -774,20 +777,36 @@ function TvLogScreen({ lines, accent }: { lines: string[]; accent: string }) {
 
   useEffect(() => () => texture.dispose(), [texture]);
 
+  // Flash the screen briefly whenever a new log line lands, so output reads as
+  // live activity instead of just scrolling.
+  const overlayRef = useRef<THREE.MeshBasicMaterial>(null);
+  const flashAtRef = useRef(0);
+  const prevLenRef = useRef(lines.length);
+  useEffect(() => {
+    if (lines.length > prevLenRef.current) flashAtRef.current = performance.now();
+    prevLenRef.current = lines.length;
+  }, [lines.length]);
+
   useFrame(({ clock }) => {
     drawTvLogCanvas(canvas, lines, accent, clock.getElapsedTime());
     texture.needsUpdate = true;
+    if (overlayRef.current) {
+      const since = (performance.now() - flashAtRef.current) / 380;
+      overlayRef.current.opacity = flashAtRef.current && since < 1 ? (1 - since) * 0.2 : 0;
+    }
   });
 
   return (
-    <mesh position={[0, 0, 0.098]}>
-      <planeGeometry args={[3.92, 1.72]} />
-      <meshBasicMaterial
-        map={texture}
-        toneMapped={false}
-        side={THREE.DoubleSide}
-      />
-    </mesh>
+    <group>
+      <mesh position={[0, 0, 0.098]}>
+        <planeGeometry args={[3.92, 1.72]} />
+        <meshBasicMaterial map={texture} toneMapped={false} side={THREE.DoubleSide} />
+      </mesh>
+      <mesh position={[0, 0, 0.1]}>
+        <planeGeometry args={[3.92, 1.72]} />
+        <meshBasicMaterial ref={overlayRef} color={accent} transparent opacity={0} depthWrite={false} toneMapped={false} />
+      </mesh>
+    </group>
   );
 }
 
@@ -1590,11 +1609,13 @@ function EyesConsoleStation({
   accent,
   status,
   snapshotDataUrl,
+  eyesLive,
   isNear,
   onStationClick,
 }: StationProps & {
   status: string;
   snapshotDataUrl?: string;
+  eyesLive?: boolean;
 }) {
   return (
     <group>
@@ -1607,6 +1628,9 @@ function EyesConsoleStation({
           accent={accent}
           snapshotDataUrl={snapshotDataUrl}
         />
+        {/* When the agent's eyes go live (browsing/operating), the console
+            casts a pulsing green glow — a visible "it's working" cue. */}
+        <PulseLight active={!!eyesLive} color="#46ff9c" position={[0, 0, 0.55]} />
         <group position={[0, -0.8, 0.09]}>
           <FlatBoardLabel
             text="EYES"
@@ -1634,8 +1658,8 @@ function EyesConsoleStation({
       </mesh>
       <StationNearGlow
         position={layout[stationId].position}
-        color={accent}
-        active={isNear}
+        color={eyesLive ? '#46ff9c' : accent}
+        active={isNear || !!eyesLive}
       />
       <ClickHotspot
         stationId={stationId}
@@ -2085,6 +2109,29 @@ function SceneLabel({
       </div>
     </Html>
   );
+}
+
+// A point light that eases in and gently pulses while `active`, then fades out.
+// Used to make a station visibly "light up" when its agent activity is live.
+function PulseLight({
+  active,
+  color,
+  position,
+}: {
+  active: boolean;
+  color: string;
+  position: [number, number, number];
+}) {
+  const lightRef = useRef<THREE.PointLight>(null);
+  const levelRef = useRef(0);
+  useFrame(({ clock }, delta) => {
+    levelRef.current += ((active ? 1 : 0) - levelRef.current) * Math.min(1, delta * 4);
+    const pulse = Math.sin(clock.elapsedTime * 4) * 0.5 + 0.5;
+    if (lightRef.current) {
+      lightRef.current.intensity = levelRef.current * (0.35 + pulse * 0.55);
+    }
+  });
+  return <pointLight ref={lightRef} color={color} intensity={0} distance={3.4} position={position} />;
 }
 
 function StationNearGlow({

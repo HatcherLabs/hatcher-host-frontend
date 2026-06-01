@@ -34,6 +34,7 @@ interface Props {
   hasMemory: boolean;
   quality: Quality;
   isChatStreaming?: boolean;
+  eyesLive?: boolean;
   avatarVariant?: string | null;
   avatarTraits?: unknown;
   activeEmote?: RoomEmoteId | null;
@@ -70,6 +71,7 @@ export function AgentRoomSceneV2({
   hasMemory,
   quality,
   isChatStreaming,
+  eyesLive,
   avatarVariant,
   avatarTraits,
   activeEmote,
@@ -139,6 +141,7 @@ export function AgentRoomSceneV2({
             canEdit={canEdit}
             hasMemory={hasMemory}
             isChatStreaming={isChatStreaming}
+            eyesLive={eyesLive}
             onStationClick={onStationClick}
           />
 
