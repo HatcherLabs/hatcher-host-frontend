@@ -85,6 +85,14 @@ export const PACKET_DATA = 8; // Data per collected packet
 export const PACKET_XP = 5; // XP per collected packet
 export const COMPLETE_XP = 25; // XP bonus for finishing a run
 
+// ── Prestige ────────────────────────────────────────────────────────────
+export const PRESTIGE_LEVEL = 15; // min level to prestige
+export const PRESTIGE_BONUS = 0.25; // +25% Data/XP per prestige rank
+
+export function prestigeMultiplier(prestige: number): number {
+  return 1 + prestige * PRESTIGE_BONUS;
+}
+
 // ── Skin catalog ────────────────────────────────────────────────────────
 export const DISPATCH_SKINS: DispatchSkin[] = [
   { id: 'default', name: 'Standard', desc: 'The classic gold courier.', currency: 'data', price: 0, color: '#ffd24a', trail: '#ffe27a' },

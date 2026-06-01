@@ -9,6 +9,8 @@ import { makeLiveAgentLoopPath, sampleLiveAgentPath, type LiveAgentPose } from '
 import type { LiveAgentMarkerLayout } from './liveLayout';
 import { getGlbAvatarModel } from '@/components/agent-room/v2/stations/AgentBody';
 import { CityAvatar } from './CityAvatar';
+import { useDispatchStore } from '@/lib/agent-dispatch/store';
+import { skinById } from '@/lib/agent-dispatch/config';
 
 interface Props {
   markers: LiveAgentMarkerLayout[];
@@ -38,6 +40,12 @@ function cityWalkerStatusLabel(status: LiveAgentMarkerLayout['status']): string 
 }
 
 export function LiveAgentMarkers({ markers, onMarkerClick, poseRef }: Props) {
+  // Your equipped dispatch skin colors your own walkers (default = the usual gold).
+  const equippedSkin = useDispatchStore((s) => s.equippedSkin);
+  const mineColor = useMemo(
+    () => new THREE.Color(skinById(equippedSkin).color).getHex(),
+    [equippedSkin],
+  );
   const avatarIds = useMemo(() => {
     const ids = new Set<string>();
     const eligible = (m: LiveAgentMarkerLayout) =>
@@ -65,6 +73,7 @@ export function LiveAgentMarkers({ markers, onMarkerClick, poseRef }: Props) {
           onMarkerClick={onMarkerClick}
           poseRef={poseRef}
           useRealAvatar={avatarIds.has(marker.agentId)}
+          mineColor={mineColor}
         />
       ))}
     </group>
@@ -76,11 +85,13 @@ function LiveRobotAgent({
   onMarkerClick,
   poseRef,
   useRealAvatar,
+  mineColor,
 }: {
   marker: LiveAgentMarkerLayout;
   onMarkerClick?: (agentId: string) => void;
   poseRef?: MutableRefObject<Map<string, LiveAgentPose>>;
   useRealAvatar?: boolean;
+  mineColor?: number;
 }) {
   const groupRef = useRef<THREE.Group>(null);
   const leftArmRef = useRef<THREE.Mesh>(null);
@@ -92,7 +103,9 @@ function LiveRobotAgent({
   const beaconRef = useRef<THREE.Mesh>(null);
   const scannerRef = useRef<THREE.Group>(null);
   const [isHovered, setIsHovered] = useState(false);
-  const color = liveAgentColor(marker);
+  // Your own walkers wear the equipped dispatch skin; everyone else keeps the
+  // framework/status palette.
+  const color = marker.mine && mineColor != null ? mineColor : liveAgentColor(marker);
   const colorObject = useMemo(() => new THREE.Color(color), [color]);
   const accentHex = useMemo(() => `#${color.toString(16).padStart(6, '0')}`, [color]);
   const path = useMemo(

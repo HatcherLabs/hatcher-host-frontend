@@ -1,12 +1,14 @@
 'use client';
 import { useEffect, useMemo, useRef, useState, type MutableRefObject } from 'react';
 import { useDispatchStore } from '@/lib/agent-dispatch/store';
-import { levelInfo } from '@/lib/agent-dispatch/config';
+import { levelInfo, prestigeMultiplier, PRESTIGE_LEVEL } from '@/lib/agent-dispatch/config';
 import { buildDispatchRoute, pathLength, spawnPackets } from '@/lib/agent-dispatch/route';
 import type { LiveCityGrid } from '../liveCityHandoff';
 import type { LiveAgentPose } from '../liveAgentMotion';
 import type { CityAgent } from '../../types';
 import { SkinShop } from './SkinShop';
+import { DispatchLeaderboard } from './DispatchLeaderboard';
+import { useDispatchScoreSync } from '@/lib/agent-dispatch/useScoreSync';
 
 interface Dest {
   name: string;
@@ -41,14 +43,20 @@ export function DispatchHud({
 }) {
   const data = useDispatchStore((s) => s.data);
   const xp = useDispatchStore((s) => s.xp);
+  const prestige = useDispatchStore((s) => s.prestige);
   const dispatches = useDispatchStore((s) => s.dispatches);
   const panelOpen = useDispatchStore((s) => s.panelOpen);
   const shopOpen = useDispatchStore((s) => s.shopOpen);
+  const leaderboardOpen = useDispatchStore((s) => s.leaderboardOpen);
   const lastResult = useDispatchStore((s) => s.lastResult);
   const setPanelOpen = useDispatchStore((s) => s.setPanelOpen);
   const setShopOpen = useDispatchStore((s) => s.setShopOpen);
+  const setLeaderboardOpen = useDispatchStore((s) => s.setLeaderboardOpen);
   const startDispatch = useDispatchStore((s) => s.startDispatch);
+  const doPrestige = useDispatchStore((s) => s.doPrestige);
   const clearResult = useDispatchStore((s) => s.clearResult);
+
+  useDispatchScoreSync();
 
   const lvl = useMemo(() => levelInfo(xp), [xp]);
   const dests = useMemo(() => dispatchDestinations(grid), [grid]);
@@ -140,15 +148,35 @@ export function DispatchHud({
           {/* Progression */}
           <div className="rounded-xl border border-white/10 bg-black/30 p-3">
             <div className="mb-1 flex items-center justify-between text-xs">
-              <span className="font-bold text-[#39ff88]">Level {lvl.level}</span>
+              <span className="font-bold text-[#39ff88]">
+                Level {lvl.level}
+                {prestige > 0 && (
+                  <span className="ml-1 text-[#ffd24a]" title={`Prestige ${prestige} · +${Math.round(prestige * 25)}% earnings`}>
+                    ★{prestige}
+                  </span>
+                )}
+              </span>
               <span className="text-[#9fceb4]">◆ {Math.round(data).toLocaleString()} Data</span>
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-white/10">
               <div className="h-full rounded-full bg-[#39ff88] transition-all" style={{ width: `${Math.round(lvl.pct * 100)}%` }} />
             </div>
-            <div className="mt-1 text-right text-[10px] text-[#7faE96]">
-              {lvl.intoLevel} / {lvl.forNext} XP
+            <div className="mt-1 flex justify-between text-[10px] text-[#7faE96]">
+              <span>{prestige > 0 ? `×${prestigeMultiplier(prestige).toFixed(2)} earnings` : ''}</span>
+              <span>{lvl.intoLevel} / {lvl.forNext} XP</span>
             </div>
+            {lvl.level >= PRESTIGE_LEVEL && (
+              <button
+                onClick={() => {
+                  if (window.confirm(`Prestige now? Your level resets to 1, but you keep your Data + skins and gain a permanent +25% earnings boost (Prestige ${prestige + 1}).`)) {
+                    doPrestige();
+                  }
+                }}
+                className="mt-2 w-full rounded-lg border border-[#ffd24a]/50 bg-[#ffd24a]/10 py-1.5 text-xs font-bold text-[#ffd24a] transition hover:bg-[#ffd24a]/20"
+              >
+                ★ Prestige → +25% forever
+              </button>
+            )}
           </div>
 
           {/* Dispatch form */}
@@ -218,12 +246,20 @@ export function DispatchHud({
             </div>
           )}
 
-          <button
-            onClick={() => setShopOpen(true)}
-            className="rounded-lg border border-[#39ff88]/30 bg-black/30 px-3 py-2 text-sm font-semibold text-[#39ff88] transition hover:bg-[#39ff88]/10"
-          >
-            ✦ Skin Shop
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShopOpen(true)}
+              className="flex-1 rounded-lg border border-[#39ff88]/30 bg-black/30 px-3 py-2 text-sm font-semibold text-[#39ff88] transition hover:bg-[#39ff88]/10"
+            >
+              ✦ Skins
+            </button>
+            <button
+              onClick={() => setLeaderboardOpen(true)}
+              className="flex-1 rounded-lg border border-[#39ff88]/30 bg-black/30 px-3 py-2 text-sm font-semibold text-[#39ff88] transition hover:bg-[#39ff88]/10"
+            >
+              ☷ Ranks
+            </button>
+          </div>
         </div>
       )}
 
@@ -243,6 +279,7 @@ export function DispatchHud({
       )}
 
       {shopOpen && <SkinShop onClose={() => setShopOpen(false)} />}
+      {leaderboardOpen && <DispatchLeaderboard onClose={() => setLeaderboardOpen(false)} />}
     </>
   );
 }
