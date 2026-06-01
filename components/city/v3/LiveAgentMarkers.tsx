@@ -138,13 +138,20 @@ function LiveRobotAgent({
     };
   }, [marker.agentId, poseRef, trail]);
 
-  useFrame(({ clock }, delta) => {
+  useFrame(({ clock, camera }, delta) => {
     const elapsed = clock.elapsedTime;
     const travel = elapsed * marker.speed + marker.phase;
     const pose = sampleLiveAgentPath(path, travel);
     poseRef?.current.set(marker.agentId, pose);
+    // Distance LOD: past ~70 units, keep the walker moving but drop the motion
+    // trail and the small flourishes (the per-frame trail buffer churn is the
+    // pricey part). Cheap and invisible at that range.
+    const dxCam = pose.x - camera.position.x;
+    const dzCam = pose.z - camera.position.z;
+    const far = dxCam * dxCam + dzCam * dzCam > 4900;
+    trail.visible = !far;
     const bob = Math.sin((elapsed + marker.phase) * 18) * 0.025;
-    const swing = Math.sin((elapsed + marker.phase) * 9) * 0.55;
+    const swing = far ? 0 : Math.sin((elapsed + marker.phase) * 9) * 0.55;
 
     if (groupRef.current) {
       groupRef.current.position.set(pose.x, bob, pose.z);
@@ -158,38 +165,41 @@ function LiveRobotAgent({
     if (rightLegRef.current) rightLegRef.current.rotation.x = -swing;
     if (leftArmRef.current) leftArmRef.current.rotation.x = -swing * 0.7;
     if (rightArmRef.current) rightArmRef.current.rotation.x = swing * 0.7;
-    if (tipRef.current) {
-      const pulse = 1 + Math.sin((elapsed + marker.phase) * 11.7) * 0.25;
-      tipRef.current.scale.set(pulse, pulse, pulse);
-    }
-    if (haloRef.current) {
-      const haloPulse = 1 + Math.sin((elapsed + marker.phase) * 2.5) * 0.08;
-      haloRef.current.scale.set(haloPulse, haloPulse, haloPulse);
-      haloRef.current.rotation.z = elapsed * 0.7 + marker.phase;
-    }
-    if (scannerRef.current) {
-      scannerRef.current.rotation.y = elapsed * 1.35 + marker.phase * 0.4;
-    }
-    if (beaconRef.current) {
-      const lift = Math.sin((elapsed + marker.phase) * 2.2) * 0.08;
-      const pulse = 0.46 + Math.sin((elapsed + marker.phase) * 4.4) * 0.16;
-      beaconRef.current.position.y = 1.22 + lift;
-      const material = beaconRef.current.material as THREE.MeshBasicMaterial;
-      material.opacity = pulse;
-    }
 
-    const positions = trail.geometry.attributes.position as THREE.BufferAttribute;
-    const colors = trail.geometry.attributes.color as THREE.BufferAttribute;
-    for (let i = TRAIL_LEN - 1; i > 0; i--) {
-      positions.setXYZ(i, positions.getX(i - 1), positions.getY(i - 1), positions.getZ(i - 1));
+    if (!far) {
+      if (tipRef.current) {
+        const pulse = 1 + Math.sin((elapsed + marker.phase) * 11.7) * 0.25;
+        tipRef.current.scale.set(pulse, pulse, pulse);
+      }
+      if (haloRef.current) {
+        const haloPulse = 1 + Math.sin((elapsed + marker.phase) * 2.5) * 0.08;
+        haloRef.current.scale.set(haloPulse, haloPulse, haloPulse);
+        haloRef.current.rotation.z = elapsed * 0.7 + marker.phase;
+      }
+      if (scannerRef.current) {
+        scannerRef.current.rotation.y = elapsed * 1.35 + marker.phase * 0.4;
+      }
+      if (beaconRef.current) {
+        const lift = Math.sin((elapsed + marker.phase) * 2.2) * 0.08;
+        const pulse = 0.46 + Math.sin((elapsed + marker.phase) * 4.4) * 0.16;
+        beaconRef.current.position.y = 1.22 + lift;
+        const material = beaconRef.current.material as THREE.MeshBasicMaterial;
+        material.opacity = pulse;
+      }
+
+      const positions = trail.geometry.attributes.position as THREE.BufferAttribute;
+      const colors = trail.geometry.attributes.color as THREE.BufferAttribute;
+      for (let i = TRAIL_LEN - 1; i > 0; i--) {
+        positions.setXYZ(i, positions.getX(i - 1), positions.getY(i - 1), positions.getZ(i - 1));
+      }
+      positions.setXYZ(0, pose.x, 0.55, pose.z);
+      for (let i = 0; i < TRAIL_LEN; i++) {
+        const fade = 1 - i / TRAIL_LEN;
+        colors.setXYZ(i, colorObject.r * fade, colorObject.g * fade, colorObject.b * fade);
+      }
+      positions.needsUpdate = true;
+      colors.needsUpdate = true;
     }
-    positions.setXYZ(0, pose.x, 0.55, pose.z);
-    for (let i = 0; i < TRAIL_LEN; i++) {
-      const fade = 1 - i / TRAIL_LEN;
-      colors.setXYZ(i, colorObject.r * fade, colorObject.g * fade, colorObject.b * fade);
-    }
-    positions.needsUpdate = true;
-    colors.needsUpdate = true;
 
     if (delta > 0.2 && groupRef.current) {
       groupRef.current.position.set(pose.x, bob, pose.z);
