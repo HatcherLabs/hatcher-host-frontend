@@ -169,6 +169,39 @@ export const RARE_PACKET_MULT = 10;
 export const COMBO_WINDOW_MS = 2500;
 export const COMBO_MAX = 5;
 
+// ── Achievements ────────────────────────────────────────────────────────
+export interface AchStats {
+  dispatches: number;
+  packets: number;
+  level: number;
+  prestige: number;
+  upgradeLevels: number; // sum of all upgrade levels
+}
+
+export interface Achievement {
+  id: string;
+  name: string;
+  desc: string;
+  reward: number; // Data
+  met: (s: AchStats) => boolean;
+}
+
+export const ACHIEVEMENTS: Achievement[] = [
+  { id: 'first-run', name: 'First Contact', desc: 'Complete your first dispatch.', reward: 60, met: (s) => s.dispatches >= 1 },
+  { id: 'collector', name: 'Collector', desc: 'Collect 100 data-packets.', reward: 150, met: (s) => s.packets >= 100 },
+  { id: 'commuter', name: 'Commuter', desc: 'Complete 25 dispatches.', reward: 300, met: (s) => s.dispatches >= 25 },
+  { id: 'tinkerer', name: 'Tinkerer', desc: 'Buy your first Lab upgrade.', reward: 120, met: (s) => s.upgradeLevels >= 1 },
+  { id: 'rising', name: 'Rising Star', desc: 'Reach level 10.', reward: 500, met: (s) => s.level >= 10 },
+  { id: 'hoarder', name: 'Data Hoarder', desc: 'Collect 1,000 packets.', reward: 900, met: (s) => s.packets >= 1000 },
+  { id: 'logistics', name: 'Logistics Pro', desc: 'Complete 100 dispatches.', reward: 1200, met: (s) => s.dispatches >= 100 },
+  { id: 'ascended', name: 'Ascended', desc: 'Prestige for the first time.', reward: 2000, met: (s) => s.prestige >= 1 },
+  { id: 'engineer', name: 'Chief Engineer', desc: 'Reach 12 total upgrade levels.', reward: 1500, met: (s) => s.upgradeLevels >= 12 },
+];
+
+// ── Idle / auto-dispatch ────────────────────────────────────────────────
+export const OFFLINE_RATE_PER_AGENT = 0.6; // Data/sec per running agent while auto-dispatching
+export const OFFLINE_CAP_SEC = 8 * 3600; // max 8h of offline accrual
+
 // ── Skin catalog ────────────────────────────────────────────────────────
 export const DISPATCH_SKINS: DispatchSkin[] = [
   { id: 'default', name: 'Standard', desc: 'The classic gold courier.', currency: 'data', price: 0, color: '#ffd24a', trail: '#ffe27a' },

@@ -1,12 +1,15 @@
 'use client';
-import { useEffect, useMemo, useRef, useState, type MutableRefObject } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type MutableRefObject } from 'react';
 import { useDispatchStore } from '@/lib/agent-dispatch/store';
 import {
   levelInfo,
   prestigeMultiplier,
   upgradeEffects,
   JOB_TYPES,
+  ACHIEVEMENTS,
   PRESTIGE_LEVEL,
+  type JobType,
+  type AchStats,
 } from '@/lib/agent-dispatch/config';
 import { buildDispatchRoute, pathLength, spawnPackets } from '@/lib/agent-dispatch/route';
 import type { LiveCityGrid } from '../liveCityHandoff';
@@ -15,6 +18,7 @@ import type { CityAgent } from '../../types';
 import { SkinShop } from './SkinShop';
 import { DispatchLeaderboard } from './DispatchLeaderboard';
 import { DispatchLab } from './DispatchLab';
+import { DispatchGoals } from './DispatchGoals';
 import { useDispatchScoreSync } from '@/lib/agent-dispatch/useScoreSync';
 
 interface Dest {
@@ -56,15 +60,27 @@ export function DispatchHud({
   const shopOpen = useDispatchStore((s) => s.shopOpen);
   const leaderboardOpen = useDispatchStore((s) => s.leaderboardOpen);
   const labOpen = useDispatchStore((s) => s.labOpen);
+  const goalsOpen = useDispatchStore((s) => s.goalsOpen);
   const upgrades = useDispatchStore((s) => s.upgrades);
+  const stats = useDispatchStore((s) => s.stats);
+  const achieved = useDispatchStore((s) => s.achieved);
+  const autoDispatch = useDispatchStore((s) => s.autoDispatch);
+  const achievementToast = useDispatchStore((s) => s.achievementToast);
+  const offlineToast = useDispatchStore((s) => s.offlineToast);
   const lastResult = useDispatchStore((s) => s.lastResult);
   const setPanelOpen = useDispatchStore((s) => s.setPanelOpen);
   const setShopOpen = useDispatchStore((s) => s.setShopOpen);
   const setLeaderboardOpen = useDispatchStore((s) => s.setLeaderboardOpen);
   const setLabOpen = useDispatchStore((s) => s.setLabOpen);
+  const setGoalsOpen = useDispatchStore((s) => s.setGoalsOpen);
+  const setAuto = useDispatchStore((s) => s.setAuto);
   const startDispatch = useDispatchStore((s) => s.startDispatch);
   const doPrestige = useDispatchStore((s) => s.doPrestige);
+  const unlockAchievement = useDispatchStore((s) => s.unlockAchievement);
+  const applyOffline = useDispatchStore((s) => s.applyOffline);
   const clearResult = useDispatchStore((s) => s.clearResult);
+  const clearAchievementToast = useDispatchStore((s) => s.clearAchievementToast);
+  const clearOfflineToast = useDispatchStore((s) => s.clearOfflineToast);
 
   useDispatchScoreSync();
 
@@ -98,41 +114,107 @@ export function DispatchHud({
   const available = runningAgents.filter((a) => !busy.has(a.id));
   const selected = agentId && available.some((a) => a.id === agentId) ? agentId : available[0]?.id ?? '';
 
+  const createDispatch = useCallback(
+    (agent: CityAgent, dest: Dest, job: JobType) => {
+      const fx = upgradeEffects(upgrades);
+      const pose = agentPosesRef.current.get(agent.id);
+      const start = pose ? { x: pose.x, z: pose.z } : { x: 0, z: 0 };
+      const route = buildDispatchRoute(start, dest);
+      const totalLength = pathLength(route);
+      const basePackets = Math.min(10, Math.max(5, Math.round(totalLength / 40)));
+      const packetCount = Math.max(3, Math.round(basePackets * job.packetMult) + fx.extraPackets);
+      const durationMs = Math.min(
+        90000,
+        Math.max(12000, (totalLength / 5) * 1000 * fx.durationMult * job.durationMult),
+      );
+      dispatchSeq += 1;
+      return startDispatch({
+        id: `dsp-${dispatchSeq}-${agent.id}`,
+        agentId: agent.id,
+        agentName: agent.name,
+        framework: agent.framework,
+        destName: dest.name,
+        route,
+        totalLength,
+        startedAt: Date.now(),
+        durationMs,
+        packets: spawnPackets(route, totalLength, packetCount, job.rarePackets),
+        collected: 0,
+        baseReward: Math.round((15 + totalLength / 20) * job.rewardMult),
+        startLevel: lvl.level,
+        xpMult: job.xpMult,
+        jobName: job.name,
+      });
+    },
+    [upgrades, agentPosesRef, startDispatch, lvl.level],
+  );
+
   const send = () => {
     const agent = available.find((a) => a.id === selected);
-    if (!agent) return;
-    const dest = dests[destIdx]!;
-    const job = JOB_TYPES[jobIdx]!;
-    const fx = upgradeEffects(upgrades);
-    const pose = agentPosesRef.current.get(agent.id);
-    const start = pose ? { x: pose.x, z: pose.z } : { x: 0, z: 0 };
-    const route = buildDispatchRoute(start, dest);
-    const totalLength = pathLength(route);
-    const basePackets = Math.min(10, Math.max(5, Math.round(totalLength / 40)));
-    const packetCount = Math.max(3, Math.round(basePackets * job.packetMult) + fx.extraPackets);
-    const durationMs = Math.min(
-      90000,
-      Math.max(12000, (totalLength / 5) * 1000 * fx.durationMult * job.durationMult),
-    );
-    dispatchSeq += 1;
-    startDispatch({
-      id: `dsp-${dispatchSeq}-${agent.id}`,
-      agentId: agent.id,
-      agentName: agent.name,
-      framework: agent.framework,
-      destName: dest.name,
-      route,
-      totalLength,
-      startedAt: Date.now(),
-      durationMs,
-      packets: spawnPackets(route, totalLength, packetCount, job.rarePackets),
-      collected: 0,
-      baseReward: Math.round((15 + totalLength / 20) * job.rewardMult),
-      startLevel: lvl.level,
-      xpMult: job.xpMult,
-      jobName: job.name,
-    });
+    if (agent) createDispatch(agent, dests[destIdx]!, JOB_TYPES[jobIdx]!);
   };
+
+  // Auto-dispatch: keep idle agents busy, filling free slots on a timer.
+  const autoDestRef = useRef(0);
+  useEffect(() => {
+    if (!autoDispatch || runningAgents.length === 0 || dests.length === 0) return;
+    const tick = () => {
+      const st = useDispatchStore.getState();
+      const free = upgradeEffects(st.upgrades).maxSlots - st.dispatches.length;
+      if (free <= 0) return;
+      const busy = new Set(st.dispatches.map((d) => d.agentId));
+      const idle = runningAgents.filter((a) => !busy.has(a.id));
+      for (let i = 0; i < Math.min(free, idle.length); i++) {
+        autoDestRef.current = (autoDestRef.current + 1) % dests.length;
+        createDispatch(idle[i]!, dests[autoDestRef.current]!, JOB_TYPES[0]!);
+      }
+    };
+    tick();
+    const t = window.setInterval(tick, 2500);
+    return () => window.clearInterval(t);
+  }, [autoDispatch, runningAgents, dests, createDispatch]);
+
+  // Unlock achievements as their conditions are met.
+  useEffect(() => {
+    const upgradeLevels = Object.values(upgrades).reduce<number>((a, b) => a + (b ?? 0), 0);
+    const snap: AchStats = {
+      dispatches: stats.dispatches,
+      packets: stats.packets,
+      level: lvl.level,
+      prestige,
+      upgradeLevels,
+    };
+    for (const a of ACHIEVEMENTS) {
+      if (!achieved.includes(a.id) && a.met(snap)) unlockAchievement(a);
+    }
+  }, [stats, achieved, upgrades, prestige, lvl.level, unlockAchievement]);
+
+  // Offline accrual (once, after agents load) + keep lastSeen fresh.
+  const offlineAppliedRef = useRef(false);
+  useEffect(() => {
+    if (offlineAppliedRef.current || runningAgents.length === 0) return;
+    offlineAppliedRef.current = true;
+    applyOffline(runningAgents.length);
+  }, [runningAgents.length, applyOffline]);
+  useEffect(() => {
+    const t = window.setInterval(() => useDispatchStore.getState().touchSeen(), 30000);
+    return () => {
+      useDispatchStore.getState().touchSeen();
+      window.clearInterval(t);
+    };
+  }, []);
+
+  // Auto-dismiss toasts.
+  useEffect(() => {
+    if (!achievementToast) return;
+    const t = window.setTimeout(() => clearAchievementToast(), 5000);
+    return () => window.clearTimeout(t);
+  }, [achievementToast, clearAchievementToast]);
+  useEffect(() => {
+    if (offlineToast == null) return;
+    const t = window.setTimeout(() => clearOfflineToast(), 7000);
+    return () => window.clearTimeout(t);
+  }, [offlineToast, clearOfflineToast]);
 
   return (
     <>
@@ -279,24 +361,32 @@ export function DispatchHud({
             </div>
           )}
 
-          <div className="flex gap-2">
-            <button
-              onClick={() => setLabOpen(true)}
-              className="flex-1 rounded-lg border border-[#39ff88]/30 bg-black/30 px-2 py-2 text-sm font-semibold text-[#39ff88] transition hover:bg-[#39ff88]/10"
-            >
+          <button
+            onClick={() => setAuto(!autoDispatch)}
+            className={`flex items-center justify-between rounded-lg border px-3 py-2 text-sm font-semibold transition ${
+              autoDispatch
+                ? 'border-[#39ff88] bg-[#39ff88]/15 text-[#39ff88]'
+                : 'border-white/10 bg-black/30 text-[#9fceb4] hover:bg-white/5'
+            }`}
+            title="Automatically keep your agents on dispatch runs"
+          >
+            <span>⟳ Auto-dispatch</span>
+            <span className={`rounded-full px-2 py-0.5 text-xs ${autoDispatch ? 'bg-[#39ff88] text-black' : 'bg-white/10'}`}>
+              {autoDispatch ? 'ON' : 'OFF'}
+            </span>
+          </button>
+          <div className="grid grid-cols-2 gap-2">
+            <button onClick={() => setLabOpen(true)} className="rounded-lg border border-[#39ff88]/30 bg-black/30 px-2 py-2 text-sm font-semibold text-[#39ff88] transition hover:bg-[#39ff88]/10">
               ⚗ Lab
             </button>
-            <button
-              onClick={() => setShopOpen(true)}
-              className="flex-1 rounded-lg border border-[#39ff88]/30 bg-black/30 px-2 py-2 text-sm font-semibold text-[#39ff88] transition hover:bg-[#39ff88]/10"
-            >
+            <button onClick={() => setShopOpen(true)} className="rounded-lg border border-[#39ff88]/30 bg-black/30 px-2 py-2 text-sm font-semibold text-[#39ff88] transition hover:bg-[#39ff88]/10">
               ✦ Skins
             </button>
-            <button
-              onClick={() => setLeaderboardOpen(true)}
-              className="flex-1 rounded-lg border border-[#39ff88]/30 bg-black/30 px-2 py-2 text-sm font-semibold text-[#39ff88] transition hover:bg-[#39ff88]/10"
-            >
+            <button onClick={() => setLeaderboardOpen(true)} className="rounded-lg border border-[#39ff88]/30 bg-black/30 px-2 py-2 text-sm font-semibold text-[#39ff88] transition hover:bg-[#39ff88]/10">
               ☷ Ranks
+            </button>
+            <button onClick={() => setGoalsOpen(true)} className="rounded-lg border border-[#39ff88]/30 bg-black/30 px-2 py-2 text-sm font-semibold text-[#39ff88] transition hover:bg-[#39ff88]/10">
+              ✔ Goals <span className="text-[10px] text-[#7faE96]">{achieved.length}/{ACHIEVEMENTS.length}</span>
             </button>
           </div>
         </div>
@@ -317,9 +407,26 @@ export function DispatchHud({
         </div>
       )}
 
+      {/* Achievement toast */}
+      {achievementToast && (
+        <div className="fixed bottom-40 left-1/2 z-40 -translate-x-1/2 rounded-xl border border-[#ffd24a]/50 bg-[rgba(8,12,10,0.96)] px-5 py-3 text-center text-sm shadow-2xl backdrop-blur">
+          <div className="font-bold text-[#ffd24a]">✔ {achievementToast.name}</div>
+          <div className="mt-0.5 text-xs text-[#dffbe9]">Achievement unlocked · +{achievementToast.reward} Data</div>
+        </div>
+      )}
+
+      {/* Offline / welcome-back toast */}
+      {offlineToast != null && (
+        <div className="fixed top-20 left-1/2 z-40 -translate-x-1/2 rounded-xl border border-[#39ff88]/50 bg-[rgba(8,12,10,0.96)] px-5 py-3 text-center text-sm shadow-2xl backdrop-blur">
+          <div className="font-bold text-[#39ff88]">Welcome back!</div>
+          <div className="mt-0.5 text-xs text-[#dffbe9]">Your agents collected +{offlineToast.toLocaleString()} Data while you were away.</div>
+        </div>
+      )}
+
       {shopOpen && <SkinShop onClose={() => setShopOpen(false)} />}
       {leaderboardOpen && <DispatchLeaderboard onClose={() => setLeaderboardOpen(false)} />}
       {labOpen && <DispatchLab onClose={() => setLabOpen(false)} />}
+      {goalsOpen && <DispatchGoals onClose={() => setGoalsOpen(false)} />}
     </>
   );
 }

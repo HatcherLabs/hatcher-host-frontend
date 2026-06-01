@@ -7,6 +7,7 @@ import {
   type DispatchSkin,
   type UpgradeId,
   type UpgradeDef,
+  type Achievement,
   levelInfo,
   prestigeMultiplier,
   upgradeCost,
@@ -16,6 +17,8 @@ import {
   PACKET_XP,
   COMPLETE_XP,
   RARE_PACKET_MULT,
+  OFFLINE_RATE_PER_AGENT,
+  OFFLINE_CAP_SEC,
 } from './config';
 
 interface DispatchState {
@@ -27,13 +30,20 @@ interface DispatchState {
   upgrades: Partial<Record<UpgradeId, number>>;
   ownedSkins: string[];
   equippedSkin: string;
+  stats: { dispatches: number; packets: number };
+  achieved: string[];
+  autoDispatch: boolean;
+  lastSeen: number;
   // Runtime (not persisted).
   dispatches: ActiveDispatch[];
   lastResult: DispatchResult | null;
+  achievementToast: { name: string; reward: number } | null;
+  offlineToast: number | null;
   panelOpen: boolean;
   shopOpen: boolean;
   leaderboardOpen: boolean;
   labOpen: boolean;
+  goalsOpen: boolean;
 
   startDispatch: (d: ActiveDispatch) => boolean;
   collectPacket: (dispatchId: string, index: number, opts?: { combo?: number; rare?: boolean }) => void;
@@ -41,6 +51,10 @@ interface DispatchState {
   cancelDispatch: (dispatchId: string) => void;
   doPrestige: () => void;
   buyUpgrade: (def: UpgradeDef) => boolean;
+  unlockAchievement: (a: Achievement) => void;
+  setAuto: (v: boolean) => void;
+  applyOffline: (runningAgents: number) => void;
+  touchSeen: () => void;
   grantSkin: (id: string) => void;
   buyWithData: (skin: DispatchSkin) => boolean;
   equipSkin: (id: string) => void;
@@ -48,7 +62,10 @@ interface DispatchState {
   setShopOpen: (v: boolean) => void;
   setLeaderboardOpen: (v: boolean) => void;
   setLabOpen: (v: boolean) => void;
+  setGoalsOpen: (v: boolean) => void;
   clearResult: () => void;
+  clearAchievementToast: () => void;
+  clearOfflineToast: () => void;
 }
 
 export const useDispatchStore = create<DispatchState>()(
@@ -61,12 +78,19 @@ export const useDispatchStore = create<DispatchState>()(
       upgrades: {},
       ownedSkins: ['default'],
       equippedSkin: 'default',
+      stats: { dispatches: 0, packets: 0 },
+      achieved: [],
+      autoDispatch: false,
+      lastSeen: 0,
       dispatches: [],
       lastResult: null,
+      achievementToast: null,
+      offlineToast: null,
       panelOpen: false,
       shopOpen: false,
       leaderboardOpen: false,
       labOpen: false,
+      goalsOpen: false,
 
       startDispatch: (d) => {
         const { dispatches, upgrades } = get();
@@ -77,7 +101,7 @@ export const useDispatchStore = create<DispatchState>()(
       },
 
       collectPacket: (dispatchId, index, opts) => {
-        const { dispatches, data, xp, prestige, frameworkData, upgrades } = get();
+        const { dispatches, data, xp, prestige, frameworkData, upgrades, stats } = get();
         const dispatch = dispatches.find((d) => d.id === dispatchId);
         if (!dispatch) return;
         const packet = dispatch.packets[index];
@@ -95,6 +119,7 @@ export const useDispatchStore = create<DispatchState>()(
             ...frameworkData,
             [dispatch.framework]: (frameworkData[dispatch.framework] ?? 0) + gained,
           },
+          stats: { ...stats, packets: stats.packets + 1 },
           dispatches: dispatches.map((d) =>
             d.id === dispatchId
               ? { ...d, collected: d.collected + 1, packets: [...d.packets] }
@@ -104,7 +129,7 @@ export const useDispatchStore = create<DispatchState>()(
       },
 
       completeDispatch: (dispatchId) => {
-        const { dispatches, data, xp, prestige, frameworkData, upgrades } = get();
+        const { dispatches, data, xp, prestige, frameworkData, upgrades, stats } = get();
         const dispatch = dispatches.find((d) => d.id === dispatchId);
         if (!dispatch) return;
         const mult = prestigeMultiplier(prestige);
@@ -120,6 +145,7 @@ export const useDispatchStore = create<DispatchState>()(
             ...frameworkData,
             [dispatch.framework]: (frameworkData[dispatch.framework] ?? 0) + reward,
           },
+          stats: { ...stats, dispatches: stats.dispatches + 1 },
           dispatches: dispatches.filter((d) => d.id !== dispatchId),
           lastResult: {
             agentName: dispatch.agentName,
@@ -152,6 +178,35 @@ export const useDispatchStore = create<DispatchState>()(
         return true;
       },
 
+      unlockAchievement: (a) => {
+        const { achieved, data } = get();
+        if (achieved.includes(a.id)) return;
+        set({
+          achieved: [...achieved, a.id],
+          data: data + a.reward,
+          achievementToast: { name: a.name, reward: a.reward },
+        });
+      },
+
+      setAuto: (v) => set({ autoDispatch: v }),
+
+      applyOffline: (runningAgents) => {
+        const { lastSeen, autoDispatch, data } = get();
+        if (!autoDispatch || lastSeen === 0 || runningAgents === 0) {
+          set({ lastSeen: Date.now() });
+          return;
+        }
+        const secAway = Math.min(OFFLINE_CAP_SEC, (Date.now() - lastSeen) / 1000);
+        const earned = Math.floor(secAway * OFFLINE_RATE_PER_AGENT * runningAgents);
+        set({
+          lastSeen: Date.now(),
+          data: earned > 0 ? data + earned : data,
+          offlineToast: earned > 30 ? earned : null,
+        });
+      },
+
+      touchSeen: () => set({ lastSeen: Date.now() }),
+
       grantSkin: (id) => {
         const { ownedSkins } = get();
         if (ownedSkins.includes(id)) return;
@@ -176,7 +231,10 @@ export const useDispatchStore = create<DispatchState>()(
       setShopOpen: (v) => set({ shopOpen: v }),
       setLeaderboardOpen: (v) => set({ leaderboardOpen: v }),
       setLabOpen: (v) => set({ labOpen: v }),
+      setGoalsOpen: (v) => set({ goalsOpen: v }),
       clearResult: () => set({ lastResult: null }),
+      clearAchievementToast: () => set({ achievementToast: null }),
+      clearOfflineToast: () => set({ offlineToast: null }),
     }),
     {
       name: 'hatcher-dispatch-v1',
@@ -188,6 +246,10 @@ export const useDispatchStore = create<DispatchState>()(
         upgrades: s.upgrades,
         ownedSkins: s.ownedSkins,
         equippedSkin: s.equippedSkin,
+        stats: s.stats,
+        achieved: s.achieved,
+        autoDispatch: s.autoDispatch,
+        lastSeen: s.lastSeen,
       }),
     },
   ),
