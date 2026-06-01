@@ -67,6 +67,8 @@ export function DispatchHud({
   const autoDispatch = useDispatchStore((s) => s.autoDispatch);
   const achievementToast = useDispatchStore((s) => s.achievementToast);
   const offlineToast = useDispatchStore((s) => s.offlineToast);
+  const streak = useDispatchStore((s) => s.streak);
+  const streakToast = useDispatchStore((s) => s.streakToast);
   const lastResult = useDispatchStore((s) => s.lastResult);
   const setPanelOpen = useDispatchStore((s) => s.setPanelOpen);
   const setShopOpen = useDispatchStore((s) => s.setShopOpen);
@@ -78,9 +80,11 @@ export function DispatchHud({
   const doPrestige = useDispatchStore((s) => s.doPrestige);
   const unlockAchievement = useDispatchStore((s) => s.unlockAchievement);
   const applyOffline = useDispatchStore((s) => s.applyOffline);
+  const claimDaily = useDispatchStore((s) => s.claimDaily);
   const clearResult = useDispatchStore((s) => s.clearResult);
   const clearAchievementToast = useDispatchStore((s) => s.clearAchievementToast);
   const clearOfflineToast = useDispatchStore((s) => s.clearOfflineToast);
+  const clearStreakToast = useDispatchStore((s) => s.clearStreakToast);
 
   useDispatchScoreSync();
 
@@ -204,6 +208,16 @@ export function DispatchHud({
     };
   }, []);
 
+  // Daily login streak — claim once on mount.
+  useEffect(() => {
+    claimDaily();
+  }, [claimDaily]);
+  useEffect(() => {
+    if (!streakToast) return;
+    const t = window.setTimeout(() => clearStreakToast(), 6000);
+    return () => window.clearTimeout(t);
+  }, [streakToast, clearStreakToast]);
+
   // Auto-dismiss toasts.
   useEffect(() => {
     if (!achievementToast) return;
@@ -257,7 +271,12 @@ export function DispatchHud({
                   </span>
                 )}
               </span>
-              <span className="text-[#9fceb4]">◆ {Math.round(data).toLocaleString()} Data</span>
+              <span className="text-[#9fceb4]">
+                {streak.count > 0 && (
+                  <span className="mr-2 text-[#ff8a3a]" title={`${streak.count}-day streak`}>🔥{streak.count}</span>
+                )}
+                ◆ {Math.round(data).toLocaleString()} Data
+              </span>
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-white/10">
               <div className="h-full rounded-full bg-[#39ff88] transition-all" style={{ width: `${Math.round(lvl.pct * 100)}%` }} />
@@ -412,6 +431,14 @@ export function DispatchHud({
         <div className="fixed bottom-40 left-1/2 z-40 -translate-x-1/2 rounded-xl border border-[#ffd24a]/50 bg-[rgba(8,12,10,0.96)] px-5 py-3 text-center text-sm shadow-2xl backdrop-blur">
           <div className="font-bold text-[#ffd24a]">✔ {achievementToast.name}</div>
           <div className="mt-0.5 text-xs text-[#dffbe9]">Achievement unlocked · +{achievementToast.reward} Data</div>
+        </div>
+      )}
+
+      {/* Daily streak toast */}
+      {streakToast && (
+        <div className="fixed top-32 left-1/2 z-40 -translate-x-1/2 rounded-xl border border-[#ff8a3a]/50 bg-[rgba(8,12,10,0.96)] px-5 py-3 text-center text-sm shadow-2xl backdrop-blur">
+          <div className="font-bold text-[#ff8a3a]">🔥 {streakToast.count}-day streak!</div>
+          <div className="mt-0.5 text-xs text-[#dffbe9]">Daily bonus · +{streakToast.bonus} Data</div>
         </div>
       )}
 

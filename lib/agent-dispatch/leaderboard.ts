@@ -42,3 +42,36 @@ export async function fetchLeaderboard(): Promise<LeaderboardData | null> {
     return null;
   }
 }
+
+export interface SeasonBoardRow {
+  rank: number;
+  username: string;
+  value: number;
+  prizeUsd: number;
+}
+
+export interface SeasonWinner {
+  rank: number;
+  username: string;
+  data: number;
+  prizeUsd: number;
+}
+
+export interface SeasonData {
+  month: string;
+  monthEnd: string;
+  prizeTable: { label: string; prizeUsd: number }[];
+  board: SeasonBoardRow[];
+  you: { rank: number; value: number; prizeUsd: number } | null;
+  past: { month: string; winners: SeasonWinner[]; paidAt: string | null }[];
+}
+
+export async function fetchSeason(): Promise<SeasonData | null> {
+  try {
+    const res = await fetch(`${API_URL}/dispatch/season`, { credentials: 'include' });
+    const json = (await res.json()) as { success?: boolean; data?: SeasonData };
+    return json?.data ?? null;
+  } catch {
+    return null;
+  }
+}

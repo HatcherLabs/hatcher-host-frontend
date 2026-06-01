@@ -19,6 +19,10 @@ import {
   RARE_PACKET_MULT,
   OFFLINE_RATE_PER_AGENT,
   OFFLINE_CAP_SEC,
+  DAILY_BASE,
+  DAILY_MAX_MULT,
+  todayKey,
+  yesterdayKey,
 } from './config';
 
 interface DispatchState {
@@ -34,11 +38,13 @@ interface DispatchState {
   achieved: string[];
   autoDispatch: boolean;
   lastSeen: number;
+  streak: { count: number; lastDay: string };
   // Runtime (not persisted).
   dispatches: ActiveDispatch[];
   lastResult: DispatchResult | null;
   achievementToast: { name: string; reward: number } | null;
   offlineToast: number | null;
+  streakToast: { bonus: number; count: number } | null;
   panelOpen: boolean;
   shopOpen: boolean;
   leaderboardOpen: boolean;
@@ -55,6 +61,8 @@ interface DispatchState {
   setAuto: (v: boolean) => void;
   applyOffline: (runningAgents: number) => void;
   touchSeen: () => void;
+  claimDaily: () => void;
+  clearStreakToast: () => void;
   grantSkin: (id: string) => void;
   buyWithData: (skin: DispatchSkin) => boolean;
   equipSkin: (id: string) => void;
@@ -82,10 +90,12 @@ export const useDispatchStore = create<DispatchState>()(
       achieved: [],
       autoDispatch: false,
       lastSeen: 0,
+      streak: { count: 0, lastDay: '' },
       dispatches: [],
       lastResult: null,
       achievementToast: null,
       offlineToast: null,
+      streakToast: null,
       panelOpen: false,
       shopOpen: false,
       leaderboardOpen: false,
@@ -207,6 +217,17 @@ export const useDispatchStore = create<DispatchState>()(
 
       touchSeen: () => set({ lastSeen: Date.now() }),
 
+      claimDaily: () => {
+        const today = todayKey();
+        const { streak, data } = get();
+        if (streak.lastDay === today) return;
+        const count = streak.lastDay === yesterdayKey() ? streak.count + 1 : 1;
+        const bonus = DAILY_BASE * Math.min(count, DAILY_MAX_MULT);
+        set({ data: data + bonus, streak: { count, lastDay: today }, streakToast: { bonus, count } });
+      },
+
+      clearStreakToast: () => set({ streakToast: null }),
+
       grantSkin: (id) => {
         const { ownedSkins } = get();
         if (ownedSkins.includes(id)) return;
@@ -250,6 +271,7 @@ export const useDispatchStore = create<DispatchState>()(
         achieved: s.achieved,
         autoDispatch: s.autoDispatch,
         lastSeen: s.lastSeen,
+        streak: s.streak,
       }),
     },
   ),

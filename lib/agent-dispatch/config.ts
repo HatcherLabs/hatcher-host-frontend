@@ -202,6 +202,17 @@ export const ACHIEVEMENTS: Achievement[] = [
 export const OFFLINE_RATE_PER_AGENT = 0.6; // Data/sec per running agent while auto-dispatching
 export const OFFLINE_CAP_SEC = 8 * 3600; // max 8h of offline accrual
 
+// ── Daily streak ────────────────────────────────────────────────────────
+export const DAILY_BASE = 60; // Data on day 1
+export const DAILY_MAX_MULT = 7; // streak caps the multiplier at 7×
+
+export function todayKey(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+export function yesterdayKey(): string {
+  return new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);
+}
+
 // ── Skin catalog ────────────────────────────────────────────────────────
 export const DISPATCH_SKINS: DispatchSkin[] = [
   { id: 'default', name: 'Standard', desc: 'The classic gold courier.', currency: 'data', price: 0, color: '#ffd24a', trail: '#ffe27a' },
