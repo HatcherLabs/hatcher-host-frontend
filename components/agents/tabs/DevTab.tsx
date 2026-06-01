@@ -102,9 +102,7 @@ export function DevTab() {
   const [githubRepo, setGithubRepo] = useState("");
   const [githubSaving, setGithubSaving] = useState(false);
   const [githubReposLoading, setGithubReposLoading] = useState(false);
-  const [githubRepos, setGithubRepos] = useState<AgentGithubRepoListItem[]>(
-    [],
-  );
+  const [githubRepos, setGithubRepos] = useState<AgentGithubRepoListItem[]>([]);
   const [allowedGithubRepos, setAllowedGithubRepos] = useState<Set<string>>(
     new Set(),
   );
@@ -137,7 +135,8 @@ export function DevTab() {
   const hasGithubConfig =
     hasGithubToken || hasGithubRepo || hasGithubAllowedRepos;
   const githubUi = useMemo(
-    () => getGithubConnectionUi(hasGithubToken, hasGithubRepo, githubTestResult),
+    () =>
+      getGithubConnectionUi(hasGithubToken, hasGithubRepo, githubTestResult),
     [githubTestResult, hasGithubRepo, hasGithubToken],
   );
   const githubRepoError = getGithubRepoInputError(githubRepo);
@@ -238,10 +237,10 @@ export function DevTab() {
     const results = await Promise.all(
       writes.map((write) => api.setEnvVar(agentId, write.key, write.value)),
     );
-    setGithubSaving(false);
 
     const failed = results.find((result) => !result.success);
     if (failed) {
+      setGithubSaving(false);
       setGithubMessage(
         `Error: ${failed.error ?? "Failed to save GitHub credentials"}`,
       );
@@ -249,10 +248,29 @@ export function DevTab() {
     }
 
     setGithubToken("");
+    if (agent.status === "active") {
+      const restart = await api.restartAgent(agentId);
+      setGithubSaving(false);
+      if (!restart.success) {
+        setGithubMessage(
+          `Saved encrypted, but restart failed: ${
+            restart.error ?? "restart the agent manually to mount GitHub env"
+          }`,
+        );
+        await loadDevState();
+        return;
+      }
+
+      setGithubMessage(
+        "Saved encrypted and restarted the agent with the new GitHub env.",
+      );
+      await Promise.all([loadAgent(), loadDevState()]);
+      return;
+    }
+
+    setGithubSaving(false);
     setGithubMessage(
-      agent.status === "active"
-        ? "Saved encrypted. Restart the agent or reconnect terminal sessions to mount the new GitHub env."
-        : "Saved encrypted. Start the agent to expose GitHub env to runtime.",
+      "Saved encrypted. Start the agent to expose GitHub env to runtime.",
     );
     await loadDevState();
   };
@@ -296,7 +314,11 @@ export function DevTab() {
     }
     setGithubRepos(res.data.repos);
     setAllowedGithubRepos(
-      new Set(res.data.repos.filter((repo) => repo.allowed).map((repo) => repo.fullName)),
+      new Set(
+        res.data.repos
+          .filter((repo) => repo.allowed)
+          .map((repo) => repo.fullName),
+      ),
     );
     if (res.data.defaultRepo) setGithubRepo(res.data.defaultRepo);
     setGithubMessage(
@@ -336,9 +358,11 @@ export function DevTab() {
     setGithubTestResult(null);
     setError(null);
     const res = await api.disconnectAgentGithub(agentId);
-    setGithubDisconnecting(false);
     if (!res.success) {
-      setGithubMessage(`Error: ${res.error ?? "Failed to remove GitHub credentials"}`);
+      setGithubDisconnecting(false);
+      setGithubMessage(
+        `Error: ${res.error ?? "Failed to remove GitHub credentials"}`,
+      );
       return;
     }
 
@@ -346,6 +370,25 @@ export function DevTab() {
     setGithubRepo("");
     setGithubRepos([]);
     setAllowedGithubRepos(new Set());
+    if (agent.status === "active") {
+      const restart = await api.restartAgent(agentId);
+      setGithubDisconnecting(false);
+      if (!restart.success) {
+        setGithubMessage(
+          `${res.data.message} Restart failed, so restart the agent manually to unmount old GitHub env.`,
+        );
+        await loadDevState();
+        return;
+      }
+
+      setGithubMessage(
+        `${res.data.message} Agent restarted with GitHub env removed.`,
+      );
+      await Promise.all([loadAgent(), loadDevState()]);
+      return;
+    }
+
+    setGithubDisconnecting(false);
     setGithubMessage(res.data.message);
     await loadDevState();
   };
@@ -625,7 +668,9 @@ export function DevTab() {
                   const nextRepo = event.target.value;
                   setGithubRepo(nextRepo);
                   if (nextRepo) {
-                    setAllowedGithubRepos((current) => new Set(current).add(nextRepo));
+                    setAllowedGithubRepos((current) =>
+                      new Set(current).add(nextRepo),
+                    );
                   }
                 }}
                 className="w-full rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-2 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent)]"
