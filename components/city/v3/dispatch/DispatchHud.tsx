@@ -1,13 +1,20 @@
 'use client';
 import { useEffect, useMemo, useRef, useState, type MutableRefObject } from 'react';
 import { useDispatchStore } from '@/lib/agent-dispatch/store';
-import { levelInfo, prestigeMultiplier, PRESTIGE_LEVEL } from '@/lib/agent-dispatch/config';
+import {
+  levelInfo,
+  prestigeMultiplier,
+  upgradeEffects,
+  JOB_TYPES,
+  PRESTIGE_LEVEL,
+} from '@/lib/agent-dispatch/config';
 import { buildDispatchRoute, pathLength, spawnPackets } from '@/lib/agent-dispatch/route';
 import type { LiveCityGrid } from '../liveCityHandoff';
 import type { LiveAgentPose } from '../liveAgentMotion';
 import type { CityAgent } from '../../types';
 import { SkinShop } from './SkinShop';
 import { DispatchLeaderboard } from './DispatchLeaderboard';
+import { DispatchLab } from './DispatchLab';
 import { useDispatchScoreSync } from '@/lib/agent-dispatch/useScoreSync';
 
 interface Dest {
@@ -48,10 +55,13 @@ export function DispatchHud({
   const panelOpen = useDispatchStore((s) => s.panelOpen);
   const shopOpen = useDispatchStore((s) => s.shopOpen);
   const leaderboardOpen = useDispatchStore((s) => s.leaderboardOpen);
+  const labOpen = useDispatchStore((s) => s.labOpen);
+  const upgrades = useDispatchStore((s) => s.upgrades);
   const lastResult = useDispatchStore((s) => s.lastResult);
   const setPanelOpen = useDispatchStore((s) => s.setPanelOpen);
   const setShopOpen = useDispatchStore((s) => s.setShopOpen);
   const setLeaderboardOpen = useDispatchStore((s) => s.setLeaderboardOpen);
+  const setLabOpen = useDispatchStore((s) => s.setLabOpen);
   const startDispatch = useDispatchStore((s) => s.startDispatch);
   const doPrestige = useDispatchStore((s) => s.doPrestige);
   const clearResult = useDispatchStore((s) => s.clearResult);
@@ -68,6 +78,7 @@ export function DispatchHud({
 
   const [agentId, setAgentId] = useState('');
   const [destIdx, setDestIdx] = useState(0);
+  const [jobIdx, setJobIdx] = useState(0);
   // Re-render every second so countdowns tick.
   const [, force] = useState(0);
   useEffect(() => {
@@ -91,12 +102,18 @@ export function DispatchHud({
     const agent = available.find((a) => a.id === selected);
     if (!agent) return;
     const dest = dests[destIdx]!;
+    const job = JOB_TYPES[jobIdx]!;
+    const fx = upgradeEffects(upgrades);
     const pose = agentPosesRef.current.get(agent.id);
     const start = pose ? { x: pose.x, z: pose.z } : { x: 0, z: 0 };
     const route = buildDispatchRoute(start, dest);
     const totalLength = pathLength(route);
-    const packetCount = Math.min(10, Math.max(5, Math.round(totalLength / 40)));
-    const durationMs = Math.min(90000, Math.max(20000, (totalLength / 5) * 1000));
+    const basePackets = Math.min(10, Math.max(5, Math.round(totalLength / 40)));
+    const packetCount = Math.max(3, Math.round(basePackets * job.packetMult) + fx.extraPackets);
+    const durationMs = Math.min(
+      90000,
+      Math.max(12000, (totalLength / 5) * 1000 * fx.durationMult * job.durationMult),
+    );
     dispatchSeq += 1;
     startDispatch({
       id: `dsp-${dispatchSeq}-${agent.id}`,
@@ -108,10 +125,12 @@ export function DispatchHud({
       totalLength,
       startedAt: Date.now(),
       durationMs,
-      packets: spawnPackets(route, totalLength, packetCount),
+      packets: spawnPackets(route, totalLength, packetCount, job.rarePackets),
       collected: 0,
-      baseReward: 15 + Math.round(totalLength / 20),
+      baseReward: Math.round((15 + totalLength / 20) * job.rewardMult),
       startLevel: lvl.level,
+      xpMult: job.xpMult,
+      jobName: job.name,
     });
   };
 
@@ -193,6 +212,20 @@ export function DispatchHud({
                   </option>
                 ))}
               </select>
+              <div className="flex gap-1">
+                {JOB_TYPES.map((j, i) => (
+                  <button
+                    key={j.id}
+                    onClick={() => setJobIdx(i)}
+                    title={j.desc}
+                    className={`flex-1 rounded-md px-1 py-1 text-[10px] font-semibold transition ${
+                      jobIdx === i ? 'bg-[#39ff88] text-black' : 'bg-white/5 text-[#9fceb4] hover:bg-white/10'
+                    }`}
+                  >
+                    {j.name}
+                  </button>
+                ))}
+              </div>
               <div className="flex gap-2">
                 <select
                   value={destIdx}
@@ -248,14 +281,20 @@ export function DispatchHud({
 
           <div className="flex gap-2">
             <button
+              onClick={() => setLabOpen(true)}
+              className="flex-1 rounded-lg border border-[#39ff88]/30 bg-black/30 px-2 py-2 text-sm font-semibold text-[#39ff88] transition hover:bg-[#39ff88]/10"
+            >
+              ⚗ Lab
+            </button>
+            <button
               onClick={() => setShopOpen(true)}
-              className="flex-1 rounded-lg border border-[#39ff88]/30 bg-black/30 px-3 py-2 text-sm font-semibold text-[#39ff88] transition hover:bg-[#39ff88]/10"
+              className="flex-1 rounded-lg border border-[#39ff88]/30 bg-black/30 px-2 py-2 text-sm font-semibold text-[#39ff88] transition hover:bg-[#39ff88]/10"
             >
               ✦ Skins
             </button>
             <button
               onClick={() => setLeaderboardOpen(true)}
-              className="flex-1 rounded-lg border border-[#39ff88]/30 bg-black/30 px-3 py-2 text-sm font-semibold text-[#39ff88] transition hover:bg-[#39ff88]/10"
+              className="flex-1 rounded-lg border border-[#39ff88]/30 bg-black/30 px-2 py-2 text-sm font-semibold text-[#39ff88] transition hover:bg-[#39ff88]/10"
             >
               ☷ Ranks
             </button>
@@ -280,6 +319,7 @@ export function DispatchHud({
 
       {shopOpen && <SkinShop onClose={() => setShopOpen(false)} />}
       {leaderboardOpen && <DispatchLeaderboard onClose={() => setLeaderboardOpen(false)} />}
+      {labOpen && <DispatchLab onClose={() => setLabOpen(false)} />}
     </>
   );
 }

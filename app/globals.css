@@ -1131,3 +1131,9 @@ button, a, [role="tab"] {
 .hatcher-terminal-frame .xterm-viewport::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 255, 65, 0.7);
 }
+
+/* Agent Dispatch — floating +Data popup on packet pickup */
+@keyframes dispatch-float {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-30px); opacity: 0; }
+}

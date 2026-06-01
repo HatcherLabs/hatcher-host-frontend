@@ -17,6 +17,7 @@ export interface DispatchPacket {
   x: number;
   z: number;
   collected: boolean;
+  rare?: boolean;
 }
 
 export interface ActiveDispatch {
@@ -33,6 +34,8 @@ export interface ActiveDispatch {
   collected: number;
   baseReward: number; // Data awarded on completion (before packet bonus)
   startLevel: number; // viewer level when the run began (for "leveled up" toast)
+  xpMult: number; // job-type XP multiplier
+  jobName: string;
 }
 
 export interface DispatchResult {
@@ -92,6 +95,79 @@ export const PRESTIGE_BONUS = 0.25; // +25% Data/XP per prestige rank
 export function prestigeMultiplier(prestige: number): number {
   return 1 + prestige * PRESTIGE_BONUS;
 }
+
+// ── Upgrades (Lab) ──────────────────────────────────────────────────────
+export type UpgradeId = 'payout' | 'speed' | 'radius' | 'yield' | 'magnet' | 'slots';
+
+export interface UpgradeDef {
+  id: UpgradeId;
+  name: string;
+  desc: string;
+  icon: string;
+  baseCost: number;
+  costMult: number;
+  maxLevel: number;
+}
+
+export const UPGRADES: UpgradeDef[] = [
+  { id: 'payout', name: 'Data Yield', desc: '+12% Data per packet & run', icon: '◆', baseCost: 180, costMult: 1.65, maxLevel: 10 },
+  { id: 'speed', name: 'Thrusters', desc: 'Couriers travel ~8% faster', icon: '➤', baseCost: 140, costMult: 1.7, maxLevel: 8 },
+  { id: 'radius', name: 'Collector Array', desc: '+15% pickup radius', icon: '◎', baseCost: 120, costMult: 1.6, maxLevel: 6 },
+  { id: 'yield', name: 'Cargo Bays', desc: '+1 packet per run', icon: '▤', baseCost: 160, costMult: 1.7, maxLevel: 8 },
+  { id: 'magnet', name: 'Tractor Beam', desc: 'Nearby packets drift to the courier', icon: '✦', baseCost: 320, costMult: 1.8, maxLevel: 5 },
+  { id: 'slots', name: 'Ops Center', desc: '+1 simultaneous dispatch', icon: '⊞', baseCost: 500, costMult: 2.0, maxLevel: 4 },
+];
+
+export function upgradeCost(def: UpgradeDef, level: number): number {
+  return Math.round(def.baseCost * Math.pow(def.costMult, level));
+}
+
+export interface UpgradeEffects {
+  durationMult: number;
+  collectRadius: number;
+  extraPackets: number;
+  maxSlots: number;
+  payoutMult: number;
+  magnetRange: number;
+}
+
+export const BASE_COLLECT_RADIUS = 2.4;
+export const BASE_SLOTS = 2;
+
+export function upgradeEffects(levels: Partial<Record<UpgradeId, number>>): UpgradeEffects {
+  const lv = (id: UpgradeId) => levels[id] ?? 0;
+  return {
+    durationMult: Math.max(0.4, 1 - 0.08 * lv('speed')),
+    collectRadius: BASE_COLLECT_RADIUS * (1 + 0.15 * lv('radius')),
+    extraPackets: lv('yield'),
+    maxSlots: BASE_SLOTS + lv('slots'),
+    payoutMult: 1 + 0.12 * lv('payout'),
+    magnetRange: lv('magnet') > 0 ? 2 + lv('magnet') * 2.2 : 0,
+  };
+}
+
+// ── Job types ───────────────────────────────────────────────────────────
+export interface JobType {
+  id: string;
+  name: string;
+  desc: string;
+  durationMult: number;
+  packetMult: number;
+  rewardMult: number;
+  xpMult: number;
+  rarePackets: number;
+}
+
+export const JOB_TYPES: JobType[] = [
+  { id: 'standard', name: 'Standard', desc: 'Balanced data run.', durationMult: 1, packetMult: 1, rewardMult: 1, xpMult: 1, rarePackets: 0 },
+  { id: 'express', name: 'Express', desc: 'Fast & short — big XP.', durationMult: 0.6, packetMult: 0.7, rewardMult: 0.9, xpMult: 1.4, rarePackets: 0 },
+  { id: 'hazard', name: 'Hazard', desc: 'Longer, packed with data.', durationMult: 1.4, packetMult: 1.8, rewardMult: 1.25, xpMult: 1.15, rarePackets: 0 },
+  { id: 'treasure', name: 'Treasure', desc: 'Fewer packets, one rare prize.', durationMult: 1.1, packetMult: 0.6, rewardMult: 1, xpMult: 1, rarePackets: 1 },
+];
+
+export const RARE_PACKET_MULT = 10;
+export const COMBO_WINDOW_MS = 2500;
+export const COMBO_MAX = 5;
 
 // ── Skin catalog ────────────────────────────────────────────────────────
 export const DISPATCH_SKINS: DispatchSkin[] = [

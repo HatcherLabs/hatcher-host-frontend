@@ -28,13 +28,21 @@ export function buildDispatchRoute(start: Pt, dest: Pt): Pt[] {
   ];
 }
 
-/** Evenly spaced collectibles along the route (excluding the very ends). */
-export function spawnPackets(route: Pt[], totalLength: number, count: number): DispatchPacket[] {
+/**
+ * Evenly spaced collectibles along the route (excluding the very ends). The
+ * last `rareCount` packets are flagged rare (worth a large multiplier).
+ */
+export function spawnPackets(
+  route: Pt[],
+  totalLength: number,
+  count: number,
+  rareCount = 0,
+): DispatchPacket[] {
   const packets: DispatchPacket[] = [];
   for (let i = 1; i <= count; i++) {
     const d = (i / (count + 1)) * totalLength;
     const p = sampleLiveAgentPath(route, d);
-    packets.push({ x: p.x, z: p.z, collected: false });
+    packets.push({ x: p.x, z: p.z, collected: false, rare: i > count - rareCount });
   }
   return packets;
 }
