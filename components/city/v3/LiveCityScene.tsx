@@ -1,6 +1,7 @@
 'use client';
 import { MapControls } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import {
   ArrowLeft,
   Bot,
@@ -389,6 +390,23 @@ function LiveCitySceneBody({
           markers={layout.markers}
           mobileAnalog={mobileWalkVector.current}
         />
+        {/* Phase 1 polish: selective bloom makes the city's emissive elements
+            (beacons, lit windows, agent halos/trails, signal packets — all
+            rendered with toneMapped=false) actually GLOW, turning the flat
+            diorama into a living neon grid. Plus a subtle vignette to frame it.
+            Disabled on 'low' quality to protect weak/mobile GPUs. */}
+        {quality !== 'low' ? (
+          <EffectComposer multisampling={quality === 'high' ? 4 : 0}>
+            <Bloom
+              mipmapBlur
+              luminanceThreshold={0.62}
+              luminanceSmoothing={0.2}
+              intensity={0.85}
+              radius={0.6}
+            />
+            <Vignette eskil={false} offset={0.32} darkness={0.55} />
+          </EffectComposer>
+        ) : null}
       </Canvas>
       <div className="hidden md:block">
         <QualityToggle />

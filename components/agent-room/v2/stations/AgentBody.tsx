@@ -916,7 +916,10 @@ function cloneAvatarScene(
       const next = material.clone();
       if (next instanceof THREE.MeshStandardMaterial) {
         next.roughness = Math.min(0.92, next.roughness + 0.08);
-        next.envMapIntensity = 0.14;
+        // Phase 1: the room now has procedural IBL (Lightformer Environment),
+        // so let metal/glass actually reflect it instead of reading as matte
+        // plastic (was 0.14 when there was no env map).
+        next.envMapIntensity = 0.85;
       }
       return next;
     });
