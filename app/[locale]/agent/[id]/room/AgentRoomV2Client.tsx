@@ -210,6 +210,7 @@ export function AgentRoomV2Client({ agentId }: Props) {
   const [chatUnread, setChatUnread] = useState(0);
   // First-person cockpit vs third-person (see your avatar). Toggle with 'V'.
   const [cameraMode, setCameraMode] = useState<'first' | 'third'>('first');
+  const [audioMuted, setAudioMuted] = useState(false);
   const [passport, setPassport] = useState<AgentPassport | null>(null);
   const [laptopOpen, setLaptopOpen] = useState(false);
   const [laptopInitialTab, setLaptopInitialTab] = useState<LaptopTab>('status');
@@ -886,6 +887,8 @@ export function AgentRoomV2Client({ agentId }: Props) {
         isChatStreaming={isChatStreaming}
         eyesLive={eyesState?.status === 'live'}
         cameraMode={cameraMode}
+        audioMuted={audioMuted}
+        chatMessageCount={chatMessages.length}
         avatarVariant={selectedAvatarVariant}
         avatarTraits={selectedAvatarTraits}
         activeEmote={activeEmote}
@@ -952,6 +955,7 @@ export function AgentRoomV2Client({ agentId }: Props) {
         mode={cameraMode}
         onToggle={() => setCameraMode((m) => (m === 'first' ? 'third' : 'first'))}
       />
+      <SoundToggleButton muted={audioMuted} onToggle={() => setAudioMuted((m) => !m)} />
       {laptopOpen && canEdit && (
         <LaptopPanel
           agentId={apiId}
@@ -1084,6 +1088,19 @@ function ViewToggleButton({
     >
       <span aria-hidden>{mode === 'first' ? '👁' : '🎥'}</span>
       <span>{mode === 'first' ? '1st person' : '3rd person'}</span>
+    </button>
+  );
+}
+
+function SoundToggleButton({ muted, onToggle }: { muted: boolean; onToggle: () => void }) {
+  return (
+    <button
+      onClick={onToggle}
+      aria-label={muted ? 'Unmute room audio' : 'Mute room audio'}
+      title={muted ? 'Unmute room audio' : 'Mute room audio'}
+      className="fixed bottom-[4.75rem] left-4 z-40 hidden h-11 w-11 items-center justify-center rounded-full border border-[#d6b177]/60 bg-[rgba(21,16,11,0.92)] text-lg text-[#f6ead8] shadow-xl backdrop-blur transition hover:scale-105 active:scale-95 md:flex"
+    >
+      <span aria-hidden>{muted ? '🔇' : '🔊'}</span>
     </button>
   );
 }

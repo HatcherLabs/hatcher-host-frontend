@@ -13,6 +13,7 @@ import {
 } from './character';
 import { ThirdPersonCamera } from './character/ThirdPersonCamera';
 import { PlayerAvatar } from './PlayerAvatar';
+import { RoomAudio } from './RoomAudio';
 import { getStationLayout, type StationId, type StationLayout } from './world/layout';
 import { collidersFromLayout, wallColliders } from './world/colliders';
 import { AgentAvatar } from './stations/AgentAvatar';
@@ -38,6 +39,8 @@ interface Props {
   isChatStreaming?: boolean;
   eyesLive?: boolean;
   cameraMode?: 'first' | 'third';
+  audioMuted?: boolean;
+  chatMessageCount?: number;
   avatarVariant?: string | null;
   avatarTraits?: unknown;
   activeEmote?: RoomEmoteId | null;
@@ -76,6 +79,8 @@ export function AgentRoomSceneV2({
   isChatStreaming,
   eyesLive,
   cameraMode = 'first',
+  audioMuted,
+  chatMessageCount,
   avatarVariant,
   avatarTraits,
   activeEmote,
@@ -166,6 +171,11 @@ export function AgentRoomSceneV2({
             active={!!isChatStreaming || !!eyesLive}
             framework={framework}
             position={layout.agentAvatar.position}
+          />
+          <RoomAudio
+            agentPosition={layout.agentAvatar.position}
+            muted={!!audioMuted}
+            messageCount={chatMessageCount ?? 0}
           />
           <CharacterController
             state={charState}
