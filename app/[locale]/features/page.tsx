@@ -204,7 +204,7 @@ const FEATURES: Feature[] = [
     title: 'Model and provider control',
     short: 'Use hosted models, IDLE models, BYOK, and presets.',
     detail:
-      'The model selector gives users a clearer view of providers, costs, privacy posture, context windows, strengths, and active presets. Hatcher can route through UsePod/OpenRouter, IDLE Haiku/Sonnet, Xiaomi MiMo launch-promo models, or BYOK providers.',
+      'The model selector gives users a clearer view of providers, costs, privacy posture, context windows, strengths, and active presets. Hatcher can route through UsePod/OpenRouter, IDLE Haiku/Sonnet, Xiaomi MiMo launch-promo models, AceData partner models, or BYOK providers.',
     bullets: ['Provider table', 'Model presets', 'BYOK', 'AI Credit metering'],
     icon: Layers,
     tone: 'amber',
