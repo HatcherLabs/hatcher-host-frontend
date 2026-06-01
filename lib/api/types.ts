@@ -176,6 +176,12 @@ export interface AgentGithubTestResponse {
   message: string;
 }
 
+export interface AgentGithubDisconnectResponse {
+  disconnected: boolean;
+  deletedKeys: string[];
+  message: string;
+}
+
 export interface AgentGithubRepoListItem {
   fullName: string;
   private: boolean;
@@ -197,6 +203,7 @@ export interface AgentGithubReposResponse {
 export interface AgentGithubConnectStartResponse {
   configured: boolean;
   authUrl: string | null;
+  redirectUri?: string;
   message: string;
 }
 
