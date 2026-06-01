@@ -136,14 +136,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const hasLocalToken = isAuthenticated();
 
     api.getSession().then((res) => {
-      if (res.success && res.data.authenticated && res.data.user) {
-        setAuthed(true);
-        setUser(mapProfile(res.data.user));
-      } else {
-        if (hasLocalToken) clearToken();
-        setAuthed(false);
-        setUser(null);
+      if (res.success) {
+        if (res.data.authenticated && res.data.user) {
+          setAuthed(true);
+          setUser(mapProfile(res.data.user));
+        } else {
+          // Server definitively says we're not signed in.
+          if (hasLocalToken) clearToken();
+          setAuthed(false);
+          setUser(null);
+        }
       }
+      // else: the probe itself failed (network error / 5xx). Don't sign the
+      // user out over a transient server hiccup — a valid cookie is still a
+      // valid session. Leave the current state and let the next probe decide.
     }).finally(() => setIsLoading(false));
   }, []);
 
