@@ -854,6 +854,21 @@ function isGlbAvatarVariant(
   return variant in AVATAR_MODEL_CONFIG;
 }
 
+export type { AvatarModelConfig };
+
+/**
+ * Resolve a (possibly legacy/aliased) variant id to its rigged-GLB model
+ * config, or null if the variant is procedural / unknown. Used by the city
+ * walker to render an agent's real chosen avatar instead of the generic robot.
+ */
+export function getGlbAvatarModel(variant: string): AvatarModelConfig | null {
+  const normalized = normalizeAvatarVariant(variant);
+  if (normalized && isGlbAvatarVariant(normalized)) {
+    return AVATAR_MODEL_CONFIG[normalized];
+  }
+  return null;
+}
+
 function pickClip(
   animations: THREE.AnimationClip[] | undefined,
   clip: string | number | undefined,

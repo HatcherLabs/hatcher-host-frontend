@@ -34,6 +34,7 @@ export interface CityAgent {
   slug: string | null;
   name: string;
   avatarUrl: string | null;
+  avatarVariant?: string | null; // room avatar variant id, drives the city walker model
   framework: Framework;
   category: Category;
   ownerKey?: string | null;

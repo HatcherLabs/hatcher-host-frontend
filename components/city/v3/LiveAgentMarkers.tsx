@@ -1,11 +1,13 @@
 'use client';
 import { useFrame } from '@react-three/fiber';
 import type { MutableRefObject } from 'react';
-import { useEffect, useMemo, useRef } from 'react';
+import { Suspense, useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { liveAgentColor } from './LiveCityColors';
 import { makeLiveAgentLoopPath, sampleLiveAgentPath, type LiveAgentPose } from './liveAgentMotion';
 import type { LiveAgentMarkerLayout } from './liveLayout';
+import { getGlbAvatarModel } from '@/components/agent-room/v2/stations/AgentBody';
+import { CityAvatar } from './CityAvatar';
 
 interface Props {
   markers: LiveAgentMarkerLayout[];
@@ -14,8 +16,28 @@ interface Props {
 }
 
 const TRAIL_LEN = 22;
+// Cap on how many walkers render their real (rigged GLB) avatar at once. Each
+// avatar is a clone + AnimationMixer; the generic robot is cheap. Your own
+// agents always get one; the rest fill the budget by layout rank order.
+const CITY_AVATAR_BUDGET = 18;
 
 export function LiveAgentMarkers({ markers, onMarkerClick, poseRef }: Props) {
+  const avatarIds = useMemo(() => {
+    const ids = new Set<string>();
+    const eligible = (m: LiveAgentMarkerLayout) =>
+      !!m.avatar && getGlbAvatarModel(m.avatar) !== null;
+    // Your own agents first — you want to see them as themselves.
+    for (const m of markers) {
+      if (m.mine && eligible(m)) ids.add(m.agentId);
+    }
+    // Then fill remaining budget by layout order (already rank-prioritised).
+    for (const m of markers) {
+      if (ids.size >= CITY_AVATAR_BUDGET) break;
+      if (!ids.has(m.agentId) && eligible(m)) ids.add(m.agentId);
+    }
+    return ids;
+  }, [markers]);
+
   if (markers.length === 0) return null;
 
   return (
@@ -26,6 +48,7 @@ export function LiveAgentMarkers({ markers, onMarkerClick, poseRef }: Props) {
           marker={marker}
           onMarkerClick={onMarkerClick}
           poseRef={poseRef}
+          useRealAvatar={avatarIds.has(marker.agentId)}
         />
       ))}
     </group>
@@ -36,10 +59,12 @@ function LiveRobotAgent({
   marker,
   onMarkerClick,
   poseRef,
+  useRealAvatar,
 }: {
   marker: LiveAgentMarkerLayout;
   onMarkerClick?: (agentId: string) => void;
   poseRef?: MutableRefObject<Map<string, LiveAgentPose>>;
+  useRealAvatar?: boolean;
 }) {
   const groupRef = useRef<THREE.Group>(null);
   const leftArmRef = useRef<THREE.Mesh>(null);
@@ -207,30 +232,52 @@ function LiveRobotAgent({
           <boxGeometry args={[1.45, 1.65, 1.45]} />
           <meshBasicMaterial transparent opacity={0} depthWrite={false} toneMapped={false} />
         </mesh>
-        <mesh position={[0, 0.45, 0]} castShadow receiveShadow>
-          <boxGeometry args={[0.32, 0.42, 0.26]} />
-          <meshLambertMaterial color={0xc7cdd8} />
-        </mesh>
-        <mesh position={[0, 0.46, 0.135]}>
-          <boxGeometry args={[0.18, 0.12, 0.02]} />
-          <meshLambertMaterial color={0x0a0e16} emissive={colorObject} emissiveIntensity={0.9} />
-        </mesh>
-        <mesh position={[0, 0.78, 0]} castShadow receiveShadow>
-          <boxGeometry args={[0.26, 0.22, 0.22]} />
-          <meshLambertMaterial color={0xc7cdd8} />
-        </mesh>
-        <mesh position={[0, 0.79, 0.111]}>
-          <boxGeometry args={[0.22, 0.07, 0.02]} />
-          <meshLambertMaterial color={0x05080f} emissive={colorObject} emissiveIntensity={1.1} />
-        </mesh>
-        <mesh position={[0, 0.97, 0]} castShadow>
-          <cylinderGeometry args={[0.02, 0.02, 0.18, 5]} />
-          <meshLambertMaterial color={0x2a3040} />
-        </mesh>
-        <mesh ref={tipRef} position={[0, 1.07, 0]}>
-          <sphereGeometry args={[0.05, 8, 6]} />
-          <meshBasicMaterial color={colorObject} toneMapped={false} />
-        </mesh>
+        {!useRealAvatar && (
+          <>
+            <mesh position={[0, 0.45, 0]} castShadow receiveShadow>
+              <boxGeometry args={[0.32, 0.42, 0.26]} />
+              <meshLambertMaterial color={0xc7cdd8} />
+            </mesh>
+            <mesh position={[0, 0.46, 0.135]}>
+              <boxGeometry args={[0.18, 0.12, 0.02]} />
+              <meshLambertMaterial color={0x0a0e16} emissive={colorObject} emissiveIntensity={0.9} />
+            </mesh>
+            <mesh position={[0, 0.78, 0]} castShadow receiveShadow>
+              <boxGeometry args={[0.26, 0.22, 0.22]} />
+              <meshLambertMaterial color={0xc7cdd8} />
+            </mesh>
+            <mesh position={[0, 0.79, 0.111]}>
+              <boxGeometry args={[0.22, 0.07, 0.02]} />
+              <meshLambertMaterial color={0x05080f} emissive={colorObject} emissiveIntensity={1.1} />
+            </mesh>
+            <mesh position={[0, 0.97, 0]} castShadow>
+              <cylinderGeometry args={[0.02, 0.02, 0.18, 5]} />
+              <meshLambertMaterial color={0x2a3040} />
+            </mesh>
+            <mesh ref={tipRef} position={[0, 1.07, 0]}>
+              <sphereGeometry args={[0.05, 8, 6]} />
+              <meshBasicMaterial color={colorObject} toneMapped={false} />
+            </mesh>
+            <mesh ref={leftArmRef} position={[-0.21, 0.45, 0]} castShadow receiveShadow>
+              <boxGeometry args={[0.07, 0.22, 0.1]} />
+              <meshLambertMaterial color={0x3a4254} />
+            </mesh>
+            <mesh ref={rightArmRef} position={[0.21, 0.45, 0]} castShadow receiveShadow>
+              <boxGeometry args={[0.07, 0.22, 0.1]} />
+              <meshLambertMaterial color={0x3a4254} />
+            </mesh>
+            <mesh ref={leftLegRef} position={[-0.08, 0.16, 0]} castShadow receiveShadow>
+              <boxGeometry args={[0.09, 0.18, 0.1]} />
+              <meshLambertMaterial color={0x2a3040} />
+            </mesh>
+            <mesh ref={rightLegRef} position={[0.08, 0.16, 0]} castShadow receiveShadow>
+              <boxGeometry args={[0.09, 0.18, 0.1]} />
+              <meshLambertMaterial color={0x2a3040} />
+            </mesh>
+          </>
+        )}
+        {/* Floating identity light — kept above both the generic robot and the
+            real avatar so framework colour still reads at a glance. */}
         <mesh ref={beaconRef} position={[0, 1.22, 0]}>
           <sphereGeometry args={[0.045, 10, 8]} />
           <meshBasicMaterial
@@ -241,22 +288,11 @@ function LiveRobotAgent({
             toneMapped={false}
           />
         </mesh>
-        <mesh ref={leftArmRef} position={[-0.21, 0.45, 0]} castShadow receiveShadow>
-          <boxGeometry args={[0.07, 0.22, 0.1]} />
-          <meshLambertMaterial color={0x3a4254} />
-        </mesh>
-        <mesh ref={rightArmRef} position={[0.21, 0.45, 0]} castShadow receiveShadow>
-          <boxGeometry args={[0.07, 0.22, 0.1]} />
-          <meshLambertMaterial color={0x3a4254} />
-        </mesh>
-        <mesh ref={leftLegRef} position={[-0.08, 0.16, 0]} castShadow receiveShadow>
-          <boxGeometry args={[0.09, 0.18, 0.1]} />
-          <meshLambertMaterial color={0x2a3040} />
-        </mesh>
-        <mesh ref={rightLegRef} position={[0.08, 0.16, 0]} castShadow receiveShadow>
-          <boxGeometry args={[0.09, 0.18, 0.1]} />
-          <meshLambertMaterial color={0x2a3040} />
-        </mesh>
+        {useRealAvatar && marker.avatar && (
+          <Suspense fallback={null}>
+            <CityAvatar variant={marker.avatar} />
+          </Suspense>
+        )}
         <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <circleGeometry args={[0.42, 14]} />
           <meshBasicMaterial color={0x000000} transparent opacity={0.28} depthWrite={false} />
