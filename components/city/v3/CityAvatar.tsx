@@ -10,6 +10,18 @@ import { getGlbAvatarModel } from '@/components/agent-room/v2/stations/AgentBody
 // consistent walker height regardless of its room (human-scale) target.
 const CITY_AVATAR_HEIGHT = 1.06;
 
+// In the room the avatar sits inside the agentAvatar station, which is rotated
+// by Math.PI (see world/layout.ts). config.rotationY is tuned relative to THAT
+// frame, so reusing it alone made every city walker face backward. Add the
+// station rotation back so the avatar's front points along travel (+Z local),
+// matching the generic robot.
+const ROOM_STATION_ROTATION_Y = Math.PI;
+
+// Per-variant fine-tuning on top of the uniform station correction, for any
+// model whose room orientation isn't a clean 180° (e.g. faces sideways).
+// Keyed by variant id; value is extra Y rotation in radians.
+const CITY_AVATAR_ROTATION_OVERRIDE: Record<string, number> = {};
+
 function pickWalkClip(
   animations: THREE.AnimationClip[],
   preferred: string | number | undefined,
@@ -78,12 +90,15 @@ export function CityAvatar({ variant, phase = 0 }: { variant: string; phase?: nu
       clone.position.y += config.offset[1];
       clone.position.z += config.offset[2];
     }
-    if (config.rotationY) clone.rotation.y = config.rotationY;
+    clone.rotation.y =
+      (config.rotationY ?? 0) +
+      ROOM_STATION_ROTATION_Y +
+      (CITY_AVATAR_ROTATION_OVERRIDE[variant] ?? 0);
 
     const group = new THREE.Group();
     group.add(clone);
     return group;
-  }, [gltf.scene, config]);
+  }, [gltf.scene, config, variant]);
 
   const mixer = useMemo(() => (root ? new THREE.AnimationMixer(root) : null), [root]);
   // True once a real clip is playing — gates the procedural fallback off.
