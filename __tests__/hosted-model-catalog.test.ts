@@ -51,6 +51,28 @@ describe('hosted model catalog', () => {
     expect(filtered.every((model) => model.providerKey === 'idle')).toBe(true);
   });
 
+  it('surfaces the expanded AceData hosted model catalog', () => {
+    expect(getHostedModelOption('acedata/claude-sonnet-4-6')).toMatchObject({
+      name: 'Claude Sonnet 4.6 (AceData)',
+      provider: 'AceData',
+      context: '1M',
+    });
+
+    expect(getHostedModelOption('acedata/gemini-2.5-pro')).toMatchObject({
+      name: 'Gemini 2.5 Pro (AceData)',
+      provider: 'AceData',
+    });
+
+    const aceDataModels = filterHostedModels({
+      provider: 'acedata',
+      privacy: 'partner',
+      search: 'deepseek',
+    });
+
+    expect(aceDataModels.map((model) => model.id)).toContain('acedata/deepseek-v3.2-exp');
+    expect(aceDataModels.every((model) => model.providerKey === 'acedata')).toBe(true);
+  });
+
   it('returns saved model metadata for unknown hosted ids', () => {
     expect(getHostedModelOption('custom/provider-model')).toMatchObject({
       id: 'custom/provider-model',
