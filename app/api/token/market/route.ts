@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { HATCH_TOKEN_MINT } from '@/lib/config';
+import { resolveMarketCapUsd, type MarketCapSource } from '@/lib/token-market';
 
 export const runtime = 'nodejs';
 export const revalidate = 60;
@@ -26,12 +27,29 @@ type DexResponse = {
   pairs?: DexPair[];
 };
 
+type RpcTokenAmount = {
+  amount?: string;
+  decimals?: number;
+  uiAmount?: number | null;
+  uiAmountString?: string;
+};
+
+type RpcResult<T> = {
+  result?: T;
+  error?: {
+    code?: number;
+    message?: string;
+  };
+};
+
 type TokenMarketPayload = {
   symbol: string;
   mint: string;
   priceUsd: number | null;
   marketCapUsd: number | null;
+  marketCapSource: MarketCapSource | null;
   fdvUsd: number | null;
+  currentSupply: number | null;
   liquidityUsd: number | null;
   volume24hUsd: number | null;
   priceChange24h: number | null;
@@ -66,12 +84,25 @@ export async function GET() {
     const pair = pickBestPair(payload.pairs ?? []);
     if (!pair) throw new Error('No HATCHER pair found on Dexscreener');
 
+    const priceUsd = readNumber(pair.priceUsd);
+    const dexMarketCapUsd = readNumber(pair.marketCap);
+    const dexFdvUsd = readNumber(pair.fdv);
+    const currentSupply = await fetchTokenSupply(HATCH_TOKEN_MINT).catch(() => null);
+    const marketCap = resolveMarketCapUsd({
+      priceUsd,
+      currentSupply,
+      dexMarketCapUsd,
+      dexFdvUsd,
+    });
+
     const data: TokenMarketPayload = {
       symbol: pair.baseToken?.symbol ?? 'HATCHER',
       mint: HATCH_TOKEN_MINT,
-      priceUsd: readNumber(pair.priceUsd),
-      marketCapUsd: readNumber(pair.marketCap) ?? readNumber(pair.fdv),
-      fdvUsd: readNumber(pair.fdv),
+      priceUsd,
+      marketCapUsd: marketCap.value,
+      marketCapSource: marketCap.source,
+      fdvUsd: dexFdvUsd,
+      currentSupply,
       liquidityUsd: readNumber(pair.liquidity?.usd),
       volume24hUsd: readNumber(pair.volume?.h24),
       priceChange24h: readNumber(pair.priceChange?.h24),
@@ -122,6 +153,53 @@ function pickBestPair(pairs: DexPair[]): DexPair | null {
 function readNumber(value: unknown): number | null {
   const parsed = typeof value === 'number' ? value : typeof value === 'string' ? Number(value) : NaN;
   return Number.isFinite(parsed) ? parsed : null;
+}
+
+async function fetchTokenSupply(mint: string): Promise<number | null> {
+  const response = await fetch(upstreamRpc(), {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'getTokenSupply',
+      params: [mint],
+    }),
+    cache: 'no-store',
+  });
+
+  if (!response.ok) throw new Error(`Solana RPC returned ${response.status}`);
+
+  const payload = await response.json() as RpcResult<{ value?: RpcTokenAmount }>;
+  if (payload.error) {
+    throw new Error(payload.error.message || `Solana RPC error ${payload.error.code ?? 'unknown'}`);
+  }
+  return amountFromTokenAmount(payload.result?.value);
+}
+
+function upstreamRpc(): string {
+  if (process.env.HELIUS_API_KEY) {
+    return `https://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY}`;
+  }
+  if (process.env.SOLANA_RPC_URL) return process.env.SOLANA_RPC_URL;
+  return process.env.NEXT_PUBLIC_SOLANA_RPC || 'https://api.mainnet-beta.solana.com';
+}
+
+function amountFromTokenAmount(tokenAmount?: RpcTokenAmount): number | null {
+  if (!tokenAmount) return null;
+  if (tokenAmount.uiAmountString) {
+    const parsed = Number(tokenAmount.uiAmountString);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  if (typeof tokenAmount.uiAmount === 'number' && Number.isFinite(tokenAmount.uiAmount)) {
+    return tokenAmount.uiAmount;
+  }
+  if (tokenAmount.amount) {
+    const raw = Number(tokenAmount.amount);
+    const decimals = tokenAmount.decimals ?? 6;
+    if (Number.isFinite(raw)) return raw / 10 ** decimals;
+  }
+  return null;
 }
 
 function json(data: TokenMarketPayload, cacheStatus: 'HIT' | 'MISS' | 'STALE') {
