@@ -208,6 +208,8 @@ export function AgentRoomV2Client({ agentId }: Props) {
   // walking up to it; stays live so async replies surface as an unread badge.
   const [floatingChatOpen, setFloatingChatOpen] = useState(false);
   const [chatUnread, setChatUnread] = useState(0);
+  // First-person cockpit vs third-person (see your avatar). Toggle with 'V'.
+  const [cameraMode, setCameraMode] = useState<'first' | 'third'>('first');
   const [passport, setPassport] = useState<AgentPassport | null>(null);
   const [laptopOpen, setLaptopOpen] = useState(false);
   const [laptopInitialTab, setLaptopInitialTab] = useState<LaptopTab>('status');
@@ -823,6 +825,9 @@ export function AgentRoomV2Client({ agentId }: Props) {
       if (key === 'e' && nearest && !openPanel && !laptopOpen) {
         handleStationClick(nearest);
       }
+      if (key === 'v') {
+        setCameraMode((m) => (m === 'first' ? 'third' : 'first'));
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -880,6 +885,7 @@ export function AgentRoomV2Client({ agentId }: Props) {
         quality={quality}
         isChatStreaming={isChatStreaming}
         eyesLive={eyesState?.status === 'live'}
+        cameraMode={cameraMode}
         avatarVariant={selectedAvatarVariant}
         avatarTraits={selectedAvatarTraits}
         activeEmote={activeEmote}
@@ -942,6 +948,10 @@ export function AgentRoomV2Client({ agentId }: Props) {
           onClick={openFloatingChat}
         />
       )}
+      <ViewToggleButton
+        mode={cameraMode}
+        onToggle={() => setCameraMode((m) => (m === 'first' ? 'third' : 'first'))}
+      />
       {laptopOpen && canEdit && (
         <LaptopPanel
           agentId={apiId}
@@ -1054,6 +1064,26 @@ function FloatingChatButton({
           {unread > 9 ? '9+' : unread}
         </span>
       )}
+    </button>
+  );
+}
+
+function ViewToggleButton({
+  mode,
+  onToggle,
+}: {
+  mode: 'first' | 'third';
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      onClick={onToggle}
+      aria-label="Toggle camera view"
+      title="Toggle first / third person (V)"
+      className="fixed bottom-4 left-4 z-40 hidden items-center gap-2 rounded-full border border-[#d6b177]/60 bg-[rgba(21,16,11,0.92)] px-4 py-3 text-sm font-semibold text-[#f6ead8] shadow-xl backdrop-blur transition hover:scale-105 active:scale-95 md:flex"
+    >
+      <span aria-hidden>{mode === 'first' ? '👁' : '🎥'}</span>
+      <span>{mode === 'first' ? '1st person' : '3rd person'}</span>
     </button>
   );
 }

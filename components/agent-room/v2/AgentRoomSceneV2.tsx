@@ -11,6 +11,8 @@ import {
   MobileJoystick,
   type CharacterState,
 } from './character';
+import { ThirdPersonCamera } from './character/ThirdPersonCamera';
+import { PlayerAvatar } from './PlayerAvatar';
 import { getStationLayout, type StationId, type StationLayout } from './world/layout';
 import { collidersFromLayout, wallColliders } from './world/colliders';
 import { AgentAvatar } from './stations/AgentAvatar';
@@ -35,6 +37,7 @@ interface Props {
   quality: Quality;
   isChatStreaming?: boolean;
   eyesLive?: boolean;
+  cameraMode?: 'first' | 'third';
   avatarVariant?: string | null;
   avatarTraits?: unknown;
   activeEmote?: RoomEmoteId | null;
@@ -72,6 +75,7 @@ export function AgentRoomSceneV2({
   quality,
   isChatStreaming,
   eyesLive,
+  cameraMode = 'first',
   avatarVariant,
   avatarTraits,
   activeEmote,
@@ -170,7 +174,12 @@ export function AgentRoomSceneV2({
             speed={6}
             characterRadius={0.6}
           />
-          <FirstPersonCamera state={charState} />
+          {cameraMode === 'third' ? (
+            <ThirdPersonCamera state={charState} />
+          ) : (
+            <FirstPersonCamera state={charState} />
+          )}
+          <PlayerAvatar state={charState} framework={framework} visible={cameraMode === 'third'} />
           <MouseLook state={charState} />
           <SyncPos state={charState} target={posRef} />
         </Suspense>
