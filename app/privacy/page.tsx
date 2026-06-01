@@ -197,6 +197,7 @@ export default function PrivacyPolicyPage() {
                   <tr><td className="px-3 py-2">UsePod</td><td className="px-3 py-2">LLM inference (hosted key)</td><td className="px-3 py-2">Hosted AI requests</td><td className="px-3 py-2">USA / Global</td></tr>
                   <tr><td className="px-3 py-2">OpenRouter</td><td className="px-3 py-2">LLM inference (hosted key)</td><td className="px-3 py-2">Hosted AI requests</td><td className="px-3 py-2">USA</td></tr>
                   <tr><td className="px-3 py-2">Xiaomi MiMo</td><td className="px-3 py-2">LLM inference (direct partner route)</td><td className="px-3 py-2">Hosted AI requests when selected</td><td className="px-3 py-2">Partner infrastructure</td></tr>
+                  <tr><td className="px-3 py-2">AceData</td><td className="px-3 py-2">LLM inference and data/media tools (direct partner route)</td><td className="px-3 py-2">Hosted AI requests and agent tool calls when selected</td><td className="px-3 py-2">Partner infrastructure</td></tr>
                   <tr><td className="px-3 py-2">Stripe</td><td className="px-3 py-2">Card payments</td><td className="px-3 py-2">Email, billing address, card token</td><td className="px-3 py-2">Ireland / USA</td></tr>
                   <tr><td className="px-3 py-2">Resend</td><td className="px-3 py-2">Transactional email</td><td className="px-3 py-2">Email address, email content</td><td className="px-3 py-2">EU / USA</td></tr>
                   <tr><td className="px-3 py-2">PostHog</td><td className="px-3 py-2">Product analytics (opt-in)</td><td className="px-3 py-2">Anonymized events, session IDs</td><td className="px-3 py-2">EU</td></tr>
@@ -281,7 +282,7 @@ export default function PrivacyPolicyPage() {
           <section>
             <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-3">11. International Transfers</h2>
             <p>
-              Primary data storage is in Germany (EU/EEA). Certain sub-processors (UsePod, OpenRouter, Stripe, Helius) are US-based.
+              Primary data storage is in Germany (EU/EEA). Certain sub-processors (UsePod, OpenRouter, AceData, Stripe, Helius) are US-based or operate on partner infrastructure.
               Transfers outside the EU/EEA rely on the EU-US Data Privacy Framework and/or Standard Contractual
               Clauses as approved by the European Commission.
             </p>

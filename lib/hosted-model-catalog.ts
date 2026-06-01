@@ -54,6 +54,7 @@ export const HOSTED_MODEL_PROVIDERS: HostedModelProvider[] = [
   { key: 'anthropic', name: 'Anthropic', description: 'Claude models for reasoning and writing.' },
   { key: 'idle', name: 'IDLE', description: 'Partner-hosted Claude models with fixed request pricing.' },
   { key: 'xiaomi', name: 'Xiaomi MiMo', description: 'Partner-hosted MiMo models with long context and launch-promo usage.' },
+  { key: 'acedata', name: 'AceData', description: 'Partner-hosted frontier models plus data and media intelligence APIs.' },
   { key: 'google', name: 'Google', description: 'Gemini models with large context windows.' },
   { key: 'qwen', name: 'Qwen', description: 'Efficient coding and agentic tool-use models.' },
   { key: 'x-ai', name: 'xAI', description: 'Grok models for fast reasoning and code.' },
@@ -262,6 +263,28 @@ export const HOSTED_MODELS: HostedModelOption[] = [
     context: '256K',
     description: 'Multimodal MiMo model for image-aware analysis, OCR, charts, and visual context.',
     fixedPrice: 'Free launch promo',
+  },
+  {
+    id: 'acedata/claude-opus-4-8',
+    name: 'Claude Opus 4.8 (AceData)',
+    providerKey: 'acedata',
+    provider: 'AceData',
+    category: 'Partner',
+    cost: 'Premium',
+    context: '1M',
+    description: 'Partner-hosted Claude Opus through AceData for deeper reasoning and agent workflows.',
+    warning: 'Uses estimated AI Credits because AceData exposes costs in their usage console, not in chat responses.',
+  },
+  {
+    id: 'acedata/gpt-5.5',
+    name: 'GPT-5.5 (AceData)',
+    providerKey: 'acedata',
+    provider: 'AceData',
+    category: 'Partner',
+    cost: 'High',
+    context: '1.05M',
+    description: 'Partner-hosted OpenAI-compatible GPT-5.5 through AceData, with OpenRouter fallback when needed.',
+    warning: 'Uses estimated AI Credits because AceData exposes costs in their usage console, not in chat responses.',
   },
   {
     id: 'anthropic/claude-sonnet-4.5',
@@ -632,16 +655,20 @@ export function getHostedModelOption(model: string | undefined): HostedModelOpti
 export function hostedModelRoute(model: HostedModelOption): string {
   if (model.providerKey === 'idle') return 'IDLE partner';
   if (model.providerKey === 'xiaomi') return 'Xiaomi MiMo direct';
+  if (model.providerKey === 'acedata') return 'AceData primary / OpenRouter fallback';
   return 'UsePod primary / OpenRouter fallback';
 }
 
 export function hostedModelPrivacy(model: HostedModelOption): HostedModelPrivacy {
-  return model.providerKey === 'idle' || model.providerKey === 'xiaomi' ? 'partner' : 'hatcher';
+  return model.providerKey === 'idle' || model.providerKey === 'xiaomi' || model.providerKey === 'acedata'
+    ? 'partner'
+    : 'hatcher';
 }
 
 export function hostedPrivacyLabel(model: HostedModelOption): string {
   if (model.providerKey === 'idle') return 'Partner-hosted';
   if (model.providerKey === 'xiaomi') return 'Xiaomi-hosted';
+  if (model.providerKey === 'acedata') return 'AceData-hosted';
   return 'Hatcher-hosted';
 }
 
@@ -671,7 +698,7 @@ export function hostedCostEstimate(cost: HostedModelCost): string {
     case 'Premium':
       return '100+ AI Credits for many replies';
     case 'Variable':
-      return 'variable, depends on UsePod/OpenRouter routing';
+      return 'variable, depends on provider routing';
   }
 }
 

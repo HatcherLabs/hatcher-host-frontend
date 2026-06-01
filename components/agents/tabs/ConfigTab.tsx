@@ -818,7 +818,7 @@ export function ConfigTab() {
               AI Model
             </h3>
             <p className="text-sm text-[var(--text-secondary)] mt-1">
-              Hosted models use UsePod first with OpenRouter fallback. IDLE and Xiaomi MiMo models use direct partner routes.
+              Hosted models use UsePod first with OpenRouter fallback. IDLE, Xiaomi MiMo, and AceData models use explicit partner routes.
             </p>
           </div>
           {aiCreditBalance && (
@@ -1059,6 +1059,8 @@ export function ConfigTab() {
                     className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-[var(--bg-panel)] border border-[var(--border-subtle)]"
                     title={selectedHostedModel.providerKey === 'xiaomi'
                       ? 'Inference routes directly through Xiaomi MiMo during the launch promo. Avoid sensitive data unless you accept the partner route.'
+                      : selectedHostedModel.providerKey === 'acedata'
+                        ? 'Inference routes through AceData first with OpenRouter fallback when needed. Review partner policy before using sensitive data.'
                       : hostedModelPrivacy(selectedHostedModel) === 'partner'
                         ? 'Inference happens through an explicit partner route such as IDLE. Review partner policy before using sensitive data.'
                         : 'Inference is routed through Hatcher managed infrastructure, currently UsePod first with OpenRouter fallback.'}
@@ -1286,7 +1288,7 @@ export function ConfigTab() {
                         <span
                           className="inline-flex h-fit items-center gap-1.5 text-xs text-[var(--text-secondary)]"
                           title={hostedModelPrivacy(model) === 'partner'
-                            ? 'Partner-hosted inference. Good for explicit partner routes like IDLE or Xiaomi MiMo; review partner policy for sensitive data.'
+                            ? 'Partner-hosted inference. Good for explicit partner routes like IDLE, Xiaomi MiMo, or AceData; review partner policy for sensitive data.'
                             : 'Hatcher-managed route. UsePod primary with OpenRouter fallback where needed.'}
                         >
                           <Info className="h-3 w-3" />
