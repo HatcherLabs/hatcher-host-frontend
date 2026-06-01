@@ -1,4 +1,4 @@
-export type Framework = 'openclaw' | 'hermes';
+export type Framework = 'openclaw' | 'hermes' | 'elizaos' | 'milady';
 // Aligned 1:1 with AgentTemplate.category on prod (25 buckets). Keep
 // in sync with routes/city.ts on the backend.
 export type Category =
@@ -129,14 +129,20 @@ export const CATEGORY_LABELS: Record<Category, string> = {
   voice: 'Voice',
 };
 
+// Canonical brand palette: openclaw=amber-yellow, hermes=violet,
+// elizaos=azure, milady=pink. Keep in sync with the room accents.
 export const FRAMEWORK_COLORS: Record<Framework, number> = {
-  openclaw: 0x10b981,
-  hermes: 0x38bdf8,
+  openclaw: 0xffc21f,
+  hermes: 0xa64dff,
+  elizaos: 0x2f9bff,
+  milady: 0xff4fa3,
 };
 
 export const FRAMEWORK_EMISSIVE: Record<Framework, number> = {
-  openclaw: 0x34d399,
-  hermes: 0x7dd3fc,
+  openclaw: 0xffd95c,
+  hermes: 0xc88bff,
+  elizaos: 0x6fc0ff,
+  milady: 0xff86c2,
 };
 
 // Building heights by tier index (0..4).

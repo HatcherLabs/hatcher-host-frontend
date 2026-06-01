@@ -1,7 +1,8 @@
 'use client';
 import { useFrame } from '@react-three/fiber';
+import { Html } from '@react-three/drei';
 import type { MutableRefObject } from 'react';
-import { Suspense, useEffect, useMemo, useRef } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { liveAgentColor } from './LiveCityColors';
 import { makeLiveAgentLoopPath, sampleLiveAgentPath, type LiveAgentPose } from './liveAgentMotion';
@@ -20,6 +21,21 @@ const TRAIL_LEN = 22;
 // avatar is a clone + AnimationMixer; the generic robot is cheap. Your own
 // agents always get one; the rest fill the budget by layout rank order.
 const CITY_AVATAR_BUDGET = 18;
+
+function cityWalkerStatusLabel(status: LiveAgentMarkerLayout['status']): string {
+  switch (status) {
+    case 'running':
+      return 'active';
+    case 'sleeping':
+      return 'sleeping';
+    case 'paused':
+      return 'paused';
+    case 'crashed':
+      return 'offline';
+    default:
+      return status;
+  }
+}
 
 export function LiveAgentMarkers({ markers, onMarkerClick, poseRef }: Props) {
   const avatarIds = useMemo(() => {
@@ -75,8 +91,10 @@ function LiveRobotAgent({
   const haloRef = useRef<THREE.Group>(null);
   const beaconRef = useRef<THREE.Mesh>(null);
   const scannerRef = useRef<THREE.Group>(null);
+  const [isHovered, setIsHovered] = useState(false);
   const color = liveAgentColor(marker);
   const colorObject = useMemo(() => new THREE.Color(color), [color]);
+  const accentHex = useMemo(() => `#${color.toString(16).padStart(6, '0')}`, [color]);
   const path = useMemo(
     () => makeLiveAgentLoopPath(marker.pathNodes, marker.x, marker.z),
     [marker.pathNodes, marker.x, marker.z],
@@ -131,6 +149,10 @@ function LiveRobotAgent({
     if (groupRef.current) {
       groupRef.current.position.set(pose.x, bob, pose.z);
       groupRef.current.rotation.y = pose.heading;
+      // Pop slightly on hover so the pointer target reads as interactive.
+      const targetScale = isHovered ? 1.16 : 1;
+      const s = groupRef.current.scale.x;
+      groupRef.current.scale.setScalar(s + (targetScale - s) * 0.2);
     }
     if (leftLegRef.current) leftLegRef.current.rotation.x = swing;
     if (rightLegRef.current) rightLegRef.current.rotation.x = -swing;
@@ -180,10 +202,63 @@ function LiveRobotAgent({
     onMarkerClick(marker.agentId);
   };
 
+  const handlePointerOver = (event: { stopPropagation: () => void }) => {
+    event.stopPropagation();
+    setIsHovered(true);
+    if (typeof document !== 'undefined') document.body.style.cursor = 'pointer';
+  };
+  const handlePointerOut = () => {
+    setIsHovered(false);
+    if (typeof document !== 'undefined') document.body.style.cursor = '';
+  };
+
+  // Don't leave a stuck pointer cursor if the walker unmounts mid-hover.
+  useEffect(() => {
+    return () => {
+      if (typeof document !== 'undefined') document.body.style.cursor = '';
+    };
+  }, []);
+
   return (
     <group>
       <primitive object={trail} />
-      <group ref={groupRef} onClick={handlePointer} onPointerDown={handlePointer}>
+      <group
+        ref={groupRef}
+        onClick={handlePointer}
+        onPointerDown={handlePointer}
+        onPointerOver={handlePointerOver}
+        onPointerOut={handlePointerOut}
+      >
+        {isHovered && (
+          <Html
+            position={[0, 1.55, 0]}
+            center
+            distanceFactor={9}
+            zIndexRange={[40, 0]}
+            style={{ pointerEvents: 'none', userSelect: 'none' }}
+          >
+            <div
+              style={{
+                whiteSpace: 'nowrap',
+                transform: 'translateY(-100%)',
+                borderRadius: 8,
+                border: `1px solid ${accentHex}`,
+                background: 'rgba(10,12,18,0.92)',
+                padding: '4px 9px',
+                fontFamily: 'var(--font-mono, monospace)',
+                fontSize: 12,
+                fontWeight: 600,
+                color: '#f3f6fb',
+                boxShadow: `0 6px 20px ${accentHex}55`,
+              }}
+            >
+              <span>{marker.agentName}</span>
+              <span style={{ color: accentHex, marginLeft: 8, fontWeight: 700 }}>
+                {cityWalkerStatusLabel(marker.status)}
+              </span>
+            </div>
+          </Html>
+        )}
         <group ref={haloRef} position={[0, 0.035, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <mesh>
             <ringGeometry args={[0.48, 0.54, 36]} />

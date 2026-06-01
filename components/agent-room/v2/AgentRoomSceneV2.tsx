@@ -138,6 +138,7 @@ export function AgentRoomSceneV2({
             nearest={nearest}
             canEdit={canEdit}
             hasMemory={hasMemory}
+            isChatStreaming={isChatStreaming}
             onStationClick={onStationClick}
           />
 
