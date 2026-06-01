@@ -48,9 +48,10 @@ export interface DispatchResult {
 }
 
 // ── Leveling ────────────────────────────────────────────────────────────
-// XP needed to go from (level-1) -> level. Gentle early, steeper later.
+// XP needed to go from (level-1) -> level. Steepens quickly so high levels are
+// a real grind (and prestige is earned, not handed out).
 export function xpForLevel(level: number): number {
-  return Math.round(80 + (level - 1) * 60 + Math.pow(level - 1, 1.7) * 12);
+  return Math.round(130 + (level - 1) * 95 + Math.pow(level - 1, 1.9) * 24);
 }
 
 export interface LevelInfo {
@@ -84,12 +85,12 @@ export function levelInfo(totalXp: number): LevelInfo {
 }
 
 // ── Dispatch economics ──────────────────────────────────────────────────
-export const PACKET_DATA = 8; // Data per collected packet
-export const PACKET_XP = 5; // XP per collected packet
-export const COMPLETE_XP = 25; // XP bonus for finishing a run
+export const PACKET_DATA = 5; // Data per collected packet
+export const PACKET_XP = 4; // XP per collected packet
+export const COMPLETE_XP = 20; // XP bonus for finishing a run
 
 // ── Prestige ────────────────────────────────────────────────────────────
-export const PRESTIGE_LEVEL = 15; // min level to prestige
+export const PRESTIGE_LEVEL = 20; // min level to prestige
 export const PRESTIGE_BONUS = 0.25; // +25% Data/XP per prestige rank
 
 export function prestigeMultiplier(prestige: number): number {
@@ -110,12 +111,12 @@ export interface UpgradeDef {
 }
 
 export const UPGRADES: UpgradeDef[] = [
-  { id: 'payout', name: 'Data Yield', desc: '+12% Data per packet & run', icon: '◆', baseCost: 180, costMult: 1.65, maxLevel: 10 },
-  { id: 'speed', name: 'Thrusters', desc: 'Couriers travel ~8% faster', icon: '➤', baseCost: 140, costMult: 1.7, maxLevel: 8 },
-  { id: 'radius', name: 'Collector Array', desc: '+15% pickup radius', icon: '◎', baseCost: 120, costMult: 1.6, maxLevel: 6 },
-  { id: 'yield', name: 'Cargo Bays', desc: '+1 packet per run', icon: '▤', baseCost: 160, costMult: 1.7, maxLevel: 8 },
-  { id: 'magnet', name: 'Tractor Beam', desc: 'Nearby packets drift to the courier', icon: '✦', baseCost: 320, costMult: 1.8, maxLevel: 5 },
-  { id: 'slots', name: 'Ops Center', desc: '+1 simultaneous dispatch', icon: '⊞', baseCost: 500, costMult: 2.0, maxLevel: 4 },
+  { id: 'payout', name: 'Data Yield', desc: '+10% Data per packet & run', icon: '◆', baseCost: 320, costMult: 1.75, maxLevel: 10 },
+  { id: 'speed', name: 'Thrusters', desc: 'Couriers travel ~8% faster', icon: '➤', baseCost: 260, costMult: 1.8, maxLevel: 8 },
+  { id: 'radius', name: 'Collector Array', desc: '+15% pickup radius', icon: '◎', baseCost: 220, costMult: 1.7, maxLevel: 6 },
+  { id: 'yield', name: 'Cargo Bays', desc: '+1 packet per run', icon: '▤', baseCost: 300, costMult: 1.8, maxLevel: 8 },
+  { id: 'magnet', name: 'Tractor Beam', desc: 'Nearby packets drift to the courier', icon: '✦', baseCost: 600, costMult: 1.9, maxLevel: 5 },
+  { id: 'slots', name: 'Ops Center', desc: '+1 simultaneous dispatch', icon: '⊞', baseCost: 1100, costMult: 2.1, maxLevel: 4 },
 ];
 
 export function upgradeCost(def: UpgradeDef, level: number): number {
@@ -141,7 +142,7 @@ export function upgradeEffects(levels: Partial<Record<UpgradeId, number>>): Upgr
     collectRadius: BASE_COLLECT_RADIUS * (1 + 0.15 * lv('radius')),
     extraPackets: lv('yield'),
     maxSlots: BASE_SLOTS + lv('slots'),
-    payoutMult: 1 + 0.12 * lv('payout'),
+    payoutMult: 1 + 0.1 * lv('payout'),
     magnetRange: lv('magnet') > 0 ? 2 + lv('magnet') * 2.2 : 0,
   };
 }
@@ -199,8 +200,8 @@ export const ACHIEVEMENTS: Achievement[] = [
 ];
 
 // ── Idle / auto-dispatch ────────────────────────────────────────────────
-export const OFFLINE_RATE_PER_AGENT = 0.6; // Data/sec per running agent while auto-dispatching
-export const OFFLINE_CAP_SEC = 8 * 3600; // max 8h of offline accrual
+export const OFFLINE_RATE_PER_AGENT = 0.3; // Data/sec per running agent while auto-dispatching
+export const OFFLINE_CAP_SEC = 6 * 3600; // max 6h of offline accrual
 
 // ── Daily streak ────────────────────────────────────────────────────────
 export const DAILY_BASE = 60; // Data on day 1

@@ -113,16 +113,16 @@ function SeasonView({ season, countdown }: { season: SeasonData | null; countdow
           <span className="text-xs text-[#9fceb4]">{countdown}</span>
         </div>
         <p className="mt-1 text-[11px] text-[#9fceb4]">
-          Top players this month win AI Credits. Earn the most Data before the month ends.
+          Top 5 each month win AI Credits. Earn the most Data before the month ends.
         </p>
         {season.you && (
           <div className="mt-2 rounded-lg bg-black/30 px-3 py-2 text-xs">
             You&apos;re <span className="font-bold text-[#ffd24a]">#{season.you.rank}</span> with ◆{' '}
             {season.you.value.toLocaleString()}
-            {season.you.prizeUsd > 0 ? (
-              <span className="text-[#39ff88]"> · on track for ${season.you.prizeUsd} credits</span>
+            {season.you.prizeCredits > 0 ? (
+              <span className="text-[#39ff88]"> · on track for {season.you.prizeCredits.toLocaleString()} AI Credits</span>
             ) : (
-              <span className="text-[#7faE96]"> · reach top 25 for a prize</span>
+              <span className="text-[#7faE96]"> · reach the top 5 for a prize</span>
             )}
           </div>
         )}
@@ -131,12 +131,13 @@ function SeasonView({ season, countdown }: { season: SeasonData | null; countdow
       {/* Prize table */}
       <div className="grid grid-cols-5 gap-1 text-center text-[10px]">
         {season.prizeTable.map((p) => (
-          <div key={p.label} className="rounded-md border border-white/10 bg-black/20 py-1.5">
-            <div className="font-bold text-[#39ff88]">${p.prizeUsd}</div>
+          <div key={p.label} className="rounded-md border border-white/10 bg-black/20 py-1.5" title={p.note}>
+            <div className="font-bold text-[#39ff88]">{p.credits.toLocaleString()}</div>
             <div className="text-[#7faE96]">{p.label}</div>
           </div>
         ))}
       </div>
+      <p className="text-center text-[9px] text-[#5f8a76]">prizes paid in AI Credits</p>
 
       {/* This month's board */}
       {season.board.length === 0 ? (
@@ -147,7 +148,7 @@ function SeasonView({ season, countdown }: { season: SeasonData | null; countdow
             <li key={r.rank} className="flex items-center gap-3 rounded-lg border border-white/5 bg-black/20 px-3 py-2 text-sm">
               <span className="w-6 text-center font-bold" style={{ color: RANK_COLOR[r.rank - 1] ?? '#7faE96' }}>{r.rank}</span>
               <span className="min-w-0 flex-1 truncate font-semibold">{r.username}</span>
-              {r.prizeUsd > 0 && <span className="text-xs font-bold text-[#39ff88]">${r.prizeUsd}</span>}
+              {r.prizeCredits > 0 && <span className="text-xs font-bold text-[#39ff88]">🏆 {r.prizeCredits.toLocaleString()}</span>}
               <span className="w-20 text-right font-mono text-[#39ff88]">◆ {r.value.toLocaleString()}</span>
             </li>
           ))}

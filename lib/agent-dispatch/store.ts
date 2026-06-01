@@ -45,6 +45,7 @@ interface DispatchState {
   achievementToast: { name: string; reward: number } | null;
   offlineToast: number | null;
   streakToast: { bonus: number; count: number } | null;
+  hydrated: boolean; // true once server state (or local fallback) is loaded
   panelOpen: boolean;
   shopOpen: boolean;
   leaderboardOpen: boolean;
@@ -71,6 +72,8 @@ interface DispatchState {
   setLeaderboardOpen: (v: boolean) => void;
   setLabOpen: (v: boolean) => void;
   setGoalsOpen: (v: boolean) => void;
+  setHydrated: (v: boolean) => void;
+  hydrateFromServer: (s: Partial<DispatchState>) => void;
   clearResult: () => void;
   clearAchievementToast: () => void;
   clearOfflineToast: () => void;
@@ -96,6 +99,7 @@ export const useDispatchStore = create<DispatchState>()(
       achievementToast: null,
       offlineToast: null,
       streakToast: null,
+      hydrated: false,
       panelOpen: false,
       shopOpen: false,
       leaderboardOpen: false,
@@ -253,6 +257,8 @@ export const useDispatchStore = create<DispatchState>()(
       setLeaderboardOpen: (v) => set({ leaderboardOpen: v }),
       setLabOpen: (v) => set({ labOpen: v }),
       setGoalsOpen: (v) => set({ goalsOpen: v }),
+      setHydrated: (v) => set({ hydrated: v }),
+      hydrateFromServer: (s) => set({ ...s }),
       clearResult: () => set({ lastResult: null }),
       clearAchievementToast: () => set({ achievementToast: null }),
       clearOfflineToast: () => set({ offlineToast: null }),

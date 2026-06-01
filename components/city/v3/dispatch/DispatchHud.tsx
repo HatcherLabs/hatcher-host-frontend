@@ -20,6 +20,7 @@ import { DispatchLeaderboard } from './DispatchLeaderboard';
 import { DispatchLab } from './DispatchLab';
 import { DispatchGoals } from './DispatchGoals';
 import { useDispatchScoreSync } from '@/lib/agent-dispatch/useScoreSync';
+import { useDispatchStateSync } from '@/lib/agent-dispatch/state-sync';
 
 interface Dest {
   name: string;
@@ -86,7 +87,9 @@ export function DispatchHud({
   const clearOfflineToast = useDispatchStore((s) => s.clearOfflineToast);
   const clearStreakToast = useDispatchStore((s) => s.clearStreakToast);
 
+  useDispatchStateSync();
   useDispatchScoreSync();
+  const hydrated = useDispatchStore((s) => s.hydrated);
 
   const lvl = useMemo(() => levelInfo(xp), [xp]);
   const dests = useMemo(() => dispatchDestinations(grid), [grid]);
@@ -144,7 +147,7 @@ export function DispatchHud({
         durationMs,
         packets: spawnPackets(route, totalLength, packetCount, job.rarePackets),
         collected: 0,
-        baseReward: Math.round((15 + totalLength / 20) * job.rewardMult),
+        baseReward: Math.round((10 + totalLength / 30) * job.rewardMult),
         startLevel: lvl.level,
         xpMult: job.xpMult,
         jobName: job.name,
@@ -180,6 +183,7 @@ export function DispatchHud({
 
   // Unlock achievements as their conditions are met.
   useEffect(() => {
+    if (!hydrated) return;
     const upgradeLevels = Object.values(upgrades).reduce<number>((a, b) => a + (b ?? 0), 0);
     const snap: AchStats = {
       dispatches: stats.dispatches,
@@ -191,15 +195,15 @@ export function DispatchHud({
     for (const a of ACHIEVEMENTS) {
       if (!achieved.includes(a.id) && a.met(snap)) unlockAchievement(a);
     }
-  }, [stats, achieved, upgrades, prestige, lvl.level, unlockAchievement]);
+  }, [hydrated, stats, achieved, upgrades, prestige, lvl.level, unlockAchievement]);
 
-  // Offline accrual (once, after agents load) + keep lastSeen fresh.
+  // Offline accrual (once, after hydration + agents load) + keep lastSeen fresh.
   const offlineAppliedRef = useRef(false);
   useEffect(() => {
-    if (offlineAppliedRef.current || runningAgents.length === 0) return;
+    if (offlineAppliedRef.current || !hydrated || runningAgents.length === 0) return;
     offlineAppliedRef.current = true;
     applyOffline(runningAgents.length);
-  }, [runningAgents.length, applyOffline]);
+  }, [hydrated, runningAgents.length, applyOffline]);
   useEffect(() => {
     const t = window.setInterval(() => useDispatchStore.getState().touchSeen(), 30000);
     return () => {
@@ -208,10 +212,10 @@ export function DispatchHud({
     };
   }, []);
 
-  // Daily login streak — claim once on mount.
+  // Daily login streak — claim once, after hydration.
   useEffect(() => {
-    claimDaily();
-  }, [claimDaily]);
+    if (hydrated) claimDaily();
+  }, [hydrated, claimDaily]);
   useEffect(() => {
     if (!streakToast) return;
     const t = window.setTimeout(() => clearStreakToast(), 6000);

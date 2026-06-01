@@ -47,22 +47,22 @@ export interface SeasonBoardRow {
   rank: number;
   username: string;
   value: number;
-  prizeUsd: number;
+  prizeCredits: number;
 }
 
 export interface SeasonWinner {
   rank: number;
   username: string;
   data: number;
-  prizeUsd: number;
+  prizeCredits: number;
 }
 
 export interface SeasonData {
   month: string;
   monthEnd: string;
-  prizeTable: { label: string; prizeUsd: number }[];
+  prizeTable: { label: string; credits: number; note: string }[];
   board: SeasonBoardRow[];
-  you: { rank: number; value: number; prizeUsd: number } | null;
+  you: { rank: number; value: number; prizeCredits: number } | null;
   past: { month: string; winners: SeasonWinner[]; paidAt: string | null }[];
 }
 
