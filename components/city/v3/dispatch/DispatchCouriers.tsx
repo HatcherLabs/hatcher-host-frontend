@@ -1,5 +1,5 @@
 'use client';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { Html, Trail } from '@react-three/drei';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
@@ -20,6 +20,39 @@ import { sampleLiveAgentPath } from '../liveAgentMotion';
 
 const VFX_POOL = 6;
 const VFX_MS = 650;
+
+// Shared live state for the manual courier so a camera rig can follow it in 3rd
+// person. `ts` is refreshed each frame the manual courier moves; the rig treats
+// the follow as active only while `ts` is fresh (auto-disengages otherwise).
+const manualCam = { x: 0, y: 1.1, z: 0, heading: Math.PI, ts: 0 };
+
+/** 3rd-person chase camera that engages while a manually-steered courier is
+ *  live. Takes over the default MapControls (disables them) and lerps the
+ *  camera behind the courier; releases control when manual steering stops. */
+function DispatchFollowCamera() {
+  const camera = useThree((s) => s.camera);
+  const controls = useThree((s) => s.controls) as unknown as
+    | { enabled: boolean; target?: THREE.Vector3 }
+    | undefined;
+  const dest = useMemo(() => new THREE.Vector3(), []);
+  const engaged = useRef(false);
+  useFrame(() => {
+    const active = !!controls && performance.now() - manualCam.ts < 160;
+    if (controls) controls.enabled = !active;
+    if (!active) {
+      engaged.current = false;
+      return;
+    }
+    const dist = 10;
+    const cx = manualCam.x - Math.sin(manualCam.heading) * dist;
+    const cz = manualCam.z - Math.cos(manualCam.heading) * dist;
+    camera.position.lerp(dest.set(cx, 6.5, cz), engaged.current ? 0.12 : 0.45);
+    camera.lookAt(manualCam.x, manualCam.y + 0.6, manualCam.z);
+    controls?.target?.set(manualCam.x, 0, manualCam.z); // continuity on release
+    engaged.current = true;
+  });
+  return null;
+}
 const RARE_COLOR = '#ffd24a';
 const HAZARD_COLOR = '#ff4444';
 const HAZARD_RADIUS = 1.35;
@@ -136,6 +169,7 @@ export function DispatchCouriers() {
   return (
     <group>
       <SurgeBeacon />
+      <DispatchFollowCamera />
       {dispatches.map((d, idx) => (
         <Courier
           key={d.id}
@@ -154,69 +188,106 @@ export function DispatchCouriers() {
   );
 }
 
-/** Real 3D courier model per equipped skin (replaces the plain glowing orb). */
-function CourierSkin({ shape, color }: { shape: DispatchSkinShape; color: THREE.ColorRepresentation }) {
-  const ref = useRef<THREE.Group>(null);
-  useFrame((_, dt) => {
-    const g = ref.current;
-    if (!g) return;
-    g.rotation.y += dt * (shape === 'drone' ? 3.4 : shape === 'satellite' ? 0.8 : 1.5);
-    if (shape === 'flame') {
-      const s = 1 + Math.sin(g.userData.t = (g.userData.t ?? 0) + dt * 9) * 0.14;
-      g.scale.set(1, s, 1);
-    }
-  });
-  const mat = (
-    <meshStandardMaterial
-      color={color}
-      emissive={color}
-      emissiveIntensity={1.5}
-      metalness={0.35}
-      roughness={0.25}
-      toneMapped={false}
-    />
-  );
+/** Shared emissive skin material (module-scoped so it isn't a new type per frame). */
+function SkinMat({ color, rough = 0.22, metal = 0.45 }: { color: THREE.ColorRepresentation; rough?: number; metal?: number }) {
+  return <meshStandardMaterial color={color} emissive={color} emissiveIntensity={1.5} metalness={metal} roughness={rough} toneMapped={false} />;
+}
+
+/** The detailed body for each skin shape (composite, not a single primitive). */
+function SkinBody({ shape, color }: { shape: DispatchSkinShape; color: THREE.ColorRepresentation }) {
   switch (shape) {
-    case 'crystal':
+    case 'crystal': // a shard cluster
       return (
-        <group ref={ref}>
-          <mesh scale={[1, 1.8, 1]}><octahedronGeometry args={[0.26, 0]} />{mat}</mesh>
+        <group>
+          <mesh scale={[1, 1.9, 1]}><octahedronGeometry args={[0.24, 0]} /><SkinMat color={color} /></mesh>
+          <mesh position={[0.18, -0.1, 0.05]} rotation={[0, 0, 0.5]} scale={[1, 1.3, 1]}><octahedronGeometry args={[0.13, 0]} /><SkinMat color={color} /></mesh>
+          <mesh position={[-0.16, -0.05, -0.08]} rotation={[0.3, 0, -0.4]} scale={[1, 1.2, 1]}><octahedronGeometry args={[0.11, 0]} /><SkinMat color={color} /></mesh>
         </group>
       );
-    case 'prism':
+    case 'prism': // gyroscope: dodecahedron + ring
       return (
-        <group ref={ref}>
-          <mesh><dodecahedronGeometry args={[0.32, 0]} />{mat}</mesh>
+        <group>
+          <mesh><dodecahedronGeometry args={[0.3, 0]} /><SkinMat color={color} /></mesh>
+          <mesh rotation={[Math.PI / 2.4, 0, 0.3]}><torusGeometry args={[0.42, 0.025, 8, 36]} /><SkinMat color={color} metal={0.7} /></mesh>
         </group>
       );
-    case 'flame':
+    case 'flame': // stacked flickering cones
       return (
-        <group ref={ref}>
-          <mesh position={[0, 0.05, 0]}><coneGeometry args={[0.24, 0.62, 9]} />{mat}</mesh>
+        <group>
+          <mesh position={[0, 0.02, 0]}><coneGeometry args={[0.24, 0.5, 10]} /><SkinMat color={color} rough={0.4} /></mesh>
+          <mesh position={[0, 0.34, 0]}><coneGeometry args={[0.14, 0.34, 10]} /><SkinMat color={color} rough={0.4} /></mesh>
         </group>
       );
-    case 'drone':
+    case 'drone': // body + dome + 4 rotor rings
       return (
-        <group ref={ref}>
-          <mesh><boxGeometry args={[0.32, 0.12, 0.32]} />{mat}</mesh>
-          <mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[0.34, 0.03, 6, 18]} />{mat}</mesh>
+        <group>
+          <mesh><boxGeometry args={[0.3, 0.1, 0.3]} /><SkinMat color={color} /></mesh>
+          <mesh position={[0, 0.08, 0]}><sphereGeometry args={[0.13, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2]} /><SkinMat color={color} /></mesh>
+          {([[0.26, 0.26], [0.26, -0.26], [-0.26, 0.26], [-0.26, -0.26]] as const).map(([x, z], i) => (
+            <mesh key={i} position={[x, 0.02, z]} rotation={[Math.PI / 2, 0, 0]}>
+              <torusGeometry args={[0.13, 0.02, 6, 16]} /><SkinMat color={color} metal={0.6} />
+            </mesh>
+          ))}
         </group>
       );
-    case 'satellite':
+    case 'satellite': // body + 2 solar panels + dish
       return (
-        <group ref={ref}>
-          <mesh><boxGeometry args={[0.2, 0.2, 0.34]} />{mat}</mesh>
-          <mesh position={[0.4, 0, 0]} rotation={[0, 0, 0.25]}><boxGeometry args={[0.5, 0.02, 0.24]} />{mat}</mesh>
-          <mesh position={[-0.4, 0, 0]} rotation={[0, 0, -0.25]}><boxGeometry args={[0.5, 0.02, 0.24]} />{mat}</mesh>
+        <group>
+          <mesh><boxGeometry args={[0.2, 0.2, 0.34]} /><SkinMat color={color} /></mesh>
+          <mesh position={[0.42, 0, 0]} rotation={[0, 0, 0.22]}><boxGeometry args={[0.55, 0.02, 0.26]} /><SkinMat color={color} metal={0.7} /></mesh>
+          <mesh position={[-0.42, 0, 0]} rotation={[0, 0, -0.22]}><boxGeometry args={[0.55, 0.02, 0.26]} /><SkinMat color={color} metal={0.7} /></mesh>
+          <mesh position={[0, 0.18, 0]} rotation={[Math.PI, 0, 0]}><coneGeometry args={[0.12, 0.14, 14, 1, true]} /><SkinMat color={color} /></mesh>
         </group>
       );
-    default: // orb — faceted, not a smooth sphere
+    default: // orb — faceted core + halo ring
       return (
-        <group ref={ref}>
-          <mesh><icosahedronGeometry args={[0.33, 0]} />{mat}</mesh>
+        <group>
+          <mesh><icosahedronGeometry args={[0.3, 0]} /><SkinMat color={color} /></mesh>
+          <mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[0.42, 0.02, 8, 32]} /><SkinMat color={color} metal={0.7} /></mesh>
         </group>
       );
   }
+}
+
+/** Animated composite courier model per skin: spinning body + pulsing core +
+ *  orbiting shards. Distinctly more than a glowing orb. */
+function CourierSkin({ shape, color }: { shape: DispatchSkinShape; color: THREE.ColorRepresentation }) {
+  const body = useRef<THREE.Group>(null);
+  const core = useRef<THREE.Mesh>(null);
+  const orbit = useRef<THREE.Group>(null);
+  const tRef = useRef(0);
+  useFrame((_, dt) => {
+    tRef.current += dt;
+    const t = tRef.current;
+    if (body.current) {
+      body.current.rotation.y += dt * (shape === 'drone' ? 3.6 : shape === 'satellite' ? 0.9 : 1.4);
+      if (shape === 'flame') body.current.scale.set(1, 1 + Math.sin(t * 9) * 0.16, 1);
+    }
+    if (core.current) core.current.scale.setScalar(0.8 + Math.sin(t * 4) * 0.22);
+    if (orbit.current) orbit.current.rotation.y -= dt * 2.2;
+  });
+  return (
+    <group>
+      <group ref={body}>
+        <SkinBody shape={shape} color={color} />
+      </group>
+      <mesh ref={core}>
+        <sphereGeometry args={[0.12, 10, 10]} />
+        <meshBasicMaterial color="#fff7e0" transparent opacity={0.95} toneMapped={false} />
+      </mesh>
+      <group ref={orbit}>
+        {[0, 1, 2].map((i) => {
+          const a = (i / 3) * Math.PI * 2;
+          return (
+            <mesh key={i} position={[Math.cos(a) * 0.52, Math.sin(a * 2) * 0.1, Math.sin(a) * 0.52]}>
+              <tetrahedronGeometry args={[0.07, 0]} />
+              <SkinMat color={color} />
+            </mesh>
+          );
+        })}
+      </group>
+    </group>
+  );
 }
 
 function Courier({
@@ -321,6 +392,12 @@ function Courier({
         groupRef.current.position.set(mp.x, 1.1 + Math.sin(t * 3) * 0.12, mp.z);
         if (k.x !== 0 || k.z !== 0) groupRef.current.rotation.y = Math.atan2(k.x, k.z);
       }
+      // Publish position for the 3rd-person chase camera.
+      manualCam.x = mp.x;
+      manualCam.y = 1.1;
+      manualCam.z = mp.z;
+      if (k.x !== 0 || k.z !== 0) manualCam.heading = Math.atan2(k.x, k.z);
+      manualCam.ts = performance.now();
     } else {
       const progress = Math.min(1, Math.max(0, (now - dispatch.startedAt) / dispatch.durationMs));
       pose = sampleLiveAgentPath(dispatch.route, progress * dispatch.totalLength);

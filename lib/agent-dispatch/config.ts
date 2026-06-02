@@ -90,7 +90,7 @@ export function levelInfo(totalXp: number): LevelInfo {
 }
 
 // ── Dispatch economics ──────────────────────────────────────────────────
-export const PACKET_DATA = 5; // Data per collected packet
+export const PACKET_DATA = 2; // Data per collected packet (combos/upgrades scale it)
 export const PACKET_XP = 4; // XP per collected packet
 export const COMPLETE_XP = 20; // XP bonus for finishing a run
 
@@ -205,11 +205,11 @@ export const ACHIEVEMENTS: Achievement[] = [
 ];
 
 // ── Idle / auto-dispatch ────────────────────────────────────────────────
-export const OFFLINE_RATE_PER_AGENT = 0.3; // Data/sec per running agent while auto-dispatching
+export const OFFLINE_RATE_PER_AGENT = 0.12; // Data/sec per running agent while auto-dispatching
 export const OFFLINE_CAP_SEC = 6 * 3600; // max 6h of offline accrual
 
 // ── Daily streak ────────────────────────────────────────────────────────
-export const DAILY_BASE = 60; // Data on day 1
+export const DAILY_BASE = 40; // Data on day 1
 export const DAILY_MAX_MULT = 7; // streak caps the multiplier at 7×
 
 export function todayKey(): string {
@@ -222,11 +222,11 @@ export function yesterdayKey(): string {
 // ── Skin catalog ────────────────────────────────────────────────────────
 export const DISPATCH_SKINS: DispatchSkin[] = [
   { id: 'default', name: 'Standard', desc: 'The classic gold courier orb.', currency: 'data', price: 0, color: '#ffd24a', trail: '#ffe27a', shape: 'orb' },
-  { id: 'spark', name: 'Spark', desc: 'Electric cyan crystal.', currency: 'data', price: 200, color: '#3fe0ff', trail: '#9af0ff', shape: 'crystal' },
-  { id: 'ember', name: 'Ember', desc: 'Molten flame courier.', currency: 'data', price: 400, color: '#ff8a3a', trail: '#ffc08a', shape: 'flame' },
-  { id: 'mint', name: 'Mint', desc: 'Phosphor delivery drone.', currency: 'data', price: 650, color: '#3dffa6', trail: '#aaffd8', shape: 'drone' },
-  { id: 'violet', name: 'Violet', desc: 'Arcade prism.', currency: 'data', price: 1000, color: '#b06bff', trail: '#d8b8ff', shape: 'prism' },
-  { id: 'crimson', name: 'Crimson', desc: 'Hot-pink satellite.', currency: 'data', price: 1600, color: '#ff4f9d', trail: '#ffa8cf', shape: 'satellite' },
+  { id: 'spark', name: 'Spark', desc: 'Electric cyan crystal.', currency: 'data', price: 600, color: '#3fe0ff', trail: '#9af0ff', shape: 'crystal' },
+  { id: 'ember', name: 'Ember', desc: 'Molten flame courier.', currency: 'data', price: 1500, color: '#ff8a3a', trail: '#ffc08a', shape: 'flame' },
+  { id: 'mint', name: 'Mint', desc: 'Phosphor delivery drone.', currency: 'data', price: 3500, color: '#3dffa6', trail: '#aaffd8', shape: 'drone' },
+  { id: 'violet', name: 'Violet', desc: 'Arcade prism.', currency: 'data', price: 7000, color: '#b06bff', trail: '#d8b8ff', shape: 'prism' },
+  { id: 'crimson', name: 'Crimson', desc: 'Hot-pink satellite.', currency: 'data', price: 14000, color: '#ff4f9d', trail: '#ffa8cf', shape: 'satellite' },
   // $HATCHER premium — real on-chain burn (price in USD, paid via $HATCHER with
   // 10% burned + 90% to treasury through the existing payment flow).
   { id: 'nebula', name: 'Nebula', desc: 'Iridescent prism — pay with $HATCHER (10% burned).', currency: 'hatch', price: 1.99, color: '#7af0d0', trail: '#c8a8ff', shape: 'prism', premium: true },

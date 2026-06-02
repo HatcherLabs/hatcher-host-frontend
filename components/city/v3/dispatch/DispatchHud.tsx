@@ -190,7 +190,7 @@ export function DispatchHud({
         durationMs,
         packets: spawnPackets(route, totalLength, packetCount, job.rarePackets),
         collected: 0,
-        baseReward: Math.round((10 + totalLength / 30) * job.rewardMult),
+        baseReward: Math.round((4 + totalLength / 55) * job.rewardMult),
         startLevel: lvl.level,
         xpMult: job.xpMult,
         jobName: job.name,
