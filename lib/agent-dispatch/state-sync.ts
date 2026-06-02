@@ -2,6 +2,7 @@
 import { useEffect, useRef } from 'react';
 import { API_URL } from '@/lib/config';
 import { useDispatchStore } from './store';
+import { fetchReceipts } from './leaderboard';
 
 interface GameStateBlob {
   data: number;
@@ -69,6 +70,14 @@ function snapshot(): GameStateBlob {
 export function useDispatchStateSync() {
   const hydrateFromServer = useDispatchStore((s) => s.hydrateFromServer);
   const setHydrated = useDispatchStore((s) => s.setHydrated);
+  const setOnchainEnabled = useDispatchStore((s) => s.setOnchainEnabled);
+
+  useEffect(() => {
+    // Learn whether the server has Solana anchoring on (gates /complete reports).
+    void fetchReceipts().then((r) => {
+      if (r) setOnchainEnabled(!!r.enabled);
+    });
+  }, [setOnchainEnabled]);
 
   useEffect(() => {
     let alive = true;

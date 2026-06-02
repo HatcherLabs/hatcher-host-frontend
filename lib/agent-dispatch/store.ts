@@ -40,6 +40,7 @@ interface DispatchState {
   lastSeen: number;
   streak: { count: number; lastDay: string };
   // Runtime (not persisted).
+  onchainEnabled: boolean; // server has Solana anchoring on (gates /complete reports)
   dispatches: ActiveDispatch[];
   lastResult: DispatchResult | null;
   achievementToast: { name: string; reward: number } | null;
@@ -73,6 +74,7 @@ interface DispatchState {
   setLabOpen: (v: boolean) => void;
   setGoalsOpen: (v: boolean) => void;
   setHydrated: (v: boolean) => void;
+  setOnchainEnabled: (v: boolean) => void;
   hydrateFromServer: (s: Partial<DispatchState>) => void;
   clearResult: () => void;
   clearAchievementToast: () => void;
@@ -94,6 +96,7 @@ export const useDispatchStore = create<DispatchState>()(
       autoDispatch: false,
       lastSeen: 0,
       streak: { count: 0, lastDay: '' },
+      onchainEnabled: false,
       dispatches: [],
       lastResult: null,
       achievementToast: null,
@@ -258,6 +261,7 @@ export const useDispatchStore = create<DispatchState>()(
       setLabOpen: (v) => set({ labOpen: v }),
       setGoalsOpen: (v) => set({ goalsOpen: v }),
       setHydrated: (v) => set({ hydrated: v }),
+      setOnchainEnabled: (v) => set({ onchainEnabled: v }),
       hydrateFromServer: (s) => set({ ...s }),
       clearResult: () => set({ lastResult: null }),
       clearAchievementToast: () => set({ achievementToast: null }),

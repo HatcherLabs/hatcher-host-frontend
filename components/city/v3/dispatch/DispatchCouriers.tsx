@@ -4,6 +4,7 @@ import { Html } from '@react-three/drei';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useDispatchStore } from '@/lib/agent-dispatch/store';
+import { reportDispatchComplete } from '@/lib/agent-dispatch/leaderboard';
 import {
   skinById,
   upgradeEffects,
@@ -201,6 +202,17 @@ function Courier({
     if (progress >= 1 && !doneRef.current) {
       doneRef.current = true;
       completeDispatch(dispatch.id);
+      // Anchor the completed run on Solana (B) — only when the server has
+      // anchoring enabled, so we don't fire a request per dispatch otherwise.
+      if (useDispatchStore.getState().onchainEnabled) {
+        const result = useDispatchStore.getState().lastResult;
+        void reportDispatchComplete({
+          framework: dispatch.framework,
+          destName: dispatch.destName,
+          dataEarned: result?.dataEarned ?? dispatch.baseReward,
+          agentId: dispatch.agentId,
+        });
+      }
     }
   });
 
