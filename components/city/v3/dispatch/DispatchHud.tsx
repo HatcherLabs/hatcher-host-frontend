@@ -474,8 +474,9 @@ export function DispatchHud({
           </button>
           {manualControl && (
             <div className="rounded-lg border border-[#62b8ff]/25 bg-[#62b8ff]/5 px-3 py-1.5 text-[11px] text-[#9fceb4]">
-              <span className="font-mono text-[#62b8ff]">W/S</span> drive, <span className="font-mono text-[#62b8ff]">A/D</span> turn —
-              the camera locks behind your courier. Reach the marked destination to deliver; sweep packets for combos.
+              <span className="font-mono text-[#62b8ff]">WASD</span> to move (relative to the camera),{' '}
+              <span className="font-mono text-[#62b8ff]">drag</span> to look around — like walk mode. Reach the marked
+              destination to deliver; sweep packets for combos.
             </div>
           )}
           <div className="grid grid-cols-2 gap-2">

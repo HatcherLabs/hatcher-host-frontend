@@ -21,21 +21,54 @@ import { sampleLiveAgentPath } from '../liveAgentMotion';
 const VFX_POOL = 6;
 const VFX_MS = 650;
 
-// Shared live state for the manual courier so a camera rig can follow it in 3rd
-// person. `ts` is refreshed each frame the manual courier moves; the rig treats
-// the follow as active only while `ts` is fresh (auto-disengages otherwise).
-const manualCam = { x: 0, y: 1.1, z: 0, heading: Math.PI, ts: 0 };
+// Shared live state for the manual courier so a camera rig can follow it. `ts`
+// is refreshed each frame the manual courier is live (rig engages only while
+// fresh). `camYaw` is the orbit angle the player drags — movement is relative
+// to it (walk-mode style: W goes where you're looking, A/D strafe).
+const manualCam = { x: 0, y: 1.1, z: 0, camYaw: Math.PI, ts: 0 };
 
-/** 3rd-person chase camera that engages while a manually-steered courier is
- *  live. Takes over the default MapControls (disables them) and lerps the
- *  camera behind the courier; releases control when manual steering stops. */
+/** Walk-mode-style 3rd-person camera for the manually-steered courier: follows
+ *  from behind the drag-controlled orbit yaw, looking at the courier. Takes over
+ *  the default MapControls while a manual courier is live; releases otherwise. */
 function DispatchFollowCamera() {
   const camera = useThree((s) => s.camera);
+  const gl = useThree((s) => s.gl);
   const controls = useThree((s) => s.controls) as unknown as
     | { enabled: boolean; target?: THREE.Vector3 }
     | undefined;
   const dest = useMemo(() => new THREE.Vector3(), []);
   const engaged = useRef(false);
+  const dragging = useRef(false);
+
+  // Drag to orbit the camera (like walk mode's look) — only while following, so
+  // MapControls keeps the drag the rest of the time.
+  useEffect(() => {
+    const el = gl.domElement;
+    const isActive = () => performance.now() - manualCam.ts < 160;
+    const down = (e: PointerEvent) => {
+      if (e.button !== 0 || !isActive()) return;
+      dragging.current = true;
+      el.setPointerCapture(e.pointerId);
+    };
+    const move = (e: PointerEvent) => {
+      if (dragging.current) manualCam.camYaw -= e.movementX * 0.005;
+    };
+    const up = (e: PointerEvent) => {
+      dragging.current = false;
+      if (el.hasPointerCapture(e.pointerId)) el.releasePointerCapture(e.pointerId);
+    };
+    el.addEventListener('pointerdown', down);
+    el.addEventListener('pointermove', move);
+    el.addEventListener('pointerup', up);
+    el.addEventListener('pointerleave', up);
+    return () => {
+      el.removeEventListener('pointerdown', down);
+      el.removeEventListener('pointermove', move);
+      el.removeEventListener('pointerup', up);
+      el.removeEventListener('pointerleave', up);
+    };
+  }, [gl]);
+
   useFrame(() => {
     const active = !!controls && performance.now() - manualCam.ts < 160;
     if (controls) controls.enabled = !active;
@@ -44,8 +77,8 @@ function DispatchFollowCamera() {
       return;
     }
     const dist = 9;
-    const cx = manualCam.x - Math.sin(manualCam.heading) * dist;
-    const cz = manualCam.z - Math.cos(manualCam.heading) * dist;
+    const cx = manualCam.x - Math.sin(manualCam.camYaw) * dist;
+    const cz = manualCam.z - Math.cos(manualCam.camYaw) * dist;
     camera.position.lerp(dest.set(cx, 5.5, cz), engaged.current ? 0.2 : 0.5);
     camera.lookAt(manualCam.x, manualCam.y + 0.6, manualCam.z);
     controls?.target?.set(manualCam.x, 0, manualCam.z); // continuity on release
@@ -88,25 +121,25 @@ function softTexture(): THREE.Texture | null {
   return sharedSoftTexture;
 }
 
-type SteerRef = React.RefObject<{ forward: number; turn: number }>;
+type SteerRef = React.RefObject<{ forward: number; strafe: number }>;
 
-/** Tank-style steering: W/S drive forward/back along the avatar's facing, A/D
- *  rotate it (camera stays locked behind). Active only while manual is on. */
+/** Walk-mode-style steering: W/S forward/back + A/D strafe, all relative to the
+ *  camera's orbit yaw. Active only while manual control is on. */
 function useSteerKeys(active: boolean): SteerRef {
-  const keys = useRef({ forward: 0, turn: 0 });
+  const keys = useRef({ forward: 0, strafe: 0 });
   useEffect(() => {
-    keys.current = { forward: 0, turn: 0 };
+    keys.current = { forward: 0, strafe: 0 };
     if (!active) return;
     const pressed = new Set<string>();
     const STEER = ['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'];
     const recompute = () => {
       let forward = 0;
-      let turn = 0;
+      let strafe = 0;
       if (pressed.has('w') || pressed.has('arrowup')) forward += 1;
       if (pressed.has('s') || pressed.has('arrowdown')) forward -= 1;
-      if (pressed.has('d') || pressed.has('arrowright')) turn += 1;
-      if (pressed.has('a') || pressed.has('arrowleft')) turn -= 1;
-      keys.current = { forward, turn };
+      if (pressed.has('d') || pressed.has('arrowright')) strafe += 1;
+      if (pressed.has('a') || pressed.has('arrowleft')) strafe -= 1;
+      keys.current = { forward, strafe };
     };
     const dn = (e: KeyboardEvent) => {
       const k = e.key.toLowerCase();
@@ -329,7 +362,6 @@ function Courier({
   // Manual steering state + roam bounds (route bbox + margin so the destination
   // is always reachable).
   const manualPos = useRef<{ x: number; z: number } | null>(null);
-  const headingRef = useRef<number | null>(null); // avatar facing (tank-style)
   const bounds = useMemo(() => {
     let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
     for (const p of dispatch.route) {
@@ -378,31 +410,36 @@ function Courier({
     let arrived: boolean;
 
     if (manual) {
-      // Tank-style: A/D rotate the avatar's heading, W/S drive along it. The
-      // camera stays locked behind, so controls feel consistent.
+      // Walk-mode style: movement is relative to the camera's orbit yaw — W/S
+      // go where you're looking, A/D strafe. The avatar turns to face where it
+      // moves; the camera (drag to orbit) follows. No tank-style turning.
       if (!manualPos.current) {
         manualPos.current = { x: dispatch.route[0]!.x, z: dispatch.route[0]!.z };
-        headingRef.current = Math.atan2(dispatch.destX - dispatch.route[0]!.x, dispatch.destZ - dispatch.route[0]!.z);
+        manualCam.camYaw = Math.atan2(dispatch.destX - dispatch.route[0]!.x, dispatch.destZ - dispatch.route[0]!.z);
       }
       const mp = manualPos.current;
-      const k = keysRef.current ?? { forward: 0, turn: 0 };
-      const TURN = 2.6;
+      const k = keysRef.current ?? { forward: 0, strafe: 0 };
       const SPEED = 17;
-      headingRef.current = (headingRef.current ?? 0) + k.turn * TURN * delta;
-      const h = headingRef.current;
-      mp.x = Math.min(bounds.maxX, Math.max(bounds.minX, mp.x + Math.sin(h) * k.forward * SPEED * delta));
-      mp.z = Math.min(bounds.maxZ, Math.max(bounds.minZ, mp.z + Math.cos(h) * k.forward * SPEED * delta));
+      const yaw = manualCam.camYaw;
+      let mvx = Math.sin(yaw) * k.forward + Math.cos(yaw) * k.strafe;
+      let mvz = Math.cos(yaw) * k.forward - Math.sin(yaw) * k.strafe;
+      const len = Math.hypot(mvx, mvz);
+      if (len > 0) {
+        mvx /= len;
+        mvz /= len;
+      }
+      mp.x = Math.min(bounds.maxX, Math.max(bounds.minX, mp.x + mvx * SPEED * delta));
+      mp.z = Math.min(bounds.maxZ, Math.max(bounds.minZ, mp.z + mvz * SPEED * delta));
       pose = mp;
       arrived = Math.hypot(dispatch.destX - mp.x, dispatch.destZ - mp.z) < 2.6;
       if (groupRef.current) {
         groupRef.current.position.set(mp.x, 1.1 + Math.sin(t * 3) * 0.12, mp.z);
-        groupRef.current.rotation.y = h;
+        if (len > 0) groupRef.current.rotation.y = Math.atan2(mvx, mvz);
       }
-      // Publish facing + position for the locked 3rd-person chase camera.
+      // Publish position for the follow camera (yaw is owned by the camera/drag).
       manualCam.x = mp.x;
       manualCam.y = 1.1;
       manualCam.z = mp.z;
-      manualCam.heading = h;
       manualCam.ts = performance.now();
     } else {
       const progress = Math.min(1, Math.max(0, (now - dispatch.startedAt) / dispatch.durationMs));
