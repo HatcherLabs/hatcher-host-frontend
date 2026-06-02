@@ -383,7 +383,7 @@ function LiveCitySceneBody({
           }}
         />
         <SceneErrorBoundary label="DispatchCouriers">
-          <DispatchCouriers />
+          <DispatchCouriers grid={layout.grid} buildings={layout.buildings} />
         </SceneErrorBoundary>
         {viewMode === 'survey' ? (
           <SurveyCamera grid={layout.grid} focusTarget={focusTarget} />
