@@ -205,6 +205,8 @@ export const ACHIEVEMENTS: Achievement[] = [
 ];
 
 // ── Idle / auto-dispatch ────────────────────────────────────────────────
+export const AUTO_UNLOCK_COST = 2500; // one-time Data to unlock auto-dispatch
+export const AUTO_FUEL_COST = 12; // Data burned per auto-triggered dispatch (manual is free)
 export const OFFLINE_RATE_PER_AGENT = 0.12; // Data/sec per running agent while auto-dispatching
 export const OFFLINE_CAP_SEC = 6 * 3600; // max 6h of offline accrual
 

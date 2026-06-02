@@ -6,6 +6,8 @@ import {
   prestigeMultiplier,
   upgradeEffects,
   JOB_TYPES,
+  AUTO_UNLOCK_COST,
+  AUTO_FUEL_COST,
   ACHIEVEMENTS,
   PRESTIGE_LEVEL,
   type JobType,
@@ -78,6 +80,8 @@ export function DispatchHud({
   const setLabOpen = useDispatchStore((s) => s.setLabOpen);
   const setGoalsOpen = useDispatchStore((s) => s.setGoalsOpen);
   const setAuto = useDispatchStore((s) => s.setAuto);
+  const autoUnlocked = useDispatchStore((s) => s.autoUnlocked);
+  const unlockAuto = useDispatchStore((s) => s.unlockAuto);
   const manualControl = useDispatchStore((s) => s.manualControl);
   const setManual = useDispatchStore((s) => s.setManual);
   // Manual WASD steering needs a keyboard. On touch / coarse-pointer devices
@@ -225,7 +229,7 @@ export function DispatchHud({
   // Auto-dispatch: keep idle agents busy, filling free slots on a timer.
   const autoDestRef = useRef(0);
   useEffect(() => {
-    if (!autoDispatch || runningAgents.length === 0 || dests.length === 0) return;
+    if (!autoUnlocked || !autoDispatch || runningAgents.length === 0 || dests.length === 0) return;
     const tick = () => {
       const st = useDispatchStore.getState();
       const free = upgradeEffects(st.upgrades).maxSlots - st.dispatches.length;
@@ -233,6 +237,9 @@ export function DispatchHud({
       const busy = new Set(st.dispatches.map((d) => d.agentId));
       const idle = runningAgents.filter((a) => !busy.has(a.id));
       for (let i = 0; i < Math.min(free, idle.length); i++) {
+        // Each auto-dispatch burns fuel (Data). Out of Data → auto pauses until
+        // you earn more (manual dispatches are free).
+        if (!useDispatchStore.getState().spendAutoFuel()) break;
         autoDestRef.current = (autoDestRef.current + 1) % dests.length;
         createDispatch(idle[i]!, dests[autoDestRef.current]!, JOB_TYPES[0]!);
       }
@@ -240,7 +247,7 @@ export function DispatchHud({
     tick();
     const t = window.setInterval(tick, 2500);
     return () => window.clearInterval(t);
-  }, [autoDispatch, runningAgents, dests, createDispatch]);
+  }, [autoUnlocked, autoDispatch, runningAgents, dests, createDispatch]);
 
   // Unlock achievements as their conditions are met.
   useEffect(() => {
@@ -462,18 +469,27 @@ export function DispatchHud({
           )}
 
           <button
-            onClick={() => setAuto(!autoDispatch)}
-            className={`flex items-center justify-between rounded-lg border px-3 py-2 text-sm font-semibold transition ${
-              autoDispatch
+            onClick={() => (autoUnlocked ? setAuto(!autoDispatch) : unlockAuto())}
+            disabled={!autoUnlocked && data < AUTO_UNLOCK_COST}
+            className={`flex items-center justify-between rounded-lg border px-3 py-2 text-sm font-semibold transition disabled:opacity-50 ${
+              autoUnlocked && autoDispatch
                 ? 'border-[#39ff88] bg-[#39ff88]/15 text-[#39ff88]'
                 : 'border-white/10 bg-black/30 text-[#9fceb4] hover:bg-white/5'
             }`}
-            title="Automatically keep your agents on dispatch runs"
+            title={
+              autoUnlocked
+                ? `Auto-dispatch burns ${AUTO_FUEL_COST} Data per run (manual is free)`
+                : `Unlock auto-dispatch for ${AUTO_UNLOCK_COST.toLocaleString()} Data`
+            }
           >
-            <span>⟳ Auto-dispatch</span>
-            <span className={`rounded-full px-2 py-0.5 text-xs ${autoDispatch ? 'bg-[#39ff88] text-black' : 'bg-white/10'}`}>
-              {autoDispatch ? 'ON' : 'OFF'}
-            </span>
+            <span>⟳ Auto-dispatch{autoUnlocked && <span className="ml-1 text-[10px] text-[#7faE96]">−{AUTO_FUEL_COST}◆/run</span>}</span>
+            {autoUnlocked ? (
+              <span className={`rounded-full px-2 py-0.5 text-xs ${autoDispatch ? 'bg-[#39ff88] text-black' : 'bg-white/10'}`}>
+                {autoDispatch ? 'ON' : 'OFF'}
+              </span>
+            ) : (
+              <span className="rounded-full bg-[#ffd24a]/20 px-2 py-0.5 text-xs text-[#ffd24a]">🔒 {AUTO_UNLOCK_COST.toLocaleString()}◆</span>
+            )}
           </button>
 
           {canSteer && (

@@ -15,6 +15,7 @@ interface GameStateBlob {
   stats: { dispatches: number; packets: number };
   achieved: string[];
   autoDispatch: boolean;
+  autoUnlocked: boolean;
   streak: { count: number; lastDay: string };
   lastSeen: number;
 }
@@ -56,6 +57,7 @@ function snapshot(): GameStateBlob {
     stats: s.stats,
     achieved: s.achieved,
     autoDispatch: s.autoDispatch,
+    autoUnlocked: s.autoUnlocked,
     streak: s.streak,
     lastSeen: s.lastSeen,
   };
@@ -95,6 +97,7 @@ export function useDispatchStateSync() {
           stats: server.stats ?? { dispatches: 0, packets: 0 },
           achieved: server.achieved ?? [],
           autoDispatch: !!server.autoDispatch,
+          autoUnlocked: !!server.autoUnlocked,
           streak: server.streak ?? { count: 0, lastDay: '' },
           lastSeen: server.lastSeen ?? 0,
         });

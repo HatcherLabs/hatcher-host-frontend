@@ -18,6 +18,8 @@ import {
   COMPLETE_XP,
   RARE_PACKET_MULT,
   OFFLINE_RATE_PER_AGENT,
+  AUTO_UNLOCK_COST,
+  AUTO_FUEL_COST,
   OFFLINE_CAP_SEC,
   DAILY_BASE,
   DAILY_MAX_MULT,
@@ -37,6 +39,7 @@ interface DispatchState {
   stats: { dispatches: number; packets: number };
   achieved: string[];
   autoDispatch: boolean;
+  autoUnlocked: boolean; // auto-dispatch is bought once with Data, then burns fuel
   manualControl: boolean; // steer the active courier yourself (WASD/arrows)
   lastSeen: number;
   streak: { count: number; lastDay: string };
@@ -64,6 +67,8 @@ interface DispatchState {
   buyUpgrade: (def: UpgradeDef) => boolean;
   unlockAchievement: (a: Achievement) => void;
   setAuto: (v: boolean) => void;
+  unlockAuto: () => boolean; // buy auto-dispatch with Data
+  spendAutoFuel: () => boolean; // burn fuel for one auto-dispatch; false if broke
   setManual: (v: boolean) => void;
   setSurge: (active: boolean, mult: number) => void;
   applyOffline: (runningAgents: number) => void;
@@ -99,6 +104,7 @@ export const useDispatchStore = create<DispatchState>()(
       stats: { dispatches: 0, packets: 0 },
       achieved: [],
       autoDispatch: false,
+      autoUnlocked: false,
       manualControl: false,
       lastSeen: 0,
       streak: { count: 0, lastDay: '' },
@@ -214,12 +220,25 @@ export const useDispatchStore = create<DispatchState>()(
       },
 
       setAuto: (v) => set({ autoDispatch: v }),
+      unlockAuto: () => {
+        const { data, autoUnlocked } = get();
+        if (autoUnlocked) return true;
+        if (data < AUTO_UNLOCK_COST) return false;
+        set({ data: data - AUTO_UNLOCK_COST, autoUnlocked: true, autoDispatch: true });
+        return true;
+      },
+      spendAutoFuel: () => {
+        const { data } = get();
+        if (data < AUTO_FUEL_COST) return false;
+        set({ data: data - AUTO_FUEL_COST });
+        return true;
+      },
       setManual: (v) => set({ manualControl: v }),
       setSurge: (active, mult) => set({ surgeActive: active, surgeMult: active ? mult : 1 }),
 
       applyOffline: (runningAgents) => {
-        const { lastSeen, autoDispatch, data } = get();
-        if (!autoDispatch || lastSeen === 0 || runningAgents === 0) {
+        const { lastSeen, autoDispatch, autoUnlocked, data } = get();
+        if (!autoUnlocked || !autoDispatch || lastSeen === 0 || runningAgents === 0) {
           set({ lastSeen: Date.now() });
           return;
         }
@@ -290,6 +309,7 @@ export const useDispatchStore = create<DispatchState>()(
         stats: s.stats,
         achieved: s.achieved,
         autoDispatch: s.autoDispatch,
+        autoUnlocked: s.autoUnlocked,
         manualControl: s.manualControl,
         lastSeen: s.lastSeen,
         streak: s.streak,
