@@ -42,17 +42,60 @@ function softTexture(): THREE.Texture | null {
   return sharedSoftTexture;
 }
 
+type SteerRef = React.RefObject<{ x: number; z: number }>;
+
+/** WASD / arrow-key steering vector, active only while manual control is on. */
+function useSteerKeys(active: boolean): SteerRef {
+  const keys = useRef({ x: 0, z: 0 });
+  useEffect(() => {
+    keys.current = { x: 0, z: 0 };
+    if (!active) return;
+    const pressed = new Set<string>();
+    const STEER = ['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'];
+    const recompute = () => {
+      let x = 0;
+      let z = 0;
+      if (pressed.has('a') || pressed.has('arrowleft')) x -= 1;
+      if (pressed.has('d') || pressed.has('arrowright')) x += 1;
+      if (pressed.has('w') || pressed.has('arrowup')) z -= 1;
+      if (pressed.has('s') || pressed.has('arrowdown')) z += 1;
+      const len = Math.hypot(x, z) || 1;
+      keys.current = { x: x / len, z: z / len };
+    };
+    const dn = (e: KeyboardEvent) => {
+      const k = e.key.toLowerCase();
+      if (!STEER.includes(k)) return;
+      pressed.add(k);
+      recompute();
+      if (k.startsWith('arrow')) e.preventDefault();
+    };
+    const up = (e: KeyboardEvent) => {
+      pressed.delete(e.key.toLowerCase());
+      recompute();
+    };
+    window.addEventListener('keydown', dn);
+    window.addEventListener('keyup', up);
+    return () => {
+      window.removeEventListener('keydown', dn);
+      window.removeEventListener('keyup', up);
+    };
+  }, [active]);
+  return keys;
+}
+
 /** All in-flight dispatch couriers + their collectibles. Reads the store. */
 export function DispatchCouriers() {
   const dispatches = useDispatchStore((s) => s.dispatches);
   const equippedSkin = useDispatchStore((s) => s.equippedSkin);
   const upgrades = useDispatchStore((s) => s.upgrades);
+  const manualControl = useDispatchStore((s) => s.manualControl);
   const skin = useMemo(() => skinById(equippedSkin), [equippedSkin]);
   const fx = useMemo(() => upgradeEffects(upgrades), [upgrades]);
+  const keysRef = useSteerKeys(manualControl);
 
   return (
     <group>
-      {dispatches.map((d) => (
+      {dispatches.map((d, idx) => (
         <Courier
           key={d.id}
           dispatch={d}
@@ -62,6 +105,8 @@ export function DispatchCouriers() {
           collectRadius={fx.collectRadius}
           magnetRange={fx.magnetRange}
           payoutMult={fx.payoutMult}
+          manual={manualControl && idx === 0}
+          keysRef={keysRef}
         />
       ))}
     </group>
@@ -141,6 +186,8 @@ function Courier({
   collectRadius,
   magnetRange,
   payoutMult,
+  manual,
+  keysRef,
 }: {
   dispatch: ActiveDispatch;
   color: string;
@@ -149,6 +196,8 @@ function Courier({
   collectRadius: number;
   magnetRange: number;
   payoutMult: number;
+  manual: boolean;
+  keysRef: SteerRef;
 }) {
   const collectPacket = useDispatchStore((s) => s.collectPacket);
   const completeDispatch = useDispatchStore((s) => s.completeDispatch);
@@ -164,6 +213,19 @@ function Courier({
   const lastCollectRef = useRef(0);
   const tex = useMemo(() => softTexture(), []);
   const accent = useMemo(() => new THREE.Color(color), [color]);
+
+  // Manual steering state + roam bounds (route bbox + margin so the destination
+  // is always reachable).
+  const manualPos = useRef<{ x: number; z: number } | null>(null);
+  const bounds = useMemo(() => {
+    let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
+    for (const p of dispatch.route) {
+      minX = Math.min(minX, p.x); maxX = Math.max(maxX, p.x);
+      minZ = Math.min(minZ, p.z); maxZ = Math.max(maxZ, p.z);
+    }
+    const m = 45;
+    return { minX: minX - m, maxX: maxX + m, minZ: minZ - m, maxZ: maxZ + m };
+  }, [dispatch.route]);
 
   // Live packet positions (so the tractor beam can pull them in).
   const posRef = useRef<{ x: number; z: number }[]>([]);
@@ -189,13 +251,34 @@ function Courier({
 
   useFrame(({ clock }, delta) => {
     const now = Date.now();
-    const progress = Math.min(1, Math.max(0, (now - dispatch.startedAt) / dispatch.durationMs));
-    const pose = sampleLiveAgentPath(dispatch.route, progress * dispatch.totalLength);
     const t = clock.elapsedTime;
+    let pose: { x: number; z: number };
+    let arrived: boolean;
 
-    if (groupRef.current) {
-      groupRef.current.position.set(pose.x, 1.1 + Math.sin(t * 3) * 0.12, pose.z);
-      groupRef.current.rotation.y = t * 1.4;
+    if (manual) {
+      // Player-steered: integrate the key vector, clamp to the roam bounds, and
+      // arrive by reaching the destination yourself.
+      if (!manualPos.current) manualPos.current = { x: dispatch.route[0]!.x, z: dispatch.route[0]!.z };
+      const mp = manualPos.current;
+      const k = keysRef.current ?? { x: 0, z: 0 };
+      const SPEED = 17;
+      mp.x = Math.min(bounds.maxX, Math.max(bounds.minX, mp.x + k.x * SPEED * delta));
+      mp.z = Math.min(bounds.maxZ, Math.max(bounds.minZ, mp.z + k.z * SPEED * delta));
+      pose = mp;
+      const dest = dispatch.route[dispatch.route.length - 1]!;
+      arrived = Math.hypot(dest.x - mp.x, dest.z - mp.z) < 2.6;
+      if (groupRef.current) {
+        groupRef.current.position.set(mp.x, 1.1 + Math.sin(t * 3) * 0.12, mp.z);
+        if (k.x !== 0 || k.z !== 0) groupRef.current.rotation.y = Math.atan2(k.x, k.z);
+      }
+    } else {
+      const progress = Math.min(1, Math.max(0, (now - dispatch.startedAt) / dispatch.durationMs));
+      pose = sampleLiveAgentPath(dispatch.route, progress * dispatch.totalLength);
+      arrived = progress >= 1;
+      if (groupRef.current) {
+        groupRef.current.position.set(pose.x, 1.1 + Math.sin(t * 3) * 0.12, pose.z);
+        groupRef.current.rotation.y = t * 1.4;
+      }
     }
 
     // Combo decays if you stop collecting.
@@ -271,7 +354,7 @@ function Courier({
       (ring.material as THREE.MeshBasicMaterial).opacity = (1 - age) * 0.6;
     }
 
-    if (progress >= 1 && !doneRef.current) {
+    if (arrived && !doneRef.current) {
       doneRef.current = true;
       completeDispatch(dispatch.id);
       // Authoritative scoring path: report the completion so the server accrues

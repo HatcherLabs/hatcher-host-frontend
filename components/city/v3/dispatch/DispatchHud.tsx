@@ -77,6 +77,8 @@ export function DispatchHud({
   const setLabOpen = useDispatchStore((s) => s.setLabOpen);
   const setGoalsOpen = useDispatchStore((s) => s.setGoalsOpen);
   const setAuto = useDispatchStore((s) => s.setAuto);
+  const manualControl = useDispatchStore((s) => s.manualControl);
+  const setManual = useDispatchStore((s) => s.setManual);
   const startDispatch = useDispatchStore((s) => s.startDispatch);
   const doPrestige = useDispatchStore((s) => s.doPrestige);
   const unlockAchievement = useDispatchStore((s) => s.unlockAchievement);
@@ -398,6 +400,27 @@ export function DispatchHud({
               {autoDispatch ? 'ON' : 'OFF'}
             </span>
           </button>
+
+          <button
+            onClick={() => setManual(!manualControl)}
+            className={`flex items-center justify-between rounded-lg border px-3 py-2 text-sm font-semibold transition ${
+              manualControl
+                ? 'border-[#62b8ff] bg-[#62b8ff]/15 text-[#62b8ff]'
+                : 'border-white/10 bg-black/30 text-[#9fceb4] hover:bg-white/5'
+            }`}
+            title="Steer your active courier yourself with WASD / arrow keys to sweep packets"
+          >
+            <span>🎮 Manual steer</span>
+            <span className={`rounded-full px-2 py-0.5 text-xs ${manualControl ? 'bg-[#62b8ff] text-black' : 'bg-white/10'}`}>
+              {manualControl ? 'WASD' : 'OFF'}
+            </span>
+          </button>
+          {manualControl && (
+            <div className="rounded-lg border border-[#62b8ff]/25 bg-[#62b8ff]/5 px-3 py-1.5 text-[11px] text-[#9fceb4]">
+              Steer your newest courier with <span className="font-mono text-[#62b8ff]">WASD</span> / arrows — reach the
+              destination to deliver. Sweep packets along the way for combos.
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-2">
             <button onClick={() => setLabOpen(true)} className="rounded-lg border border-[#39ff88]/30 bg-black/30 px-2 py-2 text-sm font-semibold text-[#39ff88] transition hover:bg-[#39ff88]/10">
               ⚗ Lab

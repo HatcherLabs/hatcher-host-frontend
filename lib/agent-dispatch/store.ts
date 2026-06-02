@@ -37,6 +37,7 @@ interface DispatchState {
   stats: { dispatches: number; packets: number };
   achieved: string[];
   autoDispatch: boolean;
+  manualControl: boolean; // steer the active courier yourself (WASD/arrows)
   lastSeen: number;
   streak: { count: number; lastDay: string };
   // Runtime (not persisted).
@@ -61,6 +62,7 @@ interface DispatchState {
   buyUpgrade: (def: UpgradeDef) => boolean;
   unlockAchievement: (a: Achievement) => void;
   setAuto: (v: boolean) => void;
+  setManual: (v: boolean) => void;
   applyOffline: (runningAgents: number) => void;
   touchSeen: () => void;
   claimDaily: () => void;
@@ -94,6 +96,7 @@ export const useDispatchStore = create<DispatchState>()(
       stats: { dispatches: 0, packets: 0 },
       achieved: [],
       autoDispatch: false,
+      manualControl: false,
       lastSeen: 0,
       streak: { count: 0, lastDay: '' },
       onchainEnabled: false,
@@ -206,6 +209,7 @@ export const useDispatchStore = create<DispatchState>()(
       },
 
       setAuto: (v) => set({ autoDispatch: v }),
+      setManual: (v) => set({ manualControl: v }),
 
       applyOffline: (runningAgents) => {
         const { lastSeen, autoDispatch, data } = get();
@@ -280,6 +284,7 @@ export const useDispatchStore = create<DispatchState>()(
         stats: s.stats,
         achieved: s.achieved,
         autoDispatch: s.autoDispatch,
+        manualControl: s.manualControl,
         lastSeen: s.lastSeen,
         streak: s.streak,
       }),
