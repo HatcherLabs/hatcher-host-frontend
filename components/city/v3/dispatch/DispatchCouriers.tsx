@@ -21,6 +21,19 @@ import { sampleLiveAgentPath } from '../liveAgentMotion';
 const VFX_POOL = 6;
 const VFX_MS = 650;
 const RARE_COLOR = '#ffd24a';
+const HAZARD_COLOR = '#ff4444';
+const HAZARD_RADIUS = 1.35;
+const HAZARD_COOLDOWN_MS = 1500;
+
+/** Obstacle positions for a Hazard-job run — placed ON the route so the
+ *  auto-courier hits them (combo break) and a manual driver can swerve to dodge. */
+function buildHazards(route: { x: number; z: number }[], totalLength: number): { x: number; z: number }[] {
+  if (route.length < 2) return [];
+  return [0.3, 0.5, 0.7].map((f) => {
+    const pose = sampleLiveAgentPath(route, f * totalLength);
+    return { x: pose.x, z: pose.z };
+  });
+}
 
 let sharedSoftTexture: THREE.Texture | null = null;
 function softTexture(): THREE.Texture | null {
@@ -83,6 +96,33 @@ function useSteerKeys(active: boolean): SteerRef {
   return keys;
 }
 
+/** A glowing city-wide beacon shown while a Data Surge is active. */
+function SurgeBeacon() {
+  const active = useDispatchStore((s) => s.surgeActive);
+  const ref = useRef<THREE.Group>(null);
+  useFrame(({ clock }) => {
+    if (!ref.current) return;
+    const t = clock.elapsedTime;
+    ref.current.rotation.y = t * 0.6;
+    const s = 1 + Math.sin(t * 3) * 0.15;
+    ref.current.scale.set(s, 1, s);
+  });
+  if (!active) return null;
+  return (
+    <group ref={ref}>
+      <mesh position={[0, 30, 0]}>
+        <cylinderGeometry args={[0.7, 0.7, 60, 12, 1, true]} />
+        <meshBasicMaterial color={RARE_COLOR} transparent opacity={0.22} side={THREE.DoubleSide} depthWrite={false} toneMapped={false} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.2, 0]}>
+        <ringGeometry args={[3, 4.2, 44]} />
+        <meshBasicMaterial color={RARE_COLOR} transparent opacity={0.5} depthWrite={false} toneMapped={false} />
+      </mesh>
+      <pointLight color={RARE_COLOR} intensity={3} distance={45} position={[0, 8, 0]} />
+    </group>
+  );
+}
+
 /** All in-flight dispatch couriers + their collectibles. Reads the store. */
 export function DispatchCouriers() {
   const dispatches = useDispatchStore((s) => s.dispatches);
@@ -95,6 +135,7 @@ export function DispatchCouriers() {
 
   return (
     <group>
+      <SurgeBeacon />
       {dispatches.map((d, idx) => (
         <Courier
           key={d.id}
@@ -227,6 +268,15 @@ function Courier({
     return { minX: minX - m, maxX: maxX + m, minZ: minZ - m, maxZ: maxZ + m };
   }, [dispatch.route]);
 
+  // Hazard obstacles (Hazard job only).
+  const hazards = useMemo(
+    () => (dispatch.jobName === 'Hazard' ? buildHazards(dispatch.route, dispatch.totalLength) : []),
+    [dispatch.jobName, dispatch.route, dispatch.totalLength],
+  );
+  const hazardRefs = useRef<(THREE.Mesh | null)[]>([]);
+  const hazardHit = useRef<number[]>([]);
+  if (hazardHit.current.length !== hazards.length) hazardHit.current = hazards.map(() => 0);
+
   // Live packet positions (so the tractor beam can pull them in).
   const posRef = useRef<{ x: number; z: number }[]>([]);
   if (posRef.current.length !== dispatch.packets.length) {
@@ -340,6 +390,26 @@ function Courier({
       }
     }
 
+    // Hazard collisions: hitting one breaks your combo (dodge in manual mode).
+    for (let h = 0; h < hazards.length; h++) {
+      const hz = hazards[h]!;
+      const mesh = hazardRefs.current[h];
+      if (mesh) {
+        mesh.rotation.y = t * 1.6;
+        mesh.rotation.x = t * 1.1;
+        mesh.scale.setScalar(1 + Math.sin(t * 4 + h) * 0.12);
+      }
+      const hdx = pose.x - hz.x;
+      const hdz = pose.z - hz.z;
+      if (hdx * hdx + hdz * hdz < HAZARD_RADIUS * HAZARD_RADIUS && now - hazardHit.current[h]! > HAZARD_COOLDOWN_MS) {
+        hazardHit.current[h] = now;
+        if (comboRef.current > 0) {
+          comboRef.current = 0;
+          setFloat({ text: '✖ combo lost', color: HAZARD_COLOR, nonce: now });
+        }
+      }
+    }
+
     for (let s = 0; s < VFX_POOL; s++) {
       const ring = vfxRefs.current[s];
       const born = vfxBorn.current[s]!;
@@ -383,6 +453,19 @@ function Courier({
         >
           <octahedronGeometry args={[0.34, 0]} />
           <meshBasicMaterial color={p.rare ? RARE_COLOR : accent} transparent opacity={0.92} toneMapped={false} />
+        </mesh>
+      ))}
+
+      {hazards.map((h, i) => (
+        <mesh
+          key={`hz-${i}`}
+          ref={(m) => {
+            hazardRefs.current[i] = m;
+          }}
+          position={[h.x, 0.8, h.z]}
+        >
+          <tetrahedronGeometry args={[0.5, 0]} />
+          <meshStandardMaterial color={HAZARD_COLOR} emissive={HAZARD_COLOR} emissiveIntensity={1.3} wireframe toneMapped={false} />
         </mesh>
       ))}
 

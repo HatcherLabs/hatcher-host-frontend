@@ -86,6 +86,27 @@ export async function fetchSeason(): Promise<SeasonData | null> {
   }
 }
 
+export interface SurgeData {
+  active: boolean;
+  multiplier: number;
+  seed: number;
+  endsAt: number | null;
+  nextStartsAt: number;
+  durationMs: number;
+  serverNow: number;
+}
+
+export async function fetchSurge(): Promise<SurgeData | null> {
+  try {
+    const res = await fetch(`${API_URL}/dispatch/surge`, { cache: 'no-store' });
+    if (!res.ok) return null;
+    const json = (await res.json()) as { data?: SurgeData };
+    return json?.data ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export interface ReceiptRow {
   id: string;
   framework: string;

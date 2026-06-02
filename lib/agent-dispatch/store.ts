@@ -41,6 +41,8 @@ interface DispatchState {
   lastSeen: number;
   streak: { count: number; lastDay: string };
   // Runtime (not persisted).
+  surgeMult: number; // active Data Surge packet multiplier (1 when inactive)
+  surgeActive: boolean;
   onchainEnabled: boolean; // server has Solana anchoring on (gates /complete reports)
   dispatches: ActiveDispatch[];
   lastResult: DispatchResult | null;
@@ -63,6 +65,7 @@ interface DispatchState {
   unlockAchievement: (a: Achievement) => void;
   setAuto: (v: boolean) => void;
   setManual: (v: boolean) => void;
+  setSurge: (active: boolean, mult: number) => void;
   applyOffline: (runningAgents: number) => void;
   touchSeen: () => void;
   claimDaily: () => void;
@@ -99,6 +102,8 @@ export const useDispatchStore = create<DispatchState>()(
       manualControl: false,
       lastSeen: 0,
       streak: { count: 0, lastDay: '' },
+      surgeMult: 1,
+      surgeActive: false,
       onchainEnabled: false,
       dispatches: [],
       lastResult: null,
@@ -121,7 +126,7 @@ export const useDispatchStore = create<DispatchState>()(
       },
 
       collectPacket: (dispatchId, index, opts) => {
-        const { dispatches, data, xp, prestige, frameworkData, upgrades, stats } = get();
+        const { dispatches, data, xp, prestige, frameworkData, upgrades, stats, surgeMult } = get();
         const dispatch = dispatches.find((d) => d.id === dispatchId);
         if (!dispatch) return;
         const packet = dispatch.packets[index];
@@ -131,7 +136,7 @@ export const useDispatchStore = create<DispatchState>()(
         const payMult = upgradeEffects(upgrades).payoutMult;
         const combo = Math.max(1, opts?.combo ?? 1);
         const rare = opts?.rare ? RARE_PACKET_MULT : 1;
-        const gained = Math.round(PACKET_DATA * rare * combo * payMult * pMult);
+        const gained = Math.round(PACKET_DATA * rare * combo * payMult * pMult * surgeMult);
         set({
           data: data + gained,
           xp: xp + Math.round(PACKET_XP * combo * pMult * dispatch.xpMult),
@@ -210,6 +215,7 @@ export const useDispatchStore = create<DispatchState>()(
 
       setAuto: (v) => set({ autoDispatch: v }),
       setManual: (v) => set({ manualControl: v }),
+      setSurge: (active, mult) => set({ surgeActive: active, surgeMult: active ? mult : 1 }),
 
       applyOffline: (runningAgents) => {
         const { lastSeen, autoDispatch, data } = get();

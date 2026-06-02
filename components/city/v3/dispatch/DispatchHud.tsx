@@ -21,6 +21,7 @@ import { DispatchLab } from './DispatchLab';
 import { DispatchGoals } from './DispatchGoals';
 import { useDispatchScoreSync } from '@/lib/agent-dispatch/useScoreSync';
 import { useDispatchStateSync } from '@/lib/agent-dispatch/state-sync';
+import { fetchSurge } from '@/lib/agent-dispatch/leaderboard';
 
 interface Dest {
   name: string;
@@ -104,6 +105,44 @@ export function DispatchHud({
   const [agentId, setAgentId] = useState('');
   const [destIdx, setDestIdx] = useState(0);
   const [jobIdx, setJobIdx] = useState(0);
+
+  // Data Surge: synchronized bonus window from the backend (clock-derived).
+  const setSurge = useDispatchStore((s) => s.setSurge);
+  const [surge, setSurgeBanner] = useState<{ active: boolean; mult: number; remaining: number } | null>(null);
+  useEffect(() => {
+    let offset = 0;
+    let data: Awaited<ReturnType<typeof fetchSurge>> = null;
+    let alive = true;
+    const load = async () => {
+      const d = await fetchSurge();
+      if (d && alive) {
+        data = d;
+        offset = d.serverNow - Date.now();
+      }
+    };
+    void load();
+    const refetch = window.setInterval(() => void load(), 30_000);
+    const tick = window.setInterval(() => {
+      if (!data) return;
+      const now = Date.now() + offset;
+      let active = false;
+      let remaining = 0;
+      if (data.endsAt && now < data.endsAt) {
+        active = true;
+        remaining = Math.ceil((data.endsAt - now) / 1000);
+      } else if (now >= data.nextStartsAt) {
+        void load();
+      }
+      setSurge(active, data.multiplier);
+      setSurgeBanner({ active, mult: data.multiplier, remaining });
+    }, 1000);
+    return () => {
+      alive = false;
+      window.clearInterval(refetch);
+      window.clearInterval(tick);
+      setSurge(false, 1);
+    };
+  }, [setSurge]);
   // Re-render every second so countdowns tick.
   const [, force] = useState(0);
   useEffect(() => {
@@ -238,6 +277,22 @@ export function DispatchHud({
 
   return (
     <>
+      {/* Data Surge banner — synchronized bonus window. */}
+      {surge?.active && (
+        <div className="pointer-events-none fixed left-1/2 top-4 z-40 -translate-x-1/2">
+          <div
+            className="flex items-center gap-2 rounded-full border border-[#ffd24a]/60 bg-[rgba(20,14,4,0.92)] px-4 py-2 text-sm font-bold text-[#ffd24a] shadow-xl backdrop-blur"
+            style={{ boxShadow: '0 0 28px rgba(255,210,74,0.4)', animation: 'dispatch-float 0.4s ease-out' }}
+          >
+            <span aria-hidden className="animate-pulse">⚡</span>
+            DATA SURGE · {surge.mult}× packets
+            <span className="font-mono text-[#fff0c0]">
+              {Math.floor(surge.remaining / 60)}:{String(surge.remaining % 60).padStart(2, '0')}
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Launcher */}
       {!panelOpen && (
         <button
