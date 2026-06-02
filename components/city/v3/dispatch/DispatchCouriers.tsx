@@ -202,17 +202,15 @@ function Courier({
     if (progress >= 1 && !doneRef.current) {
       doneRef.current = true;
       completeDispatch(dispatch.id);
-      // Anchor the completed run on Solana (B) — only when the server has
-      // anchoring enabled, so we don't fire a request per dispatch otherwise.
-      if (useDispatchStore.getState().onchainEnabled) {
-        const result = useDispatchStore.getState().lastResult;
-        void reportDispatchComplete({
-          framework: dispatch.framework,
-          destName: dispatch.destName,
-          dataEarned: result?.dataEarned ?? dispatch.baseReward,
-          agentId: dispatch.agentId,
-        });
-      }
+      // Authoritative scoring path: report the completion so the server accrues
+      // the competitive score (bounded, anti-farmed) + queues an on-chain
+      // receipt when enabled. No-ops server-side when signed out.
+      void reportDispatchComplete({
+        framework: dispatch.framework,
+        destName: dispatch.destName,
+        job: dispatch.jobName,
+        agentId: dispatch.agentId,
+      });
     }
   });
 

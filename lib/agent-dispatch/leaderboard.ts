@@ -115,16 +115,17 @@ export async function fetchReceipts(): Promise<ReceiptsData | null> {
 }
 
 /**
- * Report a completed dispatch so it gets anchored on Solana (B). Best-effort;
- * no-ops server-side when anchoring is disabled. Returns true if the server
- * queued an on-chain receipt.
+ * Report a completed dispatch. The server accrues the authoritative competitive
+ * score (bounded + anti-farmed) and queues an on-chain receipt when enabled.
+ * Best-effort; no-ops server-side when signed out. Returns the server-awarded
+ * score for this completion + whether it was anchored.
  */
 export async function reportDispatchComplete(payload: {
   framework: string;
   destName: string;
-  dataEarned: number;
+  job: string;
   agentId?: string;
-}): Promise<boolean> {
+}): Promise<{ scored: number; anchoring: boolean } | null> {
   try {
     const res = await fetch(`${API_URL}/dispatch/complete`, {
       method: 'POST',
@@ -132,10 +133,10 @@ export async function reportDispatchComplete(payload: {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    if (!res.ok) return false;
-    const json = (await res.json()) as { data?: { anchoring?: boolean } };
-    return !!json?.data?.anchoring;
+    if (!res.ok) return null;
+    const json = (await res.json()) as { data?: { scored?: number; anchoring?: boolean } };
+    return { scored: json?.data?.scored ?? 0, anchoring: !!json?.data?.anchoring };
   } catch {
-    return false;
+    return null;
   }
 }
