@@ -315,8 +315,8 @@ function Courier({
       mp.x = Math.min(bounds.maxX, Math.max(bounds.minX, mp.x + k.x * SPEED * delta));
       mp.z = Math.min(bounds.maxZ, Math.max(bounds.minZ, mp.z + k.z * SPEED * delta));
       pose = mp;
-      const dest = dispatch.route[dispatch.route.length - 1]!;
-      arrived = Math.hypot(dest.x - mp.x, dest.z - mp.z) < 2.6;
+      // The route loops back to start, so target the real destination coords.
+      arrived = Math.hypot(dispatch.destX - mp.x, dispatch.destZ - mp.z) < 2.6;
       if (groupRef.current) {
         groupRef.current.position.set(mp.x, 1.1 + Math.sin(t * 3) * 0.12, mp.z);
         if (k.x !== 0 || k.z !== 0) groupRef.current.rotation.y = Math.atan2(k.x, k.z);
@@ -442,6 +442,19 @@ function Courier({
   return (
     <group>
       <primitive object={routeLine} />
+
+      {manual && (
+        <group position={[dispatch.destX, 0, dispatch.destZ]}>
+          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.3, 0]}>
+            <ringGeometry args={[2, 2.7, 36]} />
+            <meshBasicMaterial color={accent} transparent opacity={0.65} depthWrite={false} toneMapped={false} />
+          </mesh>
+          <mesh position={[0, 7, 0]}>
+            <cylinderGeometry args={[0.28, 0.28, 14, 8, 1, true]} />
+            <meshBasicMaterial color={accent} transparent opacity={0.28} side={THREE.DoubleSide} depthWrite={false} toneMapped={false} />
+          </mesh>
+        </group>
+      )}
 
       {dispatch.packets.map((p, i) => (
         <mesh

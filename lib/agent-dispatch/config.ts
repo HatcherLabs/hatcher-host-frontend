@@ -29,6 +29,8 @@ export interface ActiveDispatch {
   agentName: string;
   framework: string;
   destName: string;
+  destX: number; // actual destination coords (route loops back to start, so
+  destZ: number; // route[last] is NOT the dest — manual steering targets these)
   route: { x: number; z: number }[];
   totalLength: number;
   startedAt: number;

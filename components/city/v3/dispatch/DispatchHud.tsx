@@ -182,6 +182,8 @@ export function DispatchHud({
         agentName: agent.name,
         framework: agent.framework,
         destName: dest.name,
+        destX: dest.x,
+        destZ: dest.z,
         route,
         totalLength,
         startedAt: Date.now(),
