@@ -43,10 +43,10 @@ function DispatchFollowCamera() {
       engaged.current = false;
       return;
     }
-    const dist = 10;
+    const dist = 9;
     const cx = manualCam.x - Math.sin(manualCam.heading) * dist;
     const cz = manualCam.z - Math.cos(manualCam.heading) * dist;
-    camera.position.lerp(dest.set(cx, 6.5, cz), engaged.current ? 0.12 : 0.45);
+    camera.position.lerp(dest.set(cx, 5.5, cz), engaged.current ? 0.2 : 0.5);
     camera.lookAt(manualCam.x, manualCam.y + 0.6, manualCam.z);
     controls?.target?.set(manualCam.x, 0, manualCam.z); // continuity on release
     engaged.current = true;
@@ -88,25 +88,25 @@ function softTexture(): THREE.Texture | null {
   return sharedSoftTexture;
 }
 
-type SteerRef = React.RefObject<{ x: number; z: number }>;
+type SteerRef = React.RefObject<{ forward: number; turn: number }>;
 
-/** WASD / arrow-key steering vector, active only while manual control is on. */
+/** Tank-style steering: W/S drive forward/back along the avatar's facing, A/D
+ *  rotate it (camera stays locked behind). Active only while manual is on. */
 function useSteerKeys(active: boolean): SteerRef {
-  const keys = useRef({ x: 0, z: 0 });
+  const keys = useRef({ forward: 0, turn: 0 });
   useEffect(() => {
-    keys.current = { x: 0, z: 0 };
+    keys.current = { forward: 0, turn: 0 };
     if (!active) return;
     const pressed = new Set<string>();
     const STEER = ['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'];
     const recompute = () => {
-      let x = 0;
-      let z = 0;
-      if (pressed.has('a') || pressed.has('arrowleft')) x -= 1;
-      if (pressed.has('d') || pressed.has('arrowright')) x += 1;
-      if (pressed.has('w') || pressed.has('arrowup')) z -= 1;
-      if (pressed.has('s') || pressed.has('arrowdown')) z += 1;
-      const len = Math.hypot(x, z) || 1;
-      keys.current = { x: x / len, z: z / len };
+      let forward = 0;
+      let turn = 0;
+      if (pressed.has('w') || pressed.has('arrowup')) forward += 1;
+      if (pressed.has('s') || pressed.has('arrowdown')) forward -= 1;
+      if (pressed.has('d') || pressed.has('arrowright')) turn += 1;
+      if (pressed.has('a') || pressed.has('arrowleft')) turn -= 1;
+      keys.current = { forward, turn };
     };
     const dn = (e: KeyboardEvent) => {
       const k = e.key.toLowerCase();
@@ -329,6 +329,7 @@ function Courier({
   // Manual steering state + roam bounds (route bbox + margin so the destination
   // is always reachable).
   const manualPos = useRef<{ x: number; z: number } | null>(null);
+  const headingRef = useRef<number | null>(null); // avatar facing (tank-style)
   const bounds = useMemo(() => {
     let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
     for (const p of dispatch.route) {
@@ -377,26 +378,31 @@ function Courier({
     let arrived: boolean;
 
     if (manual) {
-      // Player-steered: integrate the key vector, clamp to the roam bounds, and
-      // arrive by reaching the destination yourself.
-      if (!manualPos.current) manualPos.current = { x: dispatch.route[0]!.x, z: dispatch.route[0]!.z };
+      // Tank-style: A/D rotate the avatar's heading, W/S drive along it. The
+      // camera stays locked behind, so controls feel consistent.
+      if (!manualPos.current) {
+        manualPos.current = { x: dispatch.route[0]!.x, z: dispatch.route[0]!.z };
+        headingRef.current = Math.atan2(dispatch.destX - dispatch.route[0]!.x, dispatch.destZ - dispatch.route[0]!.z);
+      }
       const mp = manualPos.current;
-      const k = keysRef.current ?? { x: 0, z: 0 };
+      const k = keysRef.current ?? { forward: 0, turn: 0 };
+      const TURN = 2.6;
       const SPEED = 17;
-      mp.x = Math.min(bounds.maxX, Math.max(bounds.minX, mp.x + k.x * SPEED * delta));
-      mp.z = Math.min(bounds.maxZ, Math.max(bounds.minZ, mp.z + k.z * SPEED * delta));
+      headingRef.current = (headingRef.current ?? 0) + k.turn * TURN * delta;
+      const h = headingRef.current;
+      mp.x = Math.min(bounds.maxX, Math.max(bounds.minX, mp.x + Math.sin(h) * k.forward * SPEED * delta));
+      mp.z = Math.min(bounds.maxZ, Math.max(bounds.minZ, mp.z + Math.cos(h) * k.forward * SPEED * delta));
       pose = mp;
-      // The route loops back to start, so target the real destination coords.
       arrived = Math.hypot(dispatch.destX - mp.x, dispatch.destZ - mp.z) < 2.6;
       if (groupRef.current) {
         groupRef.current.position.set(mp.x, 1.1 + Math.sin(t * 3) * 0.12, mp.z);
-        if (k.x !== 0 || k.z !== 0) groupRef.current.rotation.y = Math.atan2(k.x, k.z);
+        groupRef.current.rotation.y = h;
       }
-      // Publish position for the 3rd-person chase camera.
+      // Publish facing + position for the locked 3rd-person chase camera.
       manualCam.x = mp.x;
       manualCam.y = 1.1;
       manualCam.z = mp.z;
-      if (k.x !== 0 || k.z !== 0) manualCam.heading = Math.atan2(k.x, k.z);
+      manualCam.heading = h;
       manualCam.ts = performance.now();
     } else {
       const progress = Math.min(1, Math.max(0, (now - dispatch.startedAt) / dispatch.durationMs));

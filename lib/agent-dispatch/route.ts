@@ -12,20 +12,34 @@ export function pathLength(nodes: Pt[]): number {
 }
 
 /**
- * A there-and-back loop from `start` to `dest`, cornered Manhattan-style so the
- * courier reads as following the street grid: out via one corner, home via the
- * other. The courier travels distance 0 -> totalLength once, then the run ends.
+ * A varied one-way path from `start` to `dest`, cornered Manhattan-style (right
+ * angles, reads as following the street grid) but with a random number of
+ * staircase steps and jittered intermediate waypoints so no two runs trace the
+ * same boring rectangle. Ends AT the destination (no round trip).
  */
 export function buildDispatchRoute(start: Pt, dest: Pt): Pt[] {
-  const cornerOut = { x: dest.x, z: start.z };
-  const cornerBack = { x: start.x, z: dest.z };
-  return [
-    { x: start.x, z: start.z },
-    cornerOut,
-    { x: dest.x, z: dest.z },
-    cornerBack,
-    { x: start.x, z: start.z },
-  ];
+  const pts: Pt[] = [{ x: start.x, z: start.z }];
+  const steps = 2 + Math.floor(Math.random() * 3); // 2-4 L-shaped steps
+  let cx = start.x;
+  let cz = start.z;
+  for (let i = 1; i <= steps; i++) {
+    const t = i / steps;
+    const last = i === steps;
+    const jitter = last ? 0 : 9;
+    const nx = last ? dest.x : start.x + (dest.x - start.x) * t + (Math.random() - 0.5) * jitter;
+    const nz = last ? dest.z : start.z + (dest.z - start.z) * t + (Math.random() - 0.5) * jitter;
+    // Alternate which axis we corner on first, for shape variety.
+    if (i % 2 === 1) {
+      pts.push({ x: nx, z: cz });
+      pts.push({ x: nx, z: nz });
+    } else {
+      pts.push({ x: cx, z: nz });
+      pts.push({ x: nx, z: nz });
+    }
+    cx = nx;
+    cz = nz;
+  }
+  return pts;
 }
 
 /**
