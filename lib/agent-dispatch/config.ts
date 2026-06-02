@@ -2,6 +2,8 @@
 
 export type SkinCurrency = 'data' | 'hatch';
 
+export type DispatchSkinShape = 'orb' | 'crystal' | 'drone' | 'satellite' | 'flame' | 'prism';
+
 export interface DispatchSkin {
   id: string;
   name: string;
@@ -10,6 +12,7 @@ export interface DispatchSkin {
   price: number; // Data points, or whole $HATCHER tokens for `hatch` skins
   color: string; // courier / aura accent
   trail: string; // trail / glow accent
+  shape: DispatchSkinShape; // real 3D courier model
   premium?: boolean;
 }
 
@@ -216,17 +219,17 @@ export function yesterdayKey(): string {
 
 // ── Skin catalog ────────────────────────────────────────────────────────
 export const DISPATCH_SKINS: DispatchSkin[] = [
-  { id: 'default', name: 'Standard', desc: 'The classic gold courier.', currency: 'data', price: 0, color: '#ffd24a', trail: '#ffe27a' },
-  { id: 'spark', name: 'Spark', desc: 'Electric cyan trail.', currency: 'data', price: 200, color: '#3fe0ff', trail: '#9af0ff' },
-  { id: 'ember', name: 'Ember', desc: 'Molten orange glow.', currency: 'data', price: 400, color: '#ff8a3a', trail: '#ffc08a' },
-  { id: 'mint', name: 'Mint', desc: 'Fresh phosphor green.', currency: 'data', price: 650, color: '#3dffa6', trail: '#aaffd8' },
-  { id: 'violet', name: 'Violet', desc: 'Deep arcade purple.', currency: 'data', price: 1000, color: '#b06bff', trail: '#d8b8ff' },
-  { id: 'crimson', name: 'Crimson', desc: 'Hot pink streak.', currency: 'data', price: 1600, color: '#ff4f9d', trail: '#ffa8cf' },
+  { id: 'default', name: 'Standard', desc: 'The classic gold courier orb.', currency: 'data', price: 0, color: '#ffd24a', trail: '#ffe27a', shape: 'orb' },
+  { id: 'spark', name: 'Spark', desc: 'Electric cyan crystal.', currency: 'data', price: 200, color: '#3fe0ff', trail: '#9af0ff', shape: 'crystal' },
+  { id: 'ember', name: 'Ember', desc: 'Molten flame courier.', currency: 'data', price: 400, color: '#ff8a3a', trail: '#ffc08a', shape: 'flame' },
+  { id: 'mint', name: 'Mint', desc: 'Phosphor delivery drone.', currency: 'data', price: 650, color: '#3dffa6', trail: '#aaffd8', shape: 'drone' },
+  { id: 'violet', name: 'Violet', desc: 'Arcade prism.', currency: 'data', price: 1000, color: '#b06bff', trail: '#d8b8ff', shape: 'prism' },
+  { id: 'crimson', name: 'Crimson', desc: 'Hot-pink satellite.', currency: 'data', price: 1600, color: '#ff4f9d', trail: '#ffa8cf', shape: 'satellite' },
   // $HATCHER premium — real on-chain burn (price in USD, paid via $HATCHER with
   // 10% burned + 90% to treasury through the existing payment flow).
-  { id: 'nebula', name: 'Nebula', desc: 'Iridescent — pay with $HATCHER (10% burned).', currency: 'hatch', price: 1.99, color: '#7af0d0', trail: '#c8a8ff', premium: true },
-  { id: 'aurora', name: 'Aurora', desc: 'Shifting aurora — $HATCHER exclusive.', currency: 'hatch', price: 3.99, color: '#a8ffe0', trail: '#8fb4ff', premium: true },
-  { id: 'singularity', name: 'Singularity', desc: 'White-gold flagship — $HATCHER burn.', currency: 'hatch', price: 6.99, color: '#fff4cf', trail: '#ffd46b', premium: true },
+  { id: 'nebula', name: 'Nebula', desc: 'Iridescent prism — pay with $HATCHER (10% burned).', currency: 'hatch', price: 1.99, color: '#7af0d0', trail: '#c8a8ff', shape: 'prism', premium: true },
+  { id: 'aurora', name: 'Aurora', desc: 'Aurora satellite — $HATCHER exclusive.', currency: 'hatch', price: 3.99, color: '#a8ffe0', trail: '#8fb4ff', shape: 'satellite', premium: true },
+  { id: 'singularity', name: 'Singularity', desc: 'White-gold flagship crystal — $HATCHER burn.', currency: 'hatch', price: 6.99, color: '#fff4cf', trail: '#ffd46b', shape: 'crystal', premium: true },
 ];
 
 export function skinById(id: string | null | undefined): DispatchSkin {

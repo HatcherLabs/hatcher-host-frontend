@@ -1,6 +1,6 @@
 'use client';
 import { useFrame } from '@react-three/fiber';
-import { Html } from '@react-three/drei';
+import { Html, Trail } from '@react-three/drei';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useDispatchStore } from '@/lib/agent-dispatch/store';
@@ -14,6 +14,7 @@ import {
   COMBO_WINDOW_MS,
   COMBO_MAX,
   type ActiveDispatch,
+  type DispatchSkinShape,
 } from '@/lib/agent-dispatch/config';
 import { sampleLiveAgentPath } from '../liveAgentMotion';
 
@@ -46,7 +47,7 @@ export function DispatchCouriers() {
   const dispatches = useDispatchStore((s) => s.dispatches);
   const equippedSkin = useDispatchStore((s) => s.equippedSkin);
   const upgrades = useDispatchStore((s) => s.upgrades);
-  const skinColor = useMemo(() => skinById(equippedSkin).color, [equippedSkin]);
+  const skin = useMemo(() => skinById(equippedSkin), [equippedSkin]);
   const fx = useMemo(() => upgradeEffects(upgrades), [upgrades]);
 
   return (
@@ -55,7 +56,9 @@ export function DispatchCouriers() {
         <Courier
           key={d.id}
           dispatch={d}
-          color={skinColor}
+          color={skin.color}
+          trailColor={skin.trail}
+          shape={skin.shape}
           collectRadius={fx.collectRadius}
           magnetRange={fx.magnetRange}
           payoutMult={fx.payoutMult}
@@ -65,15 +68,84 @@ export function DispatchCouriers() {
   );
 }
 
+/** Real 3D courier model per equipped skin (replaces the plain glowing orb). */
+function CourierSkin({ shape, color }: { shape: DispatchSkinShape; color: THREE.ColorRepresentation }) {
+  const ref = useRef<THREE.Group>(null);
+  useFrame((_, dt) => {
+    const g = ref.current;
+    if (!g) return;
+    g.rotation.y += dt * (shape === 'drone' ? 3.4 : shape === 'satellite' ? 0.8 : 1.5);
+    if (shape === 'flame') {
+      const s = 1 + Math.sin(g.userData.t = (g.userData.t ?? 0) + dt * 9) * 0.14;
+      g.scale.set(1, s, 1);
+    }
+  });
+  const mat = (
+    <meshStandardMaterial
+      color={color}
+      emissive={color}
+      emissiveIntensity={1.5}
+      metalness={0.35}
+      roughness={0.25}
+      toneMapped={false}
+    />
+  );
+  switch (shape) {
+    case 'crystal':
+      return (
+        <group ref={ref}>
+          <mesh scale={[1, 1.8, 1]}><octahedronGeometry args={[0.26, 0]} />{mat}</mesh>
+        </group>
+      );
+    case 'prism':
+      return (
+        <group ref={ref}>
+          <mesh><dodecahedronGeometry args={[0.32, 0]} />{mat}</mesh>
+        </group>
+      );
+    case 'flame':
+      return (
+        <group ref={ref}>
+          <mesh position={[0, 0.05, 0]}><coneGeometry args={[0.24, 0.62, 9]} />{mat}</mesh>
+        </group>
+      );
+    case 'drone':
+      return (
+        <group ref={ref}>
+          <mesh><boxGeometry args={[0.32, 0.12, 0.32]} />{mat}</mesh>
+          <mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[0.34, 0.03, 6, 18]} />{mat}</mesh>
+        </group>
+      );
+    case 'satellite':
+      return (
+        <group ref={ref}>
+          <mesh><boxGeometry args={[0.2, 0.2, 0.34]} />{mat}</mesh>
+          <mesh position={[0.4, 0, 0]} rotation={[0, 0, 0.25]}><boxGeometry args={[0.5, 0.02, 0.24]} />{mat}</mesh>
+          <mesh position={[-0.4, 0, 0]} rotation={[0, 0, -0.25]}><boxGeometry args={[0.5, 0.02, 0.24]} />{mat}</mesh>
+        </group>
+      );
+    default: // orb — faceted, not a smooth sphere
+      return (
+        <group ref={ref}>
+          <mesh><icosahedronGeometry args={[0.33, 0]} />{mat}</mesh>
+        </group>
+      );
+  }
+}
+
 function Courier({
   dispatch,
   color,
+  trailColor,
+  shape,
   collectRadius,
   magnetRange,
   payoutMult,
 }: {
   dispatch: ActiveDispatch;
   color: string;
+  trailColor: string;
+  shape: DispatchSkinShape;
   collectRadius: number;
   magnetRange: number;
   payoutMult: number;
@@ -245,11 +317,10 @@ function Courier({
         </mesh>
       ))}
 
+      <Trail target={groupRef as unknown as React.RefObject<THREE.Object3D>} width={1.1} length={6} color={trailColor} attenuation={(w) => w} />
+
       <group ref={groupRef}>
-        <mesh>
-          <sphereGeometry args={[0.32, 16, 12]} />
-          <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={1.4} toneMapped={false} />
-        </mesh>
+        <CourierSkin shape={shape} color={accent} />
         {tex && (
           <sprite scale={[1.7, 1.7, 1.7]}>
             <spriteMaterial map={tex} color={accent} transparent opacity={0.5} depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} />
