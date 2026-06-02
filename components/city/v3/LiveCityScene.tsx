@@ -51,6 +51,7 @@ import { LiveBuildings } from './LiveBuildings';
 import { LiveCityHud } from './LiveCityHud';
 import { DispatchCouriers } from './dispatch/DispatchCouriers';
 import { DispatchHud } from './dispatch/DispatchHud';
+import { useAuth } from '@/lib/auth-context';
 import { LiveCityInfrastructure } from './LiveCityInfrastructure';
 import {
   makeLiveAgentLoopPath,
@@ -198,6 +199,7 @@ function LiveCitySceneBody({
 }) {
   const quality = useQuality();
   const qualityControl = useQualityControl();
+  const { isAuthenticated } = useAuth();
   const timeMode = useCityTimeMode();
   const lighting = CITY_LIGHTING[timeMode];
   const [viewMode, setViewMode] = useState<'survey' | 'walk'>('survey');
@@ -382,9 +384,11 @@ function LiveCitySceneBody({
             setSelectedAgentId(agentId);
           }}
         />
-        <SceneErrorBoundary label="DispatchCouriers">
-          <DispatchCouriers />
-        </SceneErrorBoundary>
+        {isAuthenticated && (
+          <SceneErrorBoundary label="DispatchCouriers">
+            <DispatchCouriers />
+          </SceneErrorBoundary>
+        )}
         {viewMode === 'survey' ? (
           <SurveyCamera grid={layout.grid} focusTarget={focusTarget} />
         ) : null}
@@ -433,11 +437,13 @@ function LiveCitySceneBody({
         onFindMyBuildingClick={myBuilding ? focusMyBuilding : undefined}
         onAgentViewClick={focusAgentMarker}
       />
-      <DispatchHud
-        grid={layout.grid}
-        ownedAgents={layout.ownedAgents}
-        agentPosesRef={agentPosesRef}
-      />
+      {isAuthenticated && (
+        <DispatchHud
+          grid={layout.grid}
+          ownedAgents={layout.ownedAgents}
+          agentPosesRef={agentPosesRef}
+        />
+      )}
       {selectedBuilding && (
         <LiveBuildingPanel
           building={selectedBuilding}
