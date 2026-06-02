@@ -107,6 +107,51 @@ export async function fetchSurge(): Promise<SurgeData | null> {
   }
 }
 
+export interface TrophyRow {
+  month: string;
+  rank: number;
+  status: string; // claimable | claimed
+  wallet: string | null;
+  tx: string | null;
+  solscan: string | null;
+}
+
+export interface TrophiesData {
+  enabled: boolean;
+  trophies: TrophyRow[];
+}
+
+export async function fetchTrophies(): Promise<TrophiesData | null> {
+  try {
+    const res = await fetch(`${API_URL}/dispatch/trophies`, { credentials: 'include' });
+    if (!res.ok) return null;
+    const json = (await res.json()) as { data?: TrophiesData };
+    return json?.data ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** Claim a trophy as a cNFT to a Solana address (connected or pasted). */
+export async function claimTrophy(
+  month: string,
+  address: string,
+): Promise<{ ok: boolean; solscan?: string | null; error?: string }> {
+  try {
+    const res = await fetch(`${API_URL}/dispatch/trophy/${month}/claim`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address }),
+    });
+    const json = (await res.json()) as { success?: boolean; error?: string; data?: { solscan?: string | null } };
+    if (!res.ok || json.success === false) return { ok: false, error: json.error ?? 'Claim failed' };
+    return { ok: true, solscan: json.data?.solscan ?? null };
+  } catch {
+    return { ok: false, error: 'Network error' };
+  }
+}
+
 export interface ReceiptRow {
   id: string;
   framework: string;

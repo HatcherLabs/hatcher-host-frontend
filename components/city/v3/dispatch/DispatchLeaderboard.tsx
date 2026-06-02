@@ -1,14 +1,21 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import {
   fetchLeaderboard,
   fetchSeason,
   fetchReceipts,
+  fetchTrophies,
+  claimTrophy,
   type LeaderboardData,
   type LeaderRow,
   type SeasonData,
   type ReceiptsData,
+  type TrophiesData,
 } from '@/lib/agent-dispatch/leaderboard';
+
+const RANK_MEDAL = ['🥇', '🥈', '🥉', '🏅', '🏅'];
 
 const TABS = [
   { id: 'prizes', label: '🏆 Prizes' },
@@ -32,16 +39,20 @@ export function DispatchLeaderboard({ onClose }: { onClose: () => void }) {
   const [data, setData] = useState<LeaderboardData | null>(null);
   const [season, setSeason] = useState<SeasonData | null>(null);
   const [receipts, setReceipts] = useState<ReceiptsData | null>(null);
+  const [trophies, setTrophies] = useState<TrophiesData | null>(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('prizes');
 
+  const reloadTrophies = () => void fetchTrophies().then((t) => setTrophies(t));
+
   useEffect(() => {
     let alive = true;
-    Promise.all([fetchLeaderboard(), fetchSeason(), fetchReceipts()]).then(([lb, s, r]) => {
+    Promise.all([fetchLeaderboard(), fetchSeason(), fetchReceipts(), fetchTrophies()]).then(([lb, s, r, t]) => {
       if (alive) {
         setData(lb);
         setSeason(s);
         setReceipts(r);
+        setTrophies(t);
         setLoading(false);
       }
     });
@@ -86,7 +97,7 @@ export function DispatchLeaderboard({ onClose }: { onClose: () => void }) {
         ) : tab === 'prizes' ? (
           <SeasonView season={season} countdown={countdown} />
         ) : tab === 'onchain' ? (
-          <OnchainView season={season} receipts={receipts} />
+          <OnchainView season={season} receipts={receipts} trophies={trophies} onClaimed={reloadTrophies} />
         ) : allTimeRows.length === 0 ? (
           <p className="py-8 text-center text-sm text-[#9fceb4]">No scores yet — be the first to dispatch!</p>
         ) : (
@@ -195,66 +206,173 @@ function shortAddr(a: string): string {
   return a.length > 12 ? `${a.slice(0, 4)}…${a.slice(-4)}` : a;
 }
 
-function OnchainView({ season, receipts }: { season: SeasonData | null; receipts: ReceiptsData | null }) {
+function OnchainView({
+  season,
+  receipts,
+  trophies,
+  onClaimed,
+}: {
+  season: SeasonData | null;
+  receipts: ReceiptsData | null;
+  trophies: TrophiesData | null;
+  onClaimed: () => void;
+}) {
   const enabled = !!(season?.onchain?.enabled || receipts?.enabled);
   const payer = season?.onchain?.payer ?? receipts?.payer ?? null;
+  const rows = receipts?.receipts ?? [];
 
-  if (!enabled) {
-    return (
-      <div className="flex flex-col gap-3">
+  return (
+    <div className="flex flex-col gap-3">
+      <TrophiesSection trophies={trophies} onClaimed={onClaimed} />
+
+      {!enabled ? (
         <div className="rounded-xl border border-[#62b8ff]/25 bg-[#62b8ff]/5 p-3 text-xs text-[#9fceb4]">
           <div className="mb-1 font-bold text-[#62b8ff]">⛓ On-chain anchoring</div>
           Each completed dispatch and the final monthly ranking get anchored on{' '}
           <span className="text-[#dffbe9]">Solana</span> — tamper-evident and publicly verifiable, paid by Hatcher.
           <div className="mt-2 text-[#7faE96]">Anchoring is currently off for this environment.</div>
         </div>
+      ) : (
+        <>
+          <div className="rounded-xl border border-[#62b8ff]/25 bg-[#62b8ff]/5 p-3 text-xs">
+            <div className="mb-1 font-bold text-[#62b8ff]">⛓ On-chain anchoring · live</div>
+            <p className="text-[#9fceb4]">
+              Dispatches batch into a Solana memo proof; the monthly ranking is committed as a merkle root. Hatcher pays every transaction.
+            </p>
+            {payer && <div className="mt-2 font-mono text-[10px] text-[#62b8ff]">payer {shortAddr(payer)}</div>}
+            <p className="mt-1 text-[9px] text-[#5f8a76]">
+              Platform-attested, not trustless — scores are reported by the client. The chain gives auditability, not anti-cheat.
+            </p>
+          </div>
+
+          <div className="text-xs font-bold text-[#9fceb4]">Your recent dispatches</div>
+          {rows.length === 0 ? (
+            <p className="py-3 text-center text-xs text-[#9fceb4]">No anchored dispatches yet — send an agent out.</p>
+          ) : (
+            <ol className="flex flex-col gap-1">
+              {rows.map((r) => (
+                <li key={r.id} className="flex items-center gap-2 rounded-lg border border-white/5 bg-black/20 px-3 py-2 text-xs">
+                  <span
+                    className={`h-2 w-2 shrink-0 rounded-full ${
+                      r.status === 'anchored' ? 'bg-[#39ff88]' : r.status === 'failed' ? 'bg-[#ff6b6b]' : 'bg-[#ffd24a]'
+                    }`}
+                    title={r.status}
+                  />
+                  <span className="min-w-0 flex-1 truncate">
+                    <span className="text-[#dffbe9]">→ {r.destName || 'dispatch'}</span>
+                    <span className="ml-1 text-[#7faE96]">{r.framework}</span>
+                  </span>
+                  <span className="font-mono text-[#39ff88]">◆ {r.dataEarned.toLocaleString()}</span>
+                  {r.solscan ? (
+                    <a href={r.solscan} target="_blank" rel="noreferrer" className="text-[#62b8ff] hover:underline" title="View the anchor transaction on Solscan">
+                      ↗
+                    </a>
+                  ) : (
+                    <span className="text-[#7faE96]" title="Waiting for the next batch anchor">⏳</span>
+                  )}
+                </li>
+              ))}
+            </ol>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+/** Your monthly trophies + claim-as-cNFT (connect a wallet OR paste an address). */
+function TrophiesSection({ trophies, onClaimed }: { trophies: TrophiesData | null; onClaimed: () => void }) {
+  const { publicKey } = useWallet();
+  const { setVisible } = useWalletModal();
+  const [addr, setAddr] = useState('');
+  const [busy, setBusy] = useState<string | null>(null);
+  const [msg, setMsg] = useState<{ month: string; text: string; ok: boolean } | null>(null);
+
+  useEffect(() => {
+    if (publicKey) setAddr(publicKey.toBase58());
+  }, [publicKey]);
+
+  const list = trophies?.trophies ?? [];
+  if (list.length === 0) {
+    return (
+      <div className="rounded-xl border border-[#ffd24a]/25 bg-[#ffd24a]/5 p-3 text-xs text-[#9fceb4]">
+        <div className="mb-1 font-bold text-[#ffd24a]">🏆 Trophies</div>
+        Finish in the monthly top 5 to earn a trophy. You can claim it as a real NFT to any Solana wallet — no wallet needed to win.
       </div>
     );
   }
 
-  const rows = receipts?.receipts ?? [];
-  return (
-    <div className="flex flex-col gap-3">
-      <div className="rounded-xl border border-[#62b8ff]/25 bg-[#62b8ff]/5 p-3 text-xs">
-        <div className="mb-1 font-bold text-[#62b8ff]">⛓ On-chain anchoring · live</div>
-        <p className="text-[#9fceb4]">
-          Dispatches batch into a Solana memo proof; the monthly ranking is committed as a merkle root. Hatcher pays every transaction.
-        </p>
-        {payer && <div className="mt-2 font-mono text-[10px] text-[#62b8ff]">payer {shortAddr(payer)}</div>}
-        <p className="mt-1 text-[9px] text-[#5f8a76]">
-          Platform-attested, not trustless — scores are reported by the client. The chain gives auditability, not anti-cheat.
-        </p>
-      </div>
+  const doClaim = async (month: string) => {
+    const address = addr.trim();
+    if (!address) {
+      setMsg({ month, text: 'Connect a wallet or paste a Solana address first', ok: false });
+      return;
+    }
+    setBusy(month);
+    const r = await claimTrophy(month, address);
+    setBusy(null);
+    setMsg({ month, text: r.ok ? 'Claimed! NFT sent to your wallet.' : r.error ?? 'Claim failed', ok: r.ok });
+    if (r.ok) onClaimed();
+  };
 
-      <div className="text-xs font-bold text-[#9fceb4]">Your recent dispatches</div>
-      {rows.length === 0 ? (
-        <p className="py-3 text-center text-xs text-[#9fceb4]">No anchored dispatches yet — send an agent out.</p>
-      ) : (
-        <ol className="flex flex-col gap-1">
-          {rows.map((r) => (
-            <li key={r.id} className="flex items-center gap-2 rounded-lg border border-white/5 bg-black/20 px-3 py-2 text-xs">
-              <span
-                className={`h-2 w-2 shrink-0 rounded-full ${
-                  r.status === 'anchored' ? 'bg-[#39ff88]' : r.status === 'failed' ? 'bg-[#ff6b6b]' : 'bg-[#ffd24a]'
-                }`}
-                title={r.status}
-              />
-              <span className="min-w-0 flex-1 truncate">
-                <span className="text-[#dffbe9]">→ {r.destName || 'dispatch'}</span>
-                <span className="ml-1 text-[#7faE96]">{r.framework}</span>
+  return (
+    <div className="rounded-xl border border-[#ffd24a]/25 bg-[#ffd24a]/5 p-3">
+      <div className="mb-2 text-xs font-bold text-[#ffd24a]">🏆 Your trophies</div>
+      <ol className="flex flex-col gap-2">
+        {list.map((t) => (
+          <li key={t.month} className="rounded-lg border border-white/10 bg-black/25 px-3 py-2 text-xs">
+            <div className="flex items-center gap-2">
+              <span>{RANK_MEDAL[t.rank - 1] ?? '🏅'}</span>
+              <span className="flex-1 font-semibold text-[#dffbe9]">
+                {t.month} · Rank #{t.rank}
               </span>
-              <span className="font-mono text-[#39ff88]">◆ {r.dataEarned.toLocaleString()}</span>
-              {r.solscan ? (
-                <a href={r.solscan} target="_blank" rel="noreferrer" className="text-[#62b8ff] hover:underline" title="View the anchor transaction on Solscan">
-                  ↗
-                </a>
+              {t.status === 'claimed' ? (
+                t.solscan ? (
+                  <a href={t.solscan} target="_blank" rel="noreferrer" className="text-[#62b8ff] hover:underline">
+                    ⛓ minted ↗
+                  </a>
+                ) : (
+                  <span className="text-[#39ff88]">⛓ minted</span>
+                )
               ) : (
-                <span className="text-[#7faE96]" title="Waiting for the next batch anchor">⏳</span>
+                <span className="text-[#ffd24a]">claimable</span>
               )}
-            </li>
-          ))}
-        </ol>
-      )}
+            </div>
+            {t.status !== 'claimed' && (
+              <div className="mt-2 flex flex-col gap-1.5">
+                <div className="flex gap-1.5">
+                  <input
+                    value={addr}
+                    onChange={(e) => setAddr(e.target.value)}
+                    placeholder="Solana address (Phantom / Solflare / Backpack)"
+                    className="min-w-0 flex-1 rounded-md border border-white/10 bg-black/40 px-2 py-1 font-mono text-[10px] text-[#dffbe9] outline-none focus:border-[#ffd24a]/50"
+                  />
+                  <button
+                    onClick={() => setVisible(true)}
+                    className="shrink-0 rounded-md border border-[#62b8ff]/40 px-2 py-1 text-[10px] font-semibold text-[#62b8ff] hover:bg-[#62b8ff]/10"
+                    title="Connect a wallet to fill the address"
+                  >
+                    connect
+                  </button>
+                  <button
+                    onClick={() => void doClaim(t.month)}
+                    disabled={busy === t.month}
+                    className="shrink-0 rounded-md bg-[#ffd24a] px-2.5 py-1 text-[10px] font-bold text-black disabled:opacity-50"
+                  >
+                    {busy === t.month ? '…' : 'Claim'}
+                  </button>
+                </div>
+                <p className="text-[9px] text-[#7faE96]">
+                  Mints to that exact address — irreversible. Use a wallet that supports compressed NFTs (Phantom / Solflare / Backpack), not an exchange address.
+                </p>
+                {msg?.month === t.month && (
+                  <p className={`text-[10px] ${msg.ok ? 'text-[#39ff88]' : 'text-[#ff6b6b]'}`}>{msg.text}</p>
+                )}
+              </div>
+            )}
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }
