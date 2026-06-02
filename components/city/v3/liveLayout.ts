@@ -61,6 +61,7 @@ export interface LiveAgentMarkerLayout {
   mine: boolean;
   visibility?: CityAgent['visibility'];
   publicChatEnabled?: boolean;
+  avatar?: string | null;
   rank: number;
   pathNodes: LiveCityNode[];
   speed: number;
@@ -440,6 +441,7 @@ function layoutAgentMarkers(
         mine: agent.mine,
         visibility: agent.visibility,
         publicChatEnabled: agent.publicChatEnabled === true,
+        avatar: agent.avatarVariant ?? null,
         rank: rankAgentForCity(agent),
         pathNodes,
         speed: 1.35 + hashStr(`${agent.id}:walk-speed`) * 0.95,

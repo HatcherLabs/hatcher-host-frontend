@@ -2,32 +2,43 @@ import type { CityAgent } from '@/components/city/types';
 
 type AgentVisualState = Pick<CityAgent, 'framework' | 'status' | 'mine'>;
 
+// paused (amber) + crashed (red) stay status-semantic across every framework;
+// running/sleeping carry the canonical brand hue (openclaw=yellow, hermes=violet).
 const FRAMEWORK_STATUS_COLORS: Record<
   CityAgent['framework'],
   Record<CityAgent['status'], number>
 > = {
   openclaw: {
-    running: 0x16f5a5,
-    sleeping: 0x2da876,
+    running: 0xffc21f,
+    sleeping: 0xb89020,
     paused: 0xffc857,
     crashed: 0xff5c7a,
   },
   hermes: {
-    running: 0x35d6ff,
-    sleeping: 0x4d91cf,
+    running: 0xa64dff,
+    sleeping: 0x6b4d9c,
     paused: 0xffc857,
     crashed: 0xff5c7a,
   },
 };
 
+// Neutral fallback so an unexpected framework/status string never crashes the
+// scene (the backend coerces unknown frameworks to openclaw).
+const NEUTRAL = 0x9fc1c7;
+
+const FRAMEWORK_GLOW: Record<CityAgent['framework'], number> = {
+  openclaw: 0xffd95c,
+  hermes: 0xc88bff,
+};
+
 export function liveAgentColor(state: AgentVisualState): number {
   if (state.mine) return 0xffd24a;
-  return FRAMEWORK_STATUS_COLORS[state.framework][state.status];
+  return FRAMEWORK_STATUS_COLORS[state.framework]?.[state.status] ?? NEUTRAL;
 }
 
 export function liveAgentGlowColor(state: AgentVisualState): number {
   if (state.mine) return 0xffe27a;
   if (state.status === 'crashed') return 0xff6d8b;
   if (state.status === 'paused') return 0xffd36a;
-  return state.framework === 'openclaw' ? 0x22ffc0 : 0x57dcff;
+  return FRAMEWORK_GLOW[state.framework] ?? NEUTRAL;
 }

@@ -854,6 +854,21 @@ function isGlbAvatarVariant(
   return variant in AVATAR_MODEL_CONFIG;
 }
 
+export type { AvatarModelConfig };
+
+/**
+ * Resolve a (possibly legacy/aliased) variant id to its rigged-GLB model
+ * config, or null if the variant is procedural / unknown. Used by the city
+ * walker to render an agent's real chosen avatar instead of the generic robot.
+ */
+export function getGlbAvatarModel(variant: string): AvatarModelConfig | null {
+  const normalized = normalizeAvatarVariant(variant);
+  if (normalized && isGlbAvatarVariant(normalized)) {
+    return AVATAR_MODEL_CONFIG[normalized];
+  }
+  return null;
+}
+
 function pickClip(
   animations: THREE.AnimationClip[] | undefined,
   clip: string | number | undefined,
@@ -916,7 +931,10 @@ function cloneAvatarScene(
       const next = material.clone();
       if (next instanceof THREE.MeshStandardMaterial) {
         next.roughness = Math.min(0.92, next.roughness + 0.08);
-        next.envMapIntensity = 0.14;
+        // Phase 1: the room now has procedural IBL (Lightformer Environment),
+        // so let metal/glass actually reflect it instead of reading as matte
+        // plastic (was 0.14 when there was no env map).
+        next.envMapIntensity = 0.85;
       }
       return next;
     });

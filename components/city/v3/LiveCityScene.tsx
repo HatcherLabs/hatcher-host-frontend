@@ -1,6 +1,7 @@
 'use client';
 import { MapControls } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import {
   ArrowLeft,
   Bot,
@@ -48,6 +49,8 @@ import { LiveAgentMarkers } from './LiveAgentMarkers';
 import { LiveActivityPulses } from './LiveActivityPulses';
 import { LiveBuildings } from './LiveBuildings';
 import { LiveCityHud } from './LiveCityHud';
+import { DispatchCouriers } from './dispatch/DispatchCouriers';
+import { DispatchHud } from './dispatch/DispatchHud';
 import { LiveCityInfrastructure } from './LiveCityInfrastructure';
 import {
   makeLiveAgentLoopPath,
@@ -379,6 +382,9 @@ function LiveCitySceneBody({
             setSelectedAgentId(agentId);
           }}
         />
+        <SceneErrorBoundary label="DispatchCouriers">
+          <DispatchCouriers />
+        </SceneErrorBoundary>
         {viewMode === 'survey' ? (
           <SurveyCamera grid={layout.grid} focusTarget={focusTarget} />
         ) : null}
@@ -389,6 +395,23 @@ function LiveCitySceneBody({
           markers={layout.markers}
           mobileAnalog={mobileWalkVector.current}
         />
+        {/* Phase 1 polish: selective bloom makes the city's emissive elements
+            (beacons, lit windows, agent halos/trails, signal packets — all
+            rendered with toneMapped=false) actually GLOW, turning the flat
+            diorama into a living neon grid. Plus a subtle vignette to frame it.
+            Disabled on 'low' quality to protect weak/mobile GPUs. */}
+        {quality !== 'low' ? (
+          <EffectComposer multisampling={quality === 'high' ? 4 : 0}>
+            <Bloom
+              mipmapBlur
+              luminanceThreshold={0.62}
+              luminanceSmoothing={0.2}
+              intensity={0.85}
+              radius={0.6}
+            />
+            <Vignette eskil={false} offset={0.32} darkness={0.55} />
+          </EffectComposer>
+        ) : null}
       </Canvas>
       <div className="hidden md:block">
         <QualityToggle />
@@ -409,6 +432,11 @@ function LiveCitySceneBody({
         onMyBuildingClick={onBuildingEnterClick}
         onFindMyBuildingClick={myBuilding ? focusMyBuilding : undefined}
         onAgentViewClick={focusAgentMarker}
+      />
+      <DispatchHud
+        grid={layout.grid}
+        ownedAgents={layout.ownedAgents}
+        agentPosesRef={agentPosesRef}
       />
       {selectedBuilding && (
         <LiveBuildingPanel

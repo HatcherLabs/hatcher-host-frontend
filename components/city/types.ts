@@ -34,6 +34,7 @@ export interface CityAgent {
   slug: string | null;
   name: string;
   avatarUrl: string | null;
+  avatarVariant?: string | null; // room avatar variant id, drives the city walker model
   framework: Framework;
   category: Category;
   ownerKey?: string | null;
@@ -128,14 +129,15 @@ export const CATEGORY_LABELS: Record<Category, string> = {
   voice: 'Voice',
 };
 
+// Canonical brand palette: openclaw=amber-yellow, hermes=violet.
 export const FRAMEWORK_COLORS: Record<Framework, number> = {
-  openclaw: 0x10b981,
-  hermes: 0x38bdf8,
+  openclaw: 0xffc21f,
+  hermes: 0xa64dff,
 };
 
 export const FRAMEWORK_EMISSIVE: Record<Framework, number> = {
-  openclaw: 0x34d399,
-  hermes: 0x7dd3fc,
+  openclaw: 0xffd95c,
+  hermes: 0xc88bff,
 };
 
 // Building heights by tier index (0..4).

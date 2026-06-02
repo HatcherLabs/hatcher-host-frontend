@@ -24,6 +24,8 @@ interface Props {
   hasMemory: boolean;
   nearest: StationId | null;
   canEdit: boolean;
+  isChatStreaming?: boolean;
+  eyesLive?: boolean;
   onStationClick: (id: StationId) => void;
 }
 
@@ -117,6 +119,8 @@ export function RoomOffice({
   hasMemory,
   nearest,
   canEdit,
+  isChatStreaming,
+  eyesLive,
   onStationClick,
 }: Props) {
   void tier;
@@ -132,6 +136,7 @@ export function RoomOffice({
         secondary={secondary}
         layout={layout}
         nearest={nearest}
+        isChatStreaming={isChatStreaming}
         onStationClick={onStationClick}
       />
       <CentralPedestal
@@ -156,6 +161,7 @@ export function RoomOffice({
         accent={accent}
         status={status}
         snapshotDataUrl={eyesSnapshotDataUrl}
+        eyesLive={eyesLive}
         isNear={nearest === 'eyesConsole'}
         onStationClick={onStationClick}
       />
@@ -194,12 +200,14 @@ function OfficeShell({
   secondary,
   layout,
   nearest,
+  isChatStreaming,
   onStationClick,
 }: {
   accent: string;
   secondary: string;
   layout: StationLayout;
   nearest: StationId | null;
+  isChatStreaming?: boolean;
   onStationClick: (id: StationId) => void;
 }) {
   return (
@@ -229,7 +237,7 @@ function OfficeShell({
       </mesh>
       <RoomWalls accent={accent} secondary={secondary} />
       <Baseboard />
-      <CeilingLights accent={accent} secondary={secondary} />
+      <CeilingLights accent={accent} secondary={secondary} isStreaming={isChatStreaming} />
       <WindowCity accent={secondary} />
       <ExitDoor
         stationId="buildingExit"
@@ -587,9 +595,11 @@ function Baseboard() {
 function CeilingLights({
   accent,
   secondary,
+  isStreaming,
 }: {
   accent: string;
   secondary: string;
+  isStreaming?: boolean;
 }) {
   void accent;
   void secondary;
@@ -603,28 +613,51 @@ function CeilingLights({
   ];
   return (
     <group>
-      {positions.map(([x, z]) => (
-        <group key={`${x}-${z}`} position={[x, ROOM_HEIGHT - 0.035, z]}>
-          <mesh>
-            <boxGeometry args={[1.22, 0.045, 0.34]} />
-            <meshLambertMaterial
-              color="#f5d79e"
-              emissive="#ffdca8"
-              emissiveIntensity={0.55}
-            />
-          </mesh>
-          <mesh position={[0, -0.03, 0]}>
-            <boxGeometry args={[1.34, 0.012, 0.46]} />
-            <meshBasicMaterial
-              color="#ffe9bf"
-              toneMapped={false}
-              transparent
-              opacity={0.72}
-            />
-          </mesh>
-          <pointLight color="#ffd9a0" intensity={0.1} distance={4.4} />
-        </group>
+      {positions.map(([x, z], i) => (
+        <CeilingLight key={`${x}-${z}`} position={[x, ROOM_HEIGHT - 0.035, z]} phase={i * 0.7} isStreaming={isStreaming} />
       ))}
+    </group>
+  );
+}
+
+// A single ceiling fixture. Holds a calm warm glow at rest; while the agent is
+// streaming a reply it breathes brighter — the room visibly "thinks" with it.
+function CeilingLight({
+  position,
+  phase,
+  isStreaming,
+}: {
+  position: [number, number, number];
+  phase: number;
+  isStreaming?: boolean;
+}) {
+  const matRef = useRef<THREE.MeshLambertMaterial>(null);
+  const glowRef = useRef<THREE.MeshBasicMaterial>(null);
+  const lightRef = useRef<THREE.PointLight>(null);
+  const levelRef = useRef(0);
+
+  useFrame(({ clock }, delta) => {
+    const target = isStreaming ? 1 : 0;
+    // Ease toward the active level so it ramps in/out instead of snapping.
+    levelRef.current += (target - levelRef.current) * Math.min(1, delta * 4);
+    const lvl = levelRef.current;
+    const pulse = (Math.sin(clock.elapsedTime * 3.1 + phase) * 0.5 + 0.5) * lvl;
+    if (matRef.current) matRef.current.emissiveIntensity = 0.55 + pulse * 0.7;
+    if (glowRef.current) glowRef.current.opacity = 0.72 + pulse * 0.22;
+    if (lightRef.current) lightRef.current.intensity = 0.1 + lvl * 0.14 + pulse * 0.22;
+  });
+
+  return (
+    <group position={position}>
+      <mesh>
+        <boxGeometry args={[1.22, 0.045, 0.34]} />
+        <meshLambertMaterial ref={matRef} color="#f5d79e" emissive="#ffdca8" emissiveIntensity={0.55} />
+      </mesh>
+      <mesh position={[0, -0.03, 0]}>
+        <boxGeometry args={[1.34, 0.012, 0.46]} />
+        <meshBasicMaterial ref={glowRef} color="#ffe9bf" toneMapped={false} transparent opacity={0.72} />
+      </mesh>
+      <pointLight ref={lightRef} color="#ffd9a0" intensity={0.1} distance={4.4} />
     </group>
   );
 }
@@ -744,20 +777,36 @@ function TvLogScreen({ lines, accent }: { lines: string[]; accent: string }) {
 
   useEffect(() => () => texture.dispose(), [texture]);
 
+  // Flash the screen briefly whenever a new log line lands, so output reads as
+  // live activity instead of just scrolling.
+  const overlayRef = useRef<THREE.MeshBasicMaterial>(null);
+  const flashAtRef = useRef(0);
+  const prevLenRef = useRef(lines.length);
+  useEffect(() => {
+    if (lines.length > prevLenRef.current) flashAtRef.current = performance.now();
+    prevLenRef.current = lines.length;
+  }, [lines.length]);
+
   useFrame(({ clock }) => {
     drawTvLogCanvas(canvas, lines, accent, clock.getElapsedTime());
     texture.needsUpdate = true;
+    if (overlayRef.current) {
+      const since = (performance.now() - flashAtRef.current) / 380;
+      overlayRef.current.opacity = flashAtRef.current && since < 1 ? (1 - since) * 0.2 : 0;
+    }
   });
 
   return (
-    <mesh position={[0, 0, 0.098]}>
-      <planeGeometry args={[3.92, 1.72]} />
-      <meshBasicMaterial
-        map={texture}
-        toneMapped={false}
-        side={THREE.DoubleSide}
-      />
-    </mesh>
+    <group>
+      <mesh position={[0, 0, 0.098]}>
+        <planeGeometry args={[3.92, 1.72]} />
+        <meshBasicMaterial map={texture} toneMapped={false} side={THREE.DoubleSide} />
+      </mesh>
+      <mesh position={[0, 0, 0.1]}>
+        <planeGeometry args={[3.92, 1.72]} />
+        <meshBasicMaterial ref={overlayRef} color={accent} transparent opacity={0} depthWrite={false} toneMapped={false} />
+      </mesh>
+    </group>
   );
 }
 
@@ -1560,11 +1609,13 @@ function EyesConsoleStation({
   accent,
   status,
   snapshotDataUrl,
+  eyesLive,
   isNear,
   onStationClick,
 }: StationProps & {
   status: string;
   snapshotDataUrl?: string;
+  eyesLive?: boolean;
 }) {
   return (
     <group>
@@ -1577,6 +1628,9 @@ function EyesConsoleStation({
           accent={accent}
           snapshotDataUrl={snapshotDataUrl}
         />
+        {/* When the agent's eyes go live (browsing/operating), the console
+            casts a pulsing green glow — a visible "it's working" cue. */}
+        <PulseLight active={!!eyesLive} color="#46ff9c" position={[0, 0, 0.55]} />
         <group position={[0, -0.8, 0.09]}>
           <FlatBoardLabel
             text="EYES"
@@ -1604,8 +1658,8 @@ function EyesConsoleStation({
       </mesh>
       <StationNearGlow
         position={layout[stationId].position}
-        color={accent}
-        active={isNear}
+        color={eyesLive ? '#46ff9c' : accent}
+        active={isNear || !!eyesLive}
       />
       <ClickHotspot
         stationId={stationId}
@@ -2055,6 +2109,29 @@ function SceneLabel({
       </div>
     </Html>
   );
+}
+
+// A point light that eases in and gently pulses while `active`, then fades out.
+// Used to make a station visibly "light up" when its agent activity is live.
+function PulseLight({
+  active,
+  color,
+  position,
+}: {
+  active: boolean;
+  color: string;
+  position: [number, number, number];
+}) {
+  const lightRef = useRef<THREE.PointLight>(null);
+  const levelRef = useRef(0);
+  useFrame(({ clock }, delta) => {
+    levelRef.current += ((active ? 1 : 0) - levelRef.current) * Math.min(1, delta * 4);
+    const pulse = Math.sin(clock.elapsedTime * 4) * 0.5 + 0.5;
+    if (lightRef.current) {
+      lightRef.current.intensity = levelRef.current * (0.35 + pulse * 0.55);
+    }
+  });
+  return <pointLight ref={lightRef} color={color} intensity={0} distance={3.4} position={position} />;
 }
 
 function StationNearGlow({

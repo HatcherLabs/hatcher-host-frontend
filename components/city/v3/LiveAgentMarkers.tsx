@@ -1,11 +1,16 @@
 'use client';
 import { useFrame } from '@react-three/fiber';
+import { Html } from '@react-three/drei';
 import type { MutableRefObject } from 'react';
-import { useEffect, useMemo, useRef } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { liveAgentColor } from './LiveCityColors';
 import { makeLiveAgentLoopPath, sampleLiveAgentPath, type LiveAgentPose } from './liveAgentMotion';
 import type { LiveAgentMarkerLayout } from './liveLayout';
+import { getGlbAvatarModel } from '@/components/agent-room/v2/stations/AgentBody';
+import { CityAvatar } from './CityAvatar';
+import { useDispatchStore } from '@/lib/agent-dispatch/store';
+import { skinById } from '@/lib/agent-dispatch/config';
 
 interface Props {
   markers: LiveAgentMarkerLayout[];
@@ -14,8 +19,49 @@ interface Props {
 }
 
 const TRAIL_LEN = 22;
+// Cap on how many walkers render their real (rigged GLB) avatar at once. Each
+// avatar is a clone + AnimationMixer; the generic robot is cheap. Your own
+// agents always get one; the rest fill the budget by layout rank order.
+const CITY_AVATAR_BUDGET = 18;
+
+function cityWalkerStatusLabel(status: LiveAgentMarkerLayout['status']): string {
+  switch (status) {
+    case 'running':
+      return 'active';
+    case 'sleeping':
+      return 'sleeping';
+    case 'paused':
+      return 'paused';
+    case 'crashed':
+      return 'offline';
+    default:
+      return status;
+  }
+}
 
 export function LiveAgentMarkers({ markers, onMarkerClick, poseRef }: Props) {
+  // Your equipped dispatch skin colors your own walkers (default = the usual gold).
+  const equippedSkin = useDispatchStore((s) => s.equippedSkin);
+  const mineColor = useMemo(
+    () => new THREE.Color(skinById(equippedSkin).color).getHex(),
+    [equippedSkin],
+  );
+  const avatarIds = useMemo(() => {
+    const ids = new Set<string>();
+    const eligible = (m: LiveAgentMarkerLayout) =>
+      !!m.avatar && getGlbAvatarModel(m.avatar) !== null;
+    // Your own agents first — you want to see them as themselves.
+    for (const m of markers) {
+      if (m.mine && eligible(m)) ids.add(m.agentId);
+    }
+    // Then fill remaining budget by layout order (already rank-prioritised).
+    for (const m of markers) {
+      if (ids.size >= CITY_AVATAR_BUDGET) break;
+      if (!ids.has(m.agentId) && eligible(m)) ids.add(m.agentId);
+    }
+    return ids;
+  }, [markers]);
+
   if (markers.length === 0) return null;
 
   return (
@@ -26,6 +72,8 @@ export function LiveAgentMarkers({ markers, onMarkerClick, poseRef }: Props) {
           marker={marker}
           onMarkerClick={onMarkerClick}
           poseRef={poseRef}
+          useRealAvatar={avatarIds.has(marker.agentId)}
+          mineColor={mineColor}
         />
       ))}
     </group>
@@ -36,10 +84,14 @@ function LiveRobotAgent({
   marker,
   onMarkerClick,
   poseRef,
+  useRealAvatar,
+  mineColor,
 }: {
   marker: LiveAgentMarkerLayout;
   onMarkerClick?: (agentId: string) => void;
   poseRef?: MutableRefObject<Map<string, LiveAgentPose>>;
+  useRealAvatar?: boolean;
+  mineColor?: number;
 }) {
   const groupRef = useRef<THREE.Group>(null);
   const leftArmRef = useRef<THREE.Mesh>(null);
@@ -50,8 +102,12 @@ function LiveRobotAgent({
   const haloRef = useRef<THREE.Group>(null);
   const beaconRef = useRef<THREE.Mesh>(null);
   const scannerRef = useRef<THREE.Group>(null);
-  const color = liveAgentColor(marker);
+  const [isHovered, setIsHovered] = useState(false);
+  // Your own walkers wear the equipped dispatch skin; everyone else keeps the
+  // framework/status palette.
+  const color = marker.mine && mineColor != null ? mineColor : liveAgentColor(marker);
   const colorObject = useMemo(() => new THREE.Color(color), [color]);
+  const accentHex = useMemo(() => `#${color.toString(16).padStart(6, '0')}`, [color]);
   const path = useMemo(
     () => makeLiveAgentLoopPath(marker.pathNodes, marker.x, marker.z),
     [marker.pathNodes, marker.x, marker.z],
@@ -95,54 +151,68 @@ function LiveRobotAgent({
     };
   }, [marker.agentId, poseRef, trail]);
 
-  useFrame(({ clock }, delta) => {
+  useFrame(({ clock, camera }, delta) => {
     const elapsed = clock.elapsedTime;
     const travel = elapsed * marker.speed + marker.phase;
     const pose = sampleLiveAgentPath(path, travel);
     poseRef?.current.set(marker.agentId, pose);
+    // Distance LOD: past ~70 units, keep the walker moving but drop the motion
+    // trail and the small flourishes (the per-frame trail buffer churn is the
+    // pricey part). Cheap and invisible at that range.
+    const dxCam = pose.x - camera.position.x;
+    const dzCam = pose.z - camera.position.z;
+    const far = dxCam * dxCam + dzCam * dzCam > 4900;
+    trail.visible = !far;
     const bob = Math.sin((elapsed + marker.phase) * 18) * 0.025;
-    const swing = Math.sin((elapsed + marker.phase) * 9) * 0.55;
+    const swing = far ? 0 : Math.sin((elapsed + marker.phase) * 9) * 0.55;
 
     if (groupRef.current) {
       groupRef.current.position.set(pose.x, bob, pose.z);
       groupRef.current.rotation.y = pose.heading;
+      // Pop slightly on hover so the pointer target reads as interactive.
+      const targetScale = isHovered ? 1.16 : 1;
+      const s = groupRef.current.scale.x;
+      groupRef.current.scale.setScalar(s + (targetScale - s) * 0.2);
     }
     if (leftLegRef.current) leftLegRef.current.rotation.x = swing;
     if (rightLegRef.current) rightLegRef.current.rotation.x = -swing;
     if (leftArmRef.current) leftArmRef.current.rotation.x = -swing * 0.7;
     if (rightArmRef.current) rightArmRef.current.rotation.x = swing * 0.7;
-    if (tipRef.current) {
-      const pulse = 1 + Math.sin((elapsed + marker.phase) * 11.7) * 0.25;
-      tipRef.current.scale.set(pulse, pulse, pulse);
-    }
-    if (haloRef.current) {
-      const haloPulse = 1 + Math.sin((elapsed + marker.phase) * 2.5) * 0.08;
-      haloRef.current.scale.set(haloPulse, haloPulse, haloPulse);
-      haloRef.current.rotation.z = elapsed * 0.7 + marker.phase;
-    }
-    if (scannerRef.current) {
-      scannerRef.current.rotation.y = elapsed * 1.35 + marker.phase * 0.4;
-    }
-    if (beaconRef.current) {
-      const lift = Math.sin((elapsed + marker.phase) * 2.2) * 0.08;
-      const pulse = 0.46 + Math.sin((elapsed + marker.phase) * 4.4) * 0.16;
-      beaconRef.current.position.y = 1.22 + lift;
-      const material = beaconRef.current.material as THREE.MeshBasicMaterial;
-      material.opacity = pulse;
-    }
 
-    const positions = trail.geometry.attributes.position as THREE.BufferAttribute;
-    const colors = trail.geometry.attributes.color as THREE.BufferAttribute;
-    for (let i = TRAIL_LEN - 1; i > 0; i--) {
-      positions.setXYZ(i, positions.getX(i - 1), positions.getY(i - 1), positions.getZ(i - 1));
+    if (!far) {
+      if (tipRef.current) {
+        const pulse = 1 + Math.sin((elapsed + marker.phase) * 11.7) * 0.25;
+        tipRef.current.scale.set(pulse, pulse, pulse);
+      }
+      if (haloRef.current) {
+        const haloPulse = 1 + Math.sin((elapsed + marker.phase) * 2.5) * 0.08;
+        haloRef.current.scale.set(haloPulse, haloPulse, haloPulse);
+        haloRef.current.rotation.z = elapsed * 0.7 + marker.phase;
+      }
+      if (scannerRef.current) {
+        scannerRef.current.rotation.y = elapsed * 1.35 + marker.phase * 0.4;
+      }
+      if (beaconRef.current) {
+        const lift = Math.sin((elapsed + marker.phase) * 2.2) * 0.08;
+        const pulse = 0.46 + Math.sin((elapsed + marker.phase) * 4.4) * 0.16;
+        beaconRef.current.position.y = 1.22 + lift;
+        const material = beaconRef.current.material as THREE.MeshBasicMaterial;
+        material.opacity = pulse;
+      }
+
+      const positions = trail.geometry.attributes.position as THREE.BufferAttribute;
+      const colors = trail.geometry.attributes.color as THREE.BufferAttribute;
+      for (let i = TRAIL_LEN - 1; i > 0; i--) {
+        positions.setXYZ(i, positions.getX(i - 1), positions.getY(i - 1), positions.getZ(i - 1));
+      }
+      positions.setXYZ(0, pose.x, 0.55, pose.z);
+      for (let i = 0; i < TRAIL_LEN; i++) {
+        const fade = 1 - i / TRAIL_LEN;
+        colors.setXYZ(i, colorObject.r * fade, colorObject.g * fade, colorObject.b * fade);
+      }
+      positions.needsUpdate = true;
+      colors.needsUpdate = true;
     }
-    positions.setXYZ(0, pose.x, 0.55, pose.z);
-    for (let i = 0; i < TRAIL_LEN; i++) {
-      const fade = 1 - i / TRAIL_LEN;
-      colors.setXYZ(i, colorObject.r * fade, colorObject.g * fade, colorObject.b * fade);
-    }
-    positions.needsUpdate = true;
-    colors.needsUpdate = true;
 
     if (delta > 0.2 && groupRef.current) {
       groupRef.current.position.set(pose.x, bob, pose.z);
@@ -155,10 +225,63 @@ function LiveRobotAgent({
     onMarkerClick(marker.agentId);
   };
 
+  const handlePointerOver = (event: { stopPropagation: () => void }) => {
+    event.stopPropagation();
+    setIsHovered(true);
+    if (typeof document !== 'undefined') document.body.style.cursor = 'pointer';
+  };
+  const handlePointerOut = () => {
+    setIsHovered(false);
+    if (typeof document !== 'undefined') document.body.style.cursor = '';
+  };
+
+  // Don't leave a stuck pointer cursor if the walker unmounts mid-hover.
+  useEffect(() => {
+    return () => {
+      if (typeof document !== 'undefined') document.body.style.cursor = '';
+    };
+  }, []);
+
   return (
     <group>
       <primitive object={trail} />
-      <group ref={groupRef} onClick={handlePointer} onPointerDown={handlePointer}>
+      <group
+        ref={groupRef}
+        onClick={handlePointer}
+        onPointerDown={handlePointer}
+        onPointerOver={handlePointerOver}
+        onPointerOut={handlePointerOut}
+      >
+        {isHovered && (
+          <Html
+            position={[0, 1.55, 0]}
+            center
+            distanceFactor={9}
+            zIndexRange={[40, 0]}
+            style={{ pointerEvents: 'none', userSelect: 'none' }}
+          >
+            <div
+              style={{
+                whiteSpace: 'nowrap',
+                transform: 'translateY(-100%)',
+                borderRadius: 8,
+                border: `1px solid ${accentHex}`,
+                background: 'rgba(10,12,18,0.92)',
+                padding: '4px 9px',
+                fontFamily: 'var(--font-mono, monospace)',
+                fontSize: 12,
+                fontWeight: 600,
+                color: '#f3f6fb',
+                boxShadow: `0 6px 20px ${accentHex}55`,
+              }}
+            >
+              <span>{marker.agentName}</span>
+              <span style={{ color: accentHex, marginLeft: 8, fontWeight: 700 }}>
+                {cityWalkerStatusLabel(marker.status)}
+              </span>
+            </div>
+          </Html>
+        )}
         <group ref={haloRef} position={[0, 0.035, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <mesh>
             <ringGeometry args={[0.48, 0.54, 36]} />
@@ -207,30 +330,52 @@ function LiveRobotAgent({
           <boxGeometry args={[1.45, 1.65, 1.45]} />
           <meshBasicMaterial transparent opacity={0} depthWrite={false} toneMapped={false} />
         </mesh>
-        <mesh position={[0, 0.45, 0]} castShadow receiveShadow>
-          <boxGeometry args={[0.32, 0.42, 0.26]} />
-          <meshLambertMaterial color={0xc7cdd8} />
-        </mesh>
-        <mesh position={[0, 0.46, 0.135]}>
-          <boxGeometry args={[0.18, 0.12, 0.02]} />
-          <meshLambertMaterial color={0x0a0e16} emissive={colorObject} emissiveIntensity={0.9} />
-        </mesh>
-        <mesh position={[0, 0.78, 0]} castShadow receiveShadow>
-          <boxGeometry args={[0.26, 0.22, 0.22]} />
-          <meshLambertMaterial color={0xc7cdd8} />
-        </mesh>
-        <mesh position={[0, 0.79, 0.111]}>
-          <boxGeometry args={[0.22, 0.07, 0.02]} />
-          <meshLambertMaterial color={0x05080f} emissive={colorObject} emissiveIntensity={1.1} />
-        </mesh>
-        <mesh position={[0, 0.97, 0]} castShadow>
-          <cylinderGeometry args={[0.02, 0.02, 0.18, 5]} />
-          <meshLambertMaterial color={0x2a3040} />
-        </mesh>
-        <mesh ref={tipRef} position={[0, 1.07, 0]}>
-          <sphereGeometry args={[0.05, 8, 6]} />
-          <meshBasicMaterial color={colorObject} toneMapped={false} />
-        </mesh>
+        {!useRealAvatar && (
+          <>
+            <mesh position={[0, 0.45, 0]} castShadow receiveShadow>
+              <boxGeometry args={[0.32, 0.42, 0.26]} />
+              <meshLambertMaterial color={0xc7cdd8} />
+            </mesh>
+            <mesh position={[0, 0.46, 0.135]}>
+              <boxGeometry args={[0.18, 0.12, 0.02]} />
+              <meshLambertMaterial color={0x0a0e16} emissive={colorObject} emissiveIntensity={0.9} />
+            </mesh>
+            <mesh position={[0, 0.78, 0]} castShadow receiveShadow>
+              <boxGeometry args={[0.26, 0.22, 0.22]} />
+              <meshLambertMaterial color={0xc7cdd8} />
+            </mesh>
+            <mesh position={[0, 0.79, 0.111]}>
+              <boxGeometry args={[0.22, 0.07, 0.02]} />
+              <meshLambertMaterial color={0x05080f} emissive={colorObject} emissiveIntensity={1.1} />
+            </mesh>
+            <mesh position={[0, 0.97, 0]} castShadow>
+              <cylinderGeometry args={[0.02, 0.02, 0.18, 5]} />
+              <meshLambertMaterial color={0x2a3040} />
+            </mesh>
+            <mesh ref={tipRef} position={[0, 1.07, 0]}>
+              <sphereGeometry args={[0.05, 8, 6]} />
+              <meshBasicMaterial color={colorObject} toneMapped={false} />
+            </mesh>
+            <mesh ref={leftArmRef} position={[-0.21, 0.45, 0]} castShadow receiveShadow>
+              <boxGeometry args={[0.07, 0.22, 0.1]} />
+              <meshLambertMaterial color={0x3a4254} />
+            </mesh>
+            <mesh ref={rightArmRef} position={[0.21, 0.45, 0]} castShadow receiveShadow>
+              <boxGeometry args={[0.07, 0.22, 0.1]} />
+              <meshLambertMaterial color={0x3a4254} />
+            </mesh>
+            <mesh ref={leftLegRef} position={[-0.08, 0.16, 0]} castShadow receiveShadow>
+              <boxGeometry args={[0.09, 0.18, 0.1]} />
+              <meshLambertMaterial color={0x2a3040} />
+            </mesh>
+            <mesh ref={rightLegRef} position={[0.08, 0.16, 0]} castShadow receiveShadow>
+              <boxGeometry args={[0.09, 0.18, 0.1]} />
+              <meshLambertMaterial color={0x2a3040} />
+            </mesh>
+          </>
+        )}
+        {/* Floating identity light — kept above both the generic robot and the
+            real avatar so framework colour still reads at a glance. */}
         <mesh ref={beaconRef} position={[0, 1.22, 0]}>
           <sphereGeometry args={[0.045, 10, 8]} />
           <meshBasicMaterial
@@ -241,22 +386,11 @@ function LiveRobotAgent({
             toneMapped={false}
           />
         </mesh>
-        <mesh ref={leftArmRef} position={[-0.21, 0.45, 0]} castShadow receiveShadow>
-          <boxGeometry args={[0.07, 0.22, 0.1]} />
-          <meshLambertMaterial color={0x3a4254} />
-        </mesh>
-        <mesh ref={rightArmRef} position={[0.21, 0.45, 0]} castShadow receiveShadow>
-          <boxGeometry args={[0.07, 0.22, 0.1]} />
-          <meshLambertMaterial color={0x3a4254} />
-        </mesh>
-        <mesh ref={leftLegRef} position={[-0.08, 0.16, 0]} castShadow receiveShadow>
-          <boxGeometry args={[0.09, 0.18, 0.1]} />
-          <meshLambertMaterial color={0x2a3040} />
-        </mesh>
-        <mesh ref={rightLegRef} position={[0.08, 0.16, 0]} castShadow receiveShadow>
-          <boxGeometry args={[0.09, 0.18, 0.1]} />
-          <meshLambertMaterial color={0x2a3040} />
-        </mesh>
+        {useRealAvatar && marker.avatar && (
+          <Suspense fallback={null}>
+            <CityAvatar variant={marker.avatar} phase={marker.phase} />
+          </Suspense>
+        )}
         <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <circleGeometry args={[0.42, 14]} />
           <meshBasicMaterial color={0x000000} transparent opacity={0.28} depthWrite={false} />

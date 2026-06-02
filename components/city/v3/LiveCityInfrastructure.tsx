@@ -311,21 +311,30 @@ function CitySignalBackbone({ grid, timeMode }: InfrastructureProps) {
 }
 
 function StreetLights({ grid, timeMode }: InfrastructureProps) {
+  // Lamps used to sit dead-centre on each intersection node — exactly where the
+  // walking agents path through, so they clipped straight through the pole.
+  // Tuck each one onto the block corner, clear of the road centerlines.
+  const inset = LIVE_CITY_GUTTER / 2 + 0.1;
   return (
     <group>
-      {grid.streetXs.flatMap((x) =>
-        grid.streetZs.map((z) => (
-          <group key={`lamp-${x}-${z}`} position={[x, 0, z]}>
-            <mesh position={[0, 0.8, 0]} castShadow receiveShadow>
-              <cylinderGeometry args={[0.05, 0.05, 1.6, 5]} />
-              <meshLambertMaterial color={0x2a2f3d} />
-            </mesh>
-            <mesh position={[0, 1.6, 0]}>
-              <sphereGeometry args={[0.11, 6, 5]} />
-              <meshBasicMaterial color={timeMode === 'night' ? 0xffe0a8 : 0x8b9096} />
-            </mesh>
-          </group>
-        )),
+      {grid.streetXs.flatMap((x, xi) =>
+        grid.streetZs.map((z, zi) => {
+          // Push toward the inside of the grid so boundary lamps stay on-map.
+          const dx = xi < grid.streetXs.length - 1 ? inset : -inset;
+          const dz = zi < grid.streetZs.length - 1 ? inset : -inset;
+          return (
+            <group key={`lamp-${x}-${z}`} position={[x + dx, 0, z + dz]}>
+              <mesh position={[0, 0.8, 0]} castShadow receiveShadow>
+                <cylinderGeometry args={[0.05, 0.05, 1.6, 5]} />
+                <meshLambertMaterial color={0x2a2f3d} />
+              </mesh>
+              <mesh position={[0, 1.6, 0]}>
+                <sphereGeometry args={[0.11, 6, 5]} />
+                <meshBasicMaterial color={timeMode === 'night' ? 0xffe0a8 : 0x8b9096} />
+              </mesh>
+            </group>
+          );
+        }),
       )}
     </group>
   );
