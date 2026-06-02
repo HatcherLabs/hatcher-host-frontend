@@ -58,10 +58,12 @@ export function CityAvatar({ variant, phase = 0 }: { variant: string; phase?: nu
 
   const root = useMemo(() => {
     if (!config) return null;
-    const clone =
-      config.cloneMode === 'scene'
-        ? (gltf.scene.clone(true) as THREE.Group)
-        : (cloneSkeleton(gltf.scene) as THREE.Group);
+    // Always SkeletonUtils.clone here: the city spawns many independent clones
+    // of the same model, and a plain scene.clone() leaves skinned meshes bound
+    // to the ORIGINAL skeleton — which renders a rigged model's limbs detached
+    // ("floating arms beside the body", e.g. the animated robot). SkeletonUtils
+    // rebinds to the cloned skeleton and handles non-skinned models fine too.
+    const clone = cloneSkeleton(gltf.scene) as THREE.Group;
 
     clone.traverse((child) => {
       const mesh = child as THREE.Mesh;

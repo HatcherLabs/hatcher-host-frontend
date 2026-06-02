@@ -1,6 +1,5 @@
 'use client';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import {
   createSeededRng,
@@ -45,67 +44,14 @@ function isTowerTier(tier: LiveCityTierKey): boolean {
   return tier === 'business' || tier === 'founding';
 }
 
-// Distance LOD: only the nearest buildings (plus your own) render as full
-// multi-mesh houses/towers; everything else collapses into a single instanced
-// box layer. Re-partitioned only when the camera travels far enough, so the
-// per-frame cost is nil and walking around stays smooth at city scale.
-const NEAR_BUILDING_COUNT = 120;
-const REPARTITION_STEP = 12;
-
+// Every building renders as a full multi-mesh house/tower. (A distance LOD that
+// collapsed far buildings into one grey instanced box layer was removed — it
+// made the city read as flat grey boxes, and at current city size the full
+// render is cheap enough.)
 export function LiveBuildings({ buildings, timeMode, onBuildingClick }: Props) {
-  const { camera } = useThree();
-  const [nearKeys, setNearKeys] = useState<Set<string>>(() => new Set());
-  const lastPartitionPos = useRef<THREE.Vector3 | null>(null);
-  const buildingsRef = useRef(buildings);
-  buildingsRef.current = buildings;
-
-  const repartition = useCallback(() => {
-    const cx = camera.position.x;
-    const cz = camera.position.z;
-    const list = buildingsRef.current;
-    const scored = list.map((b) => ({
-      key: b.ownerKey,
-      dist: (b.x - cx) ** 2 + (b.z - cz) ** 2,
-    }));
-    scored.sort((a, b) => a.dist - b.dist);
-    const near = new Set<string>();
-    for (let i = 0; i < scored.length && near.size < NEAR_BUILDING_COUNT; i++) {
-      near.add(scored[i]!.key);
-    }
-    // Your own buildings are always full-detail wherever they are.
-    for (const b of list) if (b.mine) near.add(b.ownerKey);
-    setNearKeys(near);
-  }, [camera]);
-
-  useFrame(() => {
-    if (!lastPartitionPos.current) {
-      lastPartitionPos.current = camera.position.clone();
-      repartition();
-      return;
-    }
-    if (camera.position.distanceTo(lastPartitionPos.current) > REPARTITION_STEP) {
-      lastPartitionPos.current.copy(camera.position);
-      repartition();
-    }
-  });
-
-  // Re-partition when the building set itself changes (new city data).
-  useEffect(() => {
-    repartition();
-  }, [buildings, repartition]);
-
-  const { near, far } = useMemo(() => {
-    const nearList: LiveBuildingLayout[] = [];
-    const farList: LiveBuildingLayout[] = [];
-    for (const b of buildings) {
-      (nearKeys.has(b.ownerKey) ? nearList : farList).push(b);
-    }
-    return { near: nearList, far: farList };
-  }, [buildings, nearKeys]);
-
   return (
     <group>
-      {near.map((building) => (
+      {buildings.map((building) => (
         <HandoffBuilding
           key={building.ownerKey}
           building={building}
@@ -113,80 +59,11 @@ export function LiveBuildings({ buildings, timeMode, onBuildingClick }: Props) {
           onBuildingClick={onBuildingClick}
         />
       ))}
-      <InstancedFarBuildings buildings={far} capacity={buildings.length} timeMode={timeMode} />
       <LiveBuildingClickTargets
         buildings={buildings}
         onBuildingClick={onBuildingClick}
       />
     </group>
-  );
-}
-
-const FAR_FACADE_BASE: Record<LiveCityTierKey, string> = {
-  free: '#3d4a63',
-  starter: '#4d6d92',
-  pro: '#475a72',
-  business: '#3d4863',
-  founding: '#3f4354',
-};
-
-function farFacadeColor(tierKey: LiveCityTierKey, timeMode: LiveCityTimeMode, target: THREE.Color) {
-  target.set(FAR_FACADE_BASE[tierKey] ?? '#3d4a63');
-  if (timeMode !== 'night') target.multiplyScalar(1.4);
-  return target;
-}
-
-// All far buildings as one InstancedMesh of colored boxes — a single draw call
-// regardless of count. Capacity is fixed (total building count) so the buffer
-// isn't reallocated every re-partition; we just adjust the live `count`.
-function InstancedFarBuildings({
-  buildings,
-  capacity,
-  timeMode,
-}: {
-  buildings: LiveBuildingLayout[];
-  capacity: number;
-  timeMode: LiveCityTimeMode;
-}) {
-  const meshRef = useRef<THREE.InstancedMesh>(null);
-  const cap = Math.max(1, capacity);
-
-  useEffect(() => {
-    const mesh = meshRef.current;
-    if (!mesh) return;
-    const matrix = new THREE.Matrix4();
-    const quat = new THREE.Quaternion();
-    const euler = new THREE.Euler();
-    const pos = new THREE.Vector3();
-    const scale = new THREE.Vector3();
-    const color = new THREE.Color();
-    const n = Math.min(buildings.length, cap);
-    for (let i = 0; i < n; i++) {
-      const b = buildings[i]!;
-      euler.set(0, b.rotation, 0);
-      quat.setFromEuler(euler);
-      pos.set(b.x, b.height / 2, b.z);
-      scale.set(b.visual.width, b.height, b.visual.depth);
-      matrix.compose(pos, quat, scale);
-      mesh.setMatrixAt(i, matrix);
-      mesh.setColorAt(i, farFacadeColor(b.tierKey, timeMode, color));
-    }
-    mesh.count = n;
-    mesh.instanceMatrix.needsUpdate = true;
-    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-  }, [buildings, cap, timeMode]);
-
-  return (
-    <instancedMesh
-      ref={meshRef}
-      args={[undefined, undefined, cap]}
-      castShadow
-      receiveShadow
-      frustumCulled={false}
-    >
-      <boxGeometry args={[1, 1, 1]} />
-      <meshLambertMaterial color="#ffffff" />
-    </instancedMesh>
   );
 }
 
