@@ -17,9 +17,6 @@ import {
   type DispatchSkinShape,
 } from '@/lib/agent-dispatch/config';
 import { sampleLiveAgentPath } from '../liveAgentMotion';
-import { createWalkCollisionMap, resolveWalkPosition, type WalkCollisionMap } from '../walkCollision';
-import type { LiveCityGrid } from '../liveCityHandoff';
-import type { LiveBuildingLayout } from '../liveLayout';
 
 const VFX_POOL = 6;
 const VFX_MS = 650;
@@ -193,7 +190,7 @@ function SurgeBeacon() {
 }
 
 /** All in-flight dispatch couriers + their collectibles. Reads the store. */
-export function DispatchCouriers({ grid, buildings }: { grid?: LiveCityGrid; buildings?: LiveBuildingLayout[] }) {
+export function DispatchCouriers() {
   const dispatches = useDispatchStore((s) => s.dispatches);
   const equippedSkin = useDispatchStore((s) => s.equippedSkin);
   const upgrades = useDispatchStore((s) => s.upgrades);
@@ -201,12 +198,6 @@ export function DispatchCouriers({ grid, buildings }: { grid?: LiveCityGrid; bui
   const skin = useMemo(() => skinById(equippedSkin), [equippedSkin]);
   const fx = useMemo(() => upgradeEffects(upgrades), [upgrades]);
   const keysRef = useSteerKeys(manualControl);
-  // Building/tree collision for the manually-steered courier (auto couriers
-  // already follow street-aligned routes).
-  const collisionMap = useMemo(
-    () => (grid && buildings ? createWalkCollisionMap(grid, buildings) : null),
-    [grid, buildings],
-  );
 
   return (
     <group>
@@ -224,7 +215,6 @@ export function DispatchCouriers({ grid, buildings }: { grid?: LiveCityGrid; bui
           payoutMult={fx.payoutMult}
           manual={manualControl && idx === 0}
           keysRef={keysRef}
-          collisionMap={collisionMap}
         />
       ))}
     </group>
@@ -343,7 +333,6 @@ function Courier({
   payoutMult,
   manual,
   keysRef,
-  collisionMap,
 }: {
   dispatch: ActiveDispatch;
   color: string;
@@ -354,7 +343,6 @@ function Courier({
   payoutMult: number;
   manual: boolean;
   keysRef: SteerRef;
-  collisionMap: WalkCollisionMap | null;
 }) {
   const collectPacket = useDispatchStore((s) => s.collectPacket);
   const completeDispatch = useDispatchStore((s) => s.completeDispatch);
@@ -440,17 +428,8 @@ function Courier({
         mvx /= len;
         mvz /= len;
       }
-      const desiredX = Math.min(bounds.maxX, Math.max(bounds.minX, mp.x + mvx * SPEED * delta));
-      const desiredZ = Math.min(bounds.maxZ, Math.max(bounds.minZ, mp.z + mvz * SPEED * delta));
-      if (collisionMap) {
-        // Block / slide against buildings + trees (can't drive through them).
-        const r = resolveWalkPosition({ x: desiredX, z: desiredZ }, { x: mp.x, z: mp.z }, collisionMap);
-        mp.x = r.x;
-        mp.z = r.z;
-      } else {
-        mp.x = desiredX;
-        mp.z = desiredZ;
-      }
+      mp.x = Math.min(bounds.maxX, Math.max(bounds.minX, mp.x + mvx * SPEED * delta));
+      mp.z = Math.min(bounds.maxZ, Math.max(bounds.minZ, mp.z + mvz * SPEED * delta));
       pose = mp;
       arrived = Math.hypot(dispatch.destX - mp.x, dispatch.destZ - mp.z) < 2.6;
       if (groupRef.current) {

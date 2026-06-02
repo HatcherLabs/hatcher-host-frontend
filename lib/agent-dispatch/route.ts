@@ -60,3 +60,45 @@ export function spawnPackets(
   }
   return packets;
 }
+
+/**
+ * Collectibles scattered across the STREET GRID in the region between start and
+ * dest (not strung along the route), so a manual driver has to hunt for them.
+ * Picks random street nodes (reachable — they sit on roads, not inside
+ * buildings) with a little jitter. Falls back to the whole grid if the local
+ * region is too sparse.
+ */
+export function scatterPackets(
+  nodes: Pt[],
+  start: Pt,
+  dest: Pt,
+  count: number,
+  rareCount = 0,
+): DispatchPacket[] {
+  const margin = 55;
+  const minX = Math.min(start.x, dest.x) - margin;
+  const maxX = Math.max(start.x, dest.x) + margin;
+  const minZ = Math.min(start.z, dest.z) - margin;
+  const maxZ = Math.max(start.z, dest.z) + margin;
+  const region = nodes.filter((n) => n.x >= minX && n.x <= maxX && n.z >= minZ && n.z <= maxZ);
+  const pool = region.length >= count ? region : nodes.length ? nodes : [start, dest];
+
+  const picked: Pt[] = [];
+  const used = new Set<number>();
+  let guard = 0;
+  while (picked.length < count && guard < count * 25 && pool.length > 0) {
+    const i = Math.floor(Math.random() * pool.length);
+    if (!used.has(i) || used.size >= pool.length) {
+      used.add(i);
+      picked.push(pool[i]!);
+    }
+    guard += 1;
+  }
+
+  return picked.map((p, i) => ({
+    x: p.x + (Math.random() - 0.5) * 4,
+    z: p.z + (Math.random() - 0.5) * 4,
+    collected: false,
+    rare: i >= picked.length - rareCount,
+  }));
+}

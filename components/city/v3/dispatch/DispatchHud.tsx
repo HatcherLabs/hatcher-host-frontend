@@ -11,7 +11,7 @@ import {
   type JobType,
   type AchStats,
 } from '@/lib/agent-dispatch/config';
-import { buildDispatchRoute, pathLength, spawnPackets } from '@/lib/agent-dispatch/route';
+import { buildDispatchRoute, pathLength, scatterPackets } from '@/lib/agent-dispatch/route';
 import type { LiveCityGrid } from '../liveCityHandoff';
 import type { LiveAgentPose } from '../liveAgentMotion';
 import type { CityAgent } from '../../types';
@@ -190,7 +190,7 @@ export function DispatchHud({
         totalLength,
         startedAt: Date.now(),
         durationMs,
-        packets: spawnPackets(route, totalLength, packetCount, job.rarePackets),
+        packets: scatterPackets(grid.nodes, start, dest, packetCount, job.rarePackets),
         collected: 0,
         baseReward: Math.round((4 + totalLength / 55) * job.rewardMult),
         startLevel: lvl.level,
@@ -198,7 +198,7 @@ export function DispatchHud({
         jobName: job.name,
       });
     },
-    [upgrades, agentPosesRef, startDispatch, lvl.level],
+    [upgrades, agentPosesRef, startDispatch, lvl.level, grid.nodes],
   );
 
   const send = () => {
