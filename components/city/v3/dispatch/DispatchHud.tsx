@@ -80,6 +80,18 @@ export function DispatchHud({
   const setAuto = useDispatchStore((s) => s.setAuto);
   const manualControl = useDispatchStore((s) => s.manualControl);
   const setManual = useDispatchStore((s) => s.setManual);
+  // Manual WASD steering needs a keyboard. On touch / coarse-pointer devices
+  // hide it and force auto so a persisted "manual" pref can't strand a courier
+  // the player has no way to move.
+  const [canSteer, setCanSteer] = useState(true);
+  useEffect(() => {
+    const coarse =
+      typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches;
+    if (coarse) {
+      setCanSteer(false);
+      if (useDispatchStore.getState().manualControl) setManual(false);
+    }
+  }, [setManual]);
   const startDispatch = useDispatchStore((s) => s.startDispatch);
   const doPrestige = useDispatchStore((s) => s.doPrestige);
   const unlockAchievement = useDispatchStore((s) => s.unlockAchievement);
@@ -305,7 +317,7 @@ export function DispatchHud({
       {!panelOpen && (
         <button
           onClick={() => setPanelOpen(true)}
-          className="fixed bottom-4 right-4 z-30 hidden items-center gap-2 rounded-full border border-[#39ff88]/50 bg-[rgba(8,12,10,0.92)] px-4 py-3 text-sm font-semibold text-[#dffbe9] shadow-xl backdrop-blur transition hover:scale-105 md:flex"
+          className="fixed bottom-4 right-4 z-30 flex items-center gap-2 rounded-full border border-[#39ff88]/50 bg-[rgba(8,12,10,0.92)] px-4 py-3 text-sm font-semibold text-[#dffbe9] shadow-xl backdrop-blur transition hover:scale-105"
           style={{ boxShadow: '0 10px 30px rgba(57,255,136,0.25)' }}
         >
           <span aria-hidden>🚀</span>
@@ -319,7 +331,7 @@ export function DispatchHud({
 
       {/* Panel */}
       {panelOpen && (
-        <div className="fixed bottom-4 right-4 z-30 hidden w-[min(360px,calc(100vw-1.5rem))] flex-col gap-3 rounded-2xl border border-[#39ff88]/30 bg-[rgba(8,12,10,0.95)] p-4 text-[#dffbe9] shadow-2xl backdrop-blur md:flex">
+        <div className="fixed bottom-4 right-4 z-30 flex max-h-[calc(100dvh-2rem)] w-[min(360px,calc(100vw-1.5rem))] flex-col gap-3 overflow-y-auto rounded-2xl border border-[#39ff88]/30 bg-[rgba(8,12,10,0.95)] p-4 text-[#dffbe9] shadow-2xl backdrop-blur">
           <div className="flex items-center justify-between">
             <h2 className="flex items-center gap-2 text-sm font-bold tracking-wide text-[#39ff88]">
               <span aria-hidden>🚀</span> Agent Dispatch
@@ -464,21 +476,23 @@ export function DispatchHud({
             </span>
           </button>
 
-          <button
-            onClick={() => setManual(!manualControl)}
-            className={`flex items-center justify-between rounded-lg border px-3 py-2 text-sm font-semibold transition ${
-              manualControl
-                ? 'border-[#62b8ff] bg-[#62b8ff]/15 text-[#62b8ff]'
-                : 'border-white/10 bg-black/30 text-[#9fceb4] hover:bg-white/5'
-            }`}
-            title="Steer your active courier yourself with WASD / arrow keys to sweep packets"
-          >
-            <span>🎮 Manual steer</span>
-            <span className={`rounded-full px-2 py-0.5 text-xs ${manualControl ? 'bg-[#62b8ff] text-black' : 'bg-white/10'}`}>
-              {manualControl ? 'WASD' : 'OFF'}
-            </span>
-          </button>
-          {manualControl && (
+          {canSteer && (
+            <button
+              onClick={() => setManual(!manualControl)}
+              className={`flex items-center justify-between rounded-lg border px-3 py-2 text-sm font-semibold transition ${
+                manualControl
+                  ? 'border-[#62b8ff] bg-[#62b8ff]/15 text-[#62b8ff]'
+                  : 'border-white/10 bg-black/30 text-[#9fceb4] hover:bg-white/5'
+              }`}
+              title="Steer your active courier yourself with WASD / arrow keys to sweep packets"
+            >
+              <span>🎮 Manual steer</span>
+              <span className={`rounded-full px-2 py-0.5 text-xs ${manualControl ? 'bg-[#62b8ff] text-black' : 'bg-white/10'}`}>
+                {manualControl ? 'WASD' : 'OFF'}
+              </span>
+            </button>
+          )}
+          {canSteer && manualControl && (
             <div className="rounded-lg border border-[#62b8ff]/25 bg-[#62b8ff]/5 px-3 py-1.5 text-[11px] text-[#9fceb4]">
               <span className="font-mono text-[#62b8ff]">WASD</span> to move (relative to the camera),{' '}
               <span className="font-mono text-[#62b8ff]">drag</span> to look around — like walk mode. Reach the marked
