@@ -62,6 +62,31 @@ export function spawnPackets(
 }
 
 /**
+ * A cornered (Manhattan) route that VISITS every scattered packet on the way
+ * from start to dest, ordered by progress toward the destination. Because the
+ * path threads through the packets, auto couriers collect them all — and it's
+ * naturally long and windy. Right-angle corners keep the street-grid look.
+ */
+export function buildRouteThroughPackets(start: Pt, dest: Pt, packets: Pt[]): Pt[] {
+  const dirX = dest.x - start.x;
+  const dirZ = dest.z - start.z;
+  const ordered = packets
+    .map((p) => ({ x: p.x, z: p.z }))
+    .sort((a, b) => (a.x - start.x) * dirX + (a.z - start.z) * dirZ - ((b.x - start.x) * dirX + (b.z - start.z) * dirZ));
+  const waypoints: Pt[] = [{ x: start.x, z: start.z }, ...ordered, { x: dest.x, z: dest.z }];
+  const route: Pt[] = [{ x: start.x, z: start.z }];
+  for (let i = 1; i < waypoints.length; i++) {
+    const a = waypoints[i - 1]!;
+    const b = waypoints[i]!;
+    // L-corner, alternating the cornering axis for shape variety.
+    if (i % 2 === 1) route.push({ x: b.x, z: a.z });
+    else route.push({ x: a.x, z: b.z });
+    route.push({ x: b.x, z: b.z });
+  }
+  return route;
+}
+
+/**
  * Collectibles scattered across the STREET GRID in the region between start and
  * dest (not strung along the route), so a manual driver has to hunt for them.
  * Picks random street nodes (reachable — they sit on roads, not inside

@@ -11,7 +11,7 @@ import {
   type JobType,
   type AchStats,
 } from '@/lib/agent-dispatch/config';
-import { buildDispatchRoute, pathLength, scatterPackets } from '@/lib/agent-dispatch/route';
+import { buildRouteThroughPackets, pathLength, scatterPackets } from '@/lib/agent-dispatch/route';
 import type { LiveCityGrid } from '../liveCityHandoff';
 import type { LiveAgentPose } from '../liveAgentMotion';
 import type { CityAgent } from '../../types';
@@ -167,12 +167,16 @@ export function DispatchHud({
       const fx = upgradeEffects(upgrades);
       const pose = agentPosesRef.current.get(agent.id);
       const start = pose ? { x: pose.x, z: pose.z } : { x: 0, z: 0 };
-      const route = buildDispatchRoute(start, dest);
-      const totalLength = pathLength(route);
-      // Roughly constant count (not scaled up by the now-longer routes) so the
-      // orbs end up more spaced out along the path.
-      const basePackets = Math.min(8, Math.max(5, Math.round(totalLength / 110)));
+      // Orb count from the straight-line distance (not the windy route length),
+      // so it stays ~constant and the orbs end up well spaced.
+      const span = Math.hypot(dest.x - start.x, dest.z - start.z);
+      const basePackets = Math.min(8, Math.max(5, Math.round(span / 70)));
       const packetCount = Math.max(3, Math.round(basePackets * job.packetMult) + fx.extraPackets);
+      // Scatter the orbs on street nodes, then route THROUGH them so auto
+      // couriers actually collect them (and manual hunts the same points).
+      const packets = scatterPackets(grid.nodes, start, dest, packetCount, job.rarePackets);
+      const route = buildRouteThroughPackets(start, dest, packets);
+      const totalLength = pathLength(route);
       const durationMs = Math.min(
         90000,
         Math.max(12000, (totalLength / 5) * 1000 * fx.durationMult * job.durationMult),
@@ -190,7 +194,7 @@ export function DispatchHud({
         totalLength,
         startedAt: Date.now(),
         durationMs,
-        packets: scatterPackets(grid.nodes, start, dest, packetCount, job.rarePackets),
+        packets,
         collected: 0,
         baseReward: Math.round((4 + totalLength / 55) * job.rewardMult),
         startLevel: lvl.level,
