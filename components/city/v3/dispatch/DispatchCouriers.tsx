@@ -137,8 +137,8 @@ function useSteerKeys(active: boolean): SteerRef {
       let strafe = 0;
       if (pressed.has('w') || pressed.has('arrowup')) forward += 1;
       if (pressed.has('s') || pressed.has('arrowdown')) forward -= 1;
-      if (pressed.has('d') || pressed.has('arrowright')) strafe += 1;
-      if (pressed.has('a') || pressed.has('arrowleft')) strafe -= 1;
+      if (pressed.has('d') || pressed.has('arrowright')) strafe -= 1;
+      if (pressed.has('a') || pressed.has('arrowleft')) strafe += 1;
       keys.current = { forward, strafe };
     };
     const dn = (e: KeyboardEvent) => {

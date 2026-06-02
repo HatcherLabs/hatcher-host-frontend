@@ -19,13 +19,13 @@ export function pathLength(nodes: Pt[]): number {
  */
 export function buildDispatchRoute(start: Pt, dest: Pt): Pt[] {
   const pts: Pt[] = [{ x: start.x, z: start.z }];
-  const steps = 3 + Math.floor(Math.random() * 4); // 3-6 L-shaped steps (longer, windier)
+  const steps = 4 + Math.floor(Math.random() * 5); // 4-8 L-shaped steps (long, windy)
   let cx = start.x;
   let cz = start.z;
   for (let i = 1; i <= steps; i++) {
     const t = i / steps;
     const last = i === steps;
-    const jitter = last ? 0 : 24; // bigger detours → longer, more random paths
+    const jitter = last ? 0 : 36; // big detours → much longer, more random paths
     const nx = last ? dest.x : start.x + (dest.x - start.x) * t + (Math.random() - 0.5) * jitter;
     const nz = last ? dest.z : start.z + (dest.z - start.z) * t + (Math.random() - 0.5) * jitter;
     // Alternate which axis we corner on first, for shape variety.

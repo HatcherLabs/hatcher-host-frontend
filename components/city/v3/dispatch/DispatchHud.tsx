@@ -169,7 +169,9 @@ export function DispatchHud({
       const start = pose ? { x: pose.x, z: pose.z } : { x: 0, z: 0 };
       const route = buildDispatchRoute(start, dest);
       const totalLength = pathLength(route);
-      const basePackets = Math.min(10, Math.max(5, Math.round(totalLength / 40)));
+      // Roughly constant count (not scaled up by the now-longer routes) so the
+      // orbs end up more spaced out along the path.
+      const basePackets = Math.min(8, Math.max(5, Math.round(totalLength / 110)));
       const packetCount = Math.max(3, Math.round(basePackets * job.packetMult) + fx.extraPackets);
       const durationMs = Math.min(
         90000,
