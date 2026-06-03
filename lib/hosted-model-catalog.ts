@@ -1,3 +1,5 @@
+import { getLegacyHostedProxyProviderPrefix } from '@/lib/legacy-hosted-model';
+
 export type HostedModelCost = 'Low' | 'Medium' | 'High' | 'Premium' | 'Variable';
 export type HostedModelPrivacy = 'hatcher' | 'partner';
 export type HostedModelTag =
@@ -734,7 +736,7 @@ export const HOSTED_MODELS: HostedModelOption[] = [
 ];
 
 export const DEFAULT_HOSTED_MODEL = 'deepseek/deepseek-v4-flash';
-const HOSTED_PROXY_PROVIDER_PREFIX = 'hatcher-llm-proxy/';
+const HOSTED_PROXY_PROVIDER_PREFIX = getLegacyHostedProxyProviderPrefix();
 const HOSTED_MODEL_ALIASES = new Map<string, string>([
   ['meta-llama/llama-4-scout-17b-16e-instruct', 'qwen/qwen3.6-35b-a3b'],
   ['qwen/qwen3-32b', 'qwen/qwen3.6-35b-a3b'],

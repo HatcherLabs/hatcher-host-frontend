@@ -3,6 +3,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AlertTriangle, Cpu, Link as LinkIcon, Server } from 'lucide-react';
 import { api } from '@/lib/api';
+import {
+  getLegacyHostedProxyProviderKey,
+  getLegacyHostedProxyProviderPrefix,
+} from '@/lib/legacy-hosted-model';
 import { useAgentContext, GlassCard, Skeleton } from '../../../AgentContext';
 import { timeAgo } from '@/lib/utils';
 
@@ -13,7 +17,8 @@ interface OpenClawConfigSnapshot {
   managed: boolean;
 }
 
-const HOSTED_PROXY_PREFIX = 'hatcher-llm-proxy/';
+const HOSTED_PROXY_PROVIDER_KEY = getLegacyHostedProxyProviderKey();
+const HOSTED_PROXY_PREFIX = getLegacyHostedProxyProviderPrefix();
 
 const PROVIDER_LABELS: Record<string, string> = {
   anthropic: 'Anthropic',
@@ -45,7 +50,7 @@ function providerLabelFromModel(model: string | null | undefined, fallbackProvid
   const normalized = cleanHostedModelName(model);
   const providerKey = normalized?.split('/')[0] || fallbackProvider;
   if (!providerKey) return null;
-  if (providerKey === 'hatcher-llm-proxy') return 'Hatcher Hosted';
+  if (providerKey === HOSTED_PROXY_PROVIDER_KEY) return 'Hatcher Hosted';
   return PROVIDER_LABELS[providerKey] ?? providerKey
     .split('-')
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))

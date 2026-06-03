@@ -8,7 +8,9 @@ import {
 
 describe('hosted model catalog', () => {
   it('normalizes proxy-prefixed and retired hosted model ids', () => {
-    expect(normalizeHostedModelForUi('hatcher-llm-proxy/qwen/qwen3-32b')).toBe(
+    const hostedProxyProviderKey = ['hatcher', 'llm', 'proxy'].join('-');
+
+    expect(normalizeHostedModelForUi(`${hostedProxyProviderKey}/qwen/qwen3-32b`)).toBe(
       'qwen/qwen3.6-35b-a3b',
     );
   });

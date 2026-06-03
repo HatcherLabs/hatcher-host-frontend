@@ -357,10 +357,8 @@ function agentVideoContentUrl(raw: string, agentId?: string): string | null {
       parsed.protocol === 'https:'
       && parsed.hostname === 'openrouter.ai'
       && /^\/api\/v1\/videos\/[^/]+\/content$/i.test(parsed.pathname);
-    const isInternalProxyContent =
-      ['host.docker.internal', 'localhost', '127.0.0.1', 'hatcher-llm-proxy'].includes(parsed.hostname)
-      && /^\/media\/videos\/[^/]+\/content$/i.test(parsed.pathname);
-    if (!isOpenRouterContent && !isInternalProxyContent) return null;
+    const isManagedVideoContent = /^\/media\/videos\/[^/]+\/content$/i.test(parsed.pathname);
+    if (!isOpenRouterContent && !isManagedVideoContent) return null;
     const parts = parsed.pathname.split('/').filter(Boolean);
     const videosIndex = parts.findIndex((part) => part === 'videos');
     const jobId = videosIndex >= 0 ? parts[videosIndex + 1] : null;

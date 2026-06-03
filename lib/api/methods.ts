@@ -722,9 +722,11 @@ export const api = {
   getAgentPublicChat: (id: string) =>
     req<{
       enabled: boolean;
-      dailyAiCreditCap: number | null;
-      dailyAiCreditsSpent: number | null;
-      dailyAiCreditsRemaining: number | null;
+      dailyAiCreditsAvailable?: boolean;
+      dailyAiCreditCap?: number | null;
+      dailyAiCreditsSpent?: number | null;
+      dailyAiCreditsRemaining?: number | null;
+      piqueSignalAvailable?: boolean;
       piqueSignalDailyLimit?: number;
       piqueSignalSignalsUsed?: number;
       piqueSignalSignalsRemaining?: number;
@@ -772,9 +774,11 @@ export const api = {
       content: string;
       model: string;
       starting?: boolean;
-      dailyAiCreditCap: number | null;
-      dailyAiCreditsSpent: number | null;
-      dailyAiCreditsRemaining: number | null;
+      dailyAiCreditsAvailable?: boolean;
+      dailyAiCreditCap?: number | null;
+      dailyAiCreditsSpent?: number | null;
+      dailyAiCreditsRemaining?: number | null;
+      piqueSignalAvailable?: boolean;
       piqueSignalDailyLimit?: number;
       piqueSignalSignalsUsed?: number;
       piqueSignalSignalsRemaining?: number;
