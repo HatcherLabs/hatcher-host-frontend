@@ -1218,7 +1218,7 @@ export const RichMarkdown = memo(function RichMarkdown({
         if (part.kind === 'embed') {
           return <EmbedArtifactView key={`embed-${index}`} artifact={part.artifact} />;
         }
-        return <ReactMarkdown key={`md-${index}`}>{part.content}</ReactMarkdown>;
+        return <ReactMarkdown key={`md-${index}`} skipHtml>{part.content}</ReactMarkdown>;
       })}
     </>
   );

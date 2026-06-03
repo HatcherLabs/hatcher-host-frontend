@@ -294,7 +294,7 @@ function MemoryCanonSection({
         </div>
       </div>
       <div className="px-5 py-4 markdown-body text-[13px] text-[var(--text-secondary)] leading-relaxed max-h-[40vh] overflow-y-auto">
-        <ReactMarkdown>{content}</ReactMarkdown>
+        <ReactMarkdown skipHtml>{content}</ReactMarkdown>
       </div>
     </div>
   );
@@ -329,7 +329,7 @@ function TaggedMemoryRow({ memory }: { memory: MemorySection }) {
       </button>
       {expanded && (
         <div className="px-5 pb-4 markdown-body text-[12px] text-[var(--text-secondary)] leading-relaxed">
-          <ReactMarkdown>{memory.content}</ReactMarkdown>
+          <ReactMarkdown skipHtml>{memory.content}</ReactMarkdown>
         </div>
       )}
     </div>

@@ -170,7 +170,7 @@ export const ThinkingBlock = memo(function ThinkingBlock({
       {expanded && (
         <div className="px-3 pb-3 pt-1 border-t border-white/5">
           <div className="markdown-body text-[12px] text-[var(--text-muted)] italic leading-relaxed">
-            <ReactMarkdown>{content.trim()}</ReactMarkdown>
+            <ReactMarkdown skipHtml>{content.trim()}</ReactMarkdown>
           </div>
         </div>
       )}

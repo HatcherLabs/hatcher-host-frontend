@@ -97,55 +97,8 @@ const nextConfig = {
     ],
   },
   async headers() {
-    // CSP shared between default and embed routes, except for frame-ancestors.
-    //
-    // Security notes (recon M-003, 2026-04-23):
-    //   - `'unsafe-eval'` dropped in favour of `'wasm-unsafe-eval'`.
-    //     Three.js / drei use WebAssembly (Draco/KTX2 decoders) which
-    //     needs wasm-unsafe-eval; no first-party code path uses plain
-    //     `eval()` or `new Function(string)` (grep-verified).
-    //   - `'unsafe-inline'` is still allowed for scripts because Next.js
-    //     App Router injects inline hydration scripts without a stable
-    //     nonce hook as of Next 15. A nonce-based CSP migration is its
-    //     own effort (custom middleware + per-request nonces for every
-    //     <Script>/<script>). Tracked separately.
-    //
-    // 3D scene additions (2026-04-24):
-    //   - `worker-src 'self' blob:` — three.js DRACOLoader spins up a
-    //     decoder Web Worker from a blob URL; without this every GLB
-    //     fails to decompress.
-    //   - `blob:` in script-src for the same reason on browsers that
-    //     don't honour a separate worker-src yet.
-    //   - `blob:` in connect-src because GLTFLoader turns embedded GLB
-    //     textures into Blob URLs before uploading them to WebGL.
-    //   - Google Ads / GTM conversion tracking fans out to several
-    //     sibling domains — enumerated so pixel fetches don't get
-    //     CSP-blocked on every page load.
-    const GOOGLE_ADS_HOSTS = [
-      'https://www.googletagmanager.com',
-      'https://www.google-analytics.com',
-      'https://www.google.com',
-      'https://googleads.g.doubleclick.net',
-      'https://www.googleadservices.com',
-      'https://pagead2.googlesyndication.com',
-    ].join(' ');
-    const QWERTI_WIDGET_HOSTS = ['https://widget.qwerti.ai', 'https://api.qwerti.ai'].join(' ');
-    const baseCspParts = [
-      "default-src 'self'",
-      // Dev builds use source maps generated via runtime code execution, which
-      // CSP blocks by default. Prod builds do not, so the relaxed directive is
-      // applied only when NODE_ENV is not production.
-      `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' blob: https://s3.tradingview.com https://widget.qwerti.ai ${GOOGLE_ADS_HOSTS}${process.env.NODE_ENV !== 'production' ? " 'unsafe-" + "eval'" : ''}`,
-      "worker-src 'self' blob:",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "font-src 'self' https://fonts.gstatic.com https://widget.qwerti.ai",
-      `img-src 'self' data: blob: https: ${GOOGLE_ADS_HOSTS}`,
-      `media-src 'self' data: blob: https: ${GOOGLE_ADS_HOSTS}`,
-      `connect-src 'self' blob: https://api.hatcher.host wss://api.hatcher.host https://*.solana.com wss://*.solana.com https://*.helius-rpc.com wss://*.helius-rpc.com https://api.dexscreener.com https://threejs.org ${GOOGLE_ADS_HOSTS} ${QWERTI_WIDGET_HOSTS}${process.env.NODE_ENV !== 'production' ? ' http://localhost:3001 ws://localhost:3001 http://localhost:8080 http://127.0.0.1:3001 ws://127.0.0.1:3001 http://127.0.0.1:8080' : ''}`,
-      "frame-src 'self' https://www.tradingview.com https://s.tradingview.com https://tradingview.com https://www.tradingview-widget.com https://www.geckoterminal.com https://geckoterminal.com https://dexscreener.com https://www.dexscreener.com",
-      "base-uri 'self'",
-      "form-action 'self'",
-    ];
+    // CSP is generated in middleware.ts with a per-request nonce. Keeping it
+    // static here would block Next's inline RSC/bootstrap scripts.
     return [
       {
         // /embed/* routes are meant to be iframed on third-party sites so
@@ -153,10 +106,6 @@ const nextConfig = {
         // to *. Everything else keeps the strict defaults below.
         source: '/embed/:path*',
         headers: [
-          {
-            key: 'Content-Security-Policy',
-            value: [...baseCspParts, "frame-ancestors *"].join('; '),
-          },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(self), geolocation=()' },
@@ -170,10 +119,6 @@ const nextConfig = {
         // headers() merge rules) override the relaxed frame-ancestors.
         source: '/((?!embed).*)',
         headers: [
-          {
-            key: 'Content-Security-Policy',
-            value: [...baseCspParts, "frame-ancestors 'none'"].join('; '),
-          },
           {
             key: 'X-Frame-Options',
             value: 'DENY',
