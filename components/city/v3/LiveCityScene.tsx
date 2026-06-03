@@ -41,8 +41,9 @@ import {
   cityBuildingTitle,
   isViewerBuilding,
 } from './cityNavigation';
+import { cityAgentDisplayName } from './cityDisplay';
 import { agentFocusTargetFor, type AgentFocusTarget } from './agentFocusTarget';
-import { publicAgentChatHref, selectActiveCityAgents } from './activeAgentList';
+import { publicAgentChatHref } from './activeAgentList';
 import { LIVE_CITY_TIERS, type LiveCityGrid, type LiveCityTimeMode } from './liveCityHandoff';
 import { layoutLiveCity, type LiveAgentMarkerLayout, type LiveBuildingLayout } from './liveLayout';
 import { LiveAgentMarkers } from './LiveAgentMarkers';
@@ -496,7 +497,6 @@ function LiveCitySceneBody({
 function LiveCityMobileMenu({
   counts,
   ownedAgents,
-  activeAgents,
   generatedAt,
   viewMode,
   timeMode,
@@ -504,7 +504,6 @@ function LiveCityMobileMenu({
   hasMyBuilding,
   onMyBuildingClick,
   onFindMyBuildingClick,
-  onAgentViewClick,
   onToggleViewMode,
   onQualityChange,
 }: {
@@ -523,10 +522,8 @@ function LiveCityMobileMenu({
   onQualityChange: (quality: 'auto' | 'high' | 'low') => void;
 }) {
   const topOwned = ownedAgents
-    .filter((agent) => agent.visibility !== 'private')
     .sort((a, b) => Number(b.status === 'running') - Number(a.status === 'running'))
     .slice(0, 4);
-  const topActive = selectActiveCityAgents(activeAgents, 6);
 
   return (
     <MobileSceneMenu
@@ -618,60 +615,17 @@ function LiveCityMobileMenu({
             {topOwned.map((agent) => (
               <Link
                 key={agent.id}
-                href={`/dashboard/agent/${agent.id}`}
+                href={`/dashboard/agent/${agent.dashboardAgentId ?? agent.id}`}
                 className="rounded-[7px] border border-white/10 bg-white/[0.045] px-3 py-2"
               >
-                <span className="block truncate text-sm font-medium text-white">{agent.name}</span>
+                <span className="block truncate text-sm font-medium text-white">
+                  {cityAgentDisplayName(agent)}
+                </span>
                 <span className="mt-0.5 block text-[11px] uppercase tracking-wide text-white/48">
-                  {agent.framework} · {labelAgentStatus(agent.status)}
+                  {agent.framework} · {labelAgentStatus(agent.status)} · View
                 </span>
               </Link>
             ))}
-          </div>
-        </div>
-      )}
-
-      {topActive.length > 0 && (
-        <div>
-          <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/45">
-            Active agents
-          </div>
-          <div className="grid gap-1.5">
-            {topActive.map((agent) => {
-              const chatHref = publicAgentChatHref(agent);
-              return (
-                <div
-                  key={agent.agentId}
-                  className="rounded-[7px] border border-white/10 bg-white/[0.045] px-3 py-2"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="truncate text-sm font-medium text-white">
-                      {agent.agentName}
-                    </span>
-                    <span className="shrink-0 text-[11px] text-emerald-200/70">
-                      {labelAgentStatus(agent.status)}
-                    </span>
-                  </div>
-                  <div className={`mt-2 grid gap-2 ${chatHref ? 'grid-cols-2' : 'grid-cols-1'}`}>
-                    <button
-                      type="button"
-                      onClick={() => onAgentViewClick(agent.agentId)}
-                      className="rounded-[6px] border border-white/12 bg-white/[0.06] px-2 py-1.5 text-xs font-semibold text-white"
-                    >
-                      View
-                    </button>
-                    {chatHref ? (
-                      <Link
-                        href={chatHref}
-                        className="rounded-[6px] border border-emerald-300/30 bg-emerald-300 px-2 py-1.5 text-center text-xs font-semibold text-black"
-                      >
-                        Chat
-                      </Link>
-                    ) : null}
-                  </div>
-                </div>
-              );
-            })}
           </div>
         </div>
       )}
@@ -772,6 +726,7 @@ function LiveAgentPanel({
 }) {
   const owner = marker.ownerUsername?.trim() || 'Builder';
   const chatHref = publicAgentChatHref(marker);
+  const displayName = cityAgentDisplayName(marker);
 
   return (
     <aside className="pointer-events-auto absolute bottom-24 left-3 right-3 z-20 rounded-[4px] border border-white/18 bg-[#08111a]/88 p-4 text-white shadow-2xl backdrop-blur-xl md:bottom-5 md:left-auto md:right-5 md:w-[min(320px,calc(100vw-2.5rem))]">
@@ -781,7 +736,7 @@ function LiveAgentPanel({
             <Bot size={13} />
             Active agent
           </div>
-          <h2 className="mt-1 truncate text-lg font-semibold leading-tight">{marker.agentName}</h2>
+          <h2 className="mt-1 truncate text-lg font-semibold leading-tight">{displayName}</h2>
           <p className="mt-1 truncate text-xs text-white/58">{owner}</p>
         </div>
         <button

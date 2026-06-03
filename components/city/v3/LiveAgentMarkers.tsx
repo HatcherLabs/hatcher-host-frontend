@@ -11,6 +11,7 @@ import { getGlbAvatarModel } from '@/components/agent-room/v2/stations/AgentBody
 import { CityAvatar } from './CityAvatar';
 import { useDispatchStore } from '@/lib/agent-dispatch/store';
 import { skinById } from '@/lib/agent-dispatch/config';
+import { cityAgentDisplayName } from './cityDisplay';
 
 interface Props {
   markers: LiveAgentMarkerLayout[];
@@ -275,7 +276,7 @@ function LiveRobotAgent({
                 boxShadow: `0 6px 20px ${accentHex}55`,
               }}
             >
-              <span>{marker.agentName}</span>
+              <span>{cityAgentDisplayName(marker)}</span>
               <span style={{ color: accentHex, marginLeft: 8, fontWeight: 700 }}>
                 {cityWalkerStatusLabel(marker.status)}
               </span>
