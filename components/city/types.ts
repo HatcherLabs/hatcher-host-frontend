@@ -50,8 +50,8 @@ export interface CityAgent {
 
 export interface CityUser {
   ownerKey: string;
-  ownerUsername: string | null;
-  tier: number;
+  ownerUsername?: string | null;
+  tier?: number;
   agentCount: number;
   activeAgentCount: number;
   mine: boolean;
