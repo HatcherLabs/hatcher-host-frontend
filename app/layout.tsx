@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
+import { headers } from 'next/headers';
 import { Inter, JetBrains_Mono, Sora } from 'next/font/google';
 import '@solana/wallet-adapter-react-ui/styles.css';
 import './globals.css';
@@ -34,6 +35,8 @@ const sora = Sora({
   display: 'swap',
   variable: '--font-display',
 });
+
+export const dynamic = 'force-dynamic';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -236,6 +239,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // Non-locale pages (admin, /privacy, not-found) rely on this provider to supply
   // default-locale messages. Locale pages get their own nested provider in
   // app/[locale]/layout.tsx which takes precedence for useTranslations.
+  const nonce = (await headers()).get('x-nonce') ?? undefined;
   const locale = await getLocale();
   const messages = await getMessages();
 
@@ -244,18 +248,22 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <head>
         <script
           type="application/ld+json"
+          nonce={nonce}
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
         />
         <script
           type="application/ld+json"
+          nonce={nonce}
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
         <script
           type="application/ld+json"
+          nonce={nonce}
           dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationJsonLd) }}
         />
         <script
           type="application/ld+json"
+          nonce={nonce}
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
         />
       </head>
@@ -266,8 +274,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=AW-18098396723"
           strategy="afterInteractive"
+          nonce={nonce}
         />
-        <Script id="google-ads-init" strategy="afterInteractive">
+        <Script id="google-ads-init" strategy="afterInteractive" nonce={nonce}>
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
@@ -314,10 +323,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             });
           `}
         </Script>
-        <Script src="/register-sw.js" strategy="afterInteractive" />
+        <Script src="/register-sw.js" strategy="afterInteractive" nonce={nonce} />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <PosthogProvider>
-            <ThemeProvider>
+            <ThemeProvider nonce={nonce}>
               <AuthProvider>
                 <WalletProvider>
                   <ToastProvider>

@@ -25,6 +25,15 @@ import { defaultLocale, locales } from './i18n/config';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 const PUBLIC_SITE_URL = process.env.NEXT_PUBLIC_SITE_URL
   || (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://hatcher.host');
+const GOOGLE_ADS_HOSTS = [
+  'https://www.googletagmanager.com',
+  'https://www.google-analytics.com',
+  'https://www.google.com',
+  'https://googleads.g.doubleclick.net',
+  'https://www.googleadservices.com',
+  'https://pagead2.googlesyndication.com',
+].join(' ');
+const QWERTI_WIDGET_HOSTS = ['https://widget.qwerti.ai', 'https://api.qwerti.ai'].join(' ');
 
 // next-intl middleware instance — runs first to handle locale detection/rewrites.
 const intlMiddleware = createMiddleware(routing);
@@ -89,21 +98,29 @@ function isTrackablePath(pathname: string): boolean {
 
 export default function middleware(req: NextRequest): NextResponse {
   const { pathname } = req.nextUrl;
+  const nonce = createNonce();
+  const isEmbedRoute = stripLocalePrefix(pathname).startsWith('/embed');
+  const requestHeaders = withCspRequestHeaders(req, nonce, isEmbedRoute);
 
   // Non-locale paths (admin, legal pages, og, skill) bypass the intl middleware.
   // They live at app/ root (not under [locale]) so next-intl must not rewrite them.
   if (isNonLocalePath(pathname)) {
-    return NextResponse.next();
+    return withSecurityHeaders(
+      NextResponse.next({ request: { headers: requestHeaders } }),
+      nonce,
+      isEmbedRoute,
+    );
   }
 
   const defaultLocaleRedirect = redirectDefaultLocalePath(req);
   if (defaultLocaleRedirect) {
-    return defaultLocaleRedirect;
+    return withSecurityHeaders(defaultLocaleRedirect, nonce, isEmbedRoute);
   }
 
   // Step 1: Run next-intl first so it can handle locale detection/rewrites/redirects
   // and set the HATCHER_LOCALE cookie.
   const response = intlMiddleware(req);
+  applyRequestHeaderOverrides(response, requestHeaders);
   normalizeInternalRedirect(response);
 
   // Step 2: Beacon logic — operate on the locale-stripped pathname so
@@ -133,6 +150,68 @@ export default function middleware(req: NextRequest): NextResponse {
     }).catch(() => {
       /* swallow — beacon failures must never surface */
     });
+  }
+
+  return withSecurityHeaders(response, nonce, isEmbedRoute);
+}
+
+function createNonce(): string {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+function buildCsp(nonce: string, isEmbedRoute: boolean): string {
+  const isDev = process.env.NODE_ENV !== 'production';
+  const devConnect = isDev
+    ? ' http://localhost:3001 ws://localhost:3001 http://localhost:8080 http://127.0.0.1:3001 ws://127.0.0.1:3001 http://127.0.0.1:8080'
+    : '';
+  const scriptDev = isDev ? " 'unsafe-" + "eval'" : '';
+  const parts = [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}' 'wasm-unsafe-eval' blob: https://s3.tradingview.com https://widget.qwerti.ai ${GOOGLE_ADS_HOSTS}${scriptDev}`,
+    "worker-src 'self' blob:",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com https://widget.qwerti.ai",
+    `img-src 'self' data: blob: https: ${GOOGLE_ADS_HOSTS}`,
+    `media-src 'self' data: blob: https: ${GOOGLE_ADS_HOSTS}`,
+    `connect-src 'self' blob: https://api.hatcher.host wss://api.hatcher.host https://*.solana.com wss://*.solana.com https://*.helius-rpc.com wss://*.helius-rpc.com https://api.dexscreener.com https://threejs.org ${GOOGLE_ADS_HOSTS} ${QWERTI_WIDGET_HOSTS}${devConnect}`,
+    "frame-src 'self' https://www.tradingview.com https://s.tradingview.com https://tradingview.com https://www.tradingview-widget.com https://www.geckoterminal.com https://geckoterminal.com https://dexscreener.com https://www.dexscreener.com",
+    "base-uri 'self'",
+    "form-action 'self'",
+    isEmbedRoute ? 'frame-ancestors *' : "frame-ancestors 'none'",
+  ];
+  return parts.join('; ');
+}
+
+function withCspRequestHeaders(req: NextRequest, nonce: string, isEmbedRoute: boolean): Headers {
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set('x-nonce', nonce);
+  requestHeaders.set('Content-Security-Policy', buildCsp(nonce, isEmbedRoute));
+  return requestHeaders;
+}
+
+function applyRequestHeaderOverrides(response: NextResponse, requestHeaders: Headers): void {
+  const overrideResponse = NextResponse.next({ request: { headers: requestHeaders } });
+  overrideResponse.headers.forEach((value, key) => {
+    if (key.startsWith('x-middleware-')) {
+      response.headers.set(key, value);
+    }
+  });
+}
+
+function withSecurityHeaders(response: NextResponse, nonce: string, isEmbedRoute: boolean): NextResponse {
+  response.headers.set('Content-Security-Policy', buildCsp(nonce, isEmbedRoute));
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(self), geolocation=()');
+  response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+
+  if (!isEmbedRoute) {
+    response.headers.set('X-Frame-Options', 'DENY');
+    response.headers.set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+    response.headers.set('Cross-Origin-Resource-Policy', 'same-origin');
+    response.headers.set('X-Permitted-Cross-Domain-Policies', 'none');
   }
 
   return response;
