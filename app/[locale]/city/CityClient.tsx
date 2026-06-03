@@ -76,10 +76,11 @@ export function CityClient({ initial }: Props) {
     const now = performance.now();
     for (const a of data.agents as CityAgent[]) {
       const prev = counts.get(a.id);
-      if (prev !== undefined && a.messageCount > prev) {
+      const messageCount = a.messageCount ?? 0;
+      if (prev !== undefined && messageCount > prev) {
         pulses.set(a.id, now);
       }
-      counts.set(a.id, a.messageCount);
+      counts.set(a.id, messageCount);
     }
     if (pulses.size === 0) return;
     setPulseAts(pulses);

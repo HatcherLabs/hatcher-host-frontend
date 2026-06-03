@@ -113,10 +113,11 @@ export interface HandoffBuildingVisual {
 const spiralCache = new Map<number, Array<readonly [number, number]>>();
 
 export function tierKeyForCity(tier: CityAgent['tier']): LiveCityTierKey {
-  if (tier <= 0) return 'free';
-  if (tier === 1) return 'starter';
-  if (tier === 2) return 'pro';
-  if (tier === 3) return 'business';
+  const normalizedTier = tier ?? 0;
+  if (normalizedTier <= 0) return 'free';
+  if (normalizedTier === 1) return 'starter';
+  if (normalizedTier === 2) return 'pro';
+  if (normalizedTier === 3) return 'business';
   return 'founding';
 }
 

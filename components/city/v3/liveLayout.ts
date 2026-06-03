@@ -47,6 +47,8 @@ export interface LiveBuildingLayout {
 
 export interface LiveAgentMarkerLayout {
   agentId: string;
+  agentSlug?: string | null;
+  dashboardAgentId?: string | null;
   agentName: string;
   ownerKey: string;
   ownerUsername: string | null;
@@ -101,6 +103,14 @@ const OWNER_WEIGHT = 200_000;
 
 export const LIVE_CITY_BOUNDS = cityGridFor(DEFAULT_MAX_BUILDINGS).bounds;
 
+function safeTier(agent: Pick<CityAgent, 'tier'>): number {
+  return agent.tier ?? 0;
+}
+
+function safeMessageCount(agent: Pick<CityAgent, 'messageCount'>): number {
+  return agent.messageCount ?? 0;
+}
+
 interface LiveUserCluster {
   ownerKey: string;
   ownerUsername: string | null;
@@ -122,10 +132,10 @@ function hashStr(s: string): number {
 }
 
 export function rankAgentForCity(agent: CityAgent): number {
-  const tierScore = agent.tier * 1_200;
+  const tierScore = safeTier(agent) * 1_200;
   const activityScore = Math.min(
     4_000,
-    Math.log10(agent.messageCount + 1) * 1_500,
+    Math.log10(safeMessageCount(agent) + 1) * 1_500,
   );
   return (
     (agent.mine ? OWNER_WEIGHT : 0) +
@@ -266,10 +276,10 @@ function clusterAgentsByOwner(
             : sorted.length
               ? aggregateStatus(sorted)
               : 'sleeping',
-        tier: Math.max(user?.tier ?? 0, ...sorted.map((agent) => agent.tier)),
+        tier: Math.max(user?.tier ?? 0, ...sorted.map((agent) => safeTier(agent))),
         mine: user?.mine ?? sorted.some((agent) => agent.mine),
         messageCount: sorted.reduce(
-          (sum, agent) => sum + agent.messageCount,
+          (sum, agent) => sum + safeMessageCount(agent),
           0,
         ),
         agentCount,
@@ -315,7 +325,7 @@ export function selectRouteAgents(
   return [...agents]
     .filter(
       (agent) =>
-        agent.status === 'running' || agent.mine || agent.messageCount > 0,
+        agent.status === 'running' || agent.mine || safeMessageCount(agent) > 0,
     )
     .sort((a, b) => {
       const rankDiff = rankAgentForCity(b) - rankAgentForCity(a);
@@ -352,9 +362,9 @@ function sortForPlacement(clusters: LiveUserCluster[]): LiveUserCluster[] {
 function markerHeight(agent: CityAgent) {
   const activityBoost = Math.min(
     1.25,
-    Math.log10(agent.messageCount + 1) * 0.34,
+    Math.log10(safeMessageCount(agent) + 1) * 0.34,
   );
-  return Math.min(3.1, 1.3 + agent.tier * 0.22 + activityBoost);
+  return Math.min(3.1, 1.3 + safeTier(agent) * 0.22 + activityBoost);
 }
 
 function markerWidth(agent: CityAgent) {
@@ -427,6 +437,8 @@ function layoutAgentMarkers(
         nearestNodeForPlot(grid, building.gridX, building.gridZ);
       return {
         agentId: agent.id,
+        agentSlug: agent.slug,
+        dashboardAgentId: agent.dashboardAgentId ?? null,
         agentName: agent.name,
         ownerKey: cluster.ownerKey,
         ownerUsername: cluster.ownerUsername,
@@ -437,7 +449,7 @@ function layoutAgentMarkers(
         width: markerWidth(agent),
         framework: agent.framework,
         status: agent.status,
-        tier: agent.tier,
+        tier: safeTier(agent),
         mine: agent.mine,
         visibility: agent.visibility,
         publicChatEnabled: agent.publicChatEnabled === true,
