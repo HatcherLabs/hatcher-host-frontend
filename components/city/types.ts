@@ -37,6 +37,7 @@ export interface CityAgent {
   avatarVariant?: string | null; // room avatar variant id, drives the city walker model
   framework: Framework;
   category: Category;
+  buildingKey?: string | null;
   ownerKey?: string | null;
   ownerDisplayName?: string | null;
   ownerUsername?: string | null;
@@ -50,7 +51,8 @@ export interface CityAgent {
 }
 
 export interface CityUser {
-  ownerKey: string;
+  buildingKey?: string | null;
+  ownerKey?: string | null;
   displayName?: string | null;
   ownerUsername?: string | null;
   tier?: number;
@@ -70,7 +72,6 @@ export interface CityResponse {
     byCategory: Record<Category, number>;
   };
   generatedAt: string;
-  viewerId: string | null;
 }
 
 // UI constants — must stay in sync with backend routes/city.ts.
