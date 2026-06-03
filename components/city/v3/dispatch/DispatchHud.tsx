@@ -17,6 +17,7 @@ import { buildRouteThroughPackets, pathLength, scatterPackets } from '@/lib/agen
 import type { LiveCityGrid } from '../liveCityHandoff';
 import type { LiveAgentPose } from '../liveAgentMotion';
 import type { CityAgent } from '../../types';
+import { cityAgentDisplayName } from '../cityDisplay';
 import { SkinShop } from './SkinShop';
 import { DispatchLeaderboard } from './DispatchLeaderboard';
 import { DispatchLab } from './DispatchLab';
@@ -201,7 +202,7 @@ export function DispatchHud({
       return startDispatch({
         id: `dsp-${dispatchSeq}-${agent.id}`,
         agentId: agent.id,
-        agentName: agent.name,
+        agentName: cityAgentDisplayName(agent),
         framework: agent.framework,
         destName: dest.name,
         destX: dest.x,
@@ -397,7 +398,7 @@ export function DispatchHud({
               >
                 {available.map((a) => (
                   <option key={a.id} value={a.id}>
-                    {a.name} ({a.framework})
+                    {cityAgentDisplayName(a)} ({a.framework})
                   </option>
                 ))}
               </select>
