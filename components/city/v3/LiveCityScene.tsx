@@ -8,7 +8,6 @@ import {
   Building2,
   DoorOpen,
   Footprints,
-  LayoutDashboard,
   Map as MapIcon,
   MessageSquare,
   Signal,
@@ -36,6 +35,7 @@ import {
   MobileSceneMenu,
 } from '@/components/mobile-scene/MobileSceneControls';
 import {
+  agentRoomFromBuildingHref,
   buildingPanelEnterLabel,
   cityBuildingHref,
   cityBuildingTitle,
@@ -171,7 +171,7 @@ export function LiveCityScene({
         counts={counts ?? EMPTY_COUNTS}
         generatedAt={generatedAt}
         pulseAts={pulseAts}
-        onDashboardClick={(agentId) => router.push(`/dashboard/agent/${agentId}`)}
+        onDashboardClick={(agentId) => router.push(agentRoomFromBuildingHref(agentId))}
         onPublicChatClick={(href) => router.push(href)}
         canEnterBuilding={canEnterBuilding}
         viewerUsername={viewerUsername}
@@ -297,16 +297,16 @@ function LiveCitySceneBody({
           label: 'Enter',
           onClick: onBuildingEnterClick,
         }
-      : selectedAgentChatHref
+      : selectedAgent && selectedAgent.mine
         ? {
-            label: 'Chat',
-            onClick: () => onPublicChatClick(selectedAgentChatHref),
-          }
-        : selectedAgent && selectedAgent.mine && selectedAgent.visibility !== 'private'
-        ? {
-            label: 'Dashboard',
+            label: 'Room',
             onClick: () => onDashboardClick(selectedAgent.dashboardAgentId ?? selectedAgent.agentId),
           }
+        : selectedAgentChatHref
+          ? {
+              label: 'Chat',
+              onClick: () => onPublicChatClick(selectedAgentChatHref),
+            }
         : null;
 
   return (
@@ -528,7 +528,7 @@ function LiveCityMobileMenu({
   return (
     <MobileSceneMenu
       title="Live Agent Network"
-      subtitle={`${counts?.total ?? 0} public agents · ${counts?.running ?? 0} active${
+      subtitle={`${counts?.users ?? 0} users · ${counts?.total ?? 0} total agents · ${counts?.running ?? 0} active${
         generatedAt ? ` · ${new Date(generatedAt).toLocaleTimeString()}` : ''
       }`}
       tone="cool"
@@ -615,7 +615,7 @@ function LiveCityMobileMenu({
             {topOwned.map((agent) => (
               <Link
                 key={agent.id}
-                href={`/dashboard/agent/${agent.dashboardAgentId ?? agent.id}`}
+                href={agentRoomFromBuildingHref(agent.dashboardAgentId ?? agent.id)}
                 className="rounded-[7px] border border-white/10 bg-white/[0.045] px-3 py-2"
               >
                 <span className="block truncate text-sm font-medium text-white">
@@ -758,14 +758,14 @@ function LiveAgentPanel({
         <BuildingStat icon={<Zap size={13} />} label="Framework" value={marker.framework} />
       </div>
 
-      {marker.mine && marker.visibility !== 'private' && (
+      {marker.mine && (
         <button
           type="button"
           onClick={() => onDashboardClick(marker.dashboardAgentId ?? marker.agentId)}
           className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-[4px] border border-emerald-300/30 bg-emerald-300 px-3 py-2 text-xs font-semibold text-black transition hover:bg-emerald-200"
         >
-          <LayoutDashboard size={14} />
-          Go to dashboard
+          <DoorOpen size={14} />
+          Open room
         </button>
       )}
       {chatHref && (

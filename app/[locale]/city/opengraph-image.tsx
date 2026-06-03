@@ -97,7 +97,7 @@ export default async function OpengraphImage() {
             maxWidth: 900,
           }}
         >
-          {total.toLocaleString()} public agents · {running} running right now.
+          {(counts?.users ?? 0).toLocaleString()} users · {total.toLocaleString()} agents · {running} active.
         </div>
 
         <div
