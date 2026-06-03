@@ -62,6 +62,7 @@ import {
   type PublicChatMessage,
   type PublicChatSession,
 } from '@/lib/public-chat';
+import { sanitizePublicChatUsername } from '@/lib/public-chat-username';
 import { RichMarkdown } from '@/components/agents/tabs/ChatTab/ArtifactRenderer';
 import { FRAMEWORKS } from '@hatcher/shared';
 import type { AgentFramework } from '@hatcher/shared';
@@ -327,7 +328,9 @@ function PublicAgentChat({
       const raw = window.localStorage.getItem(buildPublicChatStorageKeys(agentId).session);
       const parsed = raw ? JSON.parse(raw) as Partial<PublicChatSession> : null;
       if (!parsed?.sessionId || !parsed.username) return;
-      const restored = { sessionId: parsed.sessionId, username: parsed.username };
+      const restoredUsername = sanitizePublicChatUsername(parsed.username);
+      if (!restoredUsername) return;
+      const restored = { sessionId: parsed.sessionId, username: restoredUsername };
       setSession(restored);
       setUsername(restored.username);
       setMessages(loadPublicChatMessages(agentId, restored.sessionId));
@@ -359,7 +362,7 @@ function PublicAgentChat({
   }, [autoFocus, session]);
 
   const startSession = useCallback(async (nameOverride?: string) => {
-    const cleanName = (nameOverride ?? username).trim();
+    const cleanName = sanitizePublicChatUsername(nameOverride ?? username);
     if (!cleanName || busy) return;
     setBusy(true);
     setError(null);
@@ -369,7 +372,14 @@ function PublicAgentChat({
       setError(res.error || t('errors.session'));
       return;
     }
-    const nextSession = { sessionId: res.data.sessionId, username: res.data.username };
+    const nextSession = {
+      sessionId: res.data.sessionId,
+      username: sanitizePublicChatUsername(res.data.username),
+    };
+    if (!nextSession.username) {
+      setError(t('errors.session'));
+      return;
+    }
     setSession(nextSession);
     setUsername(nextSession.username);
     setMessages([]);
@@ -512,7 +522,7 @@ function PublicAgentChat({
               <UserRound className="h-4 w-4 flex-shrink-0 text-[var(--text-muted)]" />
               <input
                 value={username}
-                onChange={(event) => setUsername(event.target.value)}
+                onChange={(event) => setUsername(sanitizePublicChatUsername(event.target.value))}
                 maxLength={40}
                 placeholder={t('usernamePlaceholder')}
                 className="w-full bg-transparent text-sm text-[var(--text-primary)] outline-none placeholder:text-[var(--text-muted)]"
