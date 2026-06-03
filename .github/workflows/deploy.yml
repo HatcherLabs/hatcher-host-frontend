@@ -49,6 +49,9 @@ jobs:
             echo "==> Fetching skill files (agent-discoverable docs)..."
             node prebuild.js
 
+            echo "==> Removing stale Next.js build output..."
+            rm -rf .next
+
             echo "==> Building frontend..."
             npx next build
 
