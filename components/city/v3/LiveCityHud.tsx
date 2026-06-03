@@ -122,7 +122,7 @@ export function LiveCityHud({
         </div>
       </div>
 
-      {topOwned.length > 0 ? (
+      {topOwned.length > 0 && (
         <div className="pointer-events-auto absolute right-4 top-28 w-64 rounded-lg border border-amber-300/20 bg-black/58 p-3 text-white shadow-2xl backdrop-blur-xl">
           <div className="mb-2 flex items-center justify-between">
             <p className="text-xs font-semibold text-amber-200">My agents</p>
@@ -151,10 +151,6 @@ export function LiveCityHud({
               </Link>
             ))}
           </div>
-        </div>
-      ) : (
-        <div className="absolute bottom-24 left-4 rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-xs text-white/70 backdrop-blur-xl">
-          Active agents move through the city. Your agents turn gold after login.
         </div>
       )}
     </div>
