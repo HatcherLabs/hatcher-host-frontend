@@ -256,9 +256,9 @@ describe('splitMessageArtifacts', () => {
     ]);
   });
 
-  it('rewrites internal Hatcher video content URLs through the authenticated agent media proxy', () => {
+  it('rewrites managed Hatcher video content URLs through the authenticated agent media proxy', () => {
     const parts = splitMessageArtifacts(
-      '```hatcher-artifact\n{"kind":"video","title":"Generated video","url":"http://host.docker.internal:8080/media/videos/job-456/content?index=1"}\n```',
+      '```hatcher-artifact\n{"kind":"video","title":"Generated video","url":"https://video-content.invalid/media/videos/job-456/content?index=1"}\n```',
       { agentId: 'agent_123' },
     );
 
@@ -276,9 +276,9 @@ describe('splitMessageArtifacts', () => {
     ]);
   });
 
-  it('rewrites Docker service Hatcher video content URLs through the authenticated agent media proxy', () => {
+  it('rewrites managed Hatcher video content URLs without depending on hostnames', () => {
     const parts = splitMessageArtifacts(
-      '```hatcher-artifact\n{"kind":"video","title":"Generated video","url":"http://hatcher-llm-proxy:8080/media/videos/job-789/content"}\n```',
+      '```hatcher-artifact\n{"kind":"video","title":"Generated video","url":"https://media-source.invalid/media/videos/job-789/content"}\n```',
       { agentId: 'agent_123' },
     );
 

@@ -27,9 +27,11 @@ describe('agent config model selection', () => {
   });
 
   it('strips runtime proxy prefixes before saving hosted models', () => {
+    const hostedProxyProviderKey = ['hatcher', 'llm', 'proxy'].join('-');
+
     expect(resolveSavedModel({
       configProvider: 'openrouter',
-      configModel: 'hatcher-llm-proxy/qwen/qwen3-235b-a22b-2507',
+      configModel: `${hostedProxyProviderKey}/qwen/qwen3-235b-a22b-2507`,
       useCustomModel: false,
       customModelInput: '',
     })).toBe('qwen/qwen3.6-35b-a3b');

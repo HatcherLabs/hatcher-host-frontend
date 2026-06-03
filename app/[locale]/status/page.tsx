@@ -28,10 +28,10 @@ interface Component {
 
 interface StatusData {
   status: ComponentStatus;
-  timestamp: string;
-  activeAgents: number;
-  totalAgents: number;
-  components: Component[];
+  timestamp?: string;
+  activeAgents?: number;
+  totalAgents?: number;
+  components?: Component[];
 }
 
 // ─── Helpers ──────────────────────────────────────────────────
@@ -156,6 +156,11 @@ export default function StatusPage() {
 
   const overall = data?.status ?? 'down';
   const banner = OVERALL_BANNER[overall];
+  const components = data?.components ?? [];
+  const hasDetailedStats =
+    typeof data?.activeAgents === 'number'
+    && typeof data?.totalAgents === 'number'
+    && components.length > 0;
 
   return (
     <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)]">
@@ -238,7 +243,7 @@ export default function StatusPage() {
         </AnimatePresence>
 
         {/* Stats */}
-        {data && (
+        {data && hasDetailedStats && (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
             {[
               {
@@ -255,7 +260,7 @@ export default function StatusPage() {
               },
               {
                 label: t('components'),
-                value: `${data.components.filter(c => c.status === 'operational').length}/${data.components.length} OK`,
+                value: `${components.filter(c => c.status === 'operational').length}/${components.length} OK`,
                 icon: CheckCircle2,
                 color: 'text-emerald-400',
               },
@@ -277,13 +282,13 @@ export default function StatusPage() {
         )}
 
         {/* Components list */}
-        {data && (
+        {components.length > 0 && (
           <div>
             <h2 className="text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-4">
               {t('components')}
             </h2>
             <div className="space-y-2">
-              {data.components.map((c, i) => (
+              {components.map((c, i) => (
                 <ComponentCard key={c.name} component={c} index={i} />
               ))}
             </div>

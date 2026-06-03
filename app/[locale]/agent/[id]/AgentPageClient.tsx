@@ -123,9 +123,11 @@ const PUBLIC_CHAT_SUGGESTIONS = [
 ];
 
 type PublicChatUsage = {
-  dailyAiCreditCap: number | null;
-  dailyAiCreditsSpent: number | null;
-  dailyAiCreditsRemaining: number | null;
+  dailyAiCreditsAvailable?: boolean;
+  dailyAiCreditCap?: number | null;
+  dailyAiCreditsSpent?: number | null;
+  dailyAiCreditsRemaining?: number | null;
+  piqueSignalAvailable?: boolean;
   piqueSignalDailyLimit?: number;
   piqueSignalSignalsUsed?: number;
   piqueSignalSignalsRemaining?: number;
@@ -148,12 +150,6 @@ type PublicEyesState = {
   updatedAt: number;
   frame: number | null;
 };
-
-function formatAiCredits(value: number | null | undefined): string {
-  return typeof value === 'number' && Number.isFinite(value)
-    ? Math.max(0, Math.floor(value)).toLocaleString()
-    : '--';
-}
 
 function PublicAgentEyesPanel({
   agentId,
@@ -436,9 +432,11 @@ function PublicAgentChat({
     }
     if (res.data.starting) {
       onUsageChange({
+        dailyAiCreditsAvailable: res.data.dailyAiCreditsAvailable ?? usage?.dailyAiCreditsAvailable,
         dailyAiCreditCap: res.data.dailyAiCreditCap ?? usage?.dailyAiCreditCap ?? null,
         dailyAiCreditsSpent: res.data.dailyAiCreditsSpent ?? usage?.dailyAiCreditsSpent ?? null,
         dailyAiCreditsRemaining: res.data.dailyAiCreditsRemaining ?? usage?.dailyAiCreditsRemaining ?? null,
+        piqueSignalAvailable: res.data.piqueSignalAvailable ?? usage?.piqueSignalAvailable,
         piqueSignalDailyLimit: res.data.piqueSignalDailyLimit ?? usage?.piqueSignalDailyLimit,
         piqueSignalSignalsUsed: res.data.piqueSignalSignalsUsed ?? usage?.piqueSignalSignalsUsed,
         piqueSignalSignalsRemaining: res.data.piqueSignalSignalsRemaining ?? usage?.piqueSignalSignalsRemaining,
@@ -449,9 +447,11 @@ function PublicAgentChat({
       return;
     }
     onUsageChange({
+      dailyAiCreditsAvailable: res.data.dailyAiCreditsAvailable ?? usage?.dailyAiCreditsAvailable,
       dailyAiCreditCap: res.data.dailyAiCreditCap ?? usage?.dailyAiCreditCap ?? null,
       dailyAiCreditsSpent: res.data.dailyAiCreditsSpent ?? usage?.dailyAiCreditsSpent ?? null,
       dailyAiCreditsRemaining: res.data.dailyAiCreditsRemaining ?? usage?.dailyAiCreditsRemaining ?? null,
+      piqueSignalAvailable: res.data.piqueSignalAvailable ?? usage?.piqueSignalAvailable,
       piqueSignalDailyLimit: res.data.piqueSignalDailyLimit ?? usage?.piqueSignalDailyLimit,
       piqueSignalSignalsUsed: res.data.piqueSignalSignalsUsed ?? usage?.piqueSignalSignalsUsed,
       piqueSignalSignalsRemaining: res.data.piqueSignalSignalsRemaining ?? usage?.piqueSignalSignalsRemaining,
@@ -477,19 +477,23 @@ function PublicAgentChat({
             {t('eyebrow')}
           </div>
           <h2 className="mt-1 text-lg font-semibold text-[var(--text-primary)]">{t('heading', { name: agentName })}</h2>
-          {usage?.dailyAiCreditCap !== null && usage?.dailyAiCreditCap !== undefined && (
+          {usage && (
             <div className="mt-2 flex flex-wrap gap-2">
-              <div className="inline-flex max-w-full items-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-2.5 py-1 text-xs text-[var(--text-secondary)]">
+              <div className={`inline-flex max-w-full items-center gap-2 rounded-lg border px-2.5 py-1 text-xs ${
+                usage.dailyAiCreditsAvailable === false
+                  ? 'border-amber-500/20 bg-amber-500/10 text-amber-200'
+                  : 'border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-secondary)]'
+              }`}>
                 <Sparkles className="h-3.5 w-3.5 flex-shrink-0 text-[var(--color-accent)]" />
                 <span className="truncate">
-                  {formatAiCredits(usage.dailyAiCreditsRemaining)} / {formatAiCredits(usage.dailyAiCreditCap)} AI Credits today
+                  {usage.dailyAiCreditsAvailable === false ? 'Public chat cap reached' : 'Public chat available'}
                 </span>
               </div>
-              {typeof usage.piqueSignalDailyLimit === 'number' && (
+              {(usage.piqueSignalAvailable !== undefined || typeof usage.piqueSignalDailyLimit === 'number') && (
                 <div className="inline-flex max-w-full items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-xs text-emerald-200">
                   <Activity className="h-3.5 w-3.5 flex-shrink-0" />
                   <span className="truncate">
-                    {Math.max(0, usage.piqueSignalSignalsRemaining ?? 0)} / {usage.piqueSignalDailyLimit} Pique signals today
+                    {usage.piqueSignalAvailable === false ? 'Pique signals reset soon' : 'Pique signals available'}
                   </span>
                 </div>
               )}
@@ -676,9 +680,11 @@ export function AgentPageClient() {
       const enabled = res.success && res.data.enabled;
       setPublicChatEnabled(enabled);
       setPublicChatUsage(enabled ? {
+        dailyAiCreditsAvailable: res.data.dailyAiCreditsAvailable,
         dailyAiCreditCap: res.data.dailyAiCreditCap,
         dailyAiCreditsSpent: res.data.dailyAiCreditsSpent,
         dailyAiCreditsRemaining: res.data.dailyAiCreditsRemaining,
+        piqueSignalAvailable: res.data.piqueSignalAvailable,
         piqueSignalDailyLimit: res.data.piqueSignalDailyLimit,
         piqueSignalSignalsUsed: res.data.piqueSignalSignalsUsed,
         piqueSignalSignalsRemaining: res.data.piqueSignalSignalsRemaining,

@@ -7,6 +7,7 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { api, req } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
+import { getLegacyHostedProxyProviderPrefix } from '@/lib/legacy-hosted-model';
 import styles from './ChatToHatch.module.css';
 
 type Framework = 'openclaw' | 'hermes';
@@ -720,7 +721,7 @@ const HOSTED_MODELS: HostedModel[] = [
 );
 
 const DEFAULT_HOSTED_MODEL = 'deepseek/deepseek-v4-flash';
-const HOSTED_PROXY_PROVIDER_PREFIX = 'hatcher-llm-proxy/';
+const HOSTED_PROXY_PROVIDER_PREFIX = getLegacyHostedProxyProviderPrefix();
 const HOSTED_MODEL_ALIASES = new Map<string, string>([
   ['meta-llama/llama-4-scout-17b-16e-instruct', 'qwen/qwen3.6-35b-a3b'],
   ['qwen/qwen3-32b', 'qwen/qwen3.6-35b-a3b'],

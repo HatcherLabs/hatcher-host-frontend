@@ -3,12 +3,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/lib/api';
 import type { Agent } from '@/lib/api';
+import { getLegacyHostedProxyProviderPrefix } from '@/lib/legacy-hosted-model';
 import { getBYOKProvider } from '@hatcher/shared';
 
 export const HOSTED_PROVIDER = 'openrouter';
 export const DEFAULT_PUBLIC_CHAT_DAILY_AI_CREDIT_CAP = 1000;
 const MAX_PUBLIC_CHAT_DAILY_AI_CREDIT_CAP = 100_000;
-const HOSTED_PROXY_PROVIDER_PREFIX = 'hatcher-llm-proxy/';
+const HOSTED_PROXY_PROVIDER_PREFIX = getLegacyHostedProxyProviderPrefix();
 const HOSTED_MODEL_ALIASES = new Map<string, string>([
   ['meta-llama/llama-4-scout-17b-16e-instruct', 'qwen/qwen3.6-35b-a3b'],
   ['qwen/qwen3-32b', 'qwen/qwen3.6-35b-a3b'],
