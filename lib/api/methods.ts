@@ -861,7 +861,7 @@ export const api = {
 
   /** Start an agent container */
   startAgent: (id: string) =>
-    req<{ status: string; containerId?: string }>(`/agents/${id}/start`, {
+    req<{ status: string }>(`/agents/${id}/start`, {
       method: "POST",
     }),
 
@@ -871,7 +871,7 @@ export const api = {
 
   /** Restart an agent container (server-side stop + start) */
   restartAgent: (id: string) =>
-    req<{ status: string; containerId?: string }>(`/agents/${id}/restart`, {
+    req<{ status: string }>(`/agents/${id}/restart`, {
       method: "POST",
     }),
 

@@ -18,7 +18,14 @@ describe('CSP', () => {
     expect(getDirective(csp, 'style-src')).not.toContain("'unsafe-inline'");
     const styleSrcElem = getDirective(csp, 'style-src-elem');
     expect(styleSrcElem).toContain("'nonce-testnonce'");
-    expect(styleSrcElem).toContain("'sha256-3KQmY3oxUjLH8M8dw7cRfJ2fZKou4xt/V2t2FD3AECs='");
     expect(styleSrcElem).not.toContain("'unsafe-inline'");
+  });
+
+  it('does not allow blob scripts or the removed Qwerti widget origins', () => {
+    const csp = buildCsp('testnonce', false);
+
+    expect(getDirective(csp, 'script-src')).not.toContain('blob:');
+    expect(csp).not.toContain('widget.qwerti.ai');
+    expect(csp).not.toContain('api.qwerti.ai');
   });
 });

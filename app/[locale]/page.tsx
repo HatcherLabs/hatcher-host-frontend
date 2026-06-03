@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { LandingV3 } from '@/components/landing/v3/LandingV3';
-import { QwertiWidget } from '@/components/QwertiWidget';
 import { buildLanguagesMap } from '@/lib/seo';
 
 export const metadata: Metadata = {
@@ -11,10 +10,5 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  return (
-    <>
-      <LandingV3 />
-      <QwertiWidget />
-    </>
-  );
+  return <LandingV3 />;
 }
