@@ -16,6 +16,9 @@ describe('CSP', () => {
       "style-src 'self' 'nonce-testnonce' https://fonts.googleapis.com",
     );
     expect(getDirective(csp, 'style-src')).not.toContain("'unsafe-inline'");
-    expect(getDirective(csp, 'style-src-elem')).toContain("'nonce-testnonce'");
+    const styleSrcElem = getDirective(csp, 'style-src-elem');
+    expect(styleSrcElem).toContain("'nonce-testnonce'");
+    expect(styleSrcElem).toContain("'sha256-3KQmY3oxUjLH8M8dw7cRfJ2fZKou4xt/V2t2FD3AECs='");
+    expect(styleSrcElem).not.toContain("'unsafe-inline'");
   });
 });
