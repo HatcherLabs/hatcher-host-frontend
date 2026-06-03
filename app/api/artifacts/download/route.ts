@@ -1,12 +1,50 @@
 import dns from 'node:dns/promises';
 import net from 'node:net';
 import { NextRequest, NextResponse } from 'next/server';
+import { API_URL } from '@/lib/config';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const MAX_DOWNLOAD_BYTES = 100 * 1024 * 1024;
 const MAX_REDIRECTS = 3;
+const AUTH_TIMEOUT_MS = 5000;
+
+const DEFAULT_ALLOWED_ARTIFACT_HOSTS = [
+  'v3.fal.media',
+  'fal.media',
+  'replicate.delivery',
+  'assets.coingecko.com',
+  'oaidalleapiprodscus.blob.core.windows.net',
+];
+
+function allowedArtifactHosts(): string[] {
+  const configured = process.env.ARTIFACT_DOWNLOAD_ALLOWED_HOSTS
+    ?.split(',')
+    .map((host) => host.trim().toLowerCase())
+    .filter(Boolean) ?? [];
+  return Array.from(new Set([
+    ...DEFAULT_ALLOWED_ARTIFACT_HOSTS,
+    ...configured,
+  ].filter((host): host is string => Boolean(host))));
+}
+
+function isBlockedArtifactHost(hostname: string): boolean {
+  const normalized = hostname.toLowerCase();
+  return normalized === 'hatcher.host' || normalized.endsWith('.hatcher.host');
+}
+
+function isAllowedArtifactHost(hostname: string): boolean {
+  const normalized = hostname.toLowerCase();
+  if (isBlockedArtifactHost(normalized)) return false;
+  return allowedArtifactHosts().some((allowed) => {
+    if (allowed.startsWith('*.')) {
+      const suffix = allowed.slice(1);
+      return normalized.endsWith(suffix) && normalized.length > suffix.length;
+    }
+    return normalized === allowed;
+  });
+}
 
 function safeFilename(value: string): string {
   return value
@@ -72,9 +110,33 @@ async function assertPublicHttpUrl(url: URL): Promise<void> {
   if (url.username || url.password) {
     throw new Error('Artifact URLs cannot include credentials');
   }
+  if (!isAllowedArtifactHost(url.hostname)) {
+    throw new Error('Artifact host is not allowed');
+  }
   const records = await dns.lookup(url.hostname, { all: true, verbatim: true });
   if (records.length === 0 || records.some((record) => isPrivateIp(record.address))) {
     throw new Error('Artifact host is not allowed');
+  }
+}
+
+async function isAuthorizedArtifactRequest(request: NextRequest): Promise<boolean> {
+  const cookie = request.headers.get('cookie');
+  const authorization = request.headers.get('authorization');
+  if (!cookie && !authorization) return false;
+
+  const headers: HeadersInit = { accept: 'application/json' };
+  if (cookie) headers.cookie = cookie;
+  if (authorization) headers.authorization = authorization;
+
+  try {
+    const response = await fetch(new URL('/auth/me', API_URL), {
+      headers,
+      cache: 'no-store',
+      signal: AbortSignal.timeout(AUTH_TIMEOUT_MS),
+    });
+    return response.ok;
+  } catch {
+    return false;
   }
 }
 
@@ -132,6 +194,15 @@ export async function GET(request: NextRequest) {
   let url: URL;
   try {
     url = new URL(rawUrl);
+  } catch (error) {
+    return NextResponse.json({ error: (error as Error).message || 'Invalid artifact URL' }, { status: 400 });
+  }
+
+  if (!(await isAuthorizedArtifactRequest(request))) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
+
+  try {
     await assertPublicHttpUrl(url);
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message || 'Invalid artifact URL' }, { status: 400 });

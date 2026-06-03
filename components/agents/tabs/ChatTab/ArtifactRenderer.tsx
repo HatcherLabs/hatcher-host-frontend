@@ -460,9 +460,6 @@ function artifactDownloadUrl(url: string, filename: string): string {
     return withSearchParam(url, 'download', '1');
   }
   if (url.startsWith('/')) return url;
-  if (/^https?:\/\//i.test(url)) {
-    return `/api/artifacts/download?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(filename)}`;
-  }
   return url;
 }
 
