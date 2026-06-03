@@ -16,8 +16,7 @@ type FieldStatus =
   | { state: 'idle' }
   | { state: 'checking' }
   | { state: 'invalid' }
-  | { state: 'available' }
-  | { state: 'taken' };
+  | { state: 'available' };
 
 interface PasswordStrength {
   score: number; // 0-4
@@ -65,8 +64,8 @@ export default function RegisterPage() {
     searchParams.get('return') || searchParams.get('next'),
   );
 
-  // Debounced live availability check. Ignore stale responses by comparing
-  // the value at request time vs current state when the response arrives.
+  // Debounced format check. Ignore stale responses by comparing the value at
+  // request time vs current state when the response arrives.
   useEffect(() => {
     const trimmed = email.trim().toLowerCase();
     if (trimmed.length === 0) { setEmailStatus({ state: 'idle' }); return; }
@@ -77,7 +76,7 @@ export default function RegisterPage() {
         if (email.trim().toLowerCase() !== trimmed) return;
         if (!res.success || !res.data.email) { setEmailStatus({ state: 'idle' }); return; }
         if (!res.data.email.valid) setEmailStatus({ state: 'invalid' });
-        else setEmailStatus({ state: res.data.email.taken ? 'taken' : 'available' });
+        else setEmailStatus({ state: 'available' });
       }).catch(() => setEmailStatus({ state: 'idle' }));
     }, 400);
     return () => clearTimeout(timer);
@@ -93,7 +92,7 @@ export default function RegisterPage() {
         if (username.trim() !== trimmed) return;
         if (!res.success || !res.data.username) { setUsernameStatus({ state: 'idle' }); return; }
         if (!res.data.username.valid) setUsernameStatus({ state: 'invalid' });
-        else setUsernameStatus({ state: res.data.username.taken ? 'taken' : 'available' });
+        else setUsernameStatus({ state: 'available' });
       }).catch(() => setUsernameStatus({ state: 'idle' }));
     }, 400);
     return () => clearTimeout(timer);
@@ -124,14 +123,6 @@ export default function RegisterPage() {
     e.preventDefault();
     setLocalError(null);
 
-    if (emailStatus.state === 'taken') {
-      setLocalError(t('errors.emailTaken'));
-      return;
-    }
-    if (usernameStatus.state === 'taken') {
-      setLocalError(t('errors.usernameTaken'));
-      return;
-    }
     if (password !== confirmPassword) {
       setLocalError(t('errors.passwordMismatch'));
       return;
@@ -162,9 +153,7 @@ export default function RegisterPage() {
 
   const submitBlocked =
     isLoading ||
-    emailStatus.state === 'taken' ||
     emailStatus.state === 'invalid' ||
-    usernameStatus.state === 'taken' ||
     usernameStatus.state === 'invalid';
 
   const displayError = localError || error;
@@ -209,9 +198,9 @@ export default function RegisterPage() {
                   onChange={(e) => { setEmail(e.target.value); clearError(); setLocalError(null); }}
                   required
                   autoFocus
-                  aria-invalid={emailStatus.state === 'taken' || emailStatus.state === 'invalid'}
+                  aria-invalid={emailStatus.state === 'invalid'}
                   className={`w-full h-10 pl-3 pr-9 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border focus:outline-none focus:ring-1 placeholder:text-[var(--text-muted)] transition-colors ${
-                    emailStatus.state === 'taken' || emailStatus.state === 'invalid'
+                    emailStatus.state === 'invalid'
                       ? 'border-red-500/60 focus:border-red-500/60 focus:ring-red-500/30'
                       : emailStatus.state === 'available'
                       ? 'border-green-500/50 focus:border-green-500/60 focus:ring-green-500/30'
@@ -222,15 +211,9 @@ export default function RegisterPage() {
                 <div className="absolute inset-y-0 right-2.5 flex items-center pointer-events-none">
                   {emailStatus.state === 'checking' && <Loader2 className="w-4 h-4 text-[var(--text-muted)] animate-spin" />}
                   {emailStatus.state === 'available' && <Check className="w-4 h-4 text-green-400" />}
-                  {(emailStatus.state === 'taken' || emailStatus.state === 'invalid') && <X className="w-4 h-4 text-red-400" />}
+                  {emailStatus.state === 'invalid' && <X className="w-4 h-4 text-red-400" />}
                 </div>
               </div>
-              {emailStatus.state === 'taken' && (
-                <p className="text-[10px] text-red-400 mt-1">
-                  {t('emailTaken')}{' '}
-                  <Link href={`/login?return=${encodeURIComponent(returnPath)}`} className="underline hover:text-red-300">{t('emailTakenLink')}</Link>?
-                </p>
-              )}
               {emailStatus.state === 'invalid' && email.length > 3 && (
                 <p className="text-[10px] text-red-400 mt-1">{t('emailInvalid')}</p>
               )}
@@ -254,9 +237,9 @@ export default function RegisterPage() {
                   minLength={3}
                   maxLength={30}
                   pattern={'^[a-zA-Z0-9_\\-]+$'}
-                  aria-invalid={usernameStatus.state === 'taken' || usernameStatus.state === 'invalid'}
+                  aria-invalid={usernameStatus.state === 'invalid'}
                   className={`w-full h-10 pl-3 pr-9 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border focus:outline-none focus:ring-1 placeholder:text-[var(--text-muted)] transition-colors ${
-                    usernameStatus.state === 'taken' || usernameStatus.state === 'invalid'
+                    usernameStatus.state === 'invalid'
                       ? 'border-red-500/60 focus:border-red-500/60 focus:ring-red-500/30'
                       : usernameStatus.state === 'available'
                       ? 'border-green-500/50 focus:border-green-500/60 focus:ring-green-500/30'
@@ -267,12 +250,10 @@ export default function RegisterPage() {
                 <div className="absolute inset-y-0 right-2.5 flex items-center pointer-events-none">
                   {usernameStatus.state === 'checking' && <Loader2 className="w-4 h-4 text-[var(--text-muted)] animate-spin" />}
                   {usernameStatus.state === 'available' && <Check className="w-4 h-4 text-green-400" />}
-                  {(usernameStatus.state === 'taken' || usernameStatus.state === 'invalid') && <X className="w-4 h-4 text-red-400" />}
+                  {usernameStatus.state === 'invalid' && <X className="w-4 h-4 text-red-400" />}
                 </div>
               </div>
-              {usernameStatus.state === 'taken' ? (
-                <p className="text-[10px] text-red-400 mt-1">{t('usernameTaken')}</p>
-              ) : usernameStatus.state === 'invalid' && username.length > 0 ? (
+              {usernameStatus.state === 'invalid' && username.length > 0 ? (
                 <p className="text-[10px] text-red-400 mt-1">{t('usernameInvalid')}</p>
               ) : (
                 <p className="text-[10px] text-[var(--text-muted)] mt-1">{t('usernameHint')}</p>

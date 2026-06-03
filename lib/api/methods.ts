@@ -171,14 +171,14 @@ export const api = {
       }),
     }),
 
-  /** Live check if email / username are already taken. Either param is optional. */
+  /** Format-only registration helper. Does not expose whether an identity exists. */
   checkAvailability: (params: { email?: string; username?: string }) => {
     const qs = new URLSearchParams();
     if (params.email) qs.set("email", params.email);
     if (params.username) qs.set("username", params.username);
     return req<{
-      email: { taken: boolean; valid: boolean } | null;
-      username: { taken: boolean; valid: boolean } | null;
+      email: { valid: boolean } | null;
+      username: { valid: boolean } | null;
     }>(`/auth/check-availability?${qs.toString()}`);
   },
 
@@ -861,7 +861,7 @@ export const api = {
 
   /** Start an agent container */
   startAgent: (id: string) =>
-    req<{ status: string; containerId?: string }>(`/agents/${id}/start`, {
+    req<{ status: string }>(`/agents/${id}/start`, {
       method: "POST",
     }),
 
@@ -871,7 +871,7 @@ export const api = {
 
   /** Restart an agent container (server-side stop + start) */
   restartAgent: (id: string) =>
-    req<{ status: string; containerId?: string }>(`/agents/${id}/restart`, {
+    req<{ status: string }>(`/agents/${id}/restart`, {
       method: "POST",
     }),
 
