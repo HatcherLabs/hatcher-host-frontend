@@ -8,6 +8,11 @@ const GOOGLE_ADS_HOSTS = [
 ].join(' ');
 
 const QWERTI_WIDGET_HOSTS = ['https://widget.qwerti.ai', 'https://api.qwerti.ai'].join(' ');
+const QWERTI_STYLE_HASHES = [
+  "'sha256-3KQmY3oxUjLH8M8dw7cRfJ2fZKou4xt/V2t2FD3AECs='",
+  "'sha256-xwD4L1a+daGXwTMqrBuEiHtUcKtg0CakGXN4v2rQpkI='",
+  "'sha256-hfWNzx28cgPQgRvlSOV+ABnnT2nnvgQ9SDRLCdiAOF8='",
+].join(' ');
 
 export function buildCsp(nonce: string, isEmbedRoute: boolean): string {
   const isDev = process.env.NODE_ENV !== 'production';
@@ -20,7 +25,7 @@ export function buildCsp(nonce: string, isEmbedRoute: boolean): string {
     `script-src 'self' 'nonce-${nonce}' 'wasm-unsafe-eval' blob: https://s3.tradingview.com https://widget.qwerti.ai ${GOOGLE_ADS_HOSTS}${scriptDev}`,
     "worker-src 'self' blob:",
     `style-src 'self' 'nonce-${nonce}' https://fonts.googleapis.com`,
-    `style-src-elem 'self' 'nonce-${nonce}' https://fonts.googleapis.com`,
+    `style-src-elem 'self' 'nonce-${nonce}' ${QWERTI_STYLE_HASHES} https://fonts.googleapis.com`,
     "style-src-attr 'unsafe-inline'",
     "font-src 'self' https://fonts.gstatic.com https://widget.qwerti.ai",
     `img-src 'self' data: blob: https: ${GOOGLE_ADS_HOSTS}`,
