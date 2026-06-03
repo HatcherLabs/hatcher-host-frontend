@@ -175,9 +175,10 @@ function ownerKeyFor(agent: CityAgent): string {
 
 function ownerUsernameFor(agents: CityAgent[]): string | null {
   const username = agents.find((agent) =>
-    agent.ownerUsername?.trim(),
-  )?.ownerUsername;
-  return username?.trim() || null;
+    agent.ownerDisplayName?.trim() || agent.ownerUsername?.trim(),
+  );
+  const value = username?.ownerDisplayName?.trim() || username?.ownerUsername?.trim();
+  return value || null;
 }
 
 function dominantFramework(agents: CityAgent[]): CityAgent['framework'] {
@@ -214,7 +215,7 @@ function clusterRank(cluster: Omit<LiveUserCluster, 'rank'>): number {
 }
 
 function makeUserRepresentative(user: CityUser): CityAgent {
-  const ownerUsername = user.ownerUsername?.trim() || null;
+  const ownerUsername = user.displayName?.trim() || user.ownerUsername?.trim() || null;
   return {
     id: `user-building:${user.ownerKey}`,
     slug: null,
@@ -263,7 +264,7 @@ function clusterAgentsByOwner(
       const activeAgentCount = user?.activeAgentCount ?? activeAgents.length;
       const clusterBase = {
         ownerKey,
-        ownerUsername: user?.ownerUsername ?? ownerUsernameFor(sorted),
+        ownerUsername: user?.displayName ?? user?.ownerUsername ?? ownerUsernameFor(sorted),
         agents: sorted,
         activeAgents,
         representative,

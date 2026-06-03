@@ -4,6 +4,7 @@ import { ArrowLeft, DoorOpen } from 'lucide-react';
 import type { CityAgent, CityResponse } from '@/components/city/types';
 import type { LiveAgentMarkerLayout } from './liveLayout';
 import { cityAgentDisplayName } from './cityDisplay';
+import { agentRoomFromBuildingHref } from './cityNavigation';
 
 interface Props {
   counts: CityResponse['counts'] | null;
@@ -54,8 +55,9 @@ export function LiveCityHud({
           </p>
           <h1 className="text-xl font-semibold tracking-tight">Live Agent Network</h1>
           <div className="mt-2 flex flex-wrap gap-2 text-xs text-white/65">
-            <span>{counts?.total ?? 0} public agents</span>
-            <span>{counts?.running ?? 0} active</span>
+            <span>{counts?.users ?? 0} users</span>
+            <span>{counts?.total ?? 0} total agents</span>
+            <span>{counts?.running ?? 0} active agents</span>
             <span>{counts?.byFramework?.openclaw ?? 0} OpenClaw</span>
             <span>{counts?.byFramework?.hermes ?? 0} Hermes</span>
             {generatedAt && <span>updated {new Date(generatedAt).toLocaleTimeString()}</span>}
@@ -134,7 +136,7 @@ export function LiveCityHud({
             {topOwned.map((agent) => (
               <Link
                 key={agent.id}
-                href={`/dashboard/agent/${agent.dashboardAgentId ?? agent.id}`}
+                href={agentRoomFromBuildingHref(agent.dashboardAgentId ?? agent.id)}
                 className="group rounded-md border border-white/8 bg-white/[0.035] px-2.5 py-2 transition hover:border-amber-300/35 hover:bg-amber-300/10"
               >
                 <div className="flex items-center justify-between gap-2">
