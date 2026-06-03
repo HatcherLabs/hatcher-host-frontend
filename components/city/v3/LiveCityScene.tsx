@@ -304,7 +304,7 @@ function LiveCitySceneBody({
         : selectedAgent && selectedAgent.mine && selectedAgent.visibility !== 'private'
         ? {
             label: 'Dashboard',
-            onClick: () => onDashboardClick(selectedAgent.agentId),
+            onClick: () => onDashboardClick(selectedAgent.dashboardAgentId ?? selectedAgent.agentId),
           }
         : null;
 
@@ -531,7 +531,7 @@ function LiveCityMobileMenu({
   return (
     <MobileSceneMenu
       title="Live Agent Network"
-      subtitle={`${counts?.users ?? counts?.total ?? 0} users · ${counts?.running ?? 0} active${
+      subtitle={`${counts?.total ?? 0} public agents · ${counts?.running ?? 0} active${
         generatedAt ? ` · ${new Date(generatedAt).toLocaleTimeString()}` : ''
       }`}
       tone="cool"
@@ -806,7 +806,7 @@ function LiveAgentPanel({
       {marker.mine && marker.visibility !== 'private' && (
         <button
           type="button"
-          onClick={() => onDashboardClick(marker.agentId)}
+          onClick={() => onDashboardClick(marker.dashboardAgentId ?? marker.agentId)}
           className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-[4px] border border-emerald-300/30 bg-emerald-300 px-3 py-2 text-xs font-semibold text-black transition hover:bg-emerald-200"
         >
           <LayoutDashboard size={14} />

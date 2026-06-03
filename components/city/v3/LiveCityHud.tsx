@@ -44,7 +44,7 @@ export function LiveCityHud({
     .sort((a, b) => {
       const runningDiff = Number(b.status === 'running') - Number(a.status === 'running');
       if (runningDiff !== 0) return runningDiff;
-      return b.messageCount - a.messageCount;
+      return (b.messageCount ?? 0) - (a.messageCount ?? 0);
     })
     .slice(0, 5);
   const topActive = selectActiveCityAgents(activeAgents, 8);
@@ -58,8 +58,7 @@ export function LiveCityHud({
           </p>
           <h1 className="text-xl font-semibold tracking-tight">Live Agent Network</h1>
           <div className="mt-2 flex flex-wrap gap-2 text-xs text-white/65">
-            <span>{counts?.users ?? counts?.total ?? 0} users</span>
-            <span>{counts?.total ?? 0} agents</span>
+            <span>{counts?.total ?? 0} public agents</span>
             <span>{counts?.running ?? 0} active</span>
             <span>{counts?.byFramework?.openclaw ?? 0} OpenClaw</span>
             <span>{counts?.byFramework?.hermes ?? 0} Hermes</span>
@@ -149,7 +148,7 @@ export function LiveCityHud({
                   </span>
                 </div>
                 <p className="mt-1 text-[10px] uppercase tracking-wide text-amber-200/70">
-                  {agent.framework} · {agent.messageCount} interactions
+                  {agent.framework} · {agent.messageCount ?? 0} interactions
                 </p>
               </Link>
             ))}

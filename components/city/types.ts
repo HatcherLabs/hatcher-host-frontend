@@ -39,12 +39,13 @@ export interface CityAgent {
   category: Category;
   ownerKey?: string | null;
   ownerUsername?: string | null;
-  tier: number;
+  tier?: number;
   status: CityStatus;
-  messageCount: number;
+  messageCount?: number;
   mine: boolean;
   visibility?: 'public' | 'private';
   publicChatEnabled?: boolean;
+  dashboardAgentId?: string | null;
 }
 
 export interface CityUser {

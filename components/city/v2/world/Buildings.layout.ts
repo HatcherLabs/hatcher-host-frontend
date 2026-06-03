@@ -120,19 +120,20 @@ export function layoutBuildingsV2(agents: CityAgent[]): BuildingLayout[] {
         bz = pos.z + Math.sin(angle) * LANDMARK_CLEAR_RADIUS;
       }
 
-      const baseHeight = TIER_HEIGHT[a.tier] ?? 3;
+      const tier = a.tier ?? 0;
+      const baseHeight = TIER_HEIGHT[tier] ?? 3;
       const height = baseHeight * (0.85 + rh * 0.3);
 
       out.push({
         agentId: a.id,
-        base: pickBase(a.id, a.tier),
+        base: pickBase(a.id, tier),
         x: bx,
         z: bz,
         height,
         rotation: rr * Math.PI * 2,
         framework: a.framework,
         category: a.category,
-        tier: a.tier,
+        tier,
         mine: a.mine,
       });
     });

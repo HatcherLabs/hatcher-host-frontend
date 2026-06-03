@@ -43,9 +43,10 @@ describe('active city agent list', () => {
   });
 
   it('builds chat links only for public chat enabled public agents', () => {
-    expect(publicAgentChatHref(marker('bella', { publicChatEnabled: true }))).toBe(
+    expect(publicAgentChatHref(marker('opaque-bella', { agentSlug: 'bella', publicChatEnabled: true }))).toBe(
       '/agent/bella?chat=1',
     );
+    expect(publicAgentChatHref(marker('opaque-only', { publicChatEnabled: true }))).toBeNull();
     expect(publicAgentChatHref(marker('private', { visibility: 'private', publicChatEnabled: true }))).toBeNull();
     expect(publicAgentChatHref(marker('disabled', { publicChatEnabled: false }))).toBeNull();
   });

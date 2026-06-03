@@ -24,5 +24,6 @@ export function selectActiveCityAgents(
 
 export function publicAgentChatHref(marker: LiveAgentMarkerLayout): string | null {
   if (marker.visibility === 'private' || marker.publicChatEnabled !== true) return null;
-  return `/agent/${marker.agentId}?chat=1`;
+  if (!marker.agentSlug) return null;
+  return `/agent/${encodeURIComponent(marker.agentSlug)}?chat=1`;
 }
