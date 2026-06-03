@@ -45,7 +45,7 @@ export function CityClient({ initial }: Props) {
     fetch(`${API_URL}/public/city`, { credentials: 'include' })
       .then((r) => (r.ok ? r.json() : null))
       .then((j: { success?: boolean; data?: CityResponse } | null) => {
-        if (j?.success && j.data?.viewerId) setData(j.data);
+        if (j?.success && j.data) setData(j.data);
       })
       .catch(() => {});
   }, []);

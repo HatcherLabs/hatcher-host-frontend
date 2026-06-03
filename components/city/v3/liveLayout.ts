@@ -170,7 +170,11 @@ export function selectRenderedAgents(
 }
 
 function ownerKeyFor(agent: CityAgent): string {
-  return agent.ownerKey || `agent:${agent.id}`;
+  return agent.ownerKey || agent.buildingKey || `agent:${agent.id}`;
+}
+
+function ownerKeyForUser(user: CityUser): string {
+  return user.ownerKey || user.buildingKey || `user:${user.displayName || 'building'}`;
 }
 
 function ownerUsernameFor(agents: CityAgent[]): string | null {
@@ -216,14 +220,16 @@ function clusterRank(cluster: Omit<LiveUserCluster, 'rank'>): number {
 
 function makeUserRepresentative(user: CityUser): CityAgent {
   const ownerUsername = user.displayName?.trim() || user.ownerUsername?.trim() || null;
+  const ownerKey = ownerKeyForUser(user);
   return {
-    id: `user-building:${user.ownerKey}`,
+    id: `user-building:${ownerKey}`,
     slug: null,
     name: `${ownerUsername || 'Builder'} building`,
     avatarUrl: null,
     framework: 'openclaw',
     category: 'automation',
-    ownerKey: user.ownerKey,
+    buildingKey: ownerKey,
+    ownerKey,
     ownerUsername,
     tier: user.tier,
     status: user.activeAgentCount > 0 ? 'running' : 'sleeping',
@@ -244,7 +250,7 @@ function clusterAgentsByOwner(
     bucket.push(agent);
     byOwner.set(key, bucket);
   }
-  const usersByOwner = new Map(users.map((user) => [user.ownerKey, user]));
+  const usersByOwner = new Map(users.map((user) => [ownerKeyForUser(user), user]));
   const ownerKeys = new Set([...usersByOwner.keys(), ...byOwner.keys()]);
 
   return [...ownerKeys]

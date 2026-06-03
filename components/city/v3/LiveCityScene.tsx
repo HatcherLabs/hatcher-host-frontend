@@ -233,7 +233,12 @@ function LiveCitySceneBody({
     [layout.markers, selectedAgentId],
   );
   const viewerOwnerKey = useMemo(
-    () => users.find((user) => user.mine)?.ownerKey ?? agents.find((agent) => agent.mine)?.ownerKey,
+    () => {
+      const viewerUser = users.find((user) => user.mine);
+      if (viewerUser) return viewerUser.ownerKey || viewerUser.buildingKey;
+      const viewerAgent = agents.find((agent) => agent.mine);
+      return viewerAgent?.ownerKey || viewerAgent?.buildingKey;
+    },
     [agents, users],
   );
   const myBuilding = useMemo(
