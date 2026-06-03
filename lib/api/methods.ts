@@ -158,9 +158,9 @@ export const api = {
     referralCode?: string,
   ) =>
     req<{
-      token: string;
-      expiresIn: string;
-      user: { id: string; email: string; username: string };
+      registered: boolean;
+      requiresVerification: boolean;
+      message: string;
     }>("/auth/register", {
       method: "POST",
       body: JSON.stringify({
