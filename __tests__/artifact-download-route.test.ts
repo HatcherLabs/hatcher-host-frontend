@@ -66,6 +66,22 @@ describe('artifact download route', () => {
     expect(mockedDns.lookup).not.toHaveBeenCalled();
   });
 
+  it('rejects plain http artifact URLs before DNS or upstream fetch', async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockResolvedValueOnce(Response.json({ success: true, data: { id: 'user_1' } }));
+    const { GET } = await loadRoute();
+
+    const response = await GET(makeRequest(
+      'https://hatcher.host/api/artifacts/download?url=http%3A%2F%2Fv3.fal.media%2Fartifact.txt',
+      { authorization: 'Bearer hk_test' },
+    ));
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({ error: 'Only https artifact URLs are supported' });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(mockedDns.lookup).not.toHaveBeenCalled();
+  });
+
   it('blocks private IP destinations even when the host is allowlisted', async () => {
     const fetchMock = vi.mocked(fetch);
     fetchMock.mockResolvedValueOnce(Response.json({ success: true, data: { id: 'user_1' } }));
