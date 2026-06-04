@@ -25,13 +25,22 @@ interface PasswordStrength {
   checks: { label: string; met: boolean }[];
 }
 
+function hasRequiredPasswordComplexity(pw: string): boolean {
+  return (
+    /[a-z]/.test(pw) &&
+    /[A-Z]/.test(pw) &&
+    /[0-9]/.test(pw) &&
+    /[^A-Za-z0-9\s]/.test(pw)
+  );
+}
+
 function getPasswordStrength(pw: string, t: ReturnType<typeof useTranslations>): PasswordStrength {
   const checks = [
     { label: t('strengthChecks.length'), met: pw.length >= 8 },
     { label: t('strengthChecks.lowercase'), met: /[a-z]/.test(pw) },
     { label: t('strengthChecks.uppercase'), met: /[A-Z]/.test(pw) },
     { label: t('strengthChecks.number'), met: /[0-9]/.test(pw) },
-    { label: t('strengthChecks.special'), met: /[^a-zA-Z0-9]/.test(pw) },
+    { label: t('strengthChecks.special'), met: /[^A-Za-z0-9\s]/.test(pw) },
   ];
   const score = checks.filter((c) => c.met).length;
   const labels: Record<number, { label: string; color: string }> = {
@@ -131,7 +140,7 @@ export default function RegisterPage() {
       setLocalError(t('errors.passwordTooShort'));
       return;
     }
-    if (!/[a-z]/.test(password) || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+    if (!hasRequiredPasswordComplexity(password)) {
       setLocalError(t('errors.passwordComplexity'));
       return;
     }

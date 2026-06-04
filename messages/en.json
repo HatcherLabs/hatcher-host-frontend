@@ -482,7 +482,7 @@
       "usernameHint": "Letters, numbers, hyphens and underscores only",
       "passwordLabel": "Password",
       "passwordPlaceholder": "Enter a strong password",
-      "passwordHint": "Must include: 8+ characters, uppercase, lowercase, and a number",
+      "passwordHint": "Must include: 8+ characters, uppercase, lowercase, number, and special character",
       "confirmPasswordLabel": "Confirm Password",
       "confirmPasswordPlaceholder": "Repeat your password",
       "strengthLabels": {
@@ -508,7 +508,7 @@
         "usernameTaken": "This username is already taken. Pick a different one.",
         "passwordMismatch": "Passwords do not match",
         "passwordTooShort": "Password must be at least 8 characters",
-        "passwordComplexity": "Password must contain uppercase, lowercase, and a number"
+        "passwordComplexity": "Password must contain uppercase, lowercase, number, and a special character"
       }
     },
     "forgotPassword": {
@@ -528,7 +528,8 @@
       "heading": "Set new password",
       "subheading": "Enter your new password below",
       "newPasswordLabel": "New Password",
-      "newPasswordPlaceholder": "At least 8 characters",
+      "newPasswordPlaceholder": "8+ chars, upper, lower, number, special",
+      "passwordRequirements": "Use 8+ characters with uppercase, lowercase, number, and special character.",
       "confirmPasswordLabel": "Confirm Password",
       "confirmPasswordPlaceholder": "Repeat your password",
       "passwordMismatch": "Passwords do not match",
@@ -1200,7 +1201,7 @@
         "currentPassword": "Current Password",
         "currentPasswordPlaceholder": "Enter current password",
         "newPassword": "New Password",
-        "newPasswordPlaceholder": "Min 8 chars, upper, lower, number",
+        "newPasswordPlaceholder": "Min 8 chars, upper, lower, number, special",
         "confirmPassword": "Confirm New Password",
         "confirmPasswordPlaceholder": "Repeat new password",
         "changePasswordBtn": "Change Password",

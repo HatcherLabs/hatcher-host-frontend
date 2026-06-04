@@ -482,7 +482,7 @@
       "usernameHint": "Lettres, chiffres, tirets et tirets bas uniquement",
       "passwordLabel": "Mot de passe",
       "passwordPlaceholder": "Choisissez un mot de passe fort",
-      "passwordHint": "Doit contenir : 8+ caractères, une majuscule, une minuscule et un chiffre",
+      "passwordHint": "Doit contenir : 8+ caractères, une majuscule, une minuscule, un chiffre et un caractère spécial",
       "confirmPasswordLabel": "Confirmer le mot de passe",
       "confirmPasswordPlaceholder": "Répétez votre mot de passe",
       "strengthLabels": {
@@ -508,7 +508,7 @@
         "usernameTaken": "Ce nom d'utilisateur est déjà pris. Choisissez-en un autre.",
         "passwordMismatch": "Les mots de passe ne correspondent pas",
         "passwordTooShort": "Le mot de passe doit comporter au moins 8 caractères",
-        "passwordComplexity": "Le mot de passe doit contenir une majuscule, une minuscule et un chiffre"
+        "passwordComplexity": "Le mot de passe doit contenir une majuscule, une minuscule, un chiffre et un caractère spécial"
       }
     },
     "forgotPassword": {
@@ -528,7 +528,8 @@
       "heading": "Définir un nouveau mot de passe",
       "subheading": "Saisissez votre nouveau mot de passe ci-dessous",
       "newPasswordLabel": "Nouveau mot de passe",
-      "newPasswordPlaceholder": "Au moins 8 caractères",
+      "newPasswordPlaceholder": "8+ car., maj., min., chiffre, spécial",
+      "passwordRequirements": "Utilisez 8+ caractères avec majuscule, minuscule, chiffre et caractère spécial.",
       "confirmPasswordLabel": "Confirmer le mot de passe",
       "confirmPasswordPlaceholder": "Répétez votre mot de passe",
       "passwordMismatch": "Les mots de passe ne correspondent pas",
@@ -1178,7 +1179,7 @@
         "currentPassword": "Mot de passe actuel",
         "currentPasswordPlaceholder": "Entrez le mot de passe actuel",
         "newPassword": "Nouveau mot de passe",
-        "newPasswordPlaceholder": "Min 8 car., majuscule, minuscule, chiffre",
+        "newPasswordPlaceholder": "Min 8 car., majuscule, minuscule, chiffre, spécial",
         "confirmPassword": "Confirmer le nouveau mot de passe",
         "confirmPasswordPlaceholder": "Répétez le nouveau mot de passe",
         "changePasswordBtn": "Changer le mot de passe",
