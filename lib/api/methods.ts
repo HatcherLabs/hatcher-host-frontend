@@ -67,6 +67,11 @@ import type {
   ConduitProtocolInfoResponse,
   ConduitRegisterProviderBody,
   ConduitRegisterProviderResponse,
+  ClawVilleConfigStatus,
+  ClawVillePatchBody,
+  ClawVilleRegisterBody,
+  ClawVilleRegisterResponse,
+  ClawVilleStatsResponse,
   OobeConfigStatus,
   OobeDiscoveryResponse,
   OobeNetworkStatusResponse,
@@ -625,6 +630,30 @@ export const api = {
         method: "DELETE",
       },
     ),
+
+  /** ClawVille world registration and live callback setup. */
+  getAgentClawVilleConfig: (id: string) =>
+    req<ClawVilleConfigStatus>(`/agents/${id}/clawville/config`),
+
+  registerAgentClawVille: (id: string, body: ClawVilleRegisterBody = {}) =>
+    req<ClawVilleRegisterResponse>(`/agents/${id}/clawville/register`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  patchAgentClawVille: (id: string, body: ClawVillePatchBody) =>
+    req<ClawVilleRegisterResponse>(`/agents/${id}/clawville`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+
+  unregisterAgentClawVille: (id: string) =>
+    req<{ registered: false; agentId: string }>(`/agents/${id}/clawville`, {
+      method: "DELETE",
+    }),
+
+  getAgentClawVilleStats: (id: string) =>
+    req<ClawVilleStatsResponse>(`/agents/${id}/clawville/stats`),
 
   /** OOBE Synapse RPC + SAP identity/discovery controls. */
   getAgentOobeConfig: (id: string) =>
