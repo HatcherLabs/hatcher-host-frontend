@@ -482,7 +482,7 @@
       "usernameHint": "Doar litere, cifre, cratimă și liniuță de subliniere",
       "passwordLabel": "Parolă",
       "passwordPlaceholder": "Introduceți o parolă puternică",
-      "passwordHint": "Trebuie să conțină: 8+ caractere, literă mare, literă mică și o cifră",
+      "passwordHint": "Trebuie să conțină: 8+ caractere, literă mare, literă mică, cifră și caracter special",
       "confirmPasswordLabel": "Confirmă parola",
       "confirmPasswordPlaceholder": "Repetați parola",
       "strengthLabels": {
@@ -508,7 +508,7 @@
         "usernameTaken": "Acest nume de utilizator este deja folosit. Alege altul.",
         "passwordMismatch": "Parolele nu se potrivesc",
         "passwordTooShort": "Parola trebuie să aibă cel puțin 8 caractere",
-        "passwordComplexity": "Parola trebuie să conțină literă mare, literă mică și o cifră"
+        "passwordComplexity": "Parola trebuie să conțină literă mare, literă mică, cifră și caracter special"
       }
     },
     "forgotPassword": {
@@ -528,7 +528,8 @@
       "heading": "Setează parola nouă",
       "subheading": "Introdu noua parolă mai jos",
       "newPasswordLabel": "Parolă nouă",
-      "newPasswordPlaceholder": "Cel puțin 8 caractere",
+      "newPasswordPlaceholder": "8+ caractere, maj., min., cifră, special",
+      "passwordRequirements": "Folosește 8+ caractere cu literă mare, literă mică, cifră și caracter special.",
       "confirmPasswordLabel": "Confirmă parola",
       "confirmPasswordPlaceholder": "Repetați parola",
       "passwordMismatch": "Parolele nu se potrivesc",
@@ -1200,7 +1201,7 @@
         "currentPassword": "Parola curentă",
         "currentPasswordPlaceholder": "Introdu parola curentă",
         "newPassword": "Parolă nouă",
-        "newPasswordPlaceholder": "Min. 8 caractere, maj., min., cifră",
+        "newPasswordPlaceholder": "Min. 8 caractere, maj., min., cifră, special",
         "confirmPassword": "Confirmă parola nouă",
         "confirmPasswordPlaceholder": "Repetați parola nouă",
         "changePasswordBtn": "Schimbă parola",

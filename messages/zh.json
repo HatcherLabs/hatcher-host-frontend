@@ -482,7 +482,7 @@
       "usernameHint": "仅限字母、数字、连字符和下划线",
       "passwordLabel": "密码",
       "passwordPlaceholder": "输入强密码",
-      "passwordHint": "必须包含：8个以上字符、大写字母、小写字母和数字",
+      "passwordHint": "必须包含：8个以上字符、大写字母、小写字母、数字和特殊字符",
       "confirmPasswordLabel": "确认密码",
       "confirmPasswordPlaceholder": "再次输入密码",
       "strengthLabels": {
@@ -508,7 +508,7 @@
         "usernameTaken": "此用户名已被使用，请选择其他名称。",
         "passwordMismatch": "两次输入的密码不一致",
         "passwordTooShort": "密码至少需要8个字符",
-        "passwordComplexity": "密码必须包含大写字母、小写字母和数字"
+        "passwordComplexity": "密码必须包含大写字母、小写字母、数字和特殊字符"
       }
     },
     "forgotPassword": {
@@ -528,7 +528,8 @@
       "heading": "设置新密码",
       "subheading": "在下方输入您的新密码",
       "newPasswordLabel": "新密码",
-      "newPasswordPlaceholder": "至少8个字符",
+      "newPasswordPlaceholder": "8个以上字符，含大小写、数字和特殊字符",
+      "passwordRequirements": "请使用8个以上字符，并包含大写字母、小写字母、数字和特殊字符。",
       "confirmPasswordLabel": "确认密码",
       "confirmPasswordPlaceholder": "再次输入密码",
       "passwordMismatch": "两次输入的密码不一致",
@@ -1178,7 +1179,7 @@
         "currentPassword": "当前密码",
         "currentPasswordPlaceholder": "输入当前密码",
         "newPassword": "新密码",
-        "newPasswordPlaceholder": "至少8个字符，含大小写和数字",
+        "newPasswordPlaceholder": "至少8个字符，含大小写、数字和特殊字符",
         "confirmPassword": "确认新密码",
         "confirmPasswordPlaceholder": "再次输入新密码",
         "changePasswordBtn": "更改密码",

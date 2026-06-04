@@ -47,6 +47,16 @@ const tabContentVariants = {
 
 const displayFont = { fontFamily: 'var(--font-display), system-ui, sans-serif' };
 
+function isStrongPassword(pw: string): boolean {
+  return (
+    pw.length >= 8 &&
+    /[a-z]/.test(pw) &&
+    /[A-Z]/.test(pw) &&
+    /[0-9]/.test(pw) &&
+    /[^A-Za-z0-9\s]/.test(pw)
+  );
+}
+
 // ── Tier badge ──────────────────────────────────────────────
 function TierBadge({ tier }: { tier: string }) {
   const styles: Record<string, string> = {
@@ -320,7 +330,10 @@ export default function SettingsPage() {
   // ── Save password ─────────────────────────────────────────
   async function handleChangePassword() {
     if (!currentPassword) { toast('error', 'Enter your current password'); return; }
-    if (newPassword.length < 8) { toast('error', 'New password must be at least 8 characters'); return; }
+    if (!isStrongPassword(newPassword)) {
+      toast('error', 'New password must include 8+ characters, uppercase, lowercase, number, and special character');
+      return;
+    }
     if (newPassword !== confirmPassword) { toast('error', 'Passwords do not match'); return; }
     setSavingPassword(true);
     try {

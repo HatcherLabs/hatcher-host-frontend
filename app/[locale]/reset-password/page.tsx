@@ -9,6 +9,16 @@ import { cleanResetPasswordUrl, tokenFromResetPasswordHash } from '@/lib/reset-p
 import { Lock, ArrowLeft, CheckCircle, AlertTriangle } from 'lucide-react';
 import { AuthShell } from '@/components/auth/v3/AuthShell';
 
+function isStrongPassword(pw: string): boolean {
+  return (
+    pw.length >= 8 &&
+    /[a-z]/.test(pw) &&
+    /[A-Z]/.test(pw) &&
+    /[0-9]/.test(pw) &&
+    /[^A-Za-z0-9\s]/.test(pw)
+  );
+}
+
 function ResetForm() {
   const searchParams = useSearchParams();
   const t = useTranslations('auth.resetPassword');
@@ -85,7 +95,7 @@ function ResetForm() {
   }
 
   const passwordsMatch = password === confirm;
-  const passwordValid = password.length >= 8;
+  const passwordValid = isStrongPassword(password);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -135,6 +145,9 @@ function ResetForm() {
             className="w-full h-10 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/30 placeholder:text-[var(--text-muted)] transition-colors"
             placeholder={t('newPasswordPlaceholder')}
           />
+          {password && !passwordValid && (
+            <p className="text-[10px] text-red-400 mt-1">{t('passwordRequirements')}</p>
+          )}
         </div>
 
         <div>
