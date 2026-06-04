@@ -35,6 +35,7 @@ import { buildFallbackPassport, shortAddress } from '@/lib/agent-passport';
 import { KausalayerWalletPanel } from './KausalayerWalletPanel';
 import { ConduitWalletPanel } from './ConduitWalletPanel';
 import { OobeWalletPanel } from './OobeWalletPanel';
+import { ClawVilleWalletPanel } from './ClawVilleWalletPanel';
 
 interface ReputationState {
   upCount: number;
@@ -406,6 +407,7 @@ export function WalletTab() {
             <>
               <ConduitWalletPanel agentId={agent.id} />
               <OobeWalletPanel agentId={agent.id} />
+              <ClawVilleWalletPanel agentId={agent.id} />
               <KausalayerWalletPanel agentId={agent.id} />
             </>
           )}

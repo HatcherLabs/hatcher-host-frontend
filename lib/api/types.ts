@@ -439,6 +439,58 @@ export interface ConduitProviderActionResponse {
 export type ConduitProtocolInfoResponse = unknown;
 export type ConduitManifestResponse = unknown;
 
+export interface ClawVilleProtocolPointer {
+  version?: number;
+  contentHash?: string;
+  url?: string;
+  [key: string]: unknown;
+}
+
+export interface ClawVilleRegistrationStatus {
+  agentId: string;
+  mode: string | null;
+  name: string | null;
+  species: string | null;
+  walletAddress: string | null;
+  sessionId: string | null;
+  sessionExpiresAt: string | null;
+  protocol: ClawVilleProtocolPointer | null;
+  registeredAt: string | null;
+  updatedAt: string | null;
+}
+
+export interface ClawVilleConfigStatus {
+  enabled: boolean;
+  configured: boolean;
+  apiBaseUrl: string;
+  proxyBaseUrl: string;
+  issuerPublicKey: string | null;
+  issuerWellKnownUrl: string;
+  registered: boolean;
+  registration: ClawVilleRegistrationStatus;
+}
+
+export interface ClawVilleRegisterBody {
+  mode?: "avatar" | "override";
+  name?: string;
+  species?: string;
+  personality?: string;
+  stats?: { hp?: number; attack?: number; defense?: number; speed?: number };
+  homeX?: number;
+  homeY?: number;
+  targetNpcId?: string;
+  rotateScopedToken?: boolean;
+}
+
+export type ClawVillePatchBody = Partial<ClawVilleRegisterBody>;
+
+export interface ClawVilleRegisterResponse {
+  registration: unknown;
+  local: ClawVilleConfigStatus;
+}
+
+export type ClawVilleStatsResponse = unknown;
+
 export interface OobeCapability {
   id: string;
   description: string | null;
