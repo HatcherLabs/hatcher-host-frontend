@@ -104,8 +104,8 @@ function isPrivateIp(ip: string): boolean {
 }
 
 async function assertPublicHttpUrl(url: URL): Promise<void> {
-  if (url.protocol !== 'https:' && url.protocol !== 'http:') {
-    throw new Error('Only http and https artifact URLs are supported');
+  if (url.protocol !== 'https:') {
+    throw new Error('Only https artifact URLs are supported');
   }
   if (url.username || url.password) {
     throw new Error('Artifact URLs cannot include credentials');

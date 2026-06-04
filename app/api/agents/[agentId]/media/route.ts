@@ -21,6 +21,18 @@ function filenameFromPath(value: string): string {
   return safeFilename(decodeURIComponent(name));
 }
 
+function isPassiveInlineMedia(contentType: string): boolean {
+  const type = contentType.toLowerCase().split(';', 1)[0]?.trim() ?? '';
+  return (
+    type === 'image/png'
+    || type === 'image/jpeg'
+    || type === 'image/gif'
+    || type === 'image/webp'
+    || type.startsWith('audio/')
+    || type.startsWith('video/')
+  );
+}
+
 export async function GET(request: NextRequest, context: RouteContext) {
   const { agentId } = await context.params;
   const mediaPath = request.nextUrl.searchParams.get('path');
@@ -67,14 +79,18 @@ export async function GET(request: NextRequest, context: RouteContext) {
       ? `${safeFilename(videoJobId)}.mp4`
       : filenameFromPath(mediaPath ?? 'artifact');
   const download = request.nextUrl.searchParams.get('download') === '1';
+  const contentType = upstream.headers.get('content-type') ?? 'application/octet-stream';
+  const inline = !download && isPassiveInlineMedia(contentType);
   const responseHeaders = new Headers();
-  responseHeaders.set('content-type', upstream.headers.get('content-type') ?? 'application/octet-stream');
+  responseHeaders.set('content-type', contentType);
   const contentLength = upstream.headers.get('content-length');
   if (contentLength) responseHeaders.set('content-length', contentLength);
   responseHeaders.set('cache-control', 'private, max-age=300');
+  responseHeaders.set('x-content-type-options', 'nosniff');
+  responseHeaders.set('content-security-policy', "sandbox; default-src 'none'; img-src 'self' data: blob:; media-src 'self' data: blob:");
   responseHeaders.set(
     'content-disposition',
-    `${download ? 'attachment' : 'inline'}; filename="${filename}"`,
+    `${inline ? 'inline' : 'attachment'}; filename="${filename}"`,
   );
 
   return new NextResponse(upstream.body, {
