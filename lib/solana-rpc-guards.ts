@@ -53,6 +53,20 @@ export function isTrustedSolanaRpcSource(
   });
 }
 
+export function requiresSolanaRpcProxyAuth(
+  env: Record<string, string | undefined> = process.env,
+): boolean {
+  return Boolean(env.HELIUS_API_KEY || env.SOLANA_RPC_URL || env.SOLANA_RPC_PROXY_REQUIRE_AUTH === 'true');
+}
+
+export function isAuthorizedSolanaRpcProxyRequest(
+  authorization: string | null,
+  proxyToken = process.env.SOLANA_RPC_PROXY_TOKEN,
+): boolean {
+  if (!proxyToken) return false;
+  return authorization === `Bearer ${proxyToken}`;
+}
+
 function isAllowedRpcObject(payload: unknown): payload is { method: string; id?: unknown } {
   return (
     isRpcObject(payload)

@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
   isAllowedSolanaRpcPayload,
+  isAuthorizedSolanaRpcProxyRequest,
   isTrustedSolanaRpcSource,
+  requiresSolanaRpcProxyAuth,
   solanaRpcMethods,
 } from '@/lib/solana-rpc-guards';
 
@@ -24,6 +26,13 @@ const WRITE_RATE_LIMIT_MAX = 20;
 const rateBuckets = new Map<string, { count: number; resetAt: number }>();
 
 export async function POST(request: NextRequest) {
+  if (
+    requiresSolanaRpcProxyAuth()
+    && !isAuthorizedSolanaRpcProxyRequest(request.headers.get('authorization'))
+  ) {
+    return jsonRpcError(null, -32004, 'Unauthorized', 401);
+  }
+
   const requestOrigin = publicSiteOrigin(request);
   if (
     !isTrustedSolanaRpcSource(

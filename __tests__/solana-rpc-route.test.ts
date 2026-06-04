@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   isAllowedSolanaRpcPayload,
+  isAuthorizedSolanaRpcProxyRequest,
   isTrustedSolanaRpcSource,
+  requiresSolanaRpcProxyAuth,
 } from '../lib/solana-rpc-guards';
 
 describe('/api/solana-rpc route guards', () => {
@@ -46,5 +48,17 @@ describe('/api/solana-rpc route guards', () => {
         'production',
       ),
     ).toBe(false);
+  });
+
+  it('requires explicit proxy auth when a paid server-side RPC is configured', () => {
+    expect(requiresSolanaRpcProxyAuth({ HELIUS_API_KEY: 'helius-key' }))
+      .toBe(true);
+    expect(requiresSolanaRpcProxyAuth({ SOLANA_RPC_URL: 'https://paid-rpc.example' }))
+      .toBe(true);
+    expect(requiresSolanaRpcProxyAuth({})).toBe(false);
+
+    expect(isAuthorizedSolanaRpcProxyRequest(null, 'proxy-secret')).toBe(false);
+    expect(isAuthorizedSolanaRpcProxyRequest('Bearer wrong', 'proxy-secret')).toBe(false);
+    expect(isAuthorizedSolanaRpcProxyRequest('Bearer proxy-secret', 'proxy-secret')).toBe(true);
   });
 });

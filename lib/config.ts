@@ -27,12 +27,13 @@ export const SOLANA_RPC =
 export const SOLANA_NETWORK =
   process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta';
 
-// Browser payment flows go through our same-origin proxy because public Solana
-// RPC endpoints can reject hatcher.host browser requests with 403. The wallet
-// adapter requires an absolute URL even during SSR.
+// Browser wallet/payment flows use public RPC directly by default. Do not route
+// unauthenticated browsers through our server-side premium RPC proxy; that route
+// protects paid upstream keys and is only for explicitly authorized server-side
+// callers.
 export const SOLANA_RPC_BROWSER_ENDPOINT =
   new URL(
-    process.env.NEXT_PUBLIC_SOLANA_RPC_BROWSER_ENDPOINT || '/api/solana-rpc',
+    process.env.NEXT_PUBLIC_SOLANA_RPC_BROWSER_ENDPOINT || SOLANA_RPC,
     PUBLIC_SITE_URL,
   ).toString();
 
