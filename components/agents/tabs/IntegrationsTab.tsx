@@ -1088,11 +1088,9 @@ function XonaPartnerResourcesPanel({ agentId }: { agentId: string }) {
 function WebhookSection() {
   const t = useTranslations('dashboard.agentDetail.integrations');
   const { agent } = useAgentContext();
-  const [webhookData, setWebhookData] = useState<{ url: string; token: string } | null>(null);
+  const [webhookData, setWebhookData] = useState<{ url: string; tokenConfigured: boolean } | null>(null);
   const [loading, setLoading] = useState(true);
-  const [tokenVisible, setTokenVisible] = useState(false);
   const [copiedUrl, setCopiedUrl] = useState(false);
-  const [copiedToken, setCopiedToken] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
@@ -1111,7 +1109,7 @@ function WebhookSection() {
   if (!webhookData) return null;
 
   const curlExample = `curl -X POST ${webhookData.url} \\
-  -H "Authorization: Bearer ${webhookData.token}" \\
+  -H "Authorization: Bearer <configured-webhook-token>" \\
   -H "Content-Type: application/json" \\
   -d '{"message": "Hello from webhook!"}'`;
 
@@ -1172,27 +1170,12 @@ function WebhookSection() {
             {/* Webhook Token */}
             <div>
               <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">{t('webhook.bearerToken')}</label>
-              <div className="flex items-center gap-2">
-                <input
-                  type={tokenVisible ? 'text' : 'password'}
-                  readOnly
-                  value={webhookData.token}
-                  className="flex-1 h-9 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:outline-none font-mono"
-                />
-                <button
-                  onClick={() => setTokenVisible(!tokenVisible)}
-                  className="h-9 w-9 flex items-center justify-center rounded-lg border border-[var(--border-default)] hover:bg-[var(--bg-hover)] transition-colors"
-                  title={tokenVisible ? t('webhook.hideToken') : t('webhook.revealToken')}
-                >
-                  {tokenVisible ? <EyeOff size={14} className="text-[var(--text-muted)]" /> : <Eye size={14} className="text-[var(--text-muted)]" />}
-                </button>
-                <button
-                  onClick={() => copyToClipboard(webhookData.token, setCopiedToken)}
-                  className="h-9 w-9 flex items-center justify-center rounded-lg border border-[var(--border-default)] hover:bg-[var(--bg-hover)] transition-colors"
-                  title={t('webhook.copyToken')}
-                >
-                  {copiedToken ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} className="text-[var(--text-muted)]" />}
-                </button>
+              <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] px-3 py-2">
+                <div className="text-xs text-[var(--text-secondary)]">
+                  {webhookData.tokenConfigured
+                    ? 'Token configured. For security, runtime tokens are no longer revealed in the browser.'
+                    : 'Token not configured. Start or restart the agent to provision webhook authentication.'}
+                </div>
               </div>
             </div>
 

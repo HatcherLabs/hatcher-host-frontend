@@ -1,23 +1,50 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { Link } from '@/i18n/routing';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
+import { cleanResetPasswordUrl, tokenFromResetPasswordHash } from '@/lib/reset-password-token-url';
 import { Lock, ArrowLeft, CheckCircle, AlertTriangle } from 'lucide-react';
 import { AuthShell } from '@/components/auth/v3/AuthShell';
 
 function ResetForm() {
   const searchParams = useSearchParams();
   const t = useTranslations('auth.resetPassword');
-  const token = searchParams.get('token');
+  const queryToken = searchParams.get('token');
 
+  const [token, setToken] = useState<string | null>(queryToken);
+  const [tokenSourceChecked, setTokenSourceChecked] = useState(false);
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const nextToken = queryToken ?? tokenFromResetPasswordHash(window.location.hash);
+    setToken(nextToken);
+    setTokenSourceChecked(true);
+
+    if (nextToken) {
+      window.history.replaceState(
+        null,
+        '',
+        cleanResetPasswordUrl(window.location.pathname, window.location.search),
+      );
+    }
+  }, [queryToken]);
+
+  if (!tokenSourceChecked) {
+    return (
+      <AuthShell title="Loading...">
+        <div className="flex items-center justify-center py-12">
+          <div className="w-8 h-8 border-2 border-[var(--accent)]/30 border-t-[var(--accent)] rounded-full animate-spin" />
+        </div>
+      </AuthShell>
+    );
+  }
 
   if (!token) {
     return (

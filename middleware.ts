@@ -22,6 +22,7 @@ import type { NextRequest } from 'next/server';
 import { routing } from './i18n/routing';
 import { defaultLocale, locales } from './i18n/config';
 import { buildCsp } from './lib/csp';
+import { buildSensitiveAuthTokenRedirectUrl } from './lib/reset-password-token-url';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 const PUBLIC_SITE_URL = process.env.NEXT_PUBLIC_SITE_URL
@@ -93,6 +94,19 @@ export default function middleware(req: NextRequest): NextResponse {
   const nonce = createNonce();
   const isEmbedRoute = stripLocalePrefix(pathname).startsWith('/embed');
   const requestHeaders = withCspRequestHeaders(req, nonce, isEmbedRoute);
+  const authTokenRedirect = buildSensitiveAuthTokenRedirectUrl(
+    req.nextUrl,
+    (candidate) => {
+      const unprefixed = stripLocalePrefix(candidate);
+      return unprefixed === '/reset-password' || unprefixed === '/verify-email';
+    },
+  );
+
+  if (authTokenRedirect) {
+    const response = NextResponse.redirect(authTokenRedirect, 303);
+    response.headers.set('Cache-Control', 'no-store');
+    return withSecurityHeaders(response, nonce, isEmbedRoute);
+  }
 
   // Non-locale paths (admin, legal pages, og, skill) bypass the intl middleware.
   // They live at app/ root (not under [locale]) so next-intl must not rewrite them.
@@ -183,7 +197,14 @@ function withSecurityHeaders(response: NextResponse, nonce: string, isEmbedRoute
     response.headers.set('X-Permitted-Cross-Domain-Policies', 'none');
   }
 
+  hardenLocaleCookie(response);
   return response;
+}
+
+function hardenLocaleCookie(response: NextResponse): void {
+  const raw = response.headers.get('set-cookie');
+  if (!raw || !raw.startsWith('HATCHER_LOCALE=') || /;\s*HttpOnly/i.test(raw)) return;
+  response.headers.set('set-cookie', `${raw}; HttpOnly`);
 }
 
 function redirectDefaultLocalePath(req: NextRequest): NextResponse | null {
@@ -196,6 +217,7 @@ function redirectDefaultLocalePath(req: NextRequest): NextResponse | null {
   response.cookies.set('HATCHER_LOCALE', defaultLocale, {
     path: '/',
     maxAge: 60 * 60 * 24 * 365,
+    httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
   });

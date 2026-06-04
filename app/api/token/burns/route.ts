@@ -5,6 +5,7 @@ import {
   type TokenBurnSummary,
 } from '@/lib/token-burns';
 import { API_URL } from '@/lib/config';
+import { isAuthorizedBurnRefreshRequest } from '@/lib/token-burn-refresh';
 
 export const runtime = 'nodejs';
 export const revalidate = 21_600;
@@ -15,7 +16,8 @@ let memoryCache: {
 } | null = null;
 
 export async function GET(request: NextRequest) {
-  const refresh = request.nextUrl.searchParams.has('refresh');
+  const refresh = request.nextUrl.searchParams.has('refresh')
+    && isAuthorizedBurnRefreshRequest(request.headers.get('authorization'));
   const now = Date.now();
 
   if (!refresh && memoryCache && memoryCache.expiresAt > now) {

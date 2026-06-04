@@ -6,17 +6,28 @@ import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 import { setToken } from '@/lib/api/core';
+import { cleanSensitiveAuthTokenUrl, tokenFromSensitiveAuthHash } from '@/lib/reset-password-token-url';
 import { CheckCircle2, XCircle, Loader2, Mail } from 'lucide-react';
 import { AuthShell } from '@/components/auth/v3/AuthShell';
 
 function VerifyEmailInner() {
   const searchParams = useSearchParams();
   const t = useTranslations('auth.verifyEmail');
-  const token = searchParams.get('token');
+  const queryToken = searchParams.get('token');
   const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'no-token'>('loading');
   const [message, setMessage] = useState('');
 
   useEffect(() => {
+    const token = queryToken ?? tokenFromSensitiveAuthHash(window.location.hash);
+
+    if (token) {
+      window.history.replaceState(
+        null,
+        '',
+        cleanSensitiveAuthTokenUrl(window.location.pathname, window.location.search),
+      );
+    }
+
     if (!token) {
       setStatus('no-token');
       return;
@@ -34,7 +45,7 @@ function VerifyEmailInner() {
       setStatus('error');
       setMessage(t('errorBody'));
     });
-  }, [token, t]);
+  }, [queryToken, t]);
 
   if (status === 'loading') {
     return (

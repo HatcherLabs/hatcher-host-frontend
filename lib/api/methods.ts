@@ -2357,9 +2357,9 @@ export const api = {
       body: JSON.stringify({ channel }),
     }),
 
-  /** Get webhook URL and token for an agent */
+  /** Get webhook URL status for an agent */
   getWebhookUrl: (agentId: string) =>
-    req<{ url: string; token: string }>(`/agents/${agentId}/webhook-url`),
+    req<{ url: string; tokenConfigured: boolean }>(`/agents/${agentId}/webhook-url`),
 
   /** Get outbound webhook configuration for an agent */
   getAgentWebhookConfig: (agentId: string) =>
