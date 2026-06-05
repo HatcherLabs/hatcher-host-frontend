@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useDispatchStore } from '@/lib/agent-dispatch/store';
 import { DISPATCH_SKINS, type DispatchSkin } from '@/lib/agent-dispatch/config';
 import { usePaymentDrivers } from '@/lib/payment-drivers';
+import { purchaseSkinCnft } from '@/lib/agent-dispatch/leaderboard';
 import { ConfirmPaymentModal } from '@/components/payments/ConfirmPaymentModal';
 
 export function SkinShop({ onClose }: { onClose: () => void }) {
@@ -16,6 +17,7 @@ export function SkinShop({ onClose }: { onClose: () => void }) {
   const { driveHatch, confirmState, closeConfirm, connected, openWalletModal } = usePaymentDrivers();
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [cnft, setCnft] = useState<{ skin: string; minting: boolean; minted: boolean; solscan?: string | null } | null>(null);
 
   const handleBuy = async (skin: DispatchSkin) => {
     setError(null);
@@ -30,9 +32,15 @@ export function SkinShop({ onClose }: { onClose: () => void }) {
     }
     setBusyId(skin.id);
     try {
-      await driveHatch(skin.price, `Dispatch skin: ${skin.name}`);
+      const txSignature = await driveHatch(skin.price, `Dispatch skin: ${skin.name}`);
       grantSkin(skin.id); // cosmetic-only, unlocked locally on tx success
       equipSkin(skin.id);
+      // Settle the purchase server-side (verifies the payment on-chain) and mint
+      // the collectible cNFT to the paying wallet. The skin is already usable;
+      // this is the on-chain proof of ownership.
+      setCnft({ skin: skin.name, minting: true, minted: false });
+      const res = await purchaseSkinCnft(skin.id, txSignature);
+      setCnft({ skin: skin.name, minting: false, minted: res.minted, solscan: res.solscan });
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Payment cancelled.');
     } finally {
@@ -60,13 +68,35 @@ export function SkinShop({ onClose }: { onClose: () => void }) {
           <h2 className="mb-1 flex items-center gap-2 text-lg font-bold text-[#39ff88]">
             <span aria-hidden>✦</span> Courier Skins
           </h2>
-          <p className="mb-4 text-xs text-[#9fceb4]">
+          <p className="mb-2 text-xs text-[#9fceb4]">
             ◆ {Math.round(data).toLocaleString()} Data · earn Data by dispatching agents. Premium skins burn $HATCHER.
+          </p>
+          <p className="mb-4 flex items-center gap-1 text-[11px] text-[#ffd46b]">
+            <span aria-hidden>⛓</span> Premium ★ skins mint a collectible cNFT to your wallet.
           </p>
 
           {error && (
             <div className="mb-3 rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-xs text-red-300">
               {error}
+            </div>
+          )}
+
+          {cnft && (
+            <div className="mb-3 rounded-lg border border-[#ffd46b]/40 bg-[#ffd46b]/10 px-3 py-2 text-xs text-[#ffe7a8]">
+              {cnft.minting ? (
+                <>⛓ Minting your <b>{cnft.skin}</b> cNFT…</>
+              ) : cnft.minted ? (
+                <>
+                  🎁 <b>{cnft.skin}</b> cNFT minted to your wallet!
+                  {cnft.solscan && (
+                    <a href={cnft.solscan} target="_blank" rel="noopener noreferrer" className="ml-1 underline">
+                      view on Solscan
+                    </a>
+                  )}
+                </>
+              ) : (
+                <>✓ <b>{cnft.skin}</b> unlocked. The cNFT mint is pending — it&apos;ll arrive shortly.</>
+              )}
             </div>
           )}
 
