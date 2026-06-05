@@ -153,6 +153,30 @@ export async function claimTrophy(
   }
 }
 
+/** Settle a premium skin's on-chain $HATCHER payment and mint its cNFT. */
+export async function purchaseSkinCnft(
+  skinId: string,
+  txSignature: string,
+): Promise<{ minted: boolean; solscan?: string | null; retry?: boolean; error?: string }> {
+  try {
+    const res = await fetch(`${API_URL}/dispatch/skin/${encodeURIComponent(skinId)}/purchase`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ txSignature }),
+    });
+    const json = (await res.json()) as {
+      success?: boolean;
+      error?: string;
+      data?: { minted?: boolean; solscan?: string | null; retry?: boolean };
+    };
+    if (!res.ok || json.success === false) return { minted: false, error: json.error ?? 'Mint failed' };
+    return { minted: !!json.data?.minted, solscan: json.data?.solscan ?? null, retry: !!json.data?.retry };
+  } catch {
+    return { minted: false, error: 'Network error' };
+  }
+}
+
 export interface ReceiptRow {
   id: string;
   framework: string;
