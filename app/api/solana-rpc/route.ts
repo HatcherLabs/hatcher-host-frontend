@@ -3,19 +3,21 @@ import {
   isAllowedSolanaRpcPayload,
   isAuthorizedSolanaRpcProxyRequest,
   isTrustedSolanaRpcSource,
+  paidSolanaRpcUrl,
+  publicSolanaRpcUrl,
   requiresSolanaRpcProxyAuth,
+  shouldUsePaidSolanaRpc,
   solanaRpcMethods,
 } from '@/lib/solana-rpc-guards';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-function upstreamRpc(): string {
-  if (process.env.HELIUS_API_KEY) {
-    return `https://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY}`;
+function upstreamRpc(usePaidRpc: boolean): string {
+  if (usePaidRpc) {
+    return paidSolanaRpcUrl() || publicSolanaRpcUrl();
   }
-  if (process.env.SOLANA_RPC_URL) return process.env.SOLANA_RPC_URL;
-  return process.env.NEXT_PUBLIC_SOLANA_RPC || 'https://api.mainnet-beta.solana.com';
+  return publicSolanaRpcUrl();
 }
 
 const MAX_BODY_BYTES = 512 * 1024;
@@ -26,21 +28,19 @@ const WRITE_RATE_LIMIT_MAX = 20;
 const rateBuckets = new Map<string, { count: number; resetAt: number }>();
 
 export async function POST(request: NextRequest) {
-  if (
-    requiresSolanaRpcProxyAuth()
-    && !isAuthorizedSolanaRpcProxyRequest(request.headers.get('authorization'))
-  ) {
-    return jsonRpcError(null, -32004, 'Unauthorized', 401);
-  }
-
   const requestOrigin = publicSiteOrigin(request);
-  if (
-    !isTrustedSolanaRpcSource(
-      request.headers.get('origin'),
-      request.headers.get('referer'),
-      requestOrigin,
-    )
-  ) {
+  const authorization = request.headers.get('authorization');
+  const isTrustedBrowserRequest = isTrustedSolanaRpcSource(
+    request.headers.get('origin'),
+    request.headers.get('referer'),
+    requestOrigin,
+  );
+  const isAuthorizedProxyRequest = isAuthorizedSolanaRpcProxyRequest(authorization);
+
+  if (!isTrustedBrowserRequest && !isAuthorizedProxyRequest) {
+    if (requiresSolanaRpcProxyAuth()) {
+      return jsonRpcError(null, -32004, 'Unauthorized', 401);
+    }
     return jsonRpcError(null, -32003, 'Forbidden', 403);
   }
 
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     return jsonRpcError(id, -32005, 'Rate limit exceeded', 429);
   }
 
-  const upstream = await fetch(upstreamRpc(), {
+  const upstream = await fetch(upstreamRpc(shouldUsePaidSolanaRpc(authorization)), {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body,

@@ -1,4 +1,5 @@
 const MAX_BATCH_SIZE = 20;
+const DEFAULT_PUBLIC_SOLANA_RPC = 'https://api.mainnet-beta.solana.com/';
 
 const ALLOWED_METHODS = new Set([
   'getAccountInfo',
@@ -57,6 +58,44 @@ export function requiresSolanaRpcProxyAuth(
   env: Record<string, string | undefined> = process.env,
 ): boolean {
   return Boolean(env.HELIUS_API_KEY || env.SOLANA_RPC_URL || env.SOLANA_RPC_PROXY_REQUIRE_AUTH === 'true');
+}
+
+export function publicSolanaRpcUrl(
+  env: Record<string, string | undefined> = process.env,
+): string {
+  const rpcUrl = env.NEXT_PUBLIC_SOLANA_RPC;
+  if (!rpcUrl) return DEFAULT_PUBLIC_SOLANA_RPC;
+
+  try {
+    const parsed = new URL(rpcUrl);
+    const hasPubliclyExposedSecret = Array.from(parsed.searchParams.keys()).some((key) => {
+      const normalized = key.toLowerCase().replace(/[-_]/g, '');
+      return normalized === 'apikey' || normalized === 'token' || normalized === 'key';
+    });
+    if (hasPubliclyExposedSecret) return DEFAULT_PUBLIC_SOLANA_RPC;
+    return parsed.toString();
+  } catch {
+    return DEFAULT_PUBLIC_SOLANA_RPC;
+  }
+}
+
+export function paidSolanaRpcUrl(
+  env: Record<string, string | undefined> = process.env,
+): string | null {
+  if (env.HELIUS_API_KEY) {
+    return `https://mainnet.helius-rpc.com/?api-key=${env.HELIUS_API_KEY}`;
+  }
+  return env.SOLANA_RPC_URL || null;
+}
+
+export function shouldUsePaidSolanaRpc(
+  authorization: string | null,
+  env: Record<string, string | undefined> = process.env,
+): boolean {
+  return Boolean(paidSolanaRpcUrl(env) && isAuthorizedSolanaRpcProxyRequest(
+    authorization,
+    env.SOLANA_RPC_PROXY_TOKEN,
+  ));
 }
 
 export function isAuthorizedSolanaRpcProxyRequest(
