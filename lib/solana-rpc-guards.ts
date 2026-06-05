@@ -39,15 +39,27 @@ export function solanaRpcMethods(payload: unknown): string[] {
 export function isTrustedSolanaRpcSource(
   origin: string | null,
   referer: string | null,
-  requestOrigin: string,
+  requestOrigin: string | string[],
   nodeEnv = process.env.NODE_ENV,
 ): boolean {
   if (nodeEnv !== 'production') return true;
   const candidates = [origin, referer].filter((value): value is string => Boolean(value));
   if (candidates.length === 0) return false;
+  const trustedOrigins = Array.isArray(requestOrigin) ? requestOrigin : [requestOrigin];
+  const trustedHosts = new Set(
+    trustedOrigins
+      .map((value) => {
+        try {
+          return new URL(value).host;
+        } catch {
+          return null;
+        }
+      })
+      .filter((value): value is string => Boolean(value)),
+  );
   return candidates.some((value) => {
     try {
-      return new URL(value).host === new URL(requestOrigin).host;
+      return trustedHosts.has(new URL(value).host);
     } catch {
       return false;
     }

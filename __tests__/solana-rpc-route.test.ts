@@ -53,6 +53,25 @@ describe('/api/solana-rpc route guards', () => {
     ).toBe(false);
   });
 
+  it('accepts same-site browser context against any configured trusted origin', () => {
+    expect(
+      isTrustedSolanaRpcSource(
+        'https://hatcher.host',
+        null,
+        ['https://www.hatcher.host', 'https://hatcher.host'],
+        'production',
+      ),
+    ).toBe(true);
+    expect(
+      isTrustedSolanaRpcSource(
+        'https://attacker.example',
+        null,
+        ['https://www.hatcher.host', 'https://hatcher.host'],
+        'production',
+      ),
+    ).toBe(false);
+  });
+
   it('detects when paid server-side RPC access needs explicit proxy auth', () => {
     expect(requiresSolanaRpcProxyAuth({ HELIUS_API_KEY: 'helius-key' }))
       .toBe(true);
