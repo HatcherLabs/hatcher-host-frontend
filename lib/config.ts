@@ -9,9 +9,9 @@ const PUBLIC_SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ||
   (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://hatcher.host');
 
-// Solana mainnet RPC for read-only wallet UX. Public mainnet-beta is
-// rate-limited but adequate — the backend proxies anything that needs a
-// premium provider (Helius).
+// Solana mainnet RPC used as the browser-safe upstream for wallet UX. Public
+// mainnet-beta is rate-limited but adequate — server-side jobs that need a
+// premium provider should use a private proxy token instead.
 //
 // ⚠ SECURITY: NEVER set NEXT_PUBLIC_SOLANA_RPC to a URL that contains a
 // private API key (e.g. `?api-key=...`). Anything with the NEXT_PUBLIC_
@@ -27,13 +27,13 @@ export const SOLANA_RPC =
 export const SOLANA_NETWORK =
   process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta';
 
-// Browser wallet/payment flows use public RPC directly by default. Do not route
-// unauthenticated browsers through our server-side premium RPC proxy; that route
-// protects paid upstream keys and is only for explicitly authorized server-side
+// Browser wallet/payment flows use our same-origin RPC proxy by default. The
+// proxy avoids browser CORS/403 failures from public mainnet endpoints while
+// still keeping paid upstream RPC keys available only to authorized server-side
 // callers.
 export const SOLANA_RPC_BROWSER_ENDPOINT =
   new URL(
-    process.env.NEXT_PUBLIC_SOLANA_RPC_BROWSER_ENDPOINT || SOLANA_RPC,
+    process.env.NEXT_PUBLIC_SOLANA_RPC_BROWSER_ENDPOINT || '/api/solana-rpc',
     PUBLIC_SITE_URL,
   ).toString();
 
