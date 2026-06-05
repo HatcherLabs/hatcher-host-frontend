@@ -554,7 +554,9 @@ function Courier({
         framework: dispatch.framework,
         destName: dispatch.destName,
         job: dispatch.jobName,
-        agentId: dispatch.agentId,
+        // Server scores only against a real owned agent id — the city render key
+        // (dispatch.agentId) never resolves, so the leaderboard would never move.
+        agentId: dispatch.dashboardAgentId ?? dispatch.agentId,
       });
     }
   });

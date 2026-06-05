@@ -25,7 +25,8 @@ export interface DispatchPacket {
 
 export interface ActiveDispatch {
   id: string;
-  agentId: string;
+  agentId: string; // city render key — UI / busy tracking only, NOT a real DB id
+  dashboardAgentId?: string; // real DB agent id, used for server-authoritative scoring
   agentName: string;
   framework: string;
   destName: string;

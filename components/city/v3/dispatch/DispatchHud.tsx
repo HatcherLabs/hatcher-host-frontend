@@ -208,6 +208,9 @@ export function DispatchHud({
       return startDispatch({
         id: `dsp-${dispatchSeq}-${agent.id}`,
         agentId: agent.id,
+        // Real DB id (present on the caller's own city agents) — the city `id` is
+        // an anonymized render key the server can't resolve, so scoring needs this.
+        dashboardAgentId: agent.dashboardAgentId ?? undefined,
         agentName: cityAgentDisplayName(agent),
         framework: agent.framework,
         destName: dest.name,
