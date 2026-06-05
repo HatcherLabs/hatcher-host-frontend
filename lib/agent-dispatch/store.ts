@@ -47,6 +47,9 @@ interface DispatchState {
   surgeMult: number; // active Data Surge packet multiplier (1 when inactive)
   surgeActive: boolean;
   onchainEnabled: boolean; // server has Solana anchoring on (gates /complete reports)
+  steerIndex: number; // which active courier manual steering controls
+  sessionScore: number; // ranked leaderboard points earned this session (server-validated)
+  scoreToast: { scored: number; nonce: number } | null;
   dispatches: ActiveDispatch[];
   lastResult: DispatchResult | null;
   achievementToast: { name: string; reward: number } | null;
@@ -70,6 +73,9 @@ interface DispatchState {
   unlockAuto: () => boolean; // buy auto-dispatch with Data
   spendAutoFuel: () => boolean; // burn fuel for one auto-dispatch; false if broke
   setManual: (v: boolean) => void;
+  cycleSteer: () => void; // pick the next active courier to steer
+  reportScore: (scored: number) => void; // record server-validated leaderboard points
+  clearScoreToast: () => void;
   setSurge: (active: boolean, mult: number) => void;
   applyOffline: (runningAgents: number) => void;
   touchSeen: () => void;
@@ -111,6 +117,9 @@ export const useDispatchStore = create<DispatchState>()(
       surgeMult: 1,
       surgeActive: false,
       onchainEnabled: false,
+      steerIndex: 0,
+      sessionScore: 0,
+      scoreToast: null,
       dispatches: [],
       lastResult: null,
       achievementToast: null,
@@ -237,6 +246,16 @@ export const useDispatchStore = create<DispatchState>()(
         return true;
       },
       setManual: (v) => set({ manualControl: v }),
+      cycleSteer: () =>
+        set((s) => ({ steerIndex: s.dispatches.length > 0 ? (s.steerIndex + 1) % s.dispatches.length : 0 })),
+      reportScore: (scored) => {
+        if (scored <= 0) return; // rate-limited / cooldown — leave the stat unchanged
+        set((s) => ({
+          sessionScore: s.sessionScore + scored,
+          scoreToast: { scored, nonce: (s.scoreToast?.nonce ?? 0) + 1 },
+        }));
+      },
+      clearScoreToast: () => set({ scoreToast: null }),
       setSurge: (active, mult) => set({ surgeActive: active, surgeMult: active ? mult : 1 }),
 
       applyOffline: (runningAgents) => {
