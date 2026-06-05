@@ -176,8 +176,14 @@ export function DispatchHud({
   }, [lastResult, clearResult]);
 
   const busy = new Set(dispatches.map((d) => d.agentId));
-  const available = runningAgents.filter((a) => !busy.has(a.id));
-  const selected = agentId && available.some((a) => a.id === agentId) ? agentId : available[0]?.id ?? '';
+  const idle = runningAgents.filter((a) => !busy.has(a.id));
+  const maxSlots = upgradeEffects(upgrades).maxSlots;
+  const slotsFree = maxSlots - dispatches.length;
+  // Prefer idle agents for variety; once every agent is already out but a slot is
+  // still free, reuse a running agent so extra Ops Center slots are never wasted.
+  const pool = idle.length > 0 ? idle : runningAgents;
+  const selected = agentId && pool.some((a) => a.id === agentId) ? agentId : pool[0]?.id ?? '';
+  const canSend = slotsFree > 0 && pool.length > 0;
 
   const createDispatch = useCallback(
     (agent: CityAgent, dest: Dest, job: JobType) => {
@@ -223,7 +229,8 @@ export function DispatchHud({
   );
 
   const send = () => {
-    const agent = available.find((a) => a.id === selected);
+    if (!canSend) return;
+    const agent = pool.find((a) => a.id === selected) ?? pool[0];
     if (agent) createDispatch(agent, dests[destIdx]!, JOB_TYPES[jobIdx]!);
   };
 
@@ -237,12 +244,16 @@ export function DispatchHud({
       if (free <= 0) return;
       const busy = new Set(st.dispatches.map((d) => d.agentId));
       const idle = runningAgents.filter((a) => !busy.has(a.id));
-      for (let i = 0; i < Math.min(free, idle.length); i++) {
+      for (let i = 0; i < free; i++) {
+        // Prefer an idle agent; reuse running agents round-robin to fill the
+        // remaining slots so extra Ops Center slots are never wasted.
+        const agent = idle[i] ?? runningAgents[i % runningAgents.length];
+        if (!agent) break;
         // Each auto-dispatch burns fuel (Data). Out of Data → auto pauses until
         // you earn more (manual dispatches are free).
         if (!useDispatchStore.getState().spendAutoFuel()) break;
         autoDestRef.current = (autoDestRef.current + 1) % dests.length;
-        createDispatch(idle[i]!, dests[autoDestRef.current]!, JOB_TYPES[0]!);
+        createDispatch(agent, dests[autoDestRef.current]!, JOB_TYPES[0]!);
       }
     };
     tick();
@@ -388,15 +399,23 @@ export function DispatchHud({
             )}
           </div>
 
+          {/* Courier slots — raise the cap via the Ops Center upgrade in the Lab. */}
+          <div className="flex items-center justify-between text-[11px] text-[#9fceb4]">
+            <span>⊞ Courier slots</span>
+            <span className="font-mono text-[#dffbe9]">
+              {dispatches.length}/{maxSlots}
+            </span>
+          </div>
+
           {/* Dispatch form */}
-          {available.length > 0 ? (
+          {canSend ? (
             <div className="flex flex-col gap-2">
               <select
                 value={selected}
                 onChange={(e) => setAgentId(e.target.value)}
                 className="rounded-lg border border-white/10 bg-black/40 px-2 py-2 text-sm outline-none"
               >
-                {available.map((a) => (
+                {pool.map((a) => (
                   <option key={a.id} value={a.id}>
                     {cityAgentDisplayName(a)} ({a.framework})
                   </option>
@@ -440,7 +459,7 @@ export function DispatchHud({
             <p className="text-xs text-[#9fceb4]">
               {runningAgents.length === 0
                 ? 'No running agents — start one to dispatch it.'
-                : 'All your agents are out on a run.'}
+                : `All ${maxSlots} courier slots are busy — they free up as couriers return.`}
             </p>
           )}
 

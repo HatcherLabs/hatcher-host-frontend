@@ -47,17 +47,22 @@ export function DispatchLeaderboard({ onClose }: { onClose: () => void }) {
 
   useEffect(() => {
     let alive = true;
-    Promise.all([fetchLeaderboard(), fetchSeason(), fetchReceipts(), fetchTrophies()]).then(([lb, s, r, t]) => {
-      if (alive) {
+    const load = () =>
+      Promise.all([fetchLeaderboard(), fetchSeason(), fetchReceipts(), fetchTrophies()]).then(([lb, s, r, t]) => {
+        if (!alive) return;
         setData(lb);
         setSeason(s);
         setReceipts(r);
         setTrophies(t);
         setLoading(false);
-      }
-    });
+      });
+    void load();
+    // Refresh while the panel stays open so standings don't look frozen as the
+    // player keeps completing dispatches.
+    const poll = window.setInterval(() => void load(), 15_000);
     return () => {
       alive = false;
+      window.clearInterval(poll);
     };
   }, []);
 

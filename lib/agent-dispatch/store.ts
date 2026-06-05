@@ -125,8 +125,11 @@ export const useDispatchStore = create<DispatchState>()(
 
       startDispatch: (d) => {
         const { dispatches, upgrades } = get();
+        // The Ops Center upgrade is the only cap on concurrent couriers. An agent
+        // can fly more than one courier at once so the upgrade still grants real
+        // slots even when you own fewer agents than slots (caller prefers idle
+        // agents first; reuse only fills the remaining slots).
         if (dispatches.length >= upgradeEffects(upgrades).maxSlots) return false;
-        if (dispatches.some((x) => x.agentId === d.agentId)) return false; // one run per agent
         set({ dispatches: [...dispatches, d] });
         return true;
       },
