@@ -28,12 +28,12 @@ const WRITE_RATE_LIMIT_MAX = 20;
 const rateBuckets = new Map<string, { count: number; resetAt: number }>();
 
 export async function POST(request: NextRequest) {
-  const requestOrigin = publicSiteOrigin(request);
+  const requestOrigins = publicSiteOrigins(request);
   const authorization = request.headers.get('authorization');
   const isTrustedBrowserRequest = isTrustedSolanaRpcSource(
     request.headers.get('origin'),
     request.headers.get('referer'),
-    requestOrigin,
+    requestOrigins,
   );
   const isAuthorizedProxyRequest = isAuthorizedSolanaRpcProxyRequest(authorization);
 
@@ -90,16 +90,17 @@ function isRpcObject(payload: unknown): payload is { method?: unknown; id?: unkn
   return typeof payload === 'object' && payload !== null && !Array.isArray(payload);
 }
 
-function publicSiteOrigin(request: NextRequest): string {
+function publicSiteOrigins(request: NextRequest): string[] {
+  const origins = new Set<string>([request.nextUrl.origin]);
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
   if (siteUrl) {
     try {
-      return new URL(siteUrl).origin;
+      origins.add(new URL(siteUrl).origin);
     } catch {
       // Fall back to the request origin below.
     }
   }
-  return request.nextUrl.origin;
+  return Array.from(origins);
 }
 
 function clientRateKey(request: NextRequest): string {
