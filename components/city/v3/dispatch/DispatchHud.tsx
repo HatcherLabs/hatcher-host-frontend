@@ -24,7 +24,7 @@ import { DispatchLab } from './DispatchLab';
 import { DispatchGoals } from './DispatchGoals';
 import { useDispatchScoreSync } from '@/lib/agent-dispatch/useScoreSync';
 import { useDispatchStateSync } from '@/lib/agent-dispatch/state-sync';
-import { fetchSurge } from '@/lib/agent-dispatch/leaderboard';
+import { fetchSurge, fetchSeason } from '@/lib/agent-dispatch/leaderboard';
 
 interface Dest {
   name: string;
@@ -85,6 +85,11 @@ export function DispatchHud({
   const unlockAuto = useDispatchStore((s) => s.unlockAuto);
   const manualControl = useDispatchStore((s) => s.manualControl);
   const setManual = useDispatchStore((s) => s.setManual);
+  const steerIndex = useDispatchStore((s) => s.steerIndex);
+  const cycleSteer = useDispatchStore((s) => s.cycleSteer);
+  const sessionScore = useDispatchStore((s) => s.sessionScore);
+  const scoreToast = useDispatchStore((s) => s.scoreToast);
+  const clearScoreToast = useDispatchStore((s) => s.clearScoreToast);
   // Manual WASD steering needs a keyboard. On touch / coarse-pointer devices
   // hide it and force auto so a persisted "manual" pref can't strand a courier
   // the player has no way to move.
@@ -113,6 +118,23 @@ export function DispatchHud({
 
   const lvl = useMemo(() => levelInfo(xp), [xp]);
   const dests = useMemo(() => dispatchDestinations(grid), [grid]);
+
+  // Your live competitive standing (monthly ranked board) — distinct from the
+  // cosmetic Data currency, so players can see ranked play actually counting.
+  const [seasonYou, setSeasonYou] = useState<{ rank: number; value: number } | null>(null);
+  useEffect(() => {
+    let alive = true;
+    const load = () =>
+      void fetchSeason().then((s) => {
+        if (alive) setSeasonYou(s?.you ? { rank: s.you.rank, value: s.you.value } : null);
+      });
+    load();
+    const t = window.setInterval(load, 20_000);
+    return () => {
+      alive = false;
+      window.clearInterval(t);
+    };
+  }, []);
 
   const runningAgents = useMemo(
     () => ownedAgents.filter((a) => a.status === 'running'),
@@ -316,6 +338,11 @@ export function DispatchHud({
     const t = window.setTimeout(() => clearOfflineToast(), 7000);
     return () => window.clearTimeout(t);
   }, [offlineToast, clearOfflineToast]);
+  useEffect(() => {
+    if (!scoreToast) return;
+    const t = window.setTimeout(() => clearScoreToast(), 2200);
+    return () => window.clearTimeout(t);
+  }, [scoreToast, clearScoreToast]);
 
   return (
     <>
@@ -400,6 +427,25 @@ export function DispatchHud({
                 ★ Prestige → +25% forever
               </button>
             )}
+          </div>
+
+          {/* Ranked standing — distinct from the cosmetic Data currency so players
+              can see completed dispatches actually counting toward the prize race. */}
+          <div
+            className="flex items-center justify-between rounded-lg border border-[#ffd24a]/25 bg-[#ffd24a]/5 px-2.5 py-1.5 text-[11px] text-[#9fceb4]"
+            title="Ranked leaderboard points from completed dispatches (1 scored per agent every 12s). Data ◆ is cosmetic and does not affect ranking."
+          >
+            <span className="font-semibold text-[#ffd24a]">⚔ Leaderboard</span>
+            <span className="font-mono text-[#fff0c0]">
+              {seasonYou
+                ? `#${seasonYou.rank} · ${seasonYou.value.toLocaleString()}`
+                : sessionScore > 0
+                  ? `+${sessionScore.toLocaleString()}`
+                  : '—'}
+              {sessionScore > 0 && seasonYou && (
+                <span className="ml-1 text-[#7faE96]">(+{sessionScore} run)</span>
+              )}
+            </span>
           </div>
 
           {/* Courier slots — raise the cap via the Ops Center upgrade in the Lab. */}
@@ -538,6 +584,16 @@ export function DispatchHud({
               destination to deliver; sweep packets for combos.
             </div>
           )}
+          {/* Pick which courier you steer when several are in flight at once. */}
+          {canSteer && manualControl && dispatches.length > 1 && (
+            <button
+              onClick={cycleSteer}
+              className="flex items-center justify-between rounded-lg border border-[#62b8ff]/40 bg-[#62b8ff]/10 px-3 py-1.5 text-[11px] font-semibold text-[#62b8ff] transition hover:bg-[#62b8ff]/20"
+            >
+              <span>🎮 Steering courier {(steerIndex % dispatches.length) + 1}/{dispatches.length}</span>
+              <span className="rounded-full bg-[#62b8ff]/20 px-2 py-0.5">next ▸</span>
+            </button>
+          )}
           <div className="grid grid-cols-2 gap-2">
             <button onClick={() => setLabOpen(true)} className="rounded-lg border border-[#39ff88]/30 bg-black/30 px-2 py-2 text-sm font-semibold text-[#39ff88] transition hover:bg-[#39ff88]/10">
               ⚗ Lab
@@ -567,6 +623,17 @@ export function DispatchHud({
               <span className="ml-1 font-bold text-[#ffd24a]">· Level {lastResult.leveledTo}! 🎉</span>
             )}
           </div>
+        </div>
+      )}
+
+      {/* Ranked score toast — the competitive points a completion actually added. */}
+      {scoreToast && (
+        <div
+          key={scoreToast.nonce}
+          className="pointer-events-none fixed bottom-44 left-1/2 z-40 -translate-x-1/2 rounded-full border border-[#ffd24a]/60 bg-[rgba(20,14,4,0.94)] px-4 py-1.5 text-sm font-bold text-[#ffd24a] shadow-xl backdrop-blur"
+          style={{ boxShadow: '0 0 22px rgba(255,210,74,0.35)', animation: 'dispatch-float 0.4s ease-out' }}
+        >
+          ⚔ +{scoreToast.scored} leaderboard
         </div>
       )}
 

@@ -195,9 +195,12 @@ export function DispatchCouriers() {
   const equippedSkin = useDispatchStore((s) => s.equippedSkin);
   const upgrades = useDispatchStore((s) => s.upgrades);
   const manualControl = useDispatchStore((s) => s.manualControl);
+  const steerIndex = useDispatchStore((s) => s.steerIndex);
   const skin = useMemo(() => skinById(equippedSkin), [equippedSkin]);
   const fx = useMemo(() => upgradeEffects(upgrades), [upgrades]);
   const keysRef = useSteerKeys(manualControl);
+  // Which in-flight courier manual control drives (wraps if the count shrank).
+  const activeSteer = dispatches.length > 0 ? steerIndex % dispatches.length : 0;
 
   return (
     <group>
@@ -213,7 +216,7 @@ export function DispatchCouriers() {
           collectRadius={fx.collectRadius}
           magnetRange={fx.magnetRange}
           payoutMult={fx.payoutMult}
-          manual={manualControl && idx === 0}
+          manual={manualControl && idx === activeSteer}
           keysRef={keysRef}
         />
       ))}
@@ -557,6 +560,9 @@ function Courier({
         // Server scores only against a real owned agent id — the city render key
         // (dispatch.agentId) never resolves, so the leaderboard would never move.
         agentId: dispatch.dashboardAgentId ?? dispatch.agentId,
+      }).then((res) => {
+        // Surface the server-validated ranked points (0 = anti-farm cooldown).
+        if (res) useDispatchStore.getState().reportScore(res.scored);
       });
     }
   });
