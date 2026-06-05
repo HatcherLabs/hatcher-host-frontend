@@ -10,6 +10,7 @@ export interface LeaderRow {
 export interface LeaderboardData {
   overall: LeaderRow[];
   byFramework: Record<string, LeaderRow[]>;
+  frameworkWars?: Record<string, number>; // total validated score per framework
 }
 
 export interface ScorePayload {

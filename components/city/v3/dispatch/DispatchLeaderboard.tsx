@@ -20,10 +20,24 @@ const RANK_MEDAL = ['🥇', '🥈', '🥉', '🏅', '🏅'];
 const TABS = [
   { id: 'prizes', label: '🏆 Prizes' },
   { id: 'overall', label: 'All-time' },
+  { id: 'wars', label: '⚔ Wars' },
+  { id: 'hof', label: '👑 Legends' },
   { id: 'openclaw', label: 'OpenClaw' },
   { id: 'hermes', label: 'Hermes' },
   { id: 'onchain', label: '⛓ On-chain' },
 ];
+
+const FW_WAR = {
+  openclaw: { label: 'OpenClaw', color: '#39ff88' },
+  hermes: { label: 'Hermes', color: '#62b8ff' },
+} as const;
+
+// Compose a tweet and open the X intent in a new tab.
+function shareToX(text: string) {
+  const url = 'https://hatcher.host/city';
+  const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+  if (typeof window !== 'undefined') window.open(intent, '_blank', 'noopener,noreferrer');
+}
 
 const RANK_COLOR = ['#ffd24a', '#cfd6e0', '#cd7f32'];
 
@@ -101,6 +115,10 @@ export function DispatchLeaderboard({ onClose }: { onClose: () => void }) {
           <p className="py-8 text-center text-sm text-[#9fceb4]">Loading…</p>
         ) : tab === 'prizes' ? (
           <SeasonView season={season} countdown={countdown} />
+        ) : tab === 'wars' ? (
+          <WarsView data={data} />
+        ) : tab === 'hof' ? (
+          <HallOfFameView season={season} />
         ) : tab === 'onchain' ? (
           <OnchainView season={season} receipts={receipts} trophies={trophies} onClaimed={reloadTrophies} />
         ) : allTimeRows.length === 0 ? (
@@ -140,13 +158,25 @@ function SeasonView({ season, countdown }: { season: SeasonData | null; countdow
         </p>
         {season.you && (
           <div className="mt-2 rounded-lg bg-black/30 px-3 py-2 text-xs">
-            You&apos;re <span className="font-bold text-[#ffd24a]">#{season.you.rank}</span> with ◆{' '}
-            {season.you.value.toLocaleString()}
-            {season.you.prizeCredits > 0 ? (
-              <span className="text-[#39ff88]"> · on track for {season.you.prizeCredits.toLocaleString()} AI Credits</span>
-            ) : (
-              <span className="text-[#7faE96]"> · reach the top 5 for a prize</span>
-            )}
+            <div>
+              You&apos;re <span className="font-bold text-[#ffd24a]">#{season.you.rank}</span> with ◆{' '}
+              {season.you.value.toLocaleString()}
+              {season.you.prizeCredits > 0 ? (
+                <span className="text-[#39ff88]"> · on track for {season.you.prizeCredits.toLocaleString()} AI Credits</span>
+              ) : (
+                <span className="text-[#7faE96]"> · reach the top 5 for a prize</span>
+              )}
+            </div>
+            <button
+              onClick={() =>
+                shareToX(
+                  `I'm ranked #${season.you!.rank} in Hatcher Agent Dispatch ⚔ with ${season.you!.value.toLocaleString()} pts. Deploy an AI agent, race the city for AI Credits 🤖`,
+                )
+              }
+              className="mt-2 flex items-center gap-1.5 rounded-md border border-[#1d9bf0]/50 bg-[#1d9bf0]/10 px-2.5 py-1 text-[11px] font-semibold text-[#1d9bf0] transition hover:bg-[#1d9bf0]/20"
+            >
+              𝕏 Share my rank
+            </button>
           </div>
         )}
       </div>
@@ -203,6 +233,111 @@ function SeasonView({ season, countdown }: { season: SeasonData | null; countdow
             ))}
         </div>
       )}
+    </div>
+  );
+}
+
+function WarsView({ data }: { data: LeaderboardData | null }) {
+  const wars = data?.frameworkWars ?? {};
+  const oc = Math.max(0, Math.round(wars.openclaw ?? 0));
+  const hm = Math.max(0, Math.round(wars.hermes ?? 0));
+  const total = oc + hm;
+  if (total === 0) {
+    return <p className="py-8 text-center text-sm text-[#9fceb4]">No scores yet — pick a side and dispatch!</p>;
+  }
+  const ocPct = Math.round((oc / total) * 100);
+  const leader = oc === hm ? 'tied' : oc > hm ? 'openclaw' : 'hermes';
+  return (
+    <div className="flex flex-col gap-3">
+      <p className="text-center text-xs text-[#9fceb4]">
+        Every dispatch you complete adds to your framework&apos;s total. Which side runs the city?
+      </p>
+      <div className="flex items-center justify-between text-sm font-bold">
+        <span style={{ color: FW_WAR.openclaw.color }}>{FW_WAR.openclaw.label}</span>
+        <span style={{ color: FW_WAR.hermes.color }}>{FW_WAR.hermes.label}</span>
+      </div>
+      {/* Tug-of-war bar */}
+      <div className="flex h-6 overflow-hidden rounded-full border border-white/10">
+        <div className="flex items-center justify-start pl-2 text-[10px] font-bold text-black" style={{ width: `${ocPct}%`, background: FW_WAR.openclaw.color }}>
+          {ocPct >= 12 && `${ocPct}%`}
+        </div>
+        <div className="flex flex-1 items-center justify-end pr-2 text-[10px] font-bold text-black" style={{ background: FW_WAR.hermes.color }}>
+          {100 - ocPct >= 12 && `${100 - ocPct}%`}
+        </div>
+      </div>
+      <div className="flex items-center justify-between font-mono text-xs">
+        <span style={{ color: FW_WAR.openclaw.color }}>◆ {oc.toLocaleString()}</span>
+        <span style={{ color: FW_WAR.hermes.color }}>◆ {hm.toLocaleString()}</span>
+      </div>
+      <div className="rounded-lg bg-black/30 px-3 py-2 text-center text-xs">
+        {leader === 'tied' ? (
+          <span className="font-bold text-[#dffbe9]">Dead heat — both frameworks tied!</span>
+        ) : (
+          <span>
+            <span className="font-bold" style={{ color: FW_WAR[leader].color }}>{FW_WAR[leader].label}</span> leads by{' '}
+            <span className="font-mono">◆ {Math.abs(oc - hm).toLocaleString()}</span>
+          </span>
+        )}
+      </div>
+      <button
+        onClick={() =>
+          shareToX(
+            `${FW_WAR[leader === 'tied' ? 'openclaw' : leader].label} is ${leader === 'tied' ? 'tied' : 'leading'} the Framework Wars in Hatcher Agent Dispatch ⚔ — OpenClaw ${oc.toLocaleString()} vs Hermes ${hm.toLocaleString()}. Pick a side 🤖`,
+          )
+        }
+        className="flex items-center justify-center gap-1.5 rounded-md border border-[#1d9bf0]/50 bg-[#1d9bf0]/10 px-2.5 py-1.5 text-[11px] font-semibold text-[#1d9bf0] transition hover:bg-[#1d9bf0]/20"
+      >
+        𝕏 Share the war
+      </button>
+    </div>
+  );
+}
+
+function HallOfFameView({ season }: { season: SeasonData | null }) {
+  const months = (season?.past ?? []).filter((p) => p.winners.length > 0);
+  if (months.length === 0) {
+    return (
+      <p className="py-8 text-center text-sm text-[#9fceb4]">
+        No champions crowned yet — win a monthly season to enter the hall.
+      </p>
+    );
+  }
+  return (
+    <div className="flex flex-col gap-3">
+      <p className="text-center text-xs text-[#9fceb4]">Monthly season champions, immortalized.</p>
+      {months.map((p) => {
+        const champ = p.winners.find((w) => w.rank === 1) ?? p.winners[0]!;
+        const rest = p.winners.filter((w) => w.rank > 1).slice(0, 2);
+        return (
+          <div key={p.month} className="rounded-xl border border-[#ffd24a]/30 bg-[#ffd24a]/5 p-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-semibold text-[#9fceb4]">{p.month}</span>
+              {p.solscan && (
+                <a href={p.solscan} target="_blank" rel="noopener noreferrer" className="text-[10px] text-[#39ff88] hover:underline">
+                  ⛓ on-chain
+                </a>
+              )}
+            </div>
+            <div className="mt-1 flex items-center gap-2">
+              <span className="text-2xl">👑</span>
+              <span className="min-w-0 flex-1 truncate text-base font-bold text-[#ffd24a]">{champ.username}</span>
+              {champ.prizeCredits > 0 && (
+                <span className="text-xs font-bold text-[#39ff88]">{champ.prizeCredits.toLocaleString()} AI Cr</span>
+              )}
+            </div>
+            {rest.length > 0 && (
+              <div className="mt-1 text-[11px] text-[#9fceb4]">
+                {rest.map((w, i) => (
+                  <span key={w.rank}>
+                    {i > 0 && ' · '}
+                    {RANK_MEDAL[w.rank - 1] ?? '🏅'} <span style={{ color: RANK_COLOR[w.rank - 1] ?? '#dffbe9' }}>{w.username}</span>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
