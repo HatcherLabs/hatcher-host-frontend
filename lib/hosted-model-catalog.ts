@@ -55,6 +55,7 @@ export const HOSTED_MODEL_PROVIDERS: HostedModelProvider[] = [
   { key: 'openai', name: 'OpenAI', description: 'General, coding, and frontier models.' },
   { key: 'anthropic', name: 'Anthropic', description: 'Claude models for reasoning and writing.' },
   { key: 'idle', name: 'IDLE', description: 'Partner-hosted Claude models with fixed request pricing.' },
+  { key: 'openserv', name: 'OpenServ', description: 'Private-beta SERV reasoning models for agent workflows.' },
   { key: 'xiaomi', name: 'Xiaomi MiMo', description: 'Partner-hosted MiMo models with long context and launch-promo usage.' },
   { key: 'acedata', name: 'AceData', description: 'Partner-hosted frontier models plus data and media intelligence APIs.' },
   { key: 'google', name: 'Google', description: 'Gemini models with large context windows.' },
@@ -221,6 +222,67 @@ export const HOSTED_MODELS: HostedModelOption[] = [
     context: '1M',
     description: 'Partner-hosted Claude Sonnet through IDLE. Fixed price per request.',
     fixedPrice: '3 AI Credits per request',
+  },
+  {
+    id: 'openserv/serv-nano',
+    name: 'SERV Nano',
+    providerKey: 'openserv',
+    provider: 'OpenServ',
+    category: 'Fast',
+    cost: 'Low',
+    context: '128K',
+    description: 'OpenServ SERV reasoning model for low-cost, quick agent responses.',
+  },
+  {
+    id: 'openserv/serv-mini',
+    name: 'SERV Mini',
+    providerKey: 'openserv',
+    provider: 'OpenServ',
+    category: 'Balanced',
+    cost: 'Medium',
+    context: '1M',
+    description: 'OpenServ SERV reasoning model with strong long-context price-performance.',
+  },
+  {
+    id: 'openserv/serv-swift',
+    name: 'SERV Swift',
+    providerKey: 'openserv',
+    provider: 'OpenServ',
+    category: 'Fast',
+    cost: 'Medium',
+    context: '200K',
+    description: 'OpenServ SERV model tuned for responsive reasoning and agent tool loops.',
+  },
+  {
+    id: 'openserv/serv-standard',
+    name: 'SERV Standard',
+    providerKey: 'openserv',
+    provider: 'OpenServ',
+    category: 'Balanced',
+    cost: 'High',
+    context: '200K',
+    description: 'OpenServ SERV model for stronger reasoning without using the premium tier.',
+  },
+  {
+    id: 'openserv/serv-pro',
+    name: 'SERV Pro',
+    providerKey: 'openserv',
+    provider: 'OpenServ',
+    category: 'Advanced',
+    cost: 'High',
+    context: '1M',
+    description: 'Higher-capability OpenServ SERV model for complex agent workflows.',
+  },
+  {
+    id: 'openserv/serv-ultra',
+    name: 'SERV Ultra',
+    providerKey: 'openserv',
+    provider: 'OpenServ',
+    category: 'Premium',
+    cost: 'Premium',
+    context: '200K',
+    description: 'Premium OpenServ SERV model for selective high-value reasoning tasks.',
+    warning: 'Consumes AI Credits quickly.',
   },
   {
     id: 'xiaomi/mimo-v2.5-pro',
@@ -799,19 +861,21 @@ export function getHostedModelOption(model: string | undefined): HostedModelOpti
 
 export function hostedModelRoute(model: HostedModelOption): string {
   if (model.providerKey === 'idle') return 'IDLE partner';
+  if (model.providerKey === 'openserv') return 'OpenServ direct / OpenRouter fallback';
   if (model.providerKey === 'xiaomi') return 'Xiaomi MiMo direct';
   if (model.providerKey === 'acedata') return 'AceData primary / OpenRouter fallback';
   return 'UsePod primary / OpenRouter fallback';
 }
 
 export function hostedModelPrivacy(model: HostedModelOption): HostedModelPrivacy {
-  return model.providerKey === 'idle' || model.providerKey === 'xiaomi' || model.providerKey === 'acedata'
+  return model.providerKey === 'idle' || model.providerKey === 'openserv' || model.providerKey === 'xiaomi' || model.providerKey === 'acedata'
     ? 'partner'
     : 'hatcher';
 }
 
 export function hostedPrivacyLabel(model: HostedModelOption): string {
   if (model.providerKey === 'idle') return 'Partner-hosted';
+  if (model.providerKey === 'openserv') return 'OpenServ-hosted';
   if (model.providerKey === 'xiaomi') return 'Xiaomi-hosted';
   if (model.providerKey === 'acedata') return 'AceData-hosted';
   return 'Hatcher-hosted';

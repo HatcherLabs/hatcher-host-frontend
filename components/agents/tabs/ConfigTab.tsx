@@ -150,7 +150,9 @@ const PROVIDER_GLYPH: Record<string, string> = {
   openai: '◎',
   anthropic: 'A',
   idle: 'ID',
+  openserv: 'OS',
   xiaomi: 'MI',
+  acedata: 'AC',
   google: 'G',
   qwen: 'Q',
   'x-ai': 'X',
@@ -1061,6 +1063,8 @@ export function ConfigTab() {
                       ? 'Inference routes directly through Xiaomi MiMo during the launch promo. Avoid sensitive data unless you accept the partner route.'
                       : selectedHostedModel.providerKey === 'acedata'
                         ? 'Inference routes through AceData first with OpenRouter fallback when needed. Review partner policy before using sensitive data.'
+                      : selectedHostedModel.providerKey === 'openserv'
+                        ? 'Inference routes through OpenServ first with OpenRouter fallback when needed. Review partner policy before using sensitive data.'
                       : hostedModelPrivacy(selectedHostedModel) === 'partner'
                         ? 'Inference happens through an explicit partner route such as IDLE. Review partner policy before using sensitive data.'
                         : 'Inference is routed through Hatcher managed infrastructure, currently UsePod first with OpenRouter fallback.'}

@@ -803,7 +803,7 @@
         },
         {
           "q": "What LLM do I get with the free tier?",
-          "a": "Hosted usage uses UsePod first with OpenRouter fallback and is charged from your AI Credit balance. You can choose from supported hosted models; BYOK bypasses Hatcher AI Credit metering because you pay your provider directly."
+          "a": "Hosted usage is charged from your AI Credit balance and routes through the selected Hatcher-supported provider, with fallbacks where available. You can choose from supported hosted models; BYOK bypasses Hatcher AI Credit metering because you pay your provider directly."
         },
         {
           "q": "What is the Founding Member tier?",
@@ -1873,7 +1873,7 @@
     "configRef": "Full configuration reference →",
     "docsSuffix": "docs",
     "llmSupport": "LLM support",
-    "llmSubheading": "Both frameworks support BYOK (Bring Your Own Key) for provider-paid usage. Hosted LLMs use UsePod first with OpenRouter fallback, then meter usage with AI Credits.",
+    "llmSubheading": "Both frameworks support BYOK (Bring Your Own Key) for provider-paid usage. Hosted LLMs route through Hatcher-supported providers and meter usage with AI Credits.",
     "byokNote": "* BYOK always free — provider-paid usage without Hatcher AI Credits.",
     "byokSetupLink": "View BYOK setup guide →",
     "decisionGuide": "Quick decision guide",
