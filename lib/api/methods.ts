@@ -68,6 +68,7 @@ import type {
   ConduitRegisterProviderBody,
   ConduitRegisterProviderResponse,
   ClawVilleConfigStatus,
+  ClawVilleLaunchResponse,
   ClawVillePatchBody,
   ClawVilleRegisterBody,
   ClawVilleRegisterResponse,
@@ -661,6 +662,12 @@ export const api = {
 
   getAgentClawVilleStats: (id: string) =>
     req<ClawVilleStatsResponse>(`/agents/${id}/clawville/stats`),
+
+  launchAgentClawVille: (id: string) =>
+    req<ClawVilleLaunchResponse>(`/agents/${id}/clawville/launch`, {
+      method: "POST",
+      body: JSON.stringify({}),
+    }),
 
   /** EarnFi partner proxy and paid job controls. */
   getAgentEarnFiConfig: (id: string) =>

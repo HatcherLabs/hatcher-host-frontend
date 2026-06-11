@@ -77,6 +77,7 @@ export type {
   ConduitRegisterProviderBody,
   ConduitRegisterProviderResponse,
   ClawVilleConfigStatus,
+  ClawVilleLaunchResponse,
   ClawVillePatchBody,
   ClawVilleProtocolPointer,
   ClawVilleRegisterBody,
