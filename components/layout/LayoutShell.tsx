@@ -1,32 +1,14 @@
 'use client';
 
-import { usePathname } from '@/i18n/routing';
+import { usePathname } from 'next/navigation';
 import { Nav } from '@/components/marketing/v3/Nav';
 import { Footer as FooterV3 } from '@/components/marketing/v3/Footer';
 import { ScrollToTop } from '@/components/ui/ScrollToTop';
-
-// Routes that own the full viewport — the Nav/Footer chrome would
-// cover their canvas. Extend this list as we add more immersive views.
-const IMMERSIVE_PATTERNS: RegExp[] = [
-  /^\/agent\/[^/]+\/room(?:-legacy)?(?:\/|$)/,
-  /^\/city(?:\/|$)/,
-  // Chat-to-hatch ships its own slim brand bar + back link; the global
-  // chrome would push the chat / preview columns below the fold.
-  /^\/chat-to-hatch(?:\/|$)/,
-  // LandingV3 owns its own Nav + Footer (marketing v3 chrome). Skipping
-  // the global chrome here prevents double-stacking.
-  /^\/$/,
-  // Marketing pages wrapped in MarketingShell v3 (own Nav + Footer).
-  /^\/(?:explore|features|pricing|frameworks|token|roadmap|blog|changelog|help|support|affiliate|security)(?:\/|$)/,
-  // Auth pages wrapped in AuthShell v3 (own slim brand bar).
-  /^\/(?:login|register|forgot-password|reset-password|verify-email)(?:\/|$)/,
-  // Bare legal pages wrapped in MarketingShell v3.
-  /^\/(?:privacy|terms|cookies|impressum)(?:\/|$)/,
-];
+import { isImmersiveChromePath } from './routeChrome';
 
 export function LayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const immersive = IMMERSIVE_PATTERNS.some(re => re.test(pathname));
+  const immersive = isImmersiveChromePath(pathname);
 
   if (immersive) {
     // No skip-link, no header, no footer — the page owns the screen.
