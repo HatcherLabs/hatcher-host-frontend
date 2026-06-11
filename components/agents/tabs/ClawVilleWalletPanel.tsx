@@ -75,6 +75,7 @@ export function ClawVilleWalletPanel({ agentId }: { agentId: string }) {
   const [stats, setStats] = useState<unknown | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [launching, setLaunching] = useState(false);
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({
@@ -141,6 +142,33 @@ export function ClawVilleWalletPanel({ agentId }: { agentId: string }) {
       }
     } finally {
       setSaving(false);
+    }
+  };
+
+  const enterClawVille = async () => {
+    if (!config?.registered) {
+      setError('Register this avatar in ClawVille before opening the game.');
+      return;
+    }
+    setLaunching(true);
+    setError(null);
+    const launchWindow = window.open('about:blank', '_blank');
+    if (launchWindow) launchWindow.opener = null;
+    try {
+      const launchRes = await api.launchAgentClawVille(agentId);
+      if (!launchRes.success) {
+        if (launchWindow) launchWindow.close();
+        setError(launchRes.error);
+        return;
+      }
+
+      if (launchWindow) {
+        launchWindow.location.href = launchRes.data.launchUrl;
+      } else {
+        window.location.assign(launchRes.data.launchUrl);
+      }
+    } finally {
+      setLaunching(false);
     }
   };
 
@@ -320,10 +348,23 @@ export function ClawVilleWalletPanel({ agentId }: { agentId: string }) {
             ))}
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
-            <button type="button" onClick={() => void save()} className="btn-primary inline-flex items-center gap-2" disabled={saving || loading}>
-              <Gamepad2 size={14} />
-              {saving ? 'Saving...' : config?.registered ? 'Update avatar' : 'Enter ClawVille'}
-            </button>
+            {config?.registered ? (
+              <>
+                <button type="button" onClick={() => void enterClawVille()} className="btn-primary inline-flex items-center gap-2" disabled={saving || launching || loading}>
+                  <Gamepad2 size={14} />
+                  {launching ? 'Opening...' : 'Enter ClawVille'}
+                </button>
+                <button type="button" onClick={() => void save()} className="btn-secondary inline-flex items-center gap-2" disabled={saving || launching || loading}>
+                  <Sparkles size={14} />
+                  {saving ? 'Saving...' : 'Update avatar'}
+                </button>
+              </>
+            ) : (
+              <button type="button" onClick={() => void save()} className="btn-primary inline-flex items-center gap-2" disabled={saving || launching || loading}>
+                <Gamepad2 size={14} />
+                {saving ? 'Saving...' : 'Register avatar'}
+              </button>
+            )}
             <button type="button" onClick={() => void refreshStats()} className="btn-secondary inline-flex items-center gap-2" disabled={checking || !config?.registered}>
               <RefreshCw size={14} className={checking ? 'animate-spin' : ''} />
               Stats
