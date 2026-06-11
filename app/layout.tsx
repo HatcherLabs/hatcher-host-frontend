@@ -14,6 +14,8 @@ import { PosthogProvider } from '@/components/providers/PosthogProvider';
 import { CookieConsent } from '@/components/ui/CookieConsent';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
+import { isLocale } from '@/i18n/config';
+import { HATCHER_LOCALE_HEADER } from '@/i18n/localeHeader';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -239,9 +241,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // Non-locale pages (admin, /privacy, not-found) rely on this provider to supply
   // default-locale messages. Locale pages get their own nested provider in
   // app/[locale]/layout.tsx which takes precedence for useTranslations.
-  const nonce = (await headers()).get('x-nonce') ?? undefined;
-  const locale = await getLocale();
-  const messages = await getMessages();
+  const requestHeaders = await headers();
+  const nonce = requestHeaders.get('x-nonce') ?? undefined;
+  const headerLocale = requestHeaders.get(HATCHER_LOCALE_HEADER);
+  const locale = isLocale(headerLocale) ? headerLocale : await getLocale();
+  const messages = await getMessages({ locale });
 
   return (
     <html lang={locale} className={`scroll-smooth ${inter.variable} ${jetbrainsMono.variable} ${sora.variable}`} suppressHydrationWarning>

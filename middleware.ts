@@ -21,6 +21,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { routing } from './i18n/routing';
 import { defaultLocale, locales } from './i18n/config';
+import { HATCHER_LOCALE_HEADER, resolveLocaleFromPathAndCookie } from './i18n/localeHeader';
 import { buildCsp } from './lib/csp';
 import { buildSensitiveAuthTokenRedirectUrl } from './lib/reset-password-token-url';
 
@@ -94,6 +95,12 @@ export default function middleware(req: NextRequest): NextResponse {
   const nonce = createNonce();
   const isEmbedRoute = stripLocalePrefix(pathname).startsWith('/embed');
   const requestHeaders = withCspRequestHeaders(req, nonce, isEmbedRoute);
+  requestHeaders.set(
+    HATCHER_LOCALE_HEADER,
+    isNonLocalePath(pathname)
+      ? defaultLocale
+      : resolveLocaleFromPathAndCookie(pathname, req.cookies.get('HATCHER_LOCALE')?.value),
+  );
   const authTokenRedirect = buildSensitiveAuthTokenRedirectUrl(
     req.nextUrl,
     (candidate) => {
