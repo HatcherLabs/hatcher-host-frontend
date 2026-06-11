@@ -36,6 +36,7 @@ import { KausalayerWalletPanel } from './KausalayerWalletPanel';
 import { ConduitWalletPanel } from './ConduitWalletPanel';
 import { OobeWalletPanel } from './OobeWalletPanel';
 import { ClawVilleWalletPanel } from './ClawVilleWalletPanel';
+import { OrbisWalletPanel } from './OrbisWalletPanel';
 
 interface ReputationState {
   upCount: number;
@@ -411,6 +412,7 @@ export function WalletTab() {
               <KausalayerWalletPanel agentId={agent.id} />
             </>
           )}
+          {activeNetwork.id === 'base' && <OrbisWalletPanel agentId={agent.id} />}
         </div>
       ) : (
         <GlassCard className="p-6 text-sm text-[var(--text-muted)]">Wallet not provisioned yet.</GlassCard>

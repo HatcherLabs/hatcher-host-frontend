@@ -373,6 +373,104 @@ export interface XonaCallResponse {
 
 export type XonaDiscoverResponse = unknown[];
 
+export type OrbisPayerSource = "orbis" | "base_hub" | "skale_hub" | "none";
+
+export interface OrbisAgentSettings {
+  enabled: boolean;
+  dailyBudgetUsd: number;
+  maxPerCallUsd: number;
+  allowedApiSlugs: string[];
+}
+
+export interface OrbisConfigStatus {
+  enabled: boolean;
+  configured: boolean;
+  baseUrl: string;
+  network: string;
+  payerAddress: string | null;
+  payerSource: OrbisPayerSource;
+  allowedCategories: string[];
+  allowedApiSlugs: string[];
+  allowedHosts: string[];
+  maxPerCallUsdc: number;
+  maxPerDayUsdc: number;
+  maxResponseBytes: number;
+  settings: OrbisAgentSettings;
+}
+
+export interface OrbisConfigBody {
+  enabled?: boolean;
+  dailyBudgetUsd?: number;
+  maxPerCallUsd?: number;
+  allowedApiSlugs?: string[];
+}
+
+export interface OrbisSearchParams {
+  q?: string;
+  category?: string;
+  chain?: "base" | "eip155:8453" | "solana";
+  minPriceUsd?: number;
+  maxPriceUsd?: number;
+  limit?: number;
+}
+
+export interface OrbisApiSummary {
+  id?: string | null;
+  slug?: string | null;
+  name?: string | null;
+  categorySlug?: string | null;
+  categoryName?: string | null;
+  tags?: unknown;
+  baseUrl?: string | null;
+  lowestPriceUsdc?: number | null;
+  callCount?: number | null;
+  uptimeScore?: number | null;
+  healthStatus?: string | null;
+  isActive?: boolean | null;
+  [key: string]: unknown;
+}
+
+export interface OrbisApiDetail {
+  api?: OrbisApiSummary;
+  tiers?: Array<Record<string, unknown>>;
+  endpoints?: Array<{
+    method?: string | null;
+    path?: string | null;
+    overridePrice?: number | null;
+    [key: string]: unknown;
+  }>;
+  [key: string]: unknown;
+}
+
+export type OrbisCategoriesResponse = unknown;
+export type OrbisSearchResponse = OrbisApiSummary[] | { apis?: OrbisApiSummary[]; data?: OrbisApiSummary[]; [key: string]: unknown };
+
+export interface OrbisCallBody {
+  apiSlug?: string;
+  apiId?: string;
+  endpointUrl?: string;
+  path?: string;
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  query?: Record<string, unknown>;
+  body?: Record<string, unknown>;
+  headers?: Record<string, string>;
+  workflowId?: string;
+  maxCostUsd?: number;
+}
+
+export interface OrbisCallResponse {
+  apiSlug: string | null;
+  endpointUrl: string;
+  status: number;
+  network: string;
+  amountPaid: string;
+  amountPaidUsdc: number;
+  txSig: string | null;
+  payer: string | null;
+  aiCreditsCharged: number;
+  data: unknown;
+}
+
 export type ConduitPayoutMode = "ai_credits" | "usdc_wallet";
 
 export interface ConduitConfigBody {
