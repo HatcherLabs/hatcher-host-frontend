@@ -491,6 +491,87 @@ export interface ClawVilleRegisterResponse {
 
 export type ClawVilleStatsResponse = unknown;
 
+export interface EarnFiPaidJobEstimate {
+  slots: number;
+  rewardPerUser: string;
+  estimatedUsd: number;
+  settlementMode: string;
+}
+
+export interface EarnFiJobRecord {
+  kind: "social" | "manual" | "interrupt" | string;
+  jobId: string;
+  statusUrl?: string | null;
+  idempotencyKey?: string | null;
+  estimatedUsd?: number | null;
+  settlementMode?: string | null;
+  aiCreditsCharged?: number | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}
+
+export interface EarnFiConfigStatus {
+  enabled: boolean;
+  configured: boolean;
+  apiBaseUrl: string;
+  partnerSource: string;
+  tokenStored: boolean;
+  registered: boolean;
+  registration: {
+    earnFiAgentId: string | null;
+    walletAddress: string | null;
+    registeredAt: string | null;
+    updatedAt: string | null;
+  };
+  paidJobs: {
+    social: EarnFiPaidJobEstimate;
+    manual: EarnFiPaidJobEstimate;
+    interrupt: EarnFiPaidJobEstimate;
+    pollingSeconds: number;
+  };
+  jobs: EarnFiJobRecord[];
+}
+
+export interface EarnFiRegisterResponse {
+  registered: boolean;
+  tokenStored: boolean;
+  earnFiAgentId: string | null;
+  walletAddress: string | null;
+}
+
+export interface EarnFiSocialJobBody {
+  contentUrl: string;
+  workflowId?: string;
+  correlationId?: string;
+}
+
+export interface EarnFiInterruptJobBody {
+  workflowId?: string;
+  correlationId?: string;
+}
+
+export interface EarnFiManualJobBody {
+  title: string;
+  instructions: string;
+  slots: number;
+  rewardPerUser: string;
+  verificationMethod: "manual" | "auto";
+  workflowId?: string;
+  correlationId?: string;
+}
+
+export interface EarnFiCreateJobResponse {
+  job: EarnFiJobRecord;
+  accounting?: {
+    settlementMode: string;
+    creditsCharged: number;
+    estimatedUsd: number;
+  };
+  upstream?: unknown;
+}
+
+export type EarnFiPollResponse = unknown;
+
 export interface OobeCapability {
   id: string;
   description: string | null;

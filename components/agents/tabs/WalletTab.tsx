@@ -34,6 +34,7 @@ import type {
 import { buildFallbackPassport, shortAddress } from '@/lib/agent-passport';
 import { KausalayerWalletPanel } from './KausalayerWalletPanel';
 import { ConduitWalletPanel } from './ConduitWalletPanel';
+import { EarnFiWalletPanel } from './EarnFiWalletPanel';
 import { OobeWalletPanel } from './OobeWalletPanel';
 import { ClawVilleWalletPanel } from './ClawVilleWalletPanel';
 
@@ -70,6 +71,12 @@ function iconForPanel(panel: WalletPanel) {
   if (panel === 'skale') return <ShieldCheck size={14} />;
   if (panel === 'solana') return <Zap size={14} />;
   return <Layers3 size={14} />;
+}
+
+function readInitialWalletPanel(): WalletPanel {
+  if (typeof window === 'undefined') return 'passport';
+  const requested = new URLSearchParams(window.location.search).get('wallet');
+  return TAB_ORDER.includes(requested as WalletPanel) ? (requested as WalletPanel) : 'passport';
 }
 
 function explorerTxUrl(txHash: string, chainId: number): string {
@@ -134,7 +141,7 @@ export function WalletTab() {
   const [passport, setPassport] = useState<AgentPassport | null>(null);
   const [wallets, setWallets] = useState<AgentWalletsResponse | null>(null);
   const [reputation, setReputation] = useState<ReputationState | null>(null);
-  const [activePanel, setActivePanel] = useState<WalletPanel>('passport');
+  const [activePanel, setActivePanelRaw] = useState<WalletPanel>(() => readInitialWalletPanel());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copyMsg, setCopyMsg] = useState<string | null>(null);
@@ -163,6 +170,14 @@ export function WalletTab() {
   }, [activePassport.identity.networks, wallets]);
 
   const networkById = useMemo(() => new Map(networks.map((network) => [network.id, network])), [networks]);
+
+  const setActivePanel = useCallback((panel: WalletPanel) => {
+    setActivePanelRaw(panel);
+    if (typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    url.searchParams.set('wallet', panel);
+    window.history.replaceState({}, '', `${url.pathname}${url.search}`);
+  }, []);
 
   const loadWalletData = useCallback(async () => {
     setLoading(true);
@@ -406,6 +421,7 @@ export function WalletTab() {
           {activeNetwork.id === 'solana' && (
             <>
               <ConduitWalletPanel agentId={agent.id} />
+              <EarnFiWalletPanel agentId={agent.id} />
               <OobeWalletPanel agentId={agent.id} />
               <ClawVilleWalletPanel agentId={agent.id} />
               <KausalayerWalletPanel agentId={agent.id} />

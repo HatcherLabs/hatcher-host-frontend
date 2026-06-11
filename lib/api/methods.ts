@@ -72,6 +72,13 @@ import type {
   ClawVilleRegisterBody,
   ClawVilleRegisterResponse,
   ClawVilleStatsResponse,
+  EarnFiConfigStatus,
+  EarnFiCreateJobResponse,
+  EarnFiInterruptJobBody,
+  EarnFiManualJobBody,
+  EarnFiPollResponse,
+  EarnFiRegisterResponse,
+  EarnFiSocialJobBody,
   OobeConfigStatus,
   OobeDiscoveryResponse,
   OobeNetworkStatusResponse,
@@ -654,6 +661,61 @@ export const api = {
 
   getAgentClawVilleStats: (id: string) =>
     req<ClawVilleStatsResponse>(`/agents/${id}/clawville/stats`),
+
+  /** EarnFi partner proxy and paid job controls. */
+  getAgentEarnFiConfig: (id: string) =>
+    req<EarnFiConfigStatus>(`/agents/${id}/earnfi/config`),
+
+  registerAgentEarnFi: (id: string) =>
+    req<EarnFiRegisterResponse>(`/agents/${id}/earnfi/register`, {
+      method: "POST",
+      body: JSON.stringify({}),
+    }),
+
+  createAgentEarnFiSocialJob: (id: string, body: EarnFiSocialJobBody) =>
+    req<EarnFiCreateJobResponse>(`/agents/${id}/earnfi/jobs/social`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  createAgentEarnFiManualJob: (id: string, body: EarnFiManualJobBody) =>
+    req<EarnFiCreateJobResponse>(`/agents/${id}/earnfi/jobs/manual`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  createAgentEarnFiInterrupt: (id: string, body: EarnFiInterruptJobBody) =>
+    req<EarnFiCreateJobResponse>(`/agents/${id}/earnfi/interrupt`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  getAgentEarnFiJob: (id: string, jobId: string) =>
+    req<EarnFiPollResponse>(`/agents/${id}/earnfi/jobs/${encodeURIComponent(jobId)}`),
+
+  getAgentEarnFiJobSubmissions: (id: string, jobId: string) =>
+    req<EarnFiPollResponse>(`/agents/${id}/earnfi/jobs/${encodeURIComponent(jobId)}/submissions`),
+
+  getAgentEarnFiJobCompletions: (id: string, jobId: string) =>
+    req<EarnFiPollResponse>(`/agents/${id}/earnfi/jobs/${encodeURIComponent(jobId)}/completions`),
+
+  getAgentEarnFiJobVerifications: (id: string, jobId: string) =>
+    req<EarnFiPollResponse>(`/agents/${id}/earnfi/jobs/${encodeURIComponent(jobId)}/verifications`),
+
+  getAgentEarnFiInterrupt: (id: string, interruptId: string) =>
+    req<EarnFiPollResponse>(`/agents/${id}/earnfi/interrupt/${encodeURIComponent(interruptId)}`),
+
+  approveAgentEarnFiVerification: (id: string, verificationId: string, body: Record<string, unknown> = {}) =>
+    req<EarnFiPollResponse>(`/agents/${id}/earnfi/verifications/${encodeURIComponent(verificationId)}/approve`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  rejectAgentEarnFiVerification: (id: string, verificationId: string, body: Record<string, unknown> = {}) =>
+    req<EarnFiPollResponse>(`/agents/${id}/earnfi/verifications/${encodeURIComponent(verificationId)}/reject`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
 
   /** OOBE Synapse RPC + SAP identity/discovery controls. */
   getAgentOobeConfig: (id: string) =>
