@@ -536,6 +536,7 @@ export interface EarnFiConfigStatus {
     manual: EarnFiPaidJobEstimate;
     interrupt: EarnFiPaidJobEstimate;
     pollingSeconds: number;
+    maxEstimatedUsd?: number;
   };
   jobs: EarnFiJobRecord[];
 }

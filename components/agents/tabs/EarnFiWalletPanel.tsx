@@ -220,6 +220,7 @@ export function EarnFiWalletPanel({ agentId }: { agentId: string }) {
   const interruptEstimate = config?.paidJobs?.interrupt;
   const manualSlotsNumber = Number(manualSlots);
   const manualEstimateUsd = estimateEarnFiUiCost(manualSlotsNumber, manualReward);
+  const maxEstimatedUsd = config?.paidJobs?.maxEstimatedUsd ?? 1;
   const estimatedSpendUsd = useMemo(() => {
     const social = socialEstimate?.estimatedUsd ?? 0;
     const manual = manualEstimateUsd ?? manualDefaultEstimate?.estimatedUsd ?? 0;
@@ -227,12 +228,14 @@ export function EarnFiWalletPanel({ agentId }: { agentId: string }) {
     return social + manual + interrupt;
   }, [interruptEstimate?.estimatedUsd, manualDefaultEstimate?.estimatedUsd, manualEstimateUsd, socialEstimate?.estimatedUsd]);
 
+  const manualExceedsLimit = manualEstimateUsd != null && manualEstimateUsd > maxEstimatedUsd;
   const manualReady = readyForPaidCreate
     && Boolean(manualTitle.trim())
     && Boolean(manualInstructions.trim())
     && Number.isInteger(manualSlotsNumber)
     && manualSlotsNumber >= 1
-    && manualEstimateUsd != null;
+    && manualEstimateUsd != null
+    && !manualExceedsLimit;
   const selectedCreateReady = createKind === 'social'
     ? readyForPaidCreate && Boolean(contentUrl.trim())
     : createKind === 'manual'
@@ -401,7 +404,9 @@ export function EarnFiWalletPanel({ agentId }: { agentId: string }) {
   const jobs = config?.jobs ?? [];
   const disabledReason = !readyForPaidCreate
     ? 'Register this agent with EarnFi first'
-    : undefined;
+    : createKind === 'manual' && manualExceedsLimit
+      ? `Manual job exceeds the ${formatEarnFiUsd(maxEstimatedUsd)} limit`
+      : undefined;
 
   return (
     <GlassCard className="p-5">
