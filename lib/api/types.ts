@@ -489,6 +489,14 @@ export interface ClawVilleRegisterResponse {
   local: ClawVilleConfigStatus;
 }
 
+export interface ClawVilleLaunchResponse {
+  grantId: string;
+  agentId: string;
+  launchToken: string;
+  launchUrl: string;
+  expiresAt: string;
+}
+
 export type ClawVilleStatsResponse = unknown;
 
 export interface OobeCapability {
