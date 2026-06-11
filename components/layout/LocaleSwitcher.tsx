@@ -8,9 +8,9 @@ import {
   locales,
   localeLabels,
   localeFlags,
-  defaultLocale,
   type Locale,
 } from '@/i18n/config';
+import { buildLocaleUrl, stripLocalePrefix } from './localeUrls';
 
 // Paths outside the [locale] segment — no localized version exists.
 // Keep in sync with NON_LOCALE_PREFIXES in middleware.ts.
@@ -29,20 +29,6 @@ function isNonLocalePath(rawPath: string): boolean {
   return NON_LOCALE_PREFIXES.some(
     (p) => rawPath === p || rawPath.startsWith(p + '/'),
   );
-}
-
-function stripLocalePrefix(raw: string, currentLocale: Locale): string {
-  const prefix = `/${currentLocale}`;
-  if (raw === prefix) return '/';
-  if (raw.startsWith(prefix + '/')) return raw.slice(prefix.length);
-  return raw;
-}
-
-function buildLocaleUrl(cleanPath: string, targetLocale: Locale): string {
-  // localePrefix: 'as-needed' — the default locale has no URL prefix.
-  const prefix = targetLocale === defaultLocale ? '' : `/${targetLocale}`;
-  const path = cleanPath === '/' ? '' : cleanPath;
-  return prefix + path || '/';
 }
 
 interface LocaleSwitcherProps {
