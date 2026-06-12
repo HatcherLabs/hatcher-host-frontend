@@ -471,6 +471,45 @@ export interface OrbisCallResponse {
   data: unknown;
 }
 
+export type MirariRuntime = "hermes" | "openclaw";
+export type MirariSignalKind = "drift" | "contradiction" | "skill_misfire" | "focus_hit" | "judge_score";
+
+export interface MirariConfigStatus {
+  enabled: boolean;
+  configured: boolean;
+  ingestUrl: string;
+  ingestHost: string;
+  workspaceId: string;
+  grantConfigured: boolean;
+  grantTtlSeconds: number;
+  runtimeSupport: MirariRuntime[];
+  scopes: string[];
+  runtime: MirariRuntime;
+}
+
+export interface MirariTestSignalBody {
+  kind?: MirariSignalKind;
+  severity?: number;
+  summary?: string;
+  payload?: Record<string, unknown>;
+  conversationId?: string;
+}
+
+export interface MirariSignalResult {
+  ok: boolean;
+  ingested: number;
+  deduped: number;
+}
+
+export interface MirariGrantResponse {
+  token: string;
+  expiresAt: string;
+  workspaceId: string;
+  orgId: string;
+  agentId: string;
+  scopes: string[];
+}
+
 export type ConduitPayoutMode = "ai_credits" | "usdc_wallet";
 
 export interface ConduitConfigBody {

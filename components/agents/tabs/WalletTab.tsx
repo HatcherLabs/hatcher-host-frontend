@@ -38,6 +38,7 @@ import { EarnFiWalletPanel } from './EarnFiWalletPanel';
 import { OobeWalletPanel } from './OobeWalletPanel';
 import { ClawVilleWalletPanel } from './ClawVilleWalletPanel';
 import { OrbisWalletPanel } from './OrbisWalletPanel';
+import { MirariWalletPanel } from './MirariWalletPanel';
 
 interface ReputationState {
   upCount: number;
@@ -428,7 +429,12 @@ export function WalletTab() {
               <KausalayerWalletPanel agentId={agent.id} />
             </>
           )}
-          {activeNetwork.id === 'base' && <OrbisWalletPanel agentId={agent.id} />}
+          {activeNetwork.id === 'base' && (
+            <>
+              <OrbisWalletPanel agentId={agent.id} />
+              <MirariWalletPanel agentId={agent.id} />
+            </>
+          )}
         </div>
       ) : (
         <GlassCard className="p-6 text-sm text-[var(--text-muted)]">Wallet not provisioned yet.</GlassCard>
