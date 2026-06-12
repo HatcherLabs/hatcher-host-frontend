@@ -5,7 +5,6 @@ import {
   Activity,
   AlertTriangle,
   CheckCircle2,
-  KeyRound,
   Loader2,
   Radar,
   Send,
@@ -14,73 +13,37 @@ import {
 import { api } from '@/lib/api';
 import type {
   MirariConfigStatus,
-  MirariSignalKind,
   MirariSignalResult,
   MirariTestSignalBody,
 } from '@/lib/api';
 import { GlassCard } from '@/components/agents/AgentContext';
 import { useToast } from '@/components/ui/ToastProvider';
 
-const MIRARI_SIGNAL_KINDS: MirariSignalKind[] = [
-  'focus_hit',
-  'drift',
-  'contradiction',
-  'skill_misfire',
-  'judge_score',
-];
-
-export interface MirariTestSignalFormState {
-  kind: string;
-  severity: string;
+export interface MirariConnectionCheckFormState {
   summary: string;
-  payloadJson: string;
 }
+
+export const MIRARI_PANEL_COPY = {
+  eyebrow: 'Mirari Live Mirror',
+  title: 'Mirror agent activity',
+  description: 'Send selected agent activity to Mirari so the owner can review live behavior, conflicts, and focus patterns.',
+  checkAction: 'Check connection',
+  emptyResult: 'Run a connection check to confirm this agent can send activity to Mirari.',
+};
 
 export const MIRARI_LAYOUT_GRID_CLASSNAME = 'mt-5 grid min-w-0 gap-4 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]';
 export const MIRARI_RESULT_PANEL_CLASSNAME = 'min-w-0 max-w-full overflow-hidden border border-cyan-500/30 bg-cyan-500/10 p-4';
 export const MIRARI_RESULT_PRE_CLASSNAME = 'mt-3 max-h-64 max-w-full overflow-auto whitespace-pre-wrap break-words border border-[var(--border-subtle)] bg-black/30 p-3 text-xs text-[var(--text-primary)]';
 
-function parseJsonObject(value: string, label: string): Record<string, unknown> | undefined {
-  const trimmed = value.trim();
-  if (!trimmed) return undefined;
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(trimmed);
-  } catch {
-    throw new Error(`${label} must be valid JSON`);
-  }
-  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-    throw new Error(`${label} must be a JSON object`);
-  }
-  return parsed as Record<string, unknown>;
-}
-
-function parseSeverity(value: string): number {
-  const parsed = Number(value.trim());
-  if (!Number.isInteger(parsed) || parsed < 1 || parsed > 5) {
-    throw new Error('Severity must be an integer from 1 to 5');
-  }
-  return parsed;
-}
-
-function parseKind(value: string): MirariSignalKind {
-  const kind = value.trim() as MirariSignalKind;
-  if (!MIRARI_SIGNAL_KINDS.includes(kind)) {
-    throw new Error('Signal kind is not supported');
-  }
-  return kind;
-}
-
-export function buildMirariTestSignalPayload(form: MirariTestSignalFormState): MirariTestSignalBody {
+export function buildMirariConnectionCheckPayload(form: MirariConnectionCheckFormState): MirariTestSignalBody {
   const summary = form.summary.trim();
   if (!summary) throw new Error('Summary is required');
   if (summary.length > 200) throw new Error('Summary must be 200 characters or fewer');
-  const payload = parseJsonObject(form.payloadJson, 'Payload JSON');
   return {
-    kind: parseKind(form.kind),
-    severity: parseSeverity(form.severity),
+    kind: 'focus_hit',
+    severity: 3,
     summary,
-    ...(payload ? { payload } : {}),
+    payload: { source: 'hatcher-dashboard', action: 'connection_check' },
   };
 }
 
@@ -129,14 +92,9 @@ export function MirariWalletPanel({ agentId }: { agentId: string }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [granting, setGranting] = useState(false);
   const [result, setResult] = useState<MirariSignalResult | null>(null);
-  const [grantMsg, setGrantMsg] = useState<string | null>(null);
-  const [form, setForm] = useState<MirariTestSignalFormState>({
-    kind: 'focus_hit',
-    severity: '3',
-    summary: 'Hatcher Mirari dashboard smoke test',
-    payloadJson: '{\n  "source": "hatcher-dashboard"\n}',
+  const [form, setForm] = useState<MirariConnectionCheckFormState>({
+    summary: 'Mirror this agent activity',
   });
 
   const canSend = Boolean(config?.enabled && config.configured);
@@ -167,17 +125,17 @@ export function MirariWalletPanel({ agentId }: { agentId: string }) {
     setSubmitting(true);
     setError(null);
     try {
-      const payload = buildMirariTestSignalPayload(form);
+      const payload = buildMirariConnectionCheckPayload(form);
       const res = await api.sendAgentMirariTestSignal(agentId, payload);
       if (!res.success) {
-        setError(res.error || 'Mirari test signal failed');
-        toast.error(res.error || 'Mirari test signal failed');
+        setError(res.error || 'Mirari connection check failed');
+        toast.error(res.error || 'Mirari connection check failed');
         return;
       }
       setResult(res.data);
-      toast.success(`Mirari signal ingested (${res.data.ingested})`);
+      toast.success('Mirari connection check sent');
     } catch (e) {
-      const message = (e as Error).message || 'Mirari test signal failed';
+      const message = (e as Error).message || 'Mirari connection check failed';
       setError(message);
       toast.error(message);
     } finally {
@@ -185,30 +143,16 @@ export function MirariWalletPanel({ agentId }: { agentId: string }) {
     }
   };
 
-  const mintGrant = async () => {
-    setGranting(true);
-    setGrantMsg(null);
-    const res = await api.createAgentMirariGrant(agentId, ['signals:read', 'mirror:read']);
-    if (res.success) {
-      setGrantMsg(`Grant ready until ${new Date(res.data.expiresAt).toLocaleString()}`);
-      toast.success('Mirari dashboard grant minted');
-    } else {
-      setGrantMsg(res.error || 'Mirari grant is not configured');
-      toast.warning(res.error || 'Mirari grant is not configured');
-    }
-    setGranting(false);
-  };
-
   return (
     <GlassCard className="p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">
-            <Radar size={13} /> Mirari Live Mirror
+            <Radar size={13} /> {MIRARI_PANEL_COPY.eyebrow}
           </div>
-          <h3 className="text-base font-semibold text-[var(--text-primary)]">Mirari signal mirror</h3>
+          <h3 className="text-base font-semibold text-[var(--text-primary)]">{MIRARI_PANEL_COPY.title}</h3>
           <p className="mt-1 max-w-2xl text-xs leading-relaxed text-[var(--text-muted)]">
-            Server-signed Hermes/OpenClaw signals for Live Mirror, Conflict Replay, and Pulse.
+            {MIRARI_PANEL_COPY.description}
           </p>
         </div>
         <button
@@ -228,10 +172,10 @@ export function MirariWalletPanel({ agentId }: { agentId: string }) {
         </div>
       )}
 
-      <div className="mt-4 grid min-w-0 gap-3 md:grid-cols-4">
+      <div className="mt-4 grid min-w-0 gap-3 md:grid-cols-3">
         <StatusTile
-          label="Ingest"
-          value={config ? (config.configured ? 'Configured' : 'Needs env') : loading ? 'Loading' : 'Unavailable'}
+          label="Connection"
+          value={config ? (config.configured ? 'Ready' : 'Setup needed') : loading ? 'Loading' : 'Unavailable'}
           description={config ? short(config.ingestHost) : 'Mirari status'}
           tone={statusTone}
           icon={ShieldCheck}
@@ -239,69 +183,28 @@ export function MirariWalletPanel({ agentId }: { agentId: string }) {
         <StatusTile
           label="Workspace"
           value={config ? short(config.workspaceId) : '-'}
-          description="Shared workspace partitioned by org and agent"
+          description="Activity is scoped to this agent owner"
           tone="muted"
           icon={Radar}
         />
         <StatusTile
           label="Runtime"
           value={config?.runtime ?? '-'}
-          description="Hermes first, OpenClaw-ready"
+          description="Agent activity source"
           tone="muted"
           icon={Activity}
-        />
-        <StatusTile
-          label="Grant"
-          value={config?.grantConfigured ? 'Ready' : 'Not set'}
-          description={`${config?.grantTtlSeconds ?? 900}s scoped dashboard grant`}
-          tone={config?.grantConfigured ? 'good' : 'warn'}
-          icon={KeyRound}
         />
       </div>
 
       <div className={MIRARI_LAYOUT_GRID_CLASSNAME}>
         <div className="min-w-0 space-y-3">
-          <div className="grid min-w-0 gap-3 md:grid-cols-[minmax(0,1fr)_96px]">
-            <label className="min-w-0 text-xs text-[var(--text-muted)]">
-              Kind
-              <select
-                value={form.kind}
-                onChange={(event) => setForm((current) => ({ ...current, kind: event.target.value }))}
-                className="mt-1 w-full border border-[var(--border-subtle)] bg-black/30 px-3 py-2 text-sm text-[var(--text-primary)] outline-none focus:border-cyan-300/60"
-              >
-                {MIRARI_SIGNAL_KINDS.map((kind) => (
-                  <option key={kind} value={kind}>{kind}</option>
-                ))}
-              </select>
-            </label>
-            <label className="min-w-0 text-xs text-[var(--text-muted)]">
-              Severity
-              <input
-                value={form.severity}
-                onChange={(event) => setForm((current) => ({ ...current, severity: event.target.value }))}
-                inputMode="numeric"
-                className="mt-1 w-full border border-[var(--border-subtle)] bg-black/30 px-3 py-2 text-sm text-[var(--text-primary)] outline-none focus:border-cyan-300/60"
-              />
-            </label>
-          </div>
-
           <label className="block min-w-0 text-xs text-[var(--text-muted)]">
-            Summary
+            Activity note
             <input
               value={form.summary}
               onChange={(event) => setForm((current) => ({ ...current, summary: event.target.value }))}
               maxLength={200}
               className="mt-1 w-full border border-[var(--border-subtle)] bg-black/30 px-3 py-2 text-sm text-[var(--text-primary)] outline-none focus:border-cyan-300/60"
-            />
-          </label>
-
-          <label className="block min-w-0 text-xs text-[var(--text-muted)]">
-            Payload JSON
-            <textarea
-              value={form.payloadJson}
-              onChange={(event) => setForm((current) => ({ ...current, payloadJson: event.target.value }))}
-              rows={5}
-              className="mt-1 w-full resize-y border border-[var(--border-subtle)] bg-black/30 px-3 py-2 font-mono text-xs text-[var(--text-primary)] outline-none focus:border-cyan-300/60"
             />
           </label>
 
@@ -312,24 +215,14 @@ export function MirariWalletPanel({ agentId }: { agentId: string }) {
               disabled={!canSend || submitting}
               className="inline-flex items-center gap-2 border border-cyan-400/40 bg-cyan-500/10 px-3 py-2 text-xs uppercase tracking-wider text-cyan-100 transition hover:bg-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {submitting ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />} Send test signal
-            </button>
-            <button
-              type="button"
-              onClick={() => void mintGrant()}
-              disabled={!config?.grantConfigured || granting}
-              className="inline-flex items-center gap-2 border border-[var(--border-subtle)] px-3 py-2 text-xs uppercase tracking-wider transition hover:border-cyan-300/60 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {granting ? <Loader2 size={13} className="animate-spin" /> : <KeyRound size={13} />} Mint grant
+              {submitting ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />} {MIRARI_PANEL_COPY.checkAction}
             </button>
           </div>
-
-          {grantMsg && <p className="min-w-0 break-words text-xs text-[var(--text-muted)]">{grantMsg}</p>}
         </div>
 
         <div className={MIRARI_RESULT_PANEL_CLASSNAME}>
           <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-cyan-100">
-            <CheckCircle2 size={13} /> Last smoke result
+            <CheckCircle2 size={13} /> Connection check
           </div>
           {result ? (
             <>
@@ -351,7 +244,7 @@ export function MirariWalletPanel({ agentId }: { agentId: string }) {
             </>
           ) : (
             <p className="mt-3 text-xs leading-relaxed text-[var(--text-muted)]">
-              Send one staging signal to verify Hatcher signing, Mirari ingest, and idempotency response shape.
+              {MIRARI_PANEL_COPY.emptyResult}
             </p>
           )}
         </div>

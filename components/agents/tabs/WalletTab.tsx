@@ -75,6 +75,10 @@ function iconForPanel(panel: WalletPanel) {
   return <Layers3 size={14} />;
 }
 
+export function shouldShowMirariPanelForWallet(networkId: AgentPassportNetworkId): boolean {
+  return networkId === 'solana';
+}
+
 function readInitialWalletPanel(): WalletPanel {
   if (typeof window === 'undefined') return 'passport';
   const requested = new URLSearchParams(window.location.search).get('wallet');
@@ -427,14 +431,10 @@ export function WalletTab() {
               <OobeWalletPanel agentId={agent.id} />
               <ClawVilleWalletPanel agentId={agent.id} />
               <KausalayerWalletPanel agentId={agent.id} />
+              {shouldShowMirariPanelForWallet(activeNetwork.id) && <MirariWalletPanel agentId={agent.id} />}
             </>
           )}
-          {activeNetwork.id === 'base' && (
-            <>
-              <OrbisWalletPanel agentId={agent.id} />
-              <MirariWalletPanel agentId={agent.id} />
-            </>
-          )}
+          {activeNetwork.id === 'base' && <OrbisWalletPanel agentId={agent.id} />}
         </div>
       ) : (
         <GlassCard className="p-6 text-sm text-[var(--text-muted)]">Wallet not provisioned yet.</GlassCard>
