@@ -242,6 +242,7 @@ export default function AgentManagePage() {
   const [portModalOpen, setPortModalOpen] = useState(false);
 
   const historyLoadedRef = useRef(false);
+  const loadedChatSessionIdRef = useRef<string | null>(null);
   const lastSavedCountRef = useRef(0);
   const lastHistorySignatureRef = useRef('');
   const activeChatSessionIdRef = useRef<string | null>(null);
@@ -272,6 +273,13 @@ export default function AgentManagePage() {
   const logs = useAgentLogs(id);
 
   const setActiveChatSessionId = useCallback((sessionId: string) => {
+    if (activeChatSessionIdRef.current !== sessionId) {
+      historyLoadedRef.current = false;
+      loadedChatSessionIdRef.current = null;
+      setMessages([]);
+      lastSavedCountRef.current = 0;
+      lastHistorySignatureRef.current = '';
+    }
     setActiveChatSessionIdState(sessionId);
     activeChatSessionIdRef.current = sessionId;
   }, []);
@@ -641,6 +649,11 @@ export default function AgentManagePage() {
     if (current && !selectedStillExists) {
       activeChatSessionIdRef.current = current.id;
       setActiveChatSessionIdState(current.id);
+      historyLoadedRef.current = false;
+      loadedChatSessionIdRef.current = null;
+      setMessages([]);
+      lastSavedCountRef.current = 0;
+      lastHistorySignatureRef.current = '';
     }
   }, [id]);
 
@@ -648,10 +661,15 @@ export default function AgentManagePage() {
     if (!id) return;
     if (mode === 'poll' && (sendingRef.current || wsStreamingMsgRef.current)) return;
 
-    if (mode === 'initial') historyLoadedRef.current = false;
+    const requestedSessionId = activeChatSessionIdRef.current;
+    if (mode === 'initial') {
+      historyLoadedRef.current = false;
+      loadedChatSessionIdRef.current = null;
+    }
 
     try {
-      const res = await api.getChatHistory(id, activeChatSessionIdRef.current ?? undefined);
+      const res = await api.getChatHistory(id, requestedSessionId ?? undefined);
+      if (activeChatSessionIdRef.current !== requestedSessionId) return;
       if (res.success) {
         const loaded = normalizeHistoryMessages(Array.isArray(res.data.messages) ? res.data.messages : []);
         const signature = historySignature(loaded);
@@ -683,7 +701,10 @@ export default function AgentManagePage() {
         }
       }
     } finally {
-      if (mode === 'initial') historyLoadedRef.current = true;
+      if (mode === 'initial' && activeChatSessionIdRef.current === requestedSessionId) {
+        loadedChatSessionIdRef.current = requestedSessionId;
+        historyLoadedRef.current = true;
+      }
     }
   }, [historySignature, id, normalizeHistoryMessages]);
 
@@ -716,6 +737,7 @@ export default function AgentManagePage() {
     setMessages([]);
     lastSavedCountRef.current = 0;
     lastHistorySignatureRef.current = '';
+    loadedChatSessionIdRef.current = res.data.session.id;
     historyLoadedRef.current = true;
   }, [id, setActiveChatSessionId, toast]);
 
@@ -745,7 +767,8 @@ export default function AgentManagePage() {
       setMessages([]);
       lastSavedCountRef.current = 0;
       lastHistorySignatureRef.current = '';
-      historyLoadedRef.current = true;
+      loadedChatSessionIdRef.current = null;
+      historyLoadedRef.current = false;
     }
 
     toast.success('Chat deleted');
@@ -762,6 +785,7 @@ export default function AgentManagePage() {
     if (complete.length === 0) return;
     if (complete.length <= lastSavedCountRef.current) return;
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    const saveSessionId = loadedChatSessionIdRef.current ?? activeChatSessionIdRef.current;
     saveTimerRef.current = setTimeout(() => {
       lastSavedCountRef.current = complete.length;
       const toSave = complete.map(m => ({ role: m.role, content: m.content, ts: m.timestamp?.getTime() }));
@@ -771,7 +795,7 @@ export default function AgentManagePage() {
         if (prev && prev.role === m.role && prev.content === m.content) continue;
         deduped.push(m);
       }
-      api.saveChatHistory(id, deduped, activeChatSessionIdRef.current).catch(() => {});
+      api.saveChatHistory(id, deduped, saveSessionId).catch(() => {});
     }, 2000);
   }, [messages, id]);
 
@@ -957,25 +981,10 @@ export default function AgentManagePage() {
       .filter((m) => !m.streaming)
       .slice(-40)
       .map((m) => ({ role: m.role, content: trimChatHistoryContent(m.content) }));
-    let requestSessionId = activeChatSessionIdRef.current;
-
-    // If the user is viewing an older session and sends a message, start a
-    // fresh current session and use the selected session only as context.
-    // Without this, the response would be appended after the latest marker in
-    // storage but the UI would still be filtering the old session.
-    if (currentSession && selectedSession && selectedSession.id !== currentSession.id) {
-      const res = await api.createChatSession(id, `Continued: ${selectedSession.title}`);
-      if (res.success) {
-        setActiveChatSessionId(res.data.session.id);
-        requestSessionId = res.data.session.id;
-        setChatSessions((prev) => [
-          { ...res.data.session, current: true },
-          ...prev.map((session) => ({ ...session, current: false })),
-        ]);
-        setMessages([]);
-        lastSavedCountRef.current = 0;
-        lastHistorySignatureRef.current = '';
-      }
+    const requestSessionId = selectedSession?.id ?? activeChatSessionIdRef.current ?? currentSession?.id ?? null;
+    if (!historyLoadedRef.current || loadedChatSessionIdRef.current !== requestSessionId) {
+      toast('info', 'Loading chat history. Try again in a moment.');
+      return;
     }
 
     setSendCooldown(true);

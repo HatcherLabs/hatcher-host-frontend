@@ -247,7 +247,7 @@ export const EXTRA_PLATFORM_INTEGRATIONS: IntegrationDef[] = [
     hasChannelSettings: true,
     fields: [
       { key: 'MATRIX_HOMESERVER', label: 'Homeserver URL', type: 'text', placeholder: 'https://matrix.org', required: true },
-      { key: 'MATRIX_ACCESS_TOKEN', label: 'Access Token', type: 'password', placeholder: 'Bot user access token', helper: 'Create a bot user and get an access token from Element settings' },
+      { key: 'MATRIX_ACCESS_TOKEN', label: 'Access Token', type: 'password', placeholder: 'Bot user access token', helper: 'Create a bot user and get an access token from Element settings', required: true },
     ],
   },
   {
