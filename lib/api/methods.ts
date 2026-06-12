@@ -58,6 +58,14 @@ import type {
   XonaCallResponse,
   XonaConfigStatus,
   XonaDiscoverResponse,
+  OrbisApiDetail,
+  OrbisCallBody,
+  OrbisCallResponse,
+  OrbisCategoriesResponse,
+  OrbisConfigBody,
+  OrbisConfigStatus,
+  OrbisSearchParams,
+  OrbisSearchResponse,
   ConduitConfigBody,
   ConduitConfigStatus,
   ConduitManifestResponse,
@@ -556,6 +564,40 @@ export const api = {
 
   callAgentXonaTool: (id: string, body: XonaCallBody) =>
     req<XonaCallResponse>(`/agents/${id}/xona/call`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  /** Orbis API Marketplace consumer tools proxied through Hatcher. */
+  getAgentOrbisConfig: (id: string) =>
+    req<OrbisConfigStatus>(`/agents/${id}/orbis/config`),
+
+  updateAgentOrbisConfig: (id: string, body: OrbisConfigBody) =>
+    req<OrbisConfigStatus>(`/agents/${id}/orbis/config`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+
+  getAgentOrbisCategories: (id: string) =>
+    req<OrbisCategoriesResponse>(`/agents/${id}/orbis/categories`),
+
+  searchAgentOrbisApis: (id: string, params: OrbisSearchParams = {}) => {
+    const query = new URLSearchParams();
+    if (params.q) query.set("q", params.q);
+    if (params.category) query.set("category", params.category);
+    if (params.chain) query.set("chain", params.chain);
+    if (params.minPriceUsd !== undefined) query.set("minPriceUsd", String(params.minPriceUsd));
+    if (params.maxPriceUsd !== undefined) query.set("maxPriceUsd", String(params.maxPriceUsd));
+    if (params.limit !== undefined) query.set("limit", String(params.limit));
+    const suffix = query.toString() ? `?${query.toString()}` : "";
+    return req<OrbisSearchResponse>(`/agents/${id}/orbis/search${suffix}`);
+  },
+
+  getAgentOrbisApiDetails: (id: string, slug: string) =>
+    req<OrbisApiDetail>(`/agents/${id}/orbis/apis/${encodeURIComponent(slug)}`),
+
+  callAgentOrbisApi: (id: string, body: OrbisCallBody) =>
+    req<OrbisCallResponse>(`/agents/${id}/orbis/call`, {
       method: "POST",
       body: JSON.stringify(body),
     }),
