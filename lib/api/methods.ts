@@ -66,6 +66,10 @@ import type {
   OrbisConfigStatus,
   OrbisSearchParams,
   OrbisSearchResponse,
+  MirariConfigStatus,
+  MirariGrantResponse,
+  MirariSignalResult,
+  MirariTestSignalBody,
   ConduitConfigBody,
   ConduitConfigStatus,
   ConduitManifestResponse,
@@ -600,6 +604,22 @@ export const api = {
     req<OrbisCallResponse>(`/agents/${id}/orbis/call`, {
       method: "POST",
       body: JSON.stringify(body),
+    }),
+
+  /** Mirari live mirror signals and dashboard grant. */
+  getAgentMirariConfig: (id: string) =>
+    req<MirariConfigStatus>(`/agents/${id}/mirari/config`),
+
+  sendAgentMirariTestSignal: (id: string, body: MirariTestSignalBody) =>
+    req<MirariSignalResult>(`/agents/${id}/mirari/signals/test`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  createAgentMirariGrant: (id: string, scopes?: string[]) =>
+    req<MirariGrantResponse>(`/agents/${id}/mirari/grant`, {
+      method: "POST",
+      body: JSON.stringify(scopes?.length ? { scopes } : {}),
     }),
 
   /** Conduit Protocol provider settlement controls. */
