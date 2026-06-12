@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  ORBIS_LAYOUT_COLUMN_CLASSNAME,
+  ORBIS_LAYOUT_GRID_CLASSNAME,
+  ORBIS_RESULT_PANEL_CLASSNAME,
+  ORBIS_RESULT_PRE_CLASSNAME,
+  ORBIS_SEARCH_GRID_CLASSNAME,
   buildOrbisCallRequest,
   buildOrbisSettingsPayload,
   formatOrbisPrice,
@@ -61,5 +66,21 @@ describe('Orbis wallet panel helpers', () => {
   it('formats marketplace prices with enough precision for small paid calls', () => {
     expect(formatOrbisPrice(0.005)).toBe('$0.005');
     expect(formatOrbisPrice(null)).toBe('-');
+  });
+
+  it('keeps long Orbis results constrained inside the wallet panel', () => {
+    expect(ORBIS_LAYOUT_GRID_CLASSNAME).toContain('min-w-0');
+    expect(ORBIS_LAYOUT_GRID_CLASSNAME).toContain('minmax(0,0.9fr)');
+    expect(ORBIS_LAYOUT_GRID_CLASSNAME).toContain('minmax(0,1.1fr)');
+    expect(ORBIS_LAYOUT_COLUMN_CLASSNAME).toContain('min-w-0');
+    expect(ORBIS_SEARCH_GRID_CLASSNAME).toContain('min-w-0');
+    expect(ORBIS_SEARCH_GRID_CLASSNAME).toContain('minmax(0,1fr)');
+    expect(ORBIS_SEARCH_GRID_CLASSNAME).toContain('minmax(0,0.8fr)');
+    expect(ORBIS_SEARCH_GRID_CLASSNAME).toContain('minmax(0,0.4fr)');
+    expect(ORBIS_RESULT_PANEL_CLASSNAME).toContain('min-w-0');
+    expect(ORBIS_RESULT_PANEL_CLASSNAME).toContain('overflow-hidden');
+    expect(ORBIS_RESULT_PRE_CLASSNAME).toContain('max-w-full');
+    expect(ORBIS_RESULT_PRE_CLASSNAME).toContain('whitespace-pre-wrap');
+    expect(ORBIS_RESULT_PRE_CLASSNAME).toContain('break-words');
   });
 });

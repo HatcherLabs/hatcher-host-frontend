@@ -67,6 +67,16 @@ const DEFAULT_CALL_FORM: OrbisCallFormState = {
   maxCostUsd: '0.05',
 };
 
+export const ORBIS_RESULT_PANEL_CLASSNAME = 'min-w-0 max-w-full overflow-hidden rounded-md border border-emerald-500/30 bg-emerald-500/10 p-4';
+
+export const ORBIS_RESULT_PRE_CLASSNAME = 'mt-3 max-h-72 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-md border border-[var(--border-subtle)] bg-black/30 p-3 text-xs text-[var(--text-primary)]';
+
+export const ORBIS_LAYOUT_GRID_CLASSNAME = 'mt-5 grid min-w-0 gap-4 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]';
+
+export const ORBIS_LAYOUT_COLUMN_CLASSNAME = 'min-w-0 space-y-4';
+
+export const ORBIS_SEARCH_GRID_CLASSNAME = 'grid min-w-0 gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,0.4fr)]';
+
 function short(value: string | null | undefined): string {
   if (!value) return '-';
   if (value.length <= 18) return value;
@@ -413,8 +423,8 @@ export function OrbisWalletPanel({ agentId }: { agentId: string }) {
         />
       </div>
 
-      <div className="mt-5 grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
-        <div className="space-y-4">
+      <div className={ORBIS_LAYOUT_GRID_CLASSNAME}>
+        <div className={ORBIS_LAYOUT_COLUMN_CLASSNAME}>
           <div className="rounded-md border border-[var(--border-subtle)] bg-black/20 p-4">
             <div className="mb-3 flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-[var(--text-muted)]">
@@ -469,7 +479,7 @@ export function OrbisWalletPanel({ agentId }: { agentId: string }) {
             <div className="mb-3 flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-[var(--text-muted)]">
               <Search size={12} /> Catalog Search
             </div>
-            <div className="grid gap-3 md:grid-cols-[1fr_0.8fr_0.4fr]">
+            <div className={ORBIS_SEARCH_GRID_CLASSNAME}>
               <input
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
@@ -500,7 +510,7 @@ export function OrbisWalletPanel({ agentId }: { agentId: string }) {
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className={ORBIS_LAYOUT_COLUMN_CLASSNAME}>
           <div className="rounded-md border border-[var(--border-subtle)] bg-black/20 p-4">
             <div className="mb-3 flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-[var(--text-muted)]">
               <ServerCog size={12} /> Results
@@ -656,28 +666,28 @@ export function OrbisWalletPanel({ agentId }: { agentId: string }) {
           </div>
 
           {callResult && (
-            <div className="rounded-md border border-emerald-500/30 bg-emerald-500/10 p-4">
+            <div className={ORBIS_RESULT_PANEL_CLASSNAME}>
               <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-emerald-200">
                 <CheckCircle2 size={12} /> Settled Call
               </div>
-              <div className="grid gap-2 text-xs md:grid-cols-3">
-                <div>
+              <div className="grid min-w-0 gap-2 text-xs md:grid-cols-3">
+                <div className="min-w-0">
                   <div className="text-[var(--text-muted)]">Paid</div>
-                  <div className="font-mono text-[var(--text-primary)]">{formatOrbisPrice(callResult.amountPaidUsdc)}</div>
+                  <div className="break-words font-mono text-[var(--text-primary)]">{formatOrbisPrice(callResult.amountPaidUsdc)}</div>
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="text-[var(--text-muted)]">AI Credits</div>
-                  <div className="font-mono text-[var(--text-primary)]">{callResult.aiCreditsCharged}</div>
+                  <div className="break-words font-mono text-[var(--text-primary)]">{callResult.aiCreditsCharged}</div>
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="text-[var(--text-muted)]">Network</div>
-                  <div className="font-mono text-[var(--text-primary)]">{callResult.network}</div>
+                  <div className="break-words font-mono text-[var(--text-primary)]">{callResult.network}</div>
                 </div>
               </div>
-              <div className="mt-2 break-all font-mono text-[10px] text-[var(--text-muted)]">
+              <div className="mt-2 max-w-full overflow-hidden break-all font-mono text-[10px] text-[var(--text-muted)]">
                 {callResult.txSig ?? 'No tx hash returned'}
               </div>
-              <pre className="mt-3 max-h-72 overflow-auto rounded-md border border-[var(--border-subtle)] bg-black/30 p-3 text-xs text-[var(--text-primary)]">
+              <pre className={ORBIS_RESULT_PRE_CLASSNAME}>
                 {prettyJson(callResult.data)}
               </pre>
             </div>
