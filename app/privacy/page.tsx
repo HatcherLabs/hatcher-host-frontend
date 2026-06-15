@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 // it on any material edit (scope, retention, third-parties). GDPR
 // requires material changes to be communicated to users — the
 // sendPrivacyUpdated email hook in services/email.ts handles that.
-const LAST_UPDATED = 'April 16, 2026';
+const LAST_UPDATED = 'June 15, 2026';
 
 export default function PrivacyPolicyPage() {
   return (
@@ -39,6 +39,7 @@ export default function PrivacyPolicyPage() {
             <ul className="space-y-2 text-sm">
               <li>• We collect only what we need to run your account and your agents.</li>
               <li>• We never sell your data, and we never train AI on your chats or configs.</li>
+              <li>• AI-powered features may send your prompts, chat messages, voice transcripts, agent configs, and related context to Hatcher and selected model providers for inference.</li>
               <li>• You can export or delete everything from your{' '}
                 <Link href="/dashboard/settings" className="text-[var(--color-accent)] hover:underline">Settings</Link>{' '}
                 page.
@@ -90,6 +91,7 @@ export default function PrivacyPolicyPage() {
             <h3 className="text-base font-medium text-[var(--text-primary)] mt-4 mb-2">Agent Data</h3>
             <ul className="list-disc pl-6 space-y-1.5">
               <li>Agent configurations — name, description, avatar, prompts, personality, plugin list</li>
+              <li>Agent creation descriptions, voice transcripts, session context, and tool-call content you provide</li>
               <li>Chat history with your agents (PostgreSQL, scoped to your account)</li>
               <li>Files you upload to or create within agent workspaces</li>
               <li>Agent activity logs and performance metrics</li>
@@ -142,6 +144,7 @@ export default function PrivacyPolicyPage() {
               <li>Provide, maintain, and improve the Service</li>
               <li>Authenticate your identity and manage your account</li>
               <li>Process payments and manage subscriptions / addons</li>
+              <li>Process AI requests, generate agent replies, create agent configurations, and perform requested agent tasks</li>
               <li>Enforce tier limits (AI Credits, agent count, resource quotas)</li>
               <li>Send transactional emails (signup, password reset, billing, expiry reminders)</li>
               <li>Monitor platform health, detect abuse, prevent fraud</li>
@@ -151,6 +154,14 @@ export default function PrivacyPolicyPage() {
             <p className="mt-3">
               <strong className="text-[var(--text-primary)]">We do not</strong> sell your personal data to third
               parties, use your agent configs or chat history to train AI models, or target advertising.
+            </p>
+            <p className="mt-3">
+              When you use AI-powered features, we may send your chat messages, voice transcripts, agent creation
+              descriptions, prompts, agent configuration, relevant session context, files or tool-call content you
+              provide, and generated agent outputs to Hatcher&apos;s backend and selected AI model providers for
+              inference. These providers may include OpenRouter, UsePod, Xiaomi MiMo, AceData, or the underlying
+              model provider selected for your agent. If you use Bring Your Own Key, requests route through Hatcher
+              to the provider you configure, and that provider&apos;s privacy policy applies.
             </p>
           </section>
 
@@ -194,10 +205,10 @@ export default function PrivacyPolicyPage() {
                 <tbody className="divide-y divide-[var(--border-default)]">
                   <tr><td className="px-3 py-2">Hetzner</td><td className="px-3 py-2">Hosting + compute</td><td className="px-3 py-2">All account + agent data</td><td className="px-3 py-2">Germany</td></tr>
                   <tr><td className="px-3 py-2">Cloudflare</td><td className="px-3 py-2">CDN, DDoS, DNS</td><td className="px-3 py-2">Request metadata</td><td className="px-3 py-2">Global</td></tr>
-                  <tr><td className="px-3 py-2">UsePod</td><td className="px-3 py-2">LLM inference (hosted key)</td><td className="px-3 py-2">Hosted AI requests</td><td className="px-3 py-2">USA / Global</td></tr>
-                  <tr><td className="px-3 py-2">OpenRouter</td><td className="px-3 py-2">LLM inference (hosted key)</td><td className="px-3 py-2">Hosted AI requests</td><td className="px-3 py-2">USA</td></tr>
-                  <tr><td className="px-3 py-2">Xiaomi MiMo</td><td className="px-3 py-2">LLM inference (direct partner route)</td><td className="px-3 py-2">Hosted AI requests when selected</td><td className="px-3 py-2">Partner infrastructure</td></tr>
-                  <tr><td className="px-3 py-2">AceData</td><td className="px-3 py-2">LLM inference and data/media tools (direct partner route)</td><td className="px-3 py-2">Hosted AI requests and agent tool calls when selected</td><td className="px-3 py-2">Partner infrastructure</td></tr>
+                  <tr><td className="px-3 py-2">UsePod</td><td className="px-3 py-2">LLM inference (hosted key)</td><td className="px-3 py-2">AI prompts, chat messages, voice transcripts, agent configs, session context, and generated outputs when routed to hosted models</td><td className="px-3 py-2">USA / Global</td></tr>
+                  <tr><td className="px-3 py-2">OpenRouter</td><td className="px-3 py-2">LLM inference (hosted key)</td><td className="px-3 py-2">AI prompts, chat messages, voice transcripts, agent configs, session context, and generated outputs when routed to hosted models</td><td className="px-3 py-2">USA</td></tr>
+                  <tr><td className="px-3 py-2">Xiaomi MiMo</td><td className="px-3 py-2">LLM inference (direct partner route)</td><td className="px-3 py-2">AI prompts, chat messages, voice transcripts, agent configs, session context, and generated outputs when selected</td><td className="px-3 py-2">Partner infrastructure</td></tr>
+                  <tr><td className="px-3 py-2">AceData</td><td className="px-3 py-2">LLM inference and data/media tools (direct partner route)</td><td className="px-3 py-2">AI prompts, chat messages, voice transcripts, agent configs, session context, files/tool-call content, and generated outputs when selected</td><td className="px-3 py-2">Partner infrastructure</td></tr>
                   <tr><td className="px-3 py-2">Stripe</td><td className="px-3 py-2">Card payments</td><td className="px-3 py-2">Email, billing address, card token</td><td className="px-3 py-2">Ireland / USA</td></tr>
                   <tr><td className="px-3 py-2">Resend</td><td className="px-3 py-2">Transactional email</td><td className="px-3 py-2">Email address, email content</td><td className="px-3 py-2">EU / USA</td></tr>
                   <tr><td className="px-3 py-2">PostHog</td><td className="px-3 py-2">Product analytics (opt-in)</td><td className="px-3 py-2">Anonymized events, session IDs</td><td className="px-3 py-2">EU</td></tr>
