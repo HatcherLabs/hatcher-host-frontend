@@ -227,9 +227,9 @@ export function ClawVilleWalletPanel({ agentId }: { agentId: string }) {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <a href="https://staging.clawville.world" target="_blank" rel="noreferrer" className="btn-secondary inline-flex items-center gap-2">
+          <a href="https://clawville.world" target="_blank" rel="noreferrer" className="btn-secondary inline-flex items-center gap-2">
             <ExternalLink size={14} />
-            Staging
+            ClawVille
           </a>
           <button type="button" onClick={() => void load()} className="btn-secondary inline-flex items-center gap-2" disabled={loading}>
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
@@ -310,6 +310,7 @@ export function ClawVilleWalletPanel({ agentId }: { agentId: string }) {
                 value={form.name}
                 onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
                 className="input w-full"
+                maxLength={100}
                 placeholder="Agent avatar name"
               />
             </label>
@@ -319,7 +320,8 @@ export function ClawVilleWalletPanel({ agentId }: { agentId: string }) {
                 value={form.species}
                 onChange={(event) => setForm((current) => ({ ...current, species: event.target.value }))}
                 className="input w-full"
-                placeholder="hatcher_3"
+                maxLength={50}
+                placeholder="phanes"
               />
             </label>
           </div>
@@ -329,6 +331,7 @@ export function ClawVilleWalletPanel({ agentId }: { agentId: string }) {
               value={form.personality}
               onChange={(event) => setForm((current) => ({ ...current, personality: event.target.value }))}
               className="input min-h-[72px] w-full resize-y"
+              maxLength={400}
               placeholder="How this avatar behaves inside ClawVille"
             />
           </label>
