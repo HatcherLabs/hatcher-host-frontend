@@ -105,19 +105,19 @@ export function Footer() {
               <svg viewBox="0 0 28 28" width="22" height="22" fill="none" aria-label="Hatcher logo" role="img">
                 <defs>
                   <linearGradient id="eggShellF" x1="14" y1="3" x2="14" y2="27" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stopColor="#2a2a38" />
+                    <stop offset="0%" stopColor="#10110f" />
                     <stop offset="50%" stopColor="var(--bg-elevated)" />
                     <stop offset="100%" stopColor="var(--bg-card-solid)" />
                   </linearGradient>
                   <radialGradient id="eggGlowF" cx="50%" cy="40%" r="40%">
-                    <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.35" />
-                    <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
+                    <stop offset="0%" stopColor="#73a4b9" stopOpacity="0.32" />
+                    <stop offset="100%" stopColor="#73a4b9" stopOpacity="0" />
                   </radialGradient>
                 </defs>
-                <path d="M14 4 C8.5 4, 5 10, 5 15.5 C5 21, 9 26, 14 26 C19 26, 23 21, 23 15.5 C23 10, 19.5 4, 14 4Z" fill="url(#eggShellF)" stroke="rgba(139,92,246,0.5)" strokeWidth="0.8" />
+                <path d="M14 4 C8.5 4, 5 10, 5 15.5 C5 21, 9 26, 14 26 C19 26, 23 21, 23 15.5 C23 10, 19.5 4, 14 4Z" fill="url(#eggShellF)" stroke="rgba(115,164,185,0.65)" strokeWidth="0.8" />
                 <path d="M14 4 C8.5 4, 5 10, 5 15.5 C5 21, 9 26, 14 26 C19 26, 23 21, 23 15.5 C23 10, 19.5 4, 14 4Z" fill="url(#eggGlowF)" />
-                <path d="M10 14.5 L12.5 12.5 L11 10.5 L13.5 9 L12 7" stroke="#8b5cf6" strokeWidth="0.7" strokeLinecap="round" fill="none" opacity="0.6" />
-                <circle cx="12" cy="11" r="1.5" fill="#8b5cf6" opacity="0.3" />
+                <path d="M10 14.5 L12.5 12.5 L11 10.5 L13.5 9 L12 7" stroke="#4a778b" strokeWidth="0.7" strokeLinecap="round" fill="none" opacity="0.62" />
+                <circle cx="12" cy="11" r="1.5" fill="#4a778b" opacity="0.28" />
                 <ellipse cx="11" cy="10" rx="2.5" ry="4" fill="white" opacity="0.04" transform="rotate(-15 11 10)" />
               </svg>
               <span className="text-base font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>Hatcher</span>

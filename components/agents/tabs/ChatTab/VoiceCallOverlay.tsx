@@ -61,11 +61,11 @@ export function VoiceCallOverlay({ agent, messages, sending, voice, callDuration
           )}
           {/* Sound wave ring when speaking */}
           {voice.isSpeaking && (
-            <span className="absolute inset-[-4px] rounded-full border-2 border-purple-500/40 animate-pulse" />
+            <span className="absolute inset-[-4px] rounded-full border-2 border-[var(--border-hover)] animate-pulse" />
           )}
         </div>
         <div className="text-center">
-          <h3 className="text-lg font-semibold text-white">{agent.name}</h3>
+          <h3 className="text-lg font-semibold text-[var(--text-primary)]">{agent.name}</h3>
           <p className="text-xs text-[var(--text-muted)] mt-1">{formatDuration(callDuration)}</p>
         </div>
       </div>
@@ -87,7 +87,7 @@ export function VoiceCallOverlay({ agent, messages, sending, voice, callDuration
         {voice.isSpeaking && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2">
             <SoundWaveBars />
-            <span className="text-sm text-purple-400">{t('voiceCall.speaking')}</span>
+            <span className="text-sm text-[var(--accent)]">{t('voiceCall.speaking')}</span>
           </motion.div>
         )}
         {!voice.isListening && !sending && !voice.isSpeaking && (
@@ -122,7 +122,7 @@ export function VoiceCallOverlay({ agent, messages, sending, voice, callDuration
         {/* End call */}
         <button
           onClick={onEndCall}
-          className="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center shadow-[0_0_30px_rgba(239,68,68,0.3)] transition-all duration-200"
+          className="w-16 h-16 rounded-full bg-[var(--color-destructive)] hover:bg-[var(--color-destructive)] flex items-center justify-center shadow-[0_0_30px_var(--color-destructive-bg)] transition-all duration-200"
         >
           <PhoneOff size={28} className="text-white" />
         </button>
@@ -132,11 +132,11 @@ export function VoiceCallOverlay({ agent, messages, sending, voice, callDuration
           onClick={voice.stopSpeaking}
           className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-200 ${
             voice.isSpeaking
-              ? 'bg-purple-500/20 border border-purple-500/40'
+              ? 'bg-[var(--tech-accent-soft)] border border-[var(--border-hover)]'
               : 'bg-white/10 hover:bg-white/15'
           }`}
         >
-          {voice.isSpeaking ? <Square size={20} className="text-purple-400" /> : <Volume2 size={22} className="text-[var(--text-muted)]" />}
+          {voice.isSpeaking ? <Square size={20} className="text-[var(--accent)]" /> : <Volume2 size={22} className="text-[var(--text-muted)]" />}
         </button>
       </div>
     </motion.div>

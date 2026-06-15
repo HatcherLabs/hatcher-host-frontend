@@ -114,7 +114,7 @@ const CONFIG_SUBTABS: Array<{
   description: string;
 }> = [
   { id: 'general', label: 'General', description: 'Identity and positioning' },
-  { id: 'ai-models', label: 'AI Models', description: 'Providers, models and keys' },
+  { id: 'ai-models', label: 'Model & Provider', description: 'Managed models or BYOK' },
   { id: 'public-access', label: 'Public Access', description: 'Profile and public chat' },
   { id: 'advanced', label: 'Advanced', description: 'Env vars and history' },
 ];
@@ -231,15 +231,15 @@ function tagIcon(tag: HostedModelTag) {
 function hostedCostClass(cost: HostedModelCost): string {
   switch (cost) {
     case 'Low':
-      return 'border-emerald-500/20 bg-emerald-500/10 text-emerald-300';
+      return 'border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success)]';
     case 'Medium':
-      return 'border-cyan-500/20 bg-cyan-500/10 text-cyan-300';
+      return 'border-[var(--color-info-border)] bg-[var(--color-info-bg)] text-[var(--color-info)]';
     case 'High':
-      return 'border-amber-500/20 bg-amber-500/10 text-amber-300';
+      return 'border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] text-[var(--color-warning)]';
     case 'Premium':
-      return 'border-rose-500/25 bg-rose-500/10 text-rose-300';
+      return 'border-[var(--color-destructive-border)] bg-[var(--color-destructive-bg)] text-[var(--color-destructive)]';
     case 'Variable':
-      return 'border-violet-500/25 bg-violet-500/10 text-violet-300';
+      return 'border-[var(--border-default)] bg-[var(--bg-panel)] text-[var(--text-secondary)]';
   }
 }
 
@@ -322,6 +322,11 @@ export function ConfigTab() {
     () => savedModelConfig.provider === hostedProvider ? getHostedModelOption(savedModelConfig.model) : null,
     [savedModelConfig.model, savedModelConfig.provider],
   );
+  const savedModelName = savedModelConfig.provider === hostedProvider
+    ? savedHostedModel?.name || savedModelConfig.model || 'No saved hosted model'
+    : savedModelConfig.model
+      ? `${savedModelConfig.model} (${savedModelConfig.provider})`
+      : 'No saved model';
   const hostedModelProviders = useMemo(
     () => HOSTED_MODEL_PROVIDERS.some((provider) => provider.key === selectedHostedProvider.key)
       ? HOSTED_MODEL_PROVIDERS
@@ -421,6 +426,20 @@ export function ConfigTab() {
     () => byokProvidersWithVenice.find((provider) => provider.key === configProvider),
     [byokProvidersWithVenice, configProvider],
   );
+  const selectedByokModelName = useMemo(() => {
+    if (isHostedMode) return '';
+    const modelId = useCustomModel ? customModelInput.trim() : configModel.trim();
+    const known = selectedByokProvider?.models.find((model) => model.id === modelId);
+    return known?.name ?? modelId ?? '';
+  }, [configModel, customModelInput, isHostedMode, selectedByokProvider?.models, useCustomModel]);
+  const modelModeLabel = isHostedMode ? 'Managed by Hatcher' : 'Use your own provider';
+  const modelModeDescription = isHostedMode
+    ? 'Hatcher hosts the model call, meters usage with AI Credits, and keeps provider keys out of this agent.'
+    : 'You provide the model vendor key. Hatcher stores it as a secret and the vendor bills usage directly.';
+  const currentModelName = isHostedMode ? selectedHostedModel.name : selectedByokModelName || 'No model selected';
+  const currentModelRoute = isHostedMode
+    ? hostedModelRoute(selectedHostedModel)
+    : selectedByokProvider?.defaultBaseUrl ?? 'Provider default endpoint';
 
   const selectHostedModel = useCallback((modelId: string) => {
     setConfigProvider(hostedProvider);
@@ -618,7 +637,7 @@ export function ConfigTab() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-h-[20px]">
           {saveMsg && (
-            <p className={`text-sm ${saveMsg.includes('saved') ? 'text-green-600' : 'text-red-600'}`}>
+            <p className={`text-sm ${saveMsg.includes('saved') ? 'text-[var(--color-success)]' : 'text-[var(--color-destructive)]'}`}>
               {saveMsg}
             </p>
           )}
@@ -813,19 +832,19 @@ export function ConfigTab() {
       {activeConfigSubtab === 'ai-models' && (
         <>
       <GlassCard className="p-5">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-5">
-          <div>
-            <h3 className="text-lg font-semibold text-[var(--text-primary)] flex items-center gap-2">
-              <Zap className="w-5 h-5 text-[var(--accent-primary)]" />
-              AI Model
+        <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <h3 className="flex items-center gap-2 text-lg font-semibold text-[var(--text-primary)]">
+              <Zap className="h-5 w-5 text-[var(--accent-primary)]" />
+              Model & provider
             </h3>
-            <p className="text-sm text-[var(--text-secondary)] mt-1">
-              Hosted models use UsePod first with OpenRouter fallback. IDLE, Xiaomi MiMo, and AceData models use explicit partner routes.
+            <p className="mt-1 max-w-2xl text-sm text-[var(--text-secondary)]">
+              Choose who runs this agent&apos;s LLM calls. Most users should keep Hatcher managed models; BYOK is for teams that already have vendor accounts and want provider-direct billing.
             </p>
           </div>
           {aiCreditBalance && (
-            <div className="rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-muted)] px-3 py-2 text-right">
-              <p className="text-xs uppercase tracking-[0.08em] text-[var(--text-tertiary)]">AI Credits</p>
+            <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] px-3 py-2 text-right">
+              <p className="text-xs font-semibold text-[var(--text-tertiary)]">AI Credits</p>
               <p className="text-lg font-semibold text-[var(--text-primary)]">
                 {aiCreditBalance.balance.toLocaleString()}
               </p>
@@ -840,7 +859,31 @@ export function ConfigTab() {
           onChange={(event) => void importModelPresets(event.target.files?.[0])}
         />
 
-        <div className="grid grid-cols-2 gap-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-1 mb-5">
+        <div className="mb-5 grid gap-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-4 lg:grid-cols-[1fr,0.9fr]">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold text-[var(--text-tertiary)]">Current route</p>
+            <h4 className="mt-1 text-base font-semibold text-[var(--text-primary)]">{modelModeLabel}</h4>
+            <p className="mt-1 text-sm leading-relaxed text-[var(--text-secondary)]">{modelModeDescription}</p>
+          </div>
+          <div className="grid gap-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-panel)] p-3 text-sm">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-[var(--text-tertiary)]">Selected model</span>
+              <span className="min-w-0 truncate text-right font-semibold text-[var(--text-primary)]">{currentModelName}</span>
+            </div>
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-[var(--text-tertiary)]">Route</span>
+              <span className="min-w-0 truncate text-right text-[var(--text-secondary)]">{currentModelRoute}</span>
+            </div>
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-[var(--text-tertiary)]">Billing</span>
+              <span className="min-w-0 truncate text-right text-[var(--text-secondary)]">
+                {isHostedMode ? 'AI Credits' : 'Provider account'}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-5 grid grid-cols-2 gap-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-1">
           <button
             type="button"
             onClick={() => selectHostedModel(selectedHostedModel.id)}
@@ -850,7 +893,7 @@ export function ConfigTab() {
                 : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
             }`}
           >
-            Hatcher Platform
+            Managed by Hatcher
           </button>
           <button
             type="button"
@@ -870,15 +913,199 @@ export function ConfigTab() {
                 : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
             }`}
           >
-            BYOK
+            Use your own provider
           </button>
         </div>
 
         {isHostedMode ? (
           <div className="space-y-4">
+            <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-4">
+              <div className="grid gap-4 lg:grid-cols-[0.9fr,1.1fr]">
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                  <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-panel)] p-3">
+                    <p className="text-xs font-semibold text-[var(--text-tertiary)]">Selected model</p>
+                    <p className="mt-1 truncate text-sm font-semibold text-[var(--text-primary)]">{selectedHostedModel.name}</p>
+                    <p className="mt-1 truncate text-xs text-[var(--text-secondary)]">{selectedHostedModel.provider}</p>
+                  </div>
+                  <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-panel)] p-3">
+                    <p className="text-xs font-semibold text-[var(--text-tertiary)]">Saved model</p>
+                    <p className="mt-1 truncate text-sm font-semibold text-[var(--text-primary)]">{savedModelName}</p>
+                    <p className="mt-1 text-xs text-[var(--text-secondary)]">
+                      {hasPendingHostedModelChange ? 'Save AI Models to apply the selected model.' : 'Currently active for this agent.'}
+                    </p>
+                  </div>
+                </div>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-medium text-[var(--text-primary)]">{selectedHostedModel.name}</span>
+                    <span className="rounded border border-[var(--border-subtle)] bg-[var(--bg-panel)] px-2 py-0.5 text-xs text-[var(--text-secondary)]">
+                      {selectedHostedModel.provider}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-sm text-[var(--text-secondary)]">{selectedHostedModel.description}</p>
+                  <p className="mt-2 text-xs text-[var(--text-tertiary)]">
+                    Technical route: {hostedModelRoute(selectedHostedModel)} · {hostedPrivacyLabel(selectedHostedModel)}
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2 text-xs text-[var(--text-secondary)]">
+                    <span
+                      className="rounded border border-[var(--border-subtle)] bg-[var(--bg-panel)] px-2 py-1"
+                      title="Selected context window compared with the largest window currently listed in Hatcher."
+                    >
+                      {formatContextTokens(selectedHostedContextTokens)} / {formatContextTokens(maxHostedContextTokens)}
+                    </span>
+                    <span className={`rounded border px-2 py-1 ${hostedCostClass(selectedHostedModel.cost)}`}>
+                      {selectedHostedModel.fixedPrice ?? hostedCostEstimate(selectedHostedModel.cost)}
+                    </span>
+                    <span
+                      className="inline-flex items-center gap-1.5 rounded border border-[var(--border-subtle)] bg-[var(--bg-panel)] px-2 py-1"
+                      title={selectedHostedModel.providerKey === 'xiaomi'
+                        ? 'Inference routes directly through Xiaomi MiMo during the launch promo. Avoid sensitive data unless you accept the partner route.'
+                        : selectedHostedModel.providerKey === 'acedata'
+                          ? 'Inference routes through AceData first with OpenRouter fallback when needed. Review partner policy before using sensitive data.'
+                        : selectedHostedModel.providerKey === 'openserv'
+                          ? 'Inference routes through OpenServ first with OpenRouter fallback when needed. Review partner policy before using sensitive data.'
+                        : hostedModelPrivacy(selectedHostedModel) === 'partner'
+                          ? 'Inference happens through an explicit partner route such as IDLE. Review partner policy before using sensitive data.'
+                          : 'Inference is routed through Hatcher managed infrastructure, currently UsePod first with OpenRouter fallback.'}
+                    >
+                      <Info className="h-3 w-3" />
+                      {hostedPrivacyLabel(selectedHostedModel)}
+                    </span>
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {hostedModelTags(selectedHostedModel).map((tag) => (
+                      <span key={tag} className="rounded-md border border-[var(--border-subtle)] bg-[var(--bg-panel)] px-2 py-0.5 text-[11px] text-[var(--text-secondary)]">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  {(selectedHostedModel.warning || lowAiCreditBalance) && (
+                    <div className="mt-4 flex items-start gap-2 rounded-lg border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-3 py-2 text-sm text-[var(--color-warning)]">
+                      <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                      <span>{selectedHostedModel.warning || 'AI Credits are low for hosted model usage.'}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-4">
+              <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <h4 className="text-sm font-semibold text-[var(--text-primary)]">Saved Model Presets</h4>
+                  <p className="mt-1 text-xs text-[var(--text-tertiary)]">
+                    Save reusable model choices. Export/import never includes API keys.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={exportModelPresets}
+                    disabled={modelPresets.length === 0}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border-subtle)] px-2.5 py-1.5 text-xs text-[var(--text-secondary)] transition-colors hover:border-[var(--accent-primary)]/40 hover:text-[var(--text-primary)] disabled:opacity-40"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    Export
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => presetImportRef.current?.click()}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border-subtle)] px-2.5 py-1.5 text-xs text-[var(--text-secondary)] transition-colors hover:border-[var(--accent-primary)]/40 hover:text-[var(--text-primary)]"
+                  >
+                    <Upload className="h-3.5 w-3.5" />
+                    Import
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid gap-3 lg:grid-cols-[1fr,1fr,auto]">
+                <input
+                  value={presetName}
+                  onChange={(event) => setPresetName(event.target.value)}
+                  className="config-input text-sm"
+                  placeholder={`Preset name, e.g. ${isHostedMode ? selectedHostedModel.name : 'Research BYOK'}`}
+                />
+                <input
+                  value={presetDescription}
+                  onChange={(event) => setPresetDescription(event.target.value)}
+                  className="config-input text-sm"
+                  placeholder="Optional description"
+                />
+                <button
+                  type="button"
+                  onClick={createPresetFromCurrent}
+                  className="btn-primary inline-flex items-center justify-center gap-2 px-3 py-2 text-sm"
+                >
+                  <Star className="h-4 w-4" />
+                  Save preset
+                </button>
+              </div>
+
+              {presetImportError && (
+                <p className="mt-3 text-xs text-[var(--color-destructive)]">{presetImportError}</p>
+              )}
+
+              {sortedModelPresets.length > 0 && (
+                <div className="mt-4 grid gap-2 lg:grid-cols-2">
+                  {sortedModelPresets.map((preset) => {
+                    const active = preset.provider === configProvider && preset.model === (useCustomModel ? customModelInput : configModel);
+                    return (
+                      <div
+                        key={preset.id}
+                        className={`rounded-lg border p-3 ${
+                          active
+                            ? 'border-[var(--accent-primary)]/40 bg-[var(--accent-primary)]/10'
+                            : 'border-[var(--border-subtle)] bg-[var(--bg-panel)]'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="flex min-w-0 items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => updateModelPreset(preset.id, { favorite: !preset.favorite })}
+                                className={preset.favorite ? 'text-[var(--color-warning)]' : 'text-[var(--text-tertiary)] hover:text-[var(--color-warning)]'}
+                                aria-label={preset.favorite ? 'Remove favorite' : 'Favorite preset'}
+                              >
+                                <Star className="h-3.5 w-3.5" fill={preset.favorite ? 'currentColor' : 'none'} />
+                              </button>
+                              <span className="truncate text-sm font-medium text-[var(--text-primary)]">{preset.name}</span>
+                            </div>
+                            <p className="mt-1 truncate text-xs text-[var(--text-tertiary)]">
+                              {preset.provider} · {preset.model}
+                            </p>
+                            {preset.description && (
+                              <p className="mt-1 line-clamp-2 text-xs text-[var(--text-secondary)]">{preset.description}</p>
+                            )}
+                          </div>
+                          <div className="flex flex-shrink-0 items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => applyModelPreset(preset)}
+                              className="rounded-md border border-[var(--border-subtle)] px-2 py-1 text-xs text-[var(--text-secondary)] transition-colors hover:border-[var(--accent-primary)]/40 hover:text-[var(--text-primary)]"
+                            >
+                              {active ? 'Active' : 'Apply'}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => deleteModelPreset(preset.id)}
+                              className="rounded-md p-1 text-[var(--text-tertiary)] transition-colors hover:text-[var(--color-destructive)]"
+                              aria-label="Delete preset"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
             <div className="grid gap-4 lg:grid-cols-[1fr,0.9fr]">
               <label className="block">
-                <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Search models</span>
+                <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Find a managed model</span>
                 <div className="relative">
                   <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-tertiary)]" />
                   <input
@@ -886,7 +1113,7 @@ export function ConfigTab() {
                     onChange={(event) => setModelSearch(event.target.value)}
                     className="config-input"
                     style={{ paddingLeft: '2.5rem' }}
-                    placeholder="Search by model, strength, route..."
+                    placeholder="Search by model, use case, provider, or route..."
                   />
                 </div>
               </label>
@@ -945,6 +1172,61 @@ export function ConfigTab() {
             <div className="space-y-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-3">
               <div>
                 <div className="mb-2 flex items-center justify-between gap-2">
+                  <span className="text-xs font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">Strengths</span>
+                  {selectedTagFilters.length > 0 && (
+                    <button type="button" onClick={() => setSelectedTagFilters([])} className="text-xs text-[var(--accent-primary)] hover:underline">
+                      Clear
+                    </button>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {HOSTED_TAG_OPTIONS.map((tag) => {
+                    const active = selectedTagFilters.includes(tag);
+                    return (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => toggleTagFilter(tag)}
+                        className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs capitalize transition-colors ${
+                          active
+                            ? 'border-[var(--accent-primary)]/50 bg-[var(--accent-primary)]/10 text-[var(--text-primary)]'
+                            : 'border-[var(--border-subtle)] bg-[var(--bg-panel)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)]/30'
+                        }`}
+                      >
+                        {tagIcon(tag)}
+                        {tag}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <span className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">Data route</span>
+                <div className="inline-flex overflow-hidden rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-panel)] text-xs">
+                  {([
+                    ['all', 'Any route'],
+                    ['hatcher', 'Hatcher route'],
+                    ['partner', 'Partner route'],
+                  ] as const).map(([value, label]) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setModelPrivacyFilter(value)}
+                      className={`px-3 py-1.5 transition-colors ${
+                        modelPrivacyFilter === value
+                          ? 'bg-[var(--accent-primary)]/10 text-[var(--text-primary)]'
+                          : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <div className="mb-2 flex items-center justify-between gap-2">
                   <span className="text-xs font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">Providers</span>
                   {selectedProviderFilters.length > 0 && (
                     <button type="button" onClick={() => setSelectedProviderFilters([])} className="text-xs text-[var(--accent-primary)] hover:underline">
@@ -976,236 +1258,6 @@ export function ConfigTab() {
                   })}
                 </div>
               </div>
-
-              <div>
-                <div className="mb-2 flex items-center justify-between gap-2">
-                  <span className="text-xs font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">Strengths</span>
-                  {selectedTagFilters.length > 0 && (
-                    <button type="button" onClick={() => setSelectedTagFilters([])} className="text-xs text-[var(--accent-primary)] hover:underline">
-                      Clear
-                    </button>
-                  )}
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {HOSTED_TAG_OPTIONS.map((tag) => {
-                    const active = selectedTagFilters.includes(tag);
-                    return (
-                      <button
-                        key={tag}
-                        type="button"
-                        onClick={() => toggleTagFilter(tag)}
-                        className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs capitalize transition-colors ${
-                          active
-                            ? 'border-[var(--accent-primary)]/50 bg-[var(--accent-primary)]/10 text-[var(--text-primary)]'
-                            : 'border-[var(--border-subtle)] bg-[var(--bg-panel)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)]/30'
-                        }`}
-                      >
-                        {tagIcon(tag)}
-                        {tag}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div>
-                <span className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">Privacy route</span>
-                <div className="inline-flex overflow-hidden rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-panel)] text-xs">
-                  {([
-                    ['all', 'Any route'],
-                    ['hatcher', 'Hatcher route'],
-                    ['partner', 'Partner route'],
-                  ] as const).map(([value, label]) => (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => setModelPrivacyFilter(value)}
-                      className={`px-3 py-1.5 transition-colors ${
-                        modelPrivacyFilter === value
-                          ? 'bg-[var(--accent-primary)]/10 text-[var(--text-primary)]'
-                          : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-4">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-[var(--text-primary)]">{selectedHostedModel.name}</span>
-                    <span className="px-2 py-0.5 rounded text-xs bg-[var(--bg-panel)] text-[var(--text-secondary)] border border-[var(--border-subtle)]">
-                      {selectedHostedModel.provider}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-sm text-[var(--text-secondary)]">{selectedHostedModel.description}</p>
-                  <p className="mt-2 text-xs text-[var(--text-tertiary)]">
-                    Route: {hostedModelRoute(selectedHostedModel)} · {hostedPrivacyLabel(selectedHostedModel)}
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-2 text-xs text-[var(--text-secondary)]">
-                  <span
-                    className="px-2 py-1 rounded bg-[var(--bg-panel)] border border-[var(--border-subtle)]"
-                    title="Selected context window compared with the largest window currently listed in Hatcher."
-                  >
-                    {formatContextTokens(selectedHostedContextTokens)} / {formatContextTokens(maxHostedContextTokens)}
-                  </span>
-                  <span className={`px-2 py-1 rounded border ${hostedCostClass(selectedHostedModel.cost)}`}>
-                    {selectedHostedModel.fixedPrice ?? hostedCostEstimate(selectedHostedModel.cost)}
-                  </span>
-                  <span
-                    className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-[var(--bg-panel)] border border-[var(--border-subtle)]"
-                    title={selectedHostedModel.providerKey === 'xiaomi'
-                      ? 'Inference routes directly through Xiaomi MiMo during the launch promo. Avoid sensitive data unless you accept the partner route.'
-                      : selectedHostedModel.providerKey === 'acedata'
-                        ? 'Inference routes through AceData first with OpenRouter fallback when needed. Review partner policy before using sensitive data.'
-                      : selectedHostedModel.providerKey === 'openserv'
-                        ? 'Inference routes through OpenServ first with OpenRouter fallback when needed. Review partner policy before using sensitive data.'
-                      : hostedModelPrivacy(selectedHostedModel) === 'partner'
-                        ? 'Inference happens through an explicit partner route such as IDLE. Review partner policy before using sensitive data.'
-                        : 'Inference is routed through Hatcher managed infrastructure, currently UsePod first with OpenRouter fallback.'}
-                  >
-                    <Info className="h-3 w-3" />
-                    {hostedPrivacyLabel(selectedHostedModel)}
-                  </span>
-                </div>
-              </div>
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {hostedModelTags(selectedHostedModel).map((tag) => (
-                  <span key={tag} className="rounded-md border border-[var(--border-subtle)] bg-[var(--bg-panel)] px-2 py-0.5 text-[11px] text-[var(--text-secondary)]">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-              {hasPendingHostedModelChange && (
-                <p className="mt-3 rounded-lg border border-[var(--accent-primary)]/20 bg-[var(--accent-primary)]/10 px-3 py-2 text-xs text-[var(--text-secondary)]">
-                  Pending model change. Save AI Models to make {selectedHostedModel.name} active.
-                </p>
-              )}
-              {(selectedHostedModel.warning || lowAiCreditBalance) && (
-                <div className="mt-4 flex items-start gap-2 rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-3 py-2 text-sm text-yellow-700 dark:text-yellow-300">
-                  <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  <span>{selectedHostedModel.warning || 'AI Credits are low for hosted model usage.'}</span>
-                </div>
-              )}
-            </div>
-
-            <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-4">
-              <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                  <h4 className="text-sm font-semibold text-[var(--text-primary)]">Saved Model Presets</h4>
-                  <p className="mt-1 text-xs text-[var(--text-tertiary)]">
-                    Save reusable model choices. Export/import never includes API keys.
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={exportModelPresets}
-                    disabled={modelPresets.length === 0}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border-subtle)] px-2.5 py-1.5 text-xs text-[var(--text-secondary)] transition-colors hover:border-[var(--accent-primary)]/40 hover:text-[var(--text-primary)] disabled:opacity-40"
-                  >
-                    <Download className="h-3.5 w-3.5" />
-                    Export
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => presetImportRef.current?.click()}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border-subtle)] px-2.5 py-1.5 text-xs text-[var(--text-secondary)] transition-colors hover:border-[var(--accent-primary)]/40 hover:text-[var(--text-primary)]"
-                  >
-                    <Upload className="h-3.5 w-3.5" />
-                    Import
-                  </button>
-                </div>
-              </div>
-
-              <div className="grid gap-3 lg:grid-cols-[1fr,1fr,auto]">
-                <input
-                  value={presetName}
-                  onChange={(event) => setPresetName(event.target.value)}
-                  className="config-input text-sm"
-                  placeholder={`Preset name, e.g. ${isHostedMode ? selectedHostedModel.name : 'Research BYOK'}`}
-                />
-                <input
-                  value={presetDescription}
-                  onChange={(event) => setPresetDescription(event.target.value)}
-                  className="config-input text-sm"
-                  placeholder="Optional description"
-                />
-                <button
-                  type="button"
-                  onClick={createPresetFromCurrent}
-                  className="btn-primary inline-flex items-center justify-center gap-2 px-3 py-2 text-sm"
-                >
-                  <Star className="h-4 w-4" />
-                  Save preset
-                </button>
-              </div>
-
-              {presetImportError && (
-                <p className="mt-3 text-xs text-red-400">{presetImportError}</p>
-              )}
-
-              {sortedModelPresets.length > 0 && (
-                <div className="mt-4 grid gap-2 lg:grid-cols-2">
-                  {sortedModelPresets.map((preset) => {
-                    const active = preset.provider === configProvider && preset.model === (useCustomModel ? customModelInput : configModel);
-                    return (
-                      <div
-                        key={preset.id}
-                        className={`rounded-lg border p-3 ${
-                          active
-                            ? 'border-[var(--accent-primary)]/40 bg-[var(--accent-primary)]/10'
-                            : 'border-[var(--border-subtle)] bg-[var(--bg-panel)]'
-                        }`}
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="min-w-0">
-                            <div className="flex min-w-0 items-center gap-2">
-                              <button
-                                type="button"
-                                onClick={() => updateModelPreset(preset.id, { favorite: !preset.favorite })}
-                                className={preset.favorite ? 'text-amber-300' : 'text-[var(--text-tertiary)] hover:text-amber-300'}
-                                aria-label={preset.favorite ? 'Remove favorite' : 'Favorite preset'}
-                              >
-                                <Star className="h-3.5 w-3.5" fill={preset.favorite ? 'currentColor' : 'none'} />
-                              </button>
-                              <span className="truncate text-sm font-medium text-[var(--text-primary)]">{preset.name}</span>
-                            </div>
-                            <p className="mt-1 truncate text-xs text-[var(--text-tertiary)]">
-                              {preset.provider} · {preset.model}
-                            </p>
-                            {preset.description && (
-                              <p className="mt-1 line-clamp-2 text-xs text-[var(--text-secondary)]">{preset.description}</p>
-                            )}
-                          </div>
-                          <div className="flex flex-shrink-0 items-center gap-1">
-                            <button
-                              type="button"
-                              onClick={() => applyModelPreset(preset)}
-                              className="rounded-md border border-[var(--border-subtle)] px-2 py-1 text-xs text-[var(--text-secondary)] transition-colors hover:border-[var(--accent-primary)]/40 hover:text-[var(--text-primary)]"
-                            >
-                              {active ? 'Active' : 'Apply'}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => deleteModelPreset(preset.id)}
-                              className="rounded-md p-1 text-[var(--text-tertiary)] transition-colors hover:text-red-400"
-                              aria-label="Delete preset"
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
             </div>
 
             <div className="overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)]">
@@ -1266,7 +1318,7 @@ export function ConfigTab() {
                           <span className="flex items-center gap-2">
                             <span className="truncate text-sm font-medium text-[var(--text-primary)]">{model.name}</span>
                             {model.fixedPrice && (
-                              <span className="rounded border border-emerald-500/20 bg-emerald-500/10 px-1.5 py-0.5 text-[10px] text-emerald-300">
+                              <span className="rounded border border-[var(--color-success-border)] bg-[var(--color-success-bg)] px-1.5 py-0.5 text-[10px] text-[var(--color-success)]">
                                 fixed
                               </span>
                             )}
@@ -1360,7 +1412,7 @@ export function ConfigTab() {
                   Save preset
                 </button>
               </div>
-              {presetImportError && <p className="mt-3 text-xs text-red-400">{presetImportError}</p>}
+              {presetImportError && <p className="mt-3 text-xs text-[var(--color-destructive)]">{presetImportError}</p>}
               {sortedModelPresets.length > 0 && (
                 <div className="mt-4 grid gap-2 lg:grid-cols-2">
                   {sortedModelPresets.map((preset) => {
@@ -1373,7 +1425,7 @@ export function ConfigTab() {
                               <button
                                 type="button"
                                 onClick={() => updateModelPreset(preset.id, { favorite: !preset.favorite })}
-                                className={preset.favorite ? 'text-amber-300' : 'text-[var(--text-tertiary)] hover:text-amber-300'}
+                                className={preset.favorite ? 'text-[var(--color-warning)]' : 'text-[var(--text-tertiary)] hover:text-[var(--color-warning)]'}
                                 aria-label={preset.favorite ? 'Remove favorite' : 'Favorite preset'}
                               >
                                 <Star className="h-3.5 w-3.5" fill={preset.favorite ? 'currentColor' : 'none'} />
@@ -1394,7 +1446,7 @@ export function ConfigTab() {
                             <button
                               type="button"
                               onClick={() => deleteModelPreset(preset.id)}
-                              className="rounded-md p-1 text-[var(--text-tertiary)] transition-colors hover:text-red-400"
+                              className="rounded-md p-1 text-[var(--text-tertiary)] transition-colors hover:text-[var(--color-destructive)]"
                               aria-label="Delete preset"
                             >
                               <Trash2 className="h-3.5 w-3.5" />
@@ -1409,7 +1461,7 @@ export function ConfigTab() {
             </div>
 
             <label className="block">
-              <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Provider</span>
+              <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Provider account</span>
               <div className="relative">
                 <select
                   value={configProvider}
@@ -1435,7 +1487,7 @@ export function ConfigTab() {
             </label>
 
             <label className="block">
-              <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Model</span>
+              <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Provider model ID</span>
               <input
                 value={useCustomModel ? customModelInput : configModel}
                 onChange={(e) => {
@@ -1457,7 +1509,7 @@ export function ConfigTab() {
                         BYOK direct
                       </span>
                       {selectedByokProvider.key === 'venice' && (
-                        <span className="rounded-md border border-cyan-500/20 bg-cyan-500/10 px-2 py-0.5 text-xs text-cyan-300">
+                          <span className="rounded-md border border-[var(--color-info-border)] bg-[var(--color-info-bg)] px-2 py-0.5 text-xs text-[var(--color-info)]">
                           privacy-first
                         </span>
                       )}
@@ -1489,7 +1541,7 @@ export function ConfigTab() {
                   </div>
                 </div>
                 {selectedByokProvider.key === 'venice' && (
-                  <p className="mt-3 rounded-lg border border-cyan-500/20 bg-cyan-500/10 px-3 py-2 text-xs text-cyan-200">
+                  <p className="mt-3 rounded-lg border border-[var(--color-info-border)] bg-[var(--color-info-bg)] px-3 py-2 text-xs text-[var(--color-info)]">
                     Venice is OpenAI-compatible. TEE/E2EE-capable models should be treated as model-level privacy tags until the full Hatcher logging and history path is audited for those modes.
                   </p>
                 )}
@@ -1652,8 +1704,8 @@ function EnvVarsEditor({ agentId }: { agentId?: string }) {
         className="flex items-center justify-between w-full"
       >
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-            <Lock size={14} className="text-emerald-400" />
+          <div className="w-7 h-7 rounded-lg bg-[var(--color-success-bg)] flex items-center justify-center">
+            <Lock size={14} className="text-[var(--color-success)]" />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Environment Variables</h3>
@@ -1681,7 +1733,7 @@ function EnvVarsEditor({ agentId }: { agentId?: string }) {
 
               {loading && (
                 <div className="flex items-center gap-2 py-2">
-                  <div className="w-3 h-3 border-2 border-white/20 border-t-emerald-400 rounded-full animate-spin" />
+                  <div className="w-3 h-3 border-2 border-[var(--border-default)] border-t-[var(--color-success)] rounded-full animate-spin" />
                   <span className="text-xs text-[var(--text-muted)]">Loading...</span>
                 </div>
               )}
@@ -1699,7 +1751,7 @@ function EnvVarsEditor({ agentId }: { agentId?: string }) {
                         <button
                           type="button"
                           onClick={() => setVars(prev => prev.map(x => x.key === v.key ? { ...x, editing: true, newValue: '' } : x))}
-                          className="text-[10px] text-[#A78BFA] hover:text-[#c4b5fd] transition-colors font-medium"
+                          className="text-[10px] text-[var(--accent-primary)] hover:text-[var(--accent-hover)] transition-colors font-medium"
                         >
                           Update
                         </button>
@@ -1708,7 +1760,7 @@ function EnvVarsEditor({ agentId }: { agentId?: string }) {
                         type="button"
                         onClick={() => handleDelete(v.key)}
                         disabled={deleting === v.key}
-                        className="text-[10px] text-red-400 hover:text-red-300 transition-colors disabled:opacity-40 font-medium"
+                        className="text-[10px] text-[var(--color-destructive)] hover:text-[var(--color-destructive)] transition-colors disabled:opacity-40 font-medium"
                       >
                         {deleting === v.key ? 'Removing...' : 'Remove'}
                       </button>
@@ -1751,7 +1803,7 @@ function EnvVarsEditor({ agentId }: { agentId?: string }) {
                         type="button"
                         onClick={() => handleUpdate(v.key, v.newValue)}
                         disabled={saving === v.key || !v.newValue}
-                        className="text-[10px] font-medium text-emerald-400 hover:text-emerald-300 disabled:opacity-40 transition-colors"
+                        className="text-[10px] font-medium text-[var(--color-success)] hover:text-[var(--color-success)] disabled:opacity-40 transition-colors"
                       >
                         {saving === v.key ? 'Saving...' : 'Save'}
                       </button>
@@ -1803,7 +1855,7 @@ function EnvVarsEditor({ agentId }: { agentId?: string }) {
                       type="button"
                       onClick={handleAdd}
                       disabled={saving === '__new__' || !newKey || !newValue}
-                      className="text-[10px] font-medium text-emerald-400 hover:text-emerald-300 disabled:opacity-40 transition-colors whitespace-nowrap"
+                      className="text-[10px] font-medium text-[var(--color-success)] hover:text-[var(--color-success)] disabled:opacity-40 transition-colors whitespace-nowrap"
                     >
                       {saving === '__new__' ? 'Adding...' : '+ Add'}
                     </button>
@@ -1812,7 +1864,7 @@ function EnvVarsEditor({ agentId }: { agentId?: string }) {
               )}
 
               {(error || successMsg) && (
-                <p className={`text-xs font-medium ${error ? 'text-red-400' : 'text-emerald-400'}`}>
+                <p className={`text-xs font-medium ${error ? 'text-[var(--color-destructive)]' : 'text-[var(--color-success)]'}`}>
                   {error ?? successMsg}
                 </p>
               )}
@@ -1905,8 +1957,8 @@ function ConfigHistory({ agentId }: { agentId?: string }) {
         className="flex items-center justify-between w-full"
       >
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-[#A78BFA]/10 flex items-center justify-center">
-            <History size={14} className="text-[#A78BFA]" />
+          <div className="w-7 h-7 rounded-lg bg-[var(--accent-primary)]/10 flex items-center justify-center">
+            <History size={14} className="text-[var(--accent-primary)]" />
           </div>
           <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Config History</h3>
         </div>
@@ -1925,7 +1977,7 @@ function ConfigHistory({ agentId }: { agentId?: string }) {
             <div className="mt-4 space-y-2">
               {loading && (
                 <div className="flex items-center gap-2 py-3">
-                  <div className="w-3 h-3 border-2 border-white/20 border-t-[#A78BFA] rounded-full animate-spin" />
+                  <div className="w-3 h-3 border-2 border-[var(--border-default)] border-t-[var(--accent-primary)] rounded-full animate-spin" />
                   <span className="text-xs text-[var(--text-muted)]">Loading snapshots...</span>
                 </div>
               )}
@@ -1956,7 +2008,7 @@ function ConfigHistory({ agentId }: { agentId?: string }) {
                         type="button"
                         onClick={() => handleRestore(snap.id)}
                         disabled={restoring === snap.id}
-                        className="text-[10px] font-medium text-amber-400 hover:text-amber-300 transition-colors disabled:opacity-40"
+                        className="text-[10px] font-medium text-[var(--color-warning)] hover:text-[var(--color-warning)] transition-colors disabled:opacity-40"
                       >
                         {restoring === snap.id ? 'Restoring...' : 'Confirm'}
                       </button>
@@ -1972,7 +2024,7 @@ function ConfigHistory({ agentId }: { agentId?: string }) {
                     <button
                       type="button"
                       onClick={() => setConfirmId(snap.id)}
-                      className="flex items-center gap-1 text-[10px] font-medium text-[#A78BFA] hover:text-[#c4b5fd] transition-colors flex-shrink-0"
+                      className="flex items-center gap-1 text-[10px] font-medium text-[var(--accent-primary)] hover:text-[var(--accent-hover)] transition-colors flex-shrink-0"
                     >
                       <RotateCcw size={11} />
                       Restore
@@ -1982,7 +2034,7 @@ function ConfigHistory({ agentId }: { agentId?: string }) {
               ))}
 
               {message && (
-                <p className={`text-xs font-medium mt-2 ${message.startsWith('Error') ? 'text-red-400' : 'text-emerald-400'}`}>
+                <p className={`text-xs font-medium mt-2 ${message.startsWith('Error') ? 'text-[var(--color-destructive)]' : 'text-[var(--color-success)]'}`}>
                   {message}
                 </p>
               )}

@@ -366,26 +366,26 @@ export function DispatchHud({
       {!panelOpen && (
         <button
           onClick={() => setPanelOpen(true)}
-          className="fixed bottom-4 right-4 z-30 flex items-center gap-2 rounded-full border border-[#39ff88]/50 bg-[rgba(8,12,10,0.92)] px-4 py-3 text-sm font-semibold text-[#dffbe9] shadow-xl backdrop-blur transition hover:scale-105"
+          className="fixed bottom-4 right-4 z-30 flex items-center gap-2 rounded-full border border-[#9ed5e7]/50 bg-[rgba(8,12,10,0.92)] px-4 py-3 text-sm font-semibold text-[#e8f7fb] shadow-xl backdrop-blur transition hover:scale-105"
           style={{ boxShadow: '0 10px 30px rgba(57,255,136,0.25)' }}
         >
           <span aria-hidden>🚀</span>
           <span>Dispatch</span>
-          <span className="rounded-full bg-[#39ff88]/20 px-2 text-xs">Lv {lvl.level}</span>
+          <span className="rounded-full bg-[#9ed5e7]/20 px-2 text-xs">Lv {lvl.level}</span>
           {dispatches.length > 0 && (
-            <span className="rounded-full bg-[#39ff88] px-2 text-xs font-bold text-black">{dispatches.length}</span>
+            <span className="rounded-full bg-[#9ed5e7] px-2 text-xs font-bold text-black">{dispatches.length}</span>
           )}
         </button>
       )}
 
       {/* Panel */}
       {panelOpen && (
-        <div className="fixed bottom-4 right-4 z-30 flex max-h-[calc(100dvh-2rem)] w-[min(360px,calc(100vw-1.5rem))] flex-col gap-3 overflow-y-auto rounded-2xl border border-[#39ff88]/30 bg-[rgba(8,12,10,0.95)] p-4 text-[#dffbe9] shadow-2xl backdrop-blur">
+        <div className="fixed bottom-4 right-4 z-30 flex max-h-[calc(100dvh-2rem)] w-[min(360px,calc(100vw-1.5rem))] flex-col gap-3 overflow-y-auto rounded-2xl border border-[#9ed5e7]/30 bg-[rgba(8,12,10,0.95)] p-4 text-[#e8f7fb] shadow-2xl backdrop-blur">
           <div className="flex items-center justify-between">
-            <h2 className="flex items-center gap-2 text-sm font-bold tracking-wide text-[#39ff88]">
+            <h2 className="flex items-center gap-2 text-sm font-bold tracking-wide text-[#9ed5e7]">
               <span aria-hidden>🚀</span> Agent Dispatch
             </h2>
-            <button onClick={() => setPanelOpen(false)} aria-label="Close" className="rounded-md px-2 py-1 text-[#9fceb4] hover:bg-white/5 hover:text-white">
+            <button onClick={() => setPanelOpen(false)} aria-label="Close" className="rounded-md px-2 py-1 text-[#9fc1c7] hover:bg-white/5 hover:text-white">
               ▾
             </button>
           </div>
@@ -393,7 +393,7 @@ export function DispatchHud({
           {/* Progression */}
           <div className="rounded-xl border border-white/10 bg-black/30 p-3">
             <div className="mb-1 flex items-center justify-between text-xs">
-              <span className="font-bold text-[#39ff88]">
+              <span className="font-bold text-[#9ed5e7]">
                 Level {lvl.level}
                 {prestige > 0 && (
                   <span className="ml-1 text-[#ffd24a]" title={`Prestige ${prestige} · +${Math.round(prestige * 25)}% earnings`}>
@@ -401,7 +401,7 @@ export function DispatchHud({
                   </span>
                 )}
               </span>
-              <span className="text-[#9fceb4]">
+              <span className="text-[#9fc1c7]">
                 {streak.count > 0 && (
                   <span className="mr-2 text-[#ff8a3a]" title={`${streak.count}-day streak`}>🔥{streak.count}</span>
                 )}
@@ -409,9 +409,9 @@ export function DispatchHud({
               </span>
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-white/10">
-              <div className="h-full rounded-full bg-[#39ff88] transition-all" style={{ width: `${Math.round(lvl.pct * 100)}%` }} />
+              <div className="h-full rounded-full bg-[#9ed5e7] transition-all" style={{ width: `${Math.round(lvl.pct * 100)}%` }} />
             </div>
-            <div className="mt-1 flex justify-between text-[10px] text-[#7faE96]">
+            <div className="mt-1 flex justify-between text-[10px] text-[#7f98a3]">
               <span>{prestige > 0 ? `×${prestigeMultiplier(prestige).toFixed(2)} earnings` : ''}</span>
               <span>{lvl.intoLevel} / {lvl.forNext} XP</span>
             </div>
@@ -432,7 +432,7 @@ export function DispatchHud({
           {/* Ranked standing — distinct from the cosmetic Data currency so players
               can see completed dispatches actually counting toward the prize race. */}
           <div
-            className="flex items-center justify-between rounded-lg border border-[#ffd24a]/25 bg-[#ffd24a]/5 px-2.5 py-1.5 text-[11px] text-[#9fceb4]"
+            className="flex items-center justify-between rounded-lg border border-[#ffd24a]/25 bg-[#ffd24a]/5 px-2.5 py-1.5 text-[11px] text-[#9fc1c7]"
             title="Ranked leaderboard points from completed dispatches (1 scored per agent every 12s). Data ◆ is cosmetic and does not affect ranking."
           >
             <span className="font-semibold text-[#ffd24a]">⚔ Leaderboard</span>
@@ -443,15 +443,15 @@ export function DispatchHud({
                   ? `+${sessionScore.toLocaleString()}`
                   : '—'}
               {sessionScore > 0 && seasonYou && (
-                <span className="ml-1 text-[#7faE96]">(+{sessionScore} run)</span>
+                <span className="ml-1 text-[#7f98a3]">(+{sessionScore} run)</span>
               )}
             </span>
           </div>
 
           {/* Courier slots — raise the cap via the Ops Center upgrade in the Lab. */}
-          <div className="flex items-center justify-between text-[11px] text-[#9fceb4]">
+          <div className="flex items-center justify-between text-[11px] text-[#9fc1c7]">
             <span>⊞ Courier slots</span>
-            <span className="font-mono text-[#dffbe9]">
+            <span className="font-mono text-[#e8f7fb]">
               {dispatches.length}/{maxSlots}
             </span>
           </div>
@@ -477,7 +477,7 @@ export function DispatchHud({
                     onClick={() => setJobIdx(i)}
                     title={j.desc}
                     className={`flex-1 rounded-md px-1 py-1 text-[10px] font-semibold transition ${
-                      jobIdx === i ? 'bg-[#39ff88] text-black' : 'bg-white/5 text-[#9fceb4] hover:bg-white/10'
+                      jobIdx === i ? 'bg-[#9ed5e7] text-black' : 'bg-white/5 text-[#9fc1c7] hover:bg-white/10'
                     }`}
                   >
                     {j.name}
@@ -498,14 +498,14 @@ export function DispatchHud({
                 </select>
                 <button
                   onClick={send}
-                  className="rounded-lg bg-[#39ff88] px-4 py-2 text-sm font-bold text-black transition hover:bg-[#5fffa0]"
+                  className="rounded-lg bg-[#9ed5e7] px-4 py-2 text-sm font-bold text-black transition hover:bg-[#d7eff5]"
                 >
                   Send
                 </button>
               </div>
             </div>
           ) : (
-            <p className="text-xs text-[#9fceb4]">
+            <p className="text-xs text-[#9fc1c7]">
               {runningAgents.length === 0
                 ? 'No running agents — start one to dispatch it.'
                 : `All ${maxSlots} courier slots are busy — they free up as couriers return.`}
@@ -522,12 +522,12 @@ export function DispatchHud({
                   <div key={d.id} className="rounded-lg border border-white/10 bg-black/20 p-2">
                     <div className="flex items-center justify-between text-xs">
                       <span className="truncate font-semibold">{d.agentName}</span>
-                      <span className="text-[#9fceb4]">→ {d.destName}</span>
+                      <span className="text-[#9fc1c7]">→ {d.destName}</span>
                     </div>
                     <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-white/10">
-                      <div className="h-full bg-[#39ff88]" style={{ width: `${Math.round(progress * 100)}%` }} />
+                      <div className="h-full bg-[#9ed5e7]" style={{ width: `${Math.round(progress * 100)}%` }} />
                     </div>
-                    <div className="mt-1 flex justify-between text-[10px] text-[#7faE96]">
+                    <div className="mt-1 flex justify-between text-[10px] text-[#7f98a3]">
                       <span>◆ {d.collected}/{d.packets.length}</span>
                       <span>{etaSec}s</span>
                     </div>
@@ -542,8 +542,8 @@ export function DispatchHud({
             disabled={!autoUnlocked && data < AUTO_UNLOCK_COST}
             className={`flex items-center justify-between rounded-lg border px-3 py-2 text-sm font-semibold transition disabled:opacity-50 ${
               autoUnlocked && autoDispatch
-                ? 'border-[#39ff88] bg-[#39ff88]/15 text-[#39ff88]'
-                : 'border-white/10 bg-black/30 text-[#9fceb4] hover:bg-white/5'
+                ? 'border-[#9ed5e7] bg-[#9ed5e7]/15 text-[#9ed5e7]'
+                : 'border-white/10 bg-black/30 text-[#9fc1c7] hover:bg-white/5'
             }`}
             title={
               autoUnlocked
@@ -551,9 +551,9 @@ export function DispatchHud({
                 : `Unlock auto-dispatch for ${AUTO_UNLOCK_COST.toLocaleString()} Data`
             }
           >
-            <span>⟳ Auto-dispatch{autoUnlocked && <span className="ml-1 text-[10px] text-[#7faE96]">−{AUTO_FUEL_COST}◆/run</span>}</span>
+            <span>⟳ Auto-dispatch{autoUnlocked && <span className="ml-1 text-[10px] text-[#7f98a3]">−{AUTO_FUEL_COST}◆/run</span>}</span>
             {autoUnlocked ? (
-              <span className={`rounded-full px-2 py-0.5 text-xs ${autoDispatch ? 'bg-[#39ff88] text-black' : 'bg-white/10'}`}>
+              <span className={`rounded-full px-2 py-0.5 text-xs ${autoDispatch ? 'bg-[#9ed5e7] text-black' : 'bg-white/10'}`}>
                 {autoDispatch ? 'ON' : 'OFF'}
               </span>
             ) : (
@@ -567,7 +567,7 @@ export function DispatchHud({
               className={`flex items-center justify-between rounded-lg border px-3 py-2 text-sm font-semibold transition ${
                 manualControl
                   ? 'border-[#62b8ff] bg-[#62b8ff]/15 text-[#62b8ff]'
-                  : 'border-white/10 bg-black/30 text-[#9fceb4] hover:bg-white/5'
+                  : 'border-white/10 bg-black/30 text-[#9fc1c7] hover:bg-white/5'
               }`}
               title="Steer your active courier yourself with WASD / arrow keys to sweep packets"
             >
@@ -578,7 +578,7 @@ export function DispatchHud({
             </button>
           )}
           {canSteer && manualControl && (
-            <div className="rounded-lg border border-[#62b8ff]/25 bg-[#62b8ff]/5 px-3 py-1.5 text-[11px] text-[#9fceb4]">
+            <div className="rounded-lg border border-[#62b8ff]/25 bg-[#62b8ff]/5 px-3 py-1.5 text-[11px] text-[#9fc1c7]">
               <span className="font-mono text-[#62b8ff]">WASD</span> to move (relative to the camera),{' '}
               <span className="font-mono text-[#62b8ff]">drag</span> to look around — like walk mode. Reach the marked
               destination to deliver; sweep packets for combos.
@@ -595,17 +595,17 @@ export function DispatchHud({
             </button>
           )}
           <div className="grid grid-cols-2 gap-2">
-            <button onClick={() => setLabOpen(true)} className="rounded-lg border border-[#39ff88]/30 bg-black/30 px-2 py-2 text-sm font-semibold text-[#39ff88] transition hover:bg-[#39ff88]/10">
+            <button onClick={() => setLabOpen(true)} className="rounded-lg border border-[#9ed5e7]/30 bg-black/30 px-2 py-2 text-sm font-semibold text-[#9ed5e7] transition hover:bg-[#9ed5e7]/10">
               ⚗ Lab
             </button>
-            <button onClick={() => setShopOpen(true)} className="rounded-lg border border-[#39ff88]/30 bg-black/30 px-2 py-2 text-sm font-semibold text-[#39ff88] transition hover:bg-[#39ff88]/10">
+            <button onClick={() => setShopOpen(true)} className="rounded-lg border border-[#9ed5e7]/30 bg-black/30 px-2 py-2 text-sm font-semibold text-[#9ed5e7] transition hover:bg-[#9ed5e7]/10">
               ✦ Skins
             </button>
-            <button onClick={() => setLeaderboardOpen(true)} className="rounded-lg border border-[#39ff88]/30 bg-black/30 px-2 py-2 text-sm font-semibold text-[#39ff88] transition hover:bg-[#39ff88]/10">
+            <button onClick={() => setLeaderboardOpen(true)} className="rounded-lg border border-[#9ed5e7]/30 bg-black/30 px-2 py-2 text-sm font-semibold text-[#9ed5e7] transition hover:bg-[#9ed5e7]/10">
               ☷ Ranks
             </button>
-            <button onClick={() => setGoalsOpen(true)} className="rounded-lg border border-[#39ff88]/30 bg-black/30 px-2 py-2 text-sm font-semibold text-[#39ff88] transition hover:bg-[#39ff88]/10">
-              ✔ Goals <span className="text-[10px] text-[#7faE96]">{achieved.length}/{ACHIEVEMENTS.length}</span>
+            <button onClick={() => setGoalsOpen(true)} className="rounded-lg border border-[#9ed5e7]/30 bg-black/30 px-2 py-2 text-sm font-semibold text-[#9ed5e7] transition hover:bg-[#9ed5e7]/10">
+              ✔ Goals <span className="text-[10px] text-[#7f98a3]">{achieved.length}/{ACHIEVEMENTS.length}</span>
             </button>
           </div>
         </div>
@@ -613,8 +613,8 @@ export function DispatchHud({
 
       {/* Result toast */}
       {lastResult && (
-        <div className="fixed bottom-24 left-1/2 z-40 -translate-x-1/2 rounded-xl border border-[#39ff88]/50 bg-[rgba(8,12,10,0.96)] px-5 py-3 text-center text-sm text-[#dffbe9] shadow-2xl backdrop-blur">
-          <div className="font-bold text-[#39ff88]">
+        <div className="fixed bottom-24 left-1/2 z-40 -translate-x-1/2 rounded-xl border border-[#9ed5e7]/50 bg-[rgba(8,12,10,0.96)] px-5 py-3 text-center text-sm text-[#e8f7fb] shadow-2xl backdrop-blur">
+          <div className="font-bold text-[#9ed5e7]">
             {lastResult.agentName} returned from {lastResult.destName}
           </div>
           <div className="mt-0.5 text-xs">
@@ -641,7 +641,7 @@ export function DispatchHud({
       {achievementToast && (
         <div className="fixed bottom-40 left-1/2 z-40 -translate-x-1/2 rounded-xl border border-[#ffd24a]/50 bg-[rgba(8,12,10,0.96)] px-5 py-3 text-center text-sm shadow-2xl backdrop-blur">
           <div className="font-bold text-[#ffd24a]">✔ {achievementToast.name}</div>
-          <div className="mt-0.5 text-xs text-[#dffbe9]">Achievement unlocked · +{achievementToast.reward} Data</div>
+          <div className="mt-0.5 text-xs text-[#e8f7fb]">Achievement unlocked · +{achievementToast.reward} Data</div>
         </div>
       )}
 
@@ -649,15 +649,15 @@ export function DispatchHud({
       {streakToast && (
         <div className="fixed top-32 left-1/2 z-40 -translate-x-1/2 rounded-xl border border-[#ff8a3a]/50 bg-[rgba(8,12,10,0.96)] px-5 py-3 text-center text-sm shadow-2xl backdrop-blur">
           <div className="font-bold text-[#ff8a3a]">🔥 {streakToast.count}-day streak!</div>
-          <div className="mt-0.5 text-xs text-[#dffbe9]">Daily bonus · +{streakToast.bonus} Data</div>
+          <div className="mt-0.5 text-xs text-[#e8f7fb]">Daily bonus · +{streakToast.bonus} Data</div>
         </div>
       )}
 
       {/* Offline / welcome-back toast */}
       {offlineToast != null && (
-        <div className="fixed top-20 left-1/2 z-40 -translate-x-1/2 rounded-xl border border-[#39ff88]/50 bg-[rgba(8,12,10,0.96)] px-5 py-3 text-center text-sm shadow-2xl backdrop-blur">
-          <div className="font-bold text-[#39ff88]">Welcome back!</div>
-          <div className="mt-0.5 text-xs text-[#dffbe9]">Your agents collected +{offlineToast.toLocaleString()} Data while you were away.</div>
+        <div className="fixed top-20 left-1/2 z-40 -translate-x-1/2 rounded-xl border border-[#9ed5e7]/50 bg-[rgba(8,12,10,0.96)] px-5 py-3 text-center text-sm shadow-2xl backdrop-blur">
+          <div className="font-bold text-[#9ed5e7]">Welcome back!</div>
+          <div className="mt-0.5 text-xs text-[#e8f7fb]">Your agents collected +{offlineToast.toLocaleString()} Data while you were away.</div>
         </div>
       )}
 

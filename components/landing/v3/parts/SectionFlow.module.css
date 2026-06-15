@@ -1,18 +1,26 @@
 .section {
   background:
-    linear-gradient(180deg, rgba(5, 8, 5, 0.94), var(--bg-base) 48%),
+    linear-gradient(180deg, color-mix(in srgb, var(--bg-base) 92%, var(--accent) 5%), var(--bg-base) 58%),
     var(--bg-base);
+  border-top: 1px solid var(--border-line);
 }
-.inner { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
+.inner {
+  max-width: 1280px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: 0 20px;
+}
 
 .head { display: flex; flex-direction: column; gap: 12px; margin-bottom: 48px; }
 .title {
-  font-family: var(--font-mono);
+  font-family: var(--font-inter), var(--font-body);
   font-size: clamp(28px, 4vw, 40px);
   font-weight: 700;
   color: var(--text-primary);
   margin: 0;
   max-width: 720px;
+  overflow-wrap: anywhere;
 }
 
 .tiles {
@@ -25,17 +33,32 @@
 }
 @media (max-width: 880px) { .tiles { grid-template-columns: 1fr; } }
 
+@media (max-width: 720px) {
+  .head {
+    margin-bottom: 28px;
+  }
+
+  .title {
+    font-size: clamp(28px, 8vw, 34px);
+    line-height: 1.12;
+  }
+}
+
 .tile {
   display: flex;
   flex-direction: column;
   background:
-    linear-gradient(180deg, rgba(57, 255, 136, 0.045), rgba(255, 255, 255, 0.015)),
+    linear-gradient(180deg, color-mix(in srgb, var(--bg-card) 94%, var(--accent) 4%), var(--bg-card)),
     var(--bg-card);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
   padding: 24px;
   position: relative;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  box-shadow: var(--shadow-soft);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
 }
 .tile::before {
   content: '';
@@ -44,24 +67,29 @@
   right: 24px;
   top: -1px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(57, 255, 136, 0.7), transparent);
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 46%, transparent), transparent);
+}
+.tile:hover {
+  border-color: color-mix(in srgb, var(--accent) 28%, var(--border-default));
+  box-shadow: var(--shadow-card);
+  transform: translateY(-2px);
 }
 .step {
   position: absolute;
   top: 16px;
   right: 20px;
-  font-family: var(--font-mono);
+  font-family: var(--font-inter), var(--font-body);
   font-size: 11px;
   color: var(--text-muted);
-  letter-spacing: 0.18em;
+  letter-spacing: 0;
 }
 
 .tileVisual {
   background:
-    linear-gradient(135deg, rgba(57, 255, 136, 0.08), transparent 42%),
-    #050505;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 4px;
+    linear-gradient(135deg, color-mix(in srgb, var(--accent) 10%, transparent), transparent 42%),
+    var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius);
   aspect-ratio: 16 / 9;
   margin-bottom: 16px;
   display: flex;
@@ -69,11 +97,11 @@
   justify-content: flex-start;
   padding: 16px;
   overflow: hidden;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text-primary) 4%, transparent);
 }
 
 .typed {
-  font-family: var(--font-mono);
+  font-family: var(--font-inter), var(--font-body);
   font-size: 14px;
   color: var(--text-primary);
   display: inline-flex;
@@ -98,10 +126,16 @@
 @media (prefers-reduced-motion: reduce) {
   .typedText { animation: none; width: min(34ch, 100%); }
   .typedCursor { animation: none; }
+  .tile {
+    transition: none;
+  }
+  .tile:hover {
+    transform: none;
+  }
 }
 
 .mockup {
-  font-family: var(--font-mono);
+  font-family: var(--font-inter), var(--font-body);
   font-size: 11px;
   line-height: 1.8;
   color: var(--text-secondary);
@@ -122,7 +156,7 @@
   align-items: center;
   gap: 8px;
   margin-bottom: 8px;
-  font-family: var(--font-mono);
+  font-family: var(--font-inter), var(--font-body);
   font-size: 12px;
   color: var(--accent);
   font-weight: 600;
@@ -132,17 +166,17 @@
   height: 6px;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 6px var(--accent);
+  box-shadow: none;
   animation: pulse 1.6s ease-in-out infinite;
 }
 @keyframes pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50%      { opacity: 0.4; transform: scale(0.7); }
 }
-.liveText { letter-spacing: 0.04em; }
+.liveText { letter-spacing: 0; }
 
 .tileTitle {
-  font-family: var(--font-mono);
+  font-family: var(--font-inter), var(--font-body);
   font-size: 16px;
   font-weight: 600;
   color: var(--text-primary);

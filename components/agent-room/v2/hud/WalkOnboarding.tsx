@@ -15,27 +15,23 @@ export function WalkOnboarding() {
     setShow(false);
   };
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 backdrop-blur">
-      <div className="mx-4 max-w-sm rounded-xl border border-white/10 bg-neutral-900 p-6 text-center text-white">
-        <h2 className="mb-2 text-xl font-semibold">Welcome to the Room</h2>
-        <p className="mb-4 hidden text-sm text-neutral-300 md:block">
-          Use <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">W</kbd>{' '}
-          <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">A</kbd>{' '}
-          <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">S</kbd>{' '}
-          <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">D</kbd> to walk, mouse to
-          look. Walk up to any station and press{' '}
-          <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">E</kbd> to interact, and{' '}
-          <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">Esc</kbd> to close panels.
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-[#05070a]/72 backdrop-blur-md">
+      <div className="mx-4 max-w-md rounded-2xl border border-cyan-200/18 bg-[#10161d]/92 p-6 text-center text-[#f6fbff] shadow-[0_24px_80px_rgba(0,0,0,0.48)]">
+        <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-full border border-[#d6b177]/35 bg-[#d6b177]/12 text-sm font-bold tracking-[0.18em] text-[#ffe4ad]">
+          H
+        </div>
+        <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-cyan-100/80">
+          Agent control room
         </p>
-        <p className="mb-4 text-sm text-neutral-300 md:hidden">
-          Use the joystick to walk, drag the room to look around, and use the action button when
-          you are near an object.
+        <h2 className="mb-2 text-2xl font-semibold tracking-tight">Your room is ready.</h2>
+        <p className="mx-auto mb-5 max-w-xs text-sm leading-6 text-slate-300">
+          Inspect the agent workspace, open operational panels, and steer runtime activity from one private room.
         </p>
         <button
           onClick={dismiss}
-          className="w-full rounded-lg bg-white px-4 py-2 text-sm font-medium text-black hover:bg-neutral-200"
+          className="w-full rounded-lg bg-[#f4ead8] px-4 py-2.5 text-sm font-semibold text-[#15110b] transition hover:bg-white"
         >
-          Got it
+          Enter room
         </button>
       </div>
     </div>

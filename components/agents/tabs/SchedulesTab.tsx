@@ -17,7 +17,6 @@ import {
   X,
   CalendarClock,
   Timer,
-  Info,
   Zap,
   CalendarDays,
 } from 'lucide-react';
@@ -48,20 +47,6 @@ interface LogEntry {
   response?: string;
   error?: string;
 }
-
-// ─── Framework Colors ────────────────────────────────────────
-
-const FRAMEWORK_COLORS: Record<string, { accent: string; glow: string; label: string }> = {
-  openclaw: { accent: '#f59e0b', glow: 'rgba(245,158,11,0.15)', label: 'OpenClaw' },
-  hermes:   { accent: '#a855f7', glow: 'rgba(168,85,247,0.15)', label: 'Hermes' },
-};
-
-// ─── Framework Compatibility ─────────────────────────────────
-
-const FRAMEWORK_SCHEDULE_SUPPORT: Record<string, { native: boolean; method: string; note: string }> = {
-  openclaw: { native: true, method: 'OpenClaw Gateway cron', note: 'Schedules are created inside OpenClaw Gateway cron. Finished runs post their summary back into webchat through the framework webhook delivery.' },
-  hermes:   { native: true, method: 'Hermes Jobs API',       note: 'Schedules are created inside Hermes cron through its native Jobs API and run in isolated Hermes sessions.' },
-};
 
 // ─── Cron Presets ────────────────────────────────────────────
 
@@ -209,15 +194,15 @@ function LogViewer({ agentId, jobId, onClose }: { agentId: string; jobId: string
               key={i}
               className={`px-3 py-2 rounded-lg text-xs border ${
                 log.success
-                  ? 'bg-emerald-500/5 border-emerald-500/10'
-                  : 'bg-red-500/5 border-red-500/10'
+                  ? 'bg-[var(--color-success-bg)] border-[var(--color-success-border)]'
+                  : 'bg-[var(--color-destructive-bg)] border-[var(--color-destructive-border)]'
               }`}
             >
               <div className="flex items-center gap-2 mb-1">
                 {log.success ? (
-                  <CheckCircle size={12} className="text-emerald-400" />
+                  <CheckCircle size={12} className="text-[var(--color-success)]" />
                 ) : (
-                  <XCircle size={12} className="text-red-400" />
+                  <XCircle size={12} className="text-[var(--color-destructive)]" />
                 )}
                 <span className="text-[var(--text-muted)]">
                   {new Date(log.timestamp).toLocaleString()}
@@ -227,7 +212,7 @@ function LogViewer({ agentId, jobId, onClose }: { agentId: string; jobId: string
                 <p className="text-[var(--text-secondary)] line-clamp-3 mt-1">{log.response}</p>
               )}
               {log.error && (
-                <p className="text-red-400 mt-1">{log.error}</p>
+                <p className="text-[var(--color-destructive)] mt-1">{log.error}</p>
               )}
             </div>
           ))}
@@ -253,7 +238,7 @@ function NextRunsPreview({ cronExpr }: { cronExpr: string }) {
       <div className="space-y-0.5">
         {runs.map((run, i) => (
           <div key={i} className="flex items-center gap-2">
-            <div className={`w-1 h-1 rounded-full ${i === 0 ? 'bg-emerald-400' : 'bg-[#3f3f46]'}`} />
+            <div className={`w-1 h-1 rounded-full ${i === 0 ? 'bg-[var(--color-success)]' : 'bg-[var(--border-default)]'}`} />
             <span className={`text-[10px] font-mono ${i === 0 ? 'text-[var(--text-secondary)]' : 'text-[var(--text-muted)]'}`}>
               {formatNextRun(run)}
             </span>
@@ -270,9 +255,6 @@ export function SchedulesTab() {
   const { agent } = useAgentContext();
   const t = useTranslations('dashboard.agentDetail.schedules');
   const agentId = agent?.id;
-  const framework = agent?.framework ?? 'openclaw';
-  const fwColor = FRAMEWORK_COLORS[framework] ?? FRAMEWORK_COLORS.openclaw!;
-  const fwSupport = FRAMEWORK_SCHEDULE_SUPPORT[framework] ?? FRAMEWORK_SCHEDULE_SUPPORT.openclaw!;
 
   const [jobs, setJobs] = useState<ScheduleJob[]>([]);
   const [loading, setLoading] = useState(true);
@@ -398,13 +380,13 @@ export function SchedulesTab() {
     switch (status) {
       case 'active':
         return {
-          borderLeft: '3px solid #22c55e',
-          boxShadow: '0 0 12px rgba(34,197,94,0.08), inset 0 0 12px rgba(34,197,94,0.03)',
+          borderLeft: '3px solid var(--status-live)',
+          boxShadow: '0 0 12px var(--status-live-bg), inset 0 0 12px var(--status-live-bg)',
         };
       case 'paused':
         return {
-          borderLeft: '3px solid #f59e0b',
-          boxShadow: '0 0 12px rgba(245,158,11,0.08), inset 0 0 12px rgba(245,158,11,0.03)',
+          borderLeft: '3px solid var(--status-paused)',
+          boxShadow: '0 0 12px var(--status-paused-bg), inset 0 0 12px var(--status-paused-bg)',
         };
       default:
         return {
@@ -420,8 +402,7 @@ export function SchedulesTab() {
       <GlassCard>
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-semibold text-white">Scheduled Tasks</h3>
-            <p className="text-xs text-[var(--text-muted)] mt-0.5">Set your agent to run tasks automatically in its native scheduler</p>
+            <h3 className="text-sm font-semibold text-white">Schedules</h3>
           </div>
           {!showForm && (
             <button
@@ -432,45 +413,6 @@ export function SchedulesTab() {
               {t('new')}
             </button>
           )}
-        </div>
-      </GlassCard>
-
-      {/* Framework Compatibility Note */}
-      <GlassCard className="!p-3.5">
-        <div className="flex items-start gap-3">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-            style={{ backgroundColor: fwColor.glow, border: `1px solid ${fwColor.accent}25` }}
-          >
-            {fwSupport.native ? (
-              <Zap size={14} style={{ color: fwColor.accent }} />
-            ) : (
-              <Timer size={14} style={{ color: fwColor.accent }} />
-            )}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-0.5">
-              <span className="text-xs font-medium text-white">{fwColor.label}</span>
-              <span
-                className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium rounded-full"
-                style={{
-                  backgroundColor: fwSupport.native ? 'rgba(34,197,94,0.1)' : 'rgba(245,158,11,0.1)',
-                  color: fwSupport.native ? '#4ade80' : '#fbbf24',
-                }}
-              >
-                {fwSupport.native ? 'Native Support' : fwSupport.method}
-              </span>
-            </div>
-            <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">{fwSupport.note}</p>
-            <div className="flex items-center gap-1 mt-1.5">
-              <Info size={10} className="text-[var(--text-muted)]" />
-              <span className="text-[10px] text-[var(--text-muted)]">
-                {fwSupport.native
-                  ? 'Schedules persist across container restarts.'
-                  : 'Schedules persist in Hatcher and continue independently of container restarts.'}
-              </span>
-            </div>
-          </div>
         </div>
       </GlassCard>
 
@@ -566,12 +508,12 @@ export function SchedulesTab() {
                 onChange={e => setFormPrompt(e.target.value)}
                 placeholder="What should the agent do on this schedule?"
                 rows={3}
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-white placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/50 resize-none"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/50 resize-none"
               />
             </div>
 
             {formError && (
-              <p className="text-xs text-red-400 flex items-center gap-1">
+              <p className="text-xs text-[var(--color-destructive)] flex items-center gap-1">
                 <AlertTriangle size={12} />
                 {formError}
               </p>
@@ -632,17 +574,17 @@ export function SchedulesTab() {
                 <CalendarClock size={32} className="text-[var(--color-accent)]/60" />
               </div>
               {/* Decorative orbiting dots */}
-              <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[var(--status-live-bg)] border border-[var(--status-live-border)] flex items-center justify-center">
+                <div className="w-1.5 h-1.5 rounded-full bg-[var(--status-live)]" />
               </div>
-              <div className="absolute -bottom-1 -left-1 w-3 h-3 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-                <div className="w-1 h-1 rounded-full bg-amber-400" />
+              <div className="absolute -bottom-1 -left-1 w-3 h-3 rounded-full bg-[var(--status-paused-bg)] border border-[var(--status-paused-border)] flex items-center justify-center">
+                <div className="w-1 h-1 rounded-full bg-[var(--status-paused)]" />
               </div>
-              <div className="absolute top-1/2 -right-3 w-2.5 h-2.5 rounded-full bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
-                <div className="w-1 h-1 rounded-full bg-purple-400" />
+              <div className="absolute top-1/2 -right-3 w-2.5 h-2.5 rounded-full bg-[var(--tech-accent-soft)] border border-[var(--border-hover)] flex items-center justify-center">
+                <div className="w-1 h-1 rounded-full bg-[var(--accent)]" />
               </div>
             </div>
-            <p className="text-base font-semibold text-white mb-1">No scheduled tasks yet</p>
+            <p className="text-base font-semibold text-[var(--text-primary)] mb-1">No scheduled tasks yet</p>
             <p className="text-sm text-[var(--text-muted)] max-w-sm mb-2">
               Automate your agent with scheduled tasks — send messages, run commands, or trigger workflows on a cron schedule.
             </p>
@@ -700,14 +642,14 @@ export function SchedulesTab() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <h4 className="text-sm font-medium text-white truncate">{job.name}</h4>
+                        <h4 className="text-sm font-medium text-[var(--text-primary)] truncate">{job.name}</h4>
                         <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium rounded-full ${
                           job.status === 'active'
-                            ? 'bg-emerald-500/10 text-emerald-400'
-                            : 'bg-amber-500/10 text-amber-400'
+                            ? 'bg-[var(--status-live-bg)] text-[var(--status-live)]'
+                            : 'bg-[var(--status-paused-bg)] text-[var(--status-paused)]'
                         }`}>
                           <div className={`w-1.5 h-1.5 rounded-full ${
-                            job.status === 'active' ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'
+                            job.status === 'active' ? 'bg-[var(--status-live)] animate-pulse' : 'bg-[var(--status-paused)]'
                           }`} />
                           {job.status}
                         </span>
@@ -770,7 +712,7 @@ export function SchedulesTab() {
                             <button
                               onClick={() => handlePause(job.id)}
                               title="Pause"
-                              className="p-1.5 rounded-md text-[var(--text-muted)] hover:text-amber-400 hover:bg-[var(--bg-card)] transition-colors"
+                              className="p-1.5 rounded-md text-[var(--text-muted)] hover:text-[var(--status-paused)] hover:bg-[var(--bg-card)] transition-colors"
                             >
                               <Pause size={14} />
                             </button>
@@ -778,7 +720,7 @@ export function SchedulesTab() {
                             <button
                               onClick={() => handleResume(job.id)}
                               title="Resume"
-                              className="p-1.5 rounded-md text-[var(--text-muted)] hover:text-emerald-400 hover:bg-[var(--bg-card)] transition-colors"
+                              className="p-1.5 rounded-md text-[var(--text-muted)] hover:text-[var(--status-live)] hover:bg-[var(--bg-card)] transition-colors"
                             >
                               <Play size={14} />
                             </button>
@@ -786,7 +728,7 @@ export function SchedulesTab() {
                           <button
                             onClick={() => handleDelete(job.id)}
                             title={t('delete')}
-                            className="p-1.5 rounded-md text-[var(--text-muted)] hover:text-red-400 hover:bg-[var(--bg-card)] transition-colors"
+                            className="p-1.5 rounded-md text-[var(--text-muted)] hover:text-[var(--color-destructive)] hover:bg-[var(--bg-card)] transition-colors"
                           >
                             <Trash2 size={14} />
                           </button>

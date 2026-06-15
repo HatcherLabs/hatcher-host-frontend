@@ -27,7 +27,7 @@ export function VoiceControlBar({ isListening, isSpeaking, onStop }: VoiceContro
               {isListening && (
                 <>
                   <RecordingDot />
-                  <span className="text-red-400">{t('listening')}</span>
+                  <span className="text-[var(--color-destructive)]">{t('listening')}</span>
                 </>
               )}
               {isSpeaking && (

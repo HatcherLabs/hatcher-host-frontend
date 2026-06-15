@@ -1,27 +1,67 @@
 export default function CreateLoading() {
   return (
-    <div className="min-h-screen p-4 sm:p-6 lg:p-10" style={{ background: 'var(--bg-base)' }}>
-      <div className="max-w-4xl mx-auto space-y-8">
-        {/* Title skeleton */}
-        <div className="text-center space-y-3">
-          <div className="h-8 w-64 mx-auto rounded-lg shimmer" />
-          <div className="h-4 w-96 mx-auto rounded-lg shimmer" />
+    <div className="min-h-screen px-4 py-8 sm:px-6 lg:px-10" style={{ background: 'var(--bg-base)' }}>
+      <div className="mx-auto flex max-w-6xl flex-col gap-8">
+        <div className="mx-auto w-full max-w-3xl space-y-4 text-center">
+          <div className="mx-auto h-3 w-28 rounded-full shimmer" />
+          <div className="mx-auto h-10 w-full max-w-xl rounded-2xl shimmer" />
+          <div className="mx-auto h-4 w-full max-w-lg rounded-full shimmer" />
         </div>
 
-        {/* Chat-to-Hatch skeleton */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {[1, 2].map((i) => (
-            <div key={i} className="card p-6 animate-pulse">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-[var(--bg-card)]" />
-                <div className="h-5 w-28 rounded bg-[var(--bg-card)]" />
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1.08fr)_minmax(340px,0.92fr)]">
+          <section className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-card)] p-4 shadow-[var(--shadow-soft)] sm:p-5">
+            <div className="mb-5 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl shimmer" />
+                <div className="space-y-2">
+                  <div className="h-4 w-36 rounded-full shimmer" />
+                  <div className="h-3 w-24 rounded-full shimmer" />
+                </div>
               </div>
-              <div className="space-y-2">
-                <div className="h-3.5 w-full rounded bg-[var(--bg-card)]" />
-                <div className="h-3.5 w-2/3 rounded bg-[var(--bg-card)]" />
-              </div>
+              <div className="h-8 w-24 rounded-lg shimmer" />
             </div>
-          ))}
+
+            <div className="space-y-3">
+              <div className="ml-auto h-20 w-5/6 rounded-2xl shimmer" />
+              <div className="h-28 w-11/12 rounded-2xl shimmer" />
+              <div className="ml-auto h-16 w-2/3 rounded-2xl shimmer" />
+            </div>
+
+            <div className="mt-5 flex items-center gap-3 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface)] p-3">
+              <div className="h-10 flex-1 rounded-xl shimmer" />
+              <div className="h-10 w-24 rounded-xl shimmer" />
+            </div>
+          </section>
+
+          <aside className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-card)] p-4 shadow-[var(--shadow-soft)] sm:p-5">
+            <div className="mb-5 flex items-center justify-between">
+              <div className="space-y-2">
+                <div className="h-4 w-36 rounded-full shimmer" />
+                <div className="h-3 w-28 rounded-full shimmer" />
+              </div>
+              <div className="h-7 w-20 rounded-full shimmer" />
+            </div>
+
+            <div className="grid gap-3">
+              {[0, 1, 2, 3].map((item) => (
+                <div
+                  key={item}
+                  className="flex items-center justify-between rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] p-3"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="h-8 w-8 rounded-lg shimmer" />
+                    <div className="space-y-2">
+                      <div className="h-3 w-28 rounded-full shimmer" />
+                      <div className="h-3 w-20 rounded-full shimmer" />
+                    </div>
+                  </div>
+                  <div className="h-6 w-14 rounded-full shimmer" />
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-5 h-24 rounded-2xl shimmer" />
+          </aside>
         </div>
       </div>
     </div>

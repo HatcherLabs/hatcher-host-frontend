@@ -104,7 +104,7 @@ export function HermesMemoryTab() {
       >
         <GlassCard>
           <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
-            <AlertTriangle size={14} className="text-amber-400" />
+            <AlertTriangle size={14} className="text-[var(--color-warning)]" />
             Agent is stopped. Start it to read live memories.
           </div>
         </GlassCard>
@@ -124,8 +124,8 @@ export function HermesMemoryTab() {
       {/* Header */}
       <GlassCard>
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
-            <Brain size={18} className="text-purple-400" />
+          <div className="w-10 h-10 rounded-xl bg-[var(--tech-accent-soft)] flex items-center justify-center">
+            <Brain size={18} className="text-[var(--accent)]" />
           </div>
           <div className="flex-1 min-w-0">
             <h2 className="text-base font-semibold text-[var(--text-primary)]">Memory</h2>
@@ -140,7 +140,7 @@ export function HermesMemoryTab() {
               setLoading(true);
               void load();
             }}
-            className="text-[11px] px-3 py-1.5 rounded-lg border border-white/10 hover:border-purple-500/30 hover:bg-purple-500/5 transition-all text-[var(--text-muted)] hover:text-purple-400 flex items-center gap-1.5 cursor-pointer"
+            className="text-[11px] px-3 py-1.5 rounded-lg border border-[var(--border-default)] hover:border-[var(--border-hover)] hover:bg-[var(--tech-accent-soft)] transition-all text-[var(--text-muted)] hover:text-[var(--accent)] flex items-center gap-1.5 cursor-pointer"
           >
             <RefreshCw size={11} />
             Refresh
@@ -150,7 +150,7 @@ export function HermesMemoryTab() {
 
       {error && !loading && (
         <GlassCard>
-          <div className="flex items-center gap-2 text-sm text-red-400">
+          <div className="flex items-center gap-2 text-sm text-[var(--color-destructive)]">
             <AlertTriangle size={14} />
             {error}
           </div>
@@ -182,8 +182,8 @@ export function HermesMemoryTab() {
             <MemoryCanonSection
               title="SOUL.md"
               subtitle="Persona / identity block seeded at agent init"
-              icon={<Sparkles size={14} className="text-rose-400" />}
-              accent="rose"
+              icon={<Sparkles size={14} className="text-[var(--color-warning)]" />}
+              accent="soul"
               content={sections.SOUL}
             />
           )}
@@ -193,14 +193,14 @@ export function HermesMemoryTab() {
             <MemoryCanonSection
               title="MEMORY.md"
               subtitle="Facts the agent has learned about ITSELF"
-              icon={<Brain size={14} className="text-purple-400" />}
-              accent="purple"
+              icon={<Brain size={14} className="text-[var(--accent)]" />}
+              accent="memory"
               content={sections.MEMORY}
             />
           ) : (
             <GlassCard>
               <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
-                <Brain size={12} className="text-purple-400/50" />
+                <Brain size={12} className="text-[var(--accent)]" />
                 <span>
                   <strong>MEMORY.md</strong> is empty. The agent writes here
                   as it learns facts about itself.
@@ -214,14 +214,14 @@ export function HermesMemoryTab() {
             <MemoryCanonSection
               title="USER.md"
               subtitle="Facts the agent has learned about you"
-              icon={<User size={14} className="text-cyan-400" />}
-              accent="cyan"
+              icon={<User size={14} className="text-[var(--color-info)]" />}
+              accent="user"
               content={sections.USER}
             />
           ) : (
             <GlassCard>
               <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
-                <User size={12} className="text-cyan-400/50" />
+                <User size={12} className="text-[var(--color-info)]" />
                 <span>
                   <strong>USER.md</strong> is empty. Chat with the agent
                   (&quot;my name is ...&quot;, &quot;I prefer ...&quot;) to
@@ -255,13 +255,13 @@ export function HermesMemoryTab() {
 }
 
 const ACCENT_CLASSES: Record<string, { border: string; bg: string; iconBg: string }> = {
-  rose: { border: 'border-rose-500/20', bg: 'bg-rose-500/[0.04]', iconBg: 'bg-rose-500/10' },
-  purple: {
-    border: 'border-purple-500/20',
-    bg: 'bg-purple-500/[0.04]',
-    iconBg: 'bg-purple-500/10',
+  soul: { border: 'border-[var(--color-warning-border)]', bg: 'bg-[var(--color-warning-bg)]', iconBg: 'bg-[var(--color-warning-bg)]' },
+  memory: {
+    border: 'border-[var(--border-hover)]',
+    bg: 'bg-[var(--tech-accent-soft)]',
+    iconBg: 'bg-[var(--tech-accent-soft)]',
   },
-  cyan: { border: 'border-cyan-500/20', bg: 'bg-cyan-500/[0.04]', iconBg: 'bg-cyan-500/10' },
+  user: { border: 'border-[var(--color-info-border)]', bg: 'bg-[var(--color-info-bg)]', iconBg: 'bg-[var(--color-info-bg)]' },
 };
 
 function MemoryCanonSection({
@@ -274,10 +274,10 @@ function MemoryCanonSection({
   title: string;
   subtitle: string;
   icon: React.ReactNode;
-  accent: 'rose' | 'purple' | 'cyan';
+  accent: 'soul' | 'memory' | 'user';
   content: string;
 }) {
-  const classes = ACCENT_CLASSES[accent] ?? ACCENT_CLASSES.purple!;
+  const classes = ACCENT_CLASSES[accent] ?? ACCENT_CLASSES.memory!;
   return (
     <div
       className={`rounded-2xl border ${classes.border} ${classes.bg} overflow-hidden`}
@@ -310,7 +310,7 @@ function TaggedMemoryRow({ memory }: { memory: MemorySection }) {
         aria-expanded={expanded}
         aria-label={`Memory ${memory.name}.md`}
         onClick={() => setExpanded(!expanded)}
-        className="w-full px-5 py-3 text-left flex items-center gap-2 hover:bg-[var(--bg-card)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/40 focus-visible:ring-inset transition-colors cursor-pointer"
+        className="w-full px-5 py-3 text-left flex items-center gap-2 hover:bg-[var(--bg-card)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-inset transition-colors cursor-pointer"
       >
         {expanded ? (
           <ChevronDown size={12} className="text-[var(--text-muted)] flex-shrink-0" />

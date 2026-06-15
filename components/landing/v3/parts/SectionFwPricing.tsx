@@ -8,8 +8,8 @@ import { BoxLabel } from '../shared/BoxLabel';
 import styles from './SectionFwPricing.module.css';
 
 const FRAMEWORKS = [
-  { key: 'openclaw', label: 'OpenClaw', color: '#FACC15', tagKey: 'tagOpenclaw' },
-  { key: 'hermes', label: 'Hermes', color: '#38BDF8', tagKey: 'tagHermes' },
+  { key: 'openclaw', label: 'OpenClaw', color: 'var(--accent)', tagKey: 'tagOpenclaw' },
+  { key: 'hermes', label: 'Hermes', color: 'var(--tech-accent)', tagKey: 'tagHermes' },
 ] as const;
 
 const TIER_ORDER: ReadonlyArray<UserTierKey> = ['free', 'starter', 'pro', 'business', 'founding_member'];

@@ -8,16 +8,16 @@ export function DispatchGoals({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-40 flex items-end justify-center bg-black/70 backdrop-blur sm:items-center" onClick={onClose}>
       <div
-        className="relative max-h-[88vh] w-full max-w-[520px] overflow-y-auto rounded-t-2xl border border-[#39ff88]/30 bg-[rgba(8,12,10,0.97)] p-5 text-[#dffbe9] shadow-2xl sm:rounded-2xl"
+        className="relative max-h-[88vh] w-full max-w-[520px] overflow-y-auto rounded-t-2xl border border-[#9ed5e7]/30 bg-[rgba(8,12,10,0.97)] p-5 text-[#e8f7fb] shadow-2xl sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <button onClick={onClose} aria-label="Close" className="absolute right-3 top-3 rounded-md px-2 py-1 text-[#9fceb4] hover:bg-white/5 hover:text-white">
+        <button onClick={onClose} aria-label="Close" className="absolute right-3 top-3 rounded-md px-2 py-1 text-[#9fc1c7] hover:bg-white/5 hover:text-white">
           ✕
         </button>
-        <h2 className="mb-1 flex items-center gap-2 text-lg font-bold text-[#39ff88]">
+        <h2 className="mb-1 flex items-center gap-2 text-lg font-bold text-[#9ed5e7]">
           <span aria-hidden>✔</span> Goals
         </h2>
-        <p className="mb-4 text-xs text-[#9fceb4]">
+        <p className="mb-4 text-xs text-[#9fc1c7]">
           {achieved.length} / {ACHIEVEMENTS.length} unlocked
         </p>
 
@@ -30,16 +30,16 @@ export function DispatchGoals({ onClose }: { onClose: () => void }) {
                 className="flex items-center gap-3 rounded-xl border p-3"
                 style={{ borderColor: done ? 'rgba(57,255,136,0.4)' : 'rgba(255,255,255,0.08)', background: done ? 'rgba(57,255,136,0.06)' : 'rgba(0,0,0,0.25)' }}
               >
-                <span className="text-lg" aria-hidden style={{ color: done ? '#39ff88' : '#3a4a40' }}>
+                <span className="text-lg" aria-hidden style={{ color: done ? '#9ed5e7' : '#34424a' }}>
                   {done ? '✔' : '○'}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <div className="text-sm font-bold" style={{ color: done ? '#dffbe9' : '#9fceb4' }}>
+                  <div className="text-sm font-bold" style={{ color: done ? '#e8f7fb' : '#9fc1c7' }}>
                     {a.name}
                   </div>
-                  <p className="truncate text-[11px] text-[#7faE96]">{a.desc}</p>
+                  <p className="truncate text-[11px] text-[#7f98a3]">{a.desc}</p>
                 </div>
-                <span className="text-xs font-mono" style={{ color: done ? '#39ff88' : '#5f8a76' }}>
+                <span className="text-xs font-mono" style={{ color: done ? '#9ed5e7' : '#5f8a76' }}>
                   ◆ {a.reward}
                 </span>
               </div>

@@ -28,6 +28,8 @@ export interface PaymentRailButtonsProps {
 export function PaymentRailButtons(props: PaymentRailButtonsProps) {
   const { onPayWithSOL, onPayWithUSDC, onPayWithHATCHER, onPayWithKAUSA, onPayWithCard, loading } = props;
   const stripeEnabled = !!onPayWithCard;
+  const iconShell = 'w-10 h-10 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] flex items-center justify-center flex-shrink-0 text-[var(--text-primary)]';
+
   return (
     <div className="space-y-2.5">
       <button
@@ -35,8 +37,8 @@ export function PaymentRailButtons(props: PaymentRailButtonsProps) {
         disabled={loading}
         className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/[0.03] transition-all disabled:opacity-40"
       >
-        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#9945FF] to-[#14F195] flex items-center justify-center flex-shrink-0">
-          <span className="text-white font-bold text-sm">SOL</span>
+        <div className={iconShell}>
+          <span className="font-bold text-sm">SOL</span>
         </div>
         <div className="text-left flex-1">
           <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with SOL</p>
@@ -50,8 +52,8 @@ export function PaymentRailButtons(props: PaymentRailButtonsProps) {
         disabled={loading}
         className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[#2775CA]/40 hover:bg-[#2775CA]/[0.03] transition-all disabled:opacity-40"
       >
-        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#2775CA] to-[#0B4DA1] flex items-center justify-center flex-shrink-0">
-          <span className="text-white font-bold text-[10px]">USDC</span>
+        <div className={iconShell}>
+          <span className="font-bold text-[10px]">USDC</span>
         </div>
         <div className="text-left flex-1">
           <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with USDC</p>
@@ -63,14 +65,14 @@ export function PaymentRailButtons(props: PaymentRailButtonsProps) {
       <button
         onClick={onPayWithHATCHER}
         disabled={loading}
-        className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[#f59e0b]/40 hover:bg-[#f59e0b]/[0.03] transition-all disabled:opacity-40"
+        className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[var(--color-warning)]/35 hover:bg-[var(--color-warning-bg)] transition-all disabled:opacity-40"
       >
-        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#f59e0b] to-[#f97316] flex items-center justify-center flex-shrink-0">
-          <span className="text-white font-extrabold text-[7px] tracking-tight">HATCHER</span>
+        <div className={iconShell}>
+          <span className="font-extrabold text-[7px] tracking-tight">HATCHER</span>
         </div>
         <div className="text-left flex-1">
           <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with $HATCHER</p>
-          <p className="text-[11px] text-[var(--text-muted)]">10% burned on-chain 🔥</p>
+          <p className="text-[11px] text-[var(--text-muted)]">Utility payment with on-chain burn</p>
         </div>
         {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)]" />}
       </button>
@@ -79,10 +81,10 @@ export function PaymentRailButtons(props: PaymentRailButtonsProps) {
         <button
           onClick={onPayWithKAUSA}
           disabled={loading}
-          className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[#22c55e]/25 bg-[#22c55e]/[0.045] hover:border-[#22c55e]/45 hover:bg-[#22c55e]/[0.075] transition-all disabled:opacity-40"
+          className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[var(--color-success)]/35 hover:bg-[var(--color-success-bg)] transition-all disabled:opacity-40"
         >
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#052e16] via-[#16a34a] to-[#86efac] flex items-center justify-center flex-shrink-0 shadow-[0_0_22px_rgba(34,197,94,0.18)]">
-            <span className="text-white font-extrabold text-[9px] tracking-tight drop-shadow-sm">KAUSA</span>
+          <div className={iconShell}>
+            <span className="font-extrabold text-[9px] tracking-tight">KAUSA</span>
           </div>
           <div className="text-left flex-1">
             <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with $KAUSA</p>
@@ -95,11 +97,11 @@ export function PaymentRailButtons(props: PaymentRailButtonsProps) {
       <button
         onClick={stripeEnabled ? onPayWithCard : undefined}
         disabled={loading || !stripeEnabled}
-        className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[#635BFF]/40 hover:bg-[#635BFF]/[0.03] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+        className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/[0.03] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
         title={stripeEnabled ? undefined : 'Card payments coming soon'}
       >
-        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#635BFF] to-[#A259FF] flex items-center justify-center flex-shrink-0">
-          <CreditCard className="w-5 h-5 text-white" />
+        <div className={iconShell}>
+          <CreditCard className="w-5 h-5" />
         </div>
         <div className="text-left flex-1">
           <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with Card</p>

@@ -40,10 +40,11 @@ export function ConfirmPaymentModal(props: {
     : state.token === 'usdc' ? 'USDC'
     : state.token === 'kausa' ? '$KAUSA'
     : '$HATCHER';
-  const tokenColor = state.token === 'sol' ? 'from-[#9945FF] to-[#14F195]'
-    : state.token === 'usdc' ? 'from-[#2775CA] to-[#0B4DA1]'
-    : state.token === 'kausa' ? 'from-[#052e16] via-[#16a34a] to-[#86efac]'
-    : 'from-[#f59e0b] to-[#f97316]';
+  const tokenTone = state.token === 'hatch'
+    ? 'border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] text-[var(--color-warning)]'
+    : state.token === 'kausa'
+      ? 'border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success)]'
+      : 'border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-primary)]';
 
   return (
     <AnimatePresence>
@@ -63,8 +64,8 @@ export function ConfirmPaymentModal(props: {
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-center gap-3">
-            <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${tokenColor} flex items-center justify-center shrink-0`}>
-              <span className="text-white font-bold text-xs">
+            <div className={`w-11 h-11 rounded-xl border flex items-center justify-center shrink-0 ${tokenTone}`}>
+              <span className="font-bold text-xs">
                 {tokenLabel === '$HATCHER' ? 'HATCH' : tokenLabel === '$KAUSA' ? 'KAUSA' : tokenLabel}
               </span>
             </div>
@@ -100,9 +101,9 @@ export function ConfirmPaymentModal(props: {
           </div>
 
           {state.token === 'hatch' && state.burnAmount !== undefined && state.treasuryAmount !== undefined && (
-            <div className="rounded-xl border border-[#f59e0b]/30 bg-[#f59e0b]/[0.05] p-4 space-y-1.5">
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#f59e0b]">
-                <span>🔥</span>
+            <div className="rounded-xl border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] p-4 space-y-1.5">
+              <div className="flex items-center gap-2 text-xs font-semibold text-[var(--color-warning)]">
+                <span aria-hidden>•</span>
                 <span>10% buy-and-burn</span>
               </div>
               <div className="flex justify-between text-xs text-[var(--text-secondary)]">
@@ -136,7 +137,7 @@ export function ConfirmPaymentModal(props: {
             </button>
             <button
               onClick={() => onClose(true)}
-              className="flex-1 px-4 py-2.5 rounded-xl bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white text-sm font-semibold transition-colors"
+              className="flex-1 px-4 py-2.5 rounded-xl bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-[var(--bg-base)] text-sm font-semibold transition-colors"
             >
               Approve in wallet
             </button>

@@ -16,22 +16,20 @@ interface QuickStatsProps {
 // Tier display names are resolved via useTranslations('shared.tiers') at render time.
 // TIER_KEYS from @hatcher/shared provides the stable key paths.
 
-// text color per tier
 const TIER_COLORS: Record<string, string> = {
   free:            'text-[var(--text-muted)]',
-  starter:         'text-cyan-400',
-  pro:             'text-violet-400',
-  business:        'text-blue-400',
-  founding_member: 'text-rose-400',
+  starter:         'text-[var(--color-info)]',
+  pro:             'text-[var(--color-accent)]',
+  business:        'text-[var(--color-success)]',
+  founding_member: 'text-[var(--color-warning)]',
 };
 
-// icon bg per tier
 const TIER_BG: Record<string, string> = {
-  free:            'bg-zinc-500/10',
-  starter:         'bg-cyan-500/10',
-  pro:             'bg-violet-500/10',
-  business:        'bg-blue-500/10',
-  founding_member: 'bg-rose-500/10',
+  free:            'bg-[var(--bg-elevated)]',
+  starter:         'bg-[var(--color-info-bg)]',
+  pro:             'bg-[color-mix(in_srgb,var(--color-accent)_12%,transparent)]',
+  business:        'bg-[var(--color-success-bg)]',
+  founding_member: 'bg-[var(--color-warning-bg)]',
 };
 
 function TierIcon({ tier, className }: { tier: string; className?: string }) {
@@ -117,8 +115,8 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
       {/* AI Credits */}
       <motion.div className="card glass-noise p-5" variants={cardVariants}>
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-9 h-9 rounded-lg bg-amber-500/15 flex items-center justify-center flex-shrink-0">
-            <Zap size={16} className="text-amber-400" />
+          <div className="w-9 h-9 rounded-lg bg-[var(--color-warning-bg)] flex items-center justify-center flex-shrink-0">
+            <Zap size={16} className="text-[var(--color-warning)]" />
           </div>
           <div className="text-xs text-[var(--text-muted)] leading-tight">{t('dailyMessages')}</div>
         </div>
@@ -131,8 +129,8 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
       {/* Active Agents */}
       <motion.div className="card glass-noise p-5" variants={cardVariants}>
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-9 h-9 rounded-lg bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
-            <Activity size={16} className="text-emerald-400" />
+          <div className="w-9 h-9 rounded-lg bg-[var(--color-success-bg)] flex items-center justify-center flex-shrink-0">
+            <Activity size={16} className="text-[var(--color-success)]" />
           </div>
           <div className="text-xs text-[var(--text-muted)] leading-tight">{t('activeNow')}</div>
         </div>
@@ -140,8 +138,8 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
           {activeCount}
           {activeCount > 0 && (
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-success)] opacity-60" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--color-success)]" />
             </span>
           )}
         </div>

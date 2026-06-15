@@ -13,9 +13,10 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations('auth.login');
-  const { login, isAuthenticated, isLoading, error, clearError } = useAuth();
+  const { login, isAuthenticated, error, clearError } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const didSubmit = useRef(false);
   const returnPath = sanitizeLocalReturnPath(
     searchParams.get('return') || searchParams.get('next'),
@@ -35,7 +36,12 @@ export default function LoginPage() {
     // doing it here keeps the address shown in the input consistent
     // after a failed submit and prevents the "Invalid email" server
     // error from firing on obvious whitespace.
-    await login(email.trim().toLowerCase(), password);
+    setIsSubmitting(true);
+    try {
+      await login(email.trim().toLowerCase(), password);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -102,10 +108,10 @@ export default function LoginPage() {
 
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isSubmitting}
           className="w-full h-10 rounded-lg text-sm font-medium text-[var(--bg-base)] bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
         >
-          {isLoading ? (
+          {isSubmitting ? (
             <>
               <span className="w-3.5 h-3.5 border-2 border-[var(--bg-base)]/30 border-t-[var(--bg-base)] rounded-full animate-spin" />
               {t('submitLoading')}

@@ -39,7 +39,7 @@ export default async function OpengraphImage() {
           padding: '72px',
           backgroundColor: '#050814',
           backgroundImage:
-            'radial-gradient(circle at 20% 15%, rgba(168,85,247,0.28), transparent 50%), radial-gradient(circle at 80% 85%, rgba(56,189,248,0.22), transparent 50%)',
+            'radial-gradient(circle at 20% 15%, rgba(115,164,185,0.28), transparent 50%), radial-gradient(circle at 80% 85%, rgba(214,177,119,0.18), transparent 50%)',
           color: '#e5e7eb',
           fontFamily: '"Inter", "Segoe UI", sans-serif',
           position: 'relative',
@@ -118,7 +118,7 @@ export default async function OpengraphImage() {
             </span>
           </span>
           <span style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-            <Dot color="#10b981" label="OpenClaw" />
+            <Dot color="#486a79" label="OpenClaw" />
             <Dot color="#38bdf8" label="Hermes" />
           </span>
         </div>

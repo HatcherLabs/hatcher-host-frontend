@@ -1,33 +1,64 @@
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.6em;
-  padding: 12px 20px;
-  font-family: var(--font-mono);
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0 18px;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  border-radius: 4px;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
+  border-radius: var(--radius);
   text-decoration: none;
   transition: background-color 150ms ease, box-shadow 150ms ease, transform 100ms ease, color 150ms ease, border-color 150ms ease;
   border: 1px solid transparent;
 }
-.cursor { font-weight: 400; font-size: 16px; line-height: 1; }
+.cursor { display: none; }
 .label  { line-height: 1; }
 
-.primary { background: var(--accent); color: var(--bg-base); }
+.primary { background: var(--action); color: #fffdf8; }
 .primary:hover {
-  background: var(--accent-hover);
-  box-shadow: 0 0 18px var(--accent-glow);
+  background: var(--action-hover);
+  box-shadow: 0 16px 34px rgba(18, 20, 18, 0.2);
 }
 .primary:active { transform: translateY(1px); }
 
 .ghost {
-  background: transparent;
+  background: rgba(255, 253, 248, 0.68);
   color: var(--text-primary);
   border-color: var(--border-default);
 }
-.ghost:hover { border-color: var(--accent); color: var(--accent); }
+.ghost:hover {
+  border-color: rgba(74, 119, 139, 0.36);
+  color: var(--text-primary);
+  background: var(--bg-card);
+}
+
+.darkSurface.primary {
+  background: #fff7e8;
+  color: #10110f;
+  border-color: rgba(115, 164, 185, 0.34);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.2);
+}
+
+.darkSurface.primary:hover {
+  background: var(--tech-accent);
+  color: #10110f;
+  box-shadow: 0 20px 46px rgba(0, 0, 0, 0.26);
+}
+
+.darkSurface.ghost {
+  background: rgba(255, 247, 232, 0.08);
+  color: #fff7e8;
+  border-color: rgba(255, 247, 232, 0.2);
+}
+
+.darkSurface.ghost:hover {
+  border-color: rgba(115, 164, 185, 0.42);
+  color: #fff7e8;
+  background: rgba(255, 247, 232, 0.13);
+}
 
 .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }

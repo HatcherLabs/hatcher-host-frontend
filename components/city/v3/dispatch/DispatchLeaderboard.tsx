@@ -28,7 +28,7 @@ const TABS = [
 ];
 
 const FW_WAR = {
-  openclaw: { label: 'OpenClaw', color: '#39ff88' },
+  openclaw: { label: 'OpenClaw', color: '#9ed5e7' },
   hermes: { label: 'Hermes', color: '#62b8ff' },
 } as const;
 
@@ -87,13 +87,13 @@ export function DispatchLeaderboard({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-40 flex items-end justify-center bg-black/70 backdrop-blur sm:items-center" onClick={onClose}>
       <div
-        className="relative max-h-[88vh] w-full max-w-[480px] overflow-y-auto rounded-t-2xl border border-[#39ff88]/30 bg-[rgba(8,12,10,0.97)] p-5 text-[#dffbe9] shadow-2xl sm:rounded-2xl"
+        className="relative max-h-[88vh] w-full max-w-[480px] overflow-y-auto rounded-t-2xl border border-[#9ed5e7]/30 bg-[rgba(8,12,10,0.97)] p-5 text-[#e8f7fb] shadow-2xl sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <button onClick={onClose} aria-label="Close" className="absolute right-3 top-3 rounded-md px-2 py-1 text-[#9fceb4] hover:bg-white/5 hover:text-white">
+        <button onClick={onClose} aria-label="Close" className="absolute right-3 top-3 rounded-md px-2 py-1 text-[#9fc1c7] hover:bg-white/5 hover:text-white">
           ✕
         </button>
-        <h2 className="mb-3 flex items-center gap-2 text-lg font-bold text-[#39ff88]">
+        <h2 className="mb-3 flex items-center gap-2 text-lg font-bold text-[#9ed5e7]">
           <span aria-hidden>☷</span> Leaderboard
         </h2>
 
@@ -103,7 +103,7 @@ export function DispatchLeaderboard({ onClose }: { onClose: () => void }) {
               key={t.id}
               onClick={() => setTab(t.id)}
               className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
-                tab === t.id ? 'bg-[#39ff88] text-black' : 'bg-white/5 text-[#9fceb4] hover:bg-white/10'
+                tab === t.id ? 'bg-[#9ed5e7] text-black' : 'bg-white/5 text-[#9fc1c7] hover:bg-white/10'
               }`}
             >
               {t.label}
@@ -112,7 +112,7 @@ export function DispatchLeaderboard({ onClose }: { onClose: () => void }) {
         </div>
 
         {loading ? (
-          <p className="py-8 text-center text-sm text-[#9fceb4]">Loading…</p>
+          <p className="py-8 text-center text-sm text-[#9fc1c7]">Loading…</p>
         ) : tab === 'prizes' ? (
           <SeasonView season={season} countdown={countdown} />
         ) : tab === 'wars' ? (
@@ -122,18 +122,18 @@ export function DispatchLeaderboard({ onClose }: { onClose: () => void }) {
         ) : tab === 'onchain' ? (
           <OnchainView season={season} receipts={receipts} trophies={trophies} onClaimed={reloadTrophies} />
         ) : allTimeRows.length === 0 ? (
-          <p className="py-8 text-center text-sm text-[#9fceb4]">No scores yet — be the first to dispatch!</p>
+          <p className="py-8 text-center text-sm text-[#9fc1c7]">No scores yet — be the first to dispatch!</p>
         ) : (
           <ol className="flex flex-col gap-1">
             {allTimeRows.map((r, i) => (
               <li key={`${r.username}-${i}`} className="flex items-center gap-3 rounded-lg border border-white/5 bg-black/20 px-3 py-2 text-sm">
-                <span className="w-6 text-center font-bold" style={{ color: RANK_COLOR[i] ?? '#7faE96' }}>{i + 1}</span>
+                <span className="w-6 text-center font-bold" style={{ color: RANK_COLOR[i] ?? '#7f98a3' }}>{i + 1}</span>
                 <span className="min-w-0 flex-1 truncate font-semibold">
                   {r.username}
                   {r.prestige > 0 && <span className="ml-1 text-xs text-[#ffd24a]">★{r.prestige}</span>}
                 </span>
-                <span className="text-xs text-[#9fceb4]">Lv {r.level}</span>
-                <span className="w-20 text-right font-mono text-[#39ff88]">◆ {r.value.toLocaleString()}</span>
+                <span className="text-xs text-[#9fc1c7]">Lv {r.level}</span>
+                <span className="w-20 text-right font-mono text-[#9ed5e7]">◆ {r.value.toLocaleString()}</span>
               </li>
             ))}
           </ol>
@@ -145,15 +145,15 @@ export function DispatchLeaderboard({ onClose }: { onClose: () => void }) {
 }
 
 function SeasonView({ season, countdown }: { season: SeasonData | null; countdown: string }) {
-  if (!season) return <p className="py-8 text-center text-sm text-[#9fceb4]">Season unavailable.</p>;
+  if (!season) return <p className="py-8 text-center text-sm text-[#9fc1c7]">Season unavailable.</p>;
   return (
     <div className="flex flex-col gap-3">
       <div className="rounded-xl border border-[#ffd24a]/30 bg-[#ffd24a]/5 p-3">
         <div className="flex items-center justify-between text-sm">
           <span className="font-bold text-[#ffd24a]">Monthly Season</span>
-          <span className="text-xs text-[#9fceb4]">{countdown}</span>
+          <span className="text-xs text-[#9fc1c7]">{countdown}</span>
         </div>
-        <p className="mt-1 text-[11px] text-[#9fceb4]">
+        <p className="mt-1 text-[11px] text-[#9fc1c7]">
           Top 5 each month win AI Credits. Earn the most Data before the month ends.
         </p>
         {season.you && (
@@ -162,9 +162,9 @@ function SeasonView({ season, countdown }: { season: SeasonData | null; countdow
               You&apos;re <span className="font-bold text-[#ffd24a]">#{season.you.rank}</span> with ◆{' '}
               {season.you.value.toLocaleString()}
               {season.you.prizeCredits > 0 ? (
-                <span className="text-[#39ff88]"> · on track for {season.you.prizeCredits.toLocaleString()} AI Credits</span>
+                <span className="text-[#9ed5e7]"> · on track for {season.you.prizeCredits.toLocaleString()} AI Credits</span>
               ) : (
-                <span className="text-[#7faE96]"> · reach the top 5 for a prize</span>
+                <span className="text-[#7f98a3]"> · reach the top 5 for a prize</span>
               )}
             </div>
             <button
@@ -185,8 +185,8 @@ function SeasonView({ season, countdown }: { season: SeasonData | null; countdow
       <div className="grid grid-cols-5 gap-1 text-center text-[10px]">
         {season.prizeTable.map((p) => (
           <div key={p.label} className="rounded-md border border-white/10 bg-black/20 py-1.5" title={p.note}>
-            <div className="font-bold text-[#39ff88]">{p.credits.toLocaleString()}</div>
-            <div className="text-[#7faE96]">{p.label}</div>
+            <div className="font-bold text-[#9ed5e7]">{p.credits.toLocaleString()}</div>
+            <div className="text-[#7f98a3]">{p.label}</div>
           </div>
         ))}
       </div>
@@ -194,15 +194,15 @@ function SeasonView({ season, countdown }: { season: SeasonData | null; countdow
 
       {/* This month's board */}
       {season.board.length === 0 ? (
-        <p className="py-4 text-center text-xs text-[#9fceb4]">No entries yet this month — be first!</p>
+        <p className="py-4 text-center text-xs text-[#9fc1c7]">No entries yet this month — be first!</p>
       ) : (
         <ol className="flex flex-col gap-1">
           {season.board.map((r) => (
             <li key={r.rank} className="flex items-center gap-3 rounded-lg border border-white/5 bg-black/20 px-3 py-2 text-sm">
-              <span className="w-6 text-center font-bold" style={{ color: RANK_COLOR[r.rank - 1] ?? '#7faE96' }}>{r.rank}</span>
+              <span className="w-6 text-center font-bold" style={{ color: RANK_COLOR[r.rank - 1] ?? '#7f98a3' }}>{r.rank}</span>
               <span className="min-w-0 flex-1 truncate font-semibold">{r.username}</span>
-              {r.prizeCredits > 0 && <span className="text-xs font-bold text-[#39ff88]">🏆 {r.prizeCredits.toLocaleString()}</span>}
-              <span className="w-20 text-right font-mono text-[#39ff88]">◆ {r.value.toLocaleString()}</span>
+              {r.prizeCredits > 0 && <span className="text-xs font-bold text-[#9ed5e7]">🏆 {r.prizeCredits.toLocaleString()}</span>}
+              <span className="w-20 text-right font-mono text-[#9ed5e7]">◆ {r.value.toLocaleString()}</span>
             </li>
           ))}
         </ol>
@@ -211,19 +211,19 @@ function SeasonView({ season, countdown }: { season: SeasonData | null; countdow
       {/* Past winners */}
       {season.past.some((p) => p.winners.length > 0) && (
         <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-          <div className="mb-1 text-xs font-bold text-[#9fceb4]">Past winners</div>
+          <div className="mb-1 text-xs font-bold text-[#9fc1c7]">Past winners</div>
           {season.past
             .filter((p) => p.winners.length > 0)
             .map((p) => (
               <div key={p.month} className="mb-1 text-[11px]">
-                <span className="text-[#7faE96]">{p.month}:</span>{' '}
+                <span className="text-[#7f98a3]">{p.month}:</span>{' '}
                 {p.winners.slice(0, 3).map((w, i) => (
                   <span key={w.rank}>
                     {i > 0 && ', '}
-                    <span style={{ color: RANK_COLOR[w.rank - 1] ?? '#dffbe9' }}>{w.username}</span>
+                    <span style={{ color: RANK_COLOR[w.rank - 1] ?? '#e8f7fb' }}>{w.username}</span>
                   </span>
                 ))}
-                {p.paidAt ? <span className="ml-1 text-[#39ff88]">✓ paid</span> : <span className="ml-1 text-[#7faE96]">· pending</span>}
+                {p.paidAt ? <span className="ml-1 text-[#9ed5e7]">✓ paid</span> : <span className="ml-1 text-[#7f98a3]">· pending</span>}
                 {p.solscan && (
                   <a href={p.solscan} target="_blank" rel="noreferrer" className="ml-1 text-[#62b8ff] hover:underline" title="Verify the final ranking anchored on Solana">
                     ⛓ on-chain
@@ -243,13 +243,13 @@ function WarsView({ data }: { data: LeaderboardData | null }) {
   const hm = Math.max(0, Math.round(wars.hermes ?? 0));
   const total = oc + hm;
   if (total === 0) {
-    return <p className="py-8 text-center text-sm text-[#9fceb4]">No scores yet — pick a side and dispatch!</p>;
+    return <p className="py-8 text-center text-sm text-[#9fc1c7]">No scores yet — pick a side and dispatch!</p>;
   }
   const ocPct = Math.round((oc / total) * 100);
   const leader = oc === hm ? 'tied' : oc > hm ? 'openclaw' : 'hermes';
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-center text-xs text-[#9fceb4]">
+      <p className="text-center text-xs text-[#9fc1c7]">
         Every dispatch you complete adds to your framework&apos;s total. Which side runs the city?
       </p>
       <div className="flex items-center justify-between text-sm font-bold">
@@ -271,7 +271,7 @@ function WarsView({ data }: { data: LeaderboardData | null }) {
       </div>
       <div className="rounded-lg bg-black/30 px-3 py-2 text-center text-xs">
         {leader === 'tied' ? (
-          <span className="font-bold text-[#dffbe9]">Dead heat — both frameworks tied!</span>
+          <span className="font-bold text-[#e8f7fb]">Dead heat — both frameworks tied!</span>
         ) : (
           <span>
             <span className="font-bold" style={{ color: FW_WAR[leader].color }}>{FW_WAR[leader].label}</span> leads by{' '}
@@ -297,23 +297,23 @@ function HallOfFameView({ season }: { season: SeasonData | null }) {
   const months = (season?.past ?? []).filter((p) => p.winners.length > 0);
   if (months.length === 0) {
     return (
-      <p className="py-8 text-center text-sm text-[#9fceb4]">
+      <p className="py-8 text-center text-sm text-[#9fc1c7]">
         No champions crowned yet — win a monthly season to enter the hall.
       </p>
     );
   }
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-center text-xs text-[#9fceb4]">Monthly season champions, immortalized.</p>
+      <p className="text-center text-xs text-[#9fc1c7]">Monthly season champions, immortalized.</p>
       {months.map((p) => {
         const champ = p.winners.find((w) => w.rank === 1) ?? p.winners[0]!;
         const rest = p.winners.filter((w) => w.rank > 1).slice(0, 2);
         return (
           <div key={p.month} className="rounded-xl border border-[#ffd24a]/30 bg-[#ffd24a]/5 p-3">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold text-[#9fceb4]">{p.month}</span>
+              <span className="text-[11px] font-semibold text-[#9fc1c7]">{p.month}</span>
               {p.solscan && (
-                <a href={p.solscan} target="_blank" rel="noopener noreferrer" className="text-[10px] text-[#39ff88] hover:underline">
+                <a href={p.solscan} target="_blank" rel="noopener noreferrer" className="text-[10px] text-[#9ed5e7] hover:underline">
                   ⛓ on-chain
                 </a>
               )}
@@ -322,15 +322,15 @@ function HallOfFameView({ season }: { season: SeasonData | null }) {
               <span className="text-2xl">👑</span>
               <span className="min-w-0 flex-1 truncate text-base font-bold text-[#ffd24a]">{champ.username}</span>
               {champ.prizeCredits > 0 && (
-                <span className="text-xs font-bold text-[#39ff88]">{champ.prizeCredits.toLocaleString()} AI Cr</span>
+                <span className="text-xs font-bold text-[#9ed5e7]">{champ.prizeCredits.toLocaleString()} AI Cr</span>
               )}
             </div>
             {rest.length > 0 && (
-              <div className="mt-1 text-[11px] text-[#9fceb4]">
+              <div className="mt-1 text-[11px] text-[#9fc1c7]">
                 {rest.map((w, i) => (
                   <span key={w.rank}>
                     {i > 0 && ' · '}
-                    {RANK_MEDAL[w.rank - 1] ?? '🏅'} <span style={{ color: RANK_COLOR[w.rank - 1] ?? '#dffbe9' }}>{w.username}</span>
+                    {RANK_MEDAL[w.rank - 1] ?? '🏅'} <span style={{ color: RANK_COLOR[w.rank - 1] ?? '#e8f7fb' }}>{w.username}</span>
                   </span>
                 ))}
               </div>
@@ -366,17 +366,17 @@ function OnchainView({
       <TrophiesSection trophies={trophies} onClaimed={onClaimed} />
 
       {!enabled ? (
-        <div className="rounded-xl border border-[#62b8ff]/25 bg-[#62b8ff]/5 p-3 text-xs text-[#9fceb4]">
+        <div className="rounded-xl border border-[#62b8ff]/25 bg-[#62b8ff]/5 p-3 text-xs text-[#9fc1c7]">
           <div className="mb-1 font-bold text-[#62b8ff]">⛓ On-chain anchoring</div>
           Each completed dispatch and the final monthly ranking get anchored on{' '}
-          <span className="text-[#dffbe9]">Solana</span> — tamper-evident and publicly verifiable, paid by Hatcher.
-          <div className="mt-2 text-[#7faE96]">Anchoring is currently off for this environment.</div>
+          <span className="text-[#e8f7fb]">Solana</span> — tamper-evident and publicly verifiable, paid by Hatcher.
+          <div className="mt-2 text-[#7f98a3]">Anchoring is currently off for this environment.</div>
         </div>
       ) : (
         <>
           <div className="rounded-xl border border-[#62b8ff]/25 bg-[#62b8ff]/5 p-3 text-xs">
             <div className="mb-1 font-bold text-[#62b8ff]">⛓ On-chain anchoring · live</div>
-            <p className="text-[#9fceb4]">
+            <p className="text-[#9fc1c7]">
               Dispatches batch into a Solana memo proof; the monthly ranking is committed as a merkle root. Hatcher pays every transaction.
             </p>
             {payer && <div className="mt-2 font-mono text-[10px] text-[#62b8ff]">payer {shortAddr(payer)}</div>}
@@ -385,30 +385,30 @@ function OnchainView({
             </p>
           </div>
 
-          <div className="text-xs font-bold text-[#9fceb4]">Your recent dispatches</div>
+          <div className="text-xs font-bold text-[#9fc1c7]">Your recent dispatches</div>
           {rows.length === 0 ? (
-            <p className="py-3 text-center text-xs text-[#9fceb4]">No anchored dispatches yet — send an agent out.</p>
+            <p className="py-3 text-center text-xs text-[#9fc1c7]">No anchored dispatches yet — send an agent out.</p>
           ) : (
             <ol className="flex flex-col gap-1">
               {rows.map((r) => (
                 <li key={r.id} className="flex items-center gap-2 rounded-lg border border-white/5 bg-black/20 px-3 py-2 text-xs">
                   <span
                     className={`h-2 w-2 shrink-0 rounded-full ${
-                      r.status === 'anchored' ? 'bg-[#39ff88]' : r.status === 'failed' ? 'bg-[#ff6b6b]' : 'bg-[#ffd24a]'
+                      r.status === 'anchored' ? 'bg-[#9ed5e7]' : r.status === 'failed' ? 'bg-[#ff6b6b]' : 'bg-[#ffd24a]'
                     }`}
                     title={r.status}
                   />
                   <span className="min-w-0 flex-1 truncate">
-                    <span className="text-[#dffbe9]">→ {r.destName || 'dispatch'}</span>
-                    <span className="ml-1 text-[#7faE96]">{r.framework}</span>
+                    <span className="text-[#e8f7fb]">→ {r.destName || 'dispatch'}</span>
+                    <span className="ml-1 text-[#7f98a3]">{r.framework}</span>
                   </span>
-                  <span className="font-mono text-[#39ff88]">◆ {r.dataEarned.toLocaleString()}</span>
+                  <span className="font-mono text-[#9ed5e7]">◆ {r.dataEarned.toLocaleString()}</span>
                   {r.solscan ? (
                     <a href={r.solscan} target="_blank" rel="noreferrer" className="text-[#62b8ff] hover:underline" title="View the anchor transaction on Solscan">
                       ↗
                     </a>
                   ) : (
-                    <span className="text-[#7faE96]" title="Waiting for the next batch anchor">⏳</span>
+                    <span className="text-[#7f98a3]" title="Waiting for the next batch anchor">⏳</span>
                   )}
                 </li>
               ))}
@@ -435,7 +435,7 @@ function TrophiesSection({ trophies, onClaimed }: { trophies: TrophiesData | nul
   const list = trophies?.trophies ?? [];
   if (list.length === 0) {
     return (
-      <div className="rounded-xl border border-[#ffd24a]/25 bg-[#ffd24a]/5 p-3 text-xs text-[#9fceb4]">
+      <div className="rounded-xl border border-[#ffd24a]/25 bg-[#ffd24a]/5 p-3 text-xs text-[#9fc1c7]">
         <div className="mb-1 font-bold text-[#ffd24a]">🏆 Trophies</div>
         Finish in the monthly top 5 to earn a trophy. You can claim it as a real NFT to any Solana wallet — no wallet needed to win.
       </div>
@@ -463,7 +463,7 @@ function TrophiesSection({ trophies, onClaimed }: { trophies: TrophiesData | nul
           <li key={t.month} className="rounded-lg border border-white/10 bg-black/25 px-3 py-2 text-xs">
             <div className="flex items-center gap-2">
               <span>{RANK_MEDAL[t.rank - 1] ?? '🏅'}</span>
-              <span className="flex-1 font-semibold text-[#dffbe9]">
+              <span className="flex-1 font-semibold text-[#e8f7fb]">
                 {t.month} · Rank #{t.rank}
               </span>
               {t.status === 'claimed' ? (
@@ -472,7 +472,7 @@ function TrophiesSection({ trophies, onClaimed }: { trophies: TrophiesData | nul
                     ⛓ minted ↗
                   </a>
                 ) : (
-                  <span className="text-[#39ff88]">⛓ minted</span>
+                  <span className="text-[#9ed5e7]">⛓ minted</span>
                 )
               ) : (
                 <span className="text-[#ffd24a]">claimable</span>
@@ -485,7 +485,7 @@ function TrophiesSection({ trophies, onClaimed }: { trophies: TrophiesData | nul
                     value={addr}
                     onChange={(e) => setAddr(e.target.value)}
                     placeholder="Solana address (Phantom / Solflare / Backpack)"
-                    className="min-w-0 flex-1 rounded-md border border-white/10 bg-black/40 px-2 py-1 font-mono text-[10px] text-[#dffbe9] outline-none focus:border-[#ffd24a]/50"
+                    className="min-w-0 flex-1 rounded-md border border-white/10 bg-black/40 px-2 py-1 font-mono text-[10px] text-[#e8f7fb] outline-none focus:border-[#ffd24a]/50"
                   />
                   <button
                     onClick={() => setVisible(true)}
@@ -502,11 +502,11 @@ function TrophiesSection({ trophies, onClaimed }: { trophies: TrophiesData | nul
                     {busy === t.month ? '…' : 'Claim'}
                   </button>
                 </div>
-                <p className="text-[9px] text-[#7faE96]">
+                <p className="text-[9px] text-[#7f98a3]">
                   Mints to that exact address — irreversible. Use a wallet that supports compressed NFTs (Phantom / Solflare / Backpack), not an exchange address.
                 </p>
                 {msg?.month === t.month && (
-                  <p className={`text-[10px] ${msg.ok ? 'text-[#39ff88]' : 'text-[#ff6b6b]'}`}>{msg.text}</p>
+                  <p className={`text-[10px] ${msg.ok ? 'text-[#9ed5e7]' : 'text-[#ff6b6b]'}`}>{msg.text}</p>
                 )}
               </div>
             )}

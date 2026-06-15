@@ -67,7 +67,7 @@ const DEFAULT_CALL_FORM: OrbisCallFormState = {
   maxCostUsd: '0.05',
 };
 
-export const ORBIS_RESULT_PANEL_CLASSNAME = 'min-w-0 max-w-full overflow-hidden rounded-md border border-emerald-500/30 bg-emerald-500/10 p-4';
+export const ORBIS_RESULT_PANEL_CLASSNAME = 'min-w-0 max-w-full overflow-hidden rounded-md border border-[var(--color-success-border)] bg-[var(--color-success-bg)] p-4';
 
 export const ORBIS_RESULT_PRE_CLASSNAME = 'mt-3 max-h-72 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-md border border-[var(--border-subtle)] bg-black/30 p-3 text-xs text-[var(--text-primary)]';
 
@@ -219,9 +219,9 @@ function StatusTile({
   icon: typeof CheckCircle2;
 }) {
   const toneClass = tone === 'good'
-    ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200'
+    ? 'border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success)]'
     : tone === 'warn'
-      ? 'border-amber-500/30 bg-amber-500/10 text-amber-100'
+      ? 'border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] text-[var(--color-warning)]'
       : 'border-[var(--border-subtle)] bg-black/20 text-[var(--text-muted)]';
 
   return (
@@ -386,7 +386,7 @@ export function OrbisWalletPanel({ agentId }: { agentId: string }) {
       </div>
 
       {error && (
-        <div className="mt-4 flex items-start gap-2 border border-amber-500/30 bg-amber-500/5 p-3 text-xs text-amber-200">
+        <div className="mt-4 flex items-start gap-2 border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] p-3 text-xs text-[var(--color-warning)]">
           <AlertTriangle size={14} className="mt-0.5 flex-shrink-0" />
           <span>{error}</span>
         </div>
@@ -662,12 +662,12 @@ export function OrbisWalletPanel({ agentId }: { agentId: string }) {
               {calling ? 'Calling...' : 'Call API'}
             </button>
             {!enabled && <p className="mt-2 text-[11px] text-[var(--text-muted)]">Enable Orbis for this agent before paid calls.</p>}
-            {enabled && !configured && <p className="mt-2 text-[11px] text-amber-200">Server payer wallet is not configured.</p>}
+            {enabled && !configured && <p className="mt-2 text-[11px] text-[var(--color-warning)]">Server payer wallet is not configured.</p>}
           </div>
 
           {callResult && (
             <div className={ORBIS_RESULT_PANEL_CLASSNAME}>
-              <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-emerald-200">
+              <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-[var(--color-success)]">
                 <CheckCircle2 size={12} /> Settled Call
               </div>
               <div className="grid min-w-0 gap-2 text-xs md:grid-cols-3">

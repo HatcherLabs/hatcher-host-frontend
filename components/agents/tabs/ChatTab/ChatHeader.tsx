@@ -56,8 +56,8 @@ export function ChatHeader({
           {frameworkMeta?.name ?? agent.framework}
         </span>
         {wsConnected && (
-          <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 text-emerald-400 font-medium" title="Real-time streaming via WebSocket">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border border-[var(--status-live-border)] bg-[var(--status-live-bg)] text-[var(--status-live)] font-medium" title="Real-time streaming via WebSocket">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--status-live)] animate-pulse" />
             {t('live')}
           </span>
         )}
@@ -76,7 +76,7 @@ export function ChatHeader({
         {hasVoiceSupport && sttSupported && isAuthenticated && (
           <button
             onClick={onStartVoiceCall}
-            className="flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border border-[var(--border-default)] bg-transparent text-[var(--text-muted)] hover:border-emerald-500/40 hover:text-emerald-400 hover:bg-emerald-500/10 transition-all duration-200 cursor-pointer"
+            className="flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border border-[var(--border-default)] bg-transparent text-[var(--text-muted)] hover:border-[var(--status-live-border)] hover:text-[var(--status-live)] hover:bg-[var(--status-live-bg)] transition-all duration-200 cursor-pointer"
             title={t('voiceCallTitle')}
           >
             <Phone size={11} />

@@ -20,13 +20,13 @@ export function LiveLogsPreviewCard() {
           <ScrollText size={14} className="text-[var(--color-accent)]" />
           <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Live Logs</h3>
           {isActive && wsLogsConnected ? (
-            <span className="flex items-center gap-1 text-[9px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">
-              <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="flex items-center gap-1 text-[9px] text-[var(--status-live)] bg-[var(--status-live-bg)] px-1.5 py-0.5 rounded-full">
+              <span className="w-1 h-1 rounded-full bg-[var(--status-live)] animate-pulse" />
               Connected
             </span>
           ) : isActive ? (
-            <span className="flex items-center gap-1 text-[9px] text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded-full">
-              <span className="w-1 h-1 rounded-full bg-amber-400 animate-pulse" />
+            <span className="flex items-center gap-1 text-[9px] text-[var(--status-deploying)] bg-[var(--status-deploying-bg)] px-1.5 py-0.5 rounded-full">
+              <span className="w-1 h-1 rounded-full bg-[var(--status-deploying)] animate-pulse" />
               Reconnecting
             </span>
           ) : null}

@@ -454,29 +454,29 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
           cursorBlink: false,
           fontSize: 13,
           fontFamily: '"JetBrains Mono", "Fira Code", "Cascadia Code", Menlo, Monaco, monospace',
-          theme: {
-            background: '#0a0a0a',
-            foreground: '#e0e0e0',
-            cursor: '#00ff41',
-            cursorAccent: '#0a0a0a',
-            selectionBackground: 'rgba(0, 255, 65, 0.2)',
-            black: '#0a0a0a',
-            red: '#ff5555',
-            green: '#00ff41',
-            yellow: '#ffb86c',
-            blue: '#6272a4',
-            magenta: '#ff79c6',
-            cyan: '#8be9fd',
-            white: '#e0e0e0',
-            brightBlack: '#6272a4',
-            brightRed: '#ff6e6e',
-            brightGreen: '#69ff94',
-            brightYellow: '#ffffa5',
-            brightBlue: '#d6acff',
-            brightMagenta: '#ff92df',
-            brightCyan: '#a4ffff',
-            brightWhite: '#ffffff',
-          },
+	          theme: {
+	            background: '#0f1112',
+	            foreground: '#e6eeec',
+	            cursor: '#9ed5e7',
+	            cursorAccent: '#0f1112',
+	            selectionBackground: 'rgba(115, 164, 185, 0.24)',
+	            black: '#0f1112',
+	            red: '#ff5555',
+	            green: '#89d6c6',
+	            yellow: '#d5b46b',
+	            blue: '#73a4b9',
+	            magenta: '#aab7ff',
+	            cyan: '#9ed5e7',
+	            white: '#e6eeec',
+	            brightBlack: '#647173',
+	            brightRed: '#ff6e6e',
+	            brightGreen: '#a8e2d6',
+	            brightYellow: '#ffe0a0',
+	            brightBlue: '#9ed5e7',
+	            brightMagenta: '#c9d0ff',
+	            brightCyan: '#d7eff5',
+	            brightWhite: '#ffffff',
+	          },
           allowTransparency: true,
           scrollback: 50000,
           scrollSensitivity: scrollLinesRef.current,
@@ -781,8 +781,8 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
           <div className="flex items-center gap-1.5">
             <Circle
               size={8}
-              fill={state === 'connected' ? '#00ff41' : state === 'connecting' ? '#ffb86c' : '#ff5555'}
-              className={state === 'connected' ? 'text-green-400' : state === 'connecting' ? 'text-yellow-400' : 'text-red-400'}
+              fill={state === 'connected' ? 'var(--status-live)' : state === 'connecting' ? 'var(--status-deploying)' : 'var(--color-destructive)'}
+              className={state === 'connected' ? 'text-[var(--status-live)]' : state === 'connecting' ? 'text-[var(--status-deploying)]' : 'text-[var(--color-destructive)]'}
             />
             <span className="text-xs font-mono text-[var(--text-muted)]">
               {state === 'connected' ? tTerminal('connected') : state === 'connecting' ? tTerminal('connecting') : tTerminal('disconnected')}
@@ -795,7 +795,7 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
           <span className="hidden min-w-0 truncate rounded-md border border-[var(--border-default)] bg-[#0a0a0a] px-2 py-1 text-[10px] font-mono text-[var(--text-secondary)] md:inline">
             {activeTerminalSession.name}
           </span>
-          <span className="hidden xl:inline-flex items-center gap-1.5 rounded-md border border-emerald-500/20 bg-emerald-500/5 px-2 py-0.5 text-[10px] font-mono text-emerald-300">
+          <span className="hidden xl:inline-flex items-center gap-1.5 rounded-md border border-[var(--color-success-border)] bg-[var(--color-success-bg)] px-2 py-0.5 text-[10px] font-mono text-[var(--color-success)]">
             <ShieldCheck size={11} />
             Isolated container
           </span>
@@ -922,7 +922,7 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
                   <button
                     type="button"
                     onClick={() => removeCredentialMount(mount.id)}
-                    className="rounded-md p-1.5 text-[var(--text-muted)] transition-colors hover:text-red-300"
+                    className="rounded-md p-1.5 text-[var(--text-muted)] transition-colors hover:text-[var(--color-destructive)]"
                     title="Remove credential"
                   >
                     <Trash2 size={13} />
@@ -966,7 +966,7 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
                     key={session.id}
                     className={`group rounded-md border transition-colors ${
                       isActiveSession
-                        ? 'border-[var(--accent)] bg-[rgba(74,222,128,0.08)]'
+	                        ? 'border-[var(--accent)] bg-[var(--color-accent-bg)]'
                         : 'border-[var(--border-default)] bg-[#0a0a0a] hover:border-[var(--border-strong)]'
                     }`}
                   >
@@ -997,7 +997,7 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
                           type="button"
                           onClick={() => deleteTerminalSession(session)}
                           disabled={terminalSessions.length <= 1}
-                          className="rounded p-1.5 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-35"
+                          className="rounded p-1.5 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--color-destructive)] disabled:cursor-not-allowed disabled:opacity-35"
                           title="Delete terminal session"
                         >
                           <Trash2 size={12} />
@@ -1049,7 +1049,7 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
                 onClick={() => selectTerminalSession(session.id)}
                 className={`max-w-40 flex-shrink-0 truncate rounded-md border px-2.5 py-1.5 text-xs font-mono ${
                   session.id === activeTerminalSession.id
-                    ? 'border-[var(--accent)] bg-[rgba(74,222,128,0.08)] text-[var(--accent)]'
+	                    ? 'border-[var(--accent)] bg-[var(--color-accent-bg)] text-[var(--accent)]'
                     : 'border-[var(--border-default)] text-[var(--text-secondary)]'
                 }`}
                 title={session.name}
@@ -1110,7 +1110,7 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
       <div className="px-4 py-1.5 border-t border-[var(--border-default)] bg-[var(--bg-elevated)]">
         <p className="text-[10px] text-[var(--text-muted)] font-mono">
           Attached to the framework CLI inside the isolated agent container. The gateway keeps running separately for chat and integrations. Terminal open/close and entered commands are audited with secret redaction.
-          {errorMsg && <span className="text-red-400 ml-2">Error: {errorMsg}</span>}
+          {errorMsg && <span className="text-[var(--color-destructive)] ml-2">Error: {errorMsg}</span>}
         </p>
       </div>
     </div>

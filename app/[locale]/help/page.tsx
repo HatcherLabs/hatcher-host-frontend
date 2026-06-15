@@ -244,7 +244,7 @@ export default function HelpPage() {
               { label: t('quickLinks.discord'), href: 'https://discord.gg/7tY3HjKjMc', icon: MessageCircle, color: '#7289da', external: true },
               { label: t('quickLinks.telegram'), href: 'https://t.me/HatcherLabs', icon: MessageCircle, color: '#29a9eb', external: true },
               { label: t('quickLinks.submitTicket'), href: '/support', icon: Ticket, color: '#f59e0b', external: false },
-              { label: t('quickLinks.emailSupport'), href: 'mailto:support@hatcher.host', icon: Mail, color: '#10b981', external: true },
+              { label: t('quickLinks.emailSupport'), href: 'mailto:support@hatcher.host', icon: Mail, color: '#486a79', external: true },
             ].map((link, index) => {
               const inner = (
                 <motion.div
@@ -417,7 +417,7 @@ export default function HelpPage() {
                 href="mailto:contact@hatcher.host"
                 className="flex items-center gap-2.5 p-3 rounded-lg bg-[var(--bg-card)] hover:bg-[var(--bg-card)] transition-colors group"
               >
-                <Mail size={14} className="text-[#10b981] flex-shrink-0" />
+                <Mail size={14} className="text-[#486a79] flex-shrink-0" />
                 <div>
                   <p className="text-xs font-medium text-[var(--text-primary)] group-hover:text-[var(--color-accent)] transition-colors">contact@hatcher.host</p>
                   <p className="text-[10px] text-[var(--text-muted)]">{t('generalInquiries')}</p>

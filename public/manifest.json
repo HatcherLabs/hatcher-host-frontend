@@ -1,11 +1,11 @@
 {
-  "name": "Hatcher — AI Agent Hosting Platform",
+  "name": "Hatcher — AI Agent Infrastructure",
   "short_name": "Hatcher",
-  "description": "Deploy autonomous AI agents across 20+ platforms in 60 seconds.",
+  "description": "Run hosted OpenClaw and Hermes agents with managed models, wallets, tools, rooms, and runtime controls.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0A0A0A",
-  "theme_color": "#39FF88",
+  "background_color": "#f7f3ea",
+  "theme_color": "#10110f",
   "orientation": "portrait-primary",
   "scope": "/",
   "icons": [

@@ -57,7 +57,7 @@ export default function GlobalError({
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '0.5rem',
-                  background: 'linear-gradient(to right, #9333ea, #a855f7)',
+                  background: 'linear-gradient(to right, #141817, #73a4b9)',
                   color: 'white',
                   fontWeight: 500,
                   padding: '0.625rem 1.5rem',

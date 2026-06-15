@@ -333,45 +333,84 @@ function LiveRobotAgent({
         </mesh>
         {!useRealAvatar && (
           <>
-            <mesh position={[0, 0.45, 0]} castShadow receiveShadow>
-              <boxGeometry args={[0.32, 0.42, 0.26]} />
-              <meshLambertMaterial color={0xc7cdd8} />
+            <mesh
+              position={[0, 0.4, 0]}
+              scale={[0.72, 0.92, 0.62]}
+              castShadow
+              receiveShadow
+            >
+              <sphereGeometry args={[0.36, 22, 16]} />
+              <meshLambertMaterial color={0xdedbd2} />
             </mesh>
-            <mesh position={[0, 0.46, 0.135]}>
-              <boxGeometry args={[0.18, 0.12, 0.02]} />
-              <meshLambertMaterial color={0x0a0e16} emissive={colorObject} emissiveIntensity={0.9} />
+            <mesh position={[0, 0.42, 0.205]} scale={[1, 0.42, 0.12]}>
+              <sphereGeometry args={[0.19, 18, 10]} />
+              <meshLambertMaterial
+                color={0x070b12}
+                emissive={colorObject}
+                emissiveIntensity={0.28}
+              />
             </mesh>
-            <mesh position={[0, 0.78, 0]} castShadow receiveShadow>
-              <boxGeometry args={[0.26, 0.22, 0.22]} />
-              <meshLambertMaterial color={0xc7cdd8} />
+            <mesh position={[-0.06, 0.43, 0.23]}>
+              <sphereGeometry args={[0.032, 10, 8]} />
+              <meshBasicMaterial color={colorObject} toneMapped={false} />
             </mesh>
-            <mesh position={[0, 0.79, 0.111]}>
-              <boxGeometry args={[0.22, 0.07, 0.02]} />
-              <meshLambertMaterial color={0x05080f} emissive={colorObject} emissiveIntensity={1.1} />
+            <mesh position={[0.06, 0.43, 0.23]}>
+              <sphereGeometry args={[0.032, 10, 8]} />
+              <meshBasicMaterial color={colorObject} toneMapped={false} />
             </mesh>
-            <mesh position={[0, 0.97, 0]} castShadow>
-              <cylinderGeometry args={[0.02, 0.02, 0.18, 5]} />
-              <meshLambertMaterial color={0x2a3040} />
+            <mesh position={[0, 0.74, 0]} scale={[0.76, 0.42, 0.68]} castShadow receiveShadow>
+              <sphereGeometry args={[0.32, 22, 12]} />
+              <meshLambertMaterial color={0xf0ede4} />
+            </mesh>
+            <mesh position={[0, 0.62, 0.02]} rotation={[Math.PI / 2, 0, 0]}>
+              <torusGeometry args={[0.26, 0.012, 8, 36]} />
+              <meshBasicMaterial
+                color={0xd6b177}
+                transparent
+                opacity={0.82}
+                toneMapped={false}
+              />
+            </mesh>
+            <mesh position={[0, 0.69, 0.22]} rotation={[Math.PI / 2, 0, 0]}>
+              <torusGeometry args={[0.1, 0.01, 8, 24]} />
+              <meshBasicMaterial
+                color={colorObject}
+                transparent
+                opacity={0.72}
+                toneMapped={false}
+              />
             </mesh>
             <mesh ref={tipRef} position={[0, 1.07, 0]}>
               <sphereGeometry args={[0.05, 8, 6]} />
               <meshBasicMaterial color={colorObject} toneMapped={false} />
             </mesh>
-            <mesh ref={leftArmRef} position={[-0.21, 0.45, 0]} castShadow receiveShadow>
-              <boxGeometry args={[0.07, 0.22, 0.1]} />
-              <meshLambertMaterial color={0x3a4254} />
+            <mesh
+              ref={leftArmRef}
+              position={[-0.28, 0.43, 0.02]}
+              rotation={[0, 0, -0.22]}
+              castShadow
+              receiveShadow
+            >
+              <capsuleGeometry args={[0.04, 0.19, 4, 8]} />
+              <meshLambertMaterial color={0x9ea7b4} />
             </mesh>
-            <mesh ref={rightArmRef} position={[0.21, 0.45, 0]} castShadow receiveShadow>
-              <boxGeometry args={[0.07, 0.22, 0.1]} />
-              <meshLambertMaterial color={0x3a4254} />
+            <mesh
+              ref={rightArmRef}
+              position={[0.28, 0.43, 0.02]}
+              rotation={[0, 0, 0.22]}
+              castShadow
+              receiveShadow
+            >
+              <capsuleGeometry args={[0.04, 0.19, 4, 8]} />
+              <meshLambertMaterial color={0x9ea7b4} />
             </mesh>
-            <mesh ref={leftLegRef} position={[-0.08, 0.16, 0]} castShadow receiveShadow>
-              <boxGeometry args={[0.09, 0.18, 0.1]} />
-              <meshLambertMaterial color={0x2a3040} />
+            <mesh ref={leftLegRef} position={[-0.09, 0.12, 0]} castShadow receiveShadow>
+              <capsuleGeometry args={[0.045, 0.12, 4, 8]} />
+              <meshLambertMaterial color={0x5f6874} />
             </mesh>
-            <mesh ref={rightLegRef} position={[0.08, 0.16, 0]} castShadow receiveShadow>
-              <boxGeometry args={[0.09, 0.18, 0.1]} />
-              <meshLambertMaterial color={0x2a3040} />
+            <mesh ref={rightLegRef} position={[0.09, 0.12, 0]} castShadow receiveShadow>
+              <capsuleGeometry args={[0.045, 0.12, 4, 8]} />
+              <meshLambertMaterial color={0x5f6874} />
             </mesh>
           </>
         )}

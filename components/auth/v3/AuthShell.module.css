@@ -6,18 +6,18 @@
 }
 
 .header {
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--border-line);
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border-default);
 }
 
 .brand {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.2em;
+  font-family: var(--font-inter), var(--font-body);
+  font-weight: 720;
+  font-size: 15px;
+  letter-spacing: 0.01em;
   color: var(--text-primary);
   text-decoration: none;
 }
@@ -27,24 +27,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px;
+  padding: 44px 20px;
 }
 
 .card {
   width: 100%;
-  max-width: 420px;
+  max-width: 440px;
   background: var(--bg-card);
   border: 1px solid var(--border-default);
-  border-radius: 8px;
-  padding: 32px;
+  border-radius: var(--radius);
+  padding: 34px;
+  box-shadow: var(--shadow-card);
 }
 
 .head { margin-bottom: 24px; text-align: center; }
 
 .title {
-  font-family: var(--font-mono);
-  font-size: 22px;
-  font-weight: 600;
+  font-family: var(--font-inter), var(--font-body);
+  font-size: 26px;
+  font-weight: 720;
+  letter-spacing: -0.035em;
   color: var(--text-primary);
   margin: 0 0 8px;
 }
@@ -58,7 +60,7 @@
 .foot {
   margin-top: 20px;
   padding-top: 20px;
-  border-top: 1px solid var(--border-line);
+  border-top: 1px solid var(--border-default);
   text-align: center;
   font-size: 13px;
   color: var(--text-secondary);
@@ -72,3 +74,18 @@
   text-underline-offset: 2px;
 }
 .foot :global(a):hover { color: var(--accent-hover); }
+
+@media (max-width: 520px) {
+  .header {
+    padding: 14px 16px;
+  }
+
+  .main {
+    align-items: flex-start;
+    padding: 28px 14px;
+  }
+
+  .card {
+    padding: 24px;
+  }
+}

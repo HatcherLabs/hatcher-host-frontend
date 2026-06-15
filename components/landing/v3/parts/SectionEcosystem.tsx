@@ -5,13 +5,13 @@ import { BoxLabel } from '../shared/BoxLabel';
 import styles from './SectionEcosystem.module.css';
 
 const FRAMEWORKS = [
-  { key: 'openclaw', label: 'OpenClaw', color: '#FACC15', kind: 'framework' as const },
-  { key: 'hermes', label: 'Hermes', color: '#38BDF8', kind: 'framework' as const },
+  { key: 'openclaw', label: 'OpenClaw', color: '#738a96', kind: 'framework' as const },
+  { key: 'hermes', label: 'Hermes', color: '#486a79', kind: 'framework' as const },
 ];
 
 const CHAINS = [
-  { key: 'solana', label: 'Solana', color: '#9945FF', href: 'https://solana.com' },
-  { key: 'skale',  label: 'SKALE',  color: '#39FF88', href: 'https://skale.space' },
+  { key: 'solana', label: 'Solana', color: '#746290', href: 'https://solana.com' },
+  { key: 'skale',  label: 'SKALE',  color: '#4a778b', href: 'https://skale.space' },
 ];
 
 export function SectionEcosystem() {

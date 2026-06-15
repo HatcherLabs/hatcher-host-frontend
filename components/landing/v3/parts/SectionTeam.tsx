@@ -16,7 +16,7 @@ const MEMBERS = [
     imageSrc: '/landing-v3/team-cristian.jpg',
     socialHref: 'https://x.com/CristianG1296',
     linkedInHref: 'https://www.linkedin.com/in/cristian-ghiorma-706933187',
-    accent: '#39FF88',
+    accent: '#4a778b',
   },
   {
     key: 'ioana',
@@ -25,7 +25,7 @@ const MEMBERS = [
     tagKey: 'growthTag',
     avatar: 'I',
     socialHref: 'https://x.com/IoanaG663',
-    accent: '#F472B6',
+    accent: '#b55260',
   },
   {
     key: 'john',
@@ -33,7 +33,7 @@ const MEMBERS = [
     roleKey: 'johnRole',
     tagKey: 'builderTag',
     avatar: 'J',
-    accent: '#38BDF8',
+    accent: '#486a79',
   },
   {
     key: 'moise',
@@ -41,7 +41,7 @@ const MEMBERS = [
     roleKey: 'moiseRole',
     tagKey: 'communityTag',
     avatar: 'M',
-    accent: '#FACC15',
+    accent: '#738a96',
   },
 ] as const;
 

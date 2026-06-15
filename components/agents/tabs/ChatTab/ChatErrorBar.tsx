@@ -63,7 +63,7 @@ export function ChatErrorBar({
     : chatError.trim() || info.message;
 
   return (
-    <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-lg px-4 py-2.5 mb-3 flex items-center gap-3">
+    <div className="bg-[var(--color-destructive-bg)] border border-[var(--color-destructive-border)] text-[var(--color-destructive)] text-xs rounded-lg px-4 py-2.5 mb-3 flex items-center gap-3">
       <span className="flex-1">
         {chatErrorType === 'ratelimit' ? (
           <>

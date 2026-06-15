@@ -9,8 +9,12 @@ import type { Agent, AgentCommCandidate, AgentCommLog } from '@/lib/api';
 import { timeAgo } from '@/lib/utils';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { getAgentTaskTemplates } from '@/components/agents/tabs/developerWorkflows';
+import { AgentStatusPill } from '@/components/ui/AgentStatusPill';
 import {
   ArrowRight,
+  Bot,
+  Box,
+  BrainCircuit,
   CheckCircle2,
   Loader2,
   Network,
@@ -34,25 +38,15 @@ const STATUS_FILTERS: StatusFilter[] = ['all', 'active', 'sleeping', 'paused', '
 const FRAMEWORKS: FrameworkFilter[] = ['all', 'openclaw', 'hermes'];
 const SORTS: SortOption[] = ['newest', 'az', 'messages', 'active'];
 
-const FRAMEWORK_GLYPH: Record<string, string> = {
-  openclaw: '⊞',
-  hermes: '◇',
-};
-
 const FRAMEWORK_LABEL: Record<string, string> = {
   openclaw: 'OpenClaw',
   hermes: 'Hermes',
 };
 
-function statusClass(status: string): string {
-  if (status === 'active') return styles.active;
-  if (status === 'sleeping') return styles.sleeping;
-  if (status === 'paused') return styles.paused;
-  if (status === 'archived') return styles.paused;
-  if (status === 'error' || status === 'killed') return styles.error;
-  if (status === 'restarting') return styles.restarting;
-  if (status === 'stopping') return styles.stopping;
-  return styles.sleeping;
+function FrameworkIcon({ framework, size = 18 }: { framework: string; size?: number }) {
+  if (framework === 'openclaw') return <Bot size={size} aria-hidden />;
+  if (framework === 'hermes') return <BrainCircuit size={size} aria-hidden />;
+  return <Box size={size} aria-hidden />;
 }
 
 export default function MyAgentsPage() {
@@ -73,6 +67,7 @@ export default function MyAgentsPage() {
   const [frameworkFilter, setFrameworkFilter] = useState<FrameworkFilter>('all');
   const [sortOption, setSortOption] = useState<SortOption>('newest');
   const [viewMode, setViewMode] = useState<ViewMode>('agents');
+  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
   const [meshSourceId, setMeshSourceId] = useState('');
   const [meshTargetId, setMeshTargetId] = useState('');
   const [meshMode, setMeshMode] = useState<'sync' | 'async'>('sync');
@@ -146,6 +141,21 @@ export default function MyAgentsPage() {
       }
     });
   }, [agents, statusFilter, frameworkFilter, search, sortOption]);
+
+  useEffect(() => {
+    if (filtered.length === 0) {
+      if (selectedAgentId !== null) setSelectedAgentId(null);
+      return;
+    }
+    if (!selectedAgentId || !filtered.some((agent) => agent.id === selectedAgentId)) {
+      setSelectedAgentId(filtered[0].id);
+    }
+  }, [filtered, selectedAgentId]);
+
+  const selectedAgent = useMemo(
+    () => filtered.find((agent) => agent.id === selectedAgentId) ?? filtered[0] ?? null,
+    [filtered, selectedAgentId],
+  );
 
   // ── Keyboard shortcuts ────────────────────────────────────
   useKeyboardShortcuts({
@@ -288,7 +298,7 @@ export default function MyAgentsPage() {
     return (
       <div className={styles.gate}>
         <div className={styles.gateInner}>
-          <span className={styles.gateGlyph}>◐</span>
+          <Loader2 className={styles.gateIconSpin} aria-hidden />
           <p className={styles.gateDesc}>{tc('authenticating')}</p>
         </div>
       </div>
@@ -299,7 +309,7 @@ export default function MyAgentsPage() {
     return (
       <div className={styles.gate}>
         <div className={styles.gateInner}>
-          <span className={styles.gateGlyph}>▎</span>
+          <Bot className={styles.gateIcon} aria-hidden />
           <h1 className={styles.gateTitle}>{tc('signInRequired')}</h1>
           <p className={styles.gateDesc}>{t('signInDescription')}</p>
           <Link href="/login" className={styles.cta}>{tc('signIn')}</Link>
@@ -315,7 +325,7 @@ export default function MyAgentsPage() {
         {/* Header */}
         <header className={styles.header}>
           <div className={styles.headerLeft}>
-            <span className={styles.eyebrow}>▎ {t('eyebrow')}</span>
+            <span className={styles.eyebrow}>{t('eyebrow')}</span>
             <h1 className={styles.heading}>{t('heading')}</h1>
             <p className={styles.subtitle}>
               {total === 0
@@ -326,7 +336,7 @@ export default function MyAgentsPage() {
             </p>
           </div>
           <Link href="/create" className={styles.cta}>
-            <span aria-hidden>▎</span> {t('createCta')}
+            {t('createCta')} <ArrowRight size={14} aria-hidden />
           </Link>
         </header>
 
@@ -583,7 +593,7 @@ export default function MyAgentsPage() {
                     >
                       <div className={styles.meshNodeHead}>
                         <span className={styles.cardGlyph} aria-hidden>
-                          {FRAMEWORK_GLYPH[agent.framework] ?? '◇'}
+                          <FrameworkIcon framework={agent.framework} size={18} />
                         </span>
                         <div className={styles.meshNodeMain}>
                           <span className={styles.meshNodeName}>{agent.name}</span>
@@ -664,11 +674,11 @@ export default function MyAgentsPage() {
         ) : filtered.length === 0 ? (
           total === 0 ? (
             <div className={styles.empty}>
-              <span className={styles.emptyGlyph}>◐</span>
+              <Bot className={styles.emptyIcon} aria-hidden />
               <h2 className={styles.emptyTitle}>{t('emptyTitle')}</h2>
               <p className={styles.emptyDesc}>{t('emptyDescription')}</p>
               <Link href="/create" className={styles.cta}>
-                <span aria-hidden>▎</span> {t('emptyActionLabel')}
+                {t('emptyActionLabel')} <ArrowRight size={14} aria-hidden />
               </Link>
             </div>
           ) : (
@@ -686,101 +696,194 @@ export default function MyAgentsPage() {
             </div>
           )
         ) : (
-          <div className={styles.grid}>
-            {filtered.map((agent) => {
-              const busy = actionId === agent.id;
-              const isRunning = agent.status === 'active' || agent.status === 'restarting';
-              const slugOrId = agent.slug ?? agent.id;
-              return (
-                <article
-                  key={agent.id}
-                  className={`${styles.card} ${
-                    agent.status === 'active' ? styles.statusActive :
-                    (agent.status === 'error' || agent.status === 'killed') ? styles.statusError : ''
-                  }`}
-                  onClick={() => router.push(`/dashboard/agent/${agent.id}`)}
-                  role="link"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') router.push(`/dashboard/agent/${agent.id}`);
-                  }}
-                >
-                  <div className={styles.cardHead}>
-                    <span className={styles.cardGlyph} aria-hidden>{FRAMEWORK_GLYPH[agent.framework] ?? '◇'}</span>
-                    <span className={styles.cardName}>{agent.name}</span>
-                    <span className={`${styles.statusPill} ${statusClass(agent.status)}`}>
-                      <span className={`${styles.statusDot} ${isRunning ? styles.pulse : ''}`} />
-                      {tStatus(agent.status as 'active' | 'sleeping' | 'paused' | 'archived' | 'error' | 'restarting' | 'stopping' | 'killed')}
-                    </span>
-                  </div>
-
-                  <div className={styles.cardMeta}>
-                    <span className={`${styles.frameworkBadge} ${styles[agent.framework] ?? ''}`}>
-                      {FRAMEWORK_LABEL[agent.framework] ?? agent.framework}
-                    </span>
-                    <span className={styles.dot}>·</span>
-                    <span>{(agent.messageCount ?? 0).toLocaleString()} {t('msgsShort')}</span>
-                    <span className={styles.dot}>·</span>
-                    <span>{timeAgo(new Date(agent.updatedAt ?? agent.createdAt))}</span>
-                  </div>
-
-                  <p className={`${styles.description} ${!agent.description ? styles.descriptionEmpty : ''}`}>
-                    {agent.description || tc('noDescription')}
-                  </p>
-
-                  <div className={styles.actions} onClick={(e) => e.stopPropagation()}>
-                    <Link
-                      href={`/agent/${slugOrId}/room?from=agents`}
-                      className={`${styles.actionBtn} ${styles.primary}`}
-                      onClick={(e) => e.stopPropagation()}
-                      title={t('cardOpenTooltip')}
+          <div className={styles.agentsWorkspace}>
+            <section className={styles.agentTablePanel} aria-label="Agents">
+              <div className={styles.tableHead}>
+                <span>Agent</span>
+                <span>Status</span>
+                <span>Framework</span>
+                <span>Messages</span>
+                <span>Updated</span>
+                <span>Actions</span>
+              </div>
+              <div className={styles.agentRows}>
+                {filtered.map((agent) => {
+                  const busy = actionId === agent.id;
+                  const isRunning = agent.status === 'active' || agent.status === 'restarting';
+                  const slugOrId = agent.slug ?? agent.id;
+                  const isSelected = selectedAgent?.id === agent.id;
+                  return (
+                    <article
+                      key={agent.id}
+                      className={`${styles.agentRow} ${isSelected ? styles.agentRowSelected : ''}`}
+                      onClick={() => setSelectedAgentId(agent.id)}
+                      role="button"
+                      tabIndex={0}
+                      aria-pressed={isSelected}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setSelectedAgentId(agent.id);
+                        }
+                      }}
                     >
-                      ▎ {t('cardOpen')}
-                    </Link>
-                    {isRunning ? (
-                      <button
-                        type="button"
-                        className={styles.actionBtn}
-                        disabled={busy}
-                        onClick={() => runAction(agent, api.stopAgent, `${t('actionStop')} — ${agent.name}`)}
-                        title={t('actionStop')}
-                      >
-                        <Square size={11} /> {t('actionStop')}
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        className={styles.actionBtn}
-                        disabled={busy}
-                        onClick={() => runAction(agent, api.startAgent, `${t('actionStart')} — ${agent.name}`)}
-                        title={t('actionStart')}
-                      >
-                        <Play size={11} /> {t('actionStart')}
-                      </button>
-                    )}
+                      <div className={styles.agentIdentity}>
+                        <span className={styles.cardGlyph} aria-hidden><FrameworkIcon framework={agent.framework} size={18} /></span>
+                        <div className={styles.agentIdentityText}>
+                          <span className={styles.agentName}>{agent.name}</span>
+                          <span className={`${styles.agentDesc} ${!agent.description ? styles.descriptionEmpty : ''}`}>
+                            {agent.description || tc('noDescription')}
+                          </span>
+                        </div>
+                      </div>
+
+                      <AgentStatusPill
+                        status={agent.status}
+                        label={tStatus(agent.status as 'active' | 'sleeping' | 'paused' | 'archived' | 'error' | 'restarting' | 'stopping' | 'killed')}
+                        pulse={isRunning}
+                      />
+
+                      <span className={styles.tableMeta}>
+                        <span className={`${styles.frameworkBadge} ${styles[agent.framework] ?? ''}`}>
+                          {FRAMEWORK_LABEL[agent.framework] ?? agent.framework}
+                        </span>
+                      </span>
+                      <span className={styles.tableMeta}>{(agent.messageCount ?? 0).toLocaleString()} {t('msgsShort')}</span>
+                      <span className={styles.tableMeta}>{timeAgo(new Date(agent.updatedAt ?? agent.createdAt))}</span>
+
+                      <div className={styles.rowActions} onClick={(e) => e.stopPropagation()}>
+                        <Link
+                          href={`/dashboard/agent/${agent.id}`}
+                          className={`${styles.iconAction} ${styles.primary}`}
+                          title="Open workspace"
+                          aria-label="Open workspace"
+                        >
+                          <ArrowRight size={14} />
+                        </Link>
+                        <Link
+                          href={`/agent/${slugOrId}/room?from=agents`}
+                          className={styles.iconAction}
+                          title={t('cardOpenTooltip')}
+                          aria-label={t('cardOpenTooltip')}
+                        >
+                          <Box size={14} />
+                        </Link>
+                        {isRunning ? (
+                          <button
+                            type="button"
+                            className={styles.iconAction}
+                            disabled={busy}
+                            onClick={() => runAction(agent, api.stopAgent, `${t('actionStop')} — ${agent.name}`)}
+                            title={t('actionStop')}
+                            aria-label={t('actionStop')}
+                          >
+                            <Square size={13} />
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className={styles.iconAction}
+                            disabled={busy}
+                            onClick={() => runAction(agent, api.startAgent, `${t('actionStart')} — ${agent.name}`)}
+                            title={t('actionStart')}
+                            aria-label={t('actionStart')}
+                          >
+                            <Play size={13} />
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          className={styles.iconAction}
+                          disabled={busy}
+                          onClick={() => runAction(agent, api.restartAgent, `${t('actionRestart')} — ${agent.name}`)}
+                          title={t('actionRestart')}
+                          aria-label={t('actionRestart')}
+                        >
+                          <RotateCcw size={13} />
+                        </button>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </section>
+
+            {selectedAgent && (
+              <aside className={styles.agentInspector} aria-label="Selected agent">
+                <div className={styles.inspectorHead}>
+                  <span className={styles.inspectorGlyph} aria-hidden><FrameworkIcon framework={selectedAgent.framework} size={21} /></span>
+                  <div>
+                    <span className={styles.inspectorKicker}>Selected agent</span>
+                    <h2 className={styles.inspectorTitle}>{selectedAgent.name}</h2>
+                  </div>
+                </div>
+                <p className={`${styles.inspectorDescription} ${!selectedAgent.description ? styles.descriptionEmpty : ''}`}>
+                  {selectedAgent.description || tc('noDescription')}
+                </p>
+                <div className={styles.inspectorStats}>
+                  <div>
+                    <span>Status</span>
+                    <strong className={styles.statusValue}>
+                      <AgentStatusPill
+                        status={selectedAgent.status}
+                        label={tStatus(selectedAgent.status as 'active' | 'sleeping' | 'paused' | 'archived' | 'error' | 'restarting' | 'stopping' | 'killed')}
+                        className={styles.inspectorStatusPill}
+                      />
+                    </strong>
+                  </div>
+                  <div>
+                    <span>Framework</span>
+                    <strong>{FRAMEWORK_LABEL[selectedAgent.framework] ?? selectedAgent.framework}</strong>
+                  </div>
+                  <div>
+                    <span>Messages</span>
+                    <strong>{(selectedAgent.messageCount ?? 0).toLocaleString()}</strong>
+                  </div>
+                  <div>
+                    <span>Last activity</span>
+                    <strong>{timeAgo(new Date(selectedAgent.updatedAt ?? selectedAgent.createdAt))}</strong>
+                  </div>
+                </div>
+                <div className={styles.inspectorActions}>
+                  <Link href={`/dashboard/agent/${selectedAgent.id}`} className={`${styles.actionBtn} ${styles.primary}`}>
+                    Open workspace <ArrowRight size={13} />
+                  </Link>
+                  <Link
+                    href={`/agent/${selectedAgent.slug ?? selectedAgent.id}/room?from=agents`}
+                    className={styles.actionBtn}
+                  >
+                    {t('cardOpen')}
+                  </Link>
+                  {(selectedAgent.status === 'active' || selectedAgent.status === 'restarting') ? (
                     <button
                       type="button"
                       className={styles.actionBtn}
-                      disabled={busy}
-                      onClick={() => runAction(agent, api.restartAgent, `${t('actionRestart')} — ${agent.name}`)}
-                      title={t('actionRestart')}
+                      disabled={actionId === selectedAgent.id}
+                      onClick={() => runAction(selectedAgent, api.stopAgent, `${t('actionStop')} — ${selectedAgent.name}`)}
                     >
-                      <RotateCcw size={11} /> {t('actionRestart')}
+                      <Square size={12} /> {t('actionStop')}
                     </button>
+                  ) : (
                     <button
                       type="button"
-                      className={`${styles.actionBtn} ${styles.danger}`}
-                      disabled={busy}
-                      onClick={() => handleDelete(agent)}
-                      title={tc('delete')}
-                      aria-label={tc('delete')}
+                      className={styles.actionBtn}
+                      disabled={actionId === selectedAgent.id}
+                      onClick={() => runAction(selectedAgent, api.startAgent, `${t('actionStart')} — ${selectedAgent.name}`)}
                     >
-                      <Trash2 size={11} />
+                      <Play size={12} /> {t('actionStart')}
                     </button>
-                  </div>
-                </article>
-              );
-            })}
+                  )}
+                  <button
+                    type="button"
+                    className={`${styles.actionBtn} ${styles.danger}`}
+                    disabled={actionId === selectedAgent.id}
+                    onClick={() => handleDelete(selectedAgent)}
+                  >
+                    <Trash2 size={12} /> {tc('delete')}
+                  </button>
+                </div>
+              </aside>
+            )}
           </div>
         )}
       </div>

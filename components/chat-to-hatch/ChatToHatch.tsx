@@ -81,8 +81,8 @@ const FW_VISUAL: Record<
   Framework,
   { color: string; mark: string; label: string }
 > = {
-  openclaw: { color: '#FFD23F', mark: 'OC', label: 'OpenClaw' },
-  hermes: { color: '#9B5BFF', mark: 'HE', label: 'Hermes' },
+  openclaw: { color: 'var(--tech-accent)', mark: 'OC', label: 'OpenClaw' },
+  hermes: { color: 'var(--color-info)', mark: 'HE', label: 'Hermes' },
 };
 
 const AgentRoomAvatarPreview = dynamic(
@@ -155,6 +155,7 @@ const MODEL_PROVIDERS: HostedModelProvider[] = [
   { key: 'openserv', name: 'OpenServ' },
   { key: 'xiaomi', name: 'Xiaomi MiMo' },
   { key: 'acedata', name: 'AceData' },
+  { key: 'minimax', name: 'MiniMax' },
   { key: 'google', name: 'Google' },
   { key: 'qwen', name: 'Qwen' },
   { key: 'x-ai', name: 'xAI' },
@@ -347,6 +348,24 @@ const HOSTED_MODELS: HostedModel[] = [
     'OpenServ',
     'Premium',
     'Premium',
+    '200K',
+  ],
+  [
+    'minimax/minimax-m3',
+    'MiniMax M3',
+    'minimax',
+    'MiniMax',
+    'Coding',
+    'Medium',
+    '1M',
+  ],
+  [
+    'minimax/minimax-m2.7',
+    'MiniMax M2.7',
+    'minimax',
+    'MiniMax',
+    'Balanced',
+    'Medium',
     '200K',
   ],
   [
@@ -781,6 +800,12 @@ const HOSTED_MODEL_ALIASES = new Map<string, string>([
   ['meta-llama/llama-4-scout-17b-16e-instruct', 'qwen/qwen3.6-35b-a3b'],
   ['qwen/qwen3-32b', 'qwen/qwen3.6-35b-a3b'],
   ['qwen/qwen3-235b-a22b-2507', 'qwen/qwen3.6-35b-a3b'],
+  ['minmax m3', 'minimax/minimax-m3'],
+  ['minimax m3', 'minimax/minimax-m3'],
+  ['minimax-m3', 'minimax/minimax-m3'],
+  ['minmax m2.7', 'minimax/minimax-m2.7'],
+  ['minimax m2.7', 'minimax/minimax-m2.7'],
+  ['minimax-m2.7', 'minimax/minimax-m2.7'],
 ]);
 
 const NAME_REGEX = /^[a-zA-Z0-9 \-:'.()&]+$/;
@@ -877,7 +902,7 @@ function normalizeHostedModelForUi(model: string | undefined): string {
   if (trimmed.startsWith(HOSTED_PROXY_PROVIDER_PREFIX)) {
     trimmed = trimmed.slice(HOSTED_PROXY_PROVIDER_PREFIX.length);
   }
-  return HOSTED_MODEL_ALIASES.get(trimmed) ?? trimmed;
+  return HOSTED_MODEL_ALIASES.get(trimmed) ?? HOSTED_MODEL_ALIASES.get(trimmed.toLowerCase()) ?? trimmed;
 }
 
 function providerKeyFromModel(modelId: string): string {
@@ -1476,7 +1501,10 @@ export function ChatToHatch() {
 
                     <div className={styles.modelChooser}>
                       <label className={styles.selectLabel}>
-                        {t('labelModelProvider')}
+                        <span>{t('labelModelProvider')}</span>
+                        <span className={styles.selectHelp}>
+                          Hatcher-managed hosted route. BYOK can be adjusted later in agent config.
+                        </span>
                         <select
                           className={styles.selectInput}
                           value={selectedProvider.key}
@@ -1497,7 +1525,10 @@ export function ChatToHatch() {
                       </label>
 
                       <label className={styles.selectLabel}>
-                        {t('labelModel')}
+                        <span>{t('labelModel')}</span>
+                        <span className={styles.selectHelp}>
+                          The runtime engine used for hosted calls and AI Credits metering.
+                        </span>
                         <select
                           className={styles.selectInput}
                           value={selectedModel.id}
@@ -1516,11 +1547,9 @@ export function ChatToHatch() {
                     </div>
 
                     <div className={styles.modelSummary}>
-                      <span>{selectedModel.provider}</span>
-                      <span>{selectedModel.context}</span>
-                      <span>
-                        {selectedModel.fixedPrice ?? selectedModel.cost}
-                      </span>
+                      <span>Route: {selectedModel.provider}</span>
+                      <span>Context: {selectedModel.context}</span>
+                      <span>Cost: {selectedModel.fixedPrice ?? selectedModel.cost}</span>
                     </div>
 
                     <label className={styles.selectLabel}>
@@ -1860,9 +1889,7 @@ export function ChatToHatch() {
                   </div>
                 )}
 
-                {draftError && (
-                  <p className={styles.errorLine}>✕ {draftError}</p>
-                )}
+                {draftError && <p className={styles.errorLine}>{draftError}</p>}
 
                 <div className={styles.foot}>
                   <button
@@ -1887,17 +1914,10 @@ export function ChatToHatch() {
 function BrandGlyph() {
   return (
     <svg width="22" height="22" viewBox="0 0 26 26" aria-hidden>
-      <rect
-        x="2"
-        y="2"
-        width="22"
-        height="22"
-        rx="5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-      <rect x="7" y="7" width="12" height="12" rx="2" fill="var(--accent)" />
+      <rect width="26" height="26" rx="7" fill="var(--ink)" />
+      <path d="M13 4.5c-4 0-7.2 3.9-7.2 8.7 0 5 3.1 8.9 7.2 8.9s7.2-3.9 7.2-8.9c0-4.8-3.2-8.7-7.2-8.7Z" fill="var(--bg-card)" stroke="var(--tech-accent)" strokeWidth="1.1" />
+      <path d="M8.6 13.6c1.4-2.3 2.9-3.3 4.4-3.3s3 1 4.4 3.3c-1.4 2.3-2.9 3.3-4.4 3.3s-3-1-4.4-3.3Z" fill="var(--ink)" />
+      <circle cx="13" cy="13.6" r="1.7" fill="var(--tech-accent)" />
     </svg>
   );
 }

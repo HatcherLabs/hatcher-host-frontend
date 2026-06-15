@@ -43,13 +43,13 @@ function formatValue(v: unknown): string {
 // Runtime config keys worth surfacing on the overview. See
 // apps/api/src/services/container-lifecycle/hermes-config-snapshot.ts.
 const CONFIG_KEYS: Array<{ path: string; label: string; color: string }> = [
-  { path: 'model.default', label: 'Model', color: 'text-purple-400' },
-  { path: 'model.provider', label: 'Provider', color: 'text-purple-300' },
-  { path: 'agent.max_turns', label: 'Max Turns', color: 'text-blue-400' },
-  { path: 'agent.reasoning_effort', label: 'Reasoning Effort', color: 'text-emerald-400' },
-  { path: 'compression.threshold', label: 'Compression Threshold', color: 'text-amber-400' },
-  { path: 'memory.memory_enabled', label: 'Memory', color: 'text-rose-400' },
-  { path: 'streaming.enabled', label: 'Streaming', color: 'text-cyan-400' },
+  { path: 'model.default', label: 'Model', color: 'text-[var(--text-primary)]' },
+  { path: 'model.provider', label: 'Provider', color: 'text-[var(--text-primary)]' },
+  { path: 'agent.max_turns', label: 'Max Turns', color: 'text-[var(--mineral)]' },
+  { path: 'agent.reasoning_effort', label: 'Reasoning Effort', color: 'text-[var(--text-muted)]' },
+  { path: 'compression.threshold', label: 'Compression Threshold', color: 'text-[var(--accent)]' },
+  { path: 'memory.memory_enabled', label: 'Memory', color: 'text-[var(--danger)]' },
+  { path: 'streaming.enabled', label: 'Streaming', color: 'text-[var(--mineral)]' },
 ];
 
 /**
@@ -108,7 +108,7 @@ export function HermesConfigSnapshotCard() {
     return (
       <GlassCard>
         <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
-          <AlertTriangle size={14} className="text-amber-400" />
+          <AlertTriangle size={14} className="text-[var(--color-warning)]" />
           Live config unavailable{error ? `: ${error}` : ''}
         </div>
       </GlassCard>
@@ -124,14 +124,14 @@ export function HermesConfigSnapshotCard() {
     return (
       <GlassCard>
         <div className="flex items-center gap-2 mb-3">
-          <Sliders size={14} className="text-purple-400" />
+          <Sliders size={14} className="text-[var(--accent)]" />
           <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Config</h3>
           <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--bg-card)] text-[var(--text-muted)] border border-[var(--border-default)]">
             {data.source === 'live' ? 'live' : data.source === 'snapshot' ? 'snapshot' : 'n/a'}
           </span>
         </div>
         <div className="flex items-start gap-2 text-xs text-[var(--text-muted)]">
-          <AlertTriangle size={12} className="text-amber-400 flex-shrink-0 mt-0.5" />
+          <AlertTriangle size={12} className="text-[var(--color-warning)] flex-shrink-0 mt-0.5" />
           <span>
             {data.liveReadError
               ? `Live config unavailable: ${data.liveReadError}`
@@ -146,9 +146,9 @@ export function HermesConfigSnapshotCard() {
     <GlassCard>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Sliders size={14} className="text-purple-400" />
+          <Sliders size={14} className="text-[var(--accent)]" />
           <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Config</h3>
-          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[rgba(74,119,139,0.08)] text-[var(--accent)] border border-[rgba(74,119,139,0.22)]">
             read-only
           </span>
           <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--bg-card)] text-[var(--text-muted)] border border-[var(--border-default)]">
@@ -162,7 +162,7 @@ export function HermesConfigSnapshotCard() {
         </div>
         <button
           onClick={() => setTab('config')}
-          className="text-[11px] px-3 py-1 rounded-lg border border-white/10 hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/5 transition-all text-[var(--text-muted)] hover:text-[var(--text-secondary)] cursor-pointer"
+          className="text-[11px] px-3 py-1 rounded-lg border border-[var(--border-default)] hover:border-[var(--border-hover)] hover:bg-[var(--tech-accent-soft)] transition-all text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer"
         >
           Edit
         </button>

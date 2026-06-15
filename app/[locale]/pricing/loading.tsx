@@ -1,35 +1,50 @@
 export default function PricingLoading() {
   return (
-    <div className="max-w-5xl mx-auto px-4 py-12">
-      {/* Header */}
-      <div className="text-center mb-10">
-        <div className="h-9 shimmer rounded-lg w-64 mx-auto mb-3" />
-        <div className="h-5 shimmer rounded-lg w-96 mx-auto" />
+    <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8" style={{ background: 'var(--bg-base)' }}>
+      <div className="mx-auto mb-10 max-w-3xl space-y-4 text-center">
+        <div className="mx-auto h-3 w-32 rounded-full shimmer" />
+        <div className="mx-auto h-10 w-full max-w-xl rounded-2xl shimmer" />
+        <div className="mx-auto h-4 w-full max-w-lg rounded-full shimmer" />
+        <div className="mx-auto mt-6 flex h-11 w-64 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] p-1">
+          <div className="h-full flex-1 rounded-lg shimmer" />
+          <div className="h-full flex-1 rounded-lg" />
+        </div>
       </div>
 
-      {/* Pricing cards */}
-      <div className="grid md:grid-cols-3 gap-6 mb-12">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="card glass-noise p-6">
-            <div className="h-6 shimmer rounded-lg w-24 mb-2" />
-            <div className="h-10 shimmer rounded-lg w-20 mb-4" />
-            <div className="space-y-3 mb-6">
+      <div className="mb-12 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div
+            key={i}
+            className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-card)] p-5 shadow-[var(--shadow-soft)]"
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <div className="h-5 w-20 rounded-full shimmer" />
+              <div className="h-6 w-14 rounded-full shimmer" />
+            </div>
+            <div className="mb-5 h-9 w-28 rounded-xl shimmer" />
+            <div className="mb-6 space-y-3">
               {Array.from({ length: 5 }).map((_, j) => (
-                <div key={j} className="h-4 shimmer rounded-lg" style={{ width: `${90 - j * 10}%` }} />
+                <div key={j} className="h-3.5 rounded-full shimmer" style={{ width: `${94 - j * 9}%` }} />
               ))}
             </div>
-            <div className="h-11 shimmer rounded-xl" />
+            <div className="h-10 rounded-xl shimmer" />
           </div>
         ))}
       </div>
 
-      {/* Feature table */}
-      <div className="card glass-noise p-6">
-        <div className="h-7 shimmer rounded-lg w-48 mb-6" />
+      <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-card)] p-5 shadow-[var(--shadow-soft)]">
+        <div className="mb-6 flex items-center justify-between gap-4">
+          <div className="h-6 w-48 rounded-full shimmer" />
+          <div className="h-8 w-28 rounded-lg shimmer" />
+        </div>
         {Array.from({ length: 8 }).map((_, i) => (
           <div key={i} className="flex items-center justify-between py-3 border-b border-[var(--border-default)] last:border-0">
-            <div className="h-4 shimmer rounded-lg w-40" />
-            <div className="h-4 shimmer rounded-lg w-16" />
+            <div className="h-3.5 w-44 rounded-full shimmer" />
+            <div className="flex gap-5">
+              <div className="h-3.5 w-16 rounded-full shimmer" />
+              <div className="h-3.5 w-16 rounded-full shimmer" />
+              <div className="h-3.5 w-16 rounded-full shimmer" />
+            </div>
           </div>
         ))}
       </div>

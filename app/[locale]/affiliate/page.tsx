@@ -70,7 +70,7 @@ const PAYOUT_MODES: readonly PayoutModeCard[] = [
     percent: '20%',
     payoutLabel: 'cash',
     icon: Wallet,
-    accent: '#22c55e',
+    accent: '#486a79',
     tradeoff:
       'Simple payout model: affiliates earn cash from eligible paid revenue, with a 30-day hold before each commission unlocks.',
     bullets: [

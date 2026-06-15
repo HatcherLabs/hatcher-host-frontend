@@ -14,14 +14,17 @@ import { FRAMEWORKS, getBYOKProvider } from '@hatcher/shared';
 import type { UserTierKey } from '@hatcher/shared';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/components/ui/ToastProvider';
+import { AgentStatusPill } from '@/components/ui/AgentStatusPill';
 import {
   ArrowLeft,
+  Box,
   Play,
   Square,
   RotateCcw,
   Trash2,
   Share2,
   Copy,
+  MoreHorizontal,
 } from 'lucide-react';
 import {
   AgentContext,
@@ -39,6 +42,7 @@ import { AgentSidebar } from '@/components/agents/AgentSidebar';
 import { PortAgentModal } from '@/components/agents/PortAgentModal';
 import { shouldMountTerminalTab } from '@/components/agents/terminalPersistence';
 import { resolveLoadedModelConfig, useAgentConfig } from '@/hooks/useAgentConfig';
+import { DEFAULT_AGENT_VIEW_MODE, EASY_AGENT_TABS } from '@/components/agents/navigationModel';
 import { useAgentIntegrations } from '@/hooks/useAgentIntegrations';
 import { useAgentActions } from '@/hooks/useAgentActions';
 import { useAgentLogs } from '@/hooks/useAgentLogs';
@@ -169,9 +173,8 @@ export default function AgentManagePage() {
   const tStatusPoll = useTranslations('dashboard.agentDetail.statusPoll');
 
   // View mode (easy = operational tabs only, advanced = everything).
-  // Default to advanced so Files/Logs/Terminal/etc. are discoverable for new users.
-  const EASY_TABS: Tab[] = ['overview', 'chat', 'mail', 'integrations', 'logs', 'stats'];
-  const [viewMode, setViewModeRaw] = useState<'easy' | 'advanced'>('advanced');
+  // Default to easy so new users land on the highest-signal operator workflow.
+  const [viewMode, setViewModeRaw] = useState<'easy' | 'advanced'>(DEFAULT_AGENT_VIEW_MODE);
   useEffect(() => {
     const saved = localStorage.getItem('hatcher-view-mode') as 'easy' | 'advanced' | null;
     if (saved) setViewModeRaw(saved);
@@ -179,11 +182,10 @@ export default function AgentManagePage() {
   const setViewMode = useCallback((mode: 'easy' | 'advanced') => {
     setViewModeRaw(mode);
     localStorage.setItem('hatcher-view-mode', mode);
-    // If switching to Easy and the current tab isn't visible in Easy, go to Chat
+    // If switching to Easy and the current tab isn't visible in Easy, go to Chat.
     if (mode === 'easy') {
-      setTabRaw(prev => EASY_TABS.includes(prev) ? prev : 'chat');
+      setTabRaw(prev => EASY_AGENT_TABS.includes(prev) ? prev : 'chat');
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Core state
@@ -1135,7 +1137,6 @@ export default function AgentManagePage() {
   // a restart and leaving the header empty.
   const isActive = agent?.status === 'active' || agent?.status === 'restarting' || agent?.status === 'starting' || agent?.status === 'stopping';
   const isNotActive = agent?.status === 'paused' || agent?.status === 'sleeping' || agent?.status === 'error' || agent?.status === 'stopped' || agent?.status === 'archived';
-
   const activeFeatureKeys = new Set(activeFeatures.map((f) => f.featureKey));
 
   const llmProvider = config.configProvider || (() => {
@@ -1291,7 +1292,7 @@ export default function AgentManagePage() {
   return (
     <AgentContext.Provider value={contextValue!}>
       <motion.div
-        className="flex flex-col lg:flex-row"
+        className="flex flex-col xl:flex-row"
         style={{ minHeight: 'calc(100dvh - 64px)' }}
         variants={pageEntranceVariants}
         initial="hidden"
@@ -1308,49 +1309,42 @@ export default function AgentManagePage() {
 
         {/* ─── Main Content ─────────────────────────────────── */}
         <div className="flex-1 min-w-0 flex flex-col bg-[var(--bg-base)]">
-          {/* Top action bar — v3 mono */}
+          {/* Top action bar */}
           <div
-            className="px-4 sm:px-6 py-3 border-b border-[var(--border-default)] flex items-center gap-3 flex-wrap bg-[var(--bg-base)]"
-            style={{ fontFamily: 'var(--font-mono)' }}
+            className="flex flex-wrap items-center gap-3 border-b border-[var(--border-default)] bg-[color-mix(in_srgb,var(--bg-surface)_92%,transparent)] px-4 py-3.5 backdrop-blur-md sm:px-6"
+            style={{ fontFamily: 'var(--font-inter)' }}
           >
-            {/* Status pill — v3 */}
-            <span className={`inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.06em] font-bold px-2 py-0.5 rounded-[3px] border flex-shrink-0 ${statusInfo.classes}`}>
-              {statusInfo.pulse && (
-                <span className="relative flex h-1.5 w-1.5">
-                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${statusInfo.dotColor} opacity-75`} />
-                  <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${statusInfo.dotColor}`} />
-                </span>
-              )}
-              {statusInfo.label}
-            </span>
+            {/* Status pill */}
+            <AgentStatusPill status={agent.status} label={statusInfo.label} pulse={statusInfo.pulse} size="md" />
 
             <button
               type="button"
               onClick={() => setTab('config')}
-              className="inline-flex max-w-full items-center gap-1.5 rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-elevated)] px-2 py-1 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--text-secondary)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] sm:max-w-[360px]"
+              className="inline-flex max-w-full items-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2 text-left text-xs font-semibold text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--accent)] sm:max-w-[420px]"
               title={`${activeModelDisplay.provider} · ${activeModelDisplay.name} · ${activeModelDisplay.route}`}
             >
-              <span className="text-[var(--accent)]">Model</span>
-              <span className="min-w-0 truncate normal-case tracking-normal text-[var(--text-primary)]">
-                {activeModelDisplay.provider} · {activeModelDisplay.name}
+              <span className="text-[var(--accent)]">AI route</span>
+              <span className="min-w-0 truncate text-[var(--text-primary)]">
+                {activeModelDisplay.name}
               </span>
+              <span className="hidden text-[var(--text-muted)] md:inline">· {activeModelDisplay.provider}</span>
             </button>
 
             {/* Spacer */}
             <div className="flex-1" />
 
-            {/* Easy / Advanced mode toggle — v3 */}
-            <div className="flex items-center rounded-[3px] border border-[var(--border-default)] overflow-hidden text-[11px] flex-shrink-0 bg-[var(--bg-elevated)]">
+            {/* Easy / Advanced mode toggle */}
+            <div className="flex flex-shrink-0 items-center overflow-hidden rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] text-xs">
               <button
                 onClick={() => setViewMode('easy')}
-                className={`px-3 py-1.5 uppercase tracking-[0.06em] font-bold transition-colors ${viewMode === 'easy' ? 'bg-[rgba(74,222,128,0.08)] text-[var(--accent)]' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}
+                className={`px-3 py-2 font-semibold transition-colors ${viewMode === 'easy' ? 'bg-[var(--control-active)] text-[var(--control-active-text)]' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}
               >
                 {tHeader('easy')}
               </button>
-              <div className="w-px h-4 bg-[var(--border-default)]" aria-hidden="true" />
+              <div className="h-5 w-px bg-[var(--border-line)]" aria-hidden="true" />
               <button
                 onClick={() => setViewMode('advanced')}
-                className={`px-3 py-1.5 uppercase tracking-[0.06em] font-bold transition-colors ${viewMode === 'advanced' ? 'bg-[rgba(74,222,128,0.08)] text-[var(--accent)]' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}
+                className={`px-3 py-2 font-semibold transition-colors ${viewMode === 'advanced' ? 'bg-[var(--control-active)] text-[var(--control-active-text)]' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}
               >
                 {tHeader('advanced')}
               </button>
@@ -1363,7 +1357,7 @@ export default function AgentManagePage() {
                   <button
                     onClick={() => actions.handleAction('restart')}
                     disabled={actions.actionLoading === 'restart'}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] uppercase tracking-[0.06em] font-bold rounded-[3px] border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[rgba(74,222,128,0.06)] transition-all disabled:opacity-40"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border-default)] px-3 py-2 text-xs font-semibold text-[var(--text-secondary)] transition-all hover:border-[var(--border-hover)] hover:bg-[var(--tech-accent-soft)] hover:text-[var(--accent)] disabled:opacity-40"
                     title="Restart agent"
                   >
                     <RotateCcw size={12} className={actions.actionLoading === 'restart' ? 'animate-spin' : ''} />
@@ -1372,11 +1366,11 @@ export default function AgentManagePage() {
                   <button
                     onClick={() => actions.handleAction('stop')}
                     disabled={actions.actionLoading === 'stop'}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] uppercase tracking-[0.06em] font-bold rounded-[3px] border border-[rgba(251,191,36,0.3)] text-[#fbbf24] hover:bg-[rgba(251,191,36,0.08)] transition-all disabled:opacity-40"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border-default)] px-3 py-2 text-xs font-semibold text-[var(--text-secondary)] transition-all hover:border-[var(--border-hover)] hover:bg-[var(--tech-accent-soft)] hover:text-[var(--accent)] disabled:opacity-40"
                     title="Stop agent"
                   >
                     {actions.actionLoading === 'stop' ? (
-                      <div className="w-3 h-3 border-2 border-amber-400/30 border-t-amber-400 rounded-full animate-spin" />
+                      <div className="w-3 h-3 rounded-full border-2 border-[var(--tech-accent-soft)] border-t-[var(--accent)] animate-spin" />
                     ) : (
                       <Square size={12} />
                     )}
@@ -1388,91 +1382,90 @@ export default function AgentManagePage() {
                 <button
                   onClick={() => actions.handleAction('start')}
                   disabled={actions.actionLoading === 'start'}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] uppercase tracking-[0.06em] font-bold rounded-[3px] border border-[rgba(74,222,128,0.4)] text-[var(--accent)] hover:bg-[rgba(74,222,128,0.08)] transition-all disabled:opacity-40"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--action)] bg-[var(--action)] px-3.5 py-2 text-xs font-semibold text-white shadow-[0_12px_28px_rgba(18,20,18,0.18)] transition-all hover:bg-[var(--action-hover)] disabled:opacity-40"
                   title="Start agent"
                 >
                   {actions.actionLoading === 'start' ? (
-                    <div className="w-3 h-3 border-2 border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin" />
+                    <div className="w-3 h-3 border-2 border-[rgba(74,119,139,0.28)] border-t-[var(--accent)] rounded-full animate-spin" />
                   ) : (
                     <Play size={12} />
                   )}
                   <span className="hidden sm:inline">{actions.actionLoading === 'start' ? tHeader('starting') : tHeader('start')}</span>
                 </button>
               )}
-              <button
-                onClick={() => {
-                  const fw = agent?.framework || 'openclaw';
-                  const name = agent?.name || 'My Agent';
-                  const desc = agent?.description || 'an AI agent';
-                  const text = `Check out "${name}" — ${desc}. Built on Hatcher with ${fw}.\n\nhatcher.host`;
-                  if (navigator.share) {
-                    navigator.share({ title: name, text, url: 'https://hatcher.host' }).catch(() => {});
-                  } else {
-                    const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
-                    window.open(tweetUrl, '_blank', 'width=550,height=420');
-                  }
-                }}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] uppercase tracking-[0.06em] font-bold rounded-[3px] border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[rgba(74,222,128,0.06)] transition-all"
-                title="Share agent"
-              >
-                <Share2 size={12} />
-                <span className="hidden sm:inline">{tHeader('share')}</span>
-              </button>
-              {(() => {
-                const fw = agent?.framework;
-                if (!fw || !['openclaw', 'hermes'].includes(fw)) return null;
-                const COLOR: Record<string, string> = {
-                  openclaw: '#f59e0b',
-                  hermes: '#a855f7',
-                };
-                const c = COLOR[fw]!;
-                return (
-                  <Link
-                    href={`/agent/${id}/room?from=dashboard`}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] uppercase tracking-[0.06em] font-bold rounded-[3px] border transition-all"
-                    style={{ color: c, borderColor: c + '50', background: c + '0d' }}
-                    title="Enter 3D Agent Room"
+              <details className="group relative flex-shrink-0">
+                <summary className="inline-flex cursor-pointer list-none items-center gap-1.5 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2 text-xs font-semibold text-[var(--text-secondary)] transition-all hover:border-[var(--border-hover)] hover:text-[var(--accent)] [&::-webkit-details-marker]:hidden">
+                  <MoreHorizontal size={13} />
+                  <span className="hidden sm:inline">More</span>
+                </summary>
+                <div className="absolute right-0 top-[calc(100%+8px)] z-30 w-64 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] p-2 shadow-[var(--shadow-card)]">
+                  <button
+                    onClick={() => {
+                      const fw = agent?.framework || 'openclaw';
+                      const name = agent?.name || 'My Agent';
+                      const desc = agent?.description || 'an AI agent';
+                      const text = `Check out "${name}" — ${desc}. Built on Hatcher with ${fw}.\n\nhatcher.host`;
+                      if (navigator.share) {
+                        navigator.share({ title: name, text, url: 'https://hatcher.host' }).catch(() => {});
+                      } else {
+                        const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+                        window.open(tweetUrl, '_blank', 'width=550,height=420');
+                      }
+                    }}
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-semibold text-[var(--text-secondary)] transition hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"
+                    title="Share agent"
                   >
-                    <span aria-hidden>▎</span>
-                    <span className="hidden sm:inline">{tHeader('room')}</span>
-                  </Link>
-                );
-              })()}
-              <button
-                onClick={() => setPortModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] uppercase tracking-[0.06em] font-bold rounded-[3px] border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[rgba(74,222,128,0.06)] transition-all"
-                title="Clone to another framework"
-              >
-                <Copy size={12} />
-                <span className="hidden sm:inline">{tHeader('clone')}</span>
-              </button>
-              <button
-                onClick={actions.handleDelete}
-                disabled={actions.deleting}
-                className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] uppercase tracking-[0.06em] font-bold rounded-[3px] border transition-all disabled:opacity-40 ${
-                  actions.deleteConfirm
-                    ? 'bg-[#ff6b6b] text-white border-[#ff6b6b]'
-                    : 'border-[rgba(255,107,107,0.3)] text-[#ff8a8a] hover:bg-[rgba(255,107,107,0.08)]'
-                }`}
-                title="Delete agent"
-              >
-                <Trash2 size={12} />
-                <span className="hidden sm:inline">{actions.deleting ? tHeader('deleting') : actions.deleteConfirm ? tHeader('confirm') : tHeader('delete')}</span>
-              </button>
-              {actions.deleteConfirm && !actions.deleting && (
-                <button
-                  onClick={() => { actions.setDeleteConfirm(false); actions.setDeleteError(null); }}
-                  className="text-[11px] uppercase tracking-[0.06em] font-bold px-2 py-1 transition-colors text-[var(--text-muted)] hover:text-[var(--text-primary)]"
-                >
-                  {tHeader('cancel')}
-                </button>
-              )}
+                    <Share2 size={13} />
+                    <span>{tHeader('share')}</span>
+                  </button>
+                  {agent?.framework && ['openclaw', 'hermes'].includes(agent.framework) && (
+                    <Link
+                      href={`/agent/${id}/room?from=dashboard`}
+                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-semibold text-[var(--text-secondary)] transition hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"
+                      title="Enter 3D Agent Room"
+                    >
+                      <Box size={13} aria-hidden />
+                      <span>{tHeader('room')}</span>
+                    </Link>
+                  )}
+                  <button
+                    onClick={() => setPortModalOpen(true)}
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-semibold text-[var(--text-secondary)] transition hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"
+                    title="Clone to another framework"
+                  >
+                    <Copy size={13} />
+                    <span>{tHeader('clone')}</span>
+                  </button>
+                  <div className="my-1 h-px bg-[var(--border-line)]" />
+                  <button
+                    onClick={actions.handleDelete}
+                    disabled={actions.deleting}
+                    className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-semibold transition disabled:opacity-40 ${
+                      actions.deleteConfirm
+                        ? 'bg-[var(--color-destructive)] text-[var(--bg-base)]'
+                        : 'text-[var(--color-destructive)] hover:bg-[var(--color-destructive-bg)]'
+                    }`}
+                    title="Delete agent"
+                  >
+                    <Trash2 size={13} />
+                    <span>{actions.deleting ? tHeader('deleting') : actions.deleteConfirm ? tHeader('confirm') : tHeader('delete')}</span>
+                  </button>
+                  {actions.deleteConfirm && !actions.deleting && (
+                    <button
+                      onClick={() => { actions.setDeleteConfirm(false); actions.setDeleteError(null); }}
+                      className="mt-1 flex w-full items-center rounded-lg px-3 py-2 text-left text-xs font-semibold text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"
+                    >
+                      {tHeader('cancel')}
+                    </button>
+                  )}
+                </div>
+              </details>
             </div>
           </div>
 
           {actions.deleteError && (
             <p
-              className="text-xs px-6 py-2 border-b border-[rgba(255,107,107,0.2)] text-[#ff8a8a] bg-[rgba(255,107,107,0.06)]"
+              className="text-xs px-6 py-2 border-b border-[var(--color-destructive-border)] text-[var(--color-destructive)] bg-[var(--color-destructive-bg)]"
               style={{ fontFamily: 'var(--font-mono)' }}
             >
               ✕ {actions.deleteError}

@@ -75,7 +75,7 @@ function previewBody(message: AgentMailMessage): string {
 function statusTone(status: string | null | undefined): string {
   const key = status ?? 'unknown';
   if (['sent', 'delivered', 'received'].includes(key)) {
-    return 'border-[rgba(74,222,128,0.35)] bg-[rgba(74,222,128,0.08)] text-[var(--accent)]';
+    return 'border-[var(--color-accent-border)] bg-[var(--color-accent-bg)] text-[var(--accent)]';
   }
   if (['failed', 'bounced', 'rejected'].includes(key)) {
     return 'border-[rgba(255,107,107,0.35)] bg-[rgba(255,107,107,0.08)] text-[#ff8a8a]';
@@ -104,7 +104,7 @@ function DirectionBadge({ direction }: { direction: string | undefined }) {
   const outbound = direction === 'outbound';
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-[3px] border px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.06em] ${outbound ? 'border-sky-400/25 bg-sky-400/10 text-sky-300' : 'border-violet-400/25 bg-violet-400/10 text-violet-300'}`}
+      className={`inline-flex items-center gap-1 rounded-[3px] border px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.06em] ${outbound ? 'border-[var(--color-info-border)] bg-[var(--color-info-bg)] text-[var(--color-info)]' : 'border-[var(--border-hover)] bg-[var(--tech-accent-soft)] text-[var(--accent)]'}`}
       style={{ fontFamily: 'var(--font-mono)' }}
     >
       {outbound ? <ArrowUpRight size={11} /> : <ArrowDownLeft size={11} />}
@@ -267,7 +267,7 @@ export function MailTab() {
         <button
           onClick={refreshAll}
           disabled={refreshing}
-          className="inline-flex items-center justify-center gap-2 rounded-[3px] border border-[var(--border-default)] px-3 py-2 text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--text-secondary)] transition-all hover:border-[var(--accent)] hover:bg-[rgba(74,222,128,0.06)] hover:text-[var(--accent)] disabled:opacity-50"
+          className="inline-flex items-center justify-center gap-2 rounded-[3px] border border-[var(--border-default)] px-3 py-2 text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--text-secondary)] transition-all hover:border-[var(--accent)] hover:bg-[var(--color-accent-bg)] hover:text-[var(--accent)] disabled:opacity-50"
           style={{ fontFamily: 'var(--font-mono)' }}
         >
           <RefreshCw size={13} className={refreshing ? 'animate-spin' : ''} />
@@ -334,7 +334,7 @@ export function MailTab() {
                     aria-checked={autoSendEnabled}
                     onClick={toggleAutoSend}
                     disabled={loadingMailbox || updatingSettings}
-                    className={`relative h-6 w-11 rounded-full border transition-colors disabled:opacity-50 ${autoSendEnabled ? 'border-[rgba(74,222,128,0.45)] bg-[rgba(74,222,128,0.22)]' : 'border-[var(--border-default)] bg-[var(--bg-elevated)]'}`}
+                    className={`relative h-6 w-11 rounded-full border transition-colors disabled:opacity-50 ${autoSendEnabled ? 'border-[var(--color-accent-border)] bg-[var(--color-accent-bg)]' : 'border-[var(--border-default)] bg-[var(--bg-elevated)]'}`}
                   >
                     <span
                       className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-current transition-transform ${autoSendEnabled ? 'translate-x-5 text-[var(--accent)]' : 'translate-x-0 text-[var(--text-muted)]'}`}
@@ -370,7 +370,7 @@ export function MailTab() {
                   <button
                     key={item.id}
                     onClick={() => setFilter(item.id)}
-                    className={`rounded-[2px] px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.06em] transition-colors ${filter === item.id ? 'bg-[rgba(74,222,128,0.1)] text-[var(--accent)]' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}
+                    className={`rounded-[2px] px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.06em] transition-colors ${filter === item.id ? 'bg-[var(--color-accent-bg)] text-[var(--accent)]' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}
                     style={{ fontFamily: 'var(--font-mono)' }}
                   >
                     {item.label}
@@ -407,7 +407,7 @@ export function MailTab() {
                     <button
                       key={message.id}
                       onClick={() => setSelectedMessageId(message.id)}
-                      className={`block w-full px-4 py-3 text-left transition-colors ${selected ? 'bg-[rgba(74,222,128,0.06)]' : 'hover:bg-[var(--bg-elevated)]'}`}
+                      className={`block w-full px-4 py-3 text-left transition-colors ${selected ? 'bg-[var(--color-accent-bg)]' : 'hover:bg-[var(--bg-elevated)]'}`}
                     >
                       <div className="flex flex-wrap items-center gap-2">
                         <DirectionBadge direction={message.direction} />
@@ -555,7 +555,7 @@ export function MailTab() {
               <button
                 type="submit"
                 disabled={sendState === 'sending'}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-[3px] border border-[rgba(74,222,128,0.4)] bg-[rgba(74,222,128,0.08)] px-3 py-2 text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--accent)] transition-colors hover:bg-[rgba(74,222,128,0.12)] disabled:opacity-50"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-[3px] border border-[var(--color-accent-border)] bg-[var(--color-accent-bg)] px-3 py-2 text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--accent)] transition-colors hover:bg-[var(--bg-hover)] disabled:opacity-50"
                 style={{ fontFamily: 'var(--font-mono)' }}
               >
                 {sendState === 'sending' ? (

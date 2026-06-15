@@ -61,10 +61,10 @@ function isStrongPassword(pw: string): boolean {
 function TierBadge({ tier }: { tier: string }) {
   const styles: Record<string, string> = {
     free: 'bg-[var(--bg-card)] text-[var(--text-muted)] border-[var(--border-default)]',
-    starter: 'bg-sky-500/15 text-sky-400 border-sky-500/30',
-    basic: 'bg-purple-500/15 text-purple-400 border-purple-500/30', // legacy alias
-    pro: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30',
-    business: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+    starter: 'bg-[var(--color-info-bg)] text-[var(--color-info)] border-[var(--color-info-border)]',
+    basic: 'bg-[var(--color-accent-bg)] text-[var(--color-accent)] border-[var(--color-accent-border)]', // legacy alias
+    pro: 'bg-[var(--color-accent-bg)] text-[var(--color-accent)] border-[var(--color-accent-border)]',
+    business: 'bg-[var(--color-success-bg)] text-[var(--color-success)] border-[var(--color-success-border)]',
     founding_member: 'bg-[var(--color-accent)]/15 text-[var(--color-accent)] border-[var(--color-accent)]/30',
   };
   const labels: Record<string, string> = { founding_member: 'Founding' };
@@ -77,7 +77,7 @@ function TierBadge({ tier }: { tier: string }) {
 
 // ── Avatar initials ─────────────────────────────────────────
 function getAvatarColor(name: string) {
-  const colors = ['var(--color-accent)', '#8b5cf6', '#10b981', '#f43f5e', '#6366f1', '#14b8a6', '#eab308'];
+  const colors = ['var(--color-accent)', 'var(--color-info)', 'var(--color-success)', 'var(--color-warning)', 'var(--text-muted)'];
   let hash = 0;
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
   return colors[Math.abs(hash) % colors.length];
@@ -88,7 +88,7 @@ function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: 
   return (
     <button
       onClick={() => onChange(!checked)}
-      className={`relative w-11 h-6 rounded-full transition-all duration-300 cursor-pointer ${checked ? 'bg-cyan-500 shadow-[0_0_12px_rgba(6,182,212,0.3)]' : 'bg-[var(--bg-hover)]'}`}
+      className={`relative w-11 h-6 rounded-full transition-all duration-300 cursor-pointer ${checked ? 'bg-[var(--color-accent)]' : 'bg-[var(--bg-hover)]'}`}
       role="switch"
       aria-checked={checked}
       aria-label={label}
@@ -139,7 +139,7 @@ function Field({
 }
 
 // ── Section wrapper ─────────────────────────────────────────
-function Section({ title, icon, iconColor = 'text-cyan-400', iconBg = 'bg-cyan-500/15', children }: {
+function Section({ title, icon, iconColor = 'text-[var(--color-accent)]', iconBg = 'bg-[var(--color-accent-bg)]', children }: {
   title: string; icon: React.ReactNode; iconColor?: string; iconBg?: string; children: React.ReactNode;
 }) {
   return (
@@ -364,7 +364,7 @@ export default function SettingsPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-10 h-10 rounded-full border-2 border-cyan-500 border-t-transparent animate-spin mx-auto mb-3" />
+          <div className="w-10 h-10 rounded-full border-2 border-[var(--color-accent)] border-t-transparent animate-spin mx-auto mb-3" />
           <p className="text-sm text-[var(--text-secondary)]">{tc('loading')}</p>
         </div>
       </div>
@@ -390,7 +390,7 @@ export default function SettingsPage() {
       {/* Background glow */}
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 60% 40% at 30% 0%, rgba(139,92,246,0.05), transparent 60%)' }}
+        style={{ background: 'radial-gradient(ellipse 60% 40% at 30% 0%, var(--accent-glow), transparent 60%)' }}
       />
 
       <div className="max-w-4xl mx-auto relative">
@@ -430,12 +430,12 @@ export default function SettingsPage() {
                   className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer text-left ${
                     activeTab === id
                       ? id === 'danger'
-                        ? 'bg-red-500/10 text-red-400'
+                        ? 'bg-[var(--color-destructive-bg)] text-[var(--color-destructive)]'
                         : 'bg-[var(--primary-500)]/10 text-[var(--primary-400)]'
                       : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)]'
                   }`}
                 >
-                  <Icon size={15} className={activeTab === id && id === 'danger' ? 'text-red-400' : undefined} />
+                  <Icon size={15} className={activeTab === id && id === 'danger' ? 'text-[var(--color-destructive)]' : undefined} />
                   {t(`tabs.${id}`)}
                 </button>
               ))}
@@ -517,7 +517,7 @@ export default function SettingsPage() {
                             {avatarUrl && (
                               <button
                                 onClick={() => setAvatarUrl(null)}
-                                className="text-[11px] text-red-400 hover:underline cursor-pointer"
+                                className="text-[11px] text-[var(--color-destructive)] hover:underline cursor-pointer"
                               >
                                 {tc('delete')}
                               </button>
@@ -546,7 +546,7 @@ export default function SettingsPage() {
                         on-chain payment (features.ts subscribe/addon).
                         Disconnect just clears it; the next payment re-links
                         whichever wallet signs it. */}
-                    <Section title={t('profile.walletTitle')} icon={<Wallet size={16} />} iconColor="text-purple-400" iconBg="bg-purple-500/15">
+                    <Section title={t('profile.walletTitle')} icon={<Wallet size={16} />}>
                       {user?.walletAddress ? (
                         <div className="space-y-3">
                           <p className="text-xs text-[var(--text-muted)]">
@@ -561,7 +561,7 @@ export default function SettingsPage() {
                               className="h-10 w-10 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] flex items-center justify-center transition-colors cursor-pointer flex-shrink-0"
                               title="Copy address"
                             >
-                              {copiedField === 'wallet' ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} className="text-[var(--text-muted)]" />}
+                              {copiedField === 'wallet' ? <Check size={14} className="text-[var(--color-success)]" /> : <Copy size={14} className="text-[var(--text-muted)]" />}
                             </button>
                             <a
                               href={`https://solscan.io/account/${user.walletAddress}`}
@@ -583,7 +583,7 @@ export default function SettingsPage() {
                                 toast('error', res.error ?? 'Failed to disconnect wallet');
                               }
                             }}
-                            className="text-xs text-red-400 hover:text-red-300 transition-colors"
+                            className="text-xs text-[var(--color-destructive)] hover:opacity-80 transition-colors"
                           >
                             Disconnect wallet
                           </button>
@@ -596,7 +596,7 @@ export default function SettingsPage() {
                     </Section>
 
                     {/* Referral */}
-                    <Section title={t('profile.referralTitle')} icon={<Gift size={16} />} iconColor="text-emerald-400" iconBg="bg-emerald-500/15">
+                    <Section title={t('profile.referralTitle')} icon={<Gift size={16} />} iconColor="text-[var(--color-success)]" iconBg="bg-[var(--color-success-bg)]">
                       <p className="text-sm text-[var(--text-secondary)] mb-5 leading-relaxed">
                         {t('profile.referralDesc', { credit: referralRewardLabel })}
                       </p>
@@ -613,7 +613,7 @@ export default function SettingsPage() {
                                   {value}
                                 </div>
                                 <button onClick={() => copy(value, field)} className="h-10 w-10 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] flex items-center justify-center transition-colors cursor-pointer flex-shrink-0">
-                                  {copiedField === field ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} className="text-[var(--text-muted)]" />}
+                                  {copiedField === field ? <Check size={14} className="text-[var(--color-success)]" /> : <Copy size={14} className="text-[var(--text-muted)]" />}
                                 </button>
                               </div>
                             </div>
@@ -625,7 +625,7 @@ export default function SettingsPage() {
                           <div className="flex gap-3">
                             {[
                               { label: 'Referred', value: String(referralStats.totalReferred), icon: <Users size={12} />, color: 'text-[var(--text-primary)]' },
-                              { label: 'Earned', value: `${referralStats.totalEarned.toLocaleString()} AI`, icon: <Gift size={12} />, color: 'text-emerald-400' },
+                              { label: 'Earned', value: `${referralStats.totalEarned.toLocaleString()} AI`, icon: <Gift size={12} />, color: 'text-[var(--color-success)]' },
                             ].map(({ label, value, icon, color }) => (
                               <div key={label} className="flex-1 rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] p-3 text-center">
                                 <div className="flex items-center justify-center gap-1.5 mb-1 text-[var(--text-muted)]">{icon}<span className="text-[10px] font-medium uppercase tracking-wider">{label}</span></div>
@@ -648,7 +648,7 @@ export default function SettingsPage() {
                                 finally { setClaimingRewards(false); }
                               }}
                               disabled={claimingRewards}
-                              className="w-full h-9 rounded-lg text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                              className="w-full h-9 rounded-lg text-sm font-medium text-[var(--bg-base)] bg-[var(--color-success)] hover:opacity-90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2 cursor-pointer"
                             >
                               {claimingRewards ? <><Loader2 size={13} className="animate-spin" />Claiming...</> : <><Gift size={13} />Claim Pending Rewards</>}
                             </button>
@@ -687,12 +687,12 @@ export default function SettingsPage() {
                     <Section title={t('security.apiKeysTitle')} icon={<Key size={16} />}>
                       <div className="flex items-start justify-between gap-4 mb-5">
                         <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-                          Create multiple API keys for programmatic access. Each key uses the <code className="font-mono text-xs bg-[var(--bg-card)] px-1.5 py-0.5 rounded text-cyan-400">hk_</code> prefix.
-                          The full key is shown <span className="text-amber-400 font-medium">only once</span> at creation.
+                          Create multiple API keys for programmatic access. Each key uses the <code className="font-mono text-xs bg-[var(--bg-card)] px-1.5 py-0.5 rounded text-[var(--color-accent)]">hk_</code> prefix.
+                          The full key is shown <span className="text-[var(--color-warning)] font-medium">only once</span> at creation.
                         </p>
                         <Link
                           href="/dashboard/settings/api-keys"
-                          className="inline-flex items-center gap-1.5 text-xs font-medium text-cyan-400 hover:text-cyan-300 transition-colors whitespace-nowrap flex-shrink-0"
+                          className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--color-accent)] hover:opacity-80 transition-colors whitespace-nowrap flex-shrink-0"
                         >
                           {t('security.manageKeys')} <ArrowRight size={12} />
                         </Link>
@@ -700,18 +700,18 @@ export default function SettingsPage() {
 
                       {/* Newly created key — one-time reveal */}
                       {newlyCreatedKey && (
-                        <div className="mb-5 p-4 rounded-xl bg-emerald-500/[0.08] border border-emerald-500/20">
-                          <p className="text-xs font-semibold text-emerald-400 mb-2 uppercase tracking-wider">New key created — copy it now!</p>
+                        <div className="mb-5 p-4 rounded-xl bg-[var(--color-success-bg)] border border-[var(--color-success-border)]">
+                          <p className="text-xs font-semibold text-[var(--color-success)] mb-2 uppercase tracking-wider">New key created — copy it now!</p>
                           <p className="text-xs text-[var(--text-muted)] mb-2">{newlyCreatedKey.label}</p>
                           <div className="flex items-center gap-2">
-                            <div className="flex-1 h-9 px-3 rounded-lg bg-[var(--bg-card)] border border-emerald-500/20 flex items-center font-mono text-xs tracking-wider text-[var(--text-primary)] overflow-hidden">
+                            <div className="flex-1 h-9 px-3 rounded-lg bg-[var(--bg-card)] border border-[var(--color-success-border)] flex items-center font-mono text-xs tracking-wider text-[var(--text-primary)] overflow-hidden">
                               {newlyCreatedKey.key}
                             </div>
                             <button
                               onClick={() => copy(newlyCreatedKey.key, 'newKey')}
-                              className="h-9 w-9 rounded-lg border border-emerald-500/20 bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] flex items-center justify-center transition-colors cursor-pointer flex-shrink-0"
+                              className="h-9 w-9 rounded-lg border border-[var(--color-success-border)] bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] flex items-center justify-center transition-colors cursor-pointer flex-shrink-0"
                             >
-                              {copiedField === 'newKey' ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} className="text-emerald-400" />}
+                              {copiedField === 'newKey' ? <Check size={13} className="text-[var(--color-success)]" /> : <Copy size={13} className="text-[var(--color-success)]" />}
                             </button>
                             <button
                               onClick={() => setNewlyCreatedKey(null)}
@@ -766,13 +766,13 @@ export default function SettingsPage() {
                                           }
                                           setEditingKeyId(null);
                                         }}
-                                        className="h-7 px-2 text-xs rounded-lg bg-cyan-500/15 text-cyan-400 hover:bg-cyan-500/25 transition-colors cursor-pointer"
+                                        className="h-7 px-2 text-xs rounded-lg bg-[var(--color-accent-bg)] text-[var(--color-accent)] hover:opacity-85 transition-colors cursor-pointer"
                                       >Save</button>
                                     </div>
                                   ) : (
                                     <button
                                       onClick={() => { setEditingKeyId(k.id); setEditingLabel(k.label); }}
-                                      className="text-sm font-medium text-[var(--text-primary)] hover:text-cyan-400 transition-colors text-left cursor-pointer"
+                                      className="text-sm font-medium text-[var(--text-primary)] hover:text-[var(--color-accent)] transition-colors text-left cursor-pointer"
                                       title="Click to rename"
                                     >{k.label}</button>
                                   )}
@@ -794,7 +794,7 @@ export default function SettingsPage() {
                                     className="h-7 w-7 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] hover:bg-[var(--bg-card)] flex items-center justify-center transition-colors cursor-pointer"
                                     title="Copy prefix"
                                   >
-                                    {copiedField === `key-${k.id}` ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} className="text-[var(--text-muted)]" />}
+                                    {copiedField === `key-${k.id}` ? <Check size={12} className="text-[var(--color-success)]" /> : <Copy size={12} className="text-[var(--text-muted)]" />}
                                   </button>
                                   <button
                                     disabled={revokingKeyId === k.id}
@@ -809,10 +809,10 @@ export default function SettingsPage() {
                                       } catch { toast('error', 'Failed to revoke key'); }
                                       finally { setRevokingKeyId(null); }
                                     }}
-                                    className="h-7 w-7 rounded-lg border border-red-500/20 bg-red-500/[0.04] hover:bg-red-500/[0.12] flex items-center justify-center transition-colors cursor-pointer disabled:opacity-40"
+                                    className="h-7 w-7 rounded-lg border border-[var(--color-destructive-border)] bg-[var(--color-destructive-bg)] hover:opacity-85 flex items-center justify-center transition-colors cursor-pointer disabled:opacity-40"
                                     title="Revoke key"
                                   >
-                                    {revokingKeyId === k.id ? <Loader2 size={12} className="animate-spin text-red-400" /> : <Trash2 size={12} className="text-red-400" />}
+                                    {revokingKeyId === k.id ? <Loader2 size={12} className="animate-spin text-[var(--color-destructive)]" /> : <Trash2 size={12} className="text-[var(--color-destructive)]" />}
                                   </button>
                                 </div>
                               </div>
@@ -926,7 +926,7 @@ export default function SettingsPage() {
                         {/* AI Credits */}
                         <div className="rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] p-4 mb-5">
                           <span className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider block mb-1">AI Credits</span>
-                          <p className="text-2xl font-bold text-emerald-400" style={displayFont}>{profile.aiCreditsBalance.toLocaleString()}</p>
+                          <p className="text-2xl font-bold text-[var(--color-success)]" style={displayFont}>{profile.aiCreditsBalance.toLocaleString()}</p>
                           <p className="text-xs text-[var(--text-muted)] mt-0.5">Used for hosted LLM calls and web search</p>
                         </div>
 
@@ -946,12 +946,12 @@ export default function SettingsPage() {
                     DANGER ZONE TAB
                     ════════════════════════════════════════ */}
                 {activeTab === 'danger' && (
-                  <div className="card glass-noise p-6" style={{ borderColor: 'rgba(239,68,68,0.15)' }}>
+                  <div className="card glass-noise p-6" style={{ borderColor: 'var(--color-destructive-border)' }}>
                     <div className="flex items-center gap-2.5 mb-5">
-                      <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center">
-                        <AlertTriangle size={16} className="text-red-400" />
+                      <div className="w-8 h-8 rounded-lg bg-[var(--color-destructive-bg)] flex items-center justify-center">
+                        <AlertTriangle size={16} className="text-[var(--color-destructive)]" />
                       </div>
-                      <h2 className="text-lg font-semibold text-red-400" style={displayFont}>{t('danger.sectionTitle')}</h2>
+                      <h2 className="text-lg font-semibold text-[var(--color-destructive)]" style={displayFont}>{t('danger.sectionTitle')}</h2>
                     </div>
 
                     <div className="space-y-4">
@@ -982,10 +982,10 @@ export default function SettingsPage() {
                               setExporting(false);
                             }
                           }}
-                          className="flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 hover:bg-cyan-500/20 hover:border-cyan-500/40 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                          className="flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 bg-[var(--color-accent-bg)] text-[var(--color-accent)] border border-[var(--color-accent-border)] hover:opacity-85 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                         >
                           {exporting ? (
-                            <><span className="w-4 h-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" /> Exporting...</>
+                            <><span className="w-4 h-4 border-2 border-[var(--color-accent)] border-t-transparent rounded-full animate-spin" /> Exporting...</>
                           ) : (
                             <><Download size={14} /> {t('danger.exportBtn')}</>
                           )}
@@ -993,7 +993,7 @@ export default function SettingsPage() {
                       </div>
 
                       {/* ── Delete Account ──────────────────────────────── */}
-                      <div className="rounded-xl border border-red-500/15 bg-red-500/[0.03] p-4">
+                      <div className="rounded-xl border border-[var(--color-destructive-border)] bg-[var(--color-destructive-bg)] p-4">
                         <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">{t('danger.deleteTitle')}</h3>
                         <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
                           {t('danger.deleteDesc')}
@@ -1001,7 +1001,7 @@ export default function SettingsPage() {
                         <button
                           disabled={deleting}
                           onClick={() => setShowDeleteConfirm(true)}
-                          className="flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500 hover:text-[var(--text-primary)] hover:border-red-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                          className="flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 bg-[var(--color-destructive-bg)] text-[var(--color-destructive)] border border-[var(--color-destructive-border)] hover:opacity-85 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                         >
                           <Trash2 size={14} />
                           {deleting ? t('danger.deleting') : t('danger.deleteBtn')}
@@ -1031,13 +1031,13 @@ export default function SettingsPage() {
             />
             <motion.div
               className="relative w-full max-w-md rounded-2xl border p-6"
-              style={{ background: 'var(--bg-elevated)', borderColor: 'rgba(239,68,68,0.25)', boxShadow: '0 16px 64px rgba(0,0,0,0.4)' }}
+              style={{ background: 'var(--bg-elevated)', borderColor: 'var(--color-destructive-border)', boxShadow: '0 16px 64px rgba(0,0,0,0.4)' }}
               initial={{ opacity: 0, scale: 0.95, y: 8 }} animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 8 }} transition={{ duration: 0.2 }}
               role="alertdialog" aria-modal="true"
             >
-              <div className="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-4">
-                <AlertTriangle size={24} className="text-red-400" />
+              <div className="w-12 h-12 rounded-xl bg-[var(--color-destructive-bg)] border border-[var(--color-destructive-border)] flex items-center justify-center mb-4">
+                <AlertTriangle size={24} className="text-[var(--color-destructive)]" />
               </div>
               <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2">{t('danger.dialogTitle')}</h2>
               <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-5">
@@ -1055,7 +1055,7 @@ export default function SettingsPage() {
                     onKeyDown={e => { if (e.key === 'Enter' && !deleting) handleDeleteAccount(); }}
                     placeholder="Your current password"
                     disabled={deleting}
-                    className="w-full bg-[var(--bg-card)] border border-[var(--border-default)] rounded-xl px-3 py-2.5 pr-10 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-red-500/50 disabled:opacity-50"
+                    className="w-full bg-[var(--bg-card)] border border-[var(--border-default)] rounded-xl px-3 py-2.5 pr-10 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--color-destructive-border)] disabled:opacity-50"
                     autoFocus
                   />
                   <button type="button" onClick={() => setShowDeletePassword(v => !v)}
@@ -1077,10 +1077,10 @@ export default function SettingsPage() {
                 <button
                   onClick={handleDeleteAccount}
                   disabled={deleting || !deletePassword}
-                  className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl bg-red-500 hover:bg-red-600 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-red-500/20"
+                  className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl bg-[var(--color-destructive)] text-[var(--bg-base)] transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {deleting ? (
-                    <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Deleting...</>
+                    <><span className="w-4 h-4 border-2 border-[var(--bg-base)] border-t-transparent rounded-full animate-spin" /> Deleting...</>
                   ) : (
                     <><Trash2 size={14} /> {t('danger.deleteBtn')}</>
                   )}

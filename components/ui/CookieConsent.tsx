@@ -176,10 +176,10 @@ export function CookieConsent() {
         aria-label="Cookie consent"
         aria-modal="false"
       >
-        <div className="pointer-events-auto border-t border-[var(--border-default)] bg-[var(--bg-card-solid)]/95 backdrop-blur-md shadow-[0_-4px_16px_rgba(0,0,0,0.25)]">
+        <div className="pointer-events-auto border-t border-[var(--border-default)] bg-[var(--bg-card-solid)] backdrop-blur-md shadow-[0_-4px_16px_rgba(0,0,0,0.25)]">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
             <div className="flex items-center gap-2.5 flex-1 min-w-0">
-              <CookieIcon className="w-4 h-4 text-[#f59e0b] shrink-0" />
+              <CookieIcon className="w-4 h-4 text-[var(--accent)] shrink-0" />
               <p className="text-[13px] text-[var(--text-secondary)] leading-snug">
                 We use strictly necessary cookies + optional analytics (PostHog) with your consent.{' '}
                 <Link href="/cookies" className="text-[var(--color-accent)] hover:underline">Cookie Policy</Link>
@@ -231,8 +231,8 @@ export function CookieConsent() {
         {/* Header row — short description + collapsed CTAs */}
         <div className="p-4 sm:p-5">
           <div className="flex items-start gap-3">
-            <div className="w-9 h-9 rounded-lg bg-[#f59e0b]/15 flex items-center justify-center shrink-0">
-              <CookieIcon className="w-4 h-4 text-[#f59e0b]" />
+            <div className="w-9 h-9 rounded-lg bg-[var(--tech-accent-soft)] flex items-center justify-center shrink-0">
+              <CookieIcon className="w-4 h-4 text-[var(--accent)]" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-[var(--text-primary)] mb-1">
@@ -251,22 +251,22 @@ export function CookieConsent() {
           {/* Expanded category controls */}
           {expanded && (
             <div className="mt-4 space-y-2">
-              <div className="flex items-center justify-between px-3 py-2.5 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)]/50">
+              <div className="flex items-center justify-between px-3 py-2.5 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)]">
                 <div className="flex items-center gap-2.5">
-                  <Shield className="w-4 h-4 text-emerald-400" />
+                  <Shield className="w-4 h-4 text-[var(--accent)]" />
                   <div>
                     <p className="text-xs font-semibold text-[var(--text-primary)]">Strictly necessary</p>
                     <p className="text-[11px] text-[var(--text-muted)]">Login, theme, consent choice. Can&apos;t be disabled.</p>
                   </div>
                 </div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 px-2 py-0.5 rounded-full bg-emerald-400/10 border border-emerald-400/20">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--accent)] px-2 py-0.5 rounded-full bg-[var(--tech-accent-soft)] border border-[var(--border-hover)]">
                   Always on
                 </span>
               </div>
 
               <label className="flex items-center justify-between px-3 py-2.5 rounded-lg border border-[var(--border-default)] hover:border-[var(--color-accent)]/30 transition-colors cursor-pointer">
                 <div className="flex items-center gap-2.5">
-                  <BarChart3 className="w-4 h-4 text-cyan-400" />
+                  <BarChart3 className="w-4 h-4 text-[var(--accent)]" />
                   <div>
                     <p className="text-xs font-semibold text-[var(--text-primary)]">Analytics</p>
                     <p className="text-[11px] text-[var(--text-muted)]">Anonymized product usage (PostHog). Opt-in.</p>

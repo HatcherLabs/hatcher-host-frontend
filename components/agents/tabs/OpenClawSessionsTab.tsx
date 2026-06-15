@@ -104,7 +104,7 @@ export function OpenClawSessionsTab() {
       >
         <GlassCard>
           <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
-            <Info size={14} className="text-amber-400" />
+            <Info size={14} className="text-[var(--color-warning)]" />
             Agent is stopped — start it to browse sessions.
           </div>
         </GlassCard>
@@ -123,8 +123,8 @@ export function OpenClawSessionsTab() {
     >
       <GlassCard>
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
-            <MessageSquare size={18} className="text-amber-400" />
+          <div className="w-10 h-10 rounded-xl bg-[var(--color-warning-bg)] flex items-center justify-center">
+            <MessageSquare size={18} className="text-[var(--color-warning)]" />
           </div>
           <div className="flex-1 min-w-0">
             <h2 className="text-base font-semibold text-[var(--text-primary)]">Recent Sessions</h2>
@@ -141,7 +141,7 @@ export function OpenClawSessionsTab() {
               setLoading(true);
               void load();
             }}
-            className="text-[11px] px-3 py-1.5 rounded-lg border border-white/10 hover:border-amber-500/30 hover:bg-amber-500/5 transition-all text-[var(--text-muted)] hover:text-amber-400 flex items-center gap-1.5 cursor-pointer"
+            className="text-[11px] px-3 py-1.5 rounded-lg border border-white/10 hover:border-[var(--color-warning-border)] hover:bg-[var(--color-warning-bg)] transition-all text-[var(--text-muted)] hover:text-[var(--color-warning)] flex items-center gap-1.5 cursor-pointer"
           >
             <RefreshCw size={11} />
             Refresh
@@ -151,7 +151,7 @@ export function OpenClawSessionsTab() {
 
       {error && !loading && (
         <GlassCard>
-          <div className="flex items-center gap-2 text-sm text-red-400">
+          <div className="flex items-center gap-2 text-sm text-[var(--color-destructive)]">
             <AlertTriangle size={14} />
             {error}
           </div>
@@ -175,7 +175,7 @@ export function OpenClawSessionsTab() {
               Chat with the agent via the{' '}
               <button
                 onClick={() => setTab('chat')}
-                className="text-amber-400 hover:underline cursor-pointer"
+                className="text-[var(--color-warning)] hover:underline cursor-pointer"
               >
                 Chat tab
               </button>{' '}

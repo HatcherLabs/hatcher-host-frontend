@@ -78,7 +78,7 @@ export function OpenClawSchedulesCard() {
     return (
       <GlassCard>
         <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
-          <AlertTriangle size={14} className="text-amber-400" />
+          <AlertTriangle size={14} className="text-[var(--color-warning)]" />
           Schedules unavailable{error ? `: ${error}` : ''}
         </div>
       </GlassCard>
@@ -98,7 +98,7 @@ export function OpenClawSchedulesCard() {
     <GlassCard>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Clock size={14} className="text-amber-400" />
+          <Clock size={14} className="text-[var(--color-info)]" />
           <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Schedules</h3>
           <span className="text-[10px] text-[var(--text-muted)]">({jobs.length} total)</span>
         </div>
@@ -117,10 +117,10 @@ export function OpenClawSchedulesCard() {
       ) : (
         <>
           <div className="grid grid-cols-2 gap-3 mb-3">
-            <div className="rounded-xl px-3 py-2.5 bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-2">
-              <PlayCircle size={14} className="text-emerald-400" />
+            <div className="rounded-xl px-3 py-2.5 bg-[var(--status-live-bg)] border border-[var(--status-live-border)] flex items-center gap-2">
+              <PlayCircle size={14} className="text-[var(--status-live)]" />
               <div>
-                <div className="text-sm font-semibold text-emerald-400 tabular-nums">{active}</div>
+                <div className="text-sm font-semibold text-[var(--status-live)] tabular-nums">{active}</div>
                 <div className="text-[10px] text-[var(--text-muted)]">Active</div>
               </div>
             </div>
@@ -146,7 +146,7 @@ export function OpenClawSchedulesCard() {
                     key={job.id}
                     className="flex items-center gap-2 text-xs text-[var(--text-secondary)]"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--status-deploying)] flex-shrink-0" />
                     <span className="truncate flex-1">{job.name}</span>
                     <span className="text-[10px] text-[var(--text-muted)] font-mono tabular-nums">
                       {shortTime(job.nextRun)}

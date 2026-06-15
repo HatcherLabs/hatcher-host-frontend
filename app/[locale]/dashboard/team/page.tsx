@@ -76,10 +76,10 @@ interface MyAgent {
 /* ── Helpers ─────────────────────────────────────────────── */
 function RoleBadge({ role }: { role: string }) {
   const styles: Record<string, { bg: string; text: string; icon: React.ReactNode }> = {
-    owner: { bg: 'bg-cyan-500/15 border-cyan-500/30', text: 'text-cyan-400', icon: <Crown className="w-3 h-3" /> },
-    admin: { bg: 'bg-purple-500/15 border-purple-500/30', text: 'text-purple-400', icon: <Shield className="w-3 h-3" /> },
-    member: { bg: 'bg-blue-500/15 border-blue-500/30', text: 'text-blue-400', icon: <User className="w-3 h-3" /> },
-    viewer: { bg: 'bg-gray-500/15 border-gray-500/30', text: 'text-gray-400', icon: <Eye className="w-3 h-3" /> },
+    owner: { bg: 'bg-[var(--color-accent-bg)] border-[var(--color-accent-border)]', text: 'text-[var(--color-accent)]', icon: <Crown className="w-3 h-3" /> },
+    admin: { bg: 'bg-[var(--color-info-bg)] border-[var(--color-info-border)]', text: 'text-[var(--color-info)]', icon: <Shield className="w-3 h-3" /> },
+    member: { bg: 'bg-[var(--bg-elevated)] border-[var(--border-default)]', text: 'text-[var(--text-secondary)]', icon: <User className="w-3 h-3" /> },
+    viewer: { bg: 'bg-[var(--bg-card)] border-[var(--border-default)]', text: 'text-[var(--text-muted)]', icon: <Eye className="w-3 h-3" /> },
   };
   const s = styles[role] ?? styles.viewer;
   return (
@@ -91,7 +91,11 @@ function RoleBadge({ role }: { role: string }) {
 }
 
 function StatusDot({ status }: { status: string }) {
-  const color = status === 'active' ? 'bg-green-400' : status === 'sleeping' ? 'bg-amber-400' : 'bg-gray-500';
+  const color = status === 'active'
+    ? 'bg-[var(--color-success)]'
+    : status === 'sleeping'
+      ? 'bg-[var(--color-warning)]'
+      : 'bg-[var(--text-muted)]';
   return <span className={`w-2 h-2 rounded-full ${color}`} />;
 }
 
@@ -295,7 +299,7 @@ export default function TeamPage() {
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-6 h-6 animate-spin text-cyan-400" />
+        <Loader2 className="w-6 h-6 animate-spin text-[var(--color-accent)]" />
       </div>
     );
   }
@@ -304,7 +308,7 @@ export default function TeamPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className={cardClass + ' p-8 text-center max-w-sm'}>
-          <Users className="w-10 h-10 text-cyan-400 mx-auto mb-3" />
+          <Users className="w-10 h-10 text-[var(--color-accent)] mx-auto mb-3" />
           <p className="text-[var(--text-primary)] font-medium mb-2">{t('signInTitle')}</p>
           <p className="text-sm text-[var(--text-secondary)]">{t('signInDesc')}</p>
         </div>
@@ -334,21 +338,21 @@ export default function TeamPage() {
       </motion.div>
 
       {error && (
-        <motion.div variants={itemVariants} className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+        <motion.div variants={itemVariants} className="mb-4 p-3 rounded-lg bg-[var(--color-destructive-bg)] border border-[var(--color-destructive-border)] text-[var(--color-destructive)] text-sm">
           {error}
-          <button onClick={() => setError(null)} className="ml-2 text-red-300 hover:text-[var(--text-primary)]">&times;</button>
+          <button onClick={() => setError(null)} className="ml-2 text-[var(--color-destructive)] hover:text-[var(--text-primary)]">&times;</button>
         </motion.div>
       )}
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-6 h-6 animate-spin text-cyan-400" />
+          <Loader2 className="w-6 h-6 animate-spin text-[var(--color-accent)]" />
         </div>
       ) : !team ? (
         /* ── No Team — Create Form ──────────────────────────── */
         <motion.div variants={itemVariants} className={cardClass + ' p-8 max-w-lg mx-auto text-center'}>
-          <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mx-auto mb-5">
-            <Users className="w-8 h-8 text-cyan-400" />
+          <div className="w-16 h-16 rounded-2xl bg-[var(--color-accent-bg)] border border-[var(--color-accent-border)] flex items-center justify-center mx-auto mb-5">
+            <Users className="w-8 h-8 text-[var(--color-accent)]" />
           </div>
           <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2" style={displayFont}>{t('createTeamTitle')}</h2>
           <p className="text-sm text-[var(--text-secondary)] mb-6">
@@ -361,7 +365,7 @@ export default function TeamPage() {
               value={teamName}
               onChange={(e) => setTeamName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleCreateTeam()}
-              className="flex-1 px-4 py-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-[var(--text-primary)] placeholder-[var(--text-muted)] text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="flex-1 px-4 py-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-[var(--text-primary)] placeholder-[var(--text-muted)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/40 focus:border-[var(--color-accent)]/50"
               maxLength={50}
             />
             <button
@@ -381,8 +385,8 @@ export default function TeamPage() {
           <motion.div variants={itemVariants} className={cardClass + ' p-6'}>
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
-                  <Users className="w-5 h-5 text-cyan-400" />
+                <div className="w-10 h-10 rounded-xl bg-[var(--color-accent-bg)] border border-[var(--color-accent-border)] flex items-center justify-center">
+                  <Users className="w-5 h-5 text-[var(--color-accent)]" />
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-[var(--text-primary)]" style={displayFont}>{team.name}</h2>
@@ -398,7 +402,7 @@ export default function TeamPage() {
                   <button
                     onClick={() => setConfirmDialog('leave')}
                     disabled={actionLoading === 'leave'}
-                    className="px-3 py-1.5 rounded-lg text-xs font-medium text-amber-400 border border-amber-500/20 hover:bg-amber-500/10 transition-colors flex items-center gap-1.5"
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium text-[var(--color-warning)] border border-[var(--color-warning-border)] hover:bg-[var(--color-warning-bg)] transition-colors flex items-center gap-1.5"
                   >
                     {actionLoading === 'leave' ? <Loader2 className="w-3 h-3 animate-spin" /> : <LogOut className="w-3 h-3" />}
                     Leave
@@ -408,7 +412,7 @@ export default function TeamPage() {
                   <button
                     onClick={() => setConfirmDialog('delete')}
                     disabled={actionLoading === 'delete'}
-                    className="px-3 py-1.5 rounded-lg text-xs font-medium text-red-400 border border-red-500/20 hover:bg-red-500/10 transition-colors flex items-center gap-1.5"
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium text-[var(--color-destructive)] border border-[var(--color-destructive-border)] hover:bg-[var(--color-destructive-bg)] transition-colors flex items-center gap-1.5"
                   >
                     {actionLoading === 'delete' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
                     Delete Team
@@ -421,7 +425,7 @@ export default function TeamPage() {
           {/* Members Section */}
           <motion.div variants={itemVariants} className={cardClass + ' p-6'}>
             <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2" style={displayFont}>
-              <User className="w-4 h-4 text-cyan-400" />
+              <User className="w-4 h-4 text-[var(--color-accent)]" />
               {t('membersHeading')}
             </h3>
             <div className="space-y-2">
@@ -455,7 +459,7 @@ export default function TeamPage() {
                               value={member.role}
                               onChange={(e) => handleUpdateRole(member.id, e.target.value)}
                               disabled={actionLoading === `role-${member.id}`}
-                              className="appearance-none bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-md px-2 py-1 pr-6 text-xs text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-cyan-500/50 cursor-pointer"
+                              className="appearance-none bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-md px-2 py-1 pr-6 text-xs text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]/40 cursor-pointer"
                             >
                               {isOwner && (
                                 <option value="admin" style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)' }}>Admin</option>
@@ -471,7 +475,7 @@ export default function TeamPage() {
                           <button
                             onClick={() => handleRemoveMember(member.id)}
                             disabled={actionLoading === member.id}
-                            className="p-1.5 rounded-md text-red-400/60 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                            className="p-1.5 rounded-md text-[var(--color-destructive)]/70 hover:text-[var(--color-destructive)] hover:bg-[var(--color-destructive-bg)] transition-colors"
                             title="Remove member"
                           >
                             {actionLoading === member.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
@@ -491,12 +495,12 @@ export default function TeamPage() {
                   {t('inviteMemberHeading')}
                 </h4>
                 {inviteError && (
-                  <div className="mb-3 p-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs">
+                  <div className="mb-3 p-2 rounded-lg bg-[var(--color-destructive-bg)] border border-[var(--color-destructive-border)] text-[var(--color-destructive)] text-xs">
                     {inviteError}
                   </div>
                 )}
                 {inviteSuccess && (
-                  <div className="mb-3 p-2 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-xs">
+                  <div className="mb-3 p-2 rounded-lg bg-[var(--color-success-bg)] border border-[var(--color-success-border)] text-[var(--color-success)] text-xs">
                     {inviteSuccess}
                   </div>
                 )}
@@ -507,13 +511,13 @@ export default function TeamPage() {
                     value={inviteEmail}
                     onChange={(e) => setInviteEmail(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleInvite()}
-                    className="flex-1 px-3 py-2 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-[var(--text-primary)] placeholder-[var(--text-muted)] text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
+                    className="flex-1 px-3 py-2 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-[var(--text-primary)] placeholder-[var(--text-muted)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/40"
                   />
                   <div className="relative">
                     <select
                       value={inviteRole}
                       onChange={(e) => setInviteRole(e.target.value as 'admin' | 'member' | 'viewer')}
-                      className="appearance-none h-full bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-lg px-3 pr-7 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-cyan-500/50 cursor-pointer"
+                      className="appearance-none h-full bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-lg px-3 pr-7 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/40 cursor-pointer"
                     >
                       {/* Native <option> elements inherit the OS/browser chrome
                           (white-on-white on dark Chromium) unless we set explicit
@@ -543,7 +547,7 @@ export default function TeamPage() {
           {/* Shared Agents */}
           <motion.div variants={itemVariants} className={cardClass + ' p-6'}>
             <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2" style={displayFont}>
-              <Bot className="w-4 h-4 text-cyan-400" />
+              <Bot className="w-4 h-4 text-[var(--color-accent)]" />
               {t('sharedAgentsHeading')}
             </h3>
 
@@ -569,7 +573,7 @@ export default function TeamPage() {
                         <button
                           onClick={() => handleUnshareAgent(agent.id)}
                           disabled={actionLoading === `unshare-${agent.id}`}
-                          className="p-1.5 rounded-md text-red-400/60 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                          className="p-1.5 rounded-md text-[var(--color-destructive)]/70 hover:text-[var(--color-destructive)] hover:bg-[var(--color-destructive-bg)] transition-colors"
                           title="Unshare agent"
                         >
                           {actionLoading === `unshare-${agent.id}` ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
@@ -606,8 +610,8 @@ export default function TeamPage() {
                           disabled={actionLoading === `share-${agent.id}` || actionLoading === `unshare-${agent.id}`}
                           className={`px-3 py-1 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
                             isShared
-                              ? 'text-amber-400 border border-amber-500/20 hover:bg-amber-500/10'
-                              : 'text-cyan-400 border border-cyan-500/20 hover:bg-cyan-500/10'
+                              ? 'text-[var(--color-warning)] border border-[var(--color-warning-border)] hover:bg-[var(--color-warning-bg)]'
+                              : 'text-[var(--color-accent)] border border-[var(--color-accent-border)] hover:bg-[var(--color-accent-bg)]'
                           }`}
                         >
                           {(actionLoading === `share-${agent.id}` || actionLoading === `unshare-${agent.id}`) ? (

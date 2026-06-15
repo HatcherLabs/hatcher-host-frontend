@@ -2,24 +2,28 @@
 'use client';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
-import { Play, Smartphone } from 'lucide-react';
+import Image from 'next/image';
 import { PhosphorButton } from '../shared/PhosphorButton';
 import styles from './SectionHero.module.css';
 
-const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=host.hatcher.app';
+const GOOGLE_PLAY_URL = 'https://play.google.com/store/apps/details?id=host.hatcher.app';
 const SOLANA_MOBILE_URL = 'https://solanamobile.com/';
-
-const SIGNALS = [
-  { label: 'Hosted LLM', value: 'UsePod/OpenRouter + IDLE + MiMo + AceData', tone: 'green' },
-  { label: 'Default model', value: 'DeepSeek V4 Flash', tone: 'cyan' },
-  { label: 'Focus frameworks', value: 'OpenClaw + Hermes', tone: 'amber' },
-] as const;
 
 export function SectionHero() {
   const t = useTranslations('landingV3.hero');
   return (
-    <section className={`${styles.hero} v3-scanline`}>
-      <div className={styles.media} aria-hidden />
+    <section className={styles.hero}>
+      <div className={styles.heroArt} aria-hidden>
+        <Image
+          className={styles.heroImage}
+          src="/landing-v3/hero-agent-room-hatchling.webp"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          unoptimized
+        />
+      </div>
       <div className={styles.scrim} aria-hidden />
       <div className={styles.bottomFade} aria-hidden />
 
@@ -31,50 +35,31 @@ export function SectionHero() {
           </h1>
           <p className={styles.sub}>{t('sub')}</p>
           <div className={styles.ctaRow}>
-            <PhosphorButton href="/create">{t('ctaPrimary')}</PhosphorButton>
-            <PhosphorButton href="/city" variant="ghost">{t('ctaGhost')}</PhosphorButton>
+            <PhosphorButton href="/create" surface="dark">{t('ctaPrimary')}</PhosphorButton>
+            <PhosphorButton href="/explore" variant="ghost" surface="dark">{t('ctaGhost')}</PhosphorButton>
           </div>
           <Link href="/register" className={styles.signupHint}>
             {t('ctaSignup')}
           </Link>
-          <div className={styles.storeBadges} aria-label="Hatcher mobile availability">
+          <div className={styles.appLinks} aria-label="Mobile app links">
             <a
-              className={styles.storeBadge}
-              href={PLAY_STORE_URL}
+              className={styles.appLink}
+              href={GOOGLE_PLAY_URL}
               target="_blank"
               rel="noopener noreferrer"
-              data-event="landing_google_play_click"
             >
-              <Play className={styles.storeIcon} aria-hidden />
-              <span className={styles.storeCopy}>
-                <span className={styles.storeKicker}>{t('ctaPlayStoreKicker')}</span>
-                <span className={styles.storeName}>{t('ctaPlayStore')}</span>
-              </span>
+              <span>{t('ctaPlayStoreKicker')}</span>
+              <strong>{t('ctaPlayStore')}</strong>
             </a>
             <a
-              className={styles.storeBadge}
+              className={styles.appLink}
               href={SOLANA_MOBILE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              data-event="landing_solana_mobile_click"
             >
-              <Smartphone className={styles.storeIcon} aria-hidden />
-              <span className={styles.storeCopy}>
-                <span className={styles.storeKicker}>{t('ctaSolanaMobileKicker')}</span>
-                <span className={styles.storeName}>{t('ctaSolanaMobile')}</span>
-              </span>
+              <span>{t('ctaSolanaMobileKicker')}</span>
+              <strong>{t('ctaSolanaMobile')}</strong>
             </a>
-          </div>
-          <Link href="/features" className={styles.featuresLink}>
-            {t('ctaFeatures')}
-          </Link>
-          <div className={styles.signals} aria-label="Hatcher platform highlights">
-            {SIGNALS.map((signal) => (
-              <div key={signal.label} className={`${styles.signal} ${styles[signal.tone]}`}>
-                <span className={styles.signalLabel}>{signal.label}</span>
-                <span className={styles.signalValue}>{signal.value}</span>
-              </div>
-            ))}
           </div>
         </div>
       </div>

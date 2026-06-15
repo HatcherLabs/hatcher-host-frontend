@@ -383,7 +383,7 @@ export function LaptopPanel({
             <div className="flex gap-1.5">
               <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
               <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
-              <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-[var(--color-success)]" />
             </div>
             <div className="min-w-0 flex-1 truncate text-center font-mono text-[11px] text-[#d8c3a3]">
               hatcher://agent/{agentId}/control

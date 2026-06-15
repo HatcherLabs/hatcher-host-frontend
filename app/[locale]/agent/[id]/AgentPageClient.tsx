@@ -806,7 +806,7 @@ export function AgentPageClient() {
             <div className="flex items-center gap-3 flex-wrap mb-2">
               <h1 className="text-2xl font-bold text-[var(--text-primary)]">{agent.name}</h1>
               <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full ${statusStyle.bg} ${statusStyle.text} border ${statusStyle.border}`}>
-                <span className={`w-1.5 h-1.5 rounded-full ${statusStyle.dot} ${statusStyle.pulse ? 'animate-pulse shadow-[0_0_6px_rgba(74,222,128,0.5)]' : ''}`} />
+	                <span className={`w-1.5 h-1.5 rounded-full ${statusStyle.dot} ${statusStyle.pulse ? 'animate-pulse shadow-[0_0_6px_rgba(137,214,198,0.45)]' : ''}`} />
                 {t(`status.${statusStyle.key}`)}
               </span>
             </div>

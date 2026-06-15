@@ -27,10 +27,10 @@ const PRESET_PALETTES: Array<{
   accent: string;
   secondary: string;
 }> = [
-  { match: /amber|market|trading|finance|olx|listing|revenue/i, accent: '#FFB84D', secondary: '#39FF88' },
-  { match: /research|search|browser|data|insight|analysis/i, accent: '#54D6FF', secondary: '#B9FFD4' },
-  { match: /code|dev|build|deploy|sre|ops/i, accent: '#7DFF8A', secondary: '#FFD23F' },
-  { match: /social|community|discord|telegram|support/i, accent: '#B088FF', secondary: '#66F2FF' },
+  { match: /amber|market|trading|finance|olx|listing|revenue/i, accent: '#D6B177', secondary: '#89D6C6' },
+  { match: /research|search|browser|data|insight|analysis/i, accent: '#9ED5E7', secondary: '#D7EFF5' },
+  { match: /code|dev|build|deploy|sre|ops/i, accent: '#89D6C6', secondary: '#D5B46B' },
+  { match: /social|community|discord|telegram|support/i, accent: '#AAB7FF', secondary: '#9ED5E7' },
   { match: /creative|image|art|design|video/i, accent: '#FF5FA2', secondary: '#FFD166' },
   { match: /security|audit|risk|alert|guard/i, accent: '#FF6B8A', secondary: '#FFB84D' },
 ];

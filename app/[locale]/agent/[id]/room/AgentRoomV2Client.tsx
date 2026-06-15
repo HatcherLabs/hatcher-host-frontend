@@ -2,6 +2,7 @@
 import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Camera, Eye, MessageSquare, Volume2, VolumeX } from 'lucide-react';
 import * as THREE from 'three';
 import { api } from '@/lib/api';
 import { API_URL } from '@/lib/config';
@@ -1046,14 +1047,14 @@ function FloatingChatButton({
       onClick={onClick}
       aria-label="Chat with your agent"
       title="Chat with your agent"
-      className="fixed bottom-4 right-4 z-40 flex items-center gap-2 rounded-full border px-4 py-3 text-sm font-semibold text-[#f6ead8] shadow-xl backdrop-blur transition hover:scale-105 active:scale-95"
+      className="fixed bottom-4 right-4 z-40 flex items-center gap-2 rounded-full border px-4 py-3 text-sm font-semibold text-[#f6ead8] shadow-[0_14px_34px_rgba(10,7,4,0.32)] backdrop-blur transition hover:scale-[1.03] active:scale-95"
       style={{
         borderColor: `${accent}aa`,
-        background: 'rgba(21,16,11,0.92)',
+        background: 'rgba(21,16,11,0.9)',
         boxShadow: `0 10px 30px ${accent}55`,
       }}
     >
-      <span className="text-lg leading-none" aria-hidden>💬</span>
+      <MessageSquare className="h-4 w-4" aria-hidden />
       <span>Chat</span>
       {unread > 0 && (
         <span className="absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-bold text-white">
@@ -1071,28 +1072,30 @@ function ViewToggleButton({
   mode: 'first' | 'third';
   onToggle: () => void;
 }) {
+  const Icon = mode === 'first' ? Eye : Camera;
   return (
     <button
       onClick={onToggle}
       aria-label="Toggle camera view"
       title="Toggle first / third person (V)"
-      className="fixed bottom-4 left-4 z-40 hidden items-center gap-2 rounded-full border border-[#d6b177]/60 bg-[rgba(21,16,11,0.92)] px-4 py-3 text-sm font-semibold text-[#f6ead8] shadow-xl backdrop-blur transition hover:scale-105 active:scale-95 md:flex"
+      className="fixed bottom-4 left-4 z-40 hidden items-center gap-2 rounded-full border border-[#d6b177]/55 bg-[rgba(21,16,11,0.9)] px-4 py-3 text-sm font-semibold text-[#f6ead8] shadow-[0_14px_34px_rgba(10,7,4,0.32)] backdrop-blur transition hover:border-[#f3d296]/80 hover:bg-[rgba(31,24,15,0.94)] active:scale-95 md:flex"
     >
-      <span aria-hidden>{mode === 'first' ? '👁' : '🎥'}</span>
+      <Icon className="h-4 w-4" aria-hidden />
       <span>{mode === 'first' ? '1st person' : '3rd person'}</span>
     </button>
   );
 }
 
 function SoundToggleButton({ muted, onToggle }: { muted: boolean; onToggle: () => void }) {
+  const Icon = muted ? VolumeX : Volume2;
   return (
     <button
       onClick={onToggle}
       aria-label={muted ? 'Unmute room audio' : 'Mute room audio'}
       title={muted ? 'Unmute room audio' : 'Mute room audio'}
-      className="fixed bottom-[4.75rem] left-4 z-40 hidden h-11 w-11 items-center justify-center rounded-full border border-[#d6b177]/60 bg-[rgba(21,16,11,0.92)] text-lg text-[#f6ead8] shadow-xl backdrop-blur transition hover:scale-105 active:scale-95 md:flex"
+      className="fixed bottom-[4.75rem] left-4 z-40 hidden h-11 w-11 items-center justify-center rounded-full border border-[#d6b177]/55 bg-[rgba(21,16,11,0.9)] text-[#f6ead8] shadow-[0_14px_34px_rgba(10,7,4,0.32)] backdrop-blur transition hover:border-[#f3d296]/80 hover:bg-[rgba(31,24,15,0.94)] active:scale-95 md:flex"
     >
-      <span aria-hidden>{muted ? '🔇' : '🔊'}</span>
+      <Icon className="h-4 w-4" aria-hidden />
     </button>
   );
 }

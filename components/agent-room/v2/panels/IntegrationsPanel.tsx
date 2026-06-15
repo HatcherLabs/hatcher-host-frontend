@@ -2,11 +2,11 @@
 import { PanelShell } from './PanelShell';
 
 const PLATFORMS: Array<{ key: string; label: string; icon: string }> = [
-  { key: 'discord',  label: 'Discord',  icon: '🎮' },
-  { key: 'telegram', label: 'Telegram', icon: '✈️' },
+  { key: 'discord',  label: 'Discord',  icon: 'DI' },
+  { key: 'telegram', label: 'Telegram', icon: 'TG' },
   { key: 'twitter',  label: 'Twitter/X', icon: '𝕏' },
-  { key: 'whatsapp', label: 'WhatsApp', icon: '💬' },
-  { key: 'slack',    label: 'Slack',    icon: '💼' },
+  { key: 'whatsapp', label: 'WhatsApp', icon: 'WA' },
+  { key: 'slack',    label: 'Slack',    icon: 'SL' },
 ];
 
 interface Props {
@@ -26,13 +26,13 @@ export function IntegrationsPanel({ agentId, framework, connected, onClose }: Pr
         {PLATFORMS.map(p => {
           const on = connected.has(p.key);
           return (
-            <li key={p.key} className="flex items-center justify-between rounded-lg bg-neutral-800 p-3">
+            <li key={p.key} className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.045] p-3">
               <span className="flex items-center gap-3">
-                <span className="text-xl">{p.icon}</span>
+                <span className="grid h-8 w-8 place-items-center rounded-md border border-cyan-200/15 bg-cyan-200/10 text-[10px] font-bold tracking-[0.12em] text-cyan-100">{p.icon}</span>
                 <span className="text-sm font-medium">{p.label}</span>
               </span>
               <span className={`rounded-full px-2 py-0.5 text-xs ${
-                on ? 'bg-green-600 text-white' : 'bg-neutral-700 text-neutral-400'
+                on ? 'border border-cyan-200/25 bg-cyan-200/12 text-cyan-100' : 'bg-neutral-700 text-neutral-400'
               }`}>
                 {on ? 'connected' : 'off'}
               </span>
@@ -42,7 +42,7 @@ export function IntegrationsPanel({ agentId, framework, connected, onClose }: Pr
       </ul>
       <a
         href={`/dashboard/agent/${agentId}?tab=integrations`}
-        className="inline-block w-full rounded-lg bg-white py-2 text-center text-sm font-medium text-black hover:bg-neutral-200"
+        className="inline-block w-full rounded-lg bg-[#d6b177] py-2 text-center text-sm font-semibold text-[#171007] hover:bg-[#f4d79d]"
       >
         Open full editor →
       </a>

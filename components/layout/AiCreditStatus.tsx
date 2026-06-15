@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Activity, Coins, Loader2, RefreshCw, X } from 'lucide-react';
 import { api } from '@/lib/api';
+import { formatFeatureKey } from '@/lib/feature-labels';
 import styles from './AiCreditStatus.module.css';
 
 type AiCreditBalance = {
@@ -208,7 +209,7 @@ export function AiCreditStatus({ variant = 'nav', onNavigate }: Props) {
               </div>
               <div>
                 <span className={styles.metricLabel}>Plan</span>
-                <strong>{balance?.tier?.replace(/_/g, ' ') ?? '...'}</strong>
+                <strong>{balance?.tier ? formatFeatureKey(balance.tier) : '...'}</strong>
               </div>
             </div>
 

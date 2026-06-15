@@ -19,7 +19,7 @@ export default function AgentManagementError({
     <div className="min-h-[60vh] flex items-center justify-center px-4">
       <div className="text-center max-w-md">
         <div className="w-20 h-20 rounded-2xl bg-red-500/15 flex items-center justify-center mx-auto mb-6">
-          <AlertTriangle className="w-10 h-10 text-red-400" />
+          <AlertTriangle className="w-10 h-10 text-[var(--color-destructive)]" />
         </div>
         <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-3">
           Agent Management Error
@@ -35,7 +35,7 @@ export default function AgentManagementError({
         <div className="flex items-center justify-center gap-3">
           <button
             onClick={reset}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--color-accent)] hover:bg-[#0891b2] text-white rounded-xl font-semibold text-sm transition-colors shadow-lg shadow-[var(--color-accent)]/20"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-[var(--bg-base)] rounded-xl font-semibold text-sm transition-colors shadow-lg shadow-[var(--color-accent)]/20"
           >
             <RefreshCw className="w-4 h-4" />
             Try Again

@@ -186,14 +186,20 @@ function findBillingAddon(addonKey: string | undefined): BillingAddon | undefine
 /* ── Helpers ─────────────────────────────────────────────── */
 function StatusBadge({ status }: { status: Payment['status'] }) {
   const styles: Record<Payment['status'], string> = {
-    confirmed: 'bg-green-500/10 text-green-400 border border-green-500/20',
-    pending: 'bg-amber-500/10 text-amber-400 border border-amber-500/20 animate-pulse',
-    failed: 'bg-red-500/10 text-red-400 border border-red-500/20',
-    refunded: 'bg-slate-500/10 text-slate-400 border border-slate-500/20',
+    confirmed: 'bg-[var(--color-success-bg)] text-[var(--color-success)] border border-[var(--color-success-border)]',
+    pending: 'bg-[var(--color-warning-bg)] text-[var(--color-warning)] border border-[var(--color-warning-border)] animate-pulse',
+    failed: 'bg-[var(--color-destructive-bg)] text-[var(--color-destructive)] border border-[var(--color-destructive-border)]',
+    refunded: 'bg-[var(--bg-elevated)] text-[var(--text-muted)] border border-[var(--border-default)]',
+  };
+  const dots: Record<Payment['status'], string> = {
+    confirmed: 'bg-[var(--color-success)]',
+    pending: 'bg-[var(--color-warning)]',
+    failed: 'bg-[var(--color-destructive)]',
+    refunded: 'bg-[var(--text-muted)]',
   };
   return (
     <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full ${styles[status]}`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${status === 'confirmed' ? 'bg-green-400' : status === 'pending' ? 'bg-amber-400' : 'bg-red-400'}`} />
+      <span className={`w-1.5 h-1.5 rounded-full ${dots[status]}`} />
       {status.charAt(0).toUpperCase() + status.slice(1)}
     </span>
   );
@@ -226,6 +232,8 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
   if (!isOpen) return null;
   const needsAgentSelection = requiresAgent && !selectedAgentId;
   const hatcherPrice = priceForHatcherPayment(price);
+  const paymentIconShell = 'w-10 h-10 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] flex items-center justify-center flex-shrink-0 text-[var(--text-primary)]';
+
   return (
     <AnimatePresence>
       <motion.div
@@ -284,8 +292,8 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
               disabled={loading || needsAgentSelection}
               className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/[0.03] transition-all disabled:opacity-40"
             >
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#9945FF] to-[#14F195] flex items-center justify-center flex-shrink-0">
-                <span className="text-white font-bold text-sm">SOL</span>
+              <div className={paymentIconShell}>
+                <span className="font-bold text-sm">SOL</span>
               </div>
               <div className="text-left">
                 <p className="text-sm font-semibold text-[var(--text-primary)]">{t('payWithSol')}</p>
@@ -298,10 +306,10 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
             <button
               onClick={onPayWithHATCHER}
               disabled={loading || needsAgentSelection}
-              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[#f59e0b]/30 hover:bg-[#f59e0b]/[0.03] transition-all disabled:opacity-40"
+              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[var(--color-warning-border)] hover:bg-[var(--color-warning-bg)] transition-all disabled:opacity-40"
             >
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#f59e0b] to-[#f97316] flex items-center justify-center flex-shrink-0">
-                <span className="text-white font-extrabold text-[7px] tracking-tight">HATCHER</span>
+              <div className={paymentIconShell}>
+                <span className="font-extrabold text-[7px] tracking-tight">HATCHER</span>
               </div>
               <div className="text-left min-w-0">
                 <p className="text-sm font-semibold text-[var(--text-primary)]">{t('payWithHatcher')}</p>
@@ -316,10 +324,10 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
             <button
               onClick={onPayWithKAUSA}
               disabled={loading || needsAgentSelection}
-              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[#22c55e]/25 bg-[#22c55e]/[0.045] hover:border-[#22c55e]/45 hover:bg-[#22c55e]/[0.075] transition-all disabled:opacity-40"
+              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] hover:border-[var(--color-success-border)] hover:bg-[var(--color-success-bg)] transition-all disabled:opacity-40"
             >
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#052e16] via-[#16a34a] to-[#86efac] flex items-center justify-center flex-shrink-0 shadow-[0_0_22px_rgba(34,197,94,0.18)]">
-                <span className="text-white font-extrabold text-[9px] tracking-tight drop-shadow-sm">KAUSA</span>
+              <div className={paymentIconShell}>
+                <span className="font-extrabold text-[9px] tracking-tight">KAUSA</span>
               </div>
               <div className="text-left min-w-0">
                 <p className="text-sm font-semibold text-[var(--text-primary)]">{t('payWithKausa')}</p>
@@ -332,10 +340,10 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
             <button
               onClick={onPayWithUSDC}
               disabled={loading || needsAgentSelection}
-              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[#14F195]/40 hover:bg-[#14F195]/[0.04] transition-all disabled:opacity-40"
+              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/[0.03] transition-all disabled:opacity-40"
             >
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#2775CA] via-[#9945FF] to-[#14F195] flex items-center justify-center flex-shrink-0">
-                <span className="text-white font-bold text-[10px]">USDC</span>
+              <div className={paymentIconShell}>
+                <span className="font-bold text-[10px]">USDC</span>
               </div>
               <div className="text-left">
                 <p className="text-sm font-semibold text-[var(--text-primary)]">{t('payWithUsdcSolana')}</p>
@@ -348,10 +356,10 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
             <button
               onClick={onPayWithCryptoNow}
               disabled={loading || needsAgentSelection}
-              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[#38bdf8]/35 hover:bg-[#38bdf8]/[0.035] transition-all disabled:opacity-40"
+              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/[0.03] transition-all disabled:opacity-40"
             >
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#0ea5e9] via-[#14F195] to-[#2775CA] flex items-center justify-center flex-shrink-0">
-                <Wallet className="w-5 h-5 text-white" />
+              <div className={paymentIconShell}>
+                <Wallet className="w-5 h-5" />
               </div>
               <div className="text-left min-w-0">
                 <p className="text-sm font-semibold text-[var(--text-primary)]">{t('payWithCryptoNow')}</p>
@@ -366,8 +374,8 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
               disabled={loading || needsAgentSelection}
               className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/[0.03] transition-all disabled:opacity-40"
             >
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#635BFF] to-[#A259FF] flex items-center justify-center flex-shrink-0">
-                <CreditCard className="w-5 h-5 text-white" />
+              <div className={paymentIconShell}>
+                <CreditCard className="w-5 h-5" />
               </div>
               <div className="text-left">
                 <p className="text-sm font-semibold text-[var(--text-primary)]">{t('payWithCard')}</p>
@@ -1303,11 +1311,11 @@ export default function BillingPage() {
               <button
                 type="button"
                 onClick={() => setWalletMenuOpen((o) => !o)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold hover:bg-emerald-500/15 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--color-success-bg)] border border-[var(--color-success-border)] text-[var(--color-success)] text-xs font-semibold hover:bg-[var(--bg-hover)] transition-colors"
                 aria-expanded={walletMenuOpen}
                 aria-haspopup="menu"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-success)] animate-pulse" />
                 {walletAddress.slice(0, 4)}…{walletAddress.slice(-4)}
                 <ChevronDown className={`w-3 h-3 transition-transform ${walletMenuOpen ? 'rotate-180' : ''}`} />
               </button>
@@ -1334,7 +1342,7 @@ export default function BillingPage() {
                   </button>
                   <button
                     onClick={() => { setWalletMenuOpen(false); void disconnectWallet(); }}
-                    className="w-full text-left px-3 py-2 text-xs text-[var(--text-primary)] hover:bg-red-500/10 hover:text-red-400 transition-colors flex items-center gap-2"
+                    className="w-full text-left px-3 py-2 text-xs text-[var(--text-primary)] hover:bg-[var(--color-destructive-bg)] hover:text-[var(--color-destructive)] transition-colors flex items-center gap-2"
                     role="menuitem"
                     title="Forget this wallet in the dApp. To fully revoke access, remove the site from Phantom → Settings → Trusted Apps."
                   >
@@ -1347,7 +1355,7 @@ export default function BillingPage() {
           ) : (
             <button
               onClick={openWalletModal}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white text-xs font-semibold transition-colors"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-[var(--bg-base)] text-xs font-semibold transition-colors"
             >
               <Wallet className="w-3.5 h-3.5" />
               {t('connectWallet')}
@@ -1358,19 +1366,19 @@ export default function BillingPage() {
 
       <motion.div
         variants={itemVariants}
-        className="mb-6 rounded-xl border border-amber-500/25 bg-amber-500/[0.06] px-4 py-3 text-sm text-amber-100"
+        className="mb-6 rounded-xl border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-4 py-3 text-sm text-[var(--text-secondary)]"
       >
         <div className="flex items-start gap-3">
-          <Diamond className="mt-0.5 h-4 w-4 shrink-0 text-amber-300" />
+          <Diamond className="mt-0.5 h-4 w-4 shrink-0 text-[var(--color-warning)]" />
           <div>
-            <p className="font-semibold text-amber-200">{t('hatcherDiscountTitle')}</p>
-            <p className="mt-0.5 text-xs leading-relaxed text-amber-100/80">{t('hatcherDiscountBody')}</p>
+            <p className="font-semibold text-[var(--text-primary)]">{t('hatcherDiscountTitle')}</p>
+            <p className="mt-0.5 text-xs leading-relaxed text-[var(--text-secondary)]">{t('hatcherDiscountBody')}</p>
           </div>
         </div>
       </motion.div>
 
       {error && (
-        <motion.div variants={itemVariants} className="mb-6 p-4 rounded-xl border border-red-500/30 bg-red-500/5 text-sm text-red-400">
+        <motion.div variants={itemVariants} className="mb-6 p-4 rounded-xl border border-[var(--color-destructive-border)] bg-[var(--color-destructive-bg)] text-sm text-[var(--color-destructive)]">
           {error}
         </motion.div>
       )}
@@ -1379,7 +1387,7 @@ export default function BillingPage() {
       <motion.div className={`mb-8 ${cardClass}`} variants={itemVariants}>
         <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
           <div className="flex items-center gap-2">
-            <Wallet className="w-4 h-4 text-green-400" />
+            <Wallet className="w-4 h-4 text-[var(--color-info)]" />
             <h2 className="font-semibold text-[var(--text-primary)]">AI Credits</h2>
           </div>
         </div>
@@ -1387,7 +1395,7 @@ export default function BillingPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
 	            <div>
 	              <div className="flex items-baseline gap-1">
-	                <span className="text-3xl font-extrabold text-green-400 tabular-nums" style={{ fontFamily: 'var(--font-mono, "JetBrains Mono"), monospace' }}>
+                <span className="text-3xl font-extrabold text-[var(--text-primary)] tabular-nums" style={{ fontFamily: 'var(--font-mono, "JetBrains Mono"), monospace' }}>
 	                  {format.number(aiCreditBalance)}
 	                </span>
 	                <span className="text-sm text-[var(--text-muted)]">credits</span>
@@ -1413,7 +1421,7 @@ export default function BillingPage() {
 	                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
 	                      <div className="min-w-0">
 	                        <div className="flex flex-wrap items-center gap-2">
-	                          <span className="rounded-md bg-[var(--color-accent)]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-accent)]">
+                          <span className="rounded-md bg-[var(--color-info-bg)] px-2 py-0.5 text-[10px] font-semibold text-[var(--color-info)]">
 	                            {formatUsageKind(tx.kind)}
 	                          </span>
 	                          <span className="truncate text-xs font-medium text-[var(--text-primary)]">
@@ -1435,7 +1443,7 @@ export default function BillingPage() {
 	                        </div>
 	                      </div>
 	                      <span
-	                        className="text-sm font-semibold tabular-nums text-red-400 sm:text-right"
+                        className="text-sm font-semibold tabular-nums text-[var(--color-destructive)] sm:text-right"
 	                        style={{ fontFamily: 'var(--font-mono, "JetBrains Mono"), monospace' }}
 	                      >
 	                        -{tx.credits.toLocaleString()} AI
@@ -1481,7 +1489,7 @@ export default function BillingPage() {
                 ) : currentTier === 'starter' ? (
                   <Zap className="w-7 h-7 text-[var(--color-accent)]" />
                 ) : (
-                  <Rocket className="w-7 h-7 text-green-400" />
+                  <Rocket className="w-7 h-7 text-[var(--color-info)]" />
                 )}
               </div>
               <div>
@@ -1489,7 +1497,7 @@ export default function BillingPage() {
                   <h2 className="text-2xl font-bold text-[var(--text-primary)]">{tTiers(`${currentTier as 'free' | 'starter' | 'pro' | 'business' | 'founding_member'}.name`)}</h2>
                   <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
                     currentTier === 'free'
-                      ? 'text-green-400 bg-green-500/10 border border-green-500/20'
+                      ? 'text-[var(--color-success)] bg-[var(--color-success-bg)] border border-[var(--color-success-border)]'
                       : 'text-[var(--color-accent)] bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20'
                   }`}>
                     {currentTier === 'free' ? t('freeTier') : t('active')}
@@ -1506,7 +1514,7 @@ export default function BillingPage() {
                   const isExpired = daysLeft <= 0;
                   return (
                     <div className="mt-2 space-y-2">
-                      <div className={`flex items-center gap-1.5 text-xs ${isExpired ? 'text-red-400' : isExpiring ? 'text-amber-400' : 'text-[var(--text-muted)]'}`}>
+                      <div className={`flex items-center gap-1.5 text-xs ${isExpired ? 'text-[var(--color-destructive)]' : isExpiring ? 'text-[var(--color-warning)]' : 'text-[var(--text-muted)]'}`}>
                         <Clock className="w-3 h-3" />
                         {isExpired
                           ? t('planExpired')
@@ -1518,7 +1526,7 @@ export default function BillingPage() {
                         <button
                           onClick={() => handleSubscribe(currentTier)}
                           disabled={subscribing !== null}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-[var(--color-accent)] hover:bg-[#0891b2] disabled:opacity-50 transition-colors"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[var(--bg-base)] bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] disabled:opacity-50 transition-colors"
                         >
                           {subscribing === currentTier ? <Loader2 className="w-3 h-3 animate-spin" /> : <ArrowRight className="w-3 h-3" />}
                           {t('renewFor', { price: tierConfig.usdPrice })}
@@ -1555,7 +1563,7 @@ export default function BillingPage() {
                       openSubscribeModal(currentTier as UserTierKey, 'renew');
                     }}
                     title={`Buy another 30 days of ${TIERS[currentTier].name}. Days stack on top of the current expiry.`}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white transition-colors"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-[var(--bg-base)] transition-colors"
                   >
                     <Clock className="w-3 h-3" />
                     {t('extend30Days', { price: tierMonthly })}
@@ -1566,11 +1574,11 @@ export default function BillingPage() {
                       openSubscribeModal(currentTier as UserTierKey, 'renew');
                     }}
                     title={`Buy a full year of ${TIERS[currentTier].name} at 15% off. Days stack on top of the current expiry.`}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-gradient-to-r from-[#8b5cf6] to-[#06b6d4] text-white hover:shadow-[0_0_20px_rgba(139,92,246,0.25)] transition-all"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold border border-[var(--color-accent-border)] bg-[var(--color-accent-bg)] text-[var(--color-accent)] transition-all hover:opacity-85"
                   >
                     <Clock className="w-3 h-3" />
                     {t('upgradeAnnual', { price: tierAnnual })}
-                    <span className="inline-flex items-center px-1 py-px rounded-full bg-white/20 text-white text-[9px] font-bold leading-none">
+                    <span className="inline-flex items-center px-1 py-px rounded-full bg-[var(--color-success-bg)] text-[var(--color-success)] text-[9px] font-bold leading-none">
                       -15%
                     </span>
                   </button>
@@ -1594,7 +1602,7 @@ export default function BillingPage() {
             <span className="text-sm text-[var(--text-secondary)]">
               {t('agentsOf', { count: agentCount, limit: agentLimit })}
             </span>
-            <span className={`text-xs ${agentCount > agentLimit ? 'text-red-400' : 'text-[var(--text-muted)]'}`}>
+            <span className={`text-xs ${agentCount > agentLimit ? 'text-[var(--color-destructive)]' : 'text-[var(--text-muted)]'}`}>
               {agentCount > agentLimit
                 ? t('agentsOver', { over: agentCount - agentLimit })
                 : (agentLimit - agentCount !== 1
@@ -1602,14 +1610,14 @@ export default function BillingPage() {
                   : t('slotsRemaining', { slots: agentLimit - agentCount }))}
             </span>
           </div>
-          <div className="w-full h-2.5 bg-white/5 rounded-full overflow-hidden">
+          <div className="w-full h-2.5 bg-[var(--bg-elevated)] rounded-full overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-500"
               style={{
                 width: `${Math.min((agentCount / agentLimit) * 100, 100)}%`,
                 background: agentCount >= agentLimit
-                  ? 'linear-gradient(90deg, #ef4444, var(--color-accent))'
-                  : 'linear-gradient(90deg, var(--color-accent), #22d3ee)',
+                  ? 'var(--color-destructive)'
+                  : 'var(--action)',
               }}
             />
           </div>
@@ -1629,7 +1637,7 @@ export default function BillingPage() {
                   return (
                     <div key={addon.id} className="flex flex-wrap items-center justify-between gap-2 text-sm">
                       <div className="flex items-center gap-2 min-w-0">
-                        <CheckCircle className="w-4 h-4 text-green-400 shrink-0" />
+                        <CheckCircle className="w-4 h-4 text-[var(--color-success)] shrink-0" />
                         <span className="text-[var(--text-secondary)] truncate">
                           {addon.name}
                           {addon.perAgent && addon.agentName && (
@@ -1706,7 +1714,7 @@ export default function BillingPage() {
                   }`}
                 >
                   {t('annual')}
-                  <span className="inline-flex items-center px-1 py-px rounded-full bg-green-500/15 text-green-400 text-[9px] font-bold leading-none">
+                  <span className="inline-flex items-center px-1 py-px rounded-full bg-[var(--color-success-bg)] text-[var(--color-success)] text-[9px] font-bold leading-none">
                     -15%
                   </span>
                 </button>
@@ -1736,17 +1744,17 @@ export default function BillingPage() {
                       <div className="flex items-center gap-2 flex-wrap">
                         <h3 className="font-bold text-[var(--text-primary)]">{tier.name}</h3>
                         {tierKey === 'pro' && (
-                          <span className="text-[9px] px-2 py-0.5 rounded-full bg-gradient-to-r from-[var(--color-accent)] to-[#0891b2] text-white font-bold uppercase tracking-wider">
+                          <span className="text-[9px] px-2 py-0.5 rounded-full bg-[var(--color-accent)] text-[var(--bg-base)] font-bold uppercase tracking-wider">
                             Popular
                           </span>
                         )}
                         {tierKey === 'founding_member' && foundingInfo && (
                           <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
                             foundingInfo.remaining === 0
-                              ? 'bg-red-500/15 text-red-400 border border-red-500/30'
+                              ? 'bg-[var(--color-destructive-bg)] text-[var(--color-destructive)] border border-[var(--color-destructive-border)]'
                               : foundingInfo.remaining <= 3
-                                ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30 animate-pulse'
-                                : 'bg-purple-500/15 text-purple-300 border border-purple-500/30'
+                                ? 'bg-[var(--color-warning-bg)] text-[var(--color-warning)] border border-[var(--color-warning-border)] animate-pulse'
+                                : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] border border-[var(--border-default)]'
                           }`}>
                             {foundingInfo.remaining === 0
                               ? t('foundingSoldOut')
@@ -1771,11 +1779,11 @@ export default function BillingPage() {
                               <span className="text-xs text-[var(--text-muted)] font-normal"> {suffix}</span>
                             </span>
                             {!isLifetime && billingPeriod === 'annual' && (
-                              <span className="text-[10px] text-green-400 font-semibold">
+                              <span className="text-[10px] text-[var(--color-success)] font-semibold">
                                 Save ${(monthly * 12 - displayPrice).toFixed(2)}/yr
                               </span>
                             )}
-                            <span className="text-[10px] text-amber-300 font-semibold">
+                            <span className="text-[10px] text-[var(--color-warning)] font-semibold">
                               {t('hatcherDiscountDesc', { price: `$${hatcherPrice.toFixed(2)}` })}
                             </span>
                           </div>
@@ -1806,10 +1814,10 @@ export default function BillingPage() {
                         <button
                           onClick={() => handleSubscribe(tierKey)}
                           disabled={isSubscribing || subscribing !== null || foundingSoldOut}
-                          className="w-full inline-flex items-center justify-center gap-1.5 text-sm px-4 py-2.5 rounded-xl font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed text-white"
+                          className="w-full inline-flex items-center justify-center gap-1.5 text-sm px-4 py-2.5 rounded-xl font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed text-[var(--bg-base)]"
                           style={{
                             background: foundingSoldOut ? 'var(--bg-elevated)' : 'var(--color-accent)',
-                            boxShadow: foundingSoldOut ? 'none' : '0 4px 16px rgba(6,182,212,0.3)',
+                            boxShadow: foundingSoldOut ? 'none' : '0 4px 16px var(--accent-glow)',
                           }}
                         >
                           {isSubscribing ? (
@@ -1893,11 +1901,11 @@ export default function BillingPage() {
                           <span className="text-xs text-[var(--text-muted)]">{suffix}</span>
                         </div>
                         {isSub && billingPeriod === 'annual' && (
-                          <p className="text-[10px] text-green-400 font-semibold mb-2">
+                          <p className="text-[10px] text-[var(--color-success)] font-semibold mb-2">
                             Save ${(addon.usdPrice * 12 - displayPrice).toFixed(2)}/yr
                           </p>
                         )}
-                        <p className="text-[10px] text-amber-300 font-semibold mb-2">
+                        <p className="text-[10px] text-[var(--color-warning)] font-semibold mb-2">
                           {t('hatcherDiscountDesc', { price: `$${hatcherPrice.toFixed(2)}` })}
                         </p>
                         <p className="text-xs text-[var(--text-secondary)] mb-3 flex-1">
@@ -2050,9 +2058,9 @@ export default function BillingPage() {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="fixed top-20 left-1/2 -translate-x-1/2 z-50 card-solid px-5 py-3 border-l-4 border-green-500 shadow-lg max-w-[calc(100vw-2rem)]"
+          className="fixed top-20 left-1/2 -translate-x-1/2 z-50 card-solid px-5 py-3 border-l-4 border-[var(--color-success)] shadow-lg max-w-[calc(100vw-2rem)]"
         >
-          <p className="text-sm text-green-400">{successMsg}</p>
+          <p className="text-sm text-[var(--color-success)]">{successMsg}</p>
         </motion.div>
       )}
     </motion.div>

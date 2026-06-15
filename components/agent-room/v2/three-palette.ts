@@ -14,21 +14,21 @@ export interface FrameworkPalette {
 
 export const FRAMEWORK_PALETTES: Record<Framework, FrameworkPalette> = {
   openclaw: {
-    primary: 0xfacc15,
-    dim: 0xca8a04,
-    bright: 0xfef08a,
-    primaryHex: '#FACC15',
-    dimHex: '#CA8A04',
-    brightHex: '#FEF08A',
-  },
-  hermes: {
-    primary: 0xa855f7,
-    dim: 0x7e22ce,
-    bright: 0xe9d5ff,
-    primaryHex: '#A855F7',
-    dimHex: '#7E22CE',
-    brightHex: '#E9D5FF',
-  },
+    primary: 0xd6b177,
+    dim: 0x8a6d45,
+    bright: 0xffe4ad,
+    primaryHex: '#D6B177',
+    dimHex: '#8A6D45',
+    brightHex: '#FFE4AD',
+	  },
+	  hermes: {
+	    primary: 0x9ed5e7,
+	    dim: 0x607d8d,
+	    bright: 0xd7eff5,
+	    primaryHex: '#9ED5E7',
+	    dimHex: '#607D8D',
+	    brightHex: '#D7EFF5',
+	  },
 };
 
 export function paletteFor(framework: string): FrameworkPalette {

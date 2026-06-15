@@ -46,10 +46,10 @@ function SkyDome({ timeMode }: { timeMode: LiveCityTimeMode }) {
   const uniforms = useMemo(
     () => ({
       uTop: {
-        value: new THREE.Color(timeMode === 'day' ? 0x78a9df : 0x070d20),
+        value: new THREE.Color(timeMode === 'day' ? 0x82b5df : 0x070d20),
       },
       uBottom: {
-        value: new THREE.Color(timeMode === 'day' ? 0xe5edf4 : 0x1a2548),
+        value: new THREE.Color(timeMode === 'day' ? 0xd8eadb : 0x1a2548),
       },
       uOffset: { value: timeMode === 'day' ? 0 : 0.05 },
       uExp: { value: timeMode === 'day' ? 0.72 : 0.5 },
@@ -137,10 +137,10 @@ function Terrain({ grid, timeMode }: InfrastructureProps) {
     terrain.rotateX(-Math.PI / 2);
     const positions = terrain.attributes.position as THREE.BufferAttribute;
     const colors = new Float32Array(positions.count * 3);
-    const grass = new THREE.Color(timeMode === 'day' ? 0x7dbb72 : 0x314a31);
-    const grass2 = new THREE.Color(timeMode === 'day' ? 0x95ca86 : 0x3f5d3c);
-    const dirt = new THREE.Color(timeMode === 'day' ? 0x8b805c : 0x514b37);
-    const rock = new THREE.Color(timeMode === 'day' ? 0x6d7588 : 0x343847);
+    const grass = new THREE.Color(timeMode === 'day' ? 0x6f966c : 0x1e2a30);
+    const grass2 = new THREE.Color(timeMode === 'day' ? 0x96b878 : 0x293741);
+    const dirt = new THREE.Color(timeMode === 'day' ? 0x8d8a73 : 0x373532);
+    const rock = new THREE.Color(timeMode === 'day' ? 0x7c9090 : 0x303944);
 
     for (let i = 0; i < positions.count; i++) {
       const x = positions.getX(i);
@@ -227,16 +227,160 @@ function StreetGrid({ grid }: GridProps) {
   return (
     <group>
       {grid.roads.map((road) => (
-        <mesh key={road.key} position={[road.x, 0, road.z]} receiveShadow>
-          <boxGeometry args={[road.width, 0.04, road.depth]} />
-          <meshLambertMaterial color={0x1a2130} />
+        <group key={road.key} position={[road.x, 0, road.z]}>
+          <mesh position={[0, 0, 0]} receiveShadow>
+            <boxGeometry args={[road.width, 0.04, road.depth]} />
+            <meshLambertMaterial color={0x20282a} />
+          </mesh>
+          <mesh position={[0, 0.025, 0]} receiveShadow>
+            <boxGeometry
+              args={[
+                road.kind === 'vertical' ? road.width * 0.74 : road.width,
+                0.035,
+                road.kind === 'horizontal' ? road.depth * 0.74 : road.depth,
+              ]}
+            />
+            <meshLambertMaterial color={0x293434} />
+          </mesh>
+          <mesh position={[0, 0.054, 0]}>
+            <boxGeometry
+              args={[
+                road.kind === 'vertical' ? 0.08 : road.width,
+                0.018,
+                road.kind === 'horizontal' ? 0.08 : road.depth,
+              ]}
+            />
+            <meshBasicMaterial
+              color={0xbdd6cf}
+              transparent
+              opacity={0.2}
+              depthWrite={false}
+              toneMapped={false}
+            />
+          </mesh>
+          <RoadCurbs road={road} />
+        </group>
+      ))}
+      <IntersectionNodes grid={grid} />
+      <CrosswalkNodes grid={grid} />
+      {stripeMarks.map((mark) => (
+            <mesh key={mark.key} position={[mark.x, 0.001, mark.z]}>
+              <boxGeometry args={[mark.width, 0.045, mark.depth]} />
+              <meshBasicMaterial
+                color={0x9fb1aa}
+                transparent
+                opacity={0.12}
+                depthWrite={false}
+                toneMapped={false}
+              />
+            </mesh>
+      ))}
+    </group>
+  );
+}
+
+function CrosswalkNodes({ grid }: GridProps) {
+  const stripeLength = LIVE_CITY_GUTTER * 0.48;
+  const laneOffset = LIVE_CITY_GUTTER * 0.74;
+  return (
+    <group>
+      {grid.nodes.map((node) => (
+        <group key={`crosswalk-${node.id}`} position={[node.x, 0.135, node.z]}>
+          {[-1, 1].map((side) => (
+            <group key={`z-${side}`} position={[0, 0, side * laneOffset]}>
+              {[-0.18, 0.18].map((x, index) => (
+                <mesh key={index} position={[x, 0, 0]}>
+                  <boxGeometry args={[0.055, 0.012, stripeLength]} />
+                  <meshBasicMaterial
+                    color={0xd9dfda}
+                    transparent
+                    opacity={0.08}
+                    depthWrite={false}
+                    toneMapped={false}
+                  />
+                </mesh>
+              ))}
+            </group>
+          ))}
+          {[-1, 1].map((side) => (
+            <group key={`x-${side}`} position={[side * laneOffset, 0, 0]}>
+              {[-0.18, 0.18].map((z, index) => (
+                <mesh key={index} position={[0, 0, z]}>
+                  <boxGeometry args={[stripeLength, 0.012, 0.055]} />
+                  <meshBasicMaterial
+                    color={0xd9dfda}
+                    transparent
+                    opacity={0.08}
+                    depthWrite={false}
+                    toneMapped={false}
+                  />
+                </mesh>
+              ))}
+            </group>
+          ))}
+        </group>
+      ))}
+    </group>
+  );
+}
+
+function RoadCurbs({ road }: { road: { width: number; depth: number; kind: 'vertical' | 'horizontal' } }) {
+  const isVertical = road.kind === 'vertical';
+  const curbOffset = isVertical ? road.width * 0.45 : road.depth * 0.45;
+  const curbLength = isVertical ? road.depth : road.width;
+  const curbSize: [number, number, number] = isVertical
+    ? [0.08, 0.09, curbLength]
+    : [curbLength, 0.09, 0.08];
+  return (
+    <group>
+      {[-1, 1].map((side) => (
+        <mesh
+          key={side}
+          position={isVertical ? [side * curbOffset, 0.07, 0] : [0, 0.07, side * curbOffset]}
+          receiveShadow
+        >
+          <boxGeometry args={curbSize} />
+          <meshLambertMaterial color={0x9da4a7} />
         </mesh>
       ))}
-      {stripeMarks.map((mark) => (
-        <mesh key={mark.key} position={[mark.x, 0.001, mark.z]}>
-          <boxGeometry args={[mark.width, 0.045, mark.depth]} />
-          <meshBasicMaterial color={0xcfd8ea} transparent opacity={0.7} />
-        </mesh>
+    </group>
+  );
+}
+
+function IntersectionNodes({ grid }: GridProps) {
+  return (
+    <group>
+      {grid.nodes.map((node) => (
+        <group key={node.id} position={[node.x, 0.09, node.z]}>
+          <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+            <circleGeometry args={[LIVE_CITY_GUTTER * 0.58, 48]} />
+            <meshLambertMaterial color={0x656c70} />
+          </mesh>
+          <mesh position={[0, 0.015, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[LIVE_CITY_GUTTER * 0.35, LIVE_CITY_GUTTER * 0.42, 56]} />
+            <meshBasicMaterial
+              color={0xd6b177}
+              transparent
+              opacity={0.32}
+              depthWrite={false}
+              toneMapped={false}
+            />
+          </mesh>
+          <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[LIVE_CITY_GUTTER * 0.5, LIVE_CITY_GUTTER * 0.53, 64]} />
+            <meshBasicMaterial
+              color={0xd5dfd9}
+              transparent
+              opacity={0.14}
+              depthWrite={false}
+              toneMapped={false}
+            />
+          </mesh>
+          <mesh position={[0, 0.04, 0]}>
+            <cylinderGeometry args={[0.16, 0.18, 0.12, 16]} />
+            <meshLambertMaterial color={0xd8d5cb} />
+          </mesh>
+        </group>
       ))}
     </group>
   );
@@ -246,9 +390,9 @@ function CitySignalBackbone({ grid, timeMode }: InfrastructureProps) {
   const packetRefs = useRef<(THREE.Mesh | null)[]>([]);
   const packetCount = Math.min(18, Math.max(6, grid.Nsb * 3));
   const travelLength = Math.max(20, grid.totalW - LIVE_CITY_GUTTER * 2);
-  const glowColor = timeMode === 'night' ? '#65e7ff' : '#0b5f47';
-  const packetA = timeMode === 'night' ? '#65e7ff' : '#0f766e';
-  const packetB = timeMode === 'night' ? '#39ff88' : '#047857';
+  const glowColor = timeMode === 'night' ? '#9ed5e7' : '#3f7f96';
+  const packetA = timeMode === 'night' ? '#9ed5e7' : '#3f7f96';
+  const packetB = timeMode === 'night' ? '#d6b177' : '#8a6d45';
 
   useFrame(({ clock }) => {
     const t = clock.elapsedTime;
@@ -262,7 +406,7 @@ function CitySignalBackbone({ grid, timeMode }: InfrastructureProps) {
         : travelLength / 2 - phase * travelLength;
       packet.position.z = lane;
       const material = packet.material as THREE.MeshBasicMaterial;
-      material.opacity = 0.3 + Math.sin(t * 3 + index) * 0.12;
+      material.opacity = 0.18 + Math.sin(t * 3 + index) * 0.08;
     });
   });
 
@@ -300,7 +444,7 @@ function CitySignalBackbone({ grid, timeMode }: InfrastructureProps) {
           <meshBasicMaterial
             color={index % 2 ? packetA : packetB}
             transparent
-            opacity={0.34}
+            opacity={0.2}
             depthWrite={false}
             toneMapped={false}
           />
@@ -324,13 +468,25 @@ function StreetLights({ grid, timeMode }: InfrastructureProps) {
           const dz = zi < grid.streetZs.length - 1 ? inset : -inset;
           return (
             <group key={`lamp-${x}-${z}`} position={[x + dx, 0, z + dz]}>
-              <mesh position={[0, 0.8, 0]} castShadow receiveShadow>
-                <cylinderGeometry args={[0.05, 0.05, 1.6, 5]} />
-                <meshLambertMaterial color={0x2a2f3d} />
+              <mesh position={[0, 0.75, 0]} castShadow receiveShadow>
+                <cylinderGeometry args={[0.045, 0.06, 1.5, 8]} />
+                <meshLambertMaterial color={0x2a3037} />
               </mesh>
-              <mesh position={[0, 1.6, 0]}>
-                <sphereGeometry args={[0.11, 6, 5]} />
-                <meshBasicMaterial color={timeMode === 'night' ? 0xffe0a8 : 0x8b9096} />
+              <mesh position={[0, 1.48, 0]} rotation={[Math.PI / 2, 0, 0]}>
+                <torusGeometry args={[0.22, 0.018, 8, 24]} />
+                <meshBasicMaterial
+                  color={timeMode === 'night' ? 0xffe0a8 : 0xd8e5da}
+                  transparent
+                  opacity={timeMode === 'night' ? 0.72 : 0.46}
+                  toneMapped={false}
+                />
+              </mesh>
+              <mesh position={[0, 1.54, 0]}>
+                <sphereGeometry args={[0.09, 10, 8]} />
+                <meshBasicMaterial
+                  color={timeMode === 'night' ? 0xffe0a8 : 0xd8e5da}
+                  toneMapped={false}
+                />
               </mesh>
             </group>
           );
@@ -354,7 +510,7 @@ function TreeRing({ grid, timeMode }: InfrastructureProps) {
         >
           <mesh position={[0, 0.6, 0]} castShadow receiveShadow>
             <cylinderGeometry args={[0.18, 0.22, 1.2, 5]} />
-            <meshLambertMaterial color={0x4a3624} />
+            <meshLambertMaterial color={0x27323d} />
           </mesh>
           <mesh position={[0, tree.cone ? 1.9 : 1.6, 0]} castShadow receiveShadow>
             {tree.cone ? (
@@ -407,7 +563,7 @@ function MountainRing({ timeMode }: { timeMode: LiveCityTimeMode }) {
 }
 
 function foliageColor(index: number, timeMode: LiveCityTimeMode): number {
-  const day = [0x4f8a46, 0x62a152, 0x88ad45];
-  const night = [0x2f5630, 0x3d6739, 0x566f32];
-  return (timeMode === 'day' ? day : night)[index] ?? 0x62a152;
+  const day = [0x5f8f58, 0x74a965, 0x8fab60];
+  const night = [0x24313a, 0x2f3e46, 0x384653];
+  return (timeMode === 'day' ? day : night)[index] ?? 0x74a965;
 }

@@ -70,11 +70,11 @@ export function labelAgentStatus(status: string | undefined): string {
 
 export function statusColor(status: string | undefined): string {
   switch (status) {
-    case 'active':
-    case 'running':
-      return '#68ff8a';
-    case 'restarting':
-      return '#22d3ee';
+	    case 'active':
+	    case 'running':
+	      return '#89d6c6';
+	    case 'restarting':
+	      return '#9ed5e7';
     case 'paused':
       return '#facc15';
     case 'archived':

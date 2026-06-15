@@ -234,10 +234,10 @@ function ShareActions({ shareLink }: { shareLink: string }) {
 // ─── Status badge ────────────────────────────────────────────
 function StatusBadge({ status }: { status: Commission['status'] }) {
   const style: Record<Commission['status'], { bg: string; color: string; label: string }> = {
-    PENDING: { bg: 'rgba(245,158,11,0.10)', color: '#f59e0b', label: 'Pending' },
-    PAYABLE: { bg: 'rgba(34,197,94,0.10)', color: '#22c55e', label: 'Payable' },
-    PAID: { bg: 'rgba(59,130,246,0.10)', color: '#60a5fa', label: 'Paid' },
-    VOIDED: { bg: 'rgba(239,68,68,0.10)', color: '#f87171', label: 'Voided' },
+    PENDING: { bg: 'var(--color-warning-bg)', color: 'var(--color-warning)', label: 'Pending' },
+    PAYABLE: { bg: 'var(--color-success-bg)', color: 'var(--color-success)', label: 'Payable' },
+    PAID: { bg: 'var(--color-info-bg)', color: 'var(--color-info)', label: 'Paid' },
+    VOIDED: { bg: 'var(--color-destructive-bg)', color: 'var(--color-destructive)', label: 'Voided' },
   };
   const s = style[status];
   return (
@@ -493,16 +493,16 @@ export default function AffiliateDashboardPage() {
         </motion.div>
 
         {error && (
-          <div className="rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 mb-6 text-sm text-red-400">
+          <div className="rounded-xl border border-[var(--color-destructive-border)] bg-[var(--color-destructive-bg)] px-4 py-3 mb-6 text-sm text-[var(--color-destructive)]">
             {error}
           </div>
         )}
 
         {aff?.isFrozen && (
-          <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3 mb-6 text-sm flex items-start gap-2">
-            <AlertTriangle size={16} className="text-amber-400 flex-shrink-0 mt-0.5" />
+          <div className="rounded-xl border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-4 py-3 mb-6 text-sm flex items-start gap-2">
+            <AlertTriangle size={16} className="text-[var(--color-warning)] flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-amber-400">{t('frozenTitle')}</p>
+              <p className="font-semibold text-[var(--color-warning)]">{t('frozenTitle')}</p>
               <p className="text-xs text-[var(--text-muted)] mt-0.5">
                 {aff.frozenReason ?? 'Contact support for details.'}
               </p>
@@ -540,13 +540,13 @@ export default function AffiliateDashboardPage() {
             <p className="text-xs text-[var(--text-muted)] mt-3">
               {t('referralLinkDesc')}
             </p>
-            <div className="mt-4 flex flex-col gap-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="mt-4 flex flex-col gap-3 rounded-xl border border-[var(--color-success-border)] bg-[var(--color-success-bg)] p-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-start gap-3 min-w-0">
-                <span className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-300">
+                <span className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-[var(--color-success-bg)] text-[var(--color-success)]">
                   <Gift size={16} />
                 </span>
                 <div className="min-w-0">
-                  <p className="text-xs font-semibold text-emerald-300">{t('aiCreditRewardTitle')}</p>
+                  <p className="text-xs font-semibold text-[var(--color-success)]">{t('aiCreditRewardTitle')}</p>
                   <p className="mt-1 text-xs text-[var(--text-muted)]">
                     {t('aiCreditRewardDesc', { credit: REFERRAL_REWARD_LABEL })}
                   </p>
@@ -556,7 +556,7 @@ export default function AffiliateDashboardPage() {
                 type="button"
                 onClick={claimReferralCredits}
                 disabled={claimingReferralCredits || referrals.length === 0}
-                className="inline-flex items-center justify-center rounded-lg border border-emerald-500/30 px-3 py-2 text-xs font-semibold text-emerald-200 transition-colors hover:bg-emerald-500/10 disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex items-center justify-center rounded-lg border border-[var(--color-success-border)] px-3 py-2 text-xs font-semibold text-[var(--color-success)] transition-colors hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {claimingReferralCredits ? t('claimingAiCredits') : t('claimAiCredits')}
               </button>
@@ -583,13 +583,13 @@ export default function AffiliateDashboardPage() {
                 label={t('pending30d')}
                 value={fmtUsd(stats.pending.cashUsd)}
                 icon={Clock}
-                iconColor="#f59e0b"
+                iconColor="var(--color-warning)"
               />
               <StatCard
                 label={t('payableNow')}
                 value={fmtUsd(stats.payable.cashUsd)}
                 icon={Wallet}
-                iconColor="#22c55e"
+                iconColor="var(--color-success)"
                 highlight={payableHighlight}
               />
               <StatCard
@@ -597,7 +597,7 @@ export default function AffiliateDashboardPage() {
                 value={fmtUsd(stats.lifetime.cashUsdEarned)}
                 sub={`${fmtUsd(stats.lifetime.cashUsdPaidOut)} ${t('statusPaid').toLowerCase()} out`}
                 icon={TrendingUp}
-                iconColor="#60a5fa"
+                iconColor="var(--color-info)"
               />
             </>
           )}
@@ -629,8 +629,8 @@ export default function AffiliateDashboardPage() {
                   <td className="px-5 py-3 text-xs text-[var(--text-muted)]">{fmtDate(r.referredAt)}</td>
                   <td className="px-5 py-3 font-mono text-xs text-[var(--text-primary)]">{r.maskedEmail}</td>
                   <td className="px-5 py-3">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide ${r.isPaid ? 'text-green-400' : 'text-[var(--text-muted)]'}`}
-                      style={{ background: r.isPaid ? 'rgba(34,197,94,0.10)' : 'var(--bg-card)' }}
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide ${r.isPaid ? 'text-[var(--color-success)]' : 'text-[var(--text-muted)]'}`}
+                      style={{ background: r.isPaid ? 'var(--color-success-bg)' : 'var(--bg-card)' }}
                     >
                       {r.isPaid ? 'Paid' : 'Free'}
                     </span>
@@ -638,9 +638,9 @@ export default function AffiliateDashboardPage() {
                   <td className="px-5 py-3">
                     <span
                       className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide ${
-                        r.rewardClaimed ? 'text-emerald-300' : 'text-[var(--text-muted)]'
+                        r.rewardClaimed ? 'text-[var(--color-success)]' : 'text-[var(--text-muted)]'
                       }`}
-                      style={{ background: r.rewardClaimed ? 'rgba(16,185,129,0.10)' : 'var(--bg-card)' }}
+                      style={{ background: r.rewardClaimed ? 'var(--color-success-bg)' : 'var(--bg-card)' }}
                     >
                       {r.rewardClaimed ? t('aiCreditsClaimed') : t('aiCreditsPending')}
                     </span>
@@ -648,7 +648,7 @@ export default function AffiliateDashboardPage() {
                   <td className="px-5 py-3 text-xs text-[var(--text-primary)] capitalize">{r.tier ?? '—'}</td>
                   <td className="px-5 py-3">
                     {r.isFlagged && (
-                      <span className="inline-flex items-center gap-1 text-[10px] text-red-400" title={r.flagReason ?? 'Flagged'}>
+                      <span className="inline-flex items-center gap-1 text-[10px] text-[var(--color-destructive)]" title={r.flagReason ?? 'Flagged'}>
                         <Flag size={11} /> Flagged
                       </span>
                     )}

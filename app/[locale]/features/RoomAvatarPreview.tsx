@@ -16,7 +16,7 @@ export default function RoomAvatarPreview() {
     >
       <ambientLight intensity={1.6} />
       <directionalLight position={[2.8, 4.2, 4.8]} intensity={2.4} />
-      <pointLight position={[-2.8, 1.8, 2.2]} color="#39ff88" intensity={0.8} />
+      <pointLight position={[-2.8, 1.8, 2.2]} color="#4a778b" intensity={0.8} />
       <Suspense fallback={null}>
         <group
           position={[-0.62, -1.04, 0]}
@@ -29,14 +29,14 @@ export default function RoomAvatarPreview() {
             palette={palette}
             isStreaming
             status="active"
-            avatarVariant="abandoned-mecha"
+            avatarVariant="hatcher-hatchling-operator"
             activeEmote="scan"
             showStatusAura={false}
           />
         </group>
         <group
-          position={[1.18, -0.36, -0.15]}
-          scale={0.68}
+          position={[1.12, -0.74, -0.15]}
+          scale={0.72}
           rotation={[0, -0.28, 0]}
         >
           <AgentBody
@@ -45,7 +45,7 @@ export default function RoomAvatarPreview() {
             palette={palette}
             isStreaming
             status="active"
-            avatarVariant="scout-drone"
+            avatarVariant="hatcher-hatchling-service"
             activeEmote="scan"
             showStatusAura={false}
           />

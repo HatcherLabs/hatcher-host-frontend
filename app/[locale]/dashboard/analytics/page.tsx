@@ -68,15 +68,15 @@ function formatUsageKind(kind: string): string {
 }
 
 const FRAMEWORK_COLORS: Record<string, string> = {
-  openclaw: '#f59e0b',
-  hermes: '#a855f7',
+  openclaw: 'var(--color-accent)',
+  hermes: 'var(--color-info)',
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  active: '#22c55e',
+  active: 'var(--color-success)',
   sleeping: 'var(--text-muted)',
-  paused: '#f59e0b',
-  error: '#ef4444',
+  paused: 'var(--color-warning)',
+  error: 'var(--color-destructive)',
   restarting: 'var(--color-accent)',
 };
 
@@ -291,7 +291,7 @@ export default function AnalyticsPage() {
         </motion.div>
 
         {error && (
-          <div className="rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 mb-6 text-sm text-red-400">
+          <div className="rounded-xl border border-[var(--color-destructive-border)] bg-[var(--color-destructive-bg)] px-4 py-3 mb-6 text-sm text-[var(--color-destructive)]">
             {error}
           </div>
         )}
@@ -308,10 +308,10 @@ export default function AnalyticsPage() {
             ))
           ) : (
             <>
-              <StatCard icon={Bot} label={t('totalAgents')} value={data?.totalAgents ?? 0} sub={t('totalAgentsSub', { active: data?.activeAgents ?? 0 })} color="#8b5cf6" />
-              <StatCard icon={Coins} label={t('aiCreditsBalance')} value={formatNumber(aiCredits?.balance ?? 0)} sub={t('monthlyGrant', { count: aiCredits?.monthlyGrant ?? 0 })} color="#22c55e" />
-              <StatCard icon={Zap} label={t('aiCreditsUsed')} value={formatNumber(aiCredits?.usedLast30 ?? 0)} sub={t('last30Days')} color="#f59e0b" />
-              <StatCard icon={Activity} label={t('last14DaysLabel')} value={formatNumber(totalDailyMessages)} sub={t('last14DaysSub')} color="#22c55e" />
+              <StatCard icon={Bot} label={t('totalAgents')} value={data?.totalAgents ?? 0} sub={t('totalAgentsSub', { active: data?.activeAgents ?? 0 })} color="var(--color-accent)" />
+              <StatCard icon={Coins} label={t('aiCreditsBalance')} value={formatNumber(aiCredits?.balance ?? 0)} sub={t('monthlyGrant', { count: aiCredits?.monthlyGrant ?? 0 })} color="var(--color-info)" />
+              <StatCard icon={Zap} label={t('aiCreditsUsed')} value={formatNumber(aiCredits?.usedLast30 ?? 0)} sub={t('last30Days')} color="var(--color-warning)" />
+              <StatCard icon={Activity} label={t('last14DaysLabel')} value={formatNumber(totalDailyMessages)} sub={t('last14DaysSub')} color="var(--color-success)" />
             </>
           )}
         </div>
@@ -371,7 +371,7 @@ export default function AnalyticsPage() {
                   <>
                     <div className="h-2.5 rounded-full bg-[var(--bg-card)] overflow-hidden">
                       <motion.div
-                        className="h-full rounded-full bg-[#22c55e]"
+                        className="h-full rounded-full bg-[#486a79]"
                         initial={{ width: 0 }}
                         animate={{ width: `${aiCreditBalancePct}%` }}
                         transition={{ duration: 0.6, ease: 'easeOut' }}
@@ -612,7 +612,7 @@ export default function AnalyticsPage() {
           <div className="text-center py-16">
             <TrendingUp size={40} className="mx-auto text-[var(--text-muted)] mb-4" />
             <p className="text-sm text-[var(--text-muted)]">{t('noAgentsEmpty')}</p>
-            <Link href="/create" className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-xl text-sm font-medium bg-[#8b5cf6] text-white hover:bg-[#7c3aed] transition-colors">
+            <Link href="/create" className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-xl text-sm font-medium bg-[var(--color-accent)] text-[var(--bg-base)] hover:bg-[var(--color-accent-hover)] transition-colors">
               {t('createAgent')}
             </Link>
           </div>

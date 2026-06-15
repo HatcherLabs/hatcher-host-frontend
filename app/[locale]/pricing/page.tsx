@@ -47,7 +47,7 @@ const TIERS_META: TierDef[] = [
     name: 'Free',
     price: 0,
     icon: <Rocket className="w-5 h-5" />,
-    accent: '#22c55e',
+    accent: 'var(--color-accent)',
   },
   {
     key: 'starter',
@@ -61,7 +61,7 @@ const TIERS_META: TierDef[] = [
     name: 'Pro',
     price: 19.99,
     icon: <Crown className="w-5 h-5" />,
-    accent: '#8b5cf6',
+    accent: 'var(--color-accent)',
     highlighted: true,
   },
   {
@@ -69,14 +69,14 @@ const TIERS_META: TierDef[] = [
     name: 'Business',
     price: 49.99,
     icon: <Building2 className="w-5 h-5" />,
-    accent: '#f59e0b',
+    accent: '#6ea3f7',
   },
   {
     key: 'founding_member',
     name: 'Founding Member',
     price: 99,
     icon: <Gem className="w-5 h-5" />,
-    accent: '#e11d48',
+    accent: 'var(--color-warning)',
   },
 ];
 
@@ -146,41 +146,41 @@ export default function PricingPage() {
 
   return (
     <MarketingShell>
-      <div className="mx-auto max-w-7xl px-4 pt-12 sm:pt-16 pb-16 relative">
+      <div className="mx-auto max-w-7xl px-4 pt-20 sm:pt-24 pb-20 relative">
         {/* HERO */}
-        <div className="mb-14">
+        <div className="mb-12 max-w-4xl">
           <motion.p
-            initial={{ opacity: 0, y: 10 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]"
+            className="mb-4 text-[12px] font-semibold text-[var(--text-muted)]"
           >
             {t('eyebrow')}
           </motion.p>
           <motion.h1
-            initial={{ opacity: 0, y: 14 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.05] mb-5 text-[var(--text-primary)] max-w-3xl"
-            style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
+            className="text-5xl sm:text-6xl md:text-7xl font-semibold tracking-[-0.055em] leading-[0.96] mb-5 text-[var(--text-primary)] max-w-3xl"
+            style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}
           >
             {t('heading')}
           </motion.h1>
           <motion.p
-            initial={{ opacity: 0, y: 10 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, delay: 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="text-lg text-[var(--text-secondary)] max-w-2xl leading-relaxed"
+            className="max-w-[330px] text-lg leading-relaxed text-[var(--text-secondary)] sm:max-w-2xl"
           >
             {t('subheading')}
           </motion.p>
 
           {/* Monthly / Annual toggle */}
-          <div className="inline-flex items-center mt-8 p-1 rounded-md bg-[var(--bg-card)] border border-[var(--border-default)]">
+          <div className="inline-flex items-center mt-8 p-1 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
             <button
               onClick={() => setIsAnnual(false)}
               className={cn(
-                'px-4 py-1.5 rounded text-[13px] font-semibold transition-colors',
+                'px-4 py-2 rounded-md text-[13px] font-semibold transition-colors',
                 !isAnnual
                   ? 'bg-[var(--bg-base)] text-[var(--text-primary)]'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
@@ -191,7 +191,7 @@ export default function PricingPage() {
             <button
               onClick={() => setIsAnnual(true)}
               className={cn(
-                'px-4 py-1.5 rounded text-[13px] font-semibold transition-colors flex items-center gap-1.5',
+                'px-4 py-2 rounded-md text-[13px] font-semibold transition-colors flex items-center gap-1.5',
                 isAnnual
                   ? 'bg-[var(--bg-base)] text-[var(--text-primary)]'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
@@ -202,14 +202,14 @@ export default function PricingPage() {
             </button>
           </div>
 
-          <div className="mt-4 inline-flex max-w-full items-center gap-2 rounded-lg border border-amber-500/25 bg-amber-500/[0.06] px-3 py-2 text-xs font-medium text-amber-200">
+          <div className="mt-4 inline-flex max-w-full items-center gap-2 rounded-lg border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-3 py-2 text-xs font-medium text-[var(--color-warning)]">
             <Sparkles className="h-3.5 w-3.5 shrink-0" />
             <span>{t('hatcherDiscountBanner')}</span>
           </div>
         </div>
 
         {/* TIER CARDS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 mb-20">
           {TIERS_META.map((tier) => {
             const isLifetime = tier.key === 'founding_member';
             const monthlyPrice = tier.price;
@@ -238,19 +238,19 @@ export default function PricingPage() {
                 viewport={{ once: true, amount: 0.1 }}
                 transition={{ duration: 0.4 }}
                 className={cn(
-                  'relative rounded-xl p-6 flex flex-col',
+                  'relative rounded-lg p-6 flex flex-col',
                   tier.highlighted
-                    ? 'border-2 border-[var(--color-accent)] bg-[var(--bg-card)]'
+                    ? 'border border-[var(--color-accent)] bg-[var(--bg-card)] shadow-[var(--shadow-soft)]'
                     : isLifetime
-                      ? 'border border-[var(--color-accent)]/40 bg-[var(--bg-card)]'
+                      ? 'border border-[var(--color-warning-border)] bg-[var(--bg-card)]'
                       : 'border border-[var(--border-default)] bg-[var(--bg-card)]/40'
                 )}
               >
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4">
-                  <p className="text-[11px] font-semibold tracking-[0.2em] uppercase text-[var(--text-muted)]">{tTiers(`${tier.key as 'free' | 'starter' | 'pro' | 'business' | 'founding_member'}.name`)}</p>
-                  {tier.highlighted && <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-accent)]">{t('tierBadges.popular')}</span>}
-                  {isLifetime && <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-accent)]">{t('tierBadges.limited')}</span>}
+                  <p className="text-sm font-semibold text-[var(--text-muted)]">{tTiers(`${tier.key as 'free' | 'starter' | 'pro' | 'business' | 'founding_member'}.name`)}</p>
+                  {tier.highlighted && <span className="text-[11px] font-semibold text-[var(--color-accent)]">{t('tierBadges.popular')}</span>}
+                  {isLifetime && <span className="text-[11px] font-semibold text-[var(--color-accent)]">{t('tierBadges.limited')}</span>}
                 </div>
 
                 {/* Price */}
@@ -260,7 +260,7 @@ export default function PricingPage() {
                       <motion.span
                         key={`${tier.key}-price-${isAnnual}`}
                         className="text-[32px] font-bold text-[var(--text-primary)] tabular-nums leading-none"
-                        initial={{ opacity: 0, y: -6 }}
+                        initial={false}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 6 }}
                         transition={{ duration: 0.18 }}
@@ -284,7 +284,7 @@ export default function PricingPage() {
                     <p className="text-[11px] text-[var(--color-accent)] font-medium mt-1.5">{t('payOnce')}</p>
                   )}
                   {monthlyPrice > 0 && (
-                    <p className="text-[11px] text-amber-300 font-medium mt-1.5">
+                    <p className="text-[11px] text-[var(--color-warning)] font-medium mt-1.5">
                       {annualTotal
                         ? t('hatcherDiscountAnnual', { price: hatcherPrice.toFixed(2) })
                         : t('hatcherDiscountLine', { price: hatcherPrice.toFixed(2) })}
@@ -296,7 +296,7 @@ export default function PricingPage() {
                 {isLifetime && (
                   <div className="mb-5">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] uppercase tracking-[0.15em] font-semibold text-[var(--text-muted)]">{t('availability')}</span>
+                      <span className="text-[11px] font-semibold text-[var(--text-muted)]">{t('availability')}</span>
                       {foundingRemaining === null ? (
                         <span className="text-[11px] text-[var(--text-muted)] inline-flex items-center gap-1.5">
                           <span className="w-2.5 h-2.5 border-2 border-[var(--text-muted)]/30 border-t-[var(--text-muted)] rounded-full animate-spin" />
@@ -305,8 +305,8 @@ export default function PricingPage() {
                       ) : (
                         <span className={cn(
                           'text-[11px] font-semibold tabular-nums',
-                          foundingRemaining === 0 ? 'text-red-400'
-                            : foundingRemaining <= 3 ? 'text-orange-400'
+                          foundingRemaining === 0 ? 'text-[var(--color-destructive)]'
+                            : foundingRemaining <= 3 ? 'text-[var(--color-warning)]'
                             : 'text-[var(--text-primary)]'
                         )}>
                           {foundingRemaining === 0
@@ -392,7 +392,7 @@ export default function PricingPage() {
 
               return (
                 <div key={groupKey}>
-                  <h3 className="text-xs uppercase tracking-wider font-bold text-[var(--text-muted)] mb-3 text-center">
+                  <h3 className="text-sm font-semibold text-[var(--text-muted)] mb-3 text-center">
                     {groupLabel}
                   </h3>
                   <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -416,14 +416,14 @@ export default function PricingPage() {
                           <p className="text-[var(--text-muted)] text-[10px] mb-2 font-medium">
                             {addon.period}
                           </p>
-                          <p className="text-[10px] text-amber-300 font-semibold mb-2">
+                          <p className="text-[10px] text-[var(--color-warning)] font-semibold mb-2">
                             {t('addons.hatcherDiscount', { price: hatcherPrice.toFixed(2) })}
                           </p>
                           <p className="text-[11px] text-[var(--text-secondary)]">
                             {addon.description}
                           </p>
                           {isAnnual && isSubscription && (
-                            <p className="text-[10px] text-green-400 font-semibold mt-2">
+                            <p className="text-[10px] text-[var(--color-success)] font-semibold mt-2">
                               {t('addons.annualDiscount')}
                             </p>
                           )}
@@ -440,14 +440,14 @@ export default function PricingPage() {
         {/* BYOK + INTEGRATIONS CALLOUT */}
         <section className="mb-20">
           <div className="card glass-noise p-8 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[radial-gradient(circle,rgba(34,197,94,0.06),transparent_70%)] pointer-events-none" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[radial-gradient(circle,color-mix(in_srgb,var(--color-info)_8%,transparent),transparent_70%)] pointer-events-none" />
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center">
-                <MessageSquare className="w-6 h-6 text-green-400" />
+              <div className="w-12 h-12 rounded-xl bg-[var(--color-info-bg)] border border-[var(--color-info-border)] flex items-center justify-center">
+                <MessageSquare className="w-6 h-6 text-[var(--color-info)]" />
               </div>
               <div>
                 <h2 className="text-xl font-bold text-[var(--text-primary)]">{t('integrations.heading')}</h2>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-green-400 border border-green-500/20 bg-green-500/10 px-2.5 py-0.5 rounded-full">
+                <span className="text-[11px] font-semibold text-[var(--color-success)] border border-[var(--color-success-border)] bg-[var(--color-success-bg)] px-2.5 py-0.5 rounded-md">
                   {t('integrations.badge')}
                 </span>
               </div>
@@ -482,25 +482,25 @@ export default function PricingPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-[var(--border-default)]">
-                    <th className="text-left px-2.5 py-3 sm:p-5 text-[var(--text-muted)] font-medium text-[10px] sm:text-xs uppercase tracking-wider">{t('compareTable.featureColumn')}</th>
-                    <th className="text-center px-2 py-3 sm:p-5 text-green-400 font-semibold">
-                      <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">{tTiers('free.name')}</div>
+                    <th className="text-left px-2.5 py-3 sm:p-5 text-[var(--text-muted)] font-semibold text-xs">{t('compareTable.featureColumn')}</th>
+                    <th className="text-center px-2 py-3 sm:p-5 text-[var(--color-success)] font-semibold">
+                      <div className="text-xs mb-1">{tTiers('free.name')}</div>
                       <div className="text-sm sm:text-lg font-extrabold">$0</div>
                     </th>
                     <th className="text-center px-2 py-3 sm:p-5 text-[var(--color-accent)] font-semibold">
-                      <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">{tTiers('starter.name')}</div>
+                      <div className="text-xs mb-1">{tTiers('starter.name')}</div>
                       <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$6.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">{t('priceUnit.perMonth')}</span></div>
                     </th>
-                    <th className="text-center px-2 py-3 sm:p-5 text-[#a78bfa] font-semibold">
-                      <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">{tTiers('pro.name')}</div>
+                    <th className="text-center px-2 py-3 sm:p-5 text-[var(--color-info)] font-semibold">
+                      <div className="text-xs mb-1">{tTiers('pro.name')}</div>
                       <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$19.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">{t('priceUnit.perMonth')}</span></div>
                     </th>
-                    <th className="text-center px-2 py-3 sm:p-5 text-[#f59e0b] font-semibold">
-                      <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">{tTiers('business.name')}</div>
+                    <th className="text-center px-2 py-3 sm:p-5 text-[var(--color-warning)] font-semibold">
+                      <div className="text-xs mb-1">{tTiers('business.name')}</div>
                       <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$49.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">{t('priceUnit.perMonth')}</span></div>
                     </th>
-                    <th className="text-center px-2 py-3 sm:p-5 text-[#f43f5e] font-semibold">
-                      <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">{tTiers('founding_member.name')}</div>
+                    <th className="text-center px-2 py-3 sm:p-5 text-[var(--color-destructive)] font-semibold">
+                      <div className="text-xs mb-1">{tTiers('founding_member.name')}</div>
                       <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">{t('compareTable.onceSuffix')}</span></div>
                     </th>
                   </tr>
@@ -537,9 +537,9 @@ export default function PricingPage() {
                       <td className="px-2.5 py-3 sm:p-4 text-[var(--text-secondary)] text-xs sm:text-sm">{row.label ?? t(`compareTable.rows.${row.rowKey}`)}</td>
                       <td className="px-2 py-3 sm:p-4 text-center">{renderCell(row.free, t)}</td>
                       <td className="px-2 py-3 sm:p-4 text-center">{renderCell(row.starter, t)}</td>
-                      <td className="px-2 py-3 sm:p-4 text-center bg-[#8b5cf6]/[0.03]">{renderCell(row.pro, t)}</td>
+                      <td className="px-2 py-3 sm:p-4 text-center bg-[var(--color-info-bg)]">{renderCell(row.pro, t)}</td>
                       <td className="px-2 py-3 sm:p-4 text-center">{renderCell(row.business, t)}</td>
-                      <td className="px-2 py-3 sm:p-4 text-center bg-[#e11d48]/[0.03]">{renderCell(row.founding, t)}</td>
+                      <td className="px-2 py-3 sm:p-4 text-center bg-[var(--color-warning-bg)]">{renderCell(row.founding, t)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -589,7 +589,7 @@ export default function PricingPage() {
 
         {/* CTA BANNER */}
         <div className="card glass-noise p-10 sm:p-14 text-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,var(--accent-glow),transparent_60%)] pointer-events-none" />
+          <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(88,214,141,0.08),transparent_62%)] pointer-events-none" />
           <h2 className="text-3xl sm:text-4xl font-extrabold mb-4 relative text-[var(--text-primary)]">
             {t('cta.heading')}
           </h2>
@@ -625,7 +625,7 @@ export default function PricingPage() {
 type TranslationFn = ReturnType<typeof useTranslations<'pricing'>>;
 
 function renderCell(value: string | boolean, t: TranslationFn) {
-  if (value === true)  return <Check className="w-4 h-4 text-green-400 mx-auto" />;
+  if (value === true)  return <Check className="w-4 h-4 text-[var(--color-success)] mx-auto" />;
   if (value === false) return <X className="w-4 h-4 text-[var(--text-muted)] opacity-40 mx-auto" />;
   // Special token strings mapped to translated values
   if (value === 'unlimited')   return <span className="text-[var(--text-secondary)] text-xs font-medium">{t('compareTable.values.unlimited')}</span>;
@@ -654,7 +654,7 @@ function FeatureCheck({ color, children }: { color: string; children: React.Reac
 function FeatureMissing({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-2.5 text-sm text-[var(--text-muted)]">
-      <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 bg-white/5">
+      <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 bg-[var(--bg-elevated)]">
         <X className="w-3 h-3 text-[var(--text-muted)] opacity-50" />
       </div>
       <span>{children}</span>
@@ -671,7 +671,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
     <div
       className={cn(
         'card glass-noise overflow-hidden transition-all duration-200',
-        open && 'border-[var(--border-hover)] shadow-[0_0_20px_var(--accent-glow)]'
+        open && 'border-[var(--border-hover)] shadow-[var(--shadow-soft)]'
       )}
     >
       <button

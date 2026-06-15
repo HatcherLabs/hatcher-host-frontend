@@ -105,7 +105,7 @@ export function ResourceAlertBadge({ cpuPercent, memPercent }: ResourceAlertBadg
     : `Memory ${memPercent.toFixed(0)}%`;
 
   return (
-    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/25 text-amber-400 text-[10px] font-medium">
+    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-[var(--color-warning-bg)] border border-[var(--color-warning-border)] text-[var(--color-warning)] text-[10px] font-medium">
       <AlertTriangle size={9} />
       {label}
     </span>

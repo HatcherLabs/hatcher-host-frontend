@@ -18,7 +18,7 @@ export default function DashboardError({
   return (
     <div className="min-h-[60vh] flex items-center justify-center px-4">
       <div className="card glass-noise p-10 text-center max-w-md">
-        <AlertTriangle className="w-10 h-10 text-red-400 mx-auto mb-4" />
+        <AlertTriangle className="w-10 h-10 text-[var(--color-destructive)] mx-auto mb-4" />
         <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2">
           Dashboard Error
         </h2>
@@ -28,7 +28,7 @@ export default function DashboardError({
         <div className="flex items-center justify-center gap-3">
           <button
             onClick={reset}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--color-accent)] hover:bg-[#0891b2] text-white rounded-xl font-semibold text-sm transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-[var(--bg-base)] rounded-xl font-semibold text-sm transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
             Retry

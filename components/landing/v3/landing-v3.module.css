@@ -1,9 +1,5 @@
 .page {
-  background:
-    linear-gradient(90deg, rgba(57, 255, 136, 0.025) 1px, transparent 1px),
-    linear-gradient(180deg, rgba(57, 255, 136, 0.02) 1px, transparent 1px),
-    var(--bg-base);
-  background-size: 88px 88px, 88px 88px, auto;
+  background: var(--bg-base);
   color: var(--text-primary);
   font-family: var(--font-body);
   min-height: 100vh;

@@ -15,65 +15,105 @@
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
 /* ── CSS Custom Properties ─────────────────────────── */
-/* v3 — terminal mono base + phosphor accent (dark-only).
-   Light theme support is removed in v3. Hardcoded color values in
-   component .btn-primary etc. classes are audited and replaced in
-   Phase E of the redesign — they remain as legacy artefacts here. */
+/* Premium OS system — graphite actions, porcelain surfaces, mineral-blue
+   tech emphasis, and warm metal only as a restrained secondary highlight. */
 :root {
-  /* Backgrounds — flat dark, no warm tint */
-  --bg-base: #0A0A0A;
-  --bg-surface: #131313;
-  --bg-sidebar: #0F0F0F;
-  --bg-card: #131313;
-  --bg-card-solid: #131313;
-  --bg-elevated: #1A1A1A;
-  --bg-hover: #1F1F1F;
-  --bg-active: #262626;
+  --bg-base: #f5f7f8;
+  --bg-surface: #ffffff;
+  --bg-sidebar: #f9fbfc;
+  --bg-card: #ffffff;
+  --bg-card-solid: #ffffff;
+  --bg-elevated: #eef2f4;
+  --bg-hover: #e4eaee;
+  --bg-active: #dce8ee;
 
-  /* Borders — neutral grey lines, no purple tint */
-  --border-line: #1F1F1F;
-  --border-default: #2A2A2A;
-  --border-hover: rgba(57, 255, 136, 0.3);
-  --border-active: #39FF88;
+  --border-line: rgba(23, 27, 25, 0.08);
+  --border-default: rgba(23, 27, 25, 0.13);
+  --border-hover: rgba(74, 119, 139, 0.34);
+  --border-active: #4a778b;
 
-  /* Text — high-contrast white scale */
-  --text-primary: #FFFFFF;
-  --text-secondary: #A0A0A0;
-  /* Bumped from #6B6B6B (3.7:1 on bg-base) to #8A8A8A (5.7:1) to clear
-     WCAG AA color-contrast for muted text — caught by axe-core E8 audit. */
-  --text-muted: #8A8A8A;
-  /* Was #4A4A4A (~2.1:1, fails AA). #707070 hits 4.0:1 — still below AA but
-     intended for decorative-only / hover affordances. Use --text-muted for
-     anything that needs to be readable. */
-  --text-dim: #707070;
-  --text-accent: #39FF88;
+  --text-primary: #141816;
+  --text-secondary: #505852;
+  --text-muted: #5f6964;
+  --text-dim: #717970;
+  --text-accent: #4a778b;
 
-  /* Accent — phosphor green (the only chromatic colour in the system) */
-  --accent: #39FF88;
-  --accent-hover: #7CFFB0;
-  --accent-glow: rgba(57, 255, 136, 0.18);
-  --color-accent: #39FF88;
-  --color-accent-hover: #7CFFB0;
+  --accent: #4a778b;
+  --accent-hover: #355d70;
+  --accent-strong: #26495a;
+  --accent-glow: rgba(74, 119, 139, 0.2);
+  --color-accent: #4a778b;
+  --color-accent-hover: #355d70;
+  --color-accent-bg: rgba(74, 119, 139, 0.1);
+  --color-accent-border: rgba(74, 119, 139, 0.28);
+  --champagne: #b7a36e;
+  --copper: #75664f;
+  --mineral: #4a778b;
+  --tech-accent: #73a4b9;
+  --tech-accent-soft: rgba(115, 164, 185, 0.18);
+  --ink: #10110f;
+  --action: #121412;
+  --action-hover: #262820;
+  --control-active: #121412;
+  --control-active-text: #fffdf8;
+
+  /* Compatibility aliases for older dashboard tabs. */
+  --bg-muted: #e9eef1;
+  --bg-panel: #ffffff;
+  --border-subtle: rgba(23, 27, 25, 0.13);
+  --text-tertiary: #717970;
+  --accent-primary: #4a778b;
+  --phosphor: #4a778b;
+  --danger: #b94b4b;
+  --success: #2d7468;
+  --warning: #7f560f;
+
+  --color-success: #2d7468;
+  --color-success-bg: rgba(45, 116, 104, 0.1);
+  --color-success-border: rgba(45, 116, 104, 0.26);
+  --color-warning: #7f560f;
+  --color-warning-bg: rgba(127, 86, 15, 0.1);
+  --color-warning-border: rgba(127, 86, 15, 0.28);
+  --color-destructive: #b94b4b;
+  --color-destructive-bg: rgba(185, 75, 75, 0.1);
+  --color-destructive-border: rgba(185, 75, 75, 0.28);
+  --color-info: #4a778b;
+  --color-info-bg: rgba(74, 119, 139, 0.1);
+  --color-info-border: rgba(74, 119, 139, 0.28);
+  --status-live: #2d7468;
+  --status-live-bg: rgba(45, 116, 104, 0.1);
+  --status-live-border: rgba(45, 116, 104, 0.28);
+  --status-sleeping: #4a778b;
+  --status-sleeping-bg: rgba(74, 119, 139, 0.1);
+  --status-sleeping-border: rgba(74, 119, 139, 0.26);
+  --status-paused: #7f560f;
+  --status-paused-bg: rgba(127, 86, 15, 0.1);
+  --status-paused-border: rgba(127, 86, 15, 0.28);
+  --status-deploying: #5b6fbc;
+  --status-deploying-bg: rgba(91, 111, 188, 0.1);
+  --status-deploying-border: rgba(91, 111, 188, 0.28);
+  --status-error: #b94b4b;
+  --status-error-bg: rgba(185, 75, 75, 0.1);
+  --status-error-border: rgba(185, 75, 75, 0.28);
 
   /* Legacy aliases kept so existing components don't 500.
      Mapped to phosphor so they don't introduce competing chroma. */
-  --primary-400: #7CFFB0;
-  --primary-500: #39FF88;
-  --primary-600: #2EE077;
-  --primary-700: #25B55E;
-  --primary-glow: rgba(57, 255, 136, 0.15);
-  --accent-400: #7CFFB0;
-  --accent-500: #39FF88;
-  --accent-600: #2EE077;
-  --accent-700: #25B55E;
-  --cyan-400: #7CFFB0;
-  --cyan-500: #39FF88;
-  --amber-400: #A0A0A0; /* No amber in v3 — fall back to muted text */
-  --solana-green: #39FF88;
+  --primary-400: #73a4b9;
+  --primary-500: #4a778b;
+  --primary-600: #355d70;
+  --primary-700: #26495a;
+  --primary-glow: rgba(74, 119, 139, 0.18);
+  --accent-400: #73a4b9;
+  --accent-500: #4a778b;
+  --accent-600: #355d70;
+  --accent-700: #26495a;
+  --cyan-400: #607d8d;
+  --cyan-500: #486a79;
+  --amber-400: #a79772;
+  --solana-green: #486a79;
 
-  /* Gradients — dropped chromatic gradients, use mono only */
-  --gradient-card-border: linear-gradient(135deg, rgba(57,255,136,0.18), rgba(57,255,136,0.04));
-  --gradient-bg-subtle: radial-gradient(ellipse at top, rgba(57,255,136,0.04), transparent 70%);
+  --gradient-card-border: linear-gradient(135deg, rgba(20,24,22,0.14), rgba(20,24,22,0.03));
+  --gradient-bg-subtle: radial-gradient(ellipse at top, rgba(115, 164, 185, 0.16), transparent 64%);
 
   /* Fonts — fallback stacks. The actual JetBrains Mono / Inter are
      injected via next/font in app/layout.tsx (variables --font-mono
@@ -83,16 +123,275 @@
 
   /* Misc */
   --radius: 0.5rem;
-  --radius-lg: 0.625rem;
-  --radius-xl: 0.875rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+	  --shadow-card: 0 22px 70px rgba(27, 38, 43, 0.13);
+	  --shadow-soft: 0 12px 38px rgba(27, 38, 43, 0.09);
+	  --app-nav-height: 64px;
 
-  color-scheme: dark;
+	  color-scheme: light;
+	}
+
+.dark {
+  --bg-base: #0f1112;
+  --bg-surface: #131719;
+  --bg-sidebar: #0c0d0e;
+  --bg-card: #171b1e;
+  --bg-card-solid: #171b1e;
+  --bg-elevated: #1d2327;
+  --bg-hover: #263036;
+  --bg-active: #172a32;
+
+  --border-line: rgba(228, 238, 240, 0.08);
+  --border-default: rgba(228, 238, 240, 0.13);
+  --border-hover: rgba(115, 164, 185, 0.36);
+  --border-active: #73a4b9;
+
+  --text-primary: #f3f7f4;
+  --text-secondary: #bac5c4;
+  --text-muted: #839091;
+  --text-dim: #647173;
+  --text-accent: #8fbfd0;
+
+  --accent: #8fbfd0;
+  --accent-hover: #a9d4e1;
+  --accent-strong: #d7eff5;
+  --accent-glow: rgba(115, 164, 185, 0.24);
+  --color-accent: #8fbfd0;
+  --color-accent-hover: #a9d4e1;
+  --color-accent-bg: rgba(143, 191, 208, 0.1);
+  --color-accent-border: rgba(143, 191, 208, 0.28);
+  --champagne: #a79772;
+  --copper: #a08b63;
+  --mineral: #8fbfd0;
+  --tech-accent: #9ed5e7;
+  --tech-accent-soft: rgba(115, 164, 185, 0.2);
+  --control-active: #e7f3f5;
+  --control-active-text: #0f1112;
+
+  --bg-muted: #1a2023;
+  --bg-panel: #171b1e;
+  --border-subtle: rgba(228, 238, 240, 0.13);
+  --text-tertiary: #647173;
+  --accent-primary: #8fbfd0;
+  --phosphor: #8fbfd0;
+  --success: #89d6c6;
+
+  --color-success: #89d6c6;
+  --color-success-bg: rgba(137, 214, 198, 0.1);
+  --color-success-border: rgba(137, 214, 198, 0.26);
+  --color-warning: #d5b46b;
+  --color-warning-bg: rgba(213, 180, 107, 0.12);
+  --color-warning-border: rgba(213, 180, 107, 0.28);
+  --color-destructive: #ff8a8a;
+  --color-destructive-bg: rgba(255, 138, 138, 0.1);
+  --color-destructive-border: rgba(255, 138, 138, 0.28);
+  --color-info: #8fbfd0;
+  --color-info-bg: rgba(143, 191, 208, 0.1);
+  --color-info-border: rgba(143, 191, 208, 0.28);
+  --status-live: #89d6c6;
+  --status-live-bg: rgba(137, 214, 198, 0.1);
+  --status-live-border: rgba(137, 214, 198, 0.28);
+  --status-sleeping: #8fbfd0;
+  --status-sleeping-bg: rgba(143, 191, 208, 0.1);
+  --status-sleeping-border: rgba(143, 191, 208, 0.26);
+  --status-paused: #d5b46b;
+  --status-paused-bg: rgba(213, 180, 107, 0.12);
+  --status-paused-border: rgba(213, 180, 107, 0.28);
+  --status-deploying: #aab7ff;
+  --status-deploying-bg: rgba(170, 183, 255, 0.1);
+  --status-deploying-border: rgba(170, 183, 255, 0.28);
+  --status-error: #ff8a8a;
+  --status-error-bg: rgba(255, 138, 138, 0.1);
+  --status-error-border: rgba(255, 138, 138, 0.28);
+
+  --primary-400: #9ed5e7;
+  --primary-500: #8fbfd0;
+  --primary-600: #73a4b9;
+  --primary-700: #4a778b;
+  --primary-glow: rgba(115, 164, 185, 0.2);
+  --accent-400: #9ed5e7;
+  --accent-500: #8fbfd0;
+  --accent-600: #73a4b9;
+  --accent-700: #4a778b;
+  --cyan-400: #9ed5e7;
+  --cyan-500: #8fbfd0;
+  --amber-400: #a79772;
+  --solana-green: #8fbfd0;
+
+  --gradient-card-border: linear-gradient(135deg, rgba(228,238,240,0.14), rgba(228,238,240,0.03));
+  --gradient-bg-subtle: radial-gradient(ellipse at top, rgba(115, 164, 185, 0.14), transparent 64%);
+  --shadow-card: 0 24px 80px rgba(0, 0, 0, 0.38);
+  --shadow-soft: 0 14px 46px rgba(0, 0, 0, 0.28);
+	  color-scheme: dark;
+	}
+
+/* Legacy chroma normalization.
+   Older surfaces still use utility classes from the previous neon palette.
+   Keep the classes working, but remap them into the current mineral / graphite
+   / muted-success token system so old pages do not visually regress. */
+.text-cyan-100,
+.text-cyan-200,
+.text-cyan-300,
+.text-cyan-400,
+.text-purple-300,
+.text-purple-400,
+.text-violet-300,
+.text-violet-400,
+.text-fuchsia-300,
+.text-fuchsia-400,
+.text-sky-300,
+.text-sky-400,
+.text-blue-400 {
+  color: var(--accent) !important;
 }
 
-/* Light theme support removed in v3.
-   The .light class is a no-op — any historical consumer renders dark.
-   Component-level .light overrides at the bottom of this file are
-   left in place but inert (the .light class isn't applied anywhere). */
+.dark .text-cyan-100,
+.dark .text-cyan-200,
+.dark .text-cyan-300,
+.dark .text-cyan-400,
+.dark .text-purple-300,
+.dark .text-purple-400,
+.dark .text-violet-300,
+.dark .text-violet-400,
+.dark .text-fuchsia-300,
+.dark .text-fuchsia-400,
+.dark .text-sky-300,
+.dark .text-sky-400,
+.dark .text-blue-400 {
+  color: var(--accent-strong) !important;
+}
+
+.text-emerald-300,
+.text-emerald-400,
+.text-green-300,
+.text-green-400 {
+  color: var(--color-success) !important;
+}
+
+.text-pink-300,
+.text-pink-400 {
+  color: var(--champagne) !important;
+}
+
+.bg-cyan-200,
+.bg-cyan-300,
+.bg-cyan-400,
+.bg-purple-500,
+.bg-purple-600,
+.bg-violet-400,
+.bg-violet-500 {
+  background-color: var(--tech-accent) !important;
+}
+
+.bg-cyan-200\/10,
+.bg-cyan-200\/12,
+.bg-cyan-300\/10,
+.bg-cyan-300\/15,
+.bg-cyan-500\/10,
+.bg-cyan-500\/15,
+.bg-purple-500\/10,
+.bg-purple-500\/15,
+.bg-purple-500\/20,
+.bg-violet-500\/10,
+.bg-violet-500\/15,
+.bg-fuchsia-500\/10,
+.bg-fuchsia-500\/15 {
+  background-color: var(--color-accent-bg) !important;
+}
+
+.bg-emerald-400,
+.bg-emerald-500,
+.bg-green-400,
+.bg-green-500 {
+  background-color: var(--color-success) !important;
+}
+
+.bg-emerald-500\/10,
+.bg-emerald-500\/15,
+.bg-emerald-500\/20,
+.bg-emerald-400\/10,
+.bg-emerald-400\/15,
+.bg-green-400\/10,
+.bg-green-400\/20,
+.bg-green-500\/10 {
+  background-color: var(--color-success-bg) !important;
+}
+
+.bg-pink-500\/10,
+.bg-pink-500\/15 {
+  background-color: rgba(183, 163, 110, 0.1) !important;
+}
+
+.border-cyan-200\/15,
+.border-cyan-200\/18,
+.border-cyan-200\/20,
+.border-cyan-200\/25,
+.border-cyan-200\/30,
+.border-cyan-300\/20,
+.border-cyan-300\/30,
+.border-cyan-300\/45,
+.border-cyan-500\/20,
+.border-purple-500\/20,
+.border-purple-500\/25,
+.border-purple-500\/30,
+.border-violet-500\/20,
+.border-violet-500\/25,
+.border-fuchsia-500\/20 {
+  border-color: var(--color-accent-border) !important;
+}
+
+.border-emerald-500\/20,
+.border-emerald-400\/25,
+.border-emerald-400\/30,
+.border-emerald-400\/50,
+.border-emerald-500\/25,
+.border-emerald-500\/30,
+.border-emerald-500\/40,
+.border-green-400\/20,
+.border-green-500\/20,
+.border-green-500\/50 {
+  border-color: var(--color-success-border) !important;
+}
+
+.border-pink-500\/20 {
+  border-color: rgba(183, 163, 110, 0.24) !important;
+}
+
+.hover\:bg-cyan-100:hover,
+.hover\:bg-cyan-200:hover,
+.hover\:bg-purple-500\/10:hover,
+.hover\:bg-purple-500\/20:hover,
+.hover\:bg-emerald-500\/20:hover {
+  background-color: var(--bg-hover) !important;
+}
+
+.hover\:text-cyan-200:hover,
+.hover\:text-purple-300:hover,
+.hover\:text-purple-400:hover,
+.hover\:text-emerald-300:hover,
+.hover\:text-emerald-400:hover,
+.hover\:text-green-300:hover,
+.hover\:text-green-400:hover {
+  color: var(--accent) !important;
+}
+
+.hover\:border-cyan-300\/45:hover,
+.hover\:border-emerald-400\/50:hover {
+  border-color: var(--border-hover) !important;
+}
+
+.focus\:border-cyan-500\/50:focus,
+.focus\:border-green-500\/60:focus,
+.focus-visible\:ring-purple-500:focus-visible {
+  border-color: var(--border-hover) !important;
+}
+
+.focus\:ring-cyan-500\/30:focus,
+.focus\:ring-green-500\/30:focus,
+.focus-visible\:ring-purple-500:focus-visible {
+  --tw-ring-color: var(--color-accent-border) !important;
+}
 
 /* ── Keyframe Animations ───────────────────────────── */
 @keyframes fadeIn {
@@ -156,9 +455,17 @@
 
   body {
     @apply antialiased;
-    background-color: var(--bg-base);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(245, 247, 248, 1) 46%),
+      var(--bg-base);
     color: var(--text-primary);
     font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
+  }
+
+  .dark body {
+    background:
+      radial-gradient(circle at 18% 0%, rgba(115, 164, 185, 0.1), transparent 34%),
+      linear-gradient(180deg, #0f1112 0%, #121618 46%, #0f1112 100%);
   }
 
   h1, h2, h3 {
@@ -189,7 +496,7 @@
     top: -100%;
     left: 50%;
     transform: translateX(-50%);
-    background: var(--accent-600);
+    background: var(--action);
     color: #ffffff;
     padding: 0.75rem 1.5rem;
     border-radius: 0 0 0.5rem 0.5rem;
@@ -211,66 +518,182 @@
     background: var(--bg-base);
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(139, 92, 246, 0.25);
+    background: rgba(20, 24, 22, 0.18);
     border-radius: 2px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(139, 92, 246, 0.4);
+    background: rgba(20, 24, 22, 0.32);
   }
 }
 
+/* Brand color normalization.
+   Older dashboard modules were built with Tailwind emerald/purple/blue
+   utilities. Keep the semantic states, but remap their visual language to
+   the current graphite/champagne/mineral system so the app no longer reads
+   as neon green or purple. */
+.text-emerald-400,
+.text-emerald-300,
+.text-emerald-200,
+.text-emerald-100,
+.text-green-400,
+.text-green-300 {
+  color: var(--mineral) !important;
+}
+
+.bg-emerald-400,
+.bg-emerald-300,
+.bg-green-400 {
+  background-color: var(--mineral) !important;
+}
+
+.hover\:bg-emerald-200:hover,
+.hover\:bg-green-300:hover {
+  background-color: #607d8d !important;
+}
+
+.bg-emerald-500\/5,
+.bg-emerald-500\/10,
+.bg-emerald-500\/15,
+.bg-emerald-500\/20,
+.bg-green-500\/10,
+.bg-green-500\/15,
+.bg-green-500\/20,
+.bg-green-400\/10 {
+  background-color: rgba(72, 106, 121, 0.1) !important;
+}
+
+.hover\:bg-emerald-500\/10:hover,
+.hover\:bg-emerald-500\/15:hover,
+.hover\:bg-emerald-500\/20:hover,
+.hover\:bg-green-400\/20:hover,
+.hover\:bg-green-500\/20:hover {
+  background-color: rgba(72, 106, 121, 0.16) !important;
+}
+
+.bg-green-600 {
+  background-color: var(--action) !important;
+}
+
+.hover\:bg-green-500:hover {
+  background-color: var(--action-hover) !important;
+}
+
+.border-emerald-300\/20,
+.border-emerald-300\/25,
+.border-emerald-300\/30,
+.border-emerald-300\/40,
+.border-emerald-400\/30,
+.border-emerald-400\/50,
+.border-emerald-500\/20,
+.border-emerald-500\/25,
+.border-emerald-500\/30,
+.border-emerald-500\/40,
+.border-green-400\/20,
+.border-green-400\/25,
+.border-green-400\/30,
+.border-green-500\/20 {
+  border-color: rgba(72, 106, 121, 0.28) !important;
+}
+
+.ring-emerald-400\/40,
+.focus\:ring-green-500\/30:focus,
+.focus\:ring-cyan-500\/30:focus {
+  --tw-ring-color: rgba(72, 106, 121, 0.4) !important;
+}
+
+.text-purple-400,
+.text-purple-300,
+.text-violet-400 {
+  color: var(--accent) !important;
+}
+
+.bg-purple-500\/10,
+.bg-purple-500\/15,
+.bg-violet-500\/10 {
+  background-color: rgba(74, 119, 139, 0.1) !important;
+}
+
+.border-purple-500\/20,
+.border-purple-500\/25,
+.border-purple-500\/30,
+.border-violet-500\/20 {
+  border-color: rgba(74, 119, 139, 0.28) !important;
+}
+
+.bg-purple-600,
+.hover\:bg-purple-500:hover {
+  background-color: var(--action) !important;
+}
+
+.focus-visible\:ring-purple-500:focus-visible {
+  --tw-ring-color: rgba(74, 119, 139, 0.5) !important;
+}
+
+.text-blue-400,
+.text-cyan-400 {
+  color: var(--mineral) !important;
+}
+
+.bg-blue-500\/10,
+.bg-blue-500\/15,
+.bg-cyan-500\/10 {
+  background-color: rgba(72, 106, 121, 0.1) !important;
+}
+
+.border-blue-500\/20,
+.border-blue-500\/25,
+.border-cyan-500\/20 {
+  border-color: rgba(72, 106, 121, 0.28) !important;
+}
+
 @layer components {
-  /* ── Cards (v3 mono) ─────────────────────────────── */
+  /* ── Cards ────────────────────────────────────────── */
   .card {
     background: var(--bg-card);
     border: 1px solid var(--border-default);
-    border-radius: 4px;
-    transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+    border-radius: var(--radius);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+    transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
   }
 
   .card:hover {
-    border-color: var(--accent);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-    transform: translateY(-1px);
+    border-color: rgba(20, 24, 22, 0.18);
+    box-shadow: var(--shadow-soft);
   }
 
   .card-highlighted {
     background: var(--bg-card);
-    border: 1px solid var(--accent);
-    border-radius: 4px;
-    box-shadow: 0 0 0 1px var(--accent-glow), 0 8px 24px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(74, 119, 139, 0.38);
+    border-radius: var(--radius);
+    box-shadow: 0 0 0 1px var(--accent-glow), var(--shadow-soft);
     transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
   }
 
   .card-highlighted:hover {
-    box-shadow: 0 0 0 2px var(--accent-glow), 0 8px 28px rgba(0, 0, 0, 0.5);
-    transform: translateY(-1px);
+    box-shadow: 0 0 0 2px var(--accent-glow), var(--shadow-card);
   }
 
   /* ── Glass (alias to flat card v3) ───────────────── */
   .glass {
     background: var(--bg-card);
     border: 1px solid var(--border-default);
-    border-radius: 4px;
+    border-radius: var(--radius);
   }
 
   .glass-hover:hover {
-    border-color: var(--accent);
+    border-color: var(--border-hover);
   }
 
-  /* ── Stat Cards (v3 mono) ────────────────────────── */
+  /* ── Stat Cards ──────────────────────────────────── */
   .stat-card {
     background: var(--bg-elevated);
     border: 1px solid var(--border-default);
-    border-radius: 4px;
+    border-radius: var(--radius);
     padding: 1rem 1.25rem;
     transition: border-color 150ms ease, transform 150ms ease;
   }
 
-  .stat-card:hover {
-    border-color: var(--accent);
-    transform: translateY(-1px);
-  }
+  .stat-card:hover { border-color: rgba(20, 24, 22, 0.18); }
 
   .stat-card .stat-value {
     font-family: var(--font-mono);
@@ -298,34 +721,34 @@
     border-radius: 50%;
     animation: status-pulse 2s ease-in-out infinite;
   }
-  .status-dot-active  { background-color: #4ade80; color: #4ade80; }
-  .status-dot-paused  { background-color: #fbbf24; color: #fbbf24; animation: none; opacity: 0.8; }
-  .status-dot-killed  { background-color: #f87171; color: #f87171; animation: none; opacity: 0.5; }
+  .status-dot-active  { background-color: var(--status-live); color: var(--status-live); }
+  .status-dot-paused  { background-color: var(--status-paused); color: var(--status-paused); animation: none; opacity: 0.8; }
+  .status-dot-killed  { background-color: var(--status-error); color: var(--status-error); animation: none; opacity: 0.5; }
 
-  /* ── Buttons (v3 mono/phosphor) ──────────────────── */
+  /* ── Buttons ─────────────────────────────────────── */
   .btn-primary {
     @apply relative inline-flex items-center justify-center gap-2
            px-5 py-2.5 rounded
            transition-shadow duration-150 active:scale-[0.98]
            disabled:opacity-40 disabled:cursor-not-allowed;
-    font-family: var(--font-mono);
+    font-family: var(--font-inter), var(--font-body);
     font-size: 0.8125rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    border-radius: 4px;
-    background: var(--accent);
-    color: var(--bg-base);
+    font-weight: 650;
+    letter-spacing: 0;
+    text-transform: none;
+    border-radius: var(--radius);
+    background: var(--action);
+    color: #fffdf8;
   }
 
   .btn-primary:hover:not(:disabled) {
-    background: var(--accent-hover);
-    box-shadow: 0 0 20px var(--accent-glow);
+    background: var(--action-hover);
+    box-shadow: 0 14px 34px rgba(18, 20, 18, 0.2);
   }
 
   .btn-primary:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px var(--accent);
+    box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px rgba(74, 119, 139, 0.5);
   }
 
   .btn-cta {
@@ -333,19 +756,19 @@
            px-5 py-2.5
            transition-shadow duration-150 active:scale-[0.98]
            disabled:opacity-40 disabled:cursor-not-allowed;
-    font-family: var(--font-mono);
+    font-family: var(--font-inter), var(--font-body);
     font-size: 0.8125rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    border-radius: 4px;
-    background: var(--accent);
-    color: var(--bg-base);
+    font-weight: 650;
+    letter-spacing: 0;
+    text-transform: none;
+    border-radius: var(--radius);
+    background: var(--action);
+    color: #fffdf8;
   }
 
   .btn-cta:hover:not(:disabled) {
-    background: var(--accent-hover);
-    box-shadow: 0 0 24px var(--accent-glow);
+    background: var(--action-hover);
+    box-shadow: 0 14px 34px rgba(18, 20, 18, 0.2);
   }
 
   .btn-cta:focus-visible {
@@ -357,21 +780,21 @@
     @apply inline-flex items-center justify-center gap-2
            px-5 py-2.5
            transition-colors duration-150 active:scale-[0.98];
-    font-family: var(--font-mono);
+    font-family: var(--font-inter), var(--font-body);
     font-size: 0.8125rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    border-radius: 4px;
+    font-weight: 650;
+    letter-spacing: 0;
+    text-transform: none;
+    border-radius: var(--radius);
     background: transparent;
     color: var(--text-primary);
     border: 1px solid var(--border-default);
   }
 
   .btn-secondary:hover {
-    color: var(--accent);
-    border-color: var(--accent);
-    background: rgba(74, 222, 128, 0.06);
+    color: var(--text-primary);
+    border-color: var(--border-hover);
+    background: rgba(20, 24, 22, 0.04);
   }
 
   .btn-secondary:focus-visible {
@@ -383,17 +806,17 @@
     @apply inline-flex items-center justify-center gap-2
            px-4 py-2.5
            transition-colors duration-150;
-    font-family: var(--font-mono);
+    font-family: var(--font-inter), var(--font-body);
     font-size: 0.8125rem;
     font-weight: 600;
-    letter-spacing: 0.04em;
-    border-radius: 4px;
+    letter-spacing: 0;
+    border-radius: var(--radius);
     color: var(--text-muted);
   }
 
   .btn-ghost:hover {
-    color: var(--accent);
-    background: rgba(74, 222, 128, 0.06);
+    color: var(--text-primary);
+    background: rgba(20, 24, 22, 0.05);
   }
 
   .btn-danger {
@@ -415,13 +838,13 @@
     border-color: rgba(255, 107, 107, 0.5);
   }
 
-  /* ── Inputs (v3 mono) ────────────────────────────── */
+  /* ── Inputs ──────────────────────────────────────── */
   .input {
     @apply px-3 py-2.5 text-sm
            focus:outline-none
            transition-colors duration-150 w-full;
-    font-family: var(--font-mono);
-    border-radius: 4px;
+    font-family: var(--font-inter), var(--font-body);
+    border-radius: var(--radius);
     background: var(--bg-elevated);
     border: 1px solid var(--border-default);
     color: var(--text-primary);
@@ -450,9 +873,9 @@
 
   .badge-active {
     @apply badge;
-    background: rgba(74, 222, 128, 0.08);
-    color: var(--accent);
-    border-color: rgba(74, 222, 128, 0.4);
+    background: rgba(72, 106, 121, 0.1);
+    color: var(--mineral);
+    border-color: rgba(72, 106, 121, 0.32);
   }
 
   .badge-paused {
@@ -478,12 +901,12 @@
 
   .badge-feature {
     @apply badge;
-    background: rgba(74, 222, 128, 0.08);
+    background: rgba(74, 119, 139, 0.09);
     color: var(--accent);
-    border-color: rgba(74, 222, 128, 0.3);
+    border-color: rgba(74, 119, 139, 0.3);
   }
 
-  /* ── Gradient text (v3 — flat phosphor) ──────────── */
+  /* ── Gradient text (v3 — flat accent) ────────────── */
   .text-gradient,
   .text-gradient-purple,
   .text-gradient-cyan {
@@ -492,7 +915,7 @@
     -webkit-text-fill-color: currentColor;
   }
 
-  /* ── Text glow utility (v3 — phosphor glow) ──────── */
+  /* ── Text glow utility (v3 — soft accent glow) ───── */
   .text-glow,
   .text-glow-purple,
   .text-glow-cyan {
@@ -518,9 +941,9 @@
     text-transform: uppercase;
     padding: 2px 8px;
     border-radius: 3px;
-    background: rgba(74, 222, 128, 0.08);
+    background: rgba(74, 119, 139, 0.09);
     color: var(--accent);
-    border: 1px solid rgba(74, 222, 128, 0.3);
+    border: 1px solid rgba(74, 119, 139, 0.3);
     display: inline-flex;
     align-items: center;
   }
@@ -534,7 +957,7 @@
     color: var(--text-primary);
     font-family: var(--font-mono);
     font-size: 0.8125rem;
-    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--shadow-soft);
     animation: slide-in-right 0.3s ease-out;
   }
 
@@ -562,13 +985,16 @@
   /* ── Shimmer loading effect ──────────────────────── */
   .shimmer {
     background: linear-gradient(
-      90deg,
-      var(--bg-elevated) 25%,
-      var(--bg-hover) 50%,
-      var(--bg-elevated) 75%
+      105deg,
+      var(--bg-elevated) 0%,
+      color-mix(in srgb, var(--bg-hover) 78%, var(--accent) 8%) 42%,
+      color-mix(in srgb, var(--bg-card) 84%, var(--accent) 10%) 50%,
+      color-mix(in srgb, var(--bg-hover) 78%, var(--accent) 8%) 58%,
+      var(--bg-elevated) 100%
     );
     background-size: 200% 100%;
-    animation: shimmer 2s linear infinite;
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text-primary) 4%, transparent);
+    animation: shimmer 1.85s ease-in-out infinite;
   }
 
 }
@@ -580,8 +1006,8 @@
 }
 
 .tag {
-  background: rgba(6, 182, 212, 0.06);
-  border: 1px solid rgba(6, 182, 212, 0.08);
+  background: rgba(74, 119, 139, 0.08);
+  border: 1px solid rgba(74, 119, 139, 0.14);
   padding: 1px 6px;
   border-radius: 3px;
   font-size: 9px;
@@ -590,8 +1016,8 @@
 }
 
 .tag:hover {
-  background: rgba(6, 182, 212, 0.15);
-  border-color: rgba(6, 182, 212, 0.25);
+  background: rgba(74, 119, 139, 0.14);
+  border-color: rgba(74, 119, 139, 0.26);
 }
 
 /* ── Log viewer ──────────────────────────────────────── */
@@ -610,7 +1036,7 @@
 }
 
 .log-viewer .log-line:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(20, 24, 22, 0.04);
 }
 
 
@@ -647,17 +1073,17 @@
 }
 
 .chat-bubble-user {
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.18) 0%, rgba(6, 182, 212, 0.12) 100%);
-  border: 1px solid rgba(6, 182, 212, 0.28);
+  background: linear-gradient(135deg, rgba(74, 119, 139, 0.15) 0%, rgba(115, 164, 185, 0.1) 100%);
+  border: 1px solid rgba(74, 119, 139, 0.26);
   border-bottom-right-radius: 0.375rem;
-  box-shadow: 0 2px 16px rgba(6, 182, 212, 0.08);
+  box-shadow: 0 8px 22px rgba(74, 119, 139, 0.08);
 }
 
 .chat-bubble-assistant {
-  background: linear-gradient(135deg, rgba(26, 23, 48, 0.6) 0%, rgba(20, 18, 40, 0.5) 100%);
-  border: 1px solid rgba(46, 43, 74, 0.3);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
   border-bottom-left-radius: 0.375rem;
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-soft);
 }
 
 /* ── Typing indicator ────────────────────────────────── */
@@ -696,8 +1122,8 @@ p a,
   width: 100%;
   padding: 0.625rem 0.875rem;
   border-radius: 0.75rem;
-  border: 1px solid rgba(46, 43, 74, 0.5);
-  background: rgba(37, 34, 64, 0.5);
+  border: 1px solid var(--border-default);
+  background: var(--bg-card);
   font-size: 0.875rem;
   color: var(--text-primary);
   outline: none;
@@ -705,8 +1131,8 @@ p a,
 }
 
 .config-input:focus {
-  border-color: rgba(139, 92, 246, 0.5);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.08);
+  border-color: rgba(74, 119, 139, 0.5);
+  box-shadow: 0 0 0 3px rgba(74, 119, 139, 0.1);
 }
 
 .config-input::placeholder {
@@ -717,8 +1143,8 @@ p a,
   width: 100%;
   padding: 0.75rem 0.875rem;
   border-radius: 0.75rem;
-  border: 1px solid rgba(46, 43, 74, 0.5);
-  background: rgba(37, 34, 64, 0.5);
+  border: 1px solid var(--border-default);
+  background: var(--bg-card);
   font-size: 0.875rem;
   color: var(--text-primary);
   outline: none;
@@ -729,8 +1155,8 @@ p a,
 }
 
 .config-textarea:focus {
-  border-color: rgba(6, 182, 212, 0.5);
-  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.08);
+  border-color: rgba(74, 119, 139, 0.5);
+  box-shadow: 0 0 0 3px rgba(74, 119, 139, 0.1);
 }
 
 .config-textarea::placeholder {
@@ -740,20 +1166,20 @@ p a,
 
 /* ── Status glow on agent cards ──────────────────────── */
 .agent-card-active {
-  border-color: rgba(34, 197, 94, 0.25) !important;
+  border-color: rgba(72, 106, 121, 0.25) !important;
   box-shadow:
     0 4px 24px rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 0 20px rgba(34, 197, 94, 0.06),
-    0 0 0 1px rgba(34, 197, 94, 0.08);
+    0 0 20px rgba(72, 106, 121, 0.06),
+    0 0 0 1px rgba(72, 106, 121, 0.08);
 }
 
 .agent-card-active:hover {
-  border-color: rgba(34, 197, 94, 0.4) !important;
+  border-color: rgba(72, 106, 121, 0.4) !important;
   box-shadow:
-    0 8px 40px rgba(34, 197, 94, 0.1),
+    0 8px 40px rgba(72, 106, 121, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 0 30px rgba(34, 197, 94, 0.08);
+    0 0 30px rgba(72, 106, 121, 0.08);
 }
 
 .agent-card-paused {
@@ -919,12 +1345,20 @@ select[aria-invalid="true"] {
 
 .light .shimmer {
   background: linear-gradient(
-    90deg,
-    var(--bg-elevated) 25%,
-    var(--bg-hover) 50%,
-    var(--bg-elevated) 75%
+    105deg,
+    var(--bg-elevated) 0%,
+    color-mix(in srgb, var(--bg-hover) 82%, var(--accent) 7%) 42%,
+    color-mix(in srgb, var(--bg-card) 90%, var(--accent) 8%) 50%,
+    color-mix(in srgb, var(--bg-hover) 82%, var(--accent) 7%) 58%,
+    var(--bg-elevated) 100%
   );
   background-size: 200% 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer {
+    animation: none;
+  }
 }
 
 .light .chat-bubble-user {
@@ -1110,7 +1544,7 @@ button, a, [role="tab"] {
 .hatcher-terminal-frame .xterm-viewport {
   overflow-y: scroll !important;
   overscroll-behavior: contain;
-  scrollbar-color: rgba(0, 255, 65, 0.55) #050505;
+  scrollbar-color: rgba(74, 119, 139, 0.55) #101513;
   scrollbar-width: thin;
 }
 
@@ -1119,17 +1553,17 @@ button, a, [role="tab"] {
 }
 
 .hatcher-terminal-frame .xterm-viewport::-webkit-scrollbar-track {
-  background: #050505;
+  background: #101513;
 }
 
 .hatcher-terminal-frame .xterm-viewport::-webkit-scrollbar-thumb {
-  background: rgba(0, 255, 65, 0.45);
-  border: 2px solid #050505;
+  background: rgba(74, 119, 139, 0.45);
+  border: 2px solid #101513;
   border-radius: 999px;
 }
 
 .hatcher-terminal-frame .xterm-viewport::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 255, 65, 0.7);
+  background: rgba(74, 119, 139, 0.7);
 }
 
 /* Agent Dispatch — floating +Data popup on packet pickup */

@@ -188,13 +188,13 @@ export function ChatPanel({
   }, [messages, streaming]);
 
   const accent =
-    framework === 'openclaw' ? '#e3b765' : framework === 'hermes' ? '#b9a4e6' : '#9fc1c7';
+    framework === 'openclaw' ? '#d6b177' : framework === 'hermes' ? '#9ed5e7' : '#9fc1c7';
 
   const body = (
     <>
       <ChatStyles />
       <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-neutral-400">
-        <span className={`inline-block h-2 w-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-neutral-600'}`} />
+        <span className={`inline-block h-2 w-2 rounded-full ${isConnected ? 'bg-cyan-200 shadow-[0_0_10px_rgba(115,164,185,0.68)]' : 'bg-neutral-600'}`} />
         {isConnected ? 'connected' : connectionState}
         {streaming && <span className="rounded-full bg-neutral-800 px-2 py-0.5">responding</span>}
         {queuedMessages.length > 0 && (
@@ -239,7 +239,7 @@ export function ChatPanel({
               </div>
             ))}
             {inflightTools.map((t) => (
-              <div key={`live-${t.callId}`} className="flex items-center gap-2 text-[11px] text-[var(--phosphor,#39ff88)]">
+              <div key={`live-${t.callId}`} className="flex items-center gap-2 text-[11px] text-[var(--phosphor,#9ed5e7)]">
                 <span className="animate-pulse">{toolGlyph(t.name)}</span>
                 <span className="font-mono">{t.name}</span>
                 {t.argsPreview && (

@@ -74,7 +74,7 @@ export function CostCard(_props: { agentId: string }) {
   if (!data) return null;
 
   const pct = data.monthlyGrant > 0 ? Math.min((data.balance / data.monthlyGrant) * 100, 100) : 0;
-  const barColor = pct < 10 ? 'bg-red-500' : pct < 25 ? 'bg-amber-500' : 'bg-[var(--color-accent)]';
+  const barColor = pct < 10 ? 'bg-[var(--color-destructive)]' : pct < 25 ? 'bg-[var(--color-warning)]' : 'bg-[var(--color-accent)]';
 
   return (
     <GlassCard>
@@ -104,7 +104,7 @@ export function CostCard(_props: { agentId: string }) {
       )}
 
       {data.monthlyGrant > 0 && pct < 25 && (
-        <p className="text-[11px] text-amber-400 mt-2">
+        <p className="text-[11px] text-[var(--color-warning)] mt-2">
           Low AI Credits balance. Top up or switch to BYOK before hosted usage pauses.
         </p>
       )}

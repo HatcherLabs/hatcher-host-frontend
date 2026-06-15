@@ -87,12 +87,12 @@ const STATUS_CONFIG: Record<string, {
   glowColor: string;
   pulse: boolean;
 }> = {
-  active: {
-    color: 'text-green-400',
-    bg: 'bg-green-500/10',
-    border: 'border-green-500/25',
-    dotColor: 'bg-green-400',
-    glowColor: 'rgba(74,222,128,0.4)',
+	  active: {
+	    color: 'text-[var(--color-success)]',
+	    bg: 'bg-[var(--color-success-bg)]',
+	    border: 'border-[var(--color-success-border)]',
+	    dotColor: 'bg-[var(--color-success)]',
+	    glowColor: 'rgba(137,214,198,0.32)',
     pulse: true,
   },
   sleeping: {
@@ -262,7 +262,7 @@ export default async function AgentStatusPage({
 
             {/* Status badge */}
             <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border ${statusCfg.bg} ${statusCfg.color} ${statusCfg.border}`}>
-              <span className={`w-2 h-2 rounded-full ${statusCfg.dotColor} ${statusCfg.pulse ? 'animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.6)]' : ''}`} aria-hidden="true" />
+	              <span className={`w-2 h-2 rounded-full ${statusCfg.dotColor} ${statusCfg.pulse ? 'animate-pulse shadow-[0_0_8px_rgba(137,214,198,0.45)]' : ''}`} aria-hidden="true" />
               {tStatus(statusKey)}
             </span>
           </div>

@@ -103,8 +103,10 @@ function SolanaLogo() {
 function BrandGlyph() {
   return (
     <svg width="20" height="20" viewBox="0 0 26 26" aria-hidden>
-      <rect x="2" y="2" width="22" height="22" rx="5" fill="none" stroke="currentColor" strokeWidth="1.5" />
-      <rect x="7" y="7" width="12" height="12" rx="2" fill="var(--accent)" />
+      <rect width="26" height="26" rx="7" fill="var(--ink)" />
+      <path d="M13 4.5c-4 0-7.2 3.9-7.2 8.7 0 5 3.1 8.9 7.2 8.9s7.2-3.9 7.2-8.9c0-4.8-3.2-8.7-7.2-8.7Z" fill="#fff7e8" stroke="var(--tech-accent)" strokeWidth="1.1" />
+      <path d="M8.6 13.6c1.4-2.3 2.9-3.3 4.4-3.3s3 1 4.4 3.3c-1.4 2.3-2.9 3.3-4.4 3.3s-3-1-4.4-3.3Z" fill="var(--ink)" />
+      <circle cx="13" cy="13.6" r="1.7" fill="var(--tech-accent)" />
     </svg>
   );
 }

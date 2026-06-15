@@ -9,6 +9,7 @@ interface Props {
   href: string;
   children: React.ReactNode;
   variant?: 'primary' | 'ghost';
+  surface?: 'light' | 'dark';
   target?: React.HTMLAttributeAnchorTarget;
   rel?: string;
   /** PostHog event name. Defaults to a slug derived from `href`. */
@@ -25,6 +26,7 @@ export function PhosphorButton({
   href,
   children,
   variant = 'primary',
+  surface = 'light',
   target,
   rel,
   event,
@@ -38,7 +40,7 @@ export function PhosphorButton({
   return (
     <Link
       href={href}
-      className={`${styles.btn} ${styles[variant]}`}
+      className={`${styles.btn} ${styles[variant]} ${surface === 'dark' ? styles.darkSurface : ''}`}
       target={target}
       rel={rel}
       onClick={handleClick}

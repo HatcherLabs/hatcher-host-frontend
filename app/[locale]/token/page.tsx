@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import NextImage from 'next/image';
 import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
-import { ArrowRight, Rocket, Zap, CreditCard, Users } from 'lucide-react';
+import { ArrowRight, CheckCircle, CreditCard, Database, Rocket, ShieldCheck, Users, Zap } from 'lucide-react';
 import { SOCIAL_LINKS } from '@/lib/config';
 import { TokenBurnTracker } from '@/components/token/TokenBurnTracker';
 
@@ -22,19 +22,19 @@ const PLANNED_USE_CASES: UseCase[] = [
   {
     icon: Zap,
     title: 'Subscriptions & Extras',
-    description: 'Pay for any subscription tier or extra agent slots directly with $HATCHER. Prices settled at live rates on-chain.',
+    description: 'Use $HATCHER for eligible subscriptions and extra agent slots where token checkout is enabled. Prices remain USD-denominated.',
     linkHref: '/pricing',
     linkLabel: 'See plans & extras',
   },
   {
     icon: CreditCard,
-    title: 'Token Economy',
-    description: 'Prices listed in USD. Pay by card, SOL, USDC on Solana, $HATCHER, or $KAUSA at live rates.',
+    title: 'Payment Option',
+    description: 'Card, SOL, USDC, $HATCHER, and $KAUSA sit behind one billing surface with transparent totals before checkout.',
   },
   {
     icon: Users,
-    title: 'Governance',
-    description: 'Participate in platform governance decisions, vote on new features, and shape the future roadmap.',
+    title: 'Future Governance',
+    description: 'Governance can be added carefully for eligible platform decisions without turning billing into speculation.',
   },
 ];
 
@@ -45,120 +45,132 @@ export default function TokenPage() {
     <MarketingShell>
       <div className="bg-[var(--bg-base)] text-[var(--text-primary)]">
         {/* ── HERO ───────────────────────────────────────────── */}
-        <section className="relative px-4 py-24 md:py-32 text-center overflow-hidden">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] rounded-full -z-10 opacity-50"
-            style={{ background: 'radial-gradient(circle at center, var(--accent-glow), transparent 70%)' }}
-          />
+        <section className="relative overflow-hidden px-4 py-20 md:py-28">
+          <div className="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
+            <div>
+              <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] bg-[var(--bg-card)] px-3 py-1.5 text-[12px] font-semibold text-[var(--text-secondary)]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--status-live)]" aria-hidden />
+                {t('liveLabel')}
+              </p>
 
-          <div className="mx-auto max-w-4xl">
-            {/* Live label */}
-            <p
-              className="mb-6 inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] font-bold text-[var(--accent)]"
-              style={{ fontFamily: 'var(--font-mono)' }}
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-pulse" />
-              ▎ {t('liveLabel')}
-            </p>
-
-            {/* Token logo — square v3 frame */}
-            <div className="relative w-32 h-32 sm:w-36 sm:h-36 mx-auto mb-10">
-              <div
-                aria-hidden
-                className="absolute -inset-3 rounded-[6px] blur-2xl opacity-60"
-                style={{ background: 'radial-gradient(circle at center, var(--accent-glow), transparent 70%)' }}
-              />
-              <div className="relative z-10 w-full h-full rounded-[6px] p-[2px] bg-[var(--accent)] shadow-[0_0_24px_var(--accent-glow)]">
-                <div className="w-full h-full rounded-[4px] overflow-hidden bg-[var(--bg-base)]">
+              <div className="mb-7 flex items-center gap-4">
+                <div className="relative h-16 w-16 overflow-hidden rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] p-1 shadow-[var(--shadow-soft)]">
                   <NextImage
                     src="/img/hatcher_logo.png"
                     alt="Hatcher logo"
-                    width={160}
-                    height={160}
+                    width={64}
+                    height={64}
                     priority
-                    className="w-full h-full object-cover"
+                    className="h-full w-full rounded-lg object-cover"
                   />
                 </div>
+                <div>
+                  <p className="text-sm font-semibold text-[var(--text-muted)]">Hatcher utility token</p>
+                  <h1 className="text-5xl font-semibold tracking-[-0.04em] text-[var(--text-primary)] md:text-7xl">
+                    {t('heading')}
+                  </h1>
+                </div>
+              </div>
+
+              <p className="max-w-2xl text-base leading-7 text-[var(--text-secondary)] md:text-lg">
+                {t('subheading')}
+              </p>
+
+              <div className="mt-8 grid max-w-2xl gap-3 sm:grid-cols-2">
+                <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-4">
+                  <p className="text-xs font-semibold text-[var(--text-muted)]">{t('networkLabel')}</p>
+                  <div className="mt-2 flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
+                    <span className="h-2 w-2 rounded-full bg-[var(--color-info)]" aria-hidden />
+                    {t('networkValue')} · {t('splToken')}
+                  </div>
+                </div>
+                <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-4">
+                  <p className="text-xs font-semibold text-[var(--text-muted)]">{t('statusLabel')}</p>
+                  <div className="mt-2 flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
+                    <CheckCircle size={15} className="text-[var(--color-success)]" aria-hidden />
+                    {t('statusValue')}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 max-w-2xl rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] p-4">
+                <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-[var(--text-muted)]">
+                  <Database size={14} aria-hidden />
+                  {t('contractLabel')}
+                </div>
+                <code className="block select-all break-all text-xs text-[var(--text-primary)]">
+                  {CA}
+                </code>
+                <div className="mt-3 flex flex-wrap gap-3 text-xs font-semibold">
+                  <a
+                    href={`https://dexscreener.com/solana/${CA}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[var(--accent)] hover:text-[var(--accent-hover)]"
+                  >
+                    {t('viewDexscreener')}
+                  </a>
+                  <a
+                    href={`https://solscan.io/token/${CA}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[var(--accent)] hover:text-[var(--accent-hover)]"
+                  >
+                    {t('viewSolscan')}
+                  </a>
+                </div>
+              </div>
+
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Link
+                  href="/create"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-[var(--action)] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--action-hover)]"
+                >
+                  {t('createAgentCta')}
+                  <Rocket size={15} aria-hidden />
+                </Link>
+                <Link
+                  href="/pricing"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] px-5 py-3 text-sm font-semibold text-[var(--text-primary)] transition-colors hover:border-[var(--border-hover)] hover:bg-[var(--bg-hover)]"
+                >
+                  {t('viewPricing')}
+                  <ArrowRight size={15} aria-hidden />
+                </Link>
               </div>
             </div>
 
-            <h1
-              className="text-5xl md:text-7xl font-bold mb-5 tracking-tight"
-              style={{ fontFamily: 'var(--font-mono)' }}
-            >
-              {t('heading')}
-            </h1>
+            <div className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] p-5 shadow-[var(--shadow-card)]">
+              <div className="mb-5 flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-semibold text-[var(--text-muted)]">Billing utility</p>
+                  <h2 className="mt-1 text-xl font-semibold text-[var(--text-primary)]">$HATCHER checkout</h2>
+                </div>
+                <span className="rounded-full border border-[var(--color-success-border)] bg-[var(--color-success-bg)] px-2.5 py-1 text-xs font-semibold text-[var(--color-success)]">
+                  Utility
+                </span>
+              </div>
 
-            <p className="text-base md:text-lg mb-10 max-w-2xl mx-auto leading-relaxed text-[var(--text-secondary)]">
-              {t('subheading')}
-            </p>
+              <div className="space-y-3">
+                {[
+                  ['Subscription tier', 'USD price shown before payment'],
+                  ['Payment rail', 'Card, SOL, USDC, $HATCHER, or $KAUSA'],
+                  ['Burn mechanic', t('burnBadge')],
+                  ['AI Credits', 'Hosted usage remains metered separately from BYOK'],
+                ].map(([label, value]) => (
+                  <div key={label} className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-base)] p-4">
+                    <p className="text-xs font-semibold text-[var(--text-muted)]">{label}</p>
+                    <p className="mt-1 text-sm leading-6 text-[var(--text-primary)]">{value}</p>
+                  </div>
+                ))}
+              </div>
 
-            {/* CA pill */}
-            <div
-              className="inline-flex flex-col sm:flex-row items-center gap-2 sm:gap-3 px-4 py-2.5 rounded-[3px] bg-[var(--bg-elevated)] border border-[var(--border-default)]"
-              style={{ fontFamily: 'var(--font-mono)' }}
-            >
-              <span className="text-[10px] uppercase tracking-[0.16em] font-bold text-[var(--text-muted)]">
-                {t('caLabel')}
-              </span>
-              <code className="text-[var(--accent)] text-[11px] sm:text-xs select-all break-all">
-                {CA}
-              </code>
-            </div>
-
-            {/* External links */}
-            <div
-              className="flex items-center justify-center gap-3 mt-3 text-[11px] uppercase tracking-[0.08em] font-bold"
-              style={{ fontFamily: 'var(--font-mono)' }}
-            >
-              <a
-                href={`https://dexscreener.com/solana/${CA}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors underline underline-offset-4 decoration-1"
-              >
-                {t('viewDexscreener')}
-              </a>
-              <span aria-hidden className="block w-px h-3 bg-[var(--border-default)]" />
-              <a
-                href={`https://solscan.io/token/${CA}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors underline underline-offset-4 decoration-1"
-              >
-                {t('viewSolscan')}
-              </a>
-            </div>
-
-            {/* Burn badge */}
-            <div
-              className="mt-8 inline-flex items-center gap-2 px-3 py-1.5 rounded-[3px] border border-[rgba(245,158,11,0.4)] bg-[rgba(245,158,11,0.08)] text-[11px] font-bold uppercase tracking-[0.06em] text-[#fbbf24]"
-              style={{ fontFamily: 'var(--font-mono)' }}
-            >
-              <span aria-hidden>🔥</span>
-              <span>{t('burnBadge')}</span>
-            </div>
-
-            {/* CTAs */}
-            <div className="flex flex-col sm:flex-row gap-3 justify-center mt-10">
-              <Link
-                href="/create"
-                className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-[3px] bg-[var(--accent)] text-[var(--bg-base)] text-[13px] font-bold uppercase tracking-[0.06em] transition-shadow hover:shadow-[0_0_20px_var(--accent-glow)]"
-                style={{ fontFamily: 'var(--font-mono)' }}
-              >
-                <span aria-hidden>▎</span>
-                {t('createAgentCta')}
-                <Rocket size={14} />
-              </Link>
-              <Link
-                href="/pricing"
-                className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-[3px] border border-[var(--border-default)] text-[var(--text-primary)] text-[13px] font-bold uppercase tracking-[0.06em] hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[rgba(74,222,128,0.06)] transition-all"
-                style={{ fontFamily: 'var(--font-mono)' }}
-              >
-                {t('viewPricing')}
-                <ArrowRight size={14} />
-              </Link>
+              <div className="mt-5 rounded-lg border border-[var(--color-info-border)] bg-[var(--color-info-bg)] p-4 text-sm leading-6 text-[var(--text-secondary)]">
+                <div className="mb-2 flex items-center gap-2 font-semibold text-[var(--text-primary)]">
+                  <ShieldCheck size={15} className="text-[var(--color-info)]" aria-hidden />
+                  Clear billing first
+                </div>
+                Hatcher shows plan costs, extras, and token settlement details before paid actions are confirmed.
+              </div>
             </div>
           </div>
         </section>
@@ -169,16 +181,10 @@ export default function TokenPage() {
         <section className="py-16 px-4 border-t border-[var(--border-default)]">
           <div className="mx-auto max-w-6xl">
             <div className="text-center mb-12">
-              <p
-                className="text-[11px] uppercase tracking-[0.2em] font-bold text-[var(--text-muted)] mb-3"
-                style={{ fontFamily: 'var(--font-mono)' }}
-              >
-                ▎ {t('plannedUtilityLabel')}
+              <p className="text-xs font-semibold text-[var(--text-muted)] mb-3">
+                {t('plannedUtilityLabel')}
               </p>
-              <h2
-                className="text-3xl md:text-4xl font-bold mb-4"
-                style={{ fontFamily: 'var(--font-mono)' }}
-              >
+              <h2 className="text-3xl md:text-4xl font-semibold tracking-[-0.03em] mb-4 text-[var(--text-primary)]">
                 {t('whatPowers')}
               </h2>
               <p className="text-[var(--text-secondary)] max-w-lg mx-auto text-sm">
@@ -192,15 +198,12 @@ export default function TokenPage() {
                 return (
                   <article
                     key={item.title}
-                    className="group flex flex-col gap-3 p-6 bg-[var(--bg-card)] border border-[var(--border-default)] rounded-[4px] transition-all hover:border-[var(--accent)] hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)]"
+                    className="group flex flex-col gap-3 p-6 bg-[var(--bg-card)] border border-[var(--border-default)] rounded-lg transition-colors hover:border-[var(--border-hover)] hover:bg-[var(--bg-hover)]"
                   >
-                    <span className="inline-flex items-center justify-center w-10 h-10 rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--accent)] flex-shrink-0">
+                    <span className="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--accent)] flex-shrink-0">
                       <Icon size={18} />
                     </span>
-                    <h3
-                      className="font-bold text-base"
-                      style={{ fontFamily: 'var(--font-mono)' }}
-                    >
+                    <h3 className="font-semibold text-base text-[var(--text-primary)]">
                       {item.title}
                     </h3>
                     <p className="text-[13px] leading-relaxed text-[var(--text-secondary)]">
@@ -209,8 +212,7 @@ export default function TokenPage() {
                     {item.linkHref && item.linkLabel && (
                       <Link
                         href={item.linkHref}
-                        className="mt-auto pt-3 inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.06em] font-bold text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors self-start"
-                        style={{ fontFamily: 'var(--font-mono)' }}
+                        className="mt-auto pt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors self-start"
                       >
                         {item.linkLabel}
                         <ArrowRight size={12} />
@@ -226,33 +228,29 @@ export default function TokenPage() {
         {/* ── KEY DETAILS ──────────────────────────────────────── */}
         <section className="py-16 px-4 border-t border-[var(--border-default)]">
           <div className="mx-auto max-w-3xl">
-            <div className="bg-[var(--bg-card)] border border-[var(--border-default)] rounded-[4px] p-6 sm:p-8">
-              <h2
-                className="text-xl md:text-2xl font-bold mb-6"
-                style={{ fontFamily: 'var(--font-mono)' }}
-              >
-                ▎ {t('keyDetails')}
+            <div className="bg-[var(--bg-card)] border border-[var(--border-default)] rounded-xl p-6 sm:p-8 shadow-[var(--shadow-soft)]">
+              <h2 className="text-xl md:text-2xl font-semibold tracking-[-0.02em] mb-6 text-[var(--text-primary)]">
+                {t('keyDetails')}
               </h2>
               <dl className="grid gap-0">
                 <DetailRow label={t('networkLabel')}>
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#9945FF]" aria-hidden />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)]" aria-hidden />
                   <span className="text-[var(--text-primary)]">{t('networkValue')}</span>
                   <span
-                    className="text-[10px] px-1.5 py-0.5 rounded-[3px] border uppercase font-bold tracking-[0.06em]"
-                    style={{ fontFamily: 'var(--font-mono)', color: '#9945FF', borderColor: '#9945FF50', background: '#9945FF14' }}
+                    className="text-[10px] px-1.5 py-0.5 rounded-md border font-semibold"
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      color: 'var(--color-accent)',
+                      borderColor: 'var(--color-accent-border)',
+                      background: 'var(--color-accent-bg)',
+                    }}
                   >
                     {t('splToken')}
                   </span>
                 </DetailRow>
                 <DetailRow label={t('statusLabel')}>
                   <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-pulse" aria-hidden />
-                  <span className="text-[var(--accent)] font-medium">{t('statusValue')}</span>
-                  <span
-                    className="text-[10px] px-1.5 py-0.5 rounded-[3px] border uppercase font-bold tracking-[0.06em] text-[var(--accent)] border-[rgba(74,222,128,0.4)] bg-[rgba(74,222,128,0.08)]"
-                    style={{ fontFamily: 'var(--font-mono)' }}
-                  >
-                    {t('trading')}
-                  </span>
+                  <span className="text-[var(--text-primary)] font-medium">{t('statusValue')}</span>
                 </DetailRow>
                 <DetailRow label={t('contractLabel')}>
                   <code
@@ -273,17 +271,9 @@ export default function TokenPage() {
         {/* ── STAY UPDATED CTA ─────────────────────────────────── */}
         <section className="py-20 px-4 border-t border-[var(--border-default)]">
           <div className="mx-auto max-w-3xl">
-            <div className="relative bg-[var(--bg-card)] border border-[var(--border-default)] rounded-[4px] p-8 sm:p-14 text-center overflow-hidden">
-              <div
-                aria-hidden
-                className="pointer-events-none absolute -top-16 -right-16 w-56 h-56 rounded-full opacity-50 blur-3xl"
-                style={{ background: 'radial-gradient(circle, var(--accent-glow), transparent 70%)' }}
-              />
+            <div className="relative bg-[var(--bg-card)] border border-[var(--border-default)] rounded-xl p-8 sm:p-14 text-center overflow-hidden shadow-[var(--shadow-soft)]">
               <div className="relative">
-                <h2
-                  className="text-3xl md:text-5xl font-bold mb-4"
-                  style={{ fontFamily: 'var(--font-mono)' }}
-                >
+                <h2 className="text-3xl md:text-5xl font-semibold tracking-[-0.04em] mb-4 text-[var(--text-primary)]">
                   {t('stayInLoop')}
                 </h2>
                 <p className="text-base mb-10 max-w-xl mx-auto text-[var(--text-secondary)]">
@@ -292,10 +282,8 @@ export default function TokenPage() {
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Link
                     href="/create"
-                    className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-[3px] bg-[var(--accent)] text-[var(--bg-base)] text-[13px] font-bold uppercase tracking-[0.06em] transition-shadow hover:shadow-[0_0_20px_var(--accent-glow)]"
-                    style={{ fontFamily: 'var(--font-mono)' }}
+                    className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-lg bg-[var(--action)] text-white text-sm font-semibold transition-colors hover:bg-[var(--action-hover)]"
                   >
-                    <span aria-hidden>▎</span>
                     {t('createAgentCta')}
                     <Rocket size={14} />
                   </Link>
@@ -303,8 +291,7 @@ export default function TokenPage() {
                     href={SOCIAL_LINKS.twitter}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-[3px] border border-[var(--border-default)] text-[var(--text-primary)] text-[13px] font-bold uppercase tracking-[0.06em] hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[rgba(74,222,128,0.06)] transition-all"
-                    style={{ fontFamily: 'var(--font-mono)' }}
+                    className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] text-[var(--text-primary)] text-sm font-semibold transition-colors hover:border-[var(--border-hover)] hover:bg-[var(--bg-hover)]"
                   >
                     {t('followOnX')}
                     <ArrowRight size={14} />
@@ -324,10 +311,7 @@ function DetailRow({ label, children, last }: { label: string; children: React.R
     <div
       className={`flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 py-4 ${last ? '' : 'border-b border-[var(--border-default)]'}`}
     >
-      <span
-        className="text-[10px] uppercase tracking-[0.16em] font-bold text-[var(--text-muted)] w-40 flex-shrink-0"
-        style={{ fontFamily: 'var(--font-mono)' }}
-      >
+      <span className="text-xs font-semibold text-[var(--text-muted)] w-40 flex-shrink-0">
         {label}
       </span>
       <div className="flex flex-wrap items-center gap-2">

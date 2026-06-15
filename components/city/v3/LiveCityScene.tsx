@@ -106,15 +106,15 @@ const CITY_LIGHTING: Record<
   }
 > = {
   day: {
-    background: '#e5edf4',
-    fog: '#dce8f0',
+    background: '#d2eadb',
+    fog: '#d6ebd1',
     fogNear: 340,
     fogFar: 980,
-    exposure: 1.16,
-    ambient: 0.86,
-    hemi: 0.98,
+    exposure: 1.14,
+    ambient: 0.9,
+    hemi: 1.02,
     hemiSky: '#ffffff',
-    hemiGround: '#7ca568',
+    hemiGround: '#7fa865',
     sun: 1.32,
     sunColor: '#fff5e0',
   },
@@ -557,7 +557,7 @@ function LiveCityMobileMenu({
         </button>
         <Link
           href="/create"
-          className="rounded-[7px] border border-emerald-300/25 bg-emerald-300 px-3 py-2 text-sm font-semibold text-black"
+          className="rounded-[7px] border border-cyan-200/30 bg-cyan-200 px-3 py-2 text-sm font-semibold text-slate-950"
         >
           Create agent
         </Link>
@@ -662,7 +662,7 @@ function LiveBuildingPanel({
     <aside className="pointer-events-auto absolute bottom-24 left-3 right-3 z-20 rounded-[4px] border border-white/18 bg-[#08111a]/88 p-4 text-white shadow-2xl backdrop-blur-xl md:bottom-5 md:left-auto md:right-5 md:w-[min(340px,calc(100vw-2.5rem))]">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
+          <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-100">
             <Building2 size={13} />
             User building
           </div>
@@ -698,7 +698,7 @@ function LiveBuildingPanel({
         <button
           type="button"
           onClick={onBuildingEnterClick}
-          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-[4px] border border-emerald-300/30 bg-emerald-300 px-3 py-2 text-xs font-semibold text-black transition hover:bg-emerald-200"
+          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-[4px] border border-cyan-200/30 bg-cyan-200 px-3 py-2 text-xs font-semibold text-slate-950 transition hover:bg-cyan-100"
         >
           <DoorOpen size={14} />
           {enterLabel}
@@ -767,7 +767,7 @@ function LiveAgentPanel({
         <button
           type="button"
           onClick={() => onDashboardClick(marker.dashboardAgentId ?? marker.agentId)}
-          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-[4px] border border-emerald-300/30 bg-emerald-300 px-3 py-2 text-xs font-semibold text-black transition hover:bg-emerald-200"
+          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-[4px] border border-cyan-200/30 bg-cyan-200 px-3 py-2 text-xs font-semibold text-slate-950 transition hover:bg-cyan-100"
         >
           <DoorOpen size={14} />
           Open room
@@ -776,7 +776,7 @@ function LiveAgentPanel({
       {chatHref && (
         <Link
           href={chatHref}
-          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-[4px] border border-emerald-300/30 bg-emerald-300 px-3 py-2 text-xs font-semibold text-black transition hover:bg-emerald-200"
+          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-[4px] border border-cyan-200/30 bg-cyan-200 px-3 py-2 text-xs font-semibold text-slate-950 transition hover:bg-cyan-100"
         >
           <MessageSquare size={14} />
           Chat

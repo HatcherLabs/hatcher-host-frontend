@@ -46,8 +46,8 @@ function formatBytes(bytes: number): string {
 
 /** Framework-specific accent color */
 const FRAMEWORK_ACCENT: Record<string, { color: string; border: string; bg: string; text: string }> = {
-  openclaw: { color: '#f59e0b', border: 'border-amber-500/30', bg: 'bg-amber-500/10', text: 'text-amber-400' },
-  hermes:   { color: '#a855f7', border: 'border-purple-500/30', bg: 'bg-purple-500/10', text: 'text-purple-400' },
+  openclaw: { color: 'var(--color-info)', border: 'border-[var(--color-info-border)]', bg: 'bg-[var(--color-info-bg)]', text: 'text-[var(--color-info)]' },
+  hermes:   { color: 'var(--accent)', border: 'border-[var(--border-hover)]', bg: 'bg-[var(--tech-accent-soft)]', text: 'text-[var(--accent)]' },
 };
 
 const FRAMEWORK_FS_INFO: Record<string, { label: string; description: string }> = {
@@ -62,31 +62,31 @@ const FRAMEWORK_FS_INFO: Record<string, { label: string; description: string }> 
 };
 
 function getFileIcon(name: string, type: string) {
-  if (type === 'directory') return <Folder size={16} className="text-amber-400" />;
+  if (type === 'directory') return <Folder size={16} className="text-[var(--color-info)]" />;
   // .env files — red with warning connotation
-  if (/^\.env/i.test(name)) return <ShieldAlert size={16} className="text-red-400" />;
+  if (/^\.env/i.test(name)) return <ShieldAlert size={16} className="text-[var(--color-destructive)]" />;
   // JSON
-  if (/\.json$/i.test(name)) return <FileJson size={16} className="text-yellow-400" />;
+  if (/\.json$/i.test(name)) return <FileJson size={16} className="text-[var(--color-warning)]" />;
   // TypeScript / JavaScript
-  if (/\.(ts|tsx|js|jsx|mjs|cjs)$/i.test(name)) return <FileCode size={16} className="text-blue-400" />;
+  if (/\.(ts|tsx|js|jsx|mjs|cjs)$/i.test(name)) return <FileCode size={16} className="text-[var(--color-info)]" />;
   // Python
-  if (/\.py$/i.test(name)) return <FileCode size={16} className="text-green-400" />;
+  if (/\.py$/i.test(name)) return <FileCode size={16} className="text-[var(--color-success)]" />;
   // Markdown
   if (/\.md$/i.test(name)) return <FileText size={16} className="text-zinc-400" />;
   // Config files
   if (/\.(ya?ml|toml|ini|cfg|conf)$/i.test(name)) return <Settings size={16} className="text-slate-400" />;
   // Images
-  if (/\.(png|jpg|jpeg|gif|svg|webp)$/i.test(name)) return <FileImage size={16} className="text-purple-400" />;
+  if (/\.(png|jpg|jpeg|gif|svg|webp)$/i.test(name)) return <FileImage size={16} className="text-[var(--accent)]" />;
   return <FileText size={16} className="text-[var(--text-secondary)]" />;
 }
 
 /** Small colored dot for file-type hint in the list */
 function getFileTypeTag(name: string): { label: string; color: string } | null {
-  if (/^\.env/i.test(name)) return { label: 'ENV', color: 'text-red-400 bg-red-500/10 border-red-500/20' };
-  if (/\.json$/i.test(name)) return { label: 'JSON', color: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20' };
-  if (/\.(ts|tsx)$/i.test(name)) return { label: 'TS', color: 'text-blue-400 bg-blue-500/10 border-blue-500/20' };
-  if (/\.(js|jsx|mjs|cjs)$/i.test(name)) return { label: 'JS', color: 'text-blue-300 bg-blue-400/10 border-blue-400/20' };
-  if (/\.py$/i.test(name)) return { label: 'PY', color: 'text-green-400 bg-green-500/10 border-green-500/20' };
+  if (/^\.env/i.test(name)) return { label: 'ENV', color: 'text-[var(--color-destructive)] bg-[var(--color-destructive-bg)] border-[var(--color-destructive-border)]' };
+  if (/\.json$/i.test(name)) return { label: 'JSON', color: 'text-[var(--color-warning)] bg-[var(--color-warning-bg)] border-[var(--color-warning-border)]' };
+  if (/\.(ts|tsx)$/i.test(name)) return { label: 'TS', color: 'text-[var(--color-info)] bg-[var(--color-info-bg)] border-[var(--color-info-border)]' };
+  if (/\.(js|jsx|mjs|cjs)$/i.test(name)) return { label: 'JS', color: 'text-[var(--color-info)] bg-[var(--color-info-bg)] border-[var(--color-info-border)]' };
+  if (/\.py$/i.test(name)) return { label: 'PY', color: 'text-[var(--color-success)] bg-[var(--color-success-bg)] border-[var(--color-success-border)]' };
   return null;
 }
 
@@ -273,7 +273,7 @@ export function FilesTab() {
         <p className="text-sm text-[var(--text-secondary)] max-w-sm mx-auto">
           File Manager is now included on every tier. Refresh the agent or restart it if this stale lock persists.
         </p>
-        {error && <p className="text-xs text-red-400 mt-3">{error}</p>}
+        {error && <p className="text-xs text-[var(--color-destructive)] mt-3">{error}</p>}
       </motion.div>
     );
   }
@@ -282,7 +282,7 @@ export function FilesTab() {
   if (agentStopped) {
     return (
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-16">
-        <AlertCircle className="w-10 h-10 mx-auto mb-3 text-amber-400 opacity-60" />
+        <AlertCircle className="w-10 h-10 mx-auto mb-3 text-[var(--color-warning)] opacity-60" />
         <p className="text-sm text-[var(--text-secondary)]">{stoppedMessage}</p>
       </motion.div>
     );
@@ -302,15 +302,15 @@ export function FilesTab() {
             </button>
             {getFileIcon(editingFile.name, 'file')}
             <span className="text-sm font-medium text-[var(--text-primary)] font-mono">{editingFile.name}</span>
-            {isModified && <span className="text-[10px] text-amber-400 ml-1">Modified</span>}
+            {isModified && <span className="text-[10px] text-[var(--color-warning)] ml-1">Modified</span>}
             {isEnvFile && (
-              <span className="text-[10px] text-red-400 bg-red-500/10 border border-red-500/20 rounded px-1.5 py-0.5 ml-1">
+              <span className="text-[10px] text-[var(--color-destructive)] bg-[var(--color-destructive-bg)] border border-[var(--color-destructive-border)] rounded px-1.5 py-0.5 ml-1">
                 Sensitive
               </span>
             )}
           </div>
           <div className="flex items-center gap-2">
-            {saveMsg && <span className="text-xs text-green-400">{saveMsg}</span>}
+            {saveMsg && <span className="text-xs text-[var(--color-success)]">{saveMsg}</span>}
             <button
               onClick={handleSave}
               disabled={saving || !isModified}
@@ -336,12 +336,12 @@ export function FilesTab() {
           ))}
         </div>
 
-        {error && <div className="mb-3 text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{error}</div>}
+        {error && <div className="mb-3 text-xs text-[var(--color-destructive)] bg-[var(--color-destructive-bg)] border border-[var(--color-destructive-border)] rounded-lg px-3 py-2">{error}</div>}
         <textarea
           value={editContent}
           onChange={(e) => setEditContent(e.target.value)}
           className="w-full h-[500px] px-4 py-3 rounded-xl text-xs font-mono text-[var(--text-primary)] bg-[var(--bg-base)]/90 border border-[var(--border-default)] focus:outline-none resize-none leading-relaxed"
-          style={{ borderColor: isModified ? accent.color + '40' : undefined }}
+          style={{ borderColor: isModified ? `color-mix(in srgb, ${accent.color} 45%, transparent)` : undefined }}
           spellCheck={false}
         />
       </motion.div>
@@ -351,7 +351,7 @@ export function FilesTab() {
   // ── File Browser ──
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-      {error && <div className="mb-4 text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2">{error}</div>}
+      {error && <div className="mb-4 text-xs text-[var(--color-destructive)] bg-[var(--color-destructive-bg)] border border-[var(--color-destructive-border)] rounded-xl px-3 py-2">{error}</div>}
 
       {/* Framework info banner */}
       {showInfoBanner && (
@@ -499,7 +499,7 @@ export function FilesTab() {
                     </span>
                   )}
                   {isEnvFile && (
-                    <span className="text-[9px] px-1.5 py-0.5 rounded border text-red-400 bg-red-500/10 border-red-500/20 font-medium">
+                    <span className="text-[9px] px-1.5 py-0.5 rounded border text-[var(--color-destructive)] bg-[var(--color-destructive-bg)] border-[var(--color-destructive-border)] font-medium">
                       SENSITIVE
                     </span>
                   )}
@@ -515,7 +515,7 @@ export function FilesTab() {
                     <button
                       onClick={(e) => { e.stopPropagation(); handleDelete(entry); }}
                       disabled={deleting === entry.path}
-                      className="p-1 rounded text-[var(--text-muted)] hover:text-red-400 hover:bg-red-500/10 transition-colors opacity-0 group-hover:opacity-100"
+                      className="p-1 rounded text-[var(--text-muted)] hover:text-[var(--color-destructive)] hover:bg-[var(--color-destructive-bg)] transition-colors opacity-0 group-hover:opacity-100"
                       title={t('delete')}
                     >
                       {deleting === entry.path ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}

@@ -72,9 +72,9 @@ function StatItem({
 
 // Badge colors cycling for tool types
 const BADGE_COLORS = [
-  'bg-purple-500/15 text-purple-400 border-purple-500/25',
-  'bg-blue-500/15 text-blue-400 border-blue-500/25',
-  'bg-emerald-500/15 text-emerald-400 border-emerald-500/25',
+  'bg-[var(--tech-accent-soft)] text-[var(--accent)] border-[var(--border-hover)]',
+  'bg-[var(--color-info-bg)] text-[var(--color-info)] border-[var(--color-info-border)]',
+  'bg-[var(--color-success-bg)] text-[var(--color-success)] border-[var(--color-success-border)]',
 ];
 
 // ─── Main Component ─────────────────────────────────────────────
@@ -145,7 +145,7 @@ export function HermesStatsCard() {
     return (
       <GlassCard>
         <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
-          <AlertTriangle size={14} className="text-amber-400" />
+          <AlertTriangle size={14} className="text-[var(--color-warning)]" />
           Usage stats unavailable: {error}
         </div>
       </GlassCard>
@@ -161,13 +161,13 @@ export function HermesStatsCard() {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-purple-500/10 flex items-center justify-center">
-            <Activity size={14} className="text-purple-400" />
+          <div className="w-7 h-7 rounded-lg bg-[var(--tech-accent-soft)] flex items-center justify-center">
+            <Activity size={14} className="text-[var(--accent)]" />
           </div>
           <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Usage Stats</h3>
         </div>
         {stats.containerOffline && (
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400">
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--color-warning-bg)] border border-[var(--color-warning-border)] text-[var(--color-warning)]">
             cached data
           </span>
         )}
@@ -175,7 +175,7 @@ export function HermesStatsCard() {
 
       {/* Offline notice */}
       {stats.containerOffline && (
-        <div className="flex items-center gap-1.5 text-[11px] text-amber-400 mb-3">
+        <div className="flex items-center gap-1.5 text-[11px] text-[var(--color-warning)] mb-3">
           <AlertTriangle size={11} />
           Container offline — showing DB-cached message &amp; token counts; session and tool data unavailable.
         </div>

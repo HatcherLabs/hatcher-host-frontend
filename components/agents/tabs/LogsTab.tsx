@@ -29,24 +29,24 @@ const FRAMEWORK_LOG_INFO: Record<string, { label: string; description: string; a
   openclaw: {
     label: 'OpenClaw',
     description: 'Structured JSON logs with automatic level detection. Tool calls, LLM requests, and plugin events are tagged.',
-    accent: 'text-amber-400',
-    border: 'border-amber-500/20',
-    bg: 'bg-amber-500/[0.06]',
+    accent: 'text-[var(--color-info)]',
+    border: 'border-[var(--color-info-border)]',
+    bg: 'bg-[var(--color-info-bg)]',
   },
   hermes: {
     label: 'Hermes',
     description: 'Plain-text stdout/stderr logs. Warnings and errors are detected via keyword matching.',
-    accent: 'text-purple-400',
-    border: 'border-purple-500/20',
-    bg: 'bg-purple-500/[0.06]',
+    accent: 'text-[var(--accent)]',
+    border: 'border-[var(--border-hover)]',
+    bg: 'bg-[var(--tech-accent-soft)]',
   },
 };
 
 /* ── Level badge config ── */
 const LEVEL_BADGE_CONFIG: Record<string, { icon: typeof Info; color: string; bg: string; border: string }> = {
-  info: { icon: Info, color: 'text-blue-400', bg: 'bg-blue-500/15', border: 'border-blue-500/25' },
-  warn: { icon: AlertTriangle, color: 'text-amber-400', bg: 'bg-amber-500/15', border: 'border-amber-500/25' },
-  error: { icon: XCircle, color: 'text-red-400', bg: 'bg-red-500/15', border: 'border-red-500/25' },
+  info: { icon: Info, color: 'text-[var(--color-info)]', bg: 'bg-[var(--color-info-bg)]', border: 'border-[var(--color-info-border)]' },
+  warn: { icon: AlertTriangle, color: 'text-[var(--color-warning)]', bg: 'bg-[var(--color-warning-bg)]', border: 'border-[var(--color-warning-border)]' },
+  error: { icon: XCircle, color: 'text-[var(--color-destructive)]', bg: 'bg-[var(--color-destructive-bg)]', border: 'border-[var(--color-destructive-border)]' },
   debug: { icon: Bug, color: 'text-zinc-400', bg: 'bg-zinc-500/15', border: 'border-zinc-500/25' },
 };
 
@@ -180,18 +180,18 @@ export function LogsTab() {
 
         {/* Connection status badge */}
         {isActive && wsLogsConnected ? (
-          <span className="flex items-center gap-1.5 text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-full border border-emerald-500/20">
+          <span className="flex items-center gap-1.5 text-[10px] text-[var(--status-live)] bg-[var(--status-live-bg)] px-2 py-1 rounded-full border border-[var(--status-live-border)]">
             <span className="relative flex h-1.5 w-1.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--status-live)] opacity-75" />
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[var(--status-live)]" />
             </span>
             {tLogs('connected')}
           </span>
         ) : isActive ? (
-          <span className="flex items-center gap-1.5 text-[10px] text-amber-400 bg-amber-500/10 px-2 py-1 rounded-full border border-amber-500/20">
+          <span className="flex items-center gap-1.5 text-[10px] text-[var(--status-deploying)] bg-[var(--status-deploying-bg)] px-2 py-1 rounded-full border border-[var(--status-deploying-border)]">
             <span className="relative flex h-1.5 w-1.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-400" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--status-deploying)] opacity-75" />
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[var(--status-deploying)]" />
             </span>
             {tLogs('reconnecting')}
           </span>
@@ -203,7 +203,7 @@ export function LogsTab() {
           title={autoScroll ? tLogs('autoScrollEnabled') : tLogs('autoScrollDisabled')}
           className={`text-xs px-2.5 py-1.5 rounded-lg border transition-all flex items-center gap-1.5 cursor-pointer ${
             autoScroll
-              ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400'
+              ? 'border-[var(--status-live-border)] bg-[var(--status-live-bg)] text-[var(--status-live)]'
               : 'border-[var(--border-default)] text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
           }`}
         >
@@ -234,14 +234,14 @@ export function LogsTab() {
       <GlassCard className="!p-0 overflow-hidden">
         {/* Terminal-style header bar */}
         <div className="flex items-center gap-2 px-4 py-2.5 border-b border-[var(--border-default)] bg-black/20">
-          <span className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-500/60" />
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/60" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[var(--color-destructive)]/60" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[var(--color-warning)]/60" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[var(--status-live)]/60" />
           <span className="ml-3 text-[10px] font-mono text-[var(--text-muted)]">
             {agent.name} -- {tLogs('entries', { count: `${visibleFilteredLogs.length}${logSearch || logFilter !== 'all' ? ` / ${visibleLogs.length}` : ''}` })}
           </span>
           {autoScroll && (
-            <span className="ml-auto text-[10px] text-emerald-400/60 flex items-center gap-1">
+            <span className="ml-auto text-[10px] text-[var(--status-live)] flex items-center gap-1">
               <ArrowDownToLine size={9} />
               {tLogs('pinnedToBottom')}
             </span>
@@ -307,7 +307,7 @@ function highlightMatch(text: string, query: string) {
   return (
     <>
       {text.slice(0, idx)}
-      <mark className="bg-[#8b5cf6]/30 text-[#c4b5fd] rounded px-0.5">{text.slice(idx, idx + query.length)}</mark>
+      <mark className="bg-[var(--tech-accent-soft)] text-[var(--accent)] rounded px-0.5">{text.slice(idx, idx + query.length)}</mark>
       {text.slice(idx + query.length)}
     </>
   );

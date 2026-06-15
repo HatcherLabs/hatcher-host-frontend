@@ -1,28 +1,27 @@
-/* Chat-to-hatch page — terminal phosphor-green theme. Tokens are
-   inherited from the .landingV2 wrapper but we declare them again
-   here so this page works standalone (the wrapper is only on /). */
+/* Chat-to-hatch page — premium control-plane surface. Tokens are
+   mapped to the global theme so create flow matches the rest of Hatcher. */
 
 .page {
-  --bg: #03110a;
-  --bg-2: #06180f;
-  --bg-3: #0a2316;
-  --bg-4: #0f3220;
-  --ink: #e8ffef;
-  --ink-soft: #9fd4b2;
-  --mute: #5c8a6e;
-  --line: #0e3d24;
-  --line-bright: #175438;
-  --accent: #39ff88;
-  --accent-2: #7cffb0;
-  --accent-glow: rgba(57, 255, 136, 0.5);
-  --amber: #e8ff6b;
-  --red: #ff6b8a;
-  --card: #061f0e;
+  --bg: var(--bg-base);
+  --bg-2: var(--bg-surface);
+  --bg-3: var(--bg-elevated);
+  --bg-4: var(--bg-card);
+  --ink: var(--text-primary);
+  --ink-soft: var(--text-secondary);
+  --mute: var(--text-muted);
+  --line: var(--border-default);
+  --line-bright: var(--border-hover);
+  --accent: var(--tech-accent);
+  --accent-2: var(--color-info);
+  --accent-glow: color-mix(in srgb, var(--tech-accent) 18%, transparent);
+  --amber: var(--color-warning);
+  --red: var(--color-destructive);
+  --card: var(--bg-card);
 
   background: var(--bg);
   color: var(--ink);
   min-height: 100vh;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-body), 'Inter', system-ui, sans-serif;
   padding: 28px;
 }
 @media (max-width: 700px) {
@@ -43,10 +42,11 @@
   margin-bottom: 32px;
 }
 .backLink {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  font-family: var(--font-inter), var(--font-body);
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--ink-soft);
   text-decoration: none;
   display: inline-flex;
@@ -59,8 +59,8 @@
 }
 
 .brand {
-  font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
-  font-weight: 700;
+  font-family: var(--font-inter), var(--font-body);
+  font-weight: 720;
   font-size: 17px;
   color: var(--ink);
   text-decoration: none;
@@ -76,10 +76,11 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10.5px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
+  font-family: var(--font-inter), var(--font-body);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--ink-soft);
   padding: 6px 12px;
   border: 1px solid var(--line-bright);
@@ -92,22 +93,19 @@
   height: 6px;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 8px var(--accent);
+  box-shadow: none;
 }
 
 .h1 {
-  font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
+  font-family: var(--font-inter), var(--font-body);
   font-weight: 600;
-  font-size: clamp(32px, 5vw, 52px);
+  font-size: clamp(34px, 5vw, 56px);
   line-height: 1.05;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.04em;
   margin: 0;
 }
 .ac {
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--accent);
 }
 
 /* ─── Two-column layout ───────────────────────────────── */
@@ -127,11 +125,12 @@
 .col {
   background: var(--card);
   border: 1px solid var(--line-bright);
-  border-radius: 14px;
+  border-radius: var(--radius-xl);
   padding: 22px 24px;
   display: flex;
   flex-direction: column;
   min-height: 560px;
+  box-shadow: var(--shadow-soft);
 }
 
 .chatCol {
@@ -168,11 +167,11 @@
   align-items: flex-start;
   flex: 0 0 auto;
   padding-bottom: 16px;
-  border-bottom: 1px dashed var(--line-bright);
+  border-bottom: 1px solid var(--line);
   margin-bottom: 18px;
 }
 .chatTitle {
-  font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
+  font-family: var(--font-inter), var(--font-body);
   font-weight: 700;
   font-size: 20px;
   letter-spacing: -0.01em;
@@ -187,10 +186,10 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  font-family: var(--font-inter), var(--font-body);
+  font-size: 11px;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--accent);
   padding: 5px 10px;
   background: color-mix(in srgb, var(--accent) 10%, transparent);
@@ -203,7 +202,7 @@
   height: 6px;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 8px var(--accent);
+  box-shadow: none;
   animation: blink 1.4s infinite;
 }
 @keyframes blink {
@@ -254,7 +253,7 @@
   gap: 4px;
 }
 .msgWho {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 9px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -271,21 +270,25 @@
 .msgError {
   background: color-mix(in srgb, var(--red) 14%, var(--bg-2));
   border-color: color-mix(in srgb, var(--red) 50%, var(--line-bright));
-  color: #ffd3dc;
+  color: var(--red);
 }
 
 .thinking {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 11px;
-  letter-spacing: 0.16em;
+  letter-spacing: 0;
   color: var(--mute);
-  text-transform: uppercase;
+  text-transform: none;
 }
 .thinking::before {
-  content: '▸';
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
   color: var(--accent);
   animation: pulse 1.2s ease-in-out infinite;
 }
@@ -351,7 +354,7 @@
   gap: 8px;
 }
 .inputCount {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 10px;
   letter-spacing: 0.08em;
   color: var(--mute);
@@ -367,12 +370,12 @@
 
 .send {
   appearance: none;
-  border: 1px solid var(--accent);
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color: #06180f;
-  font-family: 'JetBrains Mono', monospace;
+  border: 1px solid var(--action);
+  background: var(--action);
+  color: #ffffff;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 12px;
-  letter-spacing: 0.1em;
+  letter-spacing: 0;
   font-weight: 600;
   padding: 12px 18px;
   border-radius: 10px;
@@ -383,7 +386,7 @@
 }
 .send:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 0 18px var(--accent-glow);
+  box-shadow: var(--shadow-soft);
 }
 .send:disabled {
   opacity: 0.4;
@@ -410,7 +413,7 @@
   margin: 0;
 }
 .previewTag {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 10px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -425,7 +428,7 @@
   justify-content: center;
   gap: 10px;
   color: var(--mute);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 12px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -471,7 +474,7 @@
   background:
     radial-gradient(
       circle at 50% 18%,
-      rgba(57, 255, 136, 0.18),
+      color-mix(in srgb, var(--accent) 22%, transparent),
       transparent 48%
     ),
     linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(0, 0, 0, 0.24)),
@@ -505,7 +508,7 @@
   border-radius: 6px;
   background: rgba(0, 0, 0, 0.58);
   color: var(--ink-soft);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -539,7 +542,7 @@
   align-self: flex-start;
   padding: 6px 14px;
   border-radius: 999px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 11px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -604,7 +607,7 @@
   border: 1px solid var(--fw, var(--accent));
   border-radius: 5px;
   color: var(--fw, var(--accent));
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 10px;
   font-weight: 700;
 }
@@ -613,7 +616,7 @@
   display: block;
 }
 .frameworkOptionName {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -643,11 +646,22 @@
   min-width: 0;
   flex-direction: column;
   gap: 5px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 9px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--mute);
+}
+
+.selectHelp {
+  margin-top: -1px;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-soft);
 }
 
 .selectInput {
@@ -675,7 +689,7 @@
 
 .selectInput:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(57, 255, 136, 0.18);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 22%, transparent);
 }
 
 .traitGrid {
@@ -709,7 +723,7 @@
 
 .traitInput:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(57, 255, 136, 0.18);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 22%, transparent);
 }
 
 .modelSummary {
@@ -722,10 +736,10 @@
   min-width: 0;
   padding: 4px 7px;
   border: 1px solid var(--line-bright);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--accent) 5%, var(--bg-2));
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--accent) 4%, var(--bg-2));
   color: var(--ink-soft);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 9px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -740,7 +754,7 @@
 .reasonLabel,
 .installPlanHead {
   display: block;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 9px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -771,7 +785,7 @@
 }
 
 .skillsLabel {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 10px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
@@ -787,7 +801,7 @@
   display: inline-flex;
   align-items: center;
   padding: 5px 10px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 11px;
   color: var(--ink);
   background: var(--bg-2);
@@ -816,14 +830,14 @@
 }
 .hatchBtn {
   appearance: none;
-  border: 1px solid var(--accent);
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color: #06180f;
-  font-family: 'JetBrains Mono', monospace;
+  border: 1px solid var(--action);
+  background: var(--action);
+  color: #ffffff;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 13px;
-  letter-spacing: 0.12em;
+  letter-spacing: 0;
   font-weight: 700;
-  text-transform: uppercase;
+  text-transform: none;
   padding: 14px 20px;
   border-radius: 10px;
   cursor: pointer;
@@ -833,17 +847,17 @@
 }
 .hatchBtn:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 0 24px var(--accent-glow);
+  box-shadow: var(--shadow-soft);
 }
 .hatchBtn:disabled {
   opacity: 0.5;
   cursor: progress;
 }
 .footHint {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-family: var(--font-inter), var(--font-body);
+  font-size: 12px;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--mute);
   text-align: center;
 }
@@ -861,7 +875,7 @@
   border: 1px solid var(--line-bright);
   border-radius: 6px;
   padding: 5px 10px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -880,7 +894,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 10px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -888,7 +902,7 @@
   position: relative;
 }
 .fieldHint {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 9px;
   letter-spacing: 0.14em;
   color: var(--mute);
@@ -914,7 +928,7 @@
     box-shadow 0.15s;
 }
 .fieldInput {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 14px;
   font-weight: 600;
   color: var(--ink);
@@ -925,17 +939,17 @@
 .fieldTextarea:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(57, 255, 136, 0.18);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 22%, transparent);
 }
 .fieldMono {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 12px;
   line-height: 1.5;
 }
 
 .slugHint {
   margin: -4px 0 -2px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 10px;
   letter-spacing: 0.06em;
   color: var(--mute);
@@ -958,7 +972,7 @@
   cursor: pointer;
   list-style: none;
   padding: 9px 12px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 10px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -992,7 +1006,7 @@
   gap: 6px;
 }
 .chipsHead {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 10px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -1037,7 +1051,7 @@
   background: transparent;
   border: 0;
   outline: 0;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 11px;
   color: var(--ink);
   width: 100px;
@@ -1050,7 +1064,7 @@
   background: transparent;
   border: 0;
   color: var(--accent);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
@@ -1085,7 +1099,7 @@
   }
 }
 .installPlanType {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 9px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -1094,7 +1108,7 @@
 .installPlanName {
   min-width: 0;
   overflow-wrap: anywhere;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 11px;
   color: var(--ink);
 }
@@ -1113,7 +1127,7 @@
   border-radius: 0 6px 6px 0;
 }
 .greetingLabel {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 9px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -1144,14 +1158,14 @@
   flex: 1;
 }
 .metaLabel {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 9px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--mute);
 }
 .metaValue {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 11px;
   color: var(--ink-soft);
   background: transparent;
@@ -1164,7 +1178,7 @@
   border: 1px solid var(--red);
   background: rgba(255, 107, 138, 0.08);
   border-radius: 6px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-inter), var(--font-body);
   font-size: 11px;
   color: var(--red);
 }

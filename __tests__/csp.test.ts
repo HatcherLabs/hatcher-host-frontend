@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { buildCsp } from '../lib/csp';
 
 function getDirective(csp: string, name: string): string {
@@ -9,7 +9,12 @@ function getDirective(csp: string, name: string): string {
 }
 
 describe('CSP', () => {
-  it('does not allow unsafe-inline in style-src', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it('does not allow unsafe-inline in style-src outside development', () => {
+    vi.stubEnv('NODE_ENV', 'production');
     const csp = buildCsp('testnonce', false);
 
     expect(getDirective(csp, 'style-src')).toBe(
@@ -21,7 +26,22 @@ describe('CSP', () => {
     expect(styleSrcElem).not.toContain("'unsafe-inline'");
   });
 
+  it('allows inline style elements only in development for Next dev runtime styles', () => {
+    vi.stubEnv('NODE_ENV', 'development');
+    const csp = buildCsp('testnonce', false);
+
+    expect(getDirective(csp, 'style-src')).toBe(
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    );
+    expect(getDirective(csp, 'style-src-elem')).toBe(
+      "style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    );
+    expect(getDirective(csp, 'style-src')).not.toContain("'nonce-testnonce'");
+    expect(getDirective(csp, 'style-src-elem')).not.toContain("'nonce-testnonce'");
+  });
+
   it('does not allow blob scripts or the removed Qwerti widget origins', () => {
+    vi.stubEnv('NODE_ENV', 'production');
     const csp = buildCsp('testnonce', false);
 
     expect(getDirective(csp, 'script-src')).not.toContain('blob:');
