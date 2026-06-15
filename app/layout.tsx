@@ -17,6 +17,13 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import { isLocale } from '@/i18n/config';
 import { HATCHER_LOCALE_HEADER } from '@/i18n/localeHeader';
+import {
+  ICON_PATHS,
+  MANIFEST_PATH,
+  SOCIAL_PREVIEW_PATH,
+  absoluteSiteUrl,
+  buildSocialPreviewImage,
+} from '@/lib/site-assets';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -51,6 +58,7 @@ export const viewport: Viewport = {
 };
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://hatcher.host';
+const SOCIAL_PREVIEW_URL = absoluteSiteUrl(SOCIAL_PREVIEW_PATH, SITE_URL);
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -81,11 +89,7 @@ export const metadata: Metadata = {
     title: 'Hatcher — AI Agent Infrastructure',
     description:
       'Managed AI agent infrastructure for hosted OpenClaw and Hermes agents: models, wallets, tools, rooms, and runtime controls in one place.',
-    // Homepage social preview = the restrained hatch-capsule hero image directly,
-    // not the dynamic /og card. Static asset keeps the visual identical to the
-    // landing hero. 1672x941 is 16:9 — within Twitter/X summary_large_image bounds.
-    // Sub-pages (blog, agent rooms, affiliate) still use the dynamic /og route.
-    images: [{ url: `${SITE_URL}/landing-v3/hero-agent-infrastructure.png`, width: 1672, height: 941, alt: 'Hatcher — AI Agent Infrastructure' }],
+    images: [buildSocialPreviewImage(SITE_URL)],
     locale: 'en_US',
   },
   twitter: {
@@ -95,21 +99,21 @@ export const metadata: Metadata = {
     title: 'Hatcher — AI Agent Infrastructure',
     description:
       'Managed AI agent infrastructure for hosted OpenClaw and Hermes agents: models, wallets, tools, rooms, and runtime controls in one place.',
-    images: [`${SITE_URL}/landing-v3/hero-agent-infrastructure.png`],
+    images: [SOCIAL_PREVIEW_URL],
   },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
   alternates: { canonical: SITE_URL },
   icons: {
     icon: [
-      { url: '/icon.svg', type: 'image/svg+xml' },
-      { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
-      { url: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+      { url: ICON_PATHS.svg, type: 'image/svg+xml' },
+      { url: ICON_PATHS.icon192, sizes: '192x192', type: 'image/png' },
+      { url: ICON_PATHS.icon512, sizes: '512x512', type: 'image/png' },
     ],
     apple: [
-      { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: ICON_PATHS.icon192, sizes: '192x192', type: 'image/png' },
     ],
   },
-  manifest: '/manifest.json',
+  manifest: MANIFEST_PATH,
   category: 'technology',
   appleWebApp: {
     capable: true,
@@ -123,7 +127,7 @@ const organizationJsonLd = {
   '@type': 'Organization',
   name: 'Hatcher',
   url: 'https://hatcher.host',
-  logo: `${SITE_URL}/icon.svg`,
+  logo: absoluteSiteUrl(ICON_PATHS.svg, SITE_URL),
   description: 'Deploy OpenClaw and Hermes agents instantly. Configure with no code, launch on Telegram, Discord, WhatsApp, and manage agents in 3D rooms.',
   sameAs: ['https://twitter.com/HatcherLabs'],
 };

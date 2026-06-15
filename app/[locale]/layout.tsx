@@ -4,6 +4,7 @@ import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server
 import { routing } from '@/i18n/routing';
 import type { Locale } from '@/i18n/config';
 import type { Metadata } from 'next';
+import { buildSocialPreviewImage } from '@/lib/site-assets';
 
 const OG_LOCALE_MAP: Record<string, string> = {
   en: 'en_US',
@@ -12,6 +13,8 @@ const OG_LOCALE_MAP: Record<string, string> = {
   fr: 'fr_FR',
   ro: 'ro_RO',
 };
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://hatcher.host';
 
 export async function generateMetadata({
   params,
@@ -37,6 +40,7 @@ export async function generateMetadata({
         .filter((l) => l !== locale)
         .map((l) => OG_LOCALE_MAP[l] ?? 'en_US'),
       type: 'website',
+      images: [buildSocialPreviewImage(SITE_URL)],
     },
   };
 }
