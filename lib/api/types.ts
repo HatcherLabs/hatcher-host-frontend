@@ -505,6 +505,41 @@ export interface MirariSignalResult {
   deduped: number;
 }
 
+export interface MirariDreamIngestedResponse {
+  ok: true;
+  session_id: string;
+  findings_ingested: number;
+  [key: string]: unknown;
+}
+
+export interface MirariDreamDedupedResponse {
+  ok: true;
+  deduped: true;
+  session_id: string;
+  [key: string]: unknown;
+}
+
+export interface MirariDreamPartialResponse {
+  ok: true;
+  session_id: string;
+  findings_ingested: 0;
+  error: "findings_insert_failed";
+  [key: string]: unknown;
+}
+
+export interface MirariDreamFallbackResponse {
+  delivery: "signal_fallback";
+  reason: string;
+  signal: MirariSignalResult;
+  [key: string]: unknown;
+}
+
+export type MirariDreamResultBody =
+  | MirariDreamIngestedResponse
+  | MirariDreamDedupedResponse
+  | MirariDreamPartialResponse
+  | MirariDreamFallbackResponse;
+
 export interface MirariDreamFindingBody {
   kind: MirariDreamFindingKind;
   severity?: MirariDreamFindingSeverity;
@@ -524,9 +559,9 @@ export interface MirariDreamBody {
 }
 
 export interface MirariDreamResult {
-  ok: boolean;
+  ok: true;
   status: number;
-  body: unknown;
+  body: MirariDreamResultBody;
 }
 
 export interface MirariGrantResponse {
