@@ -67,6 +67,8 @@ import type {
   OrbisSearchParams,
   OrbisSearchResponse,
   MirariConfigStatus,
+  MirariDreamResult,
+  MirariDreamBody,
   MirariGrantResponse,
   MirariSignalResult,
   MirariTestSignalBody,
@@ -612,6 +614,12 @@ export const api = {
 
   sendAgentMirariTestSignal: (id: string, body: MirariTestSignalBody) =>
     req<MirariSignalResult>(`/agents/${id}/mirari/signals/test`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  sendAgentMirariDreamTest: (id: string, body: MirariDreamBody) =>
+    req<MirariDreamResult>(`/agents/${id}/mirari/dreams/test`, {
       method: "POST",
       body: JSON.stringify(body),
     }),

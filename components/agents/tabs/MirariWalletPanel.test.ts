@@ -6,6 +6,7 @@ import {
   MIRARI_RESULT_PANEL_CLASSNAME,
   MIRARI_RESULT_PRE_CLASSNAME,
   buildMirariConnectionCheckPayload,
+  buildMirariDreamPayload,
 } from './MirariWalletPanel';
 
 describe('Mirari wallet panel helpers', () => {
@@ -17,6 +18,25 @@ describe('Mirari wallet panel helpers', () => {
       severity: 3,
       summary: 'Mirror this agent activity',
       payload: { source: 'hatcher-dashboard', action: 'connection_check' },
+    });
+  });
+
+  it('builds a user-facing Mirari dream session payload', () => {
+    expect(buildMirariDreamPayload({
+      mode: 'consolidate',
+      summary: ' Consolidate the last memory window ',
+      findingTitle: ' Memory links look stable ',
+    })).toEqual({
+      mode: 'consolidate',
+      trigger: 'manual',
+      status: 'complete',
+      summary: 'Consolidate the last memory window',
+      findings: [{
+        kind: 'insight',
+        severity: 'medium',
+        title: 'Memory links look stable',
+        target_ref: { source: 'hatcher-dashboard', action: 'dream_check' },
+      }],
     });
   });
 

@@ -13,6 +13,9 @@ import {
 import { api } from '@/lib/api';
 import type {
   MirariConfigStatus,
+  MirariDreamBody,
+  MirariDreamMode,
+  MirariDreamResult,
   MirariSignalResult,
   MirariTestSignalBody,
 } from '@/lib/api';
@@ -23,11 +26,18 @@ export interface MirariConnectionCheckFormState {
   summary: string;
 }
 
+export interface MirariDreamFormState {
+  mode: MirariDreamMode;
+  summary: string;
+  findingTitle: string;
+}
+
 export const MIRARI_PANEL_COPY = {
   eyebrow: 'Mirari Live Mirror',
   title: 'Mirror agent activity',
   description: 'Send selected agent activity to Mirari so the owner can review live behavior, conflicts, and focus patterns.',
   checkAction: 'Check connection',
+  dreamAction: 'Send dream',
   emptyResult: 'Run a connection check to confirm this agent can send activity to Mirari.',
 };
 
@@ -44,6 +54,27 @@ export function buildMirariConnectionCheckPayload(form: MirariConnectionCheckFor
     severity: 3,
     summary,
     payload: { source: 'hatcher-dashboard', action: 'connection_check' },
+  };
+}
+
+export function buildMirariDreamPayload(form: MirariDreamFormState): MirariDreamBody {
+  const summary = form.summary.trim();
+  const findingTitle = form.findingTitle.trim();
+  if (!summary) throw new Error('Dream summary is required');
+  if (!findingTitle) throw new Error('Dream finding is required');
+  if (summary.length > 1200) throw new Error('Dream summary must be 1200 characters or fewer');
+  if (findingTitle.length > 200) throw new Error('Dream finding must be 200 characters or fewer');
+  return {
+    mode: form.mode,
+    trigger: 'manual',
+    status: 'complete',
+    summary,
+    findings: [{
+      kind: 'insight',
+      severity: 'medium',
+      title: findingTitle,
+      target_ref: { source: 'hatcher-dashboard', action: 'dream_check' },
+    }],
   };
 }
 
@@ -92,9 +123,16 @@ export function MirariWalletPanel({ agentId }: { agentId: string }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [dreamSubmitting, setDreamSubmitting] = useState(false);
   const [result, setResult] = useState<MirariSignalResult | null>(null);
+  const [dreamResult, setDreamResult] = useState<MirariDreamResult | null>(null);
   const [form, setForm] = useState<MirariConnectionCheckFormState>({
     summary: 'Mirror this agent activity',
+  });
+  const [dreamForm, setDreamForm] = useState<MirariDreamFormState>({
+    mode: 'consolidate',
+    summary: 'Consolidate the last memory window',
+    findingTitle: 'Memory links look stable',
   });
 
   const canSend = Boolean(config?.enabled && config.configured);
@@ -140,6 +178,28 @@ export function MirariWalletPanel({ agentId }: { agentId: string }) {
       toast.error(message);
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const sendDream = async () => {
+    setDreamSubmitting(true);
+    setError(null);
+    try {
+      const payload = buildMirariDreamPayload(dreamForm);
+      const res = await api.sendAgentMirariDreamTest(agentId, payload);
+      if (!res.success) {
+        setError(res.error || 'Mirari dream failed');
+        toast.error(res.error || 'Mirari dream failed');
+        return;
+      }
+      setDreamResult(res.data);
+      toast.success('Mirari dream sent');
+    } catch (e) {
+      const message = (e as Error).message || 'Mirari dream failed';
+      setError(message);
+      toast.error(message);
+    } finally {
+      setDreamSubmitting(false);
     }
   };
 
@@ -218,6 +278,51 @@ export function MirariWalletPanel({ agentId }: { agentId: string }) {
               {submitting ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />} {MIRARI_PANEL_COPY.checkAction}
             </button>
           </div>
+
+          <div className="border border-[var(--border-subtle)] bg-black/20 p-3">
+            <div className="text-[10px] uppercase tracking-[0.16em] text-[var(--text-muted)]">Dream session</div>
+            <label className="mt-3 block min-w-0 text-xs text-[var(--text-muted)]">
+              Mode
+              <select
+                value={dreamForm.mode}
+                onChange={(event) => setDreamForm((current) => ({
+                  ...current,
+                  mode: event.target.value as MirariDreamMode,
+                }))}
+                className="mt-1 w-full border border-[var(--border-subtle)] bg-black/30 px-3 py-2 text-sm text-[var(--text-primary)] outline-none focus:border-cyan-300/60"
+              >
+                <option value="consolidate">Consolidate</option>
+                <option value="stress_test">Stress test</option>
+                <option value="replay">Replay</option>
+              </select>
+            </label>
+            <label className="mt-3 block min-w-0 text-xs text-[var(--text-muted)]">
+              Dream summary
+              <input
+                value={dreamForm.summary}
+                onChange={(event) => setDreamForm((current) => ({ ...current, summary: event.target.value }))}
+                maxLength={1200}
+                className="mt-1 w-full border border-[var(--border-subtle)] bg-black/30 px-3 py-2 text-sm text-[var(--text-primary)] outline-none focus:border-cyan-300/60"
+              />
+            </label>
+            <label className="mt-3 block min-w-0 text-xs text-[var(--text-muted)]">
+              Finding
+              <input
+                value={dreamForm.findingTitle}
+                onChange={(event) => setDreamForm((current) => ({ ...current, findingTitle: event.target.value }))}
+                maxLength={200}
+                className="mt-1 w-full border border-[var(--border-subtle)] bg-black/30 px-3 py-2 text-sm text-[var(--text-primary)] outline-none focus:border-cyan-300/60"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={() => void sendDream()}
+              disabled={!canSend || dreamSubmitting}
+              className="mt-3 inline-flex items-center gap-2 border border-cyan-400/40 bg-cyan-500/10 px-3 py-2 text-xs uppercase tracking-wider text-cyan-100 transition hover:bg-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {dreamSubmitting ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />} {MIRARI_PANEL_COPY.dreamAction}
+            </button>
+          </div>
         </div>
 
         <div className={MIRARI_RESULT_PANEL_CLASSNAME}>
@@ -247,6 +352,19 @@ export function MirariWalletPanel({ agentId }: { agentId: string }) {
               {MIRARI_PANEL_COPY.emptyResult}
             </p>
           )}
+
+          <div className="mt-5 border-t border-cyan-400/20 pt-4">
+            <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-cyan-100">
+              <Radar size={13} /> Dream session
+            </div>
+            {dreamResult ? (
+              <pre className={MIRARI_RESULT_PRE_CLASSNAME}>{prettyJson(dreamResult)}</pre>
+            ) : (
+              <p className="mt-3 text-xs leading-relaxed text-[var(--text-muted)]">
+                Send a dream session to mirror an offline consolidation pass.
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </GlassCard>

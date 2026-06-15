@@ -473,6 +473,10 @@ export interface OrbisCallResponse {
 
 export type MirariRuntime = "hermes" | "openclaw";
 export type MirariSignalKind = "drift" | "contradiction" | "skill_misfire" | "focus_hit" | "judge_score";
+export type MirariDreamMode = "stress_test" | "replay" | "consolidate";
+export type MirariDreamTrigger = "manual" | "idle" | "scheduled";
+export type MirariDreamFindingKind = "weakness" | "insight" | "contradiction" | "proposal";
+export type MirariDreamFindingSeverity = "low" | "medium" | "high";
 
 export interface MirariConfigStatus {
   enabled: boolean;
@@ -499,6 +503,30 @@ export interface MirariSignalResult {
   ok: boolean;
   ingested: number;
   deduped: number;
+}
+
+export interface MirariDreamFindingBody {
+  kind: MirariDreamFindingKind;
+  severity?: MirariDreamFindingSeverity;
+  title: string;
+  detail?: string;
+  target_ref?: Record<string, unknown>;
+}
+
+export interface MirariDreamBody {
+  externalSessionId?: string;
+  mode?: MirariDreamMode;
+  trigger?: MirariDreamTrigger;
+  status?: "complete" | "failed";
+  summary?: string;
+  error?: string;
+  findings?: MirariDreamFindingBody[];
+}
+
+export interface MirariDreamResult {
+  ok: boolean;
+  status: number;
+  body: unknown;
 }
 
 export interface MirariGrantResponse {
