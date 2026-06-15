@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
@@ -38,6 +38,7 @@ import {
   type IntegrationDef,
 } from '../AgentContext';
 import { api } from '@/lib/api';
+import type { CovenantConnector, CovenantTask, CreateCovenantConnectorResponse } from '@/lib/api/types';
 import { API_URL } from '@/lib/config';
 import { DomainsSection } from './DomainsSection';
 
@@ -986,6 +987,517 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
   );
 }
 
+type CovenantBusyAction = 'create' | 'dispatch' | 'refresh' | `ping:${string}` | `revoke:${string}` | `cancel:${string}`;
+
+function formatCovenantDate(value: string | null | undefined): string {
+  if (!value) return 'Never';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleString();
+}
+
+function covenantStatusClass(status: string): string {
+  if (status === 'online' || status === 'ok' || status === 'success') {
+    return 'bg-[var(--status-live-bg)] text-[var(--status-live)] border-[var(--status-live-border)]';
+  }
+  if (status === 'pending' || status === 'accepted' || status === 'dispatched') {
+    return 'bg-[var(--color-warning-bg)] text-[var(--color-warning)] border-[var(--color-warning-border)]';
+  }
+  if (status === 'revoked' || status === 'error' || status === 'timeout' || status === 'cancelled') {
+    return 'bg-[var(--color-destructive-bg)] text-[var(--color-destructive)] border-[var(--color-destructive-border)]';
+  }
+  return 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20';
+}
+
+function covenantTraceCount(trace: unknown): number {
+  return Array.isArray(trace) ? trace.length : 0;
+}
+
+function compactJson(value: unknown): string {
+  if (value === null || value === undefined) return '';
+  if (typeof value === 'string') return value;
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+}
+
+function CovenantSection() {
+  const { agent } = useAgentContext();
+  const [expanded, setExpanded] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState<CovenantBusyAction | null>(null);
+  const [connectors, setConnectors] = useState<CovenantConnector[]>([]);
+  const [tasks, setTasks] = useState<CovenantTask[]>([]);
+  const [connectorName, setConnectorName] = useState('Local Covenant');
+  const [dispatchText, setDispatchText] = useState('Create a file hello.js that prints the current time.');
+  const [createdPairing, setCreatedPairing] = useState<CreateCovenantConnectorResponse | null>(null);
+  const [copied, setCopied] = useState<string | null>(null);
+  const [statusMsg, setStatusMsg] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadCovenant = useCallback(async (showSpinner = true) => {
+    if (showSpinner) setLoading(true);
+    setError(null);
+    try {
+      const [connectorsRes, tasksRes] = await Promise.all([
+        api.getCovenantConnectors(agent.id),
+        api.getCovenantTasks(agent.id, 12),
+      ]);
+      if (connectorsRes.success) {
+        setConnectors(connectorsRes.data.connectors);
+      } else {
+        setError(connectorsRes.error ?? 'Failed to load Covenant connectors');
+      }
+      if (tasksRes.success) {
+        setTasks(tasksRes.data.tasks);
+      } else if (connectorsRes.success) {
+        setError(tasksRes.error ?? 'Failed to load Covenant tasks');
+      }
+    } catch (e) {
+      setError((e as Error).message || 'Failed to load Covenant');
+    } finally {
+      if (showSpinner) setLoading(false);
+    }
+  }, [agent.id]);
+
+  useEffect(() => {
+    void loadCovenant();
+  }, [loadCovenant]);
+
+  const copyToClipboard = async (key: string, text: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopied(key);
+    setTimeout(() => setCopied((current) => (current === key ? null : current)), 1800);
+  };
+
+  const handleCreate = async () => {
+    setBusy('create');
+    setError(null);
+    setStatusMsg(null);
+    try {
+      const res = await api.createCovenantConnector(agent.id, {
+        name: connectorName.trim() || undefined,
+      });
+      if (res.success) {
+        setCreatedPairing(res.data);
+        setStatusMsg('Connector token minted.');
+        setConnectors((prev) => [
+          res.data.connector,
+          ...prev.filter((connector) => connector.id !== res.data.connector.id),
+        ]);
+        await loadCovenant(false);
+      } else {
+        setError(res.error ?? 'Failed to create Covenant connector');
+      }
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const handlePing = async (connector: CovenantConnector) => {
+    setBusy(`ping:${connector.id}`);
+    setError(null);
+    setStatusMsg(null);
+    try {
+      const res = await api.pingCovenantConnector(agent.id, connector.id);
+      if (res.success) {
+        setStatusMsg(`Ping sent at ${formatCovenantDate(new Date(res.data.ts).toISOString())}.`);
+        await loadCovenant(false);
+      } else {
+        setError(res.error ?? 'Connector is not online');
+      }
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const handleRevoke = async (connector: CovenantConnector) => {
+    if (!window.confirm(`Revoke ${connector.name}?`)) return;
+    setBusy(`revoke:${connector.id}`);
+    setError(null);
+    setStatusMsg(null);
+    try {
+      const res = await api.revokeCovenantConnector(agent.id, connector.id);
+      if (res.success) {
+        setStatusMsg('Connector revoked.');
+        setConnectors((prev) => prev.filter((item) => item.id !== connector.id));
+        setCreatedPairing((current) => (current?.connector.id === connector.id ? null : current));
+        await loadCovenant(false);
+      } else {
+        setError(res.error ?? 'Failed to revoke connector');
+      }
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const handleDispatch = async () => {
+    const text = dispatchText.trim();
+    if (!text) {
+      setError('Task prompt is required.');
+      return;
+    }
+    setBusy('dispatch');
+    setError(null);
+    setStatusMsg(null);
+    try {
+      const onlineConnector = connectors.find((connector) => connector.status === 'online');
+      const res = await api.dispatchCovenantTask(agent.id, {
+        connectorId: onlineConnector?.id,
+        text,
+        grants: [{ scope: 'filesystem.write', constraints: { paths: ['.'] } }],
+        deadlineMs: 300_000,
+      });
+      if (res.success) {
+        setStatusMsg(`Dispatched ${res.data.task.dispatchId}.`);
+        setTasks((prev) => [res.data.task, ...prev.filter((task) => task.id !== res.data.task.id)]);
+        await loadCovenant(false);
+      } else {
+        setError(res.error ?? 'Failed to dispatch Covenant task');
+      }
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const handleCancel = async (task: CovenantTask) => {
+    setBusy(`cancel:${task.id}`);
+    setError(null);
+    setStatusMsg(null);
+    try {
+      const res = await api.cancelCovenantTask(agent.id, task.id);
+      if (res.success) {
+        setStatusMsg(res.data.sent ? 'Cancel sent.' : 'Task marked cancelled.');
+        setTasks((prev) => prev.map((item) => (item.id === task.id ? res.data.task : item)));
+      } else {
+        setError(res.error ?? 'Failed to cancel task');
+      }
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const onlineCount = connectors.filter((connector) => connector.status === 'online').length;
+  const canDispatch = onlineCount > 0 && busy === null;
+  const latestTask = tasks[0];
+  const helloFrame = createdPairing
+    ? JSON.stringify({
+        v: 1,
+        type: 'hello',
+        agent_id: agent.id,
+        auth: createdPairing.token,
+        pairing: createdPairing.pairingCode,
+      }, null, 2)
+    : '';
+
+  return (
+    <div>
+      <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[var(--text-muted)]">
+        Covenant
+        <span className="ml-2 text-[var(--color-info)] normal-case tracking-normal font-normal">local coding gateway</span>
+      </h3>
+      <GlassCard className="!p-0">
+        <button
+          type="button"
+          onClick={() => setExpanded(!expanded)}
+          className="w-full flex items-center gap-3 p-4 text-left hover:bg-[var(--bg-card)] transition-colors cursor-pointer"
+        >
+          <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--color-info-bg)] border border-[var(--color-info-border)]">
+            <Shield size={14} className="text-[var(--color-info)]" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm font-medium text-[var(--text-primary)]">Local connector</span>
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${
+                onlineCount > 0
+                  ? 'bg-[var(--status-live-bg)] text-[var(--status-live)] border-[var(--status-live-border)]'
+                  : connectors.length > 0
+                    ? 'bg-[var(--color-warning-bg)] text-[var(--color-warning)] border-[var(--color-warning-border)]'
+                    : 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20'
+              }`}>
+                {onlineCount > 0 ? `${onlineCount} online` : connectors.length > 0 ? 'Paired' : 'Not paired'}
+              </span>
+              {latestTask && (
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${covenantStatusClass(latestTask.status)}`}>
+                  Last {latestTask.status}
+                </span>
+              )}
+            </div>
+            <p className="text-xs mt-0.5 truncate text-[var(--text-muted)]">
+              Dispatch owner-approved coding tasks to a paired Covenant daemon.
+            </p>
+          </div>
+          {expanded
+            ? <ChevronUp size={16} className="text-[var(--text-muted)]" />
+            : <ChevronDown size={16} className="text-[var(--text-muted)]" />
+          }
+        </button>
+
+        {expanded && (
+          <div className="border-t border-[var(--border-default)] p-5 space-y-5 bg-[var(--bg-card)]">
+            {loading ? (
+              <div className="flex items-center justify-center py-6">
+                <Loader2 size={16} className="animate-spin text-[var(--text-muted)]" />
+              </div>
+            ) : (
+              <>
+                {createdPairing && (
+                  <div className="rounded-lg border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] p-3 space-y-3">
+                    <div className="flex items-start gap-2">
+                      <AlertTriangle size={14} className="mt-0.5 flex-shrink-0 text-[var(--color-warning)]" />
+                      <p className="text-xs leading-relaxed text-[var(--text-secondary)]">
+                        Token is shown once. Store it in Covenant before closing this panel.
+                      </p>
+                    </div>
+                    <div className="grid gap-3 md:grid-cols-2">
+                      <div>
+                        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Connector token</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            readOnly
+                            value={createdPairing.token}
+                            className="min-w-0 flex-1 h-9 px-3 rounded-lg text-xs text-[var(--text-primary)] bg-black/25 border border-[var(--border-default)] focus:outline-none font-mono"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => copyToClipboard('covenant-token', createdPairing.token)}
+                            className="h-9 w-9 flex items-center justify-center rounded-lg border border-[var(--border-default)] hover:bg-[var(--bg-hover)] transition-colors"
+                            title="Copy token"
+                          >
+                            {copied === 'covenant-token' ? <Check size={14} className="text-[var(--color-success)]" /> : <Copy size={14} className="text-[var(--text-muted)]" />}
+                          </button>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Pairing code</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            readOnly
+                            value={createdPairing.pairingCode}
+                            className="min-w-0 flex-1 h-9 px-3 rounded-lg text-xs text-[var(--text-primary)] bg-black/25 border border-[var(--border-default)] focus:outline-none font-mono"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => copyToClipboard('covenant-pairing', createdPairing.pairingCode)}
+                            className="h-9 w-9 flex items-center justify-center rounded-lg border border-[var(--border-default)] hover:bg-[var(--bg-hover)] transition-colors"
+                            title="Copy pairing code"
+                          >
+                            {copied === 'covenant-pairing' ? <Check size={14} className="text-[var(--color-success)]" /> : <Copy size={14} className="text-[var(--text-muted)]" />}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Hello frame</label>
+                      <pre className="max-h-44 overflow-auto rounded-lg border border-[var(--border-default)] bg-black/25 p-3 text-xs text-[var(--text-secondary)] whitespace-pre-wrap break-all">
+                        {helloFrame}
+                      </pre>
+                    </div>
+                  </div>
+                )}
+
+                <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(320px,0.8fr)]">
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex items-center justify-between gap-3 mb-2">
+                        <p className="text-xs font-medium text-[var(--text-secondary)]">Connectors</p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setBusy('refresh');
+                            loadCovenant(false).finally(() => setBusy(null));
+                          }}
+                          disabled={busy === 'refresh'}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--border-hover)] disabled:opacity-50"
+                        >
+                          {busy === 'refresh' ? <Loader2 size={13} className="animate-spin" /> : <RotateCcw size={13} />}
+                          Refresh
+                        </button>
+                      </div>
+                      <div className="space-y-2">
+                        {connectors.length === 0 ? (
+                          <p className="rounded-lg border border-[var(--border-default)] bg-black/15 px-3 py-3 text-xs text-[var(--text-muted)]">
+                            No Covenant connector is paired.
+                          </p>
+                        ) : connectors.map((connector) => (
+                          <div key={connector.id} className="rounded-lg border border-[var(--border-default)] bg-black/15 px-3 py-2">
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="text-xs font-medium text-[var(--text-secondary)] truncate">{connector.name}</span>
+                                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${covenantStatusClass(connector.status)}`}>
+                                    {connector.status}
+                                  </span>
+                                </div>
+                                <p className="mt-1 text-[10px] text-[var(--text-muted)]">
+                                  Last seen {formatCovenantDate(connector.lastSeenAt)}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => handlePing(connector)}
+                                  disabled={busy === `ping:${connector.id}` || connector.status !== 'online'}
+                                  className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[var(--border-default)] px-2 text-xs text-[var(--text-secondary)] hover:border-[var(--border-hover)] disabled:opacity-40"
+                                >
+                                  {busy === `ping:${connector.id}` ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
+                                  Ping
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRevoke(connector)}
+                                  disabled={busy === `revoke:${connector.id}`}
+                                  className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[var(--color-destructive-border)] px-2 text-xs text-[var(--color-destructive)] hover:bg-[var(--color-destructive-bg)] disabled:opacity-40"
+                                >
+                                  {busy === `revoke:${connector.id}` ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
+                                  Revoke
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="border-t border-[var(--border-default)] pt-4">
+                      <p className="text-xs font-medium text-[var(--text-secondary)] mb-2">New connector</p>
+                      <div className="flex flex-col gap-2 sm:flex-row">
+                        <input
+                          value={connectorName}
+                          onChange={(event) => setConnectorName(event.target.value)}
+                          className="min-w-0 flex-1 h-9 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-[var(--accent)] focus:outline-none placeholder:text-[var(--text-muted)]"
+                          placeholder="Local Covenant"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleCreate}
+                          disabled={busy === 'create'}
+                          className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg bg-[var(--accent)] px-4 text-xs font-medium text-[var(--bg-base)] hover:bg-[var(--accent-hover)] disabled:opacity-50"
+                        >
+                          {busy === 'create' ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                          Create
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-xs font-medium text-[var(--text-secondary)] mb-2">Test coding task</p>
+                      <textarea
+                        value={dispatchText}
+                        onChange={(event) => setDispatchText(event.target.value)}
+                        className="min-h-28 w-full resize-y rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-primary)] outline-none placeholder:text-[var(--text-muted)] focus:border-[var(--accent)]"
+                        placeholder="Create a file hello.js that prints the current time."
+                      />
+                      <button
+                        type="button"
+                        onClick={handleDispatch}
+                        disabled={!canDispatch}
+                        className="mt-2 inline-flex h-9 w-full items-center justify-center gap-1.5 rounded-lg bg-[var(--accent)] px-4 text-xs font-medium text-[var(--bg-base)] hover:bg-[var(--accent-hover)] disabled:opacity-50"
+                      >
+                        {busy === 'dispatch' ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
+                        Dispatch
+                      </button>
+                      {onlineCount === 0 && (
+                        <p className="mt-2 text-[10px] text-[var(--text-muted)]">
+                          A connector must be online before dispatch.
+                        </p>
+                      )}
+                    </div>
+
+                    {(statusMsg || error) && (
+                      <div className={`rounded-lg border px-3 py-2 text-xs ${
+                        error
+                          ? 'border-[var(--color-destructive-border)] bg-[var(--color-destructive-bg)] text-[var(--color-destructive)]'
+                          : 'border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success)]'
+                      }`}>
+                        {error || statusMsg}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="border-t border-[var(--border-default)] pt-4">
+                  <div className="mb-2 flex items-center justify-between gap-3">
+                    <p className="text-xs font-medium text-[var(--text-secondary)]">Recent tasks</p>
+                    <span className="text-[10px] text-[var(--text-muted)]">{tasks.length} shown</span>
+                  </div>
+                  {tasks.length === 0 ? (
+                    <p className="rounded-lg border border-[var(--border-default)] bg-black/15 px-3 py-3 text-xs text-[var(--text-muted)]">
+                      No Covenant tasks yet.
+                    </p>
+                  ) : (
+                    <div className="overflow-x-auto rounded-lg border border-[var(--border-default)]">
+                      <table className="w-full min-w-[760px] border-collapse text-left text-xs">
+                        <thead className="bg-black/20 text-[var(--text-muted)]">
+                          <tr>
+                            <th className="px-3 py-2 font-medium">Status</th>
+                            <th className="px-3 py-2 font-medium">Prompt</th>
+                            <th className="px-3 py-2 font-medium">Trace</th>
+                            <th className="px-3 py-2 font-medium">Result</th>
+                            <th className="px-3 py-2 font-medium">Updated</th>
+                            <th className="px-3 py-2 font-medium text-right">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-[var(--border-default)]">
+                          {tasks.map((task) => {
+                            const cancellable = task.status === 'dispatched' || task.status === 'accepted';
+                            const result = compactJson(task.result || task.errorMessage).slice(0, 140);
+                            return (
+                              <tr key={task.id} className="bg-black/10">
+                                <td className="px-3 py-2 align-top">
+                                  <span className={`inline-flex rounded-full border px-1.5 py-0.5 text-[10px] ${covenantStatusClass(task.status)}`}>
+                                    {task.status}
+                                  </span>
+                                </td>
+                                <td className="max-w-[240px] px-3 py-2 align-top text-[var(--text-secondary)]">
+                                  <span className="line-clamp-2">{task.intentText}</span>
+                                  <span className="mt-1 block font-mono text-[10px] text-[var(--text-muted)]">{task.dispatchId}</span>
+                                </td>
+                                <td className="px-3 py-2 align-top text-[var(--text-muted)]">
+                                  {covenantTraceCount(task.trace)}
+                                </td>
+                                <td className="max-w-[220px] px-3 py-2 align-top text-[var(--text-muted)]">
+                                  <span className="line-clamp-2">{result || '-'}</span>
+                                </td>
+                                <td className="px-3 py-2 align-top text-[var(--text-muted)]">
+                                  {formatCovenantDate(task.completedAt ?? task.updatedAt)}
+                                </td>
+                                <td className="px-3 py-2 align-top text-right">
+                                  {cancellable ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleCancel(task)}
+                                      disabled={busy === `cancel:${task.id}`}
+                                      className="inline-flex h-7 items-center gap-1 rounded-lg border border-[var(--color-destructive-border)] px-2 text-[10px] text-[var(--color-destructive)] hover:bg-[var(--color-destructive-bg)] disabled:opacity-40"
+                                    >
+                                      {busy === `cancel:${task.id}` ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
+                                      Cancel
+                                    </button>
+                                  ) : (
+                                    <span className="text-[10px] text-[var(--text-muted)]">-</span>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </GlassCard>
+    </div>
+  );
+}
+
 function WebhookSection() {
   const t = useTranslations('dashboard.agentDetail.integrations');
   const { agent } = useAgentContext();
@@ -1668,6 +2180,7 @@ export function IntegrationsTab() {
           {/* Webhook section — always shown at top */}
           <WebhookSection />
           <OutboundWebhookSection />
+          <CovenantSection />
 
           {/* Main integrations — all free on every tier */}
           <div>
