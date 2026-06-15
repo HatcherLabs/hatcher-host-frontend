@@ -6,6 +6,8 @@ import type { Station } from '../world/layout';
 import { paletteFor as legacyPaletteFor } from '../three-palette';
 import { AgentBody, type RoomEmoteId } from './AgentBody';
 
+export const AGENT_AVATAR_PLATFORM_Y = 0.34;
+
 // Gentle idle breathing on the avatar so it never reads as a frozen statue.
 // Dampens to near-zero while an emote plays so it doesn't fight the animation.
 function BreathingWrap({ suppressed, children }: { suppressed: boolean; children: ReactNode }) {
@@ -61,17 +63,22 @@ export function AgentAvatar({
     framework === 'openclaw'
       ? {
           ...legacyBase,
-          primary: 0x39ff88,
-          dim: 0x16a34a,
-          bright: 0xb9ffd4,
-          primaryHex: '#39ff88',
-          dimHex: '#16a34a',
-          brightHex: '#b9ffd4',
+          primary: 0xd6b177,
+          dim: 0x8a6d45,
+          bright: 0xffe4ad,
+          primaryHex: '#D6B177',
+          dimHex: '#8A6D45',
+          brightHex: '#FFE4AD',
         }
       : legacyBase;
+  const raisedPosition: [number, number, number] = [
+    station.position[0],
+    station.position[1] + AGENT_AVATAR_PLATFORM_Y,
+    station.position[2],
+  ];
 
   return (
-    <group position={station.position} rotation={[0, station.rotationY, 0]}>
+    <group position={raisedPosition} rotation={[0, station.rotationY, 0]}>
       <Suspense fallback={null}>
         <BreathingWrap suppressed={!!activeEmote}>
           <AgentBody

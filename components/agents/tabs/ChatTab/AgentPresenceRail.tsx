@@ -238,7 +238,7 @@ export function AgentPresenceRail({
                         type="button"
                         onClick={() => void deleteChatSession(session.id)}
                         disabled={deletingChatSessionId === session.id}
-                        className="flex w-8 shrink-0 items-center justify-center rounded-r-md text-[var(--text-muted)] opacity-70 transition-colors hover:bg-red-500/10 hover:text-red-300 hover:opacity-100 focus-visible:bg-red-500/10 focus-visible:text-red-300 focus-visible:opacity-100 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="flex w-8 shrink-0 items-center justify-center rounded-r-md text-[var(--text-muted)] opacity-70 transition-colors hover:bg-[var(--color-destructive-bg)] hover:text-[var(--color-destructive)] hover:opacity-100 focus-visible:bg-[var(--color-destructive-bg)] focus-visible:text-[var(--color-destructive)] focus-visible:opacity-100 disabled:cursor-not-allowed disabled:opacity-50"
                         aria-label={`Delete chat ${session.title}`}
                         title="Delete chat"
                       >
@@ -265,7 +265,7 @@ export function AgentPresenceRail({
           status={agent.status}
         />
 
-        <div className="relative h-44 overflow-hidden rounded-lg border border-white/10 bg-[radial-gradient(circle_at_50%_20%,rgba(34,211,238,0.14),rgba(0,0,0,0.45)_58%,rgba(0,0,0,0.72))] md:h-[clamp(12rem,24dvh,16rem)]">
+        <div className="relative h-44 overflow-hidden rounded-lg border border-white/10 bg-[radial-gradient(circle_at_50%_20%,rgba(115,164,185,0.14),rgba(0,0,0,0.45)_58%,rgba(0,0,0,0.72))] md:h-[clamp(12rem,24dvh,16rem)]">
           <AgentRoomAvatarPreview
             agentId={agent.id}
             framework={agent.framework}
@@ -319,7 +319,7 @@ export function AgentPresenceRail({
             ))}
           </select>
           {variantError && (
-            <span className="text-[11px] leading-tight text-red-300">
+            <span className="text-[11px] leading-tight text-[var(--color-destructive)]">
               {variantError}
             </span>
           )}

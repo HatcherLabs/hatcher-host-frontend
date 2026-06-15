@@ -130,7 +130,7 @@ function ApiKeyCard({
               <button
                 onClick={handleSaveLabel}
                 disabled={saving}
-                className="h-7 px-2.5 text-xs rounded-lg bg-cyan-500/15 text-cyan-400 hover:bg-cyan-500/25 transition-colors cursor-pointer disabled:opacity-50"
+                className="h-7 px-2.5 text-xs rounded-lg bg-[var(--color-accent-bg)] text-[var(--color-accent)] hover:opacity-85 transition-colors cursor-pointer disabled:opacity-50"
               >
                 {saving ? <Loader2 size={11} className="animate-spin" /> : t('saveBtn')}
               </button>
@@ -165,7 +165,7 @@ function ApiKeyCard({
               title="Copy prefix"
             >
               {copiedId === apiKey.id ? (
-                <Check size={11} className="text-emerald-400" />
+                <Check size={11} className="text-[var(--color-success)]" />
               ) : (
                 <Copy size={11} className="text-[var(--text-muted)]" />
               )}
@@ -195,10 +195,10 @@ function ApiKeyCard({
         {/* Revoke button */}
         <button
           onClick={() => onRevoke(apiKey.id)}
-          className="opacity-0 group-hover:opacity-100 transition-opacity h-7 w-7 rounded-lg border border-red-500/20 bg-red-500/[0.05] hover:bg-red-500/10 flex items-center justify-center cursor-pointer flex-shrink-0"
+          className="opacity-0 group-hover:opacity-100 transition-opacity h-7 w-7 rounded-lg border border-[var(--color-destructive-border)] bg-[var(--color-destructive-bg)] hover:opacity-85 flex items-center justify-center cursor-pointer flex-shrink-0"
           title="Revoke key"
         >
-          <Trash2 size={12} className="text-red-400" />
+          <Trash2 size={12} className="text-[var(--color-destructive)]" />
         </button>
       </div>
     </motion.div>
@@ -309,7 +309,7 @@ export default function ApiKeysPage() {
       {/* Background glow */}
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 60% 40% at 30% 0%, rgba(139,92,246,0.05), transparent 60%)' }}
+        style={{ background: 'radial-gradient(ellipse 60% 40% at 30% 0%, rgba(115,164,185,0.08), transparent 60%)' }}
       />
 
       <div className="max-w-3xl mx-auto relative">
@@ -335,12 +335,12 @@ export default function ApiKeysPage() {
               href="https://docs.hatcher.host"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-cyan-400 hover:text-cyan-300 inline-flex items-center gap-0.5 transition-colors"
+              className="text-[var(--color-accent)] hover:opacity-80 inline-flex items-center gap-0.5 transition-colors"
             >
               {docsLinkLabel} <ExternalLink size={11} />
             </Link>
             {subheadingBetweenDocsAndPrefix}
-            <code className="font-mono text-xs bg-[var(--bg-card)] px-1 py-0.5 rounded text-cyan-400">
+            <code className="font-mono text-xs bg-[var(--bg-card)] px-1 py-0.5 rounded text-[var(--color-accent)]">
               {apiKeyPrefix}
             </code>
             {subheadingAfterPrefix}
@@ -355,12 +355,12 @@ export default function ApiKeysPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.25 }}
-              className="mb-6 p-4 rounded-xl bg-emerald-500/[0.08] border border-emerald-500/25"
+              className="mb-6 p-4 rounded-xl bg-[var(--color-success-bg)] border border-[var(--color-success-border)]"
             >
               <div className="flex items-start gap-2 mb-3">
-                <AlertTriangle size={14} className="text-amber-400 flex-shrink-0 mt-0.5" />
+                <AlertTriangle size={14} className="text-[var(--color-warning)] flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-semibold text-emerald-400">{t('newKeyAlert')}</p>
+                  <p className="text-sm font-semibold text-[var(--color-success)]">{t('newKeyAlert')}</p>
                   <p className="text-xs text-[var(--text-muted)] mt-0.5">
                     {t('newKeyAlertSub')}
                   </p>
@@ -368,12 +368,12 @@ export default function ApiKeysPage() {
               </div>
               <p className="text-xs text-[var(--text-muted)] mb-2 font-medium">{newlyCreated.label}</p>
               <div className="flex items-center gap-2">
-                <div className="flex-1 h-9 px-3 rounded-lg bg-[var(--bg-card)] border border-emerald-500/20 flex items-center font-mono text-xs text-white overflow-x-auto">
+                <div className="flex-1 h-9 px-3 rounded-lg bg-[var(--bg-card)] border border-[var(--color-success-border)] flex items-center font-mono text-xs text-[var(--text-primary)] overflow-x-auto">
                   {newlyCreated.key}
                 </div>
                 <button
                   onClick={() => copy(newlyCreated.key, 'new')}
-                  className="h-9 px-3 rounded-lg border border-emerald-500/25 bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] flex items-center gap-1.5 text-xs text-emerald-400 transition-colors cursor-pointer flex-shrink-0"
+                  className="h-9 px-3 rounded-lg border border-[var(--color-success-border)] bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] flex items-center gap-1.5 text-xs text-[var(--color-success)] transition-colors cursor-pointer flex-shrink-0"
                 >
                   {copiedId === 'new' ? <Check size={13} /> : <Copy size={13} />}
                   {copiedId === 'new' ? t('copiedLabel') : t('copyLabel')}
@@ -449,16 +449,16 @@ export default function ApiKeysPage() {
 
         {/* ── Usage note ─────────────────────────────────── */}
         <div className="mt-5 p-4 rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] flex items-start gap-3">
-          <ExternalLink size={14} className="text-cyan-400 flex-shrink-0 mt-0.5" />
+          <ExternalLink size={14} className="text-[var(--color-accent)] flex-shrink-0 mt-0.5" />
           <p className="text-xs text-[var(--text-muted)] leading-relaxed">
             {usageBeforeHeader}
-            <code className="font-mono text-cyan-400">{headerExample}</code>
+            <code className="font-mono text-[var(--color-accent)]">{headerExample}</code>
             {usageBetweenHeaderAndDocs}
             <Link
               href="https://docs.hatcher.host"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-cyan-400 hover:text-cyan-300 transition-colors underline underline-offset-2"
+              className="text-[var(--color-accent)] hover:opacity-80 transition-colors underline underline-offset-2"
             >
               {docsLinkLabel2}
             </Link>

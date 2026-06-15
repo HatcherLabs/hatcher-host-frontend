@@ -70,7 +70,7 @@ export function SkillsPanel({ agentId, framework, onClose }: Props) {
       )}
       <ul className="space-y-2">
         {skills.map(s => (
-          <li key={s.id} className="flex items-center justify-between rounded-lg bg-neutral-800 p-3">
+          <li key={s.id} className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.045] p-3">
             <div className="min-w-0 flex-1">
               <div className="truncate text-sm font-medium">{s.name}</div>
               {s.description && <div className="truncate text-xs text-neutral-400">{s.description}</div>}
@@ -79,7 +79,7 @@ export function SkillsPanel({ agentId, framework, onClose }: Props) {
               onClick={() => toggle(s.id, !s.enabled)}
               disabled={busy === s.id}
               className={`ml-3 flex-shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
-                s.enabled ? 'bg-green-600 text-white' : 'bg-neutral-700 text-neutral-300'
+                s.enabled ? 'border border-cyan-200/25 bg-cyan-200/12 text-cyan-100' : 'bg-neutral-700 text-neutral-300'
               } disabled:opacity-50`}
             >
               {busy === s.id ? '…' : s.enabled ? 'On' : 'Off'}

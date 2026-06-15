@@ -107,7 +107,7 @@ const PAYOUT_OPTIONS: Array<{
     label: 'Cash Only',
     breakdown: '20% recurring, paid in SOL / USDC / $HATCHER',
     icon: Wallet,
-    accent: '#22c55e',
+    accent: '#486a79',
   },
 ];
 
@@ -395,7 +395,7 @@ function ApplyForm({
     if (pitchLen === 0) return 'text-[var(--text-muted)]';
     if (pitchLen < 50) return 'text-[#f59e0b]';
     if (pitchLen > 2000) return 'text-red-400';
-    return 'text-[#22c55e]';
+    return 'text-[#486a79]';
   }, [pitchLen]);
 
   // Slug: live validation + preview. The slug is lowercased on blur
@@ -794,7 +794,7 @@ function ApplyForm({
               return <p className="mt-1.5 text-xs text-red-400">{slugError}</p>;
             }
             return (
-              <p className="mt-1.5 text-xs text-[#22c55e]">
+              <p className="mt-1.5 text-xs text-[#486a79]">
                 {t('slugPreviewGood', { slug: slugTrimmed })}
               </p>
             );

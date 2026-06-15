@@ -1,11 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
-  <!-- Hatcher v3 favicon — terminal mono+phosphor.
-       Outer dark square + inner phosphor-green block, matching the
-       Nav/Footer BrandGlyph component. -->
-  <rect width="32" height="32" rx="6" fill="#0A0A0A"/>
-  <rect x="3" y="3" width="26" height="26" rx="5" fill="none" stroke="#E6E6E6" stroke-width="1.5"/>
-  <rect x="9" y="9" width="14" height="14" rx="2" fill="#39FF88"/>
-  <!-- Subtle phosphor glow halo around the inner block, kept subtle so
-       the glyph still reads at 16px. -->
-  <rect x="9" y="9" width="14" height="14" rx="2" fill="none" stroke="#39FF88" stroke-opacity="0.35" stroke-width="2"/>
+  <rect width="32" height="32" rx="8" fill="#10110f"/>
+  <path
+    d="M16 5.2c-4.9 0-8.8 4.8-8.8 10.7 0 6.1 3.8 10.9 8.8 10.9s8.8-4.8 8.8-10.9c0-5.9-3.9-10.7-8.8-10.7Z"
+    fill="#fff7e8"
+    stroke="#73a4b9"
+    stroke-width="1.4"
+  />
+  <path
+    d="M10.7 16.4c1.7-2.8 3.5-4.1 5.3-4.1 1.8 0 3.6 1.3 5.3 4.1-1.7 2.8-3.5 4.1-5.3 4.1-1.8 0-3.6-1.3-5.3-4.1Z"
+    fill="#10110f"
+  />
+  <circle cx="16" cy="16.4" r="2.2" fill="#73a4b9"/>
 </svg>

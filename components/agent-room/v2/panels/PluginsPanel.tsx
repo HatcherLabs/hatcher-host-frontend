@@ -53,13 +53,13 @@ export function PluginsPanel({ agentId, framework, onClose }: Props) {
       {installed.length > 0 && (
         <ul className="mb-4 space-y-2">
           {installed.map(p => (
-            <li key={`${p.type}:${p.name}`} className="rounded-lg bg-neutral-800 p-3">
+            <li key={`${p.type}:${p.name}`} className="rounded-lg border border-white/10 bg-white/[0.045] p-3">
               <div className="flex items-center justify-between">
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-medium">{p.name}</div>
                   {p.description && <div className="truncate text-xs text-neutral-400">{p.description}</div>}
                 </div>
-                <span className="ml-3 flex-shrink-0 rounded-full bg-green-600 px-2 py-0.5 text-[10px] text-white">
+                <span className="ml-3 flex-shrink-0 rounded-full border border-cyan-200/25 bg-cyan-200/12 px-2 py-0.5 text-[10px] text-cyan-100">
                   {p.status === 'pending' ? 'pending' : p.status === 'pending_restart' ? 'ready' : 'ok'}
                 </span>
               </div>
@@ -69,7 +69,7 @@ export function PluginsPanel({ agentId, framework, onClose }: Props) {
       )}
       <a
         href={`/dashboard/agent/${agentId}?tab=plugins`}
-        className="inline-block w-full rounded-lg bg-white py-2 text-center text-sm font-medium text-black hover:bg-neutral-200"
+        className="inline-block w-full rounded-lg bg-[#d6b177] py-2 text-center text-sm font-semibold text-[#171007] hover:bg-[#f4d79d]"
       >
         Open full editor →
       </a>

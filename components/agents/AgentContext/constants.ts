@@ -25,8 +25,8 @@ export const pageEntranceVariants = {
 };
 
 export const FRAMEWORK_BADGE: Record<string, string> = {
-  openclaw: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
-  hermes: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
+  openclaw: 'bg-[var(--color-info-bg)] text-[var(--color-info)] border-[var(--color-info-border)]',
+  hermes: 'bg-[var(--tech-accent-soft)] text-[var(--accent)] border-[var(--color-info-border)]',
 };
 
 /** Root filesystem path inside each framework's container */
@@ -36,20 +36,21 @@ export const FRAMEWORK_ROOT_PATH: Record<string, string> = {
 };
 
 export const STATUS_STYLES: Record<string, { classes: string; label: string; pulse: boolean; dotColor: string }> = {
-  active: { classes: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30', label: 'Active', pulse: true, dotColor: 'bg-emerald-400' },
-  sleeping: { classes: 'bg-blue-500/15 text-blue-400 border-blue-500/30', label: 'Sleeping', pulse: false, dotColor: 'bg-blue-400' },
-  paused: { classes: 'bg-amber-500/15 text-amber-400 border-amber-500/30', label: 'Paused', pulse: false, dotColor: 'bg-amber-400' },
-  archived: { classes: 'bg-zinc-500/15 text-zinc-300 border-zinc-500/30', label: 'Archived', pulse: false, dotColor: 'bg-zinc-400' },
-  error: { classes: 'bg-red-500/15 text-red-400 border-red-500/30', label: 'Error', pulse: false, dotColor: 'bg-red-400' },
-  killed: { classes: 'bg-red-500/15 text-red-400 border-red-500/30', label: 'Killed', pulse: false, dotColor: 'bg-red-400' },
-  restarting: { classes: 'bg-amber-500/15 text-amber-400 border-amber-500/30', label: 'Restarting', pulse: true, dotColor: 'bg-amber-400' },
-  stopping: { classes: 'bg-orange-500/15 text-orange-400 border-orange-500/30', label: 'Stopping', pulse: true, dotColor: 'bg-orange-400' },
+  active: { classes: 'bg-[var(--status-live-bg)] text-[var(--status-live)] border-[var(--status-live-border)]', label: 'Live', pulse: true, dotColor: 'bg-[var(--status-live)]' },
+  sleeping: { classes: 'bg-[var(--status-sleeping-bg)] text-[var(--status-sleeping)] border-[var(--status-sleeping-border)]', label: 'Sleeping', pulse: false, dotColor: 'bg-[var(--status-sleeping)]' },
+  paused: { classes: 'bg-[var(--status-paused-bg)] text-[var(--status-paused)] border-[var(--status-paused-border)]', label: 'Paused', pulse: false, dotColor: 'bg-[var(--status-paused)]' },
+  archived: { classes: 'bg-[rgba(123,131,122,0.10)] text-[var(--text-muted)] border-[rgba(123,131,122,0.24)]', label: 'Archived', pulse: false, dotColor: 'bg-[var(--text-muted)]' },
+  error: { classes: 'bg-[var(--status-error-bg)] text-[var(--status-error)] border-[var(--status-error-border)]', label: 'Error', pulse: false, dotColor: 'bg-[var(--status-error)]' },
+  killed: { classes: 'bg-[var(--status-error-bg)] text-[var(--status-error)] border-[var(--status-error-border)]', label: 'Killed', pulse: false, dotColor: 'bg-[var(--status-error)]' },
+  restarting: { classes: 'bg-[var(--status-deploying-bg)] text-[var(--status-deploying)] border-[var(--status-deploying-border)]', label: 'Restarting', pulse: true, dotColor: 'bg-[var(--status-deploying)]' },
+  starting: { classes: 'bg-[var(--status-deploying-bg)] text-[var(--status-deploying)] border-[var(--status-deploying-border)]', label: 'Starting', pulse: true, dotColor: 'bg-[var(--status-deploying)]' },
+  stopping: { classes: 'bg-[var(--status-paused-bg)] text-[var(--status-paused)] border-[var(--status-paused-border)]', label: 'Stopping', pulse: true, dotColor: 'bg-[var(--status-paused)]' },
 };
 
 export const LOG_LEVEL_COLORS: Record<string, string> = {
-  info: 'text-emerald-400',
-  warn: 'text-amber-400',
-  error: 'text-red-400',
+  info: 'text-[var(--mineral)]',
+  warn: 'text-[var(--color-warning)]',
+  error: 'text-[var(--color-destructive)]',
 };
 
 /** Channel settings options shared across platforms */

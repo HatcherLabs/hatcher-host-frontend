@@ -39,6 +39,7 @@ import { OobeWalletPanel } from './OobeWalletPanel';
 import { ClawVilleWalletPanel } from './ClawVilleWalletPanel';
 import { OrbisWalletPanel } from './OrbisWalletPanel';
 import { MirariWalletPanel } from './MirariWalletPanel';
+import { XonaPartnerResourcesPanel } from './XonaPartnerResourcesPanel';
 
 interface ReputationState {
   upCount: number;
@@ -57,9 +58,36 @@ interface ReputationState {
 }
 
 type WalletPanel = 'passport' | AgentPassportNetworkId;
+type WalletSection = 'overview' | 'networks' | 'providers' | 'security';
+type ProviderPanelId = 'xona' | 'conduit' | 'earnfi' | 'oobe' | 'clawville' | 'kausalayer' | 'mirari' | 'orbis';
 
 const TAB_ORDER: WalletPanel[] = ['passport', 'skale', 'solana', 'base'];
 const NETWORK_ORDER: AgentPassportNetworkId[] = ['skale', 'solana', 'base'];
+const WALLET_SECTIONS: ReadonlyArray<{
+  id: WalletSection;
+  label: string;
+  description: string;
+  icon: ReactNode;
+}> = [
+  { id: 'overview', label: 'Overview', description: 'Identity, balances, and readiness.', icon: <Fingerprint size={14} /> },
+  { id: 'networks', label: 'Networks', description: 'SKALE, Solana, and Base wallets.', icon: <Layers3 size={14} /> },
+  { id: 'providers', label: 'Providers', description: 'Partner rails and runtime tools.', icon: <Zap size={14} /> },
+  { id: 'security', label: 'Security', description: 'Runtime access and key export.', icon: <Key size={14} /> },
+];
+
+const SOLANA_PROVIDERS: ReadonlyArray<{ id: ProviderPanelId; label: string; description: string; network: 'Solana' }> = [
+  { id: 'xona', label: 'Xona', description: 'xPay partner resources and agent tools.', network: 'Solana' },
+  { id: 'conduit', label: 'Conduit', description: 'Provider listing and payout routing.', network: 'Solana' },
+  { id: 'earnfi', label: 'EarnFi', description: 'Paid task creation and verification.', network: 'Solana' },
+  { id: 'oobe', label: 'Oobe', description: 'SAP registration and x402 access.', network: 'Solana' },
+  { id: 'clawville', label: 'ClawVille', description: 'Identity wallet and access state.', network: 'Solana' },
+  { id: 'kausalayer', label: 'KausaLayer', description: 'Private pockets and saved wallets.', network: 'Solana' },
+  { id: 'mirari', label: 'Mirari', description: 'Signal ingest and live mirror.', network: 'Solana' },
+];
+
+const BASE_PROVIDERS: ReadonlyArray<{ id: ProviderPanelId; label: string; description: string; network: 'Base' }> = [
+  { id: 'orbis', label: 'Orbis', description: 'Marketplace API proxy and x402 settlement.', network: 'Base' },
+];
 
 function labelForPanel(panel: WalletPanel): string {
   if (panel === 'passport') return 'Passport';
@@ -147,7 +175,9 @@ export function WalletTab() {
   const [passport, setPassport] = useState<AgentPassport | null>(null);
   const [wallets, setWallets] = useState<AgentWalletsResponse | null>(null);
   const [reputation, setReputation] = useState<ReputationState | null>(null);
+  const [activeSection, setActiveSection] = useState<WalletSection>('overview');
   const [activePanel, setActivePanelRaw] = useState<WalletPanel>(() => readInitialWalletPanel());
+  const [activeProvider, setActiveProvider] = useState<ProviderPanelId>('xona');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copyMsg, setCopyMsg] = useState<string | null>(null);
@@ -332,74 +362,105 @@ export function WalletTab() {
   };
 
   const missingWallets = networks.some((network) => !network.address);
-  const activeNetwork = activePanel === 'passport' ? null : networkById.get(activePanel);
+  const selectedNetworkPanel: AgentPassportNetworkId =
+    activePanel === 'passport' ? (networks[0]?.id ?? 'skale') : activePanel;
+  const activeNetwork = networkById.get(selectedNetworkPanel);
 
   if (loading && !wallets && !passport) {
     return (
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4 p-6">
-        <div className="shimmer h-8 w-48 rounded-xl" />
-        <div className="shimmer h-32 w-full rounded-xl" />
-        <div className="shimmer h-24 w-full rounded-xl" />
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5 p-6">
+        <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-card)] p-5 shadow-[var(--shadow-soft)]">
+            <div className="mb-5 flex items-center gap-3">
+              <div className="h-11 w-11 rounded-xl shimmer" />
+              <div className="space-y-2">
+                <div className="h-5 w-44 rounded-full shimmer" />
+                <div className="h-3 w-64 rounded-full shimmer" />
+              </div>
+            </div>
+            <div className="grid gap-3 md:grid-cols-3">
+              {[0, 1, 2].map((item) => (
+                <div key={item} className="h-28 rounded-xl shimmer" />
+              ))}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-card)] p-5 shadow-[var(--shadow-soft)]">
+            <div className="mb-5 h-5 w-36 rounded-full shimmer" />
+            <div className="space-y-3">
+              {[0, 1, 2, 3].map((item) => (
+                <div key={item} className="h-10 rounded-xl shimmer" />
+              ))}
+            </div>
+          </div>
+        </div>
       </motion.div>
     );
   }
 
   return (
-    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-5 p-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center border border-[var(--phosphor)]/40">
-            <WalletIcon size={18} className="text-[var(--phosphor)]" />
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-5 p-4 sm:p-6">
+      <WalletSurface className="p-5">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)]">
+              <WalletIcon size={18} className="text-[var(--phosphor)]" />
+            </div>
+            <div className="min-w-0">
+              <div className="text-[11px] font-semibold text-[var(--text-muted)]">Managed wallets</div>
+              <h2 className="mt-1 text-xl font-semibold tracking-[-0.01em] text-[var(--text-primary)]">
+                Runtime credentials and provider access
+              </h2>
+              <button
+                type="button"
+                onClick={() => copy(activePassport.identity.handle, 'Passport handle')}
+                className="mt-1 block max-w-full truncate font-mono text-xs text-[var(--accent)] hover:underline"
+                title={activePassport.identity.handle}
+              >
+                {activePassport.identity.handle}
+              </button>
+            </div>
           </div>
-          <div className="min-w-0">
-            <h2 className="text-lg font-semibold text-[var(--text-primary)]">Agent Wallets</h2>
-            <button
-              type="button"
-              onClick={() => copy(activePassport.identity.handle, 'Passport handle')}
-              className="block max-w-full truncate font-mono text-xs text-[var(--phosphor)] hover:underline"
-              title={activePassport.identity.handle}
-            >
-              {activePassport.identity.handle}
-            </button>
-          </div>
-        </div>
-        <button
-          onClick={() => void loadWalletData()}
-          disabled={loading}
-          className="inline-flex items-center gap-2 border border-[var(--border-subtle)] px-3 py-1.5 text-xs uppercase tracking-wider transition hover:border-[var(--phosphor)] disabled:opacity-50"
-        >
-          <RefreshCw size={12} className={loading ? 'animate-spin' : ''} /> Refresh
-        </button>
-      </div>
-
-      <div className="grid grid-cols-2 gap-2 rounded-lg border border-[var(--border-subtle)] bg-black/20 p-1 md:grid-cols-4">
-        {TAB_ORDER.map((panel) => (
           <button
-            key={panel}
-            type="button"
-            onClick={() => setActivePanel(panel)}
-            className={`flex min-h-10 items-center justify-center gap-2 rounded-md px-3 text-xs font-medium uppercase tracking-wider transition ${
-              activePanel === panel
-                ? 'border border-[var(--phosphor)]/40 bg-[var(--phosphor)]/10 text-[var(--phosphor)]'
-                : 'border border-transparent text-[var(--text-muted)] hover:bg-white/5 hover:text-[var(--text-primary)]'
-            }`}
+            onClick={() => void loadWalletData()}
+            disabled={loading}
+            className="inline-flex items-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2 text-xs font-semibold text-[var(--text-secondary)] transition hover:border-[var(--border-hover)] hover:text-[var(--accent)] disabled:opacity-50"
           >
-            {iconForPanel(panel)}
-            {labelForPanel(panel)}
+            <RefreshCw size={12} className={loading ? 'animate-spin' : ''} /> Refresh
           </button>
-        ))}
-      </div>
+        </div>
+
+        <div className="mt-5 grid gap-2 md:grid-cols-4">
+          {WALLET_SECTIONS.map((section) => (
+            <button
+              key={section.id}
+              type="button"
+              onClick={() => setActiveSection(section.id)}
+              className={`rounded-xl border p-3 text-left transition ${
+                activeSection === section.id
+                  ? 'border-[var(--border-hover)] bg-[color-mix(in_srgb,var(--accent)_10%,transparent)] text-[var(--text-primary)] shadow-[var(--shadow-soft)]'
+                  : 'border-[var(--border-default)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]'
+              }`}
+            >
+              <span className="mb-2 flex items-center gap-2 text-xs font-semibold">
+                <span className="text-[var(--accent)]">{section.icon}</span>
+                {section.label}
+              </span>
+              <span className="block text-[11px] leading-relaxed text-[var(--text-muted)]">{section.description}</span>
+            </button>
+          ))}
+        </div>
+      </WalletSurface>
 
       {error && (
-        <div className="flex items-start gap-2 border border-amber-500/30 bg-amber-500/5 p-3 text-xs text-amber-200">
+        <div className="flex items-start gap-2 rounded-xl border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] p-3 text-xs text-[var(--color-warning)]">
           <AlertTriangle size={14} className="mt-0.5 flex-shrink-0" />
           <span>{error}. Showing cached passport data where available.</span>
         </div>
       )}
 
-      {copyMsg && <div className="text-[10px] text-[var(--phosphor)]">{copyMsg}</div>}
+      {copyMsg && <div className="text-xs font-medium text-[var(--accent)]">{copyMsg}</div>}
 
-      {activePanel === 'passport' ? (
+      {activeSection === 'overview' ? (
         <PassportPanel
           passport={activePassport}
           wallets={wallets}
@@ -411,33 +472,42 @@ export function WalletTab() {
           onCopy={copy}
           onProvision={() => void provisionChainAccounts()}
           onRestartRuntime={() => void restartRuntime()}
-          onOpenNetwork={setActivePanel}
+          onOpenNetwork={(panel) => {
+            setActivePanel(panel);
+            setActiveSection('networks');
+          }}
         />
-      ) : activeNetwork ? (
+      ) : activeSection === 'networks' ? (
         <div className="space-y-4">
-          <ChainWalletPanel
-            network={activeNetwork}
-            reputation={reputation}
-            registeringSkale={registeringSkale}
-            registerMsg={registerMsg}
-            onRegisterSkale={() => void registerSkaleIdentity()}
-            onCopy={copy}
-            onViewPrivateKey={openPrivateKeyModal}
-          />
-          {activeNetwork.id === 'solana' && (
-            <>
-              <ConduitWalletPanel agentId={agent.id} />
-              <EarnFiWalletPanel agentId={agent.id} />
-              <OobeWalletPanel agentId={agent.id} />
-              <ClawVilleWalletPanel agentId={agent.id} />
-              <KausalayerWalletPanel agentId={agent.id} />
-              {shouldShowMirariPanelForWallet(activeNetwork.id) && <MirariWalletPanel agentId={agent.id} />}
-            </>
+          <NetworkSelector networks={networks} activePanel={selectedNetworkPanel} onSelect={setActivePanel} />
+          {activeNetwork ? (
+            <ChainWalletPanel
+              network={activeNetwork}
+              reputation={reputation}
+              registeringSkale={registeringSkale}
+              registerMsg={registerMsg}
+              onRegisterSkale={() => void registerSkaleIdentity()}
+              onCopy={copy}
+            />
+          ) : (
+            <WalletSurface className="p-6 text-sm text-[var(--text-muted)]">Wallet not provisioned yet.</WalletSurface>
           )}
-          {activeNetwork.id === 'base' && <OrbisWalletPanel agentId={agent.id} />}
         </div>
+      ) : activeSection === 'providers' ? (
+        <ProviderIntegrationsPanel
+          agentId={agent.id}
+          activeProvider={activeProvider}
+          onProviderChange={setActiveProvider}
+        />
+      ) : activeSection === 'security' ? (
+        <RuntimeAccessPanel
+          networks={networks}
+          wallets={wallets}
+          onCopy={copy}
+          onViewPrivateKey={openPrivateKeyModal}
+        />
       ) : (
-        <GlassCard className="p-6 text-sm text-[var(--text-muted)]">Wallet not provisioned yet.</GlassCard>
+        <WalletSurface className="p-6 text-sm text-[var(--text-muted)]">Wallet not provisioned yet.</WalletSurface>
       )}
 
       {privateKeyNetwork && (
@@ -456,6 +526,14 @@ export function WalletTab() {
         />
       )}
     </motion.div>
+  );
+}
+
+function WalletSurface({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return (
+    <div className={`rounded-2xl border border-[var(--border-default)] bg-[var(--bg-card)] shadow-[var(--shadow-soft)] ${className}`}>
+      {children}
+    </div>
   );
 }
 
@@ -486,19 +564,20 @@ function PassportPanel({
 }) {
   const transactionNetworks =
     wallets?.runtime.transactionNetworks ?? networks.filter((network) => network.canSign).map((network) => network.id);
+  const readyNetworks = networks.filter((network) => !!network.address).length;
 
   return (
     <div className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
-      <GlassCard className="p-5">
+      <WalletSurface className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">
+            <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-[var(--text-muted)]">
               <Fingerprint size={12} /> Passport Overview
             </div>
             <h3 className="text-base font-semibold text-[var(--text-primary)]">{passport.agent.name}</h3>
             <p className="mt-1 max-w-2xl text-xs leading-relaxed text-[var(--text-muted)]">
-              SKALE remains the identity and reputation anchor. SKALE, Solana, and Base wallets are available to
-              OpenClaw and Hermes runtimes by default for delegated autonomous trading.
+              SKALE anchors identity and reputation. Solana and Base credentials are available to the runtime for
+              approved provider workflows and scoped signing.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -507,7 +586,7 @@ function PassportPanel({
                 type="button"
                 onClick={onProvision}
                 disabled={provisioningChains}
-                className="inline-flex items-center gap-1 border border-[var(--phosphor)]/40 px-2 py-1 text-[10px] uppercase tracking-wider text-[var(--phosphor)] transition hover:bg-[var(--phosphor)]/10 disabled:opacity-50"
+                className="inline-flex items-center gap-1 rounded-lg border border-[var(--border-hover)] px-2 py-1 text-[10px] font-semibold text-[var(--accent)] transition hover:bg-[var(--tech-accent-soft)] disabled:opacity-50"
               >
                 <RefreshCw size={10} className={provisioningChains ? 'animate-spin' : ''} />
                 {provisioningChains ? 'Provisioning' : 'Provision wallets'}
@@ -518,7 +597,7 @@ function PassportPanel({
                 type="button"
                 onClick={onRestartRuntime}
                 disabled={restartingRuntime}
-                className="inline-flex items-center gap-1 border border-amber-400/40 px-2 py-1 text-[10px] uppercase tracking-wider text-amber-200 transition hover:bg-amber-400/10 disabled:opacity-50"
+                className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-warning-border)] px-2 py-1 text-[10px] font-semibold text-[var(--color-warning)] transition hover:bg-[var(--color-warning-bg)] disabled:opacity-50"
               >
                 <RefreshCw size={10} className={restartingRuntime ? 'animate-spin' : ''} />
                 {restartingRuntime ? 'Restarting' : 'Restart runtime'}
@@ -535,11 +614,11 @@ function PassportPanel({
               key={network.id}
               type="button"
               onClick={() => onOpenNetwork(network.id)}
-              className="min-w-0 border border-[var(--border-subtle)] bg-black/20 p-3 text-left transition hover:border-[var(--phosphor)]/50"
+              className="min-w-0 rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] p-3 text-left transition hover:border-[var(--border-hover)] hover:bg-[var(--bg-hover)]"
             >
               <div className="flex items-center justify-between gap-2">
                 <div className="flex min-w-0 items-center gap-2">
-                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center border border-[var(--border-subtle)] text-[var(--phosphor)]">
+                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--accent)]">
                     {iconForPanel(network.id)}
                   </div>
                   <div className="min-w-0">
@@ -547,7 +626,10 @@ function PassportPanel({
                     <div className="truncate font-mono text-[10px] text-[var(--text-muted)]">{network.caip2}</div>
                   </div>
                 </div>
-                <div className="text-[var(--phosphor)]">{iconForPanel(network.id)}</div>
+                <span
+                  className={`h-2 w-2 rounded-full ${network.address ? 'bg-[var(--status-live)]' : 'bg-[var(--text-dim)]'}`}
+                  aria-hidden
+                />
               </div>
               <div className="mt-3 truncate font-mono text-xs text-[var(--text-primary)]">
                 {shortAddress(network.address)}
@@ -558,45 +640,269 @@ function PassportPanel({
             </button>
           ))}
         </div>
-      </GlassCard>
+      </WalletSurface>
 
-      <GlassCard className="p-5">
-        <div className="mb-4 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">
-            <Key size={12} /> Runtime Access
+      <WalletSurface className="p-5">
+        <div className="mb-5 flex items-center justify-between gap-3">
+          <div>
+            <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-[var(--text-muted)]">
+              <ShieldCheck size={12} /> Readiness
+            </div>
+            <h3 className="text-base font-semibold text-[var(--text-primary)]">Runtime credential state</h3>
           </div>
+          <span className="rounded-full border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-1 text-xs font-semibold text-[var(--text-secondary)]">
+            {readyNetworks}/{networks.length} ready
+          </span>
         </div>
-        <div className="space-y-3 text-xs leading-relaxed text-[var(--text-muted)]">
-          <p>
-            The agent runtime can sign on every provisioned chain and can run delegated autonomous trading when
-            the wallet has enough gas or fees.
+        <div className="grid gap-3">
+          <ReadinessRow label="Identity anchor" value={networkByLabel(networks, 'skale')?.address ? 'Configured' : 'Pending'} />
+          <ReadinessRow label="Provider networks" value={transactionNetworks.length > 0 ? transactionNetworks.join(', ') : 'None'} />
+          <ReadinessRow label="Passport file" value={passport.links.passport ? 'Available' : 'Generated on demand'} />
+        </div>
+        <div className="mt-5 rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] p-3">
+          <p className="text-xs leading-relaxed text-[var(--text-muted)]">
+            Provider-specific forms live under <span className="font-semibold text-[var(--text-primary)]">Providers</span>.
+            Raw private key export is isolated under <span className="font-semibold text-[var(--text-primary)]">Security</span>.
           </p>
-          <div className="grid gap-2">
-            {networks.map((network) => (
-              <div key={network.id} className="border border-[var(--border-subtle)] bg-black/20 px-3 py-2">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[var(--text-primary)]">{network.label}</span>
-                  <button
-                    type="button"
-                    onClick={() => onCopy(network.address, `${network.label} address`)}
-                    disabled={!network.address}
-                    className="max-w-[70%] truncate font-mono text-[10px] text-[var(--phosphor)] hover:underline disabled:cursor-default disabled:text-[var(--text-muted)] disabled:no-underline"
-                    title={network.address ?? 'Not provisioned'}
-                  >
-                    {network.address ?? 'Not provisioned'}
-                  </button>
-                </div>
+        </div>
+      </WalletSurface>
+    </div>
+  );
+}
+
+function networkByLabel(networks: AgentWalletNetworkBalance[], id: AgentPassportNetworkId) {
+  return networks.find((network) => network.id === id);
+}
+
+function ReadinessRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2">
+      <span className="text-xs text-[var(--text-muted)]">{label}</span>
+      <span className="truncate text-right text-xs font-semibold text-[var(--text-primary)]">{value}</span>
+    </div>
+  );
+}
+
+function NetworkSelector({
+  networks,
+  activePanel,
+  onSelect,
+}: {
+  networks: AgentWalletNetworkBalance[];
+  activePanel: WalletPanel;
+  onSelect: (panel: WalletPanel) => void;
+}) {
+  return (
+    <WalletSurface className="p-2">
+      <div className="grid gap-2 md:grid-cols-3">
+        {networks.map((network) => {
+          const isActive = activePanel === network.id;
+          return (
+            <button
+              key={network.id}
+              type="button"
+              onClick={() => onSelect(network.id)}
+              className={`rounded-xl border p-3 text-left transition ${
+                isActive
+                  ? 'border-[var(--border-hover)] bg-[color-mix(in_srgb,var(--accent)_10%,transparent)]'
+                  : 'border-transparent hover:border-[var(--border-default)] hover:bg-[var(--bg-surface)]'
+              }`}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <span className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--accent)]">
+                    {iconForPanel(network.id)}
+                  </span>
+                  {network.label}
+                </span>
+                <span
+                  className={`h-2 w-2 rounded-full ${network.address ? 'bg-[var(--status-live)]' : 'bg-[var(--text-dim)]'}`}
+                  aria-hidden
+                />
               </div>
-            ))}
-          </div>
-          <p className="text-[11px]">
-            Transaction networks:{' '}
-            <span className="text-[var(--text-primary)]">
-              {transactionNetworks.length > 0 ? transactionNetworks.join(', ') : 'none'}
-            </span>
+              <div className="mt-3 truncate font-mono text-xs text-[var(--text-secondary)]">
+                {shortAddress(network.address)}
+              </div>
+              <div className="mt-1 truncate text-[11px] text-[var(--text-muted)]">{network.caip2}</div>
+            </button>
+          );
+        })}
+      </div>
+    </WalletSurface>
+  );
+}
+
+function ProviderIntegrationsPanel({
+  agentId,
+  activeProvider,
+  onProviderChange,
+}: {
+  agentId: string;
+  activeProvider: ProviderPanelId;
+  onProviderChange: (provider: ProviderPanelId) => void;
+}) {
+  const providers = [...SOLANA_PROVIDERS, ...BASE_PROVIDERS];
+  const current = providers.find((provider) => provider.id === activeProvider) ?? providers[0];
+
+  return (
+    <div className="grid gap-4 xl:grid-cols-[330px_minmax(0,1fr)]">
+      <WalletSurface className="p-4">
+        <div className="mb-4">
+          <div className="text-[11px] font-semibold text-[var(--text-muted)]">Provider integrations</div>
+          <h3 className="mt-1 text-base font-semibold text-[var(--text-primary)]">Runtime provider rails</h3>
+          <p className="mt-1 text-xs leading-relaxed text-[var(--text-muted)]">
+            Partner-specific setup is grouped here so wallet balances, addresses, and key safety stay readable.
           </p>
         </div>
-      </GlassCard>
+        <div className="space-y-2">
+          {providers.map((provider) => {
+            const selected = activeProvider === provider.id;
+            return (
+              <button
+                key={provider.id}
+                type="button"
+                onClick={() => onProviderChange(provider.id)}
+                className={`w-full rounded-xl border p-3 text-left transition ${
+                  selected
+                    ? 'border-[var(--border-hover)] bg-[color-mix(in_srgb,var(--accent)_10%,transparent)]'
+                    : 'border-[var(--border-default)] bg-[var(--bg-surface)] hover:border-[var(--border-hover)]'
+                }`}
+              >
+                <span className="flex items-center justify-between gap-3">
+                  <span className="text-sm font-semibold text-[var(--text-primary)]">{provider.label}</span>
+                  <span className="rounded-full border border-[var(--border-default)] px-2 py-0.5 text-[10px] font-semibold text-[var(--text-muted)]">
+                    {provider.network}
+                  </span>
+                </span>
+                <span className="mt-1 block text-xs leading-relaxed text-[var(--text-muted)]">
+                  {provider.description}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </WalletSurface>
+
+      <div className="min-w-0 space-y-4">
+        <WalletSurface className="p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <div className="text-[11px] font-semibold text-[var(--text-muted)]">{current.network}</div>
+              <h3 className="mt-1 text-lg font-semibold text-[var(--text-primary)]">{current.label}</h3>
+            </div>
+            <span className="rounded-full border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-1 text-xs font-semibold text-[var(--text-secondary)]">
+              Advanced setup
+            </span>
+          </div>
+        </WalletSurface>
+        <ProviderPanel provider={activeProvider} agentId={agentId} />
+      </div>
+    </div>
+  );
+}
+
+function ProviderPanel({ provider, agentId }: { provider: ProviderPanelId; agentId: string }) {
+  switch (provider) {
+    case 'xona':
+      return <XonaPartnerResourcesPanel agentId={agentId} />;
+    case 'conduit':
+      return <ConduitWalletPanel agentId={agentId} />;
+    case 'earnfi':
+      return <EarnFiWalletPanel agentId={agentId} />;
+    case 'oobe':
+      return <OobeWalletPanel agentId={agentId} />;
+    case 'clawville':
+      return <ClawVilleWalletPanel agentId={agentId} />;
+    case 'kausalayer':
+      return <KausalayerWalletPanel agentId={agentId} />;
+    case 'mirari':
+      return <MirariWalletPanel agentId={agentId} />;
+    case 'orbis':
+      return <OrbisWalletPanel agentId={agentId} />;
+    default:
+      return null;
+  }
+}
+
+function RuntimeAccessPanel({
+  networks,
+  wallets,
+  onCopy,
+  onViewPrivateKey,
+}: {
+  networks: AgentWalletNetworkBalance[];
+  wallets: AgentWalletsResponse | null;
+  onCopy: (value: string | null | undefined, label: string) => void;
+  onViewPrivateKey: (network: AgentWalletNetworkBalance) => void;
+}) {
+  const transactionNetworks =
+    wallets?.runtime.transactionNetworks ?? networks.filter((network) => network.canSign).map((network) => network.id);
+
+  return (
+    <div className="grid gap-4 xl:grid-cols-[1fr_0.9fr]">
+      <WalletSurface className="p-5">
+        <div className="mb-4 flex items-center gap-2 text-xs font-semibold text-[var(--text-muted)]">
+          <Key size={13} /> Runtime access
+        </div>
+        <p className="max-w-2xl text-sm leading-relaxed text-[var(--text-secondary)]">
+          Hatcher injects scoped wallet environment variables into the agent runtime. Use this page to audit addresses,
+          copy public wallet IDs, and keep raw key export isolated from routine operations.
+        </p>
+        <div className="mt-5 grid gap-3">
+          {networks.map((network) => (
+            <div
+              key={network.id}
+              className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] p-3"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <span className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
+                  <span className="text-[var(--accent)]">{iconForPanel(network.id)}</span>
+                  {network.label}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => onCopy(network.address, `${network.label} address`)}
+                  disabled={!network.address}
+                  className="max-w-full truncate font-mono text-xs text-[var(--accent)] hover:underline disabled:cursor-default disabled:text-[var(--text-muted)] disabled:no-underline sm:max-w-[70%]"
+                  title={network.address ?? 'Not provisioned'}
+                >
+                  {network.address ?? 'Not provisioned'}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 text-xs text-[var(--text-muted)]">
+          Runtime signing networks:{' '}
+          <span className="font-medium text-[var(--text-primary)]">
+            {transactionNetworks.length > 0 ? transactionNetworks.join(', ') : 'none'}
+          </span>
+        </p>
+      </WalletSurface>
+
+      <WalletSurface className="p-5">
+        <div className="mb-4 flex items-center gap-2 text-xs font-semibold text-[var(--color-destructive)]">
+          <Lock size={13} /> Danger zone
+        </div>
+        <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
+          Raw private keys are rarely needed. Export only for recovery or migration, and keep the key out of agent logs,
+          prompts, and third-party tools.
+        </p>
+        <div className="mt-5 grid gap-2">
+          {networks.map((network) => (
+            <button
+              key={network.id}
+              type="button"
+              onClick={() => onViewPrivateKey(network)}
+              disabled={!network.address}
+              className="flex items-center justify-between gap-3 rounded-xl border border-[var(--color-destructive-border)] bg-[var(--color-destructive-bg)] px-3 py-2 text-left text-xs font-semibold text-[var(--color-destructive)] transition hover:border-[var(--color-destructive)] disabled:cursor-not-allowed disabled:opacity-45"
+            >
+              <span>{network.label} private key</span>
+              <Key size={13} />
+            </button>
+          ))}
+        </div>
+      </WalletSurface>
     </div>
   );
 }
@@ -608,7 +914,6 @@ function ChainWalletPanel({
   registerMsg,
   onRegisterSkale,
   onCopy,
-  onViewPrivateKey,
 }: {
   network: AgentWalletNetworkBalance;
   reputation: ReputationState | null;
@@ -616,7 +921,6 @@ function ChainWalletPanel({
   registerMsg: string | null;
   onRegisterSkale: () => void;
   onCopy: (value: string | null | undefined, label: string) => void;
-  onViewPrivateKey: (network: AgentWalletNetworkBalance) => void;
 }) {
   const isSkale = network.id === 'skale';
   const native = network.nativeBalance;
@@ -624,10 +928,10 @@ function ChainWalletPanel({
 
   return (
     <div className="space-y-4">
-      <GlassCard className="p-5">
+      <WalletSurface className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">
+            <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-[var(--text-muted)]">
               {iconForPanel(network.id)} {network.label} Wallet
             </div>
             <div className="flex flex-wrap items-center gap-2">
@@ -638,7 +942,7 @@ function ChainWalletPanel({
             <p className="mt-1 text-xs text-[var(--text-muted)]">
               {isSkale
                 ? 'SKALE stores the Hatcher agent identity and reputation anchor.'
-                : 'Available to the agent runtime for delegated autonomous trading.'}
+                : 'Available to the agent runtime for approved provider workflows and scoped signing.'}
             </p>
           </div>
           {network.explorerUrl && <LinkButton href={network.explorerUrl} label="Explorer" />}
@@ -647,13 +951,13 @@ function ChainWalletPanel({
         <div className="mt-4 grid gap-4 lg:grid-cols-[0.75fr_1.25fr_0.8fr]">
           <WalletQr address={network.address} label={network.label} />
 
-          <div className="min-w-0 border border-[var(--border-subtle)] bg-black/20 p-4">
-            <div className="mb-2 text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)]">Address</div>
+          <div className="min-w-0 rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] p-4">
+            <div className="mb-2 text-[10px] font-semibold text-[var(--text-muted)]">Address</div>
             <button
               type="button"
               onClick={() => onCopy(network.address, `${network.label} address`)}
               disabled={!network.address}
-              className="block max-w-full break-all text-left font-mono text-sm text-[var(--text-primary)] hover:text-[var(--phosphor)] disabled:cursor-default disabled:hover:text-[var(--text-primary)]"
+              className="block max-w-full break-all text-left font-mono text-sm text-[var(--text-primary)] hover:text-[var(--accent)] disabled:cursor-default disabled:hover:text-[var(--text-primary)]"
             >
               {network.address ?? 'Not provisioned'}
             </button>
@@ -662,20 +966,12 @@ function ChainWalletPanel({
                 type="button"
                 onClick={() => onCopy(network.address, `${network.label} address`)}
                 disabled={!network.address}
-                className="inline-flex items-center gap-1 border border-[var(--border-subtle)] px-2 py-1 text-[10px] uppercase tracking-wider transition hover:border-[var(--phosphor)] disabled:opacity-50"
+                className="inline-flex items-center gap-1 rounded-lg border border-[var(--border-default)] px-2 py-1 text-[10px] font-semibold text-[var(--text-secondary)] transition hover:border-[var(--border-hover)] hover:text-[var(--accent)] disabled:opacity-50"
               >
                 <Copy size={10} /> Copy
               </button>
-              <button
-                type="button"
-                onClick={() => onViewPrivateKey(network)}
-                disabled={!network.address}
-                className="inline-flex items-center gap-1 border border-red-400/30 px-2 py-1 text-[10px] uppercase tracking-wider text-red-200 transition hover:bg-red-500/10 disabled:opacity-50"
-              >
-                <Key size={10} /> View private key
-              </button>
               {network.sharedWalletWith && (
-                <span className="inline-flex items-center border border-[var(--border-subtle)] px-2 py-1 text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
+                <span className="inline-flex items-center rounded-lg border border-[var(--border-default)] px-2 py-1 text-[10px] font-semibold text-[var(--text-muted)]">
                   Shares EVM key with {network.sharedWalletWith}
                 </span>
               )}
@@ -696,7 +992,7 @@ function ChainWalletPanel({
             />
           </div>
         </div>
-      </GlassCard>
+      </WalletSurface>
 
       {isSkale ? (
         <SkaleIdentityPanel
@@ -747,11 +1043,11 @@ function PrivateKeyModal({
           event.preventDefault();
           if (!privateKey) onSubmit();
         }}
-        className="w-full max-w-xl border border-red-400/30 bg-[#050807] p-5 shadow-2xl shadow-black/60"
+        className="w-full max-w-xl border border-[var(--color-destructive-border)] bg-[var(--bg-elevated)] p-5 shadow-2xl shadow-black/60"
       >
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-red-200">
+            <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[var(--color-destructive)]">
               <Lock size={12} /> Private Key Export
             </div>
             <h3 className="text-base font-semibold text-[var(--text-primary)]">
@@ -765,7 +1061,7 @@ function PrivateKeyModal({
           <button
             type="button"
             onClick={onClose}
-            className="flex h-8 w-8 flex-shrink-0 items-center justify-center border border-[var(--border-subtle)] text-[var(--text-muted)] transition hover:border-red-300 hover:text-red-200"
+            className="flex h-8 w-8 flex-shrink-0 items-center justify-center border border-[var(--border-subtle)] text-[var(--text-muted)] transition hover:border-[var(--color-destructive)] hover:text-[var(--color-destructive)]"
             aria-label="Close private key dialog"
           >
             <X size={14} />
@@ -817,14 +1113,14 @@ function PrivateKeyModal({
                 {visible ? 'Hide' : 'Show'}
               </button>
             </div>
-            <div className="max-h-44 overflow-auto break-all border border-red-400/30 bg-red-500/5 p-3 font-mono text-xs leading-relaxed text-red-100">
+            <div className="max-h-44 overflow-auto break-all border border-[var(--color-destructive-border)] bg-[var(--color-destructive-bg)] p-3 font-mono text-xs leading-relaxed text-[var(--color-destructive)]">
               {visible ? privateKey.privateKey : maskedKey}
             </div>
           </div>
         )}
 
         {error && (
-          <div className="mt-3 flex items-start gap-2 border border-red-500/30 bg-red-500/5 p-3 text-xs text-red-200">
+          <div className="mt-3 flex items-start gap-2 border border-[var(--color-destructive-border)] bg-[var(--color-destructive-bg)] p-3 text-xs text-[var(--color-destructive)]">
             <AlertTriangle size={14} className="mt-0.5 flex-shrink-0" />
             <span>{error}</span>
           </div>
@@ -860,7 +1156,7 @@ function PrivateKeyModal({
               <button
                 type="submit"
                 disabled={loading || !password.trim()}
-                className="inline-flex items-center gap-2 border border-red-400/40 px-3 py-1.5 text-xs uppercase tracking-wider text-red-200 transition hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex items-center gap-2 border border-[var(--color-destructive-border)] px-3 py-1.5 text-xs uppercase tracking-wider text-[var(--color-destructive)] transition hover:bg-[var(--color-destructive-bg)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <Lock size={12} /> {loading ? 'Checking' : 'View private key'}
               </button>
@@ -911,7 +1207,7 @@ function BalanceTile({
       <div className="truncate font-mono text-2xl text-[var(--text-primary)]">
         {value} {symbol && <span className="text-sm text-[var(--text-muted)]">{symbol}</span>}
       </div>
-      {error && <div className="mt-2 text-[10px] text-amber-300">Balance lookup failed: {error}</div>}
+      {error && <div className="mt-2 text-[10px] text-[var(--color-warning)]">Balance lookup failed: {error}</div>}
     </div>
   );
 }
@@ -980,7 +1276,7 @@ function SkaleIdentityPanel({
           </button>
         )}
         {registerMsg && (
-          <div className={`mt-3 text-[10px] ${registerMsgIsError ? 'text-red-400' : 'text-[var(--phosphor)]'}`}>
+          <div className={`mt-3 text-[10px] ${registerMsgIsError ? 'text-[var(--color-destructive)]' : 'text-[var(--phosphor)]'}`}>
             {registerMsg}
           </div>
         )}

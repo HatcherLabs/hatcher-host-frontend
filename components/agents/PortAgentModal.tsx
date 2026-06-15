@@ -79,7 +79,7 @@ export function PortAgentModal({ agent, isOpen, onClose }: PortAgentModalProps) 
         >
           <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border-default)]">
             <div className="flex items-center gap-2">
-              <Copy size={18} className="text-purple-400" />
+              <Copy size={18} className="text-[var(--accent)]" />
               <h3 className="text-base font-semibold text-[var(--text-primary)]">Clone to another framework</h3>
             </div>
             <button
@@ -110,8 +110,8 @@ export function PortAgentModal({ agent, isOpen, onClose }: PortAgentModalProps) 
               </select>
             </div>
 
-            <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 space-y-1.5">
-              <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-400">
+            <div className="rounded-lg border border-[var(--color-success-border)] bg-[var(--color-success-bg)] p-3 space-y-1.5">
+              <div className="flex items-center gap-1.5 text-xs font-medium text-[var(--color-success)]">
                 <Check size={12} />
                 Carried over
               </div>
@@ -123,8 +123,8 @@ export function PortAgentModal({ agent, isOpen, onClose }: PortAgentModalProps) 
               </ul>
             </div>
 
-            <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 space-y-1.5">
-              <div className="flex items-center gap-1.5 text-xs font-medium text-amber-400">
+            <div className="rounded-lg border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] p-3 space-y-1.5">
+              <div className="flex items-center gap-1.5 text-xs font-medium text-[var(--color-warning)]">
                 <AlertTriangle size={12} />
                 Not carried over
               </div>
@@ -140,7 +140,7 @@ export function PortAgentModal({ agent, isOpen, onClose }: PortAgentModalProps) 
             </p>
 
             {error && (
-              <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+              <p className="text-xs text-[var(--color-destructive)] bg-[var(--color-destructive-bg)] border border-[var(--color-destructive-border)] rounded-lg px-3 py-2">
                 {error}
               </p>
             )}

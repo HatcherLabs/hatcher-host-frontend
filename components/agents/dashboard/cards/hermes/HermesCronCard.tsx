@@ -113,7 +113,7 @@ export function HermesCronCard() {
     return (
       <GlassCard>
         <div className="flex items-center gap-2 mb-3">
-          <Clock size={14} className="text-purple-400" />
+          <Clock size={14} className="text-[var(--accent)]" />
           <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Cron jobs</h3>
         </div>
         <p className="text-xs text-[var(--text-muted)]">
@@ -142,7 +142,7 @@ export function HermesCronCard() {
     <GlassCard>
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Clock size={14} className="text-purple-400" />
+          <Clock size={14} className="text-[var(--accent)]" />
           <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Cron jobs</h3>
           {data && (
             <span className="text-[10px] text-[var(--text-muted)]">
@@ -160,8 +160,8 @@ export function HermesCronCard() {
       </div>
 
       {error && (
-        <div className="mb-3 flex items-start gap-2 rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-xs text-[var(--text-secondary)]">
-          <AlertTriangle size={12} className="text-amber-400 mt-0.5 shrink-0" />
+        <div className="mb-3 flex items-start gap-2 rounded-lg border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-3 py-2 text-xs text-[var(--text-secondary)]">
+          <AlertTriangle size={12} className="text-[var(--color-warning)] mt-0.5 shrink-0" />
           <span>{error}</span>
           <button onClick={() => setError(null)} className="ml-auto text-[var(--text-muted)] hover:text-[var(--text-primary)]">
             <X size={12} />
@@ -188,7 +188,7 @@ export function HermesCronCard() {
                   {paused ? (
                     <Pause size={11} className="text-[var(--text-muted)]" />
                   ) : (
-                    <Play size={11} className="text-emerald-400" />
+                    <Play size={11} className="text-[var(--color-success)]" />
                   )}
                   <span className="text-xs font-semibold text-[var(--text-primary)] truncate">
                     {job.name ?? job.id}
@@ -215,7 +215,7 @@ export function HermesCronCard() {
                     <button
                       onClick={() => runAction(row, 'resume')}
                       disabled={busy !== null}
-                      className="text-[10px] px-1.5 py-0.5 rounded hover:bg-white/5 text-[var(--text-muted)] hover:text-emerald-400 disabled:opacity-50 inline-flex items-center gap-1"
+                      className="text-[10px] px-1.5 py-0.5 rounded hover:bg-white/5 text-[var(--text-muted)] hover:text-[var(--color-success)] disabled:opacity-50 inline-flex items-center gap-1"
                     >
                       <Play size={10} />
                       Resume
@@ -224,7 +224,7 @@ export function HermesCronCard() {
                     <button
                       onClick={() => runAction(row, 'pause')}
                       disabled={busy !== null}
-                      className="text-[10px] px-1.5 py-0.5 rounded hover:bg-white/5 text-[var(--text-muted)] hover:text-amber-400 disabled:opacity-50 inline-flex items-center gap-1"
+                      className="text-[10px] px-1.5 py-0.5 rounded hover:bg-white/5 text-[var(--text-muted)] hover:text-[var(--color-warning)] disabled:opacity-50 inline-flex items-center gap-1"
                     >
                       <Pause size={10} />
                       Pause
@@ -243,7 +243,7 @@ export function HermesCronCard() {
                       if (confirm(`Delete cron job "${job.name ?? job.id}"?`)) runAction(row, 'delete');
                     }}
                     disabled={busy !== null}
-                    className="text-[10px] px-1.5 py-0.5 rounded hover:bg-white/5 text-[var(--text-muted)] hover:text-red-400 disabled:opacity-50 inline-flex items-center gap-1 ml-auto"
+                    className="text-[10px] px-1.5 py-0.5 rounded hover:bg-white/5 text-[var(--text-muted)] hover:text-[var(--color-destructive)] disabled:opacity-50 inline-flex items-center gap-1 ml-auto"
                   >
                     <Trash2 size={10} />
                     Delete

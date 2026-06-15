@@ -36,8 +36,8 @@ const PRIVATE_CAPABILITY_LABELS = [
 
 function statusTone(value: boolean): string {
   return value
-    ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200'
-    : 'border-amber-500/30 bg-amber-500/10 text-amber-100';
+    ? 'border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success)]'
+    : 'border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] text-[var(--color-warning)]';
 }
 
 function short(value: unknown): string {
@@ -274,11 +274,11 @@ export function KausalayerWalletPanel({ agentId }: { agentId: string }) {
                 Visible only when this agent has its own KausaLayer API key.
               </p>
             </div>
-            {!hasAgentKey && <Lock size={16} className="text-amber-200" />}
+            {!hasAgentKey && <Lock size={16} className="text-[var(--color-warning)]" />}
           </div>
 
           {!hasAgentKey ? (
-            <div className="flex items-start gap-2 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-3 text-xs text-amber-100">
+            <div className="flex items-start gap-2 rounded-md border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-3 py-3 text-xs text-[var(--color-warning)]">
               <AlertTriangle size={14} className="mt-0.5 shrink-0" />
               Add an agent key to let the agent create, list, and manage private pockets through KausaLayer.
             </div>
@@ -325,7 +325,7 @@ function CapabilityList({ title, items, active }: { title: string; items: string
   return (
     <div className="rounded-md border border-[var(--border-subtle)] bg-black/20 p-3">
       <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-[var(--text-primary)]">
-        {active ? <WalletCards size={14} className="text-[var(--phosphor)]" /> : <Lock size={14} className="text-amber-200" />}
+        {active ? <WalletCards size={14} className="text-[var(--phosphor)]" /> : <Lock size={14} className="text-[var(--color-warning)]" />}
         {title}
       </div>
       <div className="flex flex-wrap gap-1.5">
@@ -335,7 +335,7 @@ function CapabilityList({ title, items, active }: { title: string; items: string
             className={`rounded border px-2 py-1 text-[10px] uppercase tracking-[0.1em] ${
               active
                 ? 'border-[var(--phosphor)]/25 bg-[var(--phosphor)]/10 text-[var(--phosphor)]'
-                : 'border-amber-500/25 bg-amber-500/10 text-amber-100'
+                : 'border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] text-[var(--color-warning)]'
             }`}
           >
             {item}
@@ -375,7 +375,7 @@ function ResourceCard({
       </div>
 
       {result?.error ? (
-        <div className="mt-3 rounded border border-amber-500/25 bg-amber-500/10 px-2 py-1.5 text-xs text-amber-100">
+        <div className="mt-3 rounded border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-2 py-1.5 text-xs text-[var(--color-warning)]">
           {result.error}
         </div>
       ) : items.length > 0 ? (

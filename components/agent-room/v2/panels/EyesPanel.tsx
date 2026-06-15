@@ -581,7 +581,7 @@ function PipCard({
         </div>
         {pip.enabled && (
           <div className="absolute right-3 top-3 flex items-center gap-1.5 rounded bg-black/45 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-[#9fffc3]">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#68ff8a]" />
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--color-success)]" />
             live {ageSeconds}s
           </div>
         )}
@@ -677,7 +677,7 @@ function LivePipScreen({
     liveFeed.status === 'error' || liveFeed.status === 'crashed'
       ? '#fb7185'
       : ['active', 'running', 'restarting'].includes(liveFeed.status)
-        ? '#68ff8a'
+        ? 'var(--color-success)'
         : accent;
   return (
     <>

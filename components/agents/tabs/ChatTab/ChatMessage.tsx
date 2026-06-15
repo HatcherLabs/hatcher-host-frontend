@@ -87,7 +87,7 @@ const ChatMessage = memo(function ChatMessage({ msg, isSpeakingThis, ttsSupporte
               <button
                 onClick={() => handleVote('up')}
                 className={`opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200 p-0.5 rounded hover:bg-[var(--bg-card)] cursor-pointer ${
-                  vote === 'up' ? 'text-emerald-400 !opacity-100' : 'text-[var(--text-muted)] hover:text-emerald-400'
+                  vote === 'up' ? 'text-[var(--color-success)] !opacity-100' : 'text-[var(--text-muted)] hover:text-[var(--color-success)]'
                 }`}
                 title="Good response"
               >
@@ -96,7 +96,7 @@ const ChatMessage = memo(function ChatMessage({ msg, isSpeakingThis, ttsSupporte
               <button
                 onClick={() => handleVote('down')}
                 className={`opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200 p-0.5 rounded hover:bg-[var(--bg-card)] cursor-pointer ${
-                  vote === 'down' ? 'text-red-400 !opacity-100' : 'text-[var(--text-muted)] hover:text-red-400'
+                  vote === 'down' ? 'text-[var(--color-destructive)] !opacity-100' : 'text-[var(--text-muted)] hover:text-[var(--color-destructive)]'
                 }`}
                 title="Bad response"
               >

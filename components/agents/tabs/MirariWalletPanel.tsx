@@ -32,7 +32,7 @@ export const MIRARI_PANEL_COPY = {
 };
 
 export const MIRARI_LAYOUT_GRID_CLASSNAME = 'mt-5 grid min-w-0 gap-4 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]';
-export const MIRARI_RESULT_PANEL_CLASSNAME = 'min-w-0 max-w-full overflow-hidden border border-cyan-500/30 bg-cyan-500/10 p-4';
+export const MIRARI_RESULT_PANEL_CLASSNAME = 'min-w-0 max-w-full overflow-hidden border border-[var(--color-info-border)] bg-[var(--color-info-bg)] p-4';
 export const MIRARI_RESULT_PRE_CLASSNAME = 'mt-3 max-h-64 max-w-full overflow-auto whitespace-pre-wrap break-words border border-[var(--border-subtle)] bg-black/30 p-3 text-xs text-[var(--text-primary)]';
 
 export function buildMirariConnectionCheckPayload(form: MirariConnectionCheckFormState): MirariTestSignalBody {
@@ -71,9 +71,9 @@ function StatusTile({
   icon: typeof CheckCircle2;
 }) {
   const toneClass = tone === 'good'
-    ? 'border-emerald-400/30 bg-emerald-500/10 text-emerald-100'
+    ? 'border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success)]'
     : tone === 'warn'
-      ? 'border-amber-400/30 bg-amber-500/10 text-amber-100'
+      ? 'border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] text-[var(--color-warning)]'
       : 'border-[var(--border-subtle)] bg-black/20 text-[var(--text-primary)]';
   return (
     <div className={`min-w-0 border p-3 ${toneClass}`}>
@@ -159,14 +159,14 @@ export function MirariWalletPanel({ agentId }: { agentId: string }) {
           type="button"
           onClick={() => void loadConfig()}
           disabled={loading}
-          className="inline-flex items-center gap-2 border border-[var(--border-subtle)] px-3 py-2 text-xs uppercase tracking-wider transition hover:border-cyan-300/60 disabled:opacity-60"
+          className="inline-flex items-center gap-2 border border-[var(--border-subtle)] px-3 py-2 text-xs uppercase tracking-wider transition hover:border-[var(--border-hover)] disabled:opacity-60"
         >
           {loading ? <Loader2 size={13} className="animate-spin" /> : <Activity size={13} />} Refresh
         </button>
       </div>
 
       {error && (
-        <div className="mt-4 flex items-start gap-2 border border-amber-500/30 bg-amber-500/5 p-3 text-xs text-amber-200">
+        <div className="mt-4 flex items-start gap-2 border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] p-3 text-xs text-[var(--color-warning)]">
           <AlertTriangle size={14} className="mt-0.5 flex-shrink-0" />
           <span className="min-w-0 break-words">{error}</span>
         </div>
@@ -204,7 +204,7 @@ export function MirariWalletPanel({ agentId }: { agentId: string }) {
               value={form.summary}
               onChange={(event) => setForm((current) => ({ ...current, summary: event.target.value }))}
               maxLength={200}
-              className="mt-1 w-full border border-[var(--border-subtle)] bg-black/30 px-3 py-2 text-sm text-[var(--text-primary)] outline-none focus:border-cyan-300/60"
+              className="mt-1 w-full border border-[var(--border-subtle)] bg-black/30 px-3 py-2 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent)]"
             />
           </label>
 
@@ -213,7 +213,7 @@ export function MirariWalletPanel({ agentId }: { agentId: string }) {
               type="button"
               onClick={() => void sendTestSignal()}
               disabled={!canSend || submitting}
-              className="inline-flex items-center gap-2 border border-cyan-400/40 bg-cyan-500/10 px-3 py-2 text-xs uppercase tracking-wider text-cyan-100 transition hover:bg-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center gap-2 border border-[var(--color-info-border)] bg-[var(--color-info-bg)] px-3 py-2 text-xs uppercase tracking-wider text-[var(--color-info)] transition hover:bg-[var(--bg-hover)] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {submitting ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />} {MIRARI_PANEL_COPY.checkAction}
             </button>
@@ -221,21 +221,21 @@ export function MirariWalletPanel({ agentId }: { agentId: string }) {
         </div>
 
         <div className={MIRARI_RESULT_PANEL_CLASSNAME}>
-          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-cyan-100">
+          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[var(--color-info)]">
             <CheckCircle2 size={13} /> Connection check
           </div>
           {result ? (
             <>
               <div className="mt-3 grid grid-cols-3 gap-2 text-center text-xs">
-                <div className="border border-cyan-400/20 bg-black/20 p-2">
+                <div className="border border-[var(--color-info-border)] bg-black/20 p-2">
                   <div className="text-[10px] uppercase tracking-wider text-[var(--text-muted)]">OK</div>
                   <div className="mt-1 font-semibold text-[var(--text-primary)]">{String(result.ok)}</div>
                 </div>
-                <div className="border border-cyan-400/20 bg-black/20 p-2">
+                <div className="border border-[var(--color-info-border)] bg-black/20 p-2">
                   <div className="text-[10px] uppercase tracking-wider text-[var(--text-muted)]">Ingested</div>
                   <div className="mt-1 font-semibold text-[var(--text-primary)]">{result.ingested}</div>
                 </div>
-                <div className="border border-cyan-400/20 bg-black/20 p-2">
+                <div className="border border-[var(--color-info-border)] bg-black/20 p-2">
                   <div className="text-[10px] uppercase tracking-wider text-[var(--text-muted)]">Deduped</div>
                   <div className="mt-1 font-semibold text-[var(--text-primary)]">{result.deduped}</div>
                 </div>

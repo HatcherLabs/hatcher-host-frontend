@@ -2,9 +2,6 @@
 
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
 
-// v3: light theme removed. forcedTheme="dark" overrides any stored
-// preference from v1/v2 so users coming back after a light-mode session
-// land on dark immediately. The toggle UI is also removed from Header.
 export function ThemeProvider({
   children,
   nonce,
@@ -15,9 +12,8 @@ export function ThemeProvider({
   return (
     <NextThemesProvider
       attribute="class"
-      defaultTheme="dark"
-      forcedTheme="dark"
-      enableSystem={false}
+      defaultTheme="system"
+      enableSystem
       disableTransitionOnChange
       nonce={nonce}
     >

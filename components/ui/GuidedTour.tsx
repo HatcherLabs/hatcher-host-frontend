@@ -180,7 +180,7 @@ export function GuidedTour({
           left: sLeft,
           width: sW,
           height: sH,
-          boxShadow: '0 0 0 2px var(--color-accent), 0 0 24px 4px rgba(139,92,246,0.25)',
+          boxShadow: '0 0 0 2px var(--color-accent), 0 0 24px 4px rgba(115,164,185,0.28)',
         }}
       />
 

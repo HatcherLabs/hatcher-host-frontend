@@ -67,7 +67,7 @@ export function getExploreStats(agents: PublicExploreAgent[]): {
 
 export function publicAgentAccent(agent: PublicExploreAgent): string {
   if (agent.status === 'crashed') return '#f97316';
-  return agent.framework.toLowerCase() === 'hermes' ? '#38bdf8' : '#10b981';
+  return agent.framework.toLowerCase() === 'hermes' ? '#38bdf8' : '#486a79';
 }
 
 export function publicAgentHref(agent: PublicExploreAgent): string {

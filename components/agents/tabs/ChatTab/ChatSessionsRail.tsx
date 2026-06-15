@@ -280,7 +280,7 @@ export function ChatSessionsRail() {
         )}
 
         {error && (
-          <div className="rounded-md border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-[11px] text-amber-300">
+          <div className="rounded-md border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-3 py-2 text-[11px] text-[var(--color-warning)]">
             {error}
           </div>
         )}

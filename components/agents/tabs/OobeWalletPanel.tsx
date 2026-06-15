@@ -60,9 +60,9 @@ function StatusTile({
   icon: typeof CheckCircle2;
 }) {
   const toneClass = tone === 'good'
-    ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200'
+    ? 'border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success)]'
     : tone === 'warn'
-      ? 'border-amber-500/30 bg-amber-500/10 text-amber-100'
+      ? 'border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] text-[var(--color-warning)]'
       : 'border-[var(--border-subtle)] bg-black/20 text-[var(--text-muted)]';
   return (
     <div className={`rounded-md border px-3 py-3 ${toneClass}`}>
@@ -241,15 +241,15 @@ export function OobeWalletPanel({ agentId }: { agentId: string }) {
                 Registers this agent as an OOBE SAP identity and publishes the Hatcher x402 provider endpoint when
                 enabled, so SAP clients can route paid jobs into the agent runtime.
               </p>
-              <p className="mt-2 text-xs leading-relaxed text-amber-100/80">
+              <p className="mt-2 text-xs leading-relaxed text-[var(--color-warning)]">
                 Mainnet registration uses the agent Solana wallet and should keep at least 0.05 SOL available for
                 SAP account rent and transaction fees.
               </p>
             </div>
             <span className={`rounded-full border px-2 py-1 font-mono text-[10px] uppercase ${
               registration
-                ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200'
-                : 'border-amber-500/30 bg-amber-500/10 text-amber-100'
+                ? 'border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success)]'
+                : 'border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] text-[var(--color-warning)]'
             }`}>
               {registration ? 'registered' : 'not registered'}
             </span>

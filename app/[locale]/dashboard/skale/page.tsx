@@ -44,8 +44,8 @@ const FRAMEWORK_GLYPH: Record<string, string> = {
 };
 
 const FRAMEWORK_COLOR: Record<string, string> = {
-  openclaw: '#f59e0b',
-  hermes: '#a855f7',
+  openclaw: 'var(--color-accent)',
+  hermes: 'var(--color-info)',
 };
 
 function shortAddr(addr: string): string {
@@ -313,7 +313,7 @@ export default function SkaleDashboardPage() {
           deposit address from the table below.
         </div>
         {evmError && (
-          <div className="mt-3 inline-flex items-center gap-2 px-3 py-2 border border-amber-500/30 bg-amber-500/5 text-[11px] text-amber-400">
+          <div className="mt-3 inline-flex items-center gap-2 px-3 py-2 border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] text-[11px] text-[var(--color-warning)]">
             <AlertTriangle size={12} /> {evmError}
           </div>
         )}
@@ -381,14 +381,14 @@ export default function SkaleDashboardPage() {
                           )}
                         </div>
                       ) : (
-                        <span className="text-[10px] text-amber-400">No wallet (legacy — backfill required)</span>
+                        <span className="text-[10px] text-[var(--color-warning)]">No wallet (legacy — backfill required)</span>
                       )}
                     </td>
                     <td className="px-4 py-3 text-right font-mono text-xs text-[var(--text-primary)]">
-                      {row?.loading ? '…' : row?.error ? <span className="text-amber-400">err</span> : row ? row.ethFormatted : '—'}
+                      {row?.loading ? '…' : row?.error ? <span className="text-[var(--color-warning)]">err</span> : row ? row.ethFormatted : '—'}
                     </td>
                     <td className="px-4 py-3 text-right font-mono text-xs text-[var(--phosphor)]">
-                      {row?.loading ? '…' : row?.error ? <span className="text-amber-400">err</span> : row ? `$${row.usdcFormatted}` : '—'}
+                      {row?.loading ? '…' : row?.error ? <span className="text-[var(--color-warning)]">err</span> : row ? `$${row.usdcFormatted}` : '—'}
                     </td>
                     <td className="px-4 py-3">
                       {row?.erc8004AgentId ? (
@@ -416,7 +416,7 @@ export default function SkaleDashboardPage() {
       )}
 
       {error && (
-        <div className="mt-4 px-3 py-2 border border-amber-500/30 bg-amber-500/5 text-[11px] text-amber-400">
+        <div className="mt-4 px-3 py-2 border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] text-[11px] text-[var(--color-warning)]">
           {error}
         </div>
       )}

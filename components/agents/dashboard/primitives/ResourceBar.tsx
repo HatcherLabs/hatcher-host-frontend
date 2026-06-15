@@ -25,7 +25,7 @@ export function ResourceBar({
   color: string;
 }) {
   const pct = max > 0 ? Math.min((value / max) * 100, 100) : 0;
-  const barColor = pct > 80 ? 'bg-red-500' : pct > 60 ? 'bg-amber-500' : color;
+  const barColor = pct > 80 ? 'bg-[var(--color-destructive)]' : pct > 60 ? 'bg-[var(--color-warning)]' : color;
   return (
     <div>
       <div className="flex items-center justify-between mb-1.5">

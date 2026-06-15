@@ -58,6 +58,7 @@ export const HOSTED_MODEL_PROVIDERS: HostedModelProvider[] = [
   { key: 'openserv', name: 'OpenServ', description: 'Private-beta SERV reasoning models for agent workflows.' },
   { key: 'xiaomi', name: 'Xiaomi MiMo', description: 'Partner-hosted MiMo models with long context and launch-promo usage.' },
   { key: 'acedata', name: 'AceData', description: 'Partner-hosted frontier models plus data and media intelligence APIs.' },
+  { key: 'minimax', name: 'MiniMax', description: 'MiniMax M-series models routed through UsePod and OpenRouter.' },
   { key: 'google', name: 'Google', description: 'Gemini models with large context windows.' },
   { key: 'qwen', name: 'Qwen', description: 'Efficient coding and agentic tool-use models.' },
   { key: 'x-ai', name: 'xAI', description: 'Grok models for fast reasoning and code.' },
@@ -283,6 +284,26 @@ export const HOSTED_MODELS: HostedModelOption[] = [
     context: '200K',
     description: 'Premium OpenServ SERV model for selective high-value reasoning tasks.',
     warning: 'Consumes AI Credits quickly.',
+  },
+  {
+    id: 'minimax/minimax-m3',
+    name: 'MiniMax M3',
+    providerKey: 'minimax',
+    provider: 'MiniMax',
+    category: 'Coding',
+    cost: 'Medium',
+    context: '1M',
+    description: 'Frontier MiniMax model for coding, tool use, and agent workflows via UsePod/OpenRouter.',
+  },
+  {
+    id: 'minimax/minimax-m2.7',
+    name: 'MiniMax M2.7',
+    providerKey: 'minimax',
+    provider: 'MiniMax',
+    category: 'Balanced',
+    cost: 'Medium',
+    context: '200K',
+    description: 'Balanced MiniMax model for agent chat, writing, and tool workflows via UsePod/OpenRouter.',
   },
   {
     id: 'xiaomi/mimo-v2.5-pro',
@@ -803,6 +824,12 @@ const HOSTED_MODEL_ALIASES = new Map<string, string>([
   ['meta-llama/llama-4-scout-17b-16e-instruct', 'qwen/qwen3.6-35b-a3b'],
   ['qwen/qwen3-32b', 'qwen/qwen3.6-35b-a3b'],
   ['qwen/qwen3-235b-a22b-2507', 'qwen/qwen3.6-35b-a3b'],
+  ['minmax m3', 'minimax/minimax-m3'],
+  ['minimax m3', 'minimax/minimax-m3'],
+  ['minimax-m3', 'minimax/minimax-m3'],
+  ['minmax m2.7', 'minimax/minimax-m2.7'],
+  ['minimax m2.7', 'minimax/minimax-m2.7'],
+  ['minimax-m2.7', 'minimax/minimax-m2.7'],
 ]);
 
 const BYOK_PROVIDER_LABELS: Record<string, string> = {
@@ -821,7 +848,7 @@ export function normalizeHostedModelForUi(model: string | undefined): string {
   if (trimmed.startsWith(HOSTED_PROXY_PROVIDER_PREFIX)) {
     trimmed = trimmed.slice(HOSTED_PROXY_PROVIDER_PREFIX.length);
   }
-  return HOSTED_MODEL_ALIASES.get(trimmed) ?? trimmed;
+  return HOSTED_MODEL_ALIASES.get(trimmed) ?? HOSTED_MODEL_ALIASES.get(trimmed.toLowerCase()) ?? trimmed;
 }
 
 export function providerKeyFromHostedModelId(modelId: string): string {

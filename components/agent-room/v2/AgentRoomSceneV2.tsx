@@ -16,7 +16,7 @@ import { PlayerAvatar } from './PlayerAvatar';
 import { RoomAudio } from './RoomAudio';
 import { getStationLayout, type StationId, type StationLayout } from './world/layout';
 import { collidersFromLayout, wallColliders } from './world/colliders';
-import { AgentAvatar } from './stations/AgentAvatar';
+import { AgentAvatar, AGENT_AVATAR_PLATFORM_Y } from './stations/AgentAvatar';
 import type { RoomEmoteId } from './stations/AgentBody';
 import { RoomOffice } from './world/RoomOffice';
 import type { Quality } from './quality';
@@ -101,6 +101,11 @@ export function AgentRoomSceneV2({
 
   const layout: StationLayout = useMemo(() => getStationLayout(framework), [framework]);
   const solids = useMemo(() => [...collidersFromLayout(layout), ...wallColliders()], [layout]);
+  const raisedAgentPosition: [number, number, number] = [
+    layout.agentAvatar.position[0],
+    layout.agentAvatar.position[1] + AGENT_AVATAR_PLATFORM_Y,
+    layout.agentAvatar.position[2],
+  ];
 
   return (
     <>
@@ -170,10 +175,10 @@ export function AgentRoomSceneV2({
           <WorkMotes
             active={!!isChatStreaming || !!eyesLive}
             framework={framework}
-            position={layout.agentAvatar.position}
+            position={raisedAgentPosition}
           />
           <RoomAudio
-            agentPosition={layout.agentAvatar.position}
+            agentPosition={raisedAgentPosition}
             muted={!!audioMuted}
             messageCount={chatMessageCount ?? 0}
           />

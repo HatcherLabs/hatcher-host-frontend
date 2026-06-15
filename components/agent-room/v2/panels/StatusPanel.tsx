@@ -96,7 +96,7 @@ export function StatusPanel({
         <button
           onClick={() => run('start')}
           disabled={busy !== null || isRunning}
-          className="flex-1 rounded-lg bg-green-600 px-3 py-2 text-sm font-medium hover:bg-green-500 disabled:opacity-40"
+          className="flex-1 rounded-lg bg-[#d6b177] px-3 py-2 text-sm font-semibold text-[#171007] hover:bg-[#f4d79d] disabled:opacity-40"
         >
           {busy === 'start' ? '…' : 'Start'}
         </button>

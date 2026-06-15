@@ -6,22 +6,48 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import type { LucideIcon } from 'lucide-react';
+import {
+  ArrowRight,
+  BarChart3,
+  BookOpen,
+  Bot,
+  Boxes,
+  Building2,
+  CircleDollarSign,
+  CreditCard,
+  FileText,
+  GitBranch,
+  HelpCircle,
+  Handshake,
+  LayoutDashboard,
+  LogOut,
+  Newspaper,
+  Plus,
+  Rocket,
+  Search,
+  Settings,
+  ShieldCheck,
+  Sparkles,
+} from 'lucide-react';
 import styles from './Nav.module.css';
-import { NAV_GROUPS, PRIMARY_CTA, SECONDARY_CTA, SIGN_UP_CTA } from './links';
+import { NAV_GROUPS, PRIMARY_CTA, SECONDARY_CTA } from './links';
 import { NavDrawer } from './NavDrawer';
 import { LocaleSwitcher } from '@/components/layout/LocaleSwitcher';
 import { AiCreditStatus } from '@/components/layout/AiCreditStatus';
 import { HatcherMarketStatus } from '@/components/layout/HatcherMarketStatus';
 import { VersionBadge } from '@/components/layout/VersionBadge';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
+import { formatFeatureKey } from '@/lib/feature-labels';
 
 type AffiliateMenuState = 'affiliate' | 'pending' | 'rejected' | 'none';
 
 export function Nav() {
-  const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [affiliateState, setAffiliateState] = useState<AffiliateMenuState | null>(null);
   const navRef = useRef<HTMLElement | null>(null);
@@ -33,13 +59,13 @@ export function Nav() {
   const tMenu = useTranslations('nav.userMenu');
 
   const USER_MENU = useMemo(() => ([
-    { key: 'agents',   label: tNav('myAgents'),  sub: tMenu('sub_myAgents'), href: '/dashboard/agents',   glyph: '◐' },
-    { key: 'analytics', label: tNav('analytics'), sub: tMenu('sub_analytics'), href: '/dashboard/analytics', glyph: '▥' },
-    { key: 'create',   label: tNav('create'),    sub: tMenu('sub_create'),   href: '/create',             glyph: '⊞' },
-    { key: 'billing',  label: tNav('billing'),   sub: tMenu('sub_billing'),  href: '/dashboard/billing',  glyph: '◇' },
-    { key: 'settings', label: tNav('settings'),  sub: tMenu('sub_settings'), href: '/dashboard/settings', glyph: '◆' },
-    { key: 'support',  label: tNav('support'),   sub: tMenu('sub_support'),  href: '/support',            glyph: '✎' },
-  ] as const), [tNav, tMenu]);
+    { key: 'agents', label: tNav('myAgents'), sub: tMenu('sub_myAgents'), href: '/dashboard/agents', Icon: Bot },
+    { key: 'analytics', label: tNav('analytics'), sub: tMenu('sub_analytics'), href: '/dashboard/analytics', Icon: BarChart3 },
+    { key: 'create', label: tNav('create'), sub: tMenu('sub_create'), href: '/create', Icon: Plus },
+    { key: 'billing', label: tNav('billing'), sub: tMenu('sub_billing'), href: '/dashboard/billing', Icon: CreditCard },
+    { key: 'settings', label: tNav('settings'), sub: tMenu('sub_settings'), href: '/dashboard/settings', Icon: Settings },
+    { key: 'support', label: tNav('support'), sub: tMenu('sub_support'), href: '/support', Icon: HelpCircle },
+  ] satisfies ReadonlyArray<{ key: string; label: string; sub: string; href: string; Icon: LucideIcon }>), [tNav, tMenu]);
 
   const affiliateItem = useMemo(() => {
     switch (affiliateState) {
@@ -130,24 +156,27 @@ export function Nav() {
             <VersionBadge />
           </div>
 
-          <div className={styles.groups}>
-            {NAV_GROUPS.map((g) => (
-              <div key={g.key} className={styles.groupAnchor}>
+          <div className={styles.groups} aria-label="Primary navigation">
+            {NAV_GROUPS.map((group) => (
+              <div key={group.key} className={styles.groupAnchor}>
                 <button
-                  className={styles.groupBtn}
                   type="button"
-                  aria-expanded={openGroup === g.key}
-                  aria-haspopup="true"
-                  onClick={() => setOpenGroup(openGroup === g.key ? null : g.key)}
+                  className={styles.groupBtn}
+                  aria-haspopup="menu"
+                  aria-expanded={openGroup === group.key}
+                  onClick={() => {
+                    setUserMenuOpen(false);
+                    setOpenGroup((current) => (current === group.key ? null : group.key));
+                  }}
                 >
-                  {tGroups(g.labelKey)}
+                  {tGroups(group.labelKey)}
                   <svg className={styles.caret} viewBox="0 0 8 8" aria-hidden>
                     <path d="M1 3l3 3 3-3" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </button>
-                {openGroup === g.key && (
-                  <div className={styles.dropdown} role="menu">
-                    {g.items.map((it) => (
+                {openGroup === group.key && (
+                  <div className={styles.dropdown} role="menu" aria-label={tGroups(group.labelKey)}>
+                    {group.items.map((it) => (
                       <Link
                         key={it.key}
                         href={it.href}
@@ -155,7 +184,9 @@ export function Nav() {
                         role="menuitem"
                         onClick={() => setOpenGroup(null)}
                       >
-                        <span className={styles.glyph} aria-hidden>{it.glyph}</span>
+                        <span className={styles.glyph} aria-hidden>
+                          <NavItemIcon itemKey={it.key} />
+                        </span>
                         <span className={styles.itemBody}>
                           <span className={styles.itemLabel}>{tGroups(it.labelKey)}</span>
                           <span className={styles.itemSub}>{tGroups(it.subKey)}</span>
@@ -166,6 +197,9 @@ export function Nav() {
                 )}
               </div>
             ))}
+            <Link href="/docs" className={styles.navLink} onClick={() => setOpenGroup(null)}>
+              {tNav('docs')}
+            </Link>
           </div>
 
           <div className={styles.spacer} />
@@ -177,13 +211,11 @@ export function Nav() {
             <span className={styles.localeSlot}>
               <LocaleSwitcher />
             </span>
-            {authLoading ? (
-              <span className={styles.userPillSkeleton} aria-hidden />
-            ) : isAuthenticated && user ? (
+            <span className={styles.themeSlot}>
+              <ThemeToggle />
+            </span>
+            {!authLoading && isAuthenticated && user ? (
               <>
-                <span className={styles.creditSlot}>
-                  <AiCreditStatus />
-                </span>
                 <span className={styles.notificationSlot}>
                   <NotificationCenter />
                 </span>
@@ -194,7 +226,10 @@ export function Nav() {
                     aria-expanded={userMenuOpen}
                     aria-haspopup="menu"
                     aria-label={`${user.username} — ${tNav('settings')}`}
-                    onClick={() => setUserMenuOpen((v) => !v)}
+                    onClick={() => {
+                      setOpenGroup(null);
+                      setUserMenuOpen((v) => !v);
+                    }}
                   >
                     {user.avatarUrl ? (
                       <Image
@@ -236,7 +271,13 @@ export function Nav() {
                             <span className={styles.userMetaEmail}>{user.email}</span>
                           </div>
                         </div>
-                        <span className={styles.userMetaTier}>{user.tier} {tMenu('tierSuffix')}</span>
+                        <span className={styles.userMetaTier}>{formatFeatureKey(user.tier)} {tMenu('tierSuffix')}</span>
+                      </div>
+                      <div className={styles.userCredits}>
+                        <AiCreditStatus
+                          variant="drawer"
+                          onNavigate={() => setUserMenuOpen(false)}
+                        />
                       </div>
                       {USER_MENU.map((it) => (
                         <Link
@@ -246,7 +287,9 @@ export function Nav() {
                           role="menuitem"
                           onClick={() => setUserMenuOpen(false)}
                         >
-                          <span className={styles.glyph} aria-hidden>{it.glyph}</span>
+                          <span className={styles.glyph} aria-hidden>
+                            <it.Icon size={15} strokeWidth={1.8} />
+                          </span>
                           <span className={styles.itemBody}>
                             <span className={styles.itemLabel}>{it.label}</span>
                             <span className={styles.itemSub}>{it.sub}</span>
@@ -259,7 +302,9 @@ export function Nav() {
                         role="menuitem"
                         onClick={() => setUserMenuOpen(false)}
                       >
-                        <span className={styles.glyph} aria-hidden>✦</span>
+                        <span className={styles.glyph} aria-hidden>
+                          <Handshake size={15} strokeWidth={1.8} />
+                        </span>
                         <span className={styles.itemBody}>
                           <span className={styles.itemLabel}>{affiliateItem.label}</span>
                           <span className={styles.itemSub}>{tMenu('sub_affiliate')}</span>
@@ -272,7 +317,9 @@ export function Nav() {
                           role="menuitem"
                           onClick={() => setUserMenuOpen(false)}
                         >
-                          <span className={styles.glyph} aria-hidden>★</span>
+                          <span className={styles.glyph} aria-hidden>
+                            <ShieldCheck size={15} strokeWidth={1.8} />
+                          </span>
                           <span className={styles.itemBody}>
                             <span className={styles.itemLabel}>{tNav('admin')}</span>
                             <span className={styles.itemSub}>{tMenu('sub_admin')}</span>
@@ -285,7 +332,9 @@ export function Nav() {
                         role="menuitem"
                         onClick={handleLogout}
                       >
-                        <span className={styles.glyph} aria-hidden>⎋</span>
+                        <span className={styles.glyph} aria-hidden>
+                          <LogOut size={15} strokeWidth={1.8} />
+                        </span>
                         <span className={styles.itemBody}>
                           <span className={styles.itemLabel}>{tNav('logout')}</span>
                           <span className={styles.itemSub}>{tMenu('sub_signOut')}</span>
@@ -302,17 +351,10 @@ export function Nav() {
                 </Link>
               </>
             )}
-            {authLoading || isAuthenticated ? (
-              <Link href={PRIMARY_CTA.href} className={styles.cta}>
-                <span className={styles.cursor} aria-hidden>▎</span>
-                {tNav(PRIMARY_CTA.labelKey)}
-              </Link>
-            ) : (
-              <Link href={SIGN_UP_CTA.href} className={styles.signupCta}>
-                <span className={styles.cursor} aria-hidden>▎</span>
-                {tNav(SIGN_UP_CTA.labelKey)}
-              </Link>
-            )}
+            <Link href={PRIMARY_CTA.href} className={styles.cta}>
+              {tNav(PRIMARY_CTA.labelKey)}
+              <ArrowRight size={14} aria-hidden />
+            </Link>
             <button
               className={`${styles.hamburger} ${drawerOpen ? styles.open : ''}`}
               type="button"
@@ -334,8 +376,43 @@ export function Nav() {
 function BrandGlyph() {
   return (
     <svg width="22" height="22" viewBox="0 0 26 26" aria-hidden>
-      <rect x="2" y="2" width="22" height="22" rx="5" fill="none" stroke="currentColor" strokeWidth="1.5" />
-      <rect x="7" y="7" width="12" height="12" rx="2" fill="var(--accent)" />
+      <rect width="26" height="26" rx="7" fill="var(--ink)" />
+      <path d="M13 4.5c-4 0-7.2 3.9-7.2 8.7 0 5 3.1 8.9 7.2 8.9s7.2-3.9 7.2-8.9c0-4.8-3.2-8.7-7.2-8.7Z" fill="var(--bg-card)" stroke="var(--tech-accent)" strokeWidth="1.1" />
+      <path d="M8.6 13.6c1.4-2.3 2.9-3.3 4.4-3.3s3 1 4.4 3.3c-1.4 2.3-2.9 3.3-4.4 3.3s-3-1-4.4-3.3Z" fill="var(--ink)" />
+      <circle cx="13" cy="13.6" r="1.7" fill="var(--tech-accent)" />
     </svg>
   );
+}
+
+function NavItemIcon({ itemKey }: { itemKey: string }) {
+  const iconProps = { size: 15, strokeWidth: 1.8, 'aria-hidden': true } as const;
+
+  switch (itemKey) {
+    case 'hatchAgent':
+      return <Rocket {...iconProps} />;
+    case 'myAgents':
+      return <LayoutDashboard {...iconProps} />;
+    case 'publicAgents':
+      return <Search {...iconProps} />;
+    case 'features':
+      return <Sparkles {...iconProps} />;
+    case 'city':
+      return <Building2 {...iconProps} />;
+    case 'frameworks':
+      return <Boxes {...iconProps} />;
+    case 'pricing':
+      return <CircleDollarSign {...iconProps} />;
+    case 'token':
+      return <CreditCard {...iconProps} />;
+    case 'whitepaper':
+      return <FileText {...iconProps} />;
+    case 'blog':
+      return <Newspaper {...iconProps} />;
+    case 'roadmap':
+      return <GitBranch {...iconProps} />;
+    case 'changelog':
+      return <BookOpen {...iconProps} />;
+    default:
+      return <ArrowRight {...iconProps} />;
+  }
 }

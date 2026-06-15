@@ -64,7 +64,7 @@ export function HermesSkillsCard() {
     return (
       <GlassCard>
         <div className="flex items-center gap-2 mb-3">
-          <Sparkles size={14} className="text-purple-400" />
+          <Sparkles size={14} className="text-[var(--accent)]" />
           <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Bundled Skills</h3>
         </div>
         <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
@@ -93,7 +93,7 @@ export function HermesSkillsCard() {
     return (
       <GlassCard>
         <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
-          <AlertTriangle size={14} className="text-amber-400" />
+          <AlertTriangle size={14} className="text-[var(--color-warning)]" />
           Skills catalog unavailable{error ? `: ${error}` : ''}
         </div>
       </GlassCard>
@@ -104,7 +104,7 @@ export function HermesSkillsCard() {
     <GlassCard>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Sparkles size={14} className="text-purple-400" />
+          <Sparkles size={14} className="text-[var(--accent)]" />
           <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Bundled Skills</h3>
         </div>
         <button
@@ -116,8 +116,8 @@ export function HermesSkillsCard() {
       </div>
 
       <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="rounded-xl px-3 py-2.5 bg-purple-500/10 border border-purple-500/20">
-          <div className="text-2xl font-bold text-purple-400 tabular-nums">{data.totalSkills}</div>
+        <div className="rounded-xl px-3 py-2.5 bg-[var(--tech-accent-soft)] border border-[var(--border-hover)]">
+          <div className="text-2xl font-bold text-[var(--accent)] tabular-nums">{data.totalSkills}</div>
           <div className="text-[10px] text-[var(--text-muted)] mt-0.5">Total Skills</div>
         </div>
         <div className="rounded-xl px-3 py-2.5 bg-[var(--bg-card)] border border-[var(--border-default)]">

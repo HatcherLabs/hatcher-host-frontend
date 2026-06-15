@@ -112,11 +112,11 @@ const RECOMMENDED: Record<string, Array<{ name: string; displayName?: string; ty
 // ─── Helpers ─────────────────────────────────────────────────
 
 const SOURCE_COLORS: Record<string, { bg: string; text: string }> = {
-  clawhub:          { bg: 'bg-amber-500/10', text: 'text-amber-400' },
-  'clawhub-plugin': { bg: 'bg-amber-500/10', text: 'text-amber-400' },
-  github:           { bg: 'bg-slate-500/10', text: 'text-slate-300' },
-  npm:              { bg: 'bg-red-500/10', text: 'text-red-400' },
-  bundled:          { bg: 'bg-emerald-500/10', text: 'text-emerald-400' },
+  clawhub:          { bg: 'bg-[var(--color-info-bg)]', text: 'text-[var(--color-info)]' },
+  'clawhub-plugin': { bg: 'bg-[var(--color-info-bg)]', text: 'text-[var(--color-info)]' },
+  github:           { bg: 'bg-[var(--bg-panel)]', text: 'text-[var(--text-secondary)]' },
+  npm:              { bg: 'bg-[var(--color-warning-bg)]', text: 'text-[var(--color-warning)]' },
+  bundled:          { bg: 'bg-[var(--status-live-bg)]', text: 'text-[var(--status-live)]' },
 };
 
 function SourceBadge({ source }: { source: string }) {
@@ -132,7 +132,7 @@ function TypeBadge({ type }: { type: 'skill' | 'plugin' }) {
   const isSkill = type === 'skill';
   return (
     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium border border-white/5 ${
-      isSkill ? 'bg-violet-500/10 text-violet-400' : 'bg-blue-500/10 text-blue-400'
+      isSkill ? 'bg-[var(--tech-accent-soft)] text-[var(--accent)]' : 'bg-[var(--color-info-bg)] text-[var(--color-info)]'
     }`}>
       {isSkill ? <Sparkles size={10} /> : <Puzzle size={10} />}
       {isSkill ? 'Skill' : 'Plugin'}
@@ -143,23 +143,23 @@ function TypeBadge({ type }: { type: 'skill' | 'plugin' }) {
 function StatusIndicator({ status, error }: { status: InstalledItem['status']; error?: string }) {
   if (status === 'installed') {
     return (
-      <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400">
-        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+      <span className="inline-flex items-center gap-1 text-[11px] text-[var(--status-live)]">
+        <span className="w-1.5 h-1.5 rounded-full bg-[var(--status-live)]" />
         Installed
       </span>
     );
   }
   if (status === 'pending' || status === 'pending_restart') {
     return (
-      <span className="inline-flex items-center gap-1 text-[11px] text-amber-400">
-        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+      <span className="inline-flex items-center gap-1 text-[11px] text-[var(--status-deploying)]">
+        <span className="w-1.5 h-1.5 rounded-full bg-[var(--status-deploying)] animate-pulse" />
         {status === 'pending' ? 'Pending — Restart to Install' : 'Restart Required'}
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 text-[11px] text-red-400" title={error}>
-      <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
+    <span className="inline-flex items-center gap-1 text-[11px] text-[var(--status-error)]" title={error}>
+      <span className="w-1.5 h-1.5 rounded-full bg-[var(--status-error)]" />
       Failed
     </span>
   );
@@ -445,7 +445,7 @@ export function PluginsTab() {
     return (
       <motion.div key="plugins" variants={tabContentVariants} initial="enter" animate="center" exit="exit">
         <GlassCard className="text-center py-12">
-          <AlertTriangle size={32} className="mx-auto mb-3 text-red-400" />
+          <AlertTriangle size={32} className="mx-auto mb-3 text-[var(--color-destructive)]" />
           <p className="text-[var(--text-secondary)] mb-4">{error}</p>
           <button
             onClick={load}
@@ -519,12 +519,12 @@ export function PluginsTab() {
             onClick={() => setBundledExpanded(!bundledExpanded)}
             className="flex items-center gap-2.5 w-full group text-left"
           >
-            <Sparkles size={16} className="text-emerald-400" />
+            <Sparkles size={16} className="text-[var(--status-live)]" />
             <h3 className="text-sm font-medium text-[var(--text-secondary)] uppercase tracking-wider flex-1">
               Bundled
             </h3>
             {bundledEnabledCount > 0 && (
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[var(--status-live-bg)] text-[var(--status-live)] border border-[var(--status-live-border)]">
                 {bundledEnabledCount} active
               </span>
             )}
@@ -630,7 +630,7 @@ export function PluginsTab() {
                       <button
                         onClick={() => handleUninstall(item.name)}
                         disabled={uninstalling === item.name}
-                        className="px-2 py-1 text-xs rounded bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors disabled:opacity-50"
+                        className="px-2 py-1 text-xs rounded bg-[var(--color-destructive-bg)] text-[var(--color-destructive)] hover:border-[var(--color-destructive-border)] transition-colors disabled:opacity-50"
                       >
                         {uninstalling === item.name ? <Loader2 size={12} className="animate-spin" /> : 'Confirm'}
                       </button>
@@ -644,7 +644,7 @@ export function PluginsTab() {
                   ) : (
                     <button
                       onClick={() => setConfirmUninstall(item.name)}
-                      className="p-1.5 rounded-lg hover:bg-red-500/10 text-[var(--text-muted)] hover:text-red-400 transition-colors shrink-0"
+                      className="p-1.5 rounded-lg hover:bg-[var(--color-destructive-bg)] text-[var(--text-muted)] hover:text-[var(--color-destructive)] transition-colors shrink-0"
                       title="Uninstall"
                     >
                       <Trash2 size={14} />
@@ -713,7 +713,7 @@ export function PluginsTab() {
                     <TypeBadge type={subTab === 'skills' ? 'skill' : 'plugin'} />
                     <SourceBadge source={item.source} />
                     {item.requiresRestart && (
-                      <span className="inline-flex items-center gap-1 text-[11px] text-amber-400">
+                      <span className="inline-flex items-center gap-1 text-[11px] text-[var(--color-warning)]">
                         <RotateCcw size={10} /> Needs restart
                       </span>
                     )}
@@ -732,12 +732,12 @@ export function PluginsTab() {
           /* Recommended section — default view when not searching */
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <Star size={14} className="text-amber-400" />
-              <span className="text-xs font-medium text-amber-400 uppercase tracking-wider">{t('recommended')}</span>
+              <Star size={14} className="text-[var(--color-warning)]" />
+              <span className="text-xs font-medium text-[var(--color-warning)] uppercase tracking-wider">{t('recommended')}</span>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               {recommendedItems.map((item) => (
-                <GlassCard key={item.name} className="!p-4 flex flex-col gap-2 border-amber-500/10">
+                <GlassCard key={item.name} className="!p-4 flex flex-col gap-2 border-[var(--color-warning-border)]">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium text-[var(--text-primary)] truncate">{item.displayName || item.name}</p>

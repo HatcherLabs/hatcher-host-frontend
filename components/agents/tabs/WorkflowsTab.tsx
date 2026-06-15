@@ -64,8 +64,8 @@ import { useTranslations } from 'next-intl';
 // ─── Framework Workflow Compatibility ─────────────────────────
 
 const FRAMEWORK_WORKFLOW_SUPPORT: Record<string, { level: 'full' | 'partial' | 'planned'; note: string; color: string }> = {
-  openclaw: { level: 'partial', note: 'Hatcher workflows support triggers, conditions, and message/API actions. Direct native skill execution is limited.', color: 'amber' },
-  hermes: { level: 'partial', note: 'Hatcher workflows support triggers, conditions, and message/API actions. Direct native skill execution is limited.', color: 'purple' },
+  openclaw: { level: 'partial', note: 'Hatcher workflows support triggers, conditions, and message/API actions. Direct native skill execution is limited.', color: 'info' },
+  hermes: { level: 'partial', note: 'Hatcher workflows support triggers, conditions, and message/API actions. Direct native skill execution is limited.', color: 'accent' },
 };
 
 // ─── Types ───────────────────────────────────────────────────
@@ -105,10 +105,10 @@ interface NodeConfig {
 // ─── Node Category Colors ─────────────────────────────────────
 
 const CATEGORY_COLORS = {
-  trigger: { bg: 'bg-emerald-500/15', border: 'border-emerald-500/40', text: 'text-emerald-400', accent: '#10b981' },
-  action: { bg: 'bg-blue-500/15', border: 'border-blue-500/40', text: 'text-blue-400', accent: '#3b82f6' },
-  condition: { bg: 'bg-yellow-500/15', border: 'border-yellow-500/40', text: 'text-yellow-400', accent: '#eab308' },
-  response: { bg: 'bg-purple-500/15', border: 'border-purple-500/40', text: 'text-purple-400', accent: '#a855f7' },
+  trigger: { bg: 'bg-[var(--status-live-bg)]', border: 'border-[var(--status-live-border)]', text: 'text-[var(--status-live)]', accent: 'var(--status-live)' },
+  action: { bg: 'bg-[var(--color-info-bg)]', border: 'border-[var(--color-info-border)]', text: 'text-[var(--color-info)]', accent: 'var(--color-info)' },
+  condition: { bg: 'bg-[var(--color-warning-bg)]', border: 'border-[var(--color-warning-border)]', text: 'text-[var(--color-warning)]', accent: 'var(--color-warning)' },
+  response: { bg: 'bg-[var(--tech-accent-soft)]', border: 'border-[var(--border-hover)]', text: 'text-[var(--accent)]', accent: 'var(--accent)' },
 };
 
 // ─── Node Definitions (toolbar items) ──────────────────────────
@@ -669,9 +669,9 @@ function WorkflowEditor({
   return (
     <>
       {/* Mobile notice — workflow editor requires drag-and-drop which isn't usable on touch */}
-      <div className="lg:hidden p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 mb-4 flex items-start gap-3">
-        <Monitor size={16} className="text-amber-400 flex-shrink-0 mt-0.5" />
-        <p className="text-xs text-amber-300">
+      <div className="lg:hidden p-4 rounded-xl border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] mb-4 flex items-start gap-3">
+        <Monitor size={16} className="text-[var(--color-warning)] flex-shrink-0 mt-0.5" />
+        <p className="text-xs text-[var(--color-warning)]">
           The workflow editor is best used on a desktop browser. Viewing is supported, but editing requires drag-and-drop.
         </p>
       </div>
@@ -697,7 +697,7 @@ function WorkflowEditor({
           {selectedNode && (
             <button
               onClick={deleteSelectedNode}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-all"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-[var(--color-destructive-border)] text-[var(--color-destructive)] hover:bg-[var(--color-destructive-bg)] transition-all"
             >
               <Trash2 size={14} />
               Delete Node
@@ -865,8 +865,8 @@ function WorkflowLogsPanel({
       )}
 
       {!loading && error && (
-        <div className="flex items-start gap-2 px-4 py-3 text-xs text-red-300 bg-red-500/5">
-          <AlertTriangle size={14} className="mt-0.5 shrink-0 text-red-400" />
+        <div className="flex items-start gap-2 px-4 py-3 text-xs text-[var(--color-destructive)] bg-[var(--color-destructive-bg)]">
+          <AlertTriangle size={14} className="mt-0.5 shrink-0 text-[var(--color-destructive)]" />
           {error}
         </div>
       )}
@@ -886,8 +886,8 @@ function WorkflowLogsPanel({
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full border ${
                       log.error
-                        ? 'border-red-500/25 bg-red-500/10 text-red-400'
-                        : 'border-emerald-500/25 bg-emerald-500/10 text-emerald-400'
+                        ? 'border-[var(--color-destructive-border)] bg-[var(--color-destructive-bg)] text-[var(--color-destructive)]'
+                        : 'border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success)]'
                     }`}>
                       {log.error ? 'Failed' : 'Success'}
                     </span>
@@ -908,7 +908,7 @@ function WorkflowLogsPanel({
                 </pre>
               )}
               {log.error && (
-                <p className="mt-2 rounded-lg border border-red-500/15 bg-red-500/5 p-2 text-[11px] text-red-300">
+                <p className="mt-2 rounded-lg border border-[var(--color-destructive-border)] bg-[var(--color-destructive-bg)] p-2 text-[11px] text-[var(--color-destructive)]">
                   {log.error}
                 </p>
               )}
@@ -1065,9 +1065,9 @@ export function WorkflowsTab() {
   };
 
   const getStatusConfig = (wf: WorkflowData) => {
-    if (!wf.enabled) return { label: 'Paused', dotClass: 'bg-amber-400', ringClass: '', badgeClass: 'bg-amber-500/10 text-amber-400 border-amber-500/30', iconBg: 'bg-amber-500/15 text-amber-400' };
-    if (wf.status === 'error') return { label: 'Error', dotClass: 'bg-red-400', ringClass: '', badgeClass: 'bg-red-500/10 text-red-400 border-red-500/30', iconBg: 'bg-red-500/15 text-red-400' };
-    return { label: 'Active', dotClass: 'bg-emerald-400', ringClass: 'animate-ping', badgeClass: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30', iconBg: 'bg-emerald-500/15 text-emerald-400' };
+    if (!wf.enabled) return { label: 'Paused', dotClass: 'bg-[var(--status-paused)]', ringClass: '', badgeClass: 'bg-[var(--status-paused-bg)] text-[var(--status-paused)] border-[var(--status-paused-border)]', iconBg: 'bg-[var(--status-paused-bg)] text-[var(--status-paused)]' };
+    if (wf.status === 'error') return { label: 'Error', dotClass: 'bg-[var(--status-error)]', ringClass: '', badgeClass: 'bg-[var(--status-error-bg)] text-[var(--status-error)] border-[var(--status-error-border)]', iconBg: 'bg-[var(--status-error-bg)] text-[var(--status-error)]' };
+    return { label: 'Active', dotClass: 'bg-[var(--status-live)]', ringClass: 'animate-ping', badgeClass: 'bg-[var(--status-live-bg)] text-[var(--status-live)] border-[var(--status-live-border)]', iconBg: 'bg-[var(--status-live-bg)] text-[var(--status-live)]' };
   };
 
   // ─── List View ──
@@ -1109,8 +1109,8 @@ export function WorkflowsTab() {
               {framework}
             </span>
             <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
-              fwSupport.level === 'full' ? 'bg-emerald-500/10 text-emerald-400' :
-              fwSupport.level === 'partial' ? 'bg-amber-500/10 text-amber-400' :
+              fwSupport.level === 'full' ? 'bg-[var(--status-live-bg)] text-[var(--status-live)]' :
+              fwSupport.level === 'partial' ? 'bg-[var(--color-warning-bg)] text-[var(--color-warning)]' :
               'bg-zinc-500/10 text-zinc-400'
             }`}>
               {fwSupport.level === 'full' ? 'Full Support' : fwSupport.level === 'partial' ? 'Partial' : 'Planned'}
@@ -1122,8 +1122,8 @@ export function WorkflowsTab() {
 
       {/* Error */}
       {error && (
-        <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20">
-          <p className="text-xs text-red-400">{error}</p>
+        <div className="p-3 rounded-xl bg-[var(--color-destructive-bg)] border border-[var(--color-destructive-border)]">
+          <p className="text-xs text-[var(--color-destructive)]">{error}</p>
         </div>
       )}
 
@@ -1152,11 +1152,11 @@ export function WorkflowsTab() {
                   <GitMerge size={24} className="text-[var(--color-accent)]" />
                 </div>
                 {/* Floating nodes */}
-                <div className="absolute -top-2 -right-3 w-5 h-5 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center">
-                  <Zap size={10} className="text-emerald-400" />
+                <div className="absolute -top-2 -right-3 w-5 h-5 rounded-lg bg-[var(--status-live-bg)] border border-[var(--status-live-border)] flex items-center justify-center">
+                  <Zap size={10} className="text-[var(--status-live)]" />
                 </div>
-                <div className="absolute -bottom-2 -left-3 w-5 h-5 rounded-lg bg-purple-500/20 border border-purple-500/40 flex items-center justify-center">
-                  <Boxes size={10} className="text-purple-400" />
+                <div className="absolute -bottom-2 -left-3 w-5 h-5 rounded-lg bg-[var(--tech-accent-soft)] border border-[var(--border-hover)] flex items-center justify-center">
+                  <Boxes size={10} className="text-[var(--accent)]" />
                 </div>
               </div>
             </div>
@@ -1167,11 +1167,11 @@ export function WorkflowsTab() {
             Build visual automation pipelines that define how your agent responds to triggers, processes data, and executes actions.
           </p>
           <div className="flex items-center justify-center gap-4 text-[11px] text-[var(--text-muted)] mb-6">
-            <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> Triggers</span>
+            <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-[var(--status-live)]" /> Triggers</span>
             <ArrowRight size={10} className="text-[#3f3f46]" />
-            <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-yellow-400" /> Conditions</span>
+            <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-[var(--color-warning)]" /> Conditions</span>
             <ArrowRight size={10} className="text-[#3f3f46]" />
-            <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-blue-400" /> Actions</span>
+            <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-[var(--color-info)]" /> Actions</span>
           </div>
           <button
             onClick={() => setEditingWorkflow('new')}
@@ -1235,20 +1235,20 @@ export function WorkflowsTab() {
                       <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                         {/* Node breakdown mini badges */}
                         {triggerCount > 0 && (
-                          <span className="text-[10px] text-emerald-400/70 flex items-center gap-1">
-                            <span className="w-1 h-1 rounded-full bg-emerald-400" />
+                          <span className="text-[10px] text-[var(--status-live)] flex items-center gap-1">
+                            <span className="w-1 h-1 rounded-full bg-[var(--status-live)]" />
                             {triggerCount} trigger{triggerCount !== 1 ? 's' : ''}
                           </span>
                         )}
                         {conditionCount > 0 && (
-                          <span className="text-[10px] text-yellow-400/70 flex items-center gap-1">
-                            <span className="w-1 h-1 rounded-full bg-yellow-400" />
+                          <span className="text-[10px] text-[var(--color-warning)] flex items-center gap-1">
+                            <span className="w-1 h-1 rounded-full bg-[var(--color-warning)]" />
                             {conditionCount} condition{conditionCount !== 1 ? 's' : ''}
                           </span>
                         )}
                         {actionCount > 0 && (
-                          <span className="text-[10px] text-blue-400/70 flex items-center gap-1">
-                            <span className="w-1 h-1 rounded-full bg-blue-400" />
+                          <span className="text-[10px] text-[var(--color-info)] flex items-center gap-1">
+                            <span className="w-1 h-1 rounded-full bg-[var(--color-info)]" />
                             {actionCount} action{actionCount !== 1 ? 's' : ''}
                           </span>
                         )}
@@ -1280,7 +1280,7 @@ export function WorkflowsTab() {
                         {wf.status === 'error' && (
                           <>
                             <span className="text-[10px] text-[var(--text-muted)]">&middot;</span>
-                            <span className="text-[10px] text-red-400 flex items-center gap-1">
+                            <span className="text-[10px] text-[var(--color-destructive)] flex items-center gap-1">
                               <AlertTriangle size={9} />
                               Needs attention
                             </span>
@@ -1297,7 +1297,7 @@ export function WorkflowsTab() {
                       disabled={togglingId === wf.id}
                       className={`p-1.5 rounded-lg border transition-all ${
                         wf.enabled
-                          ? 'border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10'
+                          ? 'border-[var(--status-live-border)] text-[var(--status-live)] hover:bg-[var(--status-live-bg)]'
                           : 'border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--color-accent)]/40 hover:text-[var(--text-secondary)]'
                       } disabled:opacity-40`}
                       title={wf.enabled ? 'Disable' : 'Enable'}
@@ -1337,7 +1337,7 @@ export function WorkflowsTab() {
                     <button
                       onClick={() => handleDelete(wf.id)}
                       disabled={deletingId === wf.id}
-                      className="p-1.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-all disabled:opacity-40"
+                      className="p-1.5 rounded-lg border border-[var(--color-destructive-border)] text-[var(--color-destructive)] hover:bg-[var(--color-destructive-bg)] transition-all disabled:opacity-40"
                       title={t('delete')}
                     >
                       {deletingId === wf.id ? (

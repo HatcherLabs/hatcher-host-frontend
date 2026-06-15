@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
             transform: 'translate(-50%, -50%)',
             width: 500,
             height: 300,
-            background: 'radial-gradient(ellipse, rgba(57,255,136,0.18) 0%, transparent 70%)',
+            background: 'radial-gradient(ellipse, rgba(115,164,185,0.22) 0%, transparent 70%)',
             display: 'flex',
           }}
         />
@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', maxWidth: 900, zIndex: 1 }}>
           {/* Brand */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
-            <div style={{ fontSize: 28, fontWeight: 700, color: '#39FF88', letterSpacing: '-0.02em' }}>
+            <div style={{ fontSize: 28, fontWeight: 700, color: '#73a4b9', letterSpacing: '-0.02em' }}>
               🥚 hatcher.host
             </div>
           </div>
@@ -65,10 +65,10 @@ export async function GET(req: NextRequest) {
               style={{
                 display: 'flex',
                 padding: '6px 14px',
-                background: 'rgba(57,255,136,0.12)',
-                border: '1px solid rgba(57,255,136,0.35)',
+                background: 'rgba(115,164,185,0.12)',
+                border: '1px solid rgba(115,164,185,0.35)',
                 borderRadius: 20,
-                color: '#39FF88',
+                color: '#73a4b9',
                 fontSize: 14,
                 fontWeight: 600,
                 textTransform: 'uppercase',

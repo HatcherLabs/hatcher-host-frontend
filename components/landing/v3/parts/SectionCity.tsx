@@ -8,8 +8,8 @@ import { LiveCityCounter } from '../shared/LiveCityCounter';
 import styles from './SectionCity.module.css';
 
 /**
- * Hatcher City section. Uses a static capture of the current city scene rather
- * than autoplay video, so the landing page shows the real product surface.
+ * Hatcher City section. Uses an optimized concept visual for the premium
+ * Hatcher City direction while the live route remains available via /city.
  * LiveCityCounter pulls from /public/city at runtime, hidden if <10.
  */
 export function SectionCity() {
@@ -24,8 +24,8 @@ export function SectionCity() {
 
         <div className={styles.shot}>
           <Image
-            src="/landing-v3/hatcher-city-live-network.webp"
-            alt="Hatcher City live agent network with user building and active agents"
+            src="/landing-v3/hatcher-city-building-pods.webp"
+            alt="Hatcher City agent cloud campus with shell-shaped buildings and live network routes"
             fill
             sizes="(max-width: 768px) 100vw, 1280px"
             className={styles.image}

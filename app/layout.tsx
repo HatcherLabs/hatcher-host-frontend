@@ -11,6 +11,7 @@ import { LayoutShell } from '@/components/layout/LayoutShell';
 import { ToastProvider } from '@/components/ui/ToastProvider';
 import { CommandPalette } from '@/components/ui/CommandPalette';
 import { PosthogProvider } from '@/components/providers/PosthogProvider';
+import { GoogleAdsProvider } from '@/components/providers/GoogleAdsProvider';
 import { CookieConsent } from '@/components/ui/CookieConsent';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
@@ -46,16 +47,16 @@ export const viewport: Viewport = {
   maximumScale: 5,
   userScalable: true,
   viewportFit: 'cover',
-  themeColor: '#39FF88',
+  themeColor: '#10110f',
 };
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://hatcher.host';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: 'Hatcher — Hatch Your AI Agent in 60 Seconds', template: '%s | Hatcher' },
+  title: { default: 'Hatcher — AI Agent Infrastructure', template: '%s | Hatcher' },
   description:
-    'Deploy OpenClaw and Hermes AI agents instantly. Configure with no code, launch on Telegram, Discord, WhatsApp, and manage agents in 3D rooms.',
+    'Managed AI agent infrastructure for hosted OpenClaw and Hermes agents: models, wallets, tools, rooms, and runtime controls in one place.',
   keywords: [
     'AI agents',
     'agent hosting',
@@ -77,25 +78,24 @@ export const metadata: Metadata = {
     type: 'website',
     url: SITE_URL,
     siteName: 'Hatcher',
-    title: 'Hatcher — Hatch Your AI Agent in 60 Seconds',
+    title: 'Hatcher — AI Agent Infrastructure',
     description:
-      'Deploy OpenClaw and Hermes agents instantly. Configure with no code, launch on Telegram, Discord, WhatsApp, and manage agents in 3D rooms.',
-    // Homepage social preview = the hero robot-hatching-from-egg image directly,
+      'Managed AI agent infrastructure for hosted OpenClaw and Hermes agents: models, wallets, tools, rooms, and runtime controls in one place.',
+    // Homepage social preview = the restrained hatch-capsule hero image directly,
     // not the dynamic /og card. Static asset keeps the visual identical to the
-    // landing hero (phosphor green theme) and avoids drift when the OG renderer
-    // is updated. 1672x941 is 16:9 — within Twitter/X summary_large_image bounds.
+    // landing hero. 1672x941 is 16:9 — within Twitter/X summary_large_image bounds.
     // Sub-pages (blog, agent rooms, affiliate) still use the dynamic /og route.
-    images: [{ url: `${SITE_URL}/landing-v3/robot-hatch-hero.png`, width: 1672, height: 941, alt: 'Hatcher — Hatch Your AI Agent in 60 Seconds' }],
+    images: [{ url: `${SITE_URL}/landing-v3/hero-agent-infrastructure.png`, width: 1672, height: 941, alt: 'Hatcher — AI Agent Infrastructure' }],
     locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
     site: '@HatcherLabs',
     creator: '@HatcherLabs',
-    title: 'Hatcher — Hatch Your AI Agent in 60 Seconds',
+    title: 'Hatcher — AI Agent Infrastructure',
     description:
-      'Deploy OpenClaw and Hermes agents instantly. Configure with no code, launch on Telegram, Discord, WhatsApp, and manage agents in 3D rooms.',
-    images: [`${SITE_URL}/landing-v3/robot-hatch-hero.png`],
+      'Managed AI agent infrastructure for hosted OpenClaw and Hermes agents: models, wallets, tools, rooms, and runtime controls in one place.',
+    images: [`${SITE_URL}/landing-v3/hero-agent-infrastructure.png`],
   },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
   alternates: { canonical: SITE_URL },
@@ -253,82 +253,32 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <script
           type="application/ld+json"
           nonce={nonce}
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
         />
         <script
           type="application/ld+json"
           nonce={nonce}
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
         <script
           type="application/ld+json"
           nonce={nonce}
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationJsonLd) }}
         />
         <script
           type="application/ld+json"
           nonce={nonce}
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
         />
       </head>
       <body>
-        {/* Google Ads — respects Google Consent Mode v2. Defaults both ad_storage
-            and analytics_storage to 'denied' until the user accepts analytics in
-            the cookie banner, which dispatches hatcher:consent-changed. */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=AW-18098396723"
-          strategy="afterInteractive"
-          nonce={nonce}
-        />
-        <Script id="google-ads-init" strategy="afterInteractive" nonce={nonce}>
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            window.gtag = gtag;
-            gtag('consent', 'default', {
-              ad_storage: 'denied',
-              ad_user_data: 'denied',
-              ad_personalization: 'denied',
-              analytics_storage: 'denied',
-            });
-            gtag('js', new Date());
-            gtag('config', 'AW-18098396723');
-            try {
-              var raw = localStorage.getItem('hatcher-cookie-consent');
-              if (raw) {
-                var saved = JSON.parse(raw);
-                if (saved && saved.analytics) {
-                  gtag('consent', 'update', {
-                    ad_storage: 'granted',
-                    ad_user_data: 'granted',
-                    ad_personalization: 'granted',
-                    analytics_storage: 'granted',
-                  });
-                }
-              }
-            } catch (_) {}
-            window.addEventListener('hatcher:consent-changed', function (e) {
-              var detail = (e && e.detail) || {};
-              if (detail.analytics) {
-                gtag('consent', 'update', {
-                  ad_storage: 'granted',
-                  ad_user_data: 'granted',
-                  ad_personalization: 'granted',
-                  analytics_storage: 'granted',
-                });
-              } else {
-                gtag('consent', 'update', {
-                  ad_storage: 'denied',
-                  ad_user_data: 'denied',
-                  ad_personalization: 'denied',
-                  analytics_storage: 'denied',
-                });
-              }
-            });
-          `}
-        </Script>
         <Script src="/register-sw.js" strategy="afterInteractive" nonce={nonce} />
         <NextIntlClientProvider locale={locale} messages={messages}>
+          <GoogleAdsProvider nonce={nonce} />
           <PosthogProvider>
             <ThemeProvider nonce={nonce}>
               <AuthProvider>

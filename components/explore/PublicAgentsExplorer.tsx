@@ -63,7 +63,7 @@ export function PublicAgentsExplorer({ agents, locale, copy }: Props) {
   return (
     <div className="space-y-4 sm:space-y-5">
       {showFilters ? (
-        <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-2.5 sm:p-3">
+        <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)]/70 p-2.5 shadow-[var(--shadow-card)] sm:p-3">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <label className="relative block flex-1">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]" />
@@ -84,7 +84,7 @@ export function PublicAgentsExplorer({ agents, locale, copy }: Props) {
                     onClick={() => setFramework(item)}
                     className={`h-9 rounded-[6px] px-2.5 text-xs font-semibold transition-colors sm:px-3 ${
                       framework === item
-                        ? 'bg-[var(--color-accent)] text-white'
+                        ? 'bg-[var(--color-accent)] text-[var(--bg-base)]'
                         : 'text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]'
                     }`}
                   >
@@ -97,7 +97,7 @@ export function PublicAgentsExplorer({ agents, locale, copy }: Props) {
                 onClick={() => setLiveOnly((value) => !value)}
                 className={`inline-flex h-10 items-center gap-2 rounded-md border px-3 text-sm font-semibold transition-colors sm:h-11 ${
                   liveOnly
-                    ? 'border-emerald-400/45 bg-emerald-400/12 text-emerald-200'
+                    ? 'border-[rgba(36,124,109,0.42)] bg-[rgba(36,124,109,0.1)] text-[var(--accent)]'
                     : 'border-[var(--border-default)] bg-[var(--bg-base)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
@@ -114,7 +114,7 @@ export function PublicAgentsExplorer({ agents, locale, copy }: Props) {
       ) : null}
 
       {filteredAgents.length === 0 ? (
-        <div className="flex min-h-[260px] flex-col items-center justify-center rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] px-6 py-12 text-center">
+        <div className="flex min-h-[260px] flex-col items-center justify-center rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] px-6 py-12 text-center shadow-[var(--shadow-card)]">
           <Search className="h-8 w-8 text-[var(--text-muted)]" />
           <h2 className="mt-4 text-xl font-semibold text-[var(--text-primary)]">
             {copy.noResultsTitle}
@@ -155,7 +155,7 @@ function PublicAgentCard({
   return (
     <article
       data-public-agent-card
-      className="group flex min-h-[360px] flex-col overflow-hidden rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] transition-colors hover:border-[var(--color-accent)]/45"
+      className="group flex min-h-[350px] flex-col overflow-hidden rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)]/80 shadow-[var(--shadow-card)] transition-colors hover:border-[var(--color-accent)]/40"
       style={{ '--agent-accent': accent } as CSSProperties}
     >
       <AgentAvatar3D agent={agent} copy={copy} featured={featured} />
@@ -198,7 +198,7 @@ function PublicAgentCard({
           </div>
           <Link
             href={publicAgentHref(agent)}
-            className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-md bg-[var(--color-accent)] px-4 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-md bg-[var(--color-accent)] px-4 text-sm font-semibold text-[var(--bg-base)] transition-opacity hover:opacity-90"
           >
             <MessageSquare className="h-4 w-4" />
             {copy.chatCta}
@@ -228,16 +228,16 @@ function AgentAvatar3D({
   return (
     <div
       data-public-agent-avatar
-      className="relative h-44 overflow-hidden border-b border-[var(--border-default)] bg-[var(--bg-muted)]"
+      className="relative h-40 overflow-hidden border-b border-[var(--border-default)] bg-[var(--bg-muted)]"
       style={style}
       aria-label={copy.avatarLabel}
     >
-      <div className="absolute inset-0 bg-[linear-gradient(135deg,var(--agent-accent-soft),transparent_42%),radial-gradient(circle_at_70%_20%,rgba(255,255,255,0.13),transparent_28%)]" />
-      <div className="absolute inset-x-8 bottom-7 h-14 rounded-[50%] border border-white/10 bg-black/18 [transform:rotateX(62deg)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(135deg,var(--agent-accent-soft),transparent_48%),radial-gradient(circle_at_70%_20%,rgba(255,255,255,0.08),transparent_28%)]" />
+      <div className="absolute inset-x-8 bottom-7 h-14 rounded-[50%] border border-[rgba(20,24,22,0.12)] bg-[rgba(20,24,22,0.06)] [transform:rotateX(62deg)]" />
       <div className="absolute inset-x-10 bottom-12 h-px bg-[linear-gradient(90deg,transparent,var(--agent-accent),transparent)] opacity-75" />
 
       {featured ? (
-        <div className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-md border border-white/15 bg-black/24 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-white backdrop-blur">
+        <div className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-md border border-[rgba(20,24,22,0.12)] bg-[rgba(255,253,248,0.78)] px-2 py-1 text-[11px] font-semibold text-[var(--text-primary)] backdrop-blur">
           <Sparkles className="h-3 w-3 text-[var(--agent-accent)]" />
           {copy.featured}
         </div>
@@ -252,7 +252,7 @@ function AgentAvatar3D({
       ) : null}
 
       <div className="absolute inset-0 flex items-center justify-center [perspective:560px]">
-        <div className="relative h-28 w-24 transition-transform duration-300 [transform-style:preserve-3d] [transform:rotateX(8deg)_rotateY(-18deg)] group-hover:[transform:rotateX(4deg)_rotateY(-28deg)_translateY(-4px)]">
+        <div className="relative h-28 w-24 transition-transform duration-300 [transform-style:preserve-3d] [transform:rotateX(8deg)_rotateY(-18deg)] group-hover:[transform:rotateX(6deg)_rotateY(-22deg)]">
           <div className="absolute left-1/2 top-2 h-7 w-7 -translate-x-1/2 rounded-[6px] border border-white/20 bg-slate-950 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
             <div className="absolute left-1/2 top-1.5 h-1.5 w-8 -translate-x-1/2 rounded-full bg-[var(--agent-accent)] shadow-[0_0_18px_var(--agent-accent)]" />
             <div className="absolute left-1/2 top-[-10px] h-3 w-px -translate-x-1/2 bg-slate-300/70" />
@@ -281,13 +281,13 @@ function StatusPill({ agent, copy }: { agent: PublicExploreAgent; copy: ExploreC
     <span
       className={`inline-flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 text-xs font-semibold ${
         live
-          ? 'bg-emerald-400/12 text-emerald-300'
+          ? 'bg-[rgba(36,124,109,0.1)] text-[var(--accent)]'
           : 'bg-[var(--bg-muted)] text-[var(--text-muted)]'
       }`}
     >
       <span
         className={`h-1.5 w-1.5 rounded-full ${
-          live ? 'bg-emerald-300' : 'bg-[var(--text-muted)]'
+          live ? 'bg-[var(--accent)]' : 'bg-[var(--text-muted)]'
         }`}
       />
       {label}

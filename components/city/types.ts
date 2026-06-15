@@ -133,15 +133,15 @@ export const CATEGORY_LABELS: Record<Category, string> = {
   voice: 'Voice',
 };
 
-// Canonical brand palette: openclaw=amber-yellow, hermes=violet.
+// Canonical city palette: openclaw=warm operations gold, hermes=technical cyan.
 export const FRAMEWORK_COLORS: Record<Framework, number> = {
-  openclaw: 0xffc21f,
-  hermes: 0xa64dff,
+  openclaw: 0xd6b177,
+  hermes: 0x8be0ff,
 };
 
 export const FRAMEWORK_EMISSIVE: Record<Framework, number> = {
-  openclaw: 0xffd95c,
-  hermes: 0xc88bff,
+  openclaw: 0xffd89a,
+  hermes: 0x9fe7ff,
 };
 
 // Building heights by tier index (0..4).

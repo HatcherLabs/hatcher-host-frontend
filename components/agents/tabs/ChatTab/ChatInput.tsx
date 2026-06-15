@@ -232,7 +232,7 @@ export function ChatInput({
             </span>
           )}
           {attachmentError && (
-            <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-red-500/10 border border-red-500/25 text-[11px] text-red-400 max-w-full">
+            <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-[var(--color-destructive-bg)] border border-[var(--color-destructive-border)] text-[11px] text-[var(--color-destructive)] max-w-full">
               {attachmentError}
             </span>
           )}
@@ -423,7 +423,7 @@ export function ChatInput({
             disabled={inputDisabled}
           >
             {isListening ? (
-              <MicOff size={15} className="text-red-400" />
+              <MicOff size={15} className="text-[var(--color-destructive)]" />
             ) : (
               <Mic size={15} className="text-[var(--text-secondary)]" />
             )}

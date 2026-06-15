@@ -38,7 +38,6 @@ import {
   type IntegrationDef,
 } from '../AgentContext';
 import { api } from '@/lib/api';
-import type { XonaConfigStatus } from '@/lib/api';
 import { API_URL } from '@/lib/config';
 import { DomainsSection } from './DomainsSection';
 
@@ -152,11 +151,11 @@ const QUICK_SETUP_KEYS = new Set([
 const COMPAT_BADGE: Record<CompatLevel, { label: string; className: string }> = {
   native: {
     label: 'Native',
-    className: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+    className: 'bg-[var(--status-live-bg)] text-[var(--status-live)] border-[var(--status-live-border)]',
   },
   community: {
     label: 'Community',
-    className: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+    className: 'bg-[var(--color-info-bg)] text-[var(--color-info)] border-[var(--color-info-border)]',
   },
   planned: {
     label: 'Planned',
@@ -346,7 +345,7 @@ function IntegrationFieldsForm({
           {isSaving ? t('saving') : t('saveCredentials')}
         </button>
         {msg && (
-          <span className={`text-xs ${msg.startsWith('Error') || msg.startsWith('Missing') ? 'text-red-400' : 'text-emerald-400'}`}>
+          <span className={`text-xs ${msg.startsWith('Error') || msg.startsWith('Missing') ? 'text-[var(--color-destructive)]' : 'text-[var(--color-success)]'}`}>
             {msg}
           </span>
         )}
@@ -659,7 +658,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
               value={allowFromValue}
               onChange={(e) => setIntegrationField(sk, allowFromKey, e.target.value)}
               placeholder="+1234567890, +0987654321"
-              className="flex-1 h-9 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-cyan-500/50 focus:outline-none placeholder:text-[var(--text-muted)] transition-colors"
+              className="flex-1 h-9 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-[var(--accent)] focus:outline-none placeholder:text-[var(--text-muted)] transition-colors"
             />
           </div>
         )}
@@ -681,17 +680,17 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
             : t('pairing.setBeforePairing')}
         </p>
         {integrationSaveMsg[sk] && (
-          <p className={`text-[10px] mt-1 ${integrationSaveMsg[sk]?.startsWith('Error') ? 'text-red-400' : 'text-emerald-400'}`}>
+          <p className={`text-[10px] mt-1 ${integrationSaveMsg[sk]?.startsWith('Error') ? 'text-[var(--color-destructive)]' : 'text-[var(--color-success)]'}`}>
             {integrationSaveMsg[sk]}
           </p>
         )}
       </div>
 
       {(connected || isPaired) && (
-        <div className={`flex items-center gap-3 p-3 rounded-lg border ${connected ? 'border-emerald-500/20 bg-emerald-500/5' : 'border-amber-500/20 bg-amber-500/5'}`}>
-          {connected ? <CheckCircle size={16} className="text-emerald-400 flex-shrink-0" /> : <AlertTriangle size={16} className="text-amber-400 flex-shrink-0" />}
+        <div className={`flex items-center gap-3 p-3 rounded-lg border ${connected ? 'border-[var(--color-success-border)] bg-[var(--color-success-bg)]' : 'border-[var(--color-warning-border)] bg-[var(--color-warning-bg)]'}`}>
+          {connected ? <CheckCircle size={16} className="text-[var(--color-success)] flex-shrink-0" /> : <AlertTriangle size={16} className="text-[var(--color-warning)] flex-shrink-0" />}
           <div className="flex-1">
-            <p className={`text-sm font-medium ${connected ? 'text-emerald-400' : 'text-amber-400'}`}>
+            <p className={`text-sm font-medium ${connected ? 'text-[var(--color-success)]' : 'text-[var(--color-warning)]'}`}>
               {connected ? t('pairing.connected', { name: integration.name }) : t('pairing.disconnected', { name: integration.name })}
             </p>
             <p className="text-xs text-[var(--text-secondary)] mt-0.5">
@@ -716,7 +715,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
                 setQrCode(null);
                 qrCodeRef.current = null;
               }}
-              className="text-xs px-2 py-1 rounded border border-red-500/20 text-red-400 hover:bg-red-500/10 transition-colors"
+              className="text-xs px-2 py-1 rounded border border-[var(--color-destructive-border)] text-[var(--color-destructive)] hover:bg-[var(--color-destructive-bg)] transition-colors"
             >
               {t('pairing.disconnect')}
             </button>
@@ -725,8 +724,8 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
       )}
 
       {!isRunning && !connected && (
-        <div className="flex items-start gap-2.5 p-3 rounded-lg border border-amber-500/20 bg-amber-500/5">
-          <AlertTriangle size={14} className="text-amber-400 mt-0.5 flex-shrink-0" />
+        <div className="flex items-start gap-2.5 p-3 rounded-lg border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)]">
+          <AlertTriangle size={14} className="text-[var(--color-warning)] mt-0.5 flex-shrink-0" />
           <p className="text-xs leading-relaxed text-[var(--text-secondary)]">
             {t('pairing.agentMustRun', { name: integration.name })}
           </p>
@@ -885,7 +884,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
                 <div className="min-h-[360px] border-b border-white/10 lg:border-b-0 lg:border-r">
                   <pre
                     ref={terminalOutputRef}
-                    className="h-[52vh] min-h-[360px] overflow-auto whitespace-pre bg-black p-4 font-mono text-xs leading-relaxed text-emerald-100"
+                    className="h-[52vh] min-h-[360px] overflow-auto whitespace-pre bg-[var(--bg-base)] p-4 font-mono text-xs leading-relaxed text-[var(--text-secondary)]"
                   >
                     {terminalOutput || `Starting ${pairingFrameworkLabel} WhatsApp pairing...`}
                   </pre>
@@ -899,7 +898,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
                     <input
                       value={terminalInput}
                       onChange={(event) => setTerminalInput(event.target.value)}
-                      className="min-w-0 flex-1 rounded-lg border border-white/10 bg-black px-3 py-2 text-sm text-[var(--text-primary)] outline-none placeholder:text-[var(--text-muted)] focus:border-cyan-500/50"
+                      className="min-w-0 flex-1 rounded-lg border border-[var(--border-default)] bg-[var(--bg-base)] px-3 py-2 text-sm text-[var(--text-primary)] outline-none placeholder:text-[var(--text-muted)] focus:border-[var(--accent)]"
                       placeholder="Input"
                     />
                     <button
@@ -978,110 +977,12 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
       )}
 
       {error && (
-        <div className="flex items-start gap-2 p-3 rounded-lg border border-red-500/20 bg-red-500/5">
-          <AlertTriangle size={14} className="text-red-400 mt-0.5 flex-shrink-0" />
-          <p className="text-xs text-red-300">{error}</p>
+        <div className="flex items-start gap-2 p-3 rounded-lg border border-[var(--color-destructive-border)] bg-[var(--color-destructive-bg)]">
+          <AlertTriangle size={14} className="text-[var(--color-destructive)] mt-0.5 flex-shrink-0" />
+          <p className="text-xs text-[var(--color-destructive)]">{error}</p>
         </div>
       )}
     </div>
-  );
-}
-
-function XonaPartnerResourcesPanel({ agentId }: { agentId: string }) {
-  const [config, setConfig] = useState<XonaConfigStatus | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    api.getAgentXonaConfig(agentId)
-      .then((res) => {
-        if (cancelled) return;
-        if (res.success) {
-          setConfig(res.data);
-          setError(null);
-        } else {
-          setError(res.error ?? 'Xona status unavailable');
-        }
-      })
-      .catch((e) => {
-        if (!cancelled) setError(e instanceof Error ? e.message : 'Xona status unavailable');
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [agentId]);
-
-  const tools = config?.tools ?? [];
-
-  return (
-    <GlassCard className="p-4 border-emerald-500/20 bg-emerald-500/[0.03]">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-300">
-              <Zap size={12} /> Xona
-            </span>
-            <span className="text-xs text-[var(--text-muted)]">xPay partner resources</span>
-          </div>
-          <h3 className="mt-2 text-sm font-semibold text-[var(--text-primary)]">
-            Creative and crypto intelligence tools for this agent
-          </h3>
-          <p className="mt-1 max-w-3xl text-xs leading-relaxed text-[var(--text-secondary)]">
-            Agents call Xona through Hatcher's proxy. xPay payments are signed server-side, then Hatcher
-            deducts AI Credits only after a successful resource response.
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2 text-[11px]">
-          <span className={`rounded-full border px-2 py-1 ${
-            config?.configured
-              ? 'border-emerald-500/25 bg-emerald-500/10 text-emerald-300'
-              : 'border-amber-500/25 bg-amber-500/10 text-amber-300'
-          }`}>
-            {loading ? 'Checking' : config?.configured ? 'Payer ready' : 'Payer not configured'}
-          </span>
-          {config?.keySource && config.keySource !== 'none' && (
-            <span className="rounded-full border border-[var(--border-default)] bg-[var(--bg-card)] px-2 py-1 text-[var(--text-muted)]">
-              {config.keySource === 'conduit' ? 'Treasury fallback' : 'Xona payer'}
-            </span>
-          )}
-        </div>
-      </div>
-
-      {error && (
-        <div className="mt-4 rounded-lg border border-red-500/20 bg-red-500/5 px-3 py-2 text-xs text-red-300">
-          {error}
-        </div>
-      )}
-
-      <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
-        {loading
-          ? [1, 2, 3].map((i) => <Skeleton key={i} className="h-24 w-full" />)
-          : tools.map((tool) => (
-            <div key={tool.id} className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-3">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="truncate text-sm font-semibold text-[var(--text-primary)]">{tool.label}</div>
-                  <div className="mt-1 line-clamp-2 text-xs leading-relaxed text-[var(--text-muted)]">
-                    {tool.description}
-                  </div>
-                </div>
-                <span className="shrink-0 rounded border border-[var(--border-default)] px-1.5 py-0.5 text-[10px] text-[var(--text-muted)]">
-                  {tool.method}
-                </span>
-              </div>
-              <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px] text-[var(--text-muted)]">
-                <span>${tool.estimatedCostUsd.toFixed(2)}</span>
-                <span>{tool.estimatedAiCredits} AI Credits est.</span>
-              </div>
-            </div>
-          ))}
-      </div>
-    </GlassCard>
   );
 }
 
@@ -1117,7 +1018,7 @@ function WebhookSection() {
     <div>
       <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[var(--text-muted)]">
         {t('webhook.label')}
-        <span className="ml-2 text-violet-400 normal-case tracking-normal font-normal">{t('webhook.inboundHttp')}</span>
+        <span className="ml-2 text-[var(--accent)] normal-case tracking-normal font-normal">{t('webhook.inboundHttp')}</span>
       </h3>
       <GlassCard className="!p-0">
         <button
@@ -1125,13 +1026,13 @@ function WebhookSection() {
           onClick={() => setExpanded(!expanded)}
           className="w-full flex items-center gap-3 p-4 text-left hover:bg-[var(--bg-card)] transition-colors cursor-pointer"
         >
-          <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center bg-violet-500/10 border border-violet-500/20">
-            <Webhook size={14} className="text-violet-400" />
+          <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--tech-accent-soft)] border border-[var(--border-hover)]">
+            <Webhook size={14} className="text-[var(--accent)]" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-[var(--text-primary)]">{t('webhook.webhookUrl')}</span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--status-live-bg)] text-[var(--status-live)] border border-[var(--status-live-border)]">
                 {t('webhook.alwaysActive')}
               </span>
             </div>
@@ -1162,7 +1063,7 @@ function WebhookSection() {
                   className="h-9 w-9 flex items-center justify-center rounded-lg border border-[var(--border-default)] hover:bg-[var(--bg-hover)] transition-colors"
                   title={t('webhook.copyUrl')}
                 >
-                  {copiedUrl ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} className="text-[var(--text-muted)]" />}
+                  {copiedUrl ? <Check size={14} className="text-[var(--color-success)]" /> : <Copy size={14} className="text-[var(--text-muted)]" />}
                 </button>
               </div>
             </div>
@@ -1190,7 +1091,7 @@ function WebhookSection() {
             {/* Note */}
             <p className="text-[10px] leading-relaxed text-[var(--text-muted)]">
               Use this URL to trigger your agent from external services (Zapier, GitHub, n8n, etc.).
-              Send a POST request with a JSON body containing a <code className="text-violet-400">message</code> field.
+              Send a POST request with a JSON body containing a <code className="text-[var(--accent)]">message</code> field.
               The agent will auto-wake from sleep if needed.
             </p>
           </div>
@@ -1349,7 +1250,7 @@ function OutboundWebhookSection() {
     <div>
       <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[var(--text-muted)]">
         Outbound Webhooks
-        <span className="ml-2 text-cyan-400 normal-case tracking-normal font-normal">agent events to your app</span>
+        <span className="ml-2 text-[var(--color-info)] normal-case tracking-normal font-normal">agent events to your app</span>
       </h3>
       <GlassCard className="!p-0">
         <button
@@ -1357,15 +1258,15 @@ function OutboundWebhookSection() {
           onClick={() => setExpanded(!expanded)}
           className="w-full flex items-center gap-3 p-4 text-left hover:bg-[var(--bg-card)] transition-colors cursor-pointer"
         >
-          <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center bg-cyan-500/10 border border-cyan-500/20">
-            <Send size={14} className="text-cyan-400" />
+          <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--color-info-bg)] border border-[var(--color-info-border)]">
+            <Send size={14} className="text-[var(--color-info)]" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-[var(--text-primary)]">Event delivery</span>
               <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${
                 enabled && url
-                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                  ? 'bg-[var(--status-live-bg)] text-[var(--status-live)] border-[var(--status-live-border)]'
                   : 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20'
               }`}>
                 {enabled && url ? 'Enabled' : 'Disabled'}
@@ -1373,10 +1274,10 @@ function OutboundWebhookSection() {
               {latestDelivery && (
                 <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${
                   latestDelivery.status === 'success'
-                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                    ? 'bg-[var(--color-success-bg)] text-[var(--color-success)] border-[var(--color-success-border)]'
                     : latestDelivery.status === 'failed'
-                      ? 'bg-red-500/10 text-red-400 border-red-500/20'
-                      : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                      ? 'bg-[var(--color-destructive-bg)] text-[var(--color-destructive)] border-[var(--color-destructive-border)]'
+                      : 'bg-[var(--color-warning-bg)] text-[var(--color-warning)] border-[var(--color-warning-border)]'
                 }`}>
                   Last {latestDelivery.status}
                 </span>
@@ -1407,7 +1308,7 @@ function OutboundWebhookSection() {
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
                     placeholder="https://api.example.com/hatcher/events"
-                    className="w-full h-9 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-cyan-500/50 focus:outline-none placeholder:text-[var(--text-muted)] font-mono"
+                    className="w-full h-9 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-[var(--accent)] focus:outline-none placeholder:text-[var(--text-muted)] font-mono"
                   />
                 </div>
 
@@ -1419,7 +1320,7 @@ function OutboundWebhookSection() {
                   <button
                     type="button"
                     onClick={() => setEnabled((v) => !v)}
-                    className={`relative h-6 w-11 rounded-full transition-colors ${enabled ? 'bg-cyan-500' : 'bg-zinc-700'}`}
+                    className={`relative h-6 w-11 rounded-full transition-colors ${enabled ? 'bg-[var(--accent)]' : 'bg-zinc-700'}`}
                     aria-label={enabled ? 'Disable outbound webhook' : 'Enable outbound webhook'}
                   >
                     <span className={`absolute top-1 h-4 w-4 rounded-full bg-white transition-transform ${enabled ? 'translate-x-6' : 'translate-x-1'}`} />
@@ -1436,7 +1337,7 @@ function OutboundWebhookSection() {
                         onClick={() => toggleEvent(event)}
                         className={`px-2.5 py-1.5 rounded-lg border text-xs transition-colors ${
                           events.includes(event)
-                            ? 'border-cyan-500/40 bg-cyan-500/10 text-cyan-300'
+                            ? 'border-[var(--color-info-border)] bg-[var(--color-info-bg)] text-[var(--color-info)]'
                             : 'border-[var(--border-default)] text-[var(--text-muted)] hover:text-white'
                         }`}
                       >
@@ -1477,14 +1378,14 @@ function OutboundWebhookSection() {
                   </div>
                 )}
 
-                {statusMsg && <p className="text-xs text-emerald-400">{statusMsg}</p>}
-                {error && <p className="text-xs text-red-400">{error}</p>}
+                {statusMsg && <p className="text-xs text-[var(--color-success)]">{statusMsg}</p>}
+                {error && <p className="text-xs text-[var(--color-destructive)]">{error}</p>}
 
                 <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[var(--border-default)]">
                   <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium text-white bg-cyan-600 hover:bg-cyan-500 transition-colors disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium text-[var(--bg-base)] bg-[var(--accent)] hover:bg-[var(--accent-hover)] transition-colors disabled:opacity-50"
                   >
                     {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
                     Save
@@ -1492,7 +1393,7 @@ function OutboundWebhookSection() {
                   <button
                     onClick={handleTest}
                     disabled={testing || !url.trim()}
-                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-cyan-500/40 hover:text-cyan-300 transition-colors disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:text-[var(--accent)] transition-colors disabled:opacity-50"
                   >
                     {testing ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
                     Test
@@ -1508,7 +1409,7 @@ function OutboundWebhookSection() {
                   <button
                     onClick={handleClear}
                     disabled={clearing || (!url && !secret)}
-                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs border border-red-500/25 text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs border border-[var(--color-destructive-border)] text-[var(--color-destructive)] hover:bg-[var(--color-destructive-bg)] transition-colors disabled:opacity-50"
                   >
                     {clearing ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
                     Clear
@@ -1529,7 +1430,7 @@ function OutboundWebhookSection() {
                           <div className="flex items-center justify-between gap-2">
                             <div className="flex items-center gap-2 min-w-0">
                               <span className={`h-1.5 w-1.5 rounded-full ${
-                                delivery.status === 'success' ? 'bg-emerald-400' : delivery.status === 'failed' ? 'bg-red-400' : 'bg-amber-400'
+                                delivery.status === 'success' ? 'bg-[var(--color-success)]' : delivery.status === 'failed' ? 'bg-[var(--color-destructive)]' : 'bg-[var(--color-warning)]'
                               }`} />
                               <span className="text-xs text-[var(--text-secondary)]">{delivery.event}</span>
                               <span className="text-[10px] text-[var(--text-muted)] truncate">
@@ -1541,7 +1442,7 @@ function OutboundWebhookSection() {
                             </span>
                           </div>
                           {delivery.errorMessage && (
-                            <p className="text-[10px] text-red-300 mt-1 truncate">{delivery.errorMessage}</p>
+                            <p className="text-[10px] text-[var(--color-destructive)] mt-1 truncate">{delivery.errorMessage}</p>
                           )}
                         </div>
                       ))}
@@ -1588,7 +1489,7 @@ function IntegrationCard({
 
   // Visual hierarchy: configured > recommended > default > planned
   const cardBorder = isConfigured
-    ? 'border-emerald-500/30 shadow-[0_0_15px_-3px_rgba(16,185,129,0.15)]'
+    ? 'border-[var(--color-success-border)]'
     : recommended
       ? 'border-[var(--border-hover)] hover:border-[var(--border-hover)]'
       : isPlanned
@@ -1596,7 +1497,7 @@ function IntegrationCard({
         : '';
 
   const cardBg = isConfigured
-    ? 'bg-emerald-500/[0.03]'
+    ? 'bg-[var(--color-success-bg)]'
     : '';
 
   return (
@@ -1610,13 +1511,13 @@ function IntegrationCard({
         {/* Icon */}
         <div className={`flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
           isConfigured
-            ? 'bg-emerald-500/15 border border-emerald-500/25'
+            ? 'bg-[var(--color-success-bg)] border border-[var(--color-success-border)]'
             : recommended
               ? 'bg-[var(--bg-card)] border border-[var(--border-hover)]'
               : 'bg-[var(--bg-card)] border border-[var(--border-default)]'
         }`}>
           {isConfigured ? (
-            <CheckCircle size={15} className="text-emerald-400" />
+            <CheckCircle size={15} className="text-[var(--color-success)]" />
           ) : isPairing ? (
             <Smartphone size={15} className={recommended ? 'text-[var(--text-primary)]/70' : 'text-[var(--text-muted)]'} />
           ) : isPlanned ? (
@@ -1635,8 +1536,8 @@ function IntegrationCard({
 
             {/* Recommended badge */}
             {recommended && !isConfigured && (
-              <span className="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                <Star size={8} className="fill-amber-400" />
+              <span className="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--color-warning-bg)] text-[var(--color-warning)] border border-[var(--color-warning-border)]">
+                <Star size={8} className="fill-[var(--color-warning)]" />
                 {t('badges.recommended')}
               </span>
             )}
@@ -1648,7 +1549,7 @@ function IntegrationCard({
 
             {/* Quick Setup badge */}
             {quickSetup && !isConfigured && !isPlanned && (
-              <span className="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+              <span className="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--color-info-bg)] text-[var(--color-info)] border border-[var(--color-info-border)]">
                 <Zap size={8} />
                 {t('badges.quickSetup')}
               </span>
@@ -1656,19 +1557,19 @@ function IntegrationCard({
 
             {/* Pairing badge */}
             {isPairing && !isPlanned && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20">
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--tech-accent-soft)] text-[var(--accent)] border border-[var(--border-hover)]">
                 {t('badges.qrPairing')}
               </span>
             )}
 
             {/* Free badge */}
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--color-success-bg)] text-[var(--color-success)] border border-[var(--color-success-border)]">
               {t('badges.free')}
             </span>
 
             {/* Configured badge */}
             {isConfigured && (
-              <span className="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+              <span className="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--color-success-bg)] text-[var(--color-success)] border border-[var(--color-success-border)]">
                 <Shield size={8} />
                 {t('badges.connected')}
               </span>
@@ -1747,7 +1648,7 @@ export function IntegrationsTab() {
               </span>
               <div className="w-16 h-1.5 rounded-full bg-[var(--bg-card)] overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-emerald-500/60 transition-all duration-500"
+                  className="h-full rounded-full bg-[var(--color-success)]/60 transition-all duration-500"
                   style={{ width: totalCount > 0 ? `${(configuredCount / totalCount) * 100}%` : '0%' }}
                 />
               </div>
@@ -1756,8 +1657,8 @@ export function IntegrationsTab() {
 
           {/* Security note shown when any features are unlocked */}
           {activeFeatures.length > 0 && (
-            <div className="flex items-start gap-2.5 p-3 rounded-lg border border-amber-500/20 bg-amber-500/5">
-              <AlertTriangle size={14} className="text-amber-400 mt-0.5 flex-shrink-0" />
+            <div className="flex items-start gap-2.5 p-3 rounded-lg border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)]">
+              <AlertTriangle size={14} className="text-[var(--color-warning)] mt-0.5 flex-shrink-0" />
               <p className="text-xs leading-relaxed text-[var(--text-secondary)]">
                 {t('encryptedNote')}
               </p>
@@ -1767,13 +1668,12 @@ export function IntegrationsTab() {
           {/* Webhook section — always shown at top */}
           <WebhookSection />
           <OutboundWebhookSection />
-          <XonaPartnerResourcesPanel agentId={agent.id} />
 
           {/* Main integrations — all free on every tier */}
           <div>
             <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[var(--text-muted)]">
               {t('mainIntegrations')}
-              <span className="ml-2 text-emerald-400 normal-case tracking-normal font-normal">{t('mainIntegrationsFree')}</span>
+              <span className="ml-2 text-[var(--color-success)] normal-case tracking-normal font-normal">{t('mainIntegrationsFree')}</span>
             </h3>
             <div className="space-y-3">
               {mainIntegrations.map((integration) => (
@@ -1791,12 +1691,12 @@ export function IntegrationsTab() {
           {extraIntegrations.length > 0 && <div>
             <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[var(--text-muted)]">
               {t('otherPlatforms')}
-              <span className="ml-2 text-blue-400 normal-case tracking-normal font-normal">{t('communityExtensions')}</span>
+              <span className="ml-2 text-[var(--color-info)] normal-case tracking-normal font-normal">{t('communityExtensions')}</span>
             </h3>
             <div className="space-y-3">
               <div className="flex items-center gap-2 mb-1">
-                <CheckCircle size={14} className="text-emerald-400" />
-                <span className="text-xs text-emerald-400/80">{t('allPlatformsFree')}</span>
+                <CheckCircle size={14} className="text-[var(--color-success)]" />
+                <span className="text-xs text-[var(--color-success)]">{t('allPlatformsFree')}</span>
               </div>
               {extraIntegrations.map((integration) => (
                 <IntegrationCard
@@ -1817,7 +1717,7 @@ export function IntegrationsTab() {
             {(['native', 'community', 'planned'] as CompatLevel[]).map((level) => (
               <span key={level} className="flex items-center gap-1.5 text-[10px] text-[var(--text-muted)]">
                 <span className={`inline-block w-1.5 h-1.5 rounded-full ${
-                  level === 'native' ? 'bg-emerald-400' : level === 'community' ? 'bg-blue-400' : 'bg-zinc-500'
+                  level === 'native' ? 'bg-[var(--status-live)]' : level === 'community' ? 'bg-[var(--color-info)]' : 'bg-zinc-500'
                 }`} />
                 {level === 'native' ? t('legend.native') : level === 'community' ? t('legend.community') : t('legend.planned')}
               </span>

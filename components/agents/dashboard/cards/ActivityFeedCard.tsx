@@ -47,14 +47,14 @@ const ACTIVITY_ICON: Record<ActivityEventType, React.ComponentType<any>> = {
 };
 
 const ACTIVITY_COLOR: Record<ActivityEventType, string> = {
-  started: 'text-emerald-400 bg-emerald-500/15',
-  stopped: 'text-amber-400 bg-amber-500/15',
-  restarted: 'text-blue-400 bg-blue-500/15',
+  started: 'text-[var(--status-live)] bg-[var(--status-live-bg)]',
+  stopped: 'text-[var(--status-paused)] bg-[var(--status-paused-bg)]',
+  restarted: 'text-[var(--status-deploying)] bg-[var(--status-deploying-bg)]',
   config_updated: 'text-[var(--color-accent)] bg-[var(--color-accent)]/15',
-  error: 'text-red-400 bg-red-500/15',
-  message_burst: 'text-purple-400 bg-purple-500/15',
+  error: 'text-[var(--status-error)] bg-[var(--status-error-bg)]',
+  message_burst: 'text-[var(--accent)] bg-[var(--tech-accent-soft)]',
   version_deployed: 'text-[var(--color-accent)] bg-[var(--color-accent)]/15',
-  created: 'text-emerald-400 bg-emerald-500/15',
+  created: 'text-[var(--status-live)] bg-[var(--status-live-bg)]',
 };
 
 function relativeTime(dateStr: string): string {

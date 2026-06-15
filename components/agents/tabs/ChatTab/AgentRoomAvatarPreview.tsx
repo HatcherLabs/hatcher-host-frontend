@@ -18,17 +18,7 @@ interface AgentRoomAvatarPreviewProps {
 }
 
 function roomPaletteFor(framework: string): FrameworkPalette {
-  const base = paletteFor(framework);
-  if (framework !== 'openclaw') return base;
-  return {
-    ...base,
-    primary: 0x39ff88,
-    dim: 0x16a34a,
-    bright: 0xb9ffd4,
-    primaryHex: '#39ff88',
-    dimHex: '#16a34a',
-    brightHex: '#b9ffd4',
-  };
+  return paletteFor(framework);
 }
 
 function CameraTarget() {

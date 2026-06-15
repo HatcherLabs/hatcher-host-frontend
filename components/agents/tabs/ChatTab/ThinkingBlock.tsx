@@ -191,11 +191,11 @@ export const ToolCallChip = memo(function ToolCallChip({
   args?: string;
 }) {
   return (
-    <div className="inline-flex items-center gap-1.5 text-[11px] px-2 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 my-1.5">
+    <div className="inline-flex items-center gap-1.5 text-[11px] px-2 py-1 rounded-lg bg-[var(--color-warning-bg)] border border-[var(--color-warning-border)] text-[var(--color-warning)] my-1.5">
       <Wrench size={11} />
       <span className="font-mono font-semibold">{name}</span>
       {args && (
-        <span className="text-amber-400/70 font-mono max-w-[200px] truncate">({args})</span>
+        <span className="text-[var(--color-warning)] font-mono max-w-[200px] truncate">({args})</span>
       )}
     </div>
   );

@@ -139,7 +139,7 @@ function StatusBadge({ status }: { status: string }) {
 // ── Framework tag ────────────────────────────────────────────
 const FRAMEWORK_META: Record<string, { label: string; color: string; style: string }> = {
   openclaw: { label: 'OpenClaw', color: '#f59e0b', style: 'bg-amber-500/10 text-amber-400 border-amber-500/25' },
-  hermes: { label: 'Hermes', color: '#a855f7', style: 'bg-purple-500/10 text-purple-400 border-purple-500/25' },
+  hermes: { label: 'Hermes', color: '#73a4b9', style: 'bg-[#73A4B9]/10 text-[#73A4B9] border-[#73A4B9]/25' },
 };
 
 function FrameworkTag({ framework = 'openclaw' }: { framework?: string }) {
@@ -1724,10 +1724,10 @@ export default function AdminPage() {
           <div>
             <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Internal</p>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-              Admin panel
+              Admin console
             </h1>
             <p className="text-sm mt-2 text-[var(--text-secondary)]">
-              Platform management and controls.
+              Operations, billing, agents, health, and audit controls.
             </p>
           </div>
 
@@ -1739,6 +1739,42 @@ export default function AdminPage() {
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
             Refresh
           </button>
+        </motion.div>
+
+        <motion.div className="card glass-noise min-w-0 p-2 sm:p-3" variants={cardVariants}>
+          <div
+            className="grid grid-cols-2 gap-1 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-7"
+            aria-label="Admin sections"
+          >
+            {(['overview', 'agents', 'users', 'tickets', 'purchases', 'health', 'analytics', 'egress', 'idle', 'conduit', 'oobe', 'audit', 'affiliate'] as const).map((tab) => {
+              const tabIcons: Record<string, LucideIcon> = { overview: BarChart3, agents: Bot, users: Users, tickets: Ticket, purchases: DollarSign, health: HeartPulse, analytics: TrendingUp, egress: Network, idle: Radio, conduit: Router, oobe: Network, audit: ScrollText, affiliate: UserPlus };
+              const TabIcon = tabIcons[tab] ?? BarChart3;
+              const tabLabels: Record<string, string> = { overview: 'Overview', agents: `Agents (${agentsPagination.total || agents.length})`, users: `Users (${users.length})`, tickets: `Tickets${tickets.length ? ` (${tickets.length})` : ''}`, purchases: 'Purchases', health: 'Health', analytics: 'Analytics', egress: 'Egress', idle: 'IDLE', conduit: 'Conduit', oobe: 'OOBE', audit: 'Audit Log', affiliate: 'Affiliate' };
+              return (
+                <button
+                  key={tab}
+                  onClick={() => {
+                    setActiveTab(tab);
+                    if (typeof window !== 'undefined') {
+                      const params = new URLSearchParams(window.location.search);
+                      params.set('tab', tab);
+                      // Reset sub-tab param when switching top-level tab.
+                      if (tab !== 'affiliate') params.delete('sub');
+                      window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
+                    }
+                  }}
+                  className={`flex min-w-0 items-center justify-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-semibold transition-all duration-150 sm:text-sm ${
+                    activeTab === tab
+                      ? 'bg-[var(--color-accent)]/18 text-[var(--text-primary)] shadow-[inset_0_0_0_1px_var(--border-default)]'
+                      : 'text-[var(--text-muted)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]'
+                  }`}
+                >
+                  <TabIcon className="h-3.5 w-3.5 flex-shrink-0" aria-hidden />
+                  <span className="truncate">{tabLabels[tab]}</span>
+                </button>
+              );
+            })}
+          </div>
         </motion.div>
 
         {activeTab === 'overview' && (
@@ -1936,40 +1972,6 @@ export default function AdminPage() {
 
         {/* ── Tab Switcher + Table Area ─────────────────────── */}
         <motion.div className="card glass-noise min-w-0 p-3 sm:p-5" variants={cardVariants}>
-          {/* Tab switcher */}
-          <div className="-mx-1 mb-5 w-full max-w-full overflow-x-auto overscroll-x-contain px-1">
-            <div className="inline-flex min-w-max items-center gap-1 rounded-xl bg-[rgba(46,43,74,0.3)] p-1">
-              {(['overview', 'agents', 'users', 'tickets', 'purchases', 'health', 'analytics', 'egress', 'idle', 'conduit', 'oobe', 'audit', 'affiliate'] as const).map((tab) => {
-                const tabIcons: Record<string, LucideIcon> = { overview: BarChart3, agents: Bot, users: Users, tickets: Ticket, purchases: DollarSign, health: HeartPulse, analytics: TrendingUp, egress: Network, idle: Radio, conduit: Router, oobe: Network, audit: ScrollText, affiliate: UserPlus };
-                const TabIcon = tabIcons[tab] ?? BarChart3;
-                const tabLabels: Record<string, string> = { overview: 'Overview', agents: `Agents (${agentsPagination.total || agents.length})`, users: `Users (${users.length})`, tickets: `Tickets${tickets.length ? ` (${tickets.length})` : ''}`, purchases: 'Purchases', health: 'Health', analytics: 'Analytics', egress: 'Egress', idle: 'IDLE', conduit: 'Conduit', oobe: 'OOBE', audit: 'Audit Log', affiliate: 'Affiliate' };
-                return (
-                  <button
-                    key={tab}
-                    onClick={() => {
-                      setActiveTab(tab);
-                      if (typeof window !== 'undefined') {
-                        const params = new URLSearchParams(window.location.search);
-                        params.set('tab', tab);
-                        // Reset sub-tab param when switching top-level tab.
-                        if (tab !== 'affiliate') params.delete('sub');
-                        window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
-                      }
-                    }}
-                    className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-150 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${
-                      activeTab === tab
-                        ? 'text-[var(--text-primary)] bg-[var(--color-accent)]/20'
-                        : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-                    }`}
-                  >
-                    <TabIcon size={14} />
-                    {tabLabels[tab]}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
           {/* ── Overview Tab ─────────────────────────────────── */}
           {activeTab === 'overview' && stats && (
             <div className="space-y-5">
@@ -2151,12 +2153,12 @@ export default function AdminPage() {
                 <div className="flex flex-col gap-3 w-full">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                     {/* Status filters */}
-                    <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)] overflow-x-auto">
+                    <div className="flex w-full flex-wrap items-center gap-1 rounded-xl bg-[rgba(46,43,74,0.3)] p-1 sm:w-auto">
                       {STATUS_FILTERS.map((f) => (
                         <button
                           key={f.key}
                           onClick={() => setStatusFilter(f.key)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 whitespace-nowrap ${
+                          className={`min-w-[74px] flex-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-150 sm:flex-none ${
                             statusFilter === f.key
                               ? 'text-[var(--text-primary)] bg-[var(--color-accent)]/20'
                               : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
@@ -2168,12 +2170,12 @@ export default function AdminPage() {
                     </div>
 
                     {/* Framework filter */}
-                    <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)] overflow-x-auto">
+                    <div className="flex w-full flex-wrap items-center gap-1 rounded-xl bg-[rgba(46,43,74,0.3)] p-1 sm:w-auto">
                       {[{ key: 'all', label: 'All FW' }, ...Object.entries(FRAMEWORK_META).map(([k, v]) => ({ key: k, label: v.label }))].map((f) => (
                         <button
                           key={f.key}
                           onClick={() => setFrameworkFilter(f.key)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 whitespace-nowrap ${
+                          className={`min-w-[82px] flex-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-150 sm:flex-none ${
                             frameworkFilter === f.key
                               ? 'text-[var(--text-primary)] bg-[var(--color-accent)]/20'
                               : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'

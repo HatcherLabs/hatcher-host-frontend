@@ -75,6 +75,34 @@ describe('hosted model catalog', () => {
     expect(aceDataModels.every((model) => model.providerKey === 'acedata')).toBe(true);
   });
 
+  it('surfaces MiniMax models as platform-hosted models through UsePod and OpenRouter', () => {
+    expect(getHostedModelOption('minimax/minimax-m3')).toMatchObject({
+      name: 'MiniMax M3',
+      provider: 'MiniMax',
+      providerKey: 'minimax',
+      context: '1M',
+    });
+
+    expect(
+      resolveActiveModelDisplay({
+        provider: 'openrouter',
+        model: 'minimax/minimax-m3',
+      }),
+    ).toMatchObject({
+      provider: 'MiniMax',
+      route: 'UsePod primary / OpenRouter fallback',
+      privacy: 'Hatcher-hosted',
+    });
+
+    const miniMaxModels = filterHostedModels({
+      provider: 'minimax',
+      privacy: 'hatcher',
+      search: 'm2.7',
+    });
+
+    expect(miniMaxModels.map((model) => model.id)).toContain('minimax/minimax-m2.7');
+  });
+
   it('returns saved model metadata for unknown hosted ids', () => {
     expect(getHostedModelOption('custom/provider-model')).toMatchObject({
       id: 'custom/provider-model',

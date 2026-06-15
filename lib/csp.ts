@@ -8,17 +8,23 @@ const GOOGLE_ADS_HOSTS = [
 ].join(' ');
 
 export function buildCsp(nonce: string, isEmbedRoute: boolean): string {
-  const isDev = process.env.NODE_ENV !== 'production';
+  const isDev = process.env.NODE_ENV === 'development';
   const devConnect = isDev
     ? ' http://localhost:3001 ws://localhost:3001 http://localhost:8080 http://127.0.0.1:3001 ws://127.0.0.1:3001 http://127.0.0.1:8080'
     : '';
   const scriptDev = isDev ? " 'unsafe-" + "eval'" : '';
+  const styleSrc = isDev
+    ? "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com"
+    : `style-src 'self' 'nonce-${nonce}' https://fonts.googleapis.com`;
+  const styleSrcElem = isDev
+    ? "style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com"
+    : `style-src-elem 'self' 'nonce-${nonce}' https://fonts.googleapis.com`;
   const parts = [
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}' 'wasm-unsafe-eval' https://s3.tradingview.com ${GOOGLE_ADS_HOSTS}${scriptDev}`,
     "worker-src 'self' blob:",
-    `style-src 'self' 'nonce-${nonce}' https://fonts.googleapis.com`,
-    `style-src-elem 'self' 'nonce-${nonce}' https://fonts.googleapis.com`,
+    styleSrc,
+    styleSrcElem,
     "style-src-attr 'unsafe-inline'",
     "font-src 'self' https://fonts.gstatic.com",
     `img-src 'self' data: blob: https: ${GOOGLE_ADS_HOSTS}`,

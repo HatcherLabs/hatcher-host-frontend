@@ -32,7 +32,7 @@ interface CustomDomain {
 function StatusBadge({ verified, sslStatus }: { verified: boolean; sslStatus: string }) {
   if (verified && sslStatus === 'active') {
     return (
-      <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+      <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--status-live-bg)] text-[var(--status-live)] border border-[var(--status-live-border)]">
         <CheckCircle size={10} />
         Active
       </span>
@@ -40,14 +40,14 @@ function StatusBadge({ verified, sslStatus }: { verified: boolean; sslStatus: st
   }
   if (sslStatus === 'error') {
     return (
-      <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
+      <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--status-error-bg)] text-[var(--status-error)] border border-[var(--status-error-border)]">
         <AlertTriangle size={10} />
         Error
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+    <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--status-paused-bg)] text-[var(--status-paused)] border border-[var(--status-paused-border)]">
       <Clock size={10} />
       Pending
     </span>
@@ -157,7 +157,7 @@ export function DomainsSection() {
       <div>
         <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[var(--text-muted)]">
           Custom Domains
-          <span className="ml-2 text-violet-400 normal-case tracking-normal font-normal">Public Chat Access</span>
+          <span className="ml-2 text-[var(--accent)] normal-case tracking-normal font-normal">Public Chat Access</span>
         </h3>
         <Skeleton className="h-24 w-full" />
       </div>
@@ -168,18 +168,18 @@ export function DomainsSection() {
     <div>
       <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[var(--text-muted)]">
         Custom Domains
-        <span className="ml-2 text-violet-400 normal-case tracking-normal font-normal">Public Chat Access</span>
+        <span className="ml-2 text-[var(--accent)] normal-case tracking-normal font-normal">Public Chat Access</span>
       </h3>
 
       <div className="space-y-3">
         {/* Existing domains */}
         {domains.map((domain) => (
-          <GlassCard key={domain.id} className={`!p-0 ${domain.verified ? 'border-emerald-500/20' : ''}`}>
+          <GlassCard key={domain.id} className={`!p-0 ${domain.verified ? 'border-[var(--status-live-border)]' : ''}`}>
             <div className="p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Globe size={14} className={domain.verified ? 'text-emerald-400' : 'text-[var(--text-muted)]'} />
-                  <span className="text-sm font-medium text-white">{domain.domain}</span>
+                  <Globe size={14} className={domain.verified ? 'text-[var(--status-live)]' : 'text-[var(--text-muted)]'} />
+                  <span className="text-sm font-medium text-[var(--text-primary)]">{domain.domain}</span>
                   <StatusBadge verified={domain.verified} sslStatus={domain.sslStatus} />
                 </div>
                 <div className="flex items-center gap-1">
@@ -198,7 +198,7 @@ export function DomainsSection() {
                   <button
                     onClick={() => handleDelete(domain.id)}
                     disabled={deleting === domain.id}
-                    className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-40"
+                    className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--color-destructive)] hover:bg-[var(--color-destructive-bg)] transition-colors disabled:opacity-40"
                     title="Remove domain"
                   >
                     {deleting === domain.id ? (
@@ -228,7 +228,7 @@ export function DomainsSection() {
                     title="Copy CNAME target"
                   >
                     {copiedId === domain.id ? (
-                      <Check size={12} className="text-emerald-400" />
+                      <Check size={12} className="text-[var(--color-success)]" />
                     ) : (
                       <Copy size={12} className="text-[var(--text-muted)]" />
                     )}
@@ -238,7 +238,7 @@ export function DomainsSection() {
 
               {/* Verify message */}
               {verifyMsg[domain.id] && (
-                <p className={`text-xs ${verifyMsg[domain.id]?.includes('successfully') ? 'text-emerald-400' : 'text-amber-400'}`}>
+                <p className={`text-xs ${verifyMsg[domain.id]?.includes('successfully') ? 'text-[var(--color-success)]' : 'text-[var(--color-warning)]'}`}>
                   {verifyMsg[domain.id]}
                 </p>
               )}
@@ -251,7 +251,7 @@ export function DomainsSection() {
           <GlassCard className="!p-4">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-white">Add Custom Domain</p>
+                <p className="text-sm font-medium text-[var(--text-primary)]">Add Custom Domain</p>
                 <button
                   onClick={() => { setShowForm(false); setError(null); }}
                   className="p-1 rounded hover:bg-[var(--bg-card)] transition-colors"
@@ -264,13 +264,13 @@ export function DomainsSection() {
                 value={domainInput}
                 onChange={(e) => setDomainInput(e.target.value)}
                 placeholder="chat.yourdomain.com"
-                className="w-full h-9 px-3 rounded-lg text-sm text-white bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-cyan-500/50 focus:outline-none placeholder:text-[var(--text-muted)] transition-colors font-mono"
+                className="w-full h-9 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-[var(--accent)] focus:outline-none placeholder:text-[var(--text-muted)] transition-colors font-mono"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleAdd();
                 }}
               />
               {error && (
-                <p className="text-xs text-red-400">{error}</p>
+                <p className="text-xs text-[var(--color-destructive)]">{error}</p>
               )}
               <div className="flex items-center gap-2">
                 <button

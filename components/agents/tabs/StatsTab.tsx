@@ -116,8 +116,22 @@ interface MonitoringData {
 // ─── Framework themes ──────────────────────────────────────────
 
 const FRAMEWORK_THEME: Record<string, { primary: string; primaryDim: string; primaryBg: string; gradient: string; gradientDim: string; label: string }> = {
-  openclaw: { primary: '#f59e0b', primaryDim: 'rgba(245,158,11,0.4)', primaryBg: 'rgba(245,158,11,0.1)', gradient: 'linear-gradient(90deg, #f59e0b, #d97706)', gradientDim: 'linear-gradient(90deg, #d97706, #b45309)', label: 'OpenClaw' },
-  hermes: { primary: '#a855f7', primaryDim: 'rgba(168,85,247,0.4)', primaryBg: 'rgba(168,85,247,0.1)', gradient: 'linear-gradient(90deg, #8b5cf6, #a855f7)', gradientDim: 'linear-gradient(90deg, #7c3aed, #6d28d9)', label: 'Hermes' },
+  openclaw: {
+    primary: 'var(--color-info)',
+    primaryDim: 'color-mix(in srgb, var(--color-info) 40%, transparent)',
+    primaryBg: 'var(--color-info-bg)',
+    gradient: 'linear-gradient(90deg, var(--color-info), var(--accent))',
+    gradientDim: 'linear-gradient(90deg, var(--color-info), var(--text-muted))',
+    label: 'OpenClaw',
+  },
+  hermes: {
+    primary: 'var(--accent)',
+    primaryDim: 'color-mix(in srgb, var(--accent) 40%, transparent)',
+    primaryBg: 'var(--tech-accent-soft)',
+    gradient: 'linear-gradient(90deg, var(--accent), var(--color-info))',
+    gradientDim: 'linear-gradient(90deg, var(--accent), var(--text-muted))',
+    label: 'Hermes',
+  },
 };
 
 const DEFAULT_THEME = FRAMEWORK_THEME.openclaw;
@@ -128,27 +142,27 @@ const FRAMEWORK_TIPS: Record<string, string> = {
 };
 
 const FRAMEWORK_CONTEXT: Record<string, { text: string; accent: string; accentBg: string; accentBorder: string }> = {
-  openclaw: { text: 'Hosted model and web-search usage consumes AI Credits. BYOK users pay their own provider directly.', accent: 'text-amber-400', accentBg: 'bg-amber-500/[0.06]', accentBorder: 'border-amber-500/20' },
-  hermes: { text: 'Hosted model and web-search usage consumes AI Credits. BYOK users pay their own provider directly.', accent: 'text-purple-400', accentBg: 'bg-purple-500/[0.06]', accentBorder: 'border-purple-500/20' },
+  openclaw: { text: 'Managed models and web-search usage consume AI Credits. BYOK connects your own provider account and vendor billing.', accent: 'text-[var(--color-info)]', accentBg: 'bg-[var(--color-info-bg)]', accentBorder: 'border-[var(--color-info-border)]' },
+  hermes: { text: 'Managed models and web-search usage consume AI Credits. BYOK connects your own provider account and vendor billing.', accent: 'text-[var(--accent)]', accentBg: 'bg-[var(--tech-accent-soft)]', accentBorder: 'border-[var(--color-info-border)]' },
 };
 
 const TIER_BADGE: Record<string, { label: string; className: string }> = {
-  free: { label: 'Free', className: 'bg-zinc-500/15 text-zinc-400 border-zinc-500/30' },
-  starter: { label: 'Starter', className: 'bg-blue-500/15 text-blue-400 border-blue-500/30' },
-  pro: { label: 'Pro', className: 'bg-purple-500/15 text-purple-400 border-purple-500/30' },
-  business: { label: 'Business', className: 'bg-pink-500/15 text-pink-400 border-pink-500/30' },
-  founding_member: { label: 'Founding Member', className: 'bg-red-500/15 text-red-400 border-red-500/30' },
+  free: { label: 'Free', className: 'bg-[var(--bg-panel)] text-[var(--text-muted)] border-[var(--border-default)]' },
+  starter: { label: 'Starter', className: 'bg-[var(--color-info-bg)] text-[var(--color-info)] border-[var(--color-info-border)]' },
+  pro: { label: 'Pro', className: 'bg-[var(--tech-accent-soft)] text-[var(--accent)] border-[var(--border-hover)]' },
+  business: { label: 'Business', className: 'bg-[var(--bg-elevated)] text-[var(--text-primary)] border-[var(--border-hover)]' },
+  founding_member: { label: 'Founding Member', className: 'bg-[var(--color-warning-bg)] text-[var(--color-warning)] border-[var(--color-warning-border)]' },
 };
 
 const HEALTH_STYLES: Record<string, { bg: string; text: string; dot: string; ring: string; label: string }> = {
-  healthy: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', dot: 'bg-emerald-400', ring: 'ring-emerald-400/30', label: 'Healthy' },
-  unhealthy: { bg: 'bg-amber-500/10', text: 'text-amber-400', dot: 'bg-amber-400', ring: 'ring-amber-400/30', label: 'Unhealthy' },
+  healthy: { bg: 'bg-[var(--status-live-bg)]', text: 'text-[var(--status-live)]', dot: 'bg-[var(--status-live)]', ring: 'ring-[var(--status-live-border)]', label: 'Healthy' },
+  unhealthy: { bg: 'bg-[var(--status-paused-bg)]', text: 'text-[var(--status-paused)]', dot: 'bg-[var(--status-paused)]', ring: 'ring-[var(--status-paused-border)]', label: 'Unhealthy' },
   stopped: { bg: 'bg-zinc-500/10', text: 'text-zinc-400', dot: 'bg-zinc-500', ring: 'ring-zinc-500/30', label: 'Stopped' },
 };
 
 const FRAMEWORK_COLORS: Record<string, { hex: string; hexLight: string; border: string; text: string }> = {
-  openclaw: { hex: '#f59e0b', hexLight: '#fbbf24', border: 'border-amber-500/20', text: 'text-amber-400' },
-  hermes: { hex: '#a855f7', hexLight: '#c084fc', border: 'border-purple-500/20', text: 'text-purple-400' },
+  openclaw: { hex: 'var(--color-info)', hexLight: 'var(--accent-hover)', border: 'border-[var(--color-info-border)]', text: 'text-[var(--color-info)]' },
+  hermes: { hex: 'var(--accent)', hexLight: 'var(--accent-hover)', border: 'border-[var(--border-hover)]', text: 'text-[var(--accent)]' },
 };
 
 const RANGES: { value: Range; label: string }[] = [
@@ -230,7 +244,7 @@ function TrendBadge({ pct, direction }: { pct: number; direction: 'up' | 'down' 
   }
   const isUp = direction === 'up';
   return (
-    <span className="inline-flex items-center gap-0.5 text-[10px] font-medium" style={{ color: isUp ? '#22c55e' : '#ef4444' }}>
+    <span className="inline-flex items-center gap-0.5 text-[10px] font-medium" style={{ color: isUp ? 'var(--color-success)' : 'var(--color-destructive)' }}>
       {isUp ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
       {pct}%
     </span>
@@ -265,8 +279,8 @@ function ChartTooltipContent({ active, payload, label, theme }: RechartsTooltipP
 function StorageProgressBar({ value, max, label }: { value: number; max: number; label?: string }) {
   const pct = max > 0 ? Math.min(100, (value / max) * 100) : 0;
   let barColor = 'var(--color-accent)';
-  if (pct >= 80) barColor = '#ef4444';
-  else if (pct >= 50) barColor = '#f59e0b';
+  if (pct >= 80) barColor = 'var(--color-destructive)';
+  else if (pct >= 50) barColor = 'var(--color-warning)';
   return (
     <div className="w-full">
       <div className="flex justify-between items-center mb-1.5">
@@ -302,7 +316,7 @@ function StatCard({ icon, label, value, sub, accentHex }: {
       className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)]/80 p-4 relative overflow-hidden"
     >
       {accentHex && (
-        <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: `linear-gradient(90deg, ${accentHex}80, ${accentHex}20)` }} />
+        <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: `linear-gradient(90deg, color-mix(in srgb, ${accentHex} 72%, transparent), transparent)` }} />
       )}
       <div className="flex items-center gap-2 mb-2">
         <div style={{ color: accentHex || 'var(--text-secondary)' }}>{icon}</div>
@@ -357,31 +371,31 @@ function RestartIndicator({ restarts, accentHex }: { restarts: number; accentHex
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`rounded-xl border p-4 relative overflow-hidden ${isHigh ? 'border-red-500/20 bg-red-500/5' : isWarning ? 'border-amber-500/15 bg-amber-500/5' : 'border-[var(--border-default)] bg-[var(--bg-elevated)]/80'}`}
+      className={`rounded-xl border p-4 relative overflow-hidden ${isHigh ? 'border-[var(--color-destructive-border)] bg-[var(--color-destructive-bg)]' : isWarning ? 'border-[var(--color-warning-border)] bg-[var(--color-warning-bg)]' : 'border-[var(--border-default)] bg-[var(--bg-elevated)]/80'}`}
     >
-      <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: isHigh ? 'linear-gradient(90deg, #ef444480, #ef444420)' : `linear-gradient(90deg, ${accentHex}80, ${accentHex}20)` }} />
+      <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: isHigh ? 'linear-gradient(90deg, var(--color-destructive), transparent)' : `linear-gradient(90deg, color-mix(in srgb, ${accentHex} 72%, transparent), transparent)` }} />
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <RotateCcw size={16} className={isHigh ? 'text-red-400' : isWarning ? 'text-amber-400' : 'text-[var(--text-muted)]'} />
+          <RotateCcw size={16} className={isHigh ? 'text-[var(--color-destructive)]' : isWarning ? 'text-[var(--color-warning)]' : 'text-[var(--text-muted)]'} />
           <span className="text-xs text-[var(--text-muted)] uppercase tracking-wider">Restarts</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className={`text-2xl font-bold ${isHigh ? 'text-red-400' : isWarning ? 'text-amber-400' : 'text-[var(--text-primary)]'}`}>{restarts}</span>
+          <span className={`text-2xl font-bold ${isHigh ? 'text-[var(--color-destructive)]' : isWarning ? 'text-[var(--color-warning)]' : 'text-[var(--text-primary)]'}`}>{restarts}</span>
           {isHigh && (
-            <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/15 border border-red-500/25">
-              <AlertTriangle size={10} className="text-red-400" />
-              <span className="text-[10px] font-medium text-red-400">HIGH</span>
+            <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--color-destructive-bg)] border border-[var(--color-destructive-border)]">
+              <AlertTriangle size={10} className="text-[var(--color-destructive)]" />
+              <span className="text-[10px] font-medium text-[var(--color-destructive)]">HIGH</span>
             </motion.div>
           )}
           {isWarning && !isHigh && (
-            <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/25">
-              <AlertTriangle size={10} className="text-amber-400" />
-              <span className="text-[10px] font-medium text-amber-400">WARN</span>
+            <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--color-warning-bg)] border border-[var(--color-warning-border)]">
+              <AlertTriangle size={10} className="text-[var(--color-warning)]" />
+              <span className="text-[10px] font-medium text-[var(--color-warning)]">WARN</span>
             </motion.div>
           )}
         </div>
       </div>
-      {isHigh && <p className="text-[10px] text-red-400/70 mt-2">High restart count may indicate a crash loop. Check logs for errors.</p>}
+      {isHigh && <p className="text-[10px] text-[var(--color-destructive)] mt-2">High restart count may indicate a crash loop. Check logs for errors.</p>}
     </motion.div>
   );
 }
@@ -684,7 +698,7 @@ export function StatsTab() {
           {/* Framework analytics context banner */}
           <div
             className="flex items-start gap-3 rounded-xl border px-4 py-3"
-            style={{ background: theme.primaryBg, borderColor: `${theme.primary}20` }}
+            style={{ background: theme.primaryBg, borderColor: 'var(--color-info-border)' }}
           >
             <Info size={14} className="mt-0.5 shrink-0" style={{ color: theme.primary }} />
             <div>
@@ -706,7 +720,7 @@ export function StatsTab() {
                 label: 'Success Rate',
                 value: deep ? `${(100 - deep.errorRate.rate).toFixed(1)}%` : '--',
                 trend: null,
-                color: deep ? (deep.errorRate.rate > 5 ? '#ef4444' : '#22c55e') : undefined,
+                color: deep ? (deep.errorRate.rate > 5 ? 'var(--color-destructive)' : 'var(--color-success)') : undefined,
               },
             ].map(({ icon: Icon, label, value, trend, color }) => (
               <div
@@ -733,7 +747,7 @@ export function StatsTab() {
           {deep && deep.errorRate.total > 0 && (
             <GlassCard>
               <div className="flex items-center gap-2 mb-5">
-                <AlertTriangle size={18} style={{ color: deep.errorRate.rate > 5 ? '#ef4444' : theme.primary }} />
+                <AlertTriangle size={18} style={{ color: deep.errorRate.rate > 5 ? 'var(--color-destructive)' : theme.primary }} />
                 <h3 className="text-base font-semibold text-[var(--text-primary)]">Reliability</h3>
               </div>
               <div className="mb-4">
@@ -742,16 +756,16 @@ export function StatsTab() {
                   <span>Failed ({deep.errorRate.errors.toLocaleString()})</span>
                 </div>
                 <div className="flex h-3 rounded-full overflow-hidden bg-[var(--bg-card)]">
-                  <div className="transition-all rounded-l-full" style={{ width: `${deep.errorRate.total > 0 ? ((deep.errorRate.successful / deep.errorRate.total) * 100) : 100}%`, background: '#22c55e' }} />
+                  <div className="transition-all rounded-l-full" style={{ width: `${deep.errorRate.total > 0 ? ((deep.errorRate.successful / deep.errorRate.total) * 100) : 100}%`, background: 'var(--color-success)' }} />
                   {deep.errorRate.errors > 0 && (
-                    <div className="transition-all rounded-r-full" style={{ width: `${(deep.errorRate.errors / deep.errorRate.total) * 100}%`, background: '#ef4444' }} />
+                    <div className="transition-all rounded-r-full" style={{ width: `${(deep.errorRate.errors / deep.errorRate.total) * 100}%`, background: 'var(--color-destructive)' }} />
                   )}
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-2 sm:gap-3">
                 {[
-                  { icon: CheckCircle, label: 'Success', value: `${(100 - deep.errorRate.rate).toFixed(1)}%`, bg: 'bg-emerald-500/10', hex: '#22c55e' },
-                  { icon: AlertTriangle, label: 'Error Rate', value: `${deep.errorRate.rate.toFixed(1)}%`, bg: 'bg-red-500/10', hex: '#ef4444' },
+                  { icon: CheckCircle, label: 'Success', value: `${(100 - deep.errorRate.rate).toFixed(1)}%`, bg: 'bg-[var(--color-success-bg)]', hex: 'var(--color-success)' },
+                  { icon: AlertTriangle, label: 'Error Rate', value: `${deep.errorRate.rate.toFixed(1)}%`, bg: 'bg-[var(--color-destructive-bg)]', hex: 'var(--color-destructive)' },
                   { icon: MessageSquare, label: 'Interactions', value: deep.errorRate.total.toLocaleString(), bg: theme.primaryBg, hex: theme.primary },
                 ].map(({ icon: Icon, label, value, bg, hex }) => (
                   <div key={label} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'var(--bg-card)' }}>
@@ -852,9 +866,9 @@ export function StatsTab() {
           </div>
         ) : monError ? (
           <div className="flex flex-col items-center justify-center py-16 text-[var(--text-muted)]">
-            <AlertTriangle size={32} className="mb-3 text-amber-400" />
+            <AlertTriangle size={32} className="mb-3 text-[var(--color-warning)]" />
             <p className="text-sm">{monError}</p>
-            <button onClick={refreshMonitoring} className="mt-3 text-xs text-purple-400 hover:underline">Try again</button>
+            <button onClick={refreshMonitoring} className="mt-3 text-xs text-[var(--accent)] hover:underline">Try again</button>
           </div>
         ) : monData ? (
           <div className="space-y-6">
@@ -948,13 +962,13 @@ export function StatsTab() {
                 <span className="text-xs text-[var(--text-muted)] uppercase tracking-wider">Errors (24h)</span>
               </div>
               {monData.errors.last24h === 0 ? (
-                <div className="flex items-center gap-2 text-emerald-400">
+                <div className="flex items-center gap-2 text-[var(--color-success)]">
                   <CheckCircle2 size={16} />
                   <span className="text-sm">No errors in the last 24 hours</span>
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-amber-400">
+                  <div className="flex items-center gap-2 text-[var(--color-warning)]">
                     <XCircle size={16} />
                     <span className="text-sm font-medium">{monData.errors.last24h} error{monData.errors.last24h > 1 ? 's' : ''}</span>
                   </div>

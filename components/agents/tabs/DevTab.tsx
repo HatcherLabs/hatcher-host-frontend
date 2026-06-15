@@ -50,7 +50,7 @@ function StatusPill({ enabled }: { enabled: boolean }) {
     <span
       className={`inline-flex items-center gap-1 rounded-[3px] border px-2 py-1 text-[10px] font-bold uppercase tracking-[0.08em] ${
         enabled
-          ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+          ? "border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success)]"
           : "border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-muted)]"
       }`}
     >
@@ -61,9 +61,9 @@ function StatusPill({ enabled }: { enabled: boolean }) {
 }
 
 const capabilityStatusStyles: Record<DevCapabilityStatus, string> = {
-  live: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
+  live: "border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success)]",
   ready: "border-sky-500/30 bg-sky-500/10 text-sky-300",
-  next: "border-amber-500/30 bg-amber-500/10 text-amber-300",
+  next: "border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] text-[var(--color-warning)]",
 };
 
 function CapabilityStatusPill({ status }: { status: DevCapabilityStatus }) {
@@ -513,7 +513,7 @@ export function DevTab() {
       </header>
 
       {error && (
-        <div className="flex items-start gap-2 rounded-[3px] border border-red-500/25 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+        <div className="flex items-start gap-2 rounded-[3px] border border-[var(--color-destructive-border)] bg-[var(--color-destructive-bg)] px-3 py-2 text-sm text-[var(--color-destructive)]">
           <AlertTriangle size={16} className="mt-0.5 flex-shrink-0" />
           <span>{error}</span>
         </div>
@@ -600,14 +600,14 @@ export function DevTab() {
               key={method.id}
               className={`rounded-[3px] border p-3 ${
                 method.id === "api-token"
-                  ? "border-emerald-500/30 bg-emerald-500/10"
+                  ? "border-[var(--color-success-border)] bg-[var(--color-success-bg)]"
                   : "border-[var(--border-default)] bg-[var(--bg-base)]"
               }`}
             >
               <p
                 className={`text-[10px] font-mono uppercase tracking-[0.1em] ${
                   method.id === "api-token"
-                    ? "text-emerald-300"
+                    ? "text-[var(--color-success)]"
                     : "text-[var(--text-muted)]"
                 }`}
               >
@@ -688,7 +688,7 @@ export function DevTab() {
             </div>
           )}
           {githubRepoError && (
-            <p className="text-xs text-red-300">{githubRepoError}</p>
+            <p className="text-xs text-[var(--color-destructive)]">{githubRepoError}</p>
           )}
           {githubRepos.length > 0 && (
             <div className="rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-base)] p-3">
@@ -786,7 +786,7 @@ export function DevTab() {
               type="button"
               onClick={() => void disconnectGithub()}
               disabled={githubDisconnecting || !hasGithubConfig}
-              className="inline-flex items-center justify-center gap-2 rounded-[3px] border border-red-500/25 px-3 py-2 text-xs font-mono text-red-300 transition-colors hover:border-red-400 hover:text-red-200 disabled:cursor-not-allowed disabled:opacity-40"
+              className="inline-flex items-center justify-center gap-2 rounded-[3px] border border-[var(--color-destructive-border)] px-3 py-2 text-xs font-mono text-[var(--color-destructive)] transition-colors hover:border-[var(--color-destructive)] hover:text-[var(--color-destructive)] disabled:cursor-not-allowed disabled:opacity-40"
             >
               {githubDisconnecting ? (
                 <Loader2 size={13} className="animate-spin" />
@@ -801,8 +801,8 @@ export function DevTab() {
               className={`text-xs leading-5 ${
                 githubMessage.startsWith("Error") ||
                 githubTestResult?.tokenValid === false
-                  ? "text-red-300"
-                  : "text-emerald-300"
+                  ? "text-[var(--color-destructive)]"
+                  : "text-[var(--color-success)]"
               }`}
             >
               {githubMessage}
@@ -973,7 +973,7 @@ export function DevTab() {
                       type="button"
                       onClick={() => void deletePermission(permission.id)}
                       disabled={saving}
-                      className="rounded-[3px] p-1.5 text-[var(--text-muted)] transition-colors hover:bg-red-500/10 hover:text-red-300 disabled:opacity-40"
+                      className="rounded-[3px] p-1.5 text-[var(--text-muted)] transition-colors hover:bg-[var(--color-destructive-bg)] hover:text-[var(--color-destructive)] disabled:opacity-40"
                       title="Remove caller permission"
                     >
                       <Trash2 size={14} />
@@ -1010,7 +1010,7 @@ export function DevTab() {
                   >
                     <div className="mb-1 flex items-center justify-between gap-2">
                       <span
-                        className={`text-[10px] font-mono uppercase tracking-[0.08em] ${log.status === "success" ? "text-emerald-300" : "text-red-300"}`}
+                        className={`text-[10px] font-mono uppercase tracking-[0.08em] ${log.status === "success" ? "text-[var(--color-success)]" : "text-[var(--color-destructive)]"}`}
                       >
                         {log.status}
                       </span>

@@ -170,7 +170,7 @@ export function OpenClawGatewayCard() {
     return (
       <GlassCard>
         <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
-          <AlertTriangle size={14} className="text-amber-400" />
+          <AlertTriangle size={14} className="text-[var(--color-warning)]" />
           Gateway config unavailable{error ? `: ${error}` : ''}
         </div>
       </GlassCard>
@@ -192,7 +192,7 @@ export function OpenClawGatewayCard() {
     <GlassCard>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Server size={14} className="text-amber-400" />
+          <Server size={14} className="text-[var(--color-info)]" />
           <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Gateway</h3>
           <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--bg-card)] text-[var(--text-muted)] border border-[var(--border-default)]">
             {data.source === 'live' ? 'live' : data.source === 'snapshot' ? 'snapshot' : 'n/a'}
@@ -208,7 +208,7 @@ export function OpenClawGatewayCard() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="rounded-xl px-3 py-2.5 bg-[var(--bg-card)] border border-[var(--border-default)]">
           <div className="flex items-center gap-1.5">
-            <LinkIcon size={12} className="text-amber-400" />
+            <LinkIcon size={12} className="text-[var(--color-info)]" />
             <span className="text-sm font-semibold text-[var(--text-primary)] tabular-nums">
               {info.bind ?? 'lan'}:{info.port ?? 18789}
             </span>
@@ -218,7 +218,7 @@ export function OpenClawGatewayCard() {
 
         <div className="rounded-xl px-3 py-2.5 bg-[var(--bg-card)] border border-[var(--border-default)]">
           <div className="flex items-center gap-1.5">
-            <Cpu size={12} className="text-amber-400" />
+            <Cpu size={12} className="text-[var(--color-info)]" />
             <span
               className="text-sm font-semibold text-[var(--text-primary)] truncate"
               title={info.primaryModel ?? ''}
@@ -243,7 +243,7 @@ export function OpenClawGatewayCard() {
             <span
               className={`text-[10px] px-1.5 py-0.5 rounded-full border ${
                 info.responsesEnabled
-                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                  ? 'bg-[var(--color-success-bg)] text-[var(--color-success)] border-[var(--color-success-border)]'
                   : 'bg-[var(--bg-card)] text-[var(--text-muted)] border-[var(--border-default)]'
               }`}
               title="/v1/responses endpoint"
@@ -253,7 +253,7 @@ export function OpenClawGatewayCard() {
             <span
               className={`text-[10px] px-1.5 py-0.5 rounded-full border ${
                 info.chatCompletionsEnabled
-                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                  ? 'bg-[var(--color-success-bg)] text-[var(--color-success)] border-[var(--color-success-border)]'
                   : 'bg-[var(--bg-card)] text-[var(--text-muted)] border-[var(--border-default)]'
               }`}
               title="/v1/chat/completions endpoint"
@@ -278,7 +278,7 @@ export function OpenClawGatewayCard() {
             {info.activeChannels.map((ch) => (
               <span
                 key={ch}
-                className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 capitalize"
+                className="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--color-info-bg)] text-[var(--color-info)] border border-[var(--color-info-border)] capitalize"
                 title={`channels.${ch}.enabled = true`}
               >
                 {ch}

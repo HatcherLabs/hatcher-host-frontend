@@ -32,13 +32,13 @@ const FRAMEWORK_CAPABILITIES: Record<string, string[]> = {
 };
 
 const FRAMEWORK_CAP_STYLE: Record<string, string> = {
-  openclaw: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-  hermes: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+  openclaw: 'bg-[var(--color-info-bg)] text-[var(--color-info)] border-[var(--color-info-border)]',
+  hermes: 'bg-[var(--tech-accent-soft)] text-[var(--accent)] border-[var(--color-info-border)]',
 };
 
 const FRAMEWORK_STAT_COLOR: Record<string, string> = {
-  openclaw: 'text-amber-400',
-  hermes: 'text-purple-400',
+  openclaw: 'text-[var(--color-info)]',
+  hermes: 'text-[var(--accent)]',
 };
 
 const FRAMEWORK_STATS: Record<string, { label: string; value: string }[]> = {

@@ -112,7 +112,7 @@ export function HealthPerformanceCard({
     return (
       <GlassCard>
         <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
-          <AlertTriangle size={14} className="text-amber-400" />
+          <AlertTriangle size={14} className="text-[var(--color-warning)]" />
           Monitoring unavailable
         </div>
       </GlassCard>
@@ -123,22 +123,22 @@ export function HealthPerformanceCard({
 
   const healthConfig = {
     healthy: {
-      dot: 'bg-emerald-400',
-      text: 'text-emerald-400',
+      dot: 'bg-[var(--mineral)]',
+      text: 'text-[var(--mineral)]',
       label: 'Healthy',
-      bg: 'bg-emerald-500/10',
+      bg: 'bg-[rgba(72,106,121,0.08)]',
     },
     unhealthy: {
-      dot: 'bg-amber-400',
-      text: 'text-amber-400',
+      dot: 'bg-[var(--status-paused)]',
+      text: 'text-[var(--status-paused)]',
       label: 'Degraded',
-      bg: 'bg-amber-500/10',
+      bg: 'bg-[var(--status-paused-bg)]',
     },
     stopped: {
-      dot: 'bg-red-400',
-      text: 'text-red-400',
+      dot: 'bg-[var(--status-error)]',
+      text: 'text-[var(--status-error)]',
       label: 'Down',
-      bg: 'bg-red-500/10',
+      bg: 'bg-[var(--status-error-bg)]',
     },
   }[data.health];
 
@@ -199,8 +199,8 @@ export function HealthPerformanceCard({
         </div>
 
         {/* Uptime */}
-        <div className="rounded-xl px-3 py-2.5 bg-blue-500/10 border border-[var(--border-default)]">
-          <div className="text-sm font-semibold text-blue-400 mb-1 tabular-nums">
+        <div className="rounded-xl px-3 py-2.5 bg-[rgba(72,106,121,0.08)] border border-[var(--border-default)]">
+          <div className="text-sm font-semibold text-[var(--mineral)] mb-1 tabular-nums">
             {data.uptime.seconds > 0 ? formatUptime(data.uptime.seconds) : '--'}
           </div>
           <div className="text-[10px] text-[var(--text-muted)]">Uptime</div>
@@ -209,17 +209,17 @@ export function HealthPerformanceCard({
         {/* Restarts */}
         <div
           className={`rounded-xl px-3 py-2.5 border border-[var(--border-default)] ${
-            data.restarts > 0 ? 'bg-amber-500/10' : 'bg-[var(--bg-card)]'
+            data.restarts > 0 ? 'bg-[var(--color-warning-bg)]' : 'bg-[var(--bg-card)]'
           }`}
         >
           <div className="flex items-center gap-1.5">
             <RefreshCw
               size={12}
-              className={data.restarts > 0 ? 'text-amber-400' : 'text-[var(--text-muted)]'}
+              className={data.restarts > 0 ? 'text-[var(--color-warning)]' : 'text-[var(--text-muted)]'}
             />
             <span
               className={`text-sm font-semibold tabular-nums ${
-                data.restarts > 0 ? 'text-amber-400' : 'text-[var(--text-primary)]'
+                data.restarts > 0 ? 'text-[var(--color-warning)]' : 'text-[var(--text-primary)]'
               }`}
             >
               {data.restarts}
@@ -231,17 +231,17 @@ export function HealthPerformanceCard({
         {/* Errors */}
         <div
           className={`rounded-xl px-3 py-2.5 border border-[var(--border-default)] ${
-            data.errors.last24h > 0 ? 'bg-red-500/10' : 'bg-[var(--bg-card)]'
+            data.errors.last24h > 0 ? 'bg-[var(--color-destructive-bg)]' : 'bg-[var(--bg-card)]'
           }`}
         >
           <div className="flex items-center gap-1.5">
             <AlertTriangle
               size={12}
-              className={data.errors.last24h > 0 ? 'text-red-400' : 'text-[var(--text-muted)]'}
+              className={data.errors.last24h > 0 ? 'text-[var(--color-destructive)]' : 'text-[var(--text-muted)]'}
             />
             <span
               className={`text-sm font-semibold tabular-nums ${
-                data.errors.last24h > 0 ? 'text-red-400' : 'text-[var(--text-primary)]'
+                data.errors.last24h > 0 ? 'text-[var(--color-destructive)]' : 'text-[var(--text-primary)]'
               }`}
             >
               {data.errors.last24h}
@@ -265,7 +265,7 @@ export function HealthPerformanceCard({
           value={data.resources.memoryUsageMb}
           max={data.resources.memoryLimitMb}
           unit="MB"
-          color="bg-blue-500"
+          color="bg-[var(--mineral)]"
         />
       </div>
 
@@ -293,8 +293,8 @@ export function HealthPerformanceCard({
       {/* Last error preview */}
       {data.errors.lastError && (
         <div className="border-t border-[var(--border-default)] pt-3 mt-3">
-          <div className="text-[10px] text-red-400 mb-1">Last Error</div>
-          <div className="text-xs text-[var(--text-secondary)] font-mono bg-red-500/5 rounded-lg px-3 py-2 border border-red-500/10 truncate">
+          <div className="text-[10px] text-[var(--color-destructive)] mb-1">Last Error</div>
+          <div className="text-xs text-[var(--text-secondary)] font-mono bg-[var(--color-destructive-bg)] rounded-lg px-3 py-2 border border-[var(--color-destructive-border)] truncate">
             {data.errors.lastError}
           </div>
         </div>

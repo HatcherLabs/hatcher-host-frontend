@@ -20,14 +20,20 @@ interface FacadeTextures {
 }
 
 interface StaticMaterialSet {
-  freeRoof: THREE.MeshLambertMaterial;
-  freeChimney: THREE.MeshLambertMaterial;
-  starterRoof: THREE.MeshLambertMaterial;
+  freeShell: THREE.MeshLambertMaterial;
+  freeTrim: THREE.MeshLambertMaterial;
+  starterShell: THREE.MeshLambertMaterial;
   starterParapet: THREE.MeshLambertMaterial;
   starterTank: THREE.MeshLambertMaterial;
   proLobby: THREE.MeshLambertMaterial;
   enterprisePodium: THREE.MeshLambertMaterial;
   enterpriseLedge: THREE.MeshLambertMaterial;
+  ivoryShell: THREE.MeshLambertMaterial;
+  graphiteShell: THREE.MeshLambertMaterial;
+  warmGold: THREE.MeshLambertMaterial;
+  cyanGlass: THREE.MeshLambertMaterial;
+  cyanLine: THREE.MeshBasicMaterial;
+  darkPanel: THREE.MeshLambertMaterial;
   antenna: THREE.MeshLambertMaterial;
   beacon: THREE.MeshBasicMaterial;
   plinth: THREE.MeshLambertMaterial;
@@ -144,15 +150,23 @@ function HandoffBuilding({
           facadeMaterial={facadeMaterial}
           materials={materials}
         />
-      ) : (
+      ) : building.visual.tierKey === 'business' ? (
         <EnterpriseBuilding
           building={building}
           facadeMaterial={facadeMaterial}
           glassMaterial={glassMaterial}
           materials={materials}
         />
+      ) : (
+        <FoundingBuilding
+          building={building}
+          facadeMaterial={facadeMaterial}
+          glassMaterial={glassMaterial}
+          materials={materials}
+        />
       )}
-      <Plinth building={building} material={materials.plinth} />
+      <TierMarker building={building} materials={materials} />
+      <Plinth building={building} materials={materials} />
       {building.mine && <MyBuildingMarker height={building.height} />}
     </group>
   );
@@ -194,43 +208,146 @@ function FreeBuilding({
   const { width, depth, height, seed } = building.visual;
   const spec = useMemo(() => {
     const rng = rngAfterVisual(seed);
-    const roofH = 0.7 + rng() * 0.4;
-    const hasChimney = rng() > 0.4;
-    const chimney = hasChimney
-      ? {
-          x: (rng() - 0.5) * width * 0.5,
-          y: height + 0.5 + roofH * 0.3,
-          z: (rng() - 0.5) * depth * 0.3,
-        }
-      : null;
-    const tree = makeTreeSpec(rng, width, depth);
-    return { roofH, chimney, tree };
-  }, [depth, height, seed, width]);
+    const shellH = 0.72 + rng() * 0.18;
+    const signalNode = makeSignalNodeSpec(rng, width, depth);
+    return {
+      shellH,
+      signalNode,
+      doorOffset: (rng() - 0.5) * width * 0.18,
+    };
+  }, [depth, seed, width]);
+
+  if (building.visual.variant % 3 === 1) {
+    return (
+      <FreeStudioBuilding
+        building={building}
+        facadeMaterial={facadeMaterial}
+        materials={materials}
+        signalNode={spec.signalNode}
+      />
+    );
+  }
+
+  if (building.visual.variant % 3 === 2) {
+    return (
+      <FreeTwinCapsuleBuilding
+        building={building}
+        materials={materials}
+        signalNode={spec.signalNode}
+      />
+    );
+  }
 
   return (
     <group>
-      <mesh position={[0, height / 2, 0]} castShadow receiveShadow>
-        <boxGeometry args={[width, height, depth]} />
+      <mesh position={[0, height * 0.38, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[width * 0.48, width * 0.56, height * 0.76, 28]} />
+        <primitive object={materials.ivoryShell} attach="material" />
+      </mesh>
+      <mesh position={[0, height * 0.82, 0]} scale={[width * 0.58, spec.shellH, depth * 0.58]} castShadow receiveShadow>
+        <sphereGeometry args={[1, 28, 14]} />
+        <primitive object={materials.freeShell} attach="material" />
+      </mesh>
+      <mesh position={[0, height * 0.98, depth * 0.12]} scale={[width * 0.3, 0.22, 0.08]} castShadow>
+        <sphereGeometry args={[1, 18, 10]} />
+        <primitive object={materials.cyanGlass} attach="material" />
+      </mesh>
+      <mesh position={[spec.doorOffset, height * 0.34, depth * 0.52]} castShadow>
+        <boxGeometry args={[width * 0.22, height * 0.38, 0.06]} />
+        <primitive object={materials.darkPanel} attach="material" />
+      </mesh>
+      <mesh position={[0, height * 0.08, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[Math.max(width, depth) * 0.45, 0.045, 8, 48]} />
+        <primitive object={materials.freeTrim} attach="material" />
+      </mesh>
+      <HatchPodPetals
+        width={width}
+        depth={depth}
+        height={height}
+        materials={materials}
+        scale={0.72}
+      />
+      {spec.signalNode && <SignalNode spec={spec.signalNode} materials={materials} />}
+    </group>
+  );
+}
+
+function FreeStudioBuilding({
+  building,
+  facadeMaterial,
+  materials,
+  signalNode,
+}: {
+  building: LiveBuildingLayout;
+  facadeMaterial: THREE.Material;
+  materials: StaticMaterialSet;
+  signalNode: { x: number; z: number } | null;
+}) {
+  const { width, depth, height } = building.visual;
+  return (
+    <group>
+      <mesh position={[0, height * 0.43, 0]} castShadow receiveShadow>
+        <boxGeometry args={[width * 0.98, height * 0.86, depth * 0.92]} />
         <primitive object={facadeMaterial} attach="material" />
       </mesh>
-      <PitchedRoof
-        width={width * 1.06}
-        depth={depth * 1.06}
-        height={spec.roofH}
-        y={height}
-        material={materials.freeRoof}
-      />
-      {spec.chimney && (
-        <mesh
-          position={[spec.chimney.x, spec.chimney.y, spec.chimney.z]}
-          castShadow
-          receiveShadow
-        >
-          <boxGeometry args={[0.35, 1, 0.35]} />
-          <primitive object={materials.freeChimney} attach="material" />
-        </mesh>
-      )}
-      {spec.tree && <SmallTree spec={spec.tree} materials={materials} />}
+      <mesh position={[0, height * 0.78, 0]} castShadow receiveShadow>
+        <boxGeometry args={[width * 1.12, height * 0.22, depth * 1.06]} />
+        <primitive object={materials.ivoryShell} attach="material" />
+      </mesh>
+      <mesh position={[0, height * 0.5, depth * 0.48]} castShadow receiveShadow>
+        <boxGeometry args={[width * 0.42, height * 0.36, 0.055]} />
+        <primitive object={materials.darkPanel} attach="material" />
+      </mesh>
+      <mesh position={[0, height * 0.52, depth * 0.515]}>
+        <boxGeometry args={[width * 0.26, height * 0.06, 0.035]} />
+        <primitive object={materials.cyanLine} attach="material" />
+      </mesh>
+      <mesh position={[0, height + 0.22, 0]} scale={[width * 0.36, 0.28, depth * 0.28]} castShadow receiveShadow>
+        <sphereGeometry args={[1, 18, 10]} />
+        <primitive object={materials.cyanGlass} attach="material" />
+      </mesh>
+      {signalNode && <SignalNode spec={signalNode} materials={materials} />}
+    </group>
+  );
+}
+
+function FreeTwinCapsuleBuilding({
+  building,
+  materials,
+  signalNode,
+}: {
+  building: LiveBuildingLayout;
+  materials: StaticMaterialSet;
+  signalNode: { x: number; z: number } | null;
+}) {
+  const { width, depth, height } = building.visual;
+  return (
+    <group>
+      <mesh position={[0, height * 0.18, 0]} castShadow receiveShadow>
+        <boxGeometry args={[width * 1.18, height * 0.32, depth * 0.82]} />
+        <primitive object={materials.graphiteShell} attach="material" />
+      </mesh>
+      {[-1, 1].map((side) => (
+        <group key={side} position={[side * width * 0.28, 0, 0]}>
+          <mesh position={[0, height * 0.52, 0]} castShadow receiveShadow>
+            <cylinderGeometry args={[width * 0.24, width * 0.28, height * 0.62, 22]} />
+            <primitive object={materials.ivoryShell} attach="material" />
+          </mesh>
+          <mesh position={[0, height * 0.86, 0]} scale={[width * 0.29, 0.32, depth * 0.29]} castShadow receiveShadow>
+            <sphereGeometry args={[1, 18, 10]} />
+            <primitive object={materials.freeShell} attach="material" />
+          </mesh>
+        </group>
+      ))}
+      <mesh position={[0, height * 0.48, depth * 0.38]}>
+        <boxGeometry args={[width * 0.34, height * 0.09, 0.04]} />
+        <primitive object={materials.cyanLine} attach="material" />
+      </mesh>
+      <mesh position={[0, height * 0.08, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[Math.max(width, depth) * 0.44, 0.025, 8, 44]} />
+        <primitive object={materials.cyanLine} attach="material" />
+      </mesh>
+      {signalNode && <SignalNode spec={signalNode} materials={materials} />}
     </group>
   );
 }
@@ -247,48 +364,45 @@ function StarterBuilding({
   const { width, depth, height, seed } = building.visual;
   const spec = useMemo(() => {
     const rng = rngAfterVisual(seed);
-    const pitched = rng() < 0.5;
-    const tank = pitched
-      ? null
-      : {
-          x: (rng() - 0.5) * width * 0.3,
-          z: (rng() - 0.5) * depth * 0.3,
-        };
-    const tree = makeTreeSpec(rng, width, depth);
-    return { pitched, tank, tree };
-  }, [depth, seed, width]);
+    const signalNode = makeSignalNodeSpec(rng, width, depth);
+    return {
+      signalNode,
+      baseH: height * 0.48,
+      labH: height * 0.56,
+      atriumOffset: (rng() - 0.5) * width * 0.12,
+    };
+  }, [depth, height, seed, width]);
 
   return (
     <group>
-      <mesh position={[0, height / 2, 0]} castShadow receiveShadow>
-        <boxGeometry args={[width, height, depth]} />
+      <mesh position={[0, spec.baseH / 2, 0]} castShadow receiveShadow>
+        <boxGeometry args={[width * 1.18, spec.baseH, depth * 1.04]} />
         <primitive object={facadeMaterial} attach="material" />
       </mesh>
-      {spec.pitched ? (
-        <PitchedRoof
-          width={width * 1.05}
-          depth={depth * 1.05}
-          height={0.9}
-          y={height}
-          material={materials.starterRoof}
-        />
-      ) : (
-        <>
-          <mesh position={[0, height + 0.1, 0]} castShadow receiveShadow>
-            <boxGeometry args={[width * 1.04, 0.25, depth * 1.04]} />
-            <primitive object={materials.starterParapet} attach="material" />
-          </mesh>
-          <mesh
-            position={[spec.tank?.x ?? 0, height + 0.6, spec.tank?.z ?? 0]}
-            castShadow
-            receiveShadow
-          >
-            <cylinderGeometry args={[0.4, 0.4, 0.7, 10]} />
-            <primitive object={materials.starterTank} attach="material" />
-          </mesh>
-        </>
-      )}
-      {spec.tree && <SmallTree spec={spec.tree} materials={materials} />}
+      <mesh position={[0, spec.baseH + 0.12, 0]} castShadow receiveShadow>
+        <boxGeometry args={[width * 1.26, 0.22, depth * 1.12]} />
+        <primitive object={materials.starterParapet} attach="material" />
+      </mesh>
+      <mesh position={[spec.atriumOffset, spec.baseH + spec.labH * 0.42, depth * 0.08]} castShadow receiveShadow>
+        <boxGeometry args={[width * 0.72, spec.labH * 0.84, depth * 0.52]} />
+        <primitive object={materials.ivoryShell} attach="material" />
+      </mesh>
+      <mesh position={[spec.atriumOffset, spec.baseH + spec.labH * 0.92, depth * 0.08]} scale={[width * 0.48, 0.34, depth * 0.32]} castShadow receiveShadow>
+        <sphereGeometry args={[1, 24, 12]} />
+        <primitive object={materials.starterShell} attach="material" />
+      </mesh>
+      <mesh position={[0, spec.baseH * 0.62, depth * 0.54]} castShadow receiveShadow>
+        <boxGeometry args={[width * 0.54, spec.baseH * 0.5, 0.08]} />
+        <primitive object={materials.darkPanel} attach="material" />
+      </mesh>
+      <mesh position={[0, spec.baseH * 0.68, depth * 0.59]}>
+        <boxGeometry args={[width * 0.36, spec.baseH * 0.08, 0.035]} />
+        <primitive object={materials.cyanLine} attach="material" />
+      </mesh>
+      <StarterSideModules width={width} depth={depth} height={height} materials={materials} />
+      <StarterAtriumPods width={width} depth={depth} height={height} materials={materials} />
+      <CornerPylons width={width * 1.06} depth={depth * 0.98} height={height * 0.74} materials={materials} />
+      {spec.signalNode && <SignalNode spec={spec.signalNode} materials={materials} />}
     </group>
   );
 }
@@ -312,44 +426,75 @@ function ProBuilding({
     const rng = rngAfterVisual(seed);
     const width = baseWidth + 0.6;
     const depth = baseDepth + 0.6;
-    const baseHeight = totalHeight * (0.55 + rng() * 0.15);
-    const topHeight = totalHeight - baseHeight;
+    const baseHeight = Math.max(1.2, totalHeight * 0.22);
+    const shaftHeight = Math.max(2.2, totalHeight * 0.62);
+    const deckY = baseHeight + shaftHeight + 0.12;
     return {
       width,
       depth,
       baseHeight,
-      topHeight,
-      topWidth: width * 0.78,
-      topDepth: depth * 0.78,
+      shaftHeight,
+      deckY,
+      shaftRadius: Math.min(width, depth) * 0.27,
+      deckRadius: Math.min(width, depth) * 0.52,
+      antennaX: (rng() - 0.5) * width * 0.34,
+      antennaZ: (rng() - 0.5) * depth * 0.34,
     };
   }, [baseDepth, baseWidth, seed, totalHeight]);
 
   return (
     <group>
       <mesh position={[0, spec.baseHeight / 2, 0]} castShadow receiveShadow>
-        <boxGeometry args={[spec.width, spec.baseHeight, spec.depth]} />
+        <boxGeometry args={[spec.width * 1.16, spec.baseHeight, spec.depth * 1.16]} />
+        <primitive object={materials.proLobby} attach="material" />
+      </mesh>
+      <mesh position={[0, spec.baseHeight + spec.shaftHeight / 2, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[spec.shaftRadius * 0.82, spec.shaftRadius, spec.shaftHeight, 8]} />
         <primitive object={facadeMaterial} attach="material" />
       </mesh>
-      <mesh
-        position={[0, spec.baseHeight + spec.topHeight / 2, 0]}
-        castShadow
-        receiveShadow
-      >
-        <boxGeometry args={[spec.topWidth, spec.topHeight, spec.topDepth]} />
-        <primitive object={facadeMaterial} attach="material" />
+      <mesh position={[0, spec.baseHeight + spec.shaftHeight * 0.52, spec.shaftRadius * 0.86]}>
+        <boxGeometry args={[spec.shaftRadius * 0.92, spec.shaftHeight * 0.76, 0.055]} />
+        <primitive object={materials.cyanGlass} attach="material" />
       </mesh>
+      <mesh position={[0, spec.deckY, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[spec.deckRadius, spec.deckRadius * 0.92, 0.32, 8]} />
+        <primitive object={materials.warmGold} attach="material" />
+      </mesh>
+      <mesh position={[0, spec.deckY + 0.28, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[spec.deckRadius * 0.72, spec.deckRadius * 0.78, 0.5, 8]} />
+        <primitive object={materials.graphiteShell} attach="material" />
+      </mesh>
+      <mesh position={[0, spec.deckY + 0.68, 0]} scale={[spec.deckRadius * 0.52, 0.34, spec.deckRadius * 0.52]} castShadow receiveShadow>
+        <sphereGeometry args={[1, 20, 10]} />
+        <primitive object={materials.ivoryShell} attach="material" />
+      </mesh>
+      <mesh position={[0, spec.deckY + 0.1, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[spec.deckRadius * 0.9, 0.04, 8, 48]} />
+        <primitive object={materials.cyanLine} attach="material" />
+      </mesh>
+      <ControlTowerFins
+        width={spec.width * 0.92}
+        depth={spec.depth * 0.92}
+        baseY={spec.baseHeight}
+        height={spec.shaftHeight}
+        materials={materials}
+      />
       <RooftopEquipment
         seed={seed}
         skipAfterVisual={1}
-        width={spec.topWidth}
-        depth={spec.topDepth}
-        baseY={totalHeight}
+        width={spec.width}
+        depth={spec.depth}
+        baseY={spec.baseHeight}
         dense={false}
         materials={materials}
       />
-      <mesh position={[0, 0.5, 0]} castShadow receiveShadow>
-        <boxGeometry args={[spec.width * 1.005, 1, spec.depth * 1.005]} />
-        <primitive object={materials.proLobby} attach="material" />
+      <mesh position={[spec.antennaX, spec.deckY + 1.55, spec.antennaZ]} castShadow>
+        <cylinderGeometry args={[0.035, 0.06, 1.55, 7]} />
+        <primitive object={materials.antenna} attach="material" />
+      </mesh>
+      <mesh position={[spec.antennaX, spec.deckY + 2.38, spec.antennaZ]}>
+        <sphereGeometry args={[0.16, 10, 8]} />
+        <primitive object={materials.beacon} attach="material" />
       </mesh>
     </group>
   );
@@ -374,31 +519,27 @@ function EnterpriseBuilding({
   } = building.visual;
   const spec = useMemo(() => {
     const rng = rngAfterVisual(seed);
-    const podiumHeight = 2.8 + rng() * 1.2;
-    const podiumWidth = baseWidth + 1.2;
-    const podiumDepth = baseDepth + 1.2;
-    const remaining = Math.max(1, totalHeight - podiumHeight);
-    const segmentHeight = remaining / 3;
-    const segments = Array.from({ length: 3 }, (_, index) => {
-      const scale = 0.86 ** index;
-      return {
-        index,
-        width: baseWidth * 1.05 * scale,
-        depth: baseDepth * 1.05 * scale,
-        height: segmentHeight,
-        y: podiumHeight + segmentHeight * index + segmentHeight / 2,
-        topY: podiumHeight + segmentHeight * (index + 1),
-      };
-    });
-    const finalScale = 0.86 ** 3;
+    const podiumHeight = 1.9 + rng() * 0.5;
+    const podiumWidth = baseWidth + 1.55;
+    const podiumDepth = baseDepth + 1.55;
+    const towerHeight = Math.max(2.8, totalHeight - podiumHeight - 0.9);
+    const coreWidth = baseWidth * 0.54;
+    const coreDepth = baseDepth * 0.54;
+    const towerSpecs = [
+      { x: -0.34, z: -0.32, scale: 0.74 },
+      { x: 0.34, z: -0.3, scale: 0.84 },
+      { x: -0.32, z: 0.34, scale: 0.66 },
+      { x: 0.32, z: 0.34, scale: 0.7 },
+    ];
     return {
       podiumHeight,
       podiumWidth,
       podiumDepth,
-      segments,
-      crownWidth: baseWidth * 1.05 * finalScale * 0.7,
-      crownDepth: baseDepth * 1.05 * finalScale * 0.7,
-      topY: podiumHeight + remaining,
+      towerHeight,
+      coreWidth,
+      coreDepth,
+      towerSpecs,
+      topY: podiumHeight + towerHeight,
     };
   }, [baseDepth, baseWidth, seed, totalHeight]);
 
@@ -410,53 +551,106 @@ function EnterpriseBuilding({
         />
         <primitive object={materials.enterprisePodium} attach="material" />
       </mesh>
+      <mesh position={[0, spec.podiumHeight + 0.08, 0]} castShadow receiveShadow>
+        <boxGeometry args={[spec.podiumWidth * 1.04, 0.16, spec.podiumDepth * 1.04]} />
+        <primitive object={materials.warmGold} attach="material" />
+      </mesh>
       {glassMaterial && (
-        <mesh position={[0, spec.podiumHeight * 0.45, 0]}>
+        <mesh position={[0, spec.podiumHeight * 0.52, 0]}>
           <boxGeometry
             args={[
-              spec.podiumWidth * 1.005,
-              spec.podiumHeight * 0.6,
-              spec.podiumDepth * 1.005,
+              spec.podiumWidth * 0.72,
+              spec.podiumHeight * 0.64,
+              spec.podiumDepth * 0.72,
             ]}
           />
           <primitive object={glassMaterial} attach="material" />
         </mesh>
       )}
-      {spec.segments.map((segment) => (
-        <group key={segment.index}>
-          <mesh position={[0, segment.y, 0]} castShadow receiveShadow>
-            <boxGeometry
-              args={[segment.width, segment.height, segment.depth]}
-            />
-            <primitive object={facadeMaterial} attach="material" />
-          </mesh>
-          {segment.index < spec.segments.length - 1 && (
-            <mesh position={[0, segment.topY, 0]} castShadow receiveShadow>
-              <boxGeometry
-                args={[segment.width * 1.02, 0.2, segment.depth * 1.02]}
-              />
+      <CampusSatellites
+        width={spec.podiumWidth}
+        depth={spec.podiumDepth}
+        y={spec.podiumHeight + 0.38}
+        materials={materials}
+      />
+      <mesh position={[0, spec.podiumHeight + spec.towerHeight * 0.46, 0]} castShadow receiveShadow>
+        <boxGeometry args={[spec.coreWidth, spec.towerHeight * 0.92, spec.coreDepth]} />
+        <primitive object={facadeMaterial} attach="material" />
+      </mesh>
+      <mesh position={[0, spec.podiumHeight + spec.towerHeight * 0.94, 0]} castShadow receiveShadow>
+        <boxGeometry args={[spec.coreWidth * 1.16, 0.26, spec.coreDepth * 1.16]} />
+        <primitive object={materials.warmGold} attach="material" />
+      </mesh>
+      {spec.towerSpecs.map((tower, index) => {
+        const towerH = spec.towerHeight * tower.scale;
+        return (
+          <group
+            key={index}
+            position={[
+              tower.x * spec.podiumWidth,
+              spec.podiumHeight + towerH / 2,
+              tower.z * spec.podiumDepth,
+            ]}
+          >
+            <mesh castShadow receiveShadow>
+              <boxGeometry args={[baseWidth * 0.26, towerH, baseDepth * 0.26]} />
+              <primitive object={facadeMaterial} attach="material" />
+            </mesh>
+            <mesh position={[0, towerH / 2 + 0.18, 0]} castShadow receiveShadow>
+              <boxGeometry args={[baseWidth * 0.34, 0.18, baseDepth * 0.34]} />
               <primitive object={materials.enterpriseLedge} attach="material" />
             </mesh>
-          )}
-        </group>
+            {glassMaterial && (
+              <mesh position={[0, 0, baseDepth * 0.135]}>
+                <boxGeometry args={[baseWidth * 0.14, towerH * 0.72, 0.04]} />
+                <primitive object={glassMaterial} attach="material" />
+              </mesh>
+            )}
+          </group>
+        );
+      })}
+      {[
+        [0, -0.48],
+        [0.48, 0],
+        [0, 0.48],
+        [-0.48, 0],
+      ].map(([x, z], index) => (
+        <mesh
+          key={`bridge-${index}`}
+          position={[
+            x * spec.podiumWidth * 0.5,
+            spec.podiumHeight + spec.towerHeight * 0.36,
+            z * spec.podiumDepth * 0.5,
+          ]}
+          rotation={[0, index % 2 ? Math.PI / 2 : 0, 0]}
+          castShadow
+          receiveShadow
+        >
+          <boxGeometry args={[spec.podiumWidth * 0.42, 0.16, 0.16]} />
+          <primitive object={materials.enterpriseLedge} attach="material" />
+        </mesh>
       ))}
-      <mesh position={[0, spec.topY + 0.7, 0]} castShadow receiveShadow>
-        <boxGeometry args={[spec.crownWidth, 1.4, spec.crownDepth]} />
+      <mesh position={[0, spec.topY + 0.42, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[spec.coreWidth * 0.42, spec.coreWidth * 0.52, 0.84, 8]} />
         <primitive object={materials.enterprisePodium} attach="material" />
       </mesh>
-      <mesh position={[0, spec.topY + 1.4 + totalHeight * 0.09, 0]} castShadow>
-        <cylinderGeometry args={[0.06, 0.1, totalHeight * 0.18, 6]} />
+      <mesh position={[0, spec.topY + 0.94, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[spec.coreWidth * 0.48, 0.035, 8, 44]} />
+        <primitive object={materials.cyanLine} attach="material" />
+      </mesh>
+      <mesh position={[0, spec.topY + 1.7, 0]} castShadow>
+        <cylinderGeometry args={[0.055, 0.09, 1.34, 6]} />
         <primitive object={materials.antenna} attach="material" />
       </mesh>
-      <mesh position={[0, spec.topY + 1.4 + totalHeight * 0.18 + 0.18, 0]}>
-        <sphereGeometry args={[0.22, 12, 8]} />
+      <mesh position={[0, spec.topY + 2.42, 0]}>
+        <sphereGeometry args={[0.2, 12, 8]} />
         <primitive object={materials.beacon} attach="material" />
       </mesh>
       <RooftopEquipment
         seed={seed}
         skipAfterVisual={1}
-        width={spec.podiumWidth * 0.7}
-        depth={spec.podiumDepth * 0.7}
+        width={spec.podiumWidth * 0.78}
+        depth={spec.podiumDepth * 0.78}
         baseY={spec.podiumHeight}
         dense
         materials={materials}
@@ -465,51 +659,376 @@ function EnterpriseBuilding({
   );
 }
 
-function Plinth({
+function FoundingBuilding({
   building,
-  material,
+  facadeMaterial,
+  glassMaterial,
+  materials,
 }: {
   building: LiveBuildingLayout;
-  material: THREE.Material;
+  facadeMaterial: THREE.Material;
+  glassMaterial: THREE.Material | null;
+  materials: StaticMaterialSet;
 }) {
+  const { width, depth, height, seed } = building.visual;
+  const spec = useMemo(() => {
+    const rng = rngAfterVisual(seed);
+    const baseHeight = height * 0.18;
+    const shaftHeight = height * 0.72;
+    return {
+      baseHeight,
+      shaftHeight,
+      spireHeight: height * 0.26,
+      finOffset: width * (0.6 + rng() * 0.08),
+    };
+  }, [height, seed, width]);
+
   return (
-    <mesh position={[0, 0.06, 0]} receiveShadow>
-      <boxGeometry
-        args={[building.visual.width + 0.5, 0.12, building.visual.depth + 0.5]}
+    <group>
+      <mesh position={[0, spec.baseHeight / 2, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[width * 0.64, width * 0.78, spec.baseHeight, 8]} />
+        <primitive object={materials.enterprisePodium} attach="material" />
+      </mesh>
+      <mesh position={[0, spec.baseHeight + spec.shaftHeight / 2, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[width * 0.24, width * 0.36, spec.shaftHeight, 8]} />
+        <primitive object={facadeMaterial} attach="material" />
+      </mesh>
+      {glassMaterial && (
+        <mesh position={[0, spec.baseHeight + spec.shaftHeight / 2, depth * 0.18]}>
+          <boxGeometry args={[width * 0.18, spec.shaftHeight * 0.82, 0.05]} />
+          <primitive object={glassMaterial} attach="material" />
+        </mesh>
+      )}
+      {[0, Math.PI / 2, Math.PI, Math.PI * 1.5].map((rotation, index) => (
+        <mesh
+          key={index}
+          position={[
+            Math.sin(rotation) * spec.finOffset * 0.28,
+            spec.baseHeight + spec.shaftHeight * 0.38,
+            Math.cos(rotation) * spec.finOffset * 0.28,
+          ]}
+          rotation={[0, rotation, 0]}
+          castShadow
+          receiveShadow
+        >
+          <boxGeometry args={[0.12, spec.shaftHeight * 0.78, spec.finOffset]} />
+          <primitive object={materials.ivoryShell} attach="material" />
+        </mesh>
+      ))}
+      <FoundingBasePavilions width={width} depth={depth} y={spec.baseHeight + 0.12} materials={materials} />
+      <mesh position={[0, spec.baseHeight + spec.shaftHeight + spec.spireHeight / 2, 0]} castShadow>
+        <coneGeometry args={[width * 0.2, spec.spireHeight, 8]} />
+        <primitive object={materials.warmGold} attach="material" />
+      </mesh>
+      <mesh position={[0, spec.baseHeight + spec.shaftHeight + spec.spireHeight + 0.3, 0]}>
+        <sphereGeometry args={[0.2, 12, 8]} />
+        <primitive object={materials.beacon} attach="material" />
+      </mesh>
+      <RooftopEquipment
+        seed={seed}
+        skipAfterVisual={2}
+        width={width * 1.2}
+        depth={depth * 1.2}
+        baseY={spec.baseHeight}
+        dense
+        materials={materials}
       />
-      <primitive object={material} attach="material" />
-    </mesh>
+    </group>
   );
 }
 
-function PitchedRoof({
+function FoundingBasePavilions({
+  width,
+  depth,
+  y,
+  materials,
+}: {
+  width: number;
+  depth: number;
+  y: number;
+  materials: StaticMaterialSet;
+}) {
+  return (
+    <group>
+      {[
+        [0, -0.52],
+        [0.52, 0],
+        [0, 0.52],
+        [-0.52, 0],
+      ].map(([x, z], index) => (
+        <group key={index} position={[x * width, y, z * depth]}>
+          <mesh castShadow receiveShadow>
+            <boxGeometry args={[width * 0.18, 0.42, depth * 0.18]} />
+            <primitive object={materials.enterprisePodium} attach="material" />
+          </mesh>
+          <mesh position={[0, 0.28, 0]}>
+            <boxGeometry args={[width * 0.24, 0.08, depth * 0.24]} />
+            <primitive object={materials.warmGold} attach="material" />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
+function CornerPylons({
   width,
   depth,
   height,
-  y,
-  material,
+  materials,
 }: {
   width: number;
   depth: number;
   height: number;
-  y: number;
-  material: THREE.Material;
+  materials: StaticMaterialSet;
 }) {
-  const geometry = useMemo(
-    () => makePitchedRoofGeometry(width, depth, height),
-    [depth, height, width],
-  );
-
-  useEffect(() => () => geometry.dispose(), [geometry]);
-
+  const x = width * 0.43;
+  const z = depth * 0.43;
   return (
-    <mesh
-      geometry={geometry}
-      material={material}
-      position={[0, y, 0]}
-      castShadow
-      receiveShadow
-    />
+    <group>
+      {[
+        [-x, -z],
+        [x, -z],
+        [-x, z],
+        [x, z],
+      ].map(([px, pz], index) => (
+        <mesh key={index} position={[px, height * 0.5, pz]} castShadow receiveShadow>
+          <cylinderGeometry args={[0.08, 0.1, height * 0.95, 8]} />
+          <primitive object={materials.ivoryShell} attach="material" />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+function StarterSideModules({
+  width,
+  depth,
+  height,
+  materials,
+}: {
+  width: number;
+  depth: number;
+  height: number;
+  materials: StaticMaterialSet;
+}) {
+  return (
+    <group>
+      {[-1, 1].map((side) => (
+        <group key={side} position={[side * width * 0.6, 0, -depth * 0.06]}>
+          <mesh position={[0, height * 0.33, 0]} castShadow receiveShadow>
+            <boxGeometry args={[width * 0.26, height * 0.5, depth * 0.62]} />
+            <primitive object={materials.graphiteShell} attach="material" />
+          </mesh>
+          <mesh position={[0, height * 0.62, 0]} scale={[width * 0.16, 0.18, depth * 0.34]} castShadow receiveShadow>
+            <sphereGeometry args={[1, 16, 8]} />
+            <primitive object={materials.starterShell} attach="material" />
+          </mesh>
+        </group>
+      ))}
+      <mesh position={[0, height * 0.84, depth * 0.12]} castShadow receiveShadow>
+        <boxGeometry args={[width * 0.86, 0.12, depth * 0.2]} />
+        <primitive object={materials.warmGold} attach="material" />
+      </mesh>
+    </group>
+  );
+}
+
+function StarterAtriumPods({
+  width,
+  depth,
+  height,
+  materials,
+}: {
+  width: number;
+  depth: number;
+  height: number;
+  materials: StaticMaterialSet;
+}) {
+  return (
+    <group>
+      {[-0.34, 0.34].map((x, index) => (
+        <group key={index} position={[x * width, height * 0.72, -depth * 0.36]}>
+          <mesh castShadow receiveShadow>
+            <cylinderGeometry args={[0.18, 0.22, height * 0.38, 14]} />
+            <primitive object={materials.starterTank} attach="material" />
+          </mesh>
+          <mesh position={[0, height * 0.24, 0]} scale={[0.24, 0.16, 0.24]}>
+            <sphereGeometry args={[1, 12, 8]} />
+            <primitive object={materials.cyanGlass} attach="material" />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
+function ControlTowerFins({
+  width,
+  depth,
+  baseY,
+  height,
+  materials,
+}: {
+  width: number;
+  depth: number;
+  baseY: number;
+  height: number;
+  materials: StaticMaterialSet;
+}) {
+  return (
+    <group>
+      {[0, Math.PI / 2, Math.PI, Math.PI * 1.5].map((rotation, index) => (
+        <mesh
+          key={index}
+          position={[
+            Math.sin(rotation) * width * 0.46,
+            baseY + height * 0.5,
+            Math.cos(rotation) * depth * 0.46,
+          ]}
+          rotation={[0, rotation, 0]}
+          castShadow
+          receiveShadow
+        >
+          <boxGeometry args={[0.07, height * 0.82, 0.16]} />
+          <primitive object={index % 2 ? materials.cyanLine : materials.ivoryShell} attach="material" />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+function CampusSatellites({
+  width,
+  depth,
+  y,
+  materials,
+}: {
+  width: number;
+  depth: number;
+  y: number;
+  materials: StaticMaterialSet;
+}) {
+  return (
+    <group>
+      {[
+        [-0.34, -0.36],
+        [0.34, 0.36],
+        [-0.34, 0.34],
+        [0.34, -0.34],
+      ].map(([x, z], index) => (
+        <group key={index} position={[x * width, y, z * depth]}>
+          <mesh castShadow receiveShadow>
+            <cylinderGeometry args={[0.28, 0.34, 0.48, 12]} />
+            <primitive object={materials.ivoryShell} attach="material" />
+          </mesh>
+          <mesh position={[0, 0.34, 0]} scale={[0.28, 0.14, 0.28]}>
+            <sphereGeometry args={[1, 14, 8]} />
+            <primitive object={materials.cyanGlass} attach="material" />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
+function Plinth({
+  building,
+  materials,
+}: {
+  building: LiveBuildingLayout;
+  materials: StaticMaterialSet;
+}) {
+  return (
+    <group>
+      <mesh position={[0, 0.06, 0]} receiveShadow>
+        <boxGeometry
+          args={[building.visual.width + 0.68, 0.12, building.visual.depth + 0.68]}
+        />
+        <primitive object={materials.plinth} attach="material" />
+      </mesh>
+      <mesh position={[0, 0.135, 0]} receiveShadow>
+        <boxGeometry
+          args={[building.visual.width + 0.38, 0.035, building.visual.depth + 0.38]}
+        />
+        <primitive object={materials.darkPanel} attach="material" />
+      </mesh>
+      <mesh position={[0, 0.158, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[Math.max(building.visual.width, building.visual.depth) * 0.54, 0.025, 8, 48]} />
+        <primitive object={building.visual.tierKey === 'founding' ? materials.warmGold : materials.cyanLine} attach="material" />
+      </mesh>
+    </group>
+  );
+}
+
+function HatchPodPetals({
+  width,
+  depth,
+  height,
+  materials,
+  scale = 1,
+}: {
+  width: number;
+  depth: number;
+  height: number;
+  materials: StaticMaterialSet;
+  scale?: number;
+}) {
+  const radius = Math.max(width, depth) * 0.34 * scale;
+  return (
+    <group>
+      {[0, Math.PI / 2, Math.PI, Math.PI * 1.5].map((angle, index) => (
+        <mesh
+          key={index}
+          position={[
+            Math.sin(angle) * width * 0.24,
+            height * 0.82,
+            Math.cos(angle) * depth * 0.24,
+          ]}
+          rotation={[0.24, angle, 0]}
+          scale={[radius, radius * 0.62, radius * 0.24]}
+          castShadow
+          receiveShadow
+        >
+          <sphereGeometry args={[1, 18, 10, 0, Math.PI * 2, 0, Math.PI * 0.58]} />
+          <primitive object={materials.ivoryShell} attach="material" />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+function TierMarker({
+  building,
+  materials,
+}: {
+  building: LiveBuildingLayout;
+  materials: StaticMaterialSet;
+}) {
+  const rank = tierRank(building.visual.tierKey);
+  const frontZ = building.visual.depth * 0.5 + 0.52;
+  const markerHeight = 0.46 + rank * 0.08;
+  return (
+    <group position={[0, 0.28, frontZ]}>
+      <mesh position={[0, 0.04, 0]} castShadow receiveShadow>
+        <boxGeometry args={[1.08, 0.08, 0.3]} />
+        <primitive object={materials.darkPanel} attach="material" />
+      </mesh>
+      <mesh position={[0, markerHeight / 2 + 0.08, -0.02]} castShadow receiveShadow>
+        <boxGeometry args={[0.12, markerHeight, 0.08]} />
+        <primitive object={building.visual.tierKey === 'founding' ? materials.warmGold : materials.cyanLine} attach="material" />
+      </mesh>
+      {Array.from({ length: rank }, (_, index) => (
+        <mesh
+          key={index}
+          position={[-0.36 + index * 0.18, 0.16, -0.08]}
+          rotation={[Math.PI / 2, 0, 0]}
+        >
+          <circleGeometry args={[0.055, 14]} />
+          <primitive object={index === rank - 1 && building.visual.tierKey === 'founding' ? materials.warmGold : materials.cyanLine} attach="material" />
+        </mesh>
+      ))}
+    </group>
   );
 }
 
@@ -584,7 +1103,7 @@ function RooftopEquipment({
   );
 }
 
-function SmallTree({
+function SignalNode({
   spec,
   materials,
 }: {
@@ -593,12 +1112,12 @@ function SmallTree({
 }) {
   return (
     <group position={[spec.x, 0.16, spec.z]}>
-      <mesh position={[0, 0.25, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.08, 0.1, 0.5, 5]} />
+      <mesh position={[0, 0.3, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.04, 0.055, 0.62, 8]} />
         <primitive object={materials.treeTrunk} attach="material" />
       </mesh>
-      <mesh position={[0, 0.7, 0]} castShadow receiveShadow>
-        <icosahedronGeometry args={[0.42, 0]} />
+      <mesh position={[0, 0.72, 0]} castShadow receiveShadow>
+        <icosahedronGeometry args={[0.22, 0]} />
         <primitive object={materials.treeFoliage} attach="material" />
       </mesh>
     </group>
@@ -691,7 +1210,7 @@ function rngAfterVisual(seed: number): () => number {
   return rng;
 }
 
-function makeTreeSpec(rng: () => number, width: number, depth: number) {
+function makeSignalNodeSpec(rng: () => number, width: number, depth: number) {
   if (rng() <= 0.4) return null;
   return {
     x: (rng() - 0.5) * width * 1.3,
@@ -699,24 +1218,21 @@ function makeTreeSpec(rng: () => number, width: number, depth: number) {
   };
 }
 
-function makePitchedRoofGeometry(
-  width: number,
-  depth: number,
-  height: number,
-): THREE.ExtrudeGeometry {
-  const shape = new THREE.Shape();
-  shape.moveTo(-width / 2, 0);
-  shape.lineTo(width / 2, 0);
-  shape.lineTo(0, height);
-  shape.lineTo(-width / 2, 0);
-  const geometry = new THREE.ExtrudeGeometry(shape, {
-    depth,
-    bevelEnabled: false,
-    steps: 1,
-  });
-  geometry.translate(0, 0, -depth / 2);
-  geometry.computeVertexNormals();
-  return geometry;
+function tierRank(tier: LiveCityTierKey): number {
+  switch (tier) {
+    case 'free':
+      return 1;
+    case 'starter':
+      return 2;
+    case 'pro':
+      return 3;
+    case 'business':
+      return 4;
+    case 'founding':
+      return 5;
+    default:
+      return 1;
+  }
 }
 
 function makeFacadeTextures(
@@ -737,36 +1253,36 @@ function makeFacadeTextures(
     free: {
       cols: 4,
       rows: 4,
-      base: '#3d4a63',
-      trim: '#2a3346',
-      litColor: '#ffd089',
+      base: '#d7d5ca',
+      trim: '#8b8e91',
+      litColor: '#b7c8c0',
     },
     starter: {
       cols: 5,
       rows: 6,
-      base: '#4d6d92',
-      trim: '#33486a',
+      base: '#a9b0b4',
+      trim: '#596066',
       litColor: '#ffe4a8',
     },
     pro: {
       cols: 7,
       rows: 10,
-      base: '#475a72',
-      trim: '#2c3a4d',
+      base: '#4d5560',
+      trim: '#252b33',
       litColor: '#7fd9ff',
     },
     business: {
       cols: 9,
       rows: 16,
-      base: '#3d4863',
-      trim: '#222a3d',
+      base: '#3f4852',
+      trim: '#20262e',
       litColor: '#a9d8ff',
     },
     founding: {
       cols: 10,
       rows: 20,
-      base: '#3f4354',
-      trim: '#25283a',
+      base: '#d9d5c9',
+      trim: '#5c6064',
       litColor: '#ffd46b',
     },
   }[tier];
@@ -862,28 +1378,45 @@ function makeFacadeTextures(
 function getStaticMaterials(): StaticMaterialSet {
   if (staticMaterials) return staticMaterials;
   staticMaterials = {
-    freeRoof: new THREE.MeshLambertMaterial({
-      color: 0x6b3c2e,
+    freeShell: new THREE.MeshLambertMaterial({
+      color: 0xf0ede4,
       flatShading: true,
     }),
-    freeChimney: new THREE.MeshLambertMaterial({ color: 0x4a3a30 }),
-    starterRoof: new THREE.MeshLambertMaterial({
-      color: 0x5a4030,
+    freeTrim: new THREE.MeshLambertMaterial({ color: 0xd6b177 }),
+    starterShell: new THREE.MeshLambertMaterial({
+      color: 0xe8e3d7,
       flatShading: true,
     }),
-    starterParapet: new THREE.MeshLambertMaterial({ color: 0x2a3346 }),
-    starterTank: new THREE.MeshLambertMaterial({ color: 0x6b6e7a }),
-    proLobby: new THREE.MeshLambertMaterial({ color: 0x1a2030 }),
-    enterprisePodium: new THREE.MeshLambertMaterial({ color: 0x222a3d }),
-    enterpriseLedge: new THREE.MeshLambertMaterial({ color: 0x1a2030 }),
-    antenna: new THREE.MeshLambertMaterial({ color: 0x666e80 }),
-    beacon: new THREE.MeshBasicMaterial({ color: 0xff5050 }),
-    plinth: new THREE.MeshLambertMaterial({ color: 0x6b6f78 }),
-    equipment: new THREE.MeshLambertMaterial({ color: 0x4a525e }),
-    duct: new THREE.MeshLambertMaterial({ color: 0x2e3340 }),
-    treeTrunk: new THREE.MeshLambertMaterial({ color: 0x4a3624 }),
+    starterParapet: new THREE.MeshLambertMaterial({ color: 0x343a3b }),
+    starterTank: new THREE.MeshLambertMaterial({ color: 0xa4a7a6 }),
+    proLobby: new THREE.MeshLambertMaterial({ color: 0x232b30 }),
+    enterprisePodium: new THREE.MeshLambertMaterial({ color: 0x30373a }),
+    enterpriseLedge: new THREE.MeshLambertMaterial({ color: 0x242b2e }),
+    ivoryShell: new THREE.MeshLambertMaterial({ color: 0xe9e4d8, flatShading: true }),
+    graphiteShell: new THREE.MeshLambertMaterial({ color: 0x2c3339, flatShading: true }),
+    warmGold: new THREE.MeshLambertMaterial({ color: 0xc7a86a }),
+    cyanGlass: new THREE.MeshLambertMaterial({
+      color: 0x9fe7ef,
+      emissive: 0x60dbe8,
+      emissiveIntensity: 0.34,
+      transparent: true,
+      opacity: 0.78,
+    }),
+    cyanLine: new THREE.MeshBasicMaterial({
+      color: 0x9bcfd0,
+      transparent: true,
+      opacity: 0.56,
+      toneMapped: false,
+    }),
+    darkPanel: new THREE.MeshLambertMaterial({ color: 0x232a2d }),
+    antenna: new THREE.MeshLambertMaterial({ color: 0x9ba0a3 }),
+    beacon: new THREE.MeshBasicMaterial({ color: 0xffd89a, toneMapped: false }),
+    plinth: new THREE.MeshLambertMaterial({ color: 0x6c7276 }),
+    equipment: new THREE.MeshLambertMaterial({ color: 0x545b62 }),
+    duct: new THREE.MeshLambertMaterial({ color: 0x2d343b }),
+    treeTrunk: new THREE.MeshLambertMaterial({ color: 0x27323d }),
     treeFoliage: new THREE.MeshLambertMaterial({
-      color: 0x4d7d44,
+      color: 0x6f966c,
       flatShading: true,
     }),
   };

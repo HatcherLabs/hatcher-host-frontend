@@ -30,59 +30,84 @@ interface Props {
 }
 
 const FLOOR = new THREE.MeshStandardMaterial({
-  color: 0x705235,
-  roughness: 0.82,
-  metalness: 0.02,
+  color: 0xdfe4e1,
+  roughness: 0.54,
+  metalness: 0.08,
 });
 const FLOOR_DARK = new THREE.MeshStandardMaterial({
-  color: 0x442b1a,
-  roughness: 0.88,
+  color: 0xcfd8d3,
+  roughness: 0.62,
+  metalness: 0.06,
 });
 const FLOOR_PLANK_A = new THREE.MeshStandardMaterial({
-  color: 0x7c5736,
-  roughness: 0.78,
+  color: 0xe7ece8,
+  roughness: 0.5,
+  metalness: 0.08,
 });
 const FLOOR_PLANK_B = new THREE.MeshStandardMaterial({
-  color: 0x654329,
-  roughness: 0.82,
+  color: 0xe2e8e4,
+  roughness: 0.58,
+  metalness: 0.06,
 });
 const WALL = new THREE.MeshStandardMaterial({
-  color: 0x5a4a3b,
-  roughness: 0.86,
+  color: 0x39433f,
+  roughness: 0.64,
+  metalness: 0.14,
 });
 const WALL_TRIM = new THREE.MeshStandardMaterial({
-  color: 0x3a281a,
-  roughness: 0.75,
+  color: 0x93866d,
+  roughness: 0.38,
+  metalness: 0.52,
 });
 const CEILING = new THREE.MeshStandardMaterial({
-  color: 0x2c2118,
-  roughness: 0.9,
+  color: 0xd9dfda,
+  roughness: 0.58,
+  metalness: 0.08,
 });
 const WOOD = new THREE.MeshStandardMaterial({
-  color: 0x8a5a2e,
-  roughness: 0.74,
+  color: 0x3a4242,
+  roughness: 0.48,
+  metalness: 0.24,
 });
 const WOOD_DARK = new THREE.MeshStandardMaterial({
-  color: 0x4a2e18,
-  roughness: 0.78,
+  color: 0x252b2d,
+  roughness: 0.52,
+  metalness: 0.22,
 });
 const METAL = new THREE.MeshStandardMaterial({
-  color: 0x7a7167,
-  roughness: 0.48,
-  metalness: 0.36,
+  color: 0xa8aba8,
+  roughness: 0.32,
+  metalness: 0.62,
 });
 const BLACK = new THREE.MeshStandardMaterial({
-  color: 0x0a0f18,
-  roughness: 0.62,
-  metalness: 0.15,
+  color: 0x12191b,
+  roughness: 0.42,
+  metalness: 0.26,
 });
 const FABRIC = new THREE.MeshStandardMaterial({
-  color: 0x5a4a40,
-  roughness: 0.92,
+  color: 0x2f3839,
+  roughness: 0.86,
+  metalness: 0.04,
 });
 const RUG = new THREE.MeshStandardMaterial({
-  color: 0x6b3f2b,
-  roughness: 0.84,
+  color: 0x2c3632,
+  roughness: 0.7,
+  metalness: 0.12,
+});
+const CERAMIC = new THREE.MeshStandardMaterial({
+  color: 0xf2f3ef,
+  roughness: 0.42,
+  metalness: 0.08,
+});
+const GRAPHITE_PANEL = new THREE.MeshStandardMaterial({
+  color: 0x3a4441,
+  roughness: 0.5,
+  metalness: 0.22,
+});
+const BRASS = new THREE.MeshStandardMaterial({
+  color: 0x9a8a68,
+  roughness: 0.28,
+  metalness: 0.7,
 });
 
 const INTEGRATION_CATALOG = {
@@ -221,14 +246,14 @@ function OfficeShell({
         rotation={[-Math.PI / 2, 0, 0]}
         material={RUG}
       >
-        <circleGeometry args={[2.55, 44]} />
+        <circleGeometry args={[2.34, 44]} />
       </mesh>
       <mesh position={[0, 0.038, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[1.74, 1.86, 48]} />
+        <ringGeometry args={[1.54, 1.64, 48]} />
         <meshBasicMaterial
           color="#e7c981"
           transparent
-          opacity={0.44}
+          opacity={0.34}
           toneMapped={false}
         />
       </mesh>
@@ -236,9 +261,11 @@ function OfficeShell({
         <boxGeometry args={[ROOM_SIZE, 0.1, ROOM_SIZE]} />
       </mesh>
       <RoomWalls accent={accent} secondary={secondary} />
+      <PremiumRoomRibs accent={accent} secondary={secondary} />
       <Baseboard />
       <CeilingLights accent={accent} secondary={secondary} isStreaming={isChatStreaming} />
       <WindowCity accent={secondary} />
+      <RoomServicePods accent={accent} />
       <ExitDoor
         stationId="buildingExit"
         layout={layout}
@@ -271,22 +298,25 @@ function FloorPlanks() {
               material={(row + col) % 2 === 0 ? FLOOR_PLANK_A : FLOOR_PLANK_B}
             >
               <boxGeometry
-                args={[plankW - 0.035, 0.018, ROOM_SIZE / rows - 0.035]}
+                args={[plankW - 0.008, 0.014, ROOM_SIZE / rows - 0.008]}
               />
             </mesh>
           );
         }),
       )}
-      {Array.from({ length: rows + 1 }, (_, i) => (
-        <mesh
-          key={`seam-z-${i}`}
-          position={[0, 0.018, -ROOM_HALF + i * (ROOM_SIZE / rows)]}
-          receiveShadow
-          material={FLOOR_DARK}
-        >
-          <boxGeometry args={[ROOM_SIZE, 0.01, 0.018]} />
-        </mesh>
-      ))}
+      {Array.from({ length: rows + 1 }, (_, i) => {
+        if (i % 3 !== 0) return null;
+        return (
+          <mesh
+            key={`seam-z-${i}`}
+            position={[0, 0.018, -ROOM_HALF + i * (ROOM_SIZE / rows)]}
+            receiveShadow
+            material={FLOOR_DARK}
+          >
+            <boxGeometry args={[ROOM_SIZE, 0.008, 0.012]} />
+          </mesh>
+        );
+      })}
     </group>
   );
 }
@@ -437,8 +467,8 @@ function WindowViewBackdrop({
   );
   const skyColor = timeMode === 'day' ? '#dce8f0' : '#162038';
   const horizonColor = timeMode === 'day' ? '#b9d6db' : '#1e2d40';
-  const groundColor = timeMode === 'day' ? '#7dbb72' : '#314a31';
-  const groundAlt = timeMode === 'day' ? '#95ca86' : '#3f5d3c';
+  const groundColor = timeMode === 'day' ? '#6f8178' : '#223038';
+  const groundAlt = timeMode === 'day' ? '#87948d' : '#2d3d45';
   const roadColor = timeMode === 'day' ? '#1a2130' : '#111827';
   const hillColor = timeMode === 'day' ? '#89a6a2' : '#1d3440';
   const farHillColor = timeMode === 'day' ? '#a8bec2' : '#22394a';
@@ -588,6 +618,162 @@ function Baseboard() {
       <mesh position={[ROOM_HALF - 0.14, 0.1, 0]} material={WALL_TRIM}>
         <boxGeometry args={[0.07, 0.2, ROOM_SIZE]} />
       </mesh>
+    </group>
+  );
+}
+
+function PremiumRoomRibs({
+  accent,
+  secondary,
+}: {
+  accent: string;
+  secondary: string;
+}) {
+  void secondary;
+  const backZ = ROOM_HALF - 0.19;
+  const frontZ = -ROOM_HALF + 0.19;
+  return (
+    <group>
+      {[-5.7, -2.85, 0, 2.85, 5.7].map((x, index) => (
+        <group key={`front-rib-${x}`}>
+          <mesh position={[x, ROOM_HEIGHT / 2, frontZ]} castShadow receiveShadow material={BRASS}>
+            <boxGeometry args={[0.08, ROOM_HEIGHT - 0.32, 0.08]} />
+          </mesh>
+          <mesh position={[x, ROOM_HEIGHT - 0.72, frontZ + 0.02]}>
+            <boxGeometry args={[1.16, 0.045, 0.035]} />
+            <meshBasicMaterial
+              color="#aab8b0"
+              transparent
+              opacity={0.045}
+              toneMapped={false}
+            />
+          </mesh>
+        </group>
+      ))}
+
+      {[-5.7, -2.85, 0, 2.85, 5.7].map((x, index) => (
+        <group key={`back-rib-${x}`}>
+          <mesh position={[x, ROOM_HEIGHT / 2, backZ]} castShadow receiveShadow material={BRASS}>
+            <boxGeometry args={[0.08, ROOM_HEIGHT - 0.32, 0.08]} />
+          </mesh>
+          <mesh position={[x, ROOM_HEIGHT - 0.74, backZ - 0.02]}>
+            <boxGeometry args={[1.16, 0.045, 0.035]} />
+            <meshBasicMaterial
+              color="#aab8b0"
+              transparent
+              opacity={0.04}
+              toneMapped={false}
+            />
+          </mesh>
+        </group>
+      ))}
+
+      {[0.9, ROOM_HEIGHT - 1.02].map((y, index) => (
+        <mesh key={`back-cyan-rail-${y}`} position={[0, y, backZ - 0.03]}>
+          <boxGeometry args={[ROOM_SIZE - 2.4, 0.045, 0.035]} />
+          <meshBasicMaterial
+            color={index ? '#b7c8c0' : '#a8b9ae'}
+            transparent
+            opacity={0.03}
+            toneMapped={false}
+          />
+        </mesh>
+      ))}
+
+      {[0.9, ROOM_HEIGHT - 1.02].map((y, index) => (
+        <mesh key={`front-cyan-rail-${y}`} position={[0, y, frontZ + 0.03]}>
+          <boxGeometry args={[ROOM_SIZE - 2.4, 0.045, 0.035]} />
+          <meshBasicMaterial
+            color={index ? '#b7c8c0' : '#a8b9ae'}
+            transparent
+            opacity={0.028}
+            toneMapped={false}
+          />
+        </mesh>
+      ))}
+
+      {[-ROOM_HALF + 0.18, ROOM_HALF - 0.18].map((x, index) => (
+        <group key={`side-rail-${x}`}>
+          <mesh position={[x, ROOM_HEIGHT - 0.78, 0]} castShadow receiveShadow material={BRASS}>
+            <boxGeometry args={[0.06, 0.08, ROOM_SIZE - 1.6]} />
+          </mesh>
+          <mesh position={[x, ROOM_HEIGHT - 1.08, 0]}>
+            <boxGeometry args={[0.035, 0.045, ROOM_SIZE - 2.4]} />
+            <meshBasicMaterial
+              color={index ? '#b7c8c0' : '#a8b9ae'}
+              transparent
+              opacity={0.035}
+              toneMapped={false}
+            />
+          </mesh>
+        </group>
+      ))}
+
+      <mesh position={[0, ROOM_HEIGHT - 0.22, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[2.0, 2.08, 80]} />
+        <meshBasicMaterial
+          color={accent}
+          transparent
+          opacity={0.065}
+          depthWrite={false}
+          toneMapped={false}
+        />
+      </mesh>
+    </group>
+  );
+}
+
+function RoomServicePods({ accent }: { accent: string }) {
+  const pods: Array<{
+    key: string;
+    position: [number, number, number];
+    rotation: number;
+    scale: number;
+  }> = [
+    { key: 'left-dock', position: [-ROOM_HALF + 1.05, 0, -ROOM_HALF + 2.25], rotation: Math.PI / 4, scale: 0.92 },
+    { key: 'right-dock', position: [ROOM_HALF - 1.1, 0, -ROOM_HALF + 2.15], rotation: -Math.PI / 4, scale: 0.86 },
+    { key: 'archive-dock', position: [ROOM_HALF - 1.15, 0, ROOM_HALF - 2.55], rotation: -Math.PI * 0.72, scale: 0.72 },
+  ];
+
+  return (
+    <group>
+      {pods.map((pod, index) => (
+        <group
+          key={pod.key}
+          position={pod.position}
+          rotation={[0, pod.rotation, 0]}
+          scale={pod.scale}
+        >
+          <mesh position={[0, 0.1, 0]} castShadow receiveShadow material={GRAPHITE_PANEL}>
+            <cylinderGeometry args={[0.46, 0.56, 0.2, 28]} />
+          </mesh>
+          <mesh position={[0, 0.42, 0]} scale={[0.7, 0.62, 0.58]} castShadow receiveShadow material={CERAMIC}>
+            <sphereGeometry args={[0.56, 24, 14]} />
+          </mesh>
+          <mesh position={[0, 0.62, 0.12]} scale={[0.44, 0.16, 0.09]}>
+            <sphereGeometry args={[0.5, 18, 10]} />
+            <meshBasicMaterial color="#b7c8c0" transparent opacity={0.32} toneMapped={false} />
+          </mesh>
+          <mesh position={[0, 0.16, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[0.42, 0.48, 42]} />
+            <meshBasicMaterial
+              color={index === 1 ? '#d6b177' : accent}
+              transparent
+              opacity={0.18}
+              depthWrite={false}
+              toneMapped={false}
+            />
+          </mesh>
+          <mesh position={[0, 0.96, 0]} castShadow>
+            <cylinderGeometry args={[0.014, 0.018, 0.38, 8]} />
+            <meshStandardMaterial color={0xa8aba8} roughness={0.3} metalness={0.62} />
+          </mesh>
+          <mesh position={[0, 1.18, 0]}>
+            <sphereGeometry args={[0.055, 10, 8]} />
+            <meshBasicMaterial color="#fff1c0" toneMapped={false} />
+          </mesh>
+        </group>
+      ))}
     </group>
   );
 }
@@ -748,9 +934,9 @@ function drawTvLogCanvas(
         : level === 'WARN'
           ? '#fbbf24'
           : level === 'OK'
-            ? '#6ee7b7'
-            : level === 'DEBUG'
-              ? '#7dd3fc'
+	            ? '#89d6c6'
+	    : level === 'DEBUG'
+	              ? '#9ed5e7'
               : '#c7d2e0';
     ctx.fillText(line.slice(0, 96), 34, y);
   });
@@ -829,12 +1015,12 @@ function drawEyesCanvas(
     status === 'error' || status === 'crashed'
       ? '#fb7185'
       : ['active', 'running', 'restarting'].includes(status)
-        ? '#68ff8a'
+	        ? '#89d6c6'
         : accent;
   const gradient = ctx.createLinearGradient(0, 0, w, h);
   gradient.addColorStop(0, `${accent}22`);
   gradient.addColorStop(0.62, 'rgba(15, 23, 42, 0.16)');
-  gradient.addColorStop(1, 'rgba(16, 185, 129, 0.12)');
+  gradient.addColorStop(1, 'rgba(115, 164, 185, 0.12)');
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, w, h);
 
@@ -961,9 +1147,9 @@ function drawLaptopCanvas(
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
-  ctx.fillStyle = '#1c130c';
+  ctx.fillStyle = '#05090d';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = 'rgba(36, 23, 13, 0.96)';
+  ctx.fillStyle = 'rgba(16, 24, 30, 0.96)';
   ctx.fillRect(0, 0, canvas.width, 42);
 
   ctx.fillStyle = '#ff5f57';
@@ -974,7 +1160,7 @@ function drawLaptopCanvas(
   ctx.beginPath();
   ctx.arc(45, 21, 6, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = '#28c840';
+  ctx.fillStyle = '#89d6c6';
   ctx.beginPath();
   ctx.arc(66, 21, 6, 0, Math.PI * 2);
   ctx.fill();
@@ -988,7 +1174,7 @@ function drawLaptopCanvas(
   tabs.forEach((tab, i) => {
     const x = 28 + i * 118;
     ctx.fillStyle =
-      i === Math.floor(elapsed / 2) % tabs.length ? accent : '#bfa88b';
+      i === Math.floor(elapsed / 2) % tabs.length ? accent : '#a8b3b8';
     ctx.fillText(tab, x, 74);
   });
 
@@ -996,11 +1182,11 @@ function drawLaptopCanvas(
   ctx.lineWidth = 2;
   ctx.strokeRect(28, 92, 252, 112);
   ctx.strokeRect(302, 92, 254, 112);
-  ctx.fillStyle = '#fff7e8';
+  ctx.fillStyle = '#f5fafb';
   ctx.font = '700 18px ui-monospace, SFMono-Regular, Menlo, monospace';
   ctx.fillText('ROOM CONTROLS', 48, 125);
   ctx.fillText('CONFIG EDITOR', 322, 125);
-  ctx.fillStyle = '#d8c3a3';
+  ctx.fillStyle = '#b6c4c9';
   ctx.font = '500 14px ui-monospace, SFMono-Regular, Menlo, monospace';
   ctx.fillText('runtime / inbox / passport', 48, 154);
   ctx.fillText('agent console online', 48, 178);
@@ -1010,7 +1196,7 @@ function drawLaptopCanvas(
   for (let i = 0; i < 28; i++) {
     const x = 36 + ((i * 43) % 500);
     const y = 228 + ((i * 29) % 70);
-    ctx.fillStyle = i % 3 === 0 ? accent : 'rgba(191,168,139,0.5)';
+    ctx.fillStyle = i % 3 === 0 ? accent : 'rgba(166,181,187,0.5)';
     ctx.fillRect(x, y, 22 + (i % 4) * 8, 3);
   }
 }
@@ -1122,9 +1308,9 @@ function createWindowTerrainGeometry(
   terrain.rotateX(-Math.PI / 2);
   const positions = terrain.attributes.position as THREE.BufferAttribute;
   const colors = new Float32Array(positions.count * 3);
-  const grass = new THREE.Color(timeMode === 'day' ? 0x7dbb72 : 0x245c37);
-  const grass2 = new THREE.Color(timeMode === 'day' ? 0x95ca86 : 0x356f43);
-  const farGrass = new THREE.Color(timeMode === 'day' ? 0xa7d29a : 0x274f37);
+  const grass = new THREE.Color(timeMode === 'day' ? 0x6f8178 : 0x223038);
+  const grass2 = new THREE.Color(timeMode === 'day' ? 0x87948d : 0x2d3d45);
+  const farGrass = new THREE.Color(timeMode === 'day' ? 0x9ca8a2 : 0x31444d);
 
   for (let i = 0; i < positions.count; i++) {
     const x = positions.getX(i);
@@ -1423,22 +1609,23 @@ function CentralPedestal({
 }: StationProps) {
   return (
     <group position={layout[stationId].position}>
+      <HatchStage accent={accent} isNear={isNear} />
       <mesh position={[0, 0.08, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[0.86, 1.02, 56]} />
+        <ringGeometry args={[0.62, 0.76, 56]} />
         <meshBasicMaterial
           color={accent}
           transparent
-          opacity={isNear ? 0.58 : 0.22}
+          opacity={isNear ? 0.38 : 0.14}
           depthWrite={false}
           toneMapped={false}
         />
       </mesh>
       <mesh position={[0, 0.12, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[1.17, 1.2, 64]} />
+        <ringGeometry args={[0.88, 0.91, 64]} />
         <meshBasicMaterial
           color="#fff1c0"
           transparent
-          opacity={isNear ? 0.34 : 0.1}
+          opacity={isNear ? 0.22 : 0.07}
           depthWrite={false}
           toneMapped={false}
         />
@@ -1450,6 +1637,46 @@ function CentralPedestal({
         radius={1.2}
         height={2.5}
       />
+    </group>
+  );
+}
+
+function HatchStage({ accent, isNear }: { accent: string; isNear: boolean }) {
+  return (
+    <group>
+      <mesh position={[0, 0.13, 0]} castShadow receiveShadow material={CERAMIC}>
+        <cylinderGeometry args={[0.78, 0.92, 0.16, 48]} />
+      </mesh>
+      <mesh position={[0, 0.27, 0]} castShadow receiveShadow material={GRAPHITE_PANEL}>
+        <cylinderGeometry args={[0.52, 0.64, 0.1, 48]} />
+      </mesh>
+      <mesh position={[0, 0.3, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.38, 0.48, 64]} />
+        <meshBasicMaterial
+          color={accent}
+          transparent
+          opacity={isNear ? 0.32 : 0.14}
+          toneMapped={false}
+          depthWrite={false}
+        />
+      </mesh>
+      {[0, 1, 2, 3, 4, 5].map((index) => {
+        const angle = (index / 6) * Math.PI * 2;
+        return (
+          <mesh
+            key={index}
+            position={[Math.cos(angle) * 0.46, 0.23, Math.sin(angle) * 0.46]}
+            rotation={[0.18, -angle, 0]}
+            scale={[0.42, 0.27, 0.22]}
+            castShadow
+            receiveShadow
+            material={CERAMIC}
+          >
+            <sphereGeometry args={[0.24, 16, 10, 0, Math.PI * 2, 0, Math.PI * 0.44]} />
+          </mesh>
+        );
+      })}
+      <pointLight color={accent} intensity={isNear ? 0.32 : 0.14} distance={3.8} />
     </group>
   );
 }
@@ -1478,7 +1705,7 @@ function TvStation({
     status === 'error' || status === 'crashed'
       ? '#fb7185'
       : ['active', 'running', 'restarting'].includes(status)
-        ? '#68ff8a'
+	        ? '#89d6c6'
         : '#ffd166';
   return (
     <group position={[0, 0, 0]}>
@@ -1691,12 +1918,26 @@ function CorkboardStation({
         position={[-3.65, 1.92, ROOM_HALF - 0.14]}
         rotation={[0, Math.PI, 0]}
       >
-        <mesh material={WOOD_DARK}>
+        <mesh material={GRAPHITE_PANEL}>
           <boxGeometry args={[4.35, 2.52, 0.06]} />
         </mesh>
         <mesh position={[0, 0, 0.04]}>
           <boxGeometry args={[4.05, 2.25, 0.05]} />
-          <meshStandardMaterial color="#a67a4a" roughness={0.9} />
+          <meshStandardMaterial
+            color="#10171c"
+            roughness={0.54}
+            metalness={0.22}
+            emissive={accent}
+            emissiveIntensity={0.025}
+          />
+        </mesh>
+        <mesh position={[0, 1.22, 0.085]}>
+          <boxGeometry args={[4.2, 0.05, 0.035]} />
+          <meshBasicMaterial color={accent} transparent opacity={0.5} toneMapped={false} />
+        </mesh>
+        <mesh position={[0, -1.22, 0.085]}>
+          <boxGeometry args={[4.2, 0.05, 0.035]} />
+          <meshBasicMaterial color="#d6b177" transparent opacity={0.42} toneMapped={false} />
         </mesh>
         {integrations.map((integration, i) => {
           const col = i % 4;
@@ -1712,11 +1953,13 @@ function CorkboardStation({
               rotation={[0, 0, (((i * 17) % 7) - 3) * 0.01]}
             >
               <mesh>
-                <boxGeometry args={[0.82, 0.52, 0.035]} />
-                <meshLambertMaterial
-                  color={connected ? '#f1ead7' : '#6d6655'}
+                <boxGeometry args={[0.82, 0.52, 0.04]} />
+                <meshStandardMaterial
+                  color={connected ? '#e9e5dc' : '#273038'}
+                  metalness={connected ? 0.22 : 0.36}
+                  roughness={0.48}
                   emissive={connected ? color : '#000'}
-                  emissiveIntensity={connected ? 0.12 : 0}
+                  emissiveIntensity={connected ? 0.16 : 0}
                 />
               </mesh>
               <mesh position={[-0.27, 0.08, 0.03]}>
@@ -1726,7 +1969,7 @@ function CorkboardStation({
               <group position={[0.12, 0.08, 0.057]}>
                 <FlatBoardLabel
                   text={integration.label}
-                  color={connected ? '#111827' : '#c8bea4'}
+                  color={connected ? '#111827' : '#b9c3c7'}
                 />
               </group>
             </group>
@@ -1762,12 +2005,12 @@ function BookshelfStation({
   canEdit: boolean;
 }) {
   const bookColors = [
-    '#8a3a4a',
-    '#4a6a8a',
-    '#6b8a4a',
-    '#8a6e3a',
-    '#6b4a6e',
-    '#3a6b6e',
+    '#50605f',
+    '#586765',
+    '#63706c',
+    '#52706b',
+    '#72664b',
+    '#5b606a',
   ];
   const memoryFiles = [
     'soul.md',
@@ -1780,22 +2023,23 @@ function BookshelfStation({
   return (
     <group>
       <group position={[ROOM_HALF - 0.3, 0, 0]}>
-        <mesh position={[0.02, 1.9, 0]} material={WOOD}>
+        <mesh position={[0.02, 1.9, 0]}>
           <boxGeometry args={[0.42, 3.35, 7.45]} />
+          <meshStandardMaterial color="#465150" roughness={0.44} metalness={0.18} />
         </mesh>
-        <mesh position={[-0.22, 0.22, 0]} material={WOOD}>
+        <mesh position={[-0.22, 0.22, 0]} material={BRASS}>
           <boxGeometry args={[0.74, 0.12, 7.64]} />
         </mesh>
-        <mesh position={[-0.22, 3.64, 0]} material={WOOD}>
+        <mesh position={[-0.22, 3.64, 0]} material={BRASS}>
           <boxGeometry args={[0.74, 0.12, 7.64]} />
         </mesh>
         {[-3.86, 3.86].map((z) => (
-          <mesh key={z} position={[-0.22, 1.92, z]} material={WOOD}>
+          <mesh key={z} position={[-0.22, 1.92, z]} material={BRASS}>
             <boxGeometry args={[0.74, 3.42, 0.12]} />
           </mesh>
         ))}
         {[0.88, 1.58, 2.28, 2.98].map((y) => (
-          <mesh key={y} position={[-0.22, y, 0]} material={WOOD}>
+          <mesh key={y} position={[-0.22, y, 0]} material={METAL}>
             <boxGeometry args={[0.72, 0.06, 7.35]} />
           </mesh>
         ))}
@@ -1814,10 +2058,12 @@ function BookshelfStation({
               rotation={[0, 0, ((i % 5) - 2) * 0.012]}
             >
               <boxGeometry args={[0.16, h, width]} />
-              <meshLambertMaterial
-                color={memory ? '#c89a55' : bookColors[i % bookColors.length]}
+              <meshStandardMaterial
+                color={memory ? '#d6b177' : bookColors[i % bookColors.length]}
+                roughness={0.48}
+                metalness={0.28}
                 emissive={memory ? accent : '#000'}
-                emissiveIntensity={memory ? 0.22 : 0}
+                emissiveIntensity={memory ? 0.3 : i % 11 === 0 ? 0.08 : 0}
               />
             </mesh>
           );
@@ -1836,7 +2082,7 @@ function BookshelfStation({
                 <mesh position={[0, -0.01, -0.006]}>
                   <planeGeometry args={[0.5, 0.14]} />
                   <meshBasicMaterial
-                    color="#2b1b10"
+                    color="#061016"
                     transparent
                     opacity={0.72}
                     toneMapped={false}
@@ -1845,7 +2091,7 @@ function BookshelfStation({
                 </mesh>
                 <FlatBoardLabel
                   text={name}
-                  color="#f8ead0"
+                  color="#f5fafb"
                   width={0.44}
                   height={0.095}
                 />
@@ -1891,7 +2137,7 @@ function ExitDoor({
           position={[0, 1.08, 0]}
           castShadow
           receiveShadow
-          material={WOOD_DARK}
+          material={GRAPHITE_PANEL}
         >
           <boxGeometry args={[1.12, 2.16, 0.07]} />
         </mesh>
@@ -1901,13 +2147,13 @@ function ExitDoor({
         <mesh position={[0.4, 1.05, 0.05]} material={METAL}>
           <sphereGeometry args={[0.05, 12, 8]} />
         </mesh>
-        <mesh position={[0, 2.42, -0.08]} material={WOOD_DARK}>
+        <mesh position={[0, 2.42, -0.08]} material={BRASS}>
           <boxGeometry args={[0.86, 0.24, 0.035]} />
         </mesh>
         <group position={[0, 2.42, -0.105]}>
           <FlatBoardLabel
             text="BUILDING"
-            color="#f6ead8"
+            color="#f5fafb"
             width={0.72}
             height={0.13}
           />
@@ -1946,7 +2192,7 @@ function SmallShelfPlant({ position }: { position: [number, number, number] }) {
     <group position={position} scale={0.34}>
       <mesh position={[0, 0.16, 0]}>
         <cylinderGeometry args={[0.18, 0.22, 0.32, 12]} />
-        <meshLambertMaterial color="#6b3f2b" />
+        <meshLambertMaterial color="#2e3437" />
       </mesh>
       {[0, 1, 2, 3, 4].map((i) => {
         const a = (i / 5) * Math.PI * 2;
@@ -1958,7 +2204,7 @@ function SmallShelfPlant({ position }: { position: [number, number, number] }) {
             rotation={[0.28, a, 0.48]}
           >
             <sphereGeometry args={[0.18, 8, 6]} />
-            <meshLambertMaterial color={i % 2 ? '#2f7d4a' : '#1f6b41'} />
+            <meshLambertMaterial color={i % 2 ? '#6f9189' : '#4f7470'} />
           </mesh>
         );
       })}
@@ -1979,7 +2225,7 @@ function FlowerPot({
     <group position={position} scale={scale}>
       <mesh position={[0, 0.18, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[0.18, 0.24, 0.36, 12]} />
-        <meshLambertMaterial color="#6b3f2b" />
+        <meshLambertMaterial color="#2e3437" />
       </mesh>
       {[0, 1, 2, 3, 4, 5].map((i) => {
         const a = (i / 6) * Math.PI * 2;
@@ -1997,7 +2243,7 @@ function FlowerPot({
       })}
       <mesh position={[0, 0.44, 0]}>
         <sphereGeometry args={[0.17, 8, 6]} />
-        <meshLambertMaterial color="#1f6b41" />
+        <meshLambertMaterial color="#4f7470" />
       </mesh>
     </group>
   );
@@ -2014,15 +2260,15 @@ function Tree({
     <group position={position} scale={scale}>
       <mesh position={[0, 0.34, 0]}>
         <cylinderGeometry args={[0.08, 0.1, 0.68, 8]} />
-        <meshLambertMaterial color="#5b3a22" />
+        <meshLambertMaterial color="#2e3437" />
       </mesh>
       <mesh position={[0, 0.88, 0]}>
         <coneGeometry args={[0.36, 0.78, 9]} />
-        <meshLambertMaterial color="#1f6b41" />
+        <meshLambertMaterial color="#4f7470" />
       </mesh>
       <mesh position={[0, 1.2, 0]}>
         <coneGeometry args={[0.28, 0.62, 9]} />
-        <meshLambertMaterial color="#2f7d4a" />
+        <meshLambertMaterial color="#6f9189" />
       </mesh>
     </group>
   );
@@ -2039,7 +2285,7 @@ function Plant({
     <group position={position} scale={scale}>
       <mesh position={[0, 0.23, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[0.2, 0.28, 0.46, 14]} />
-        <meshLambertMaterial color="#6b3f2b" />
+        <meshLambertMaterial color="#2e3437" />
       </mesh>
       {Array.from({ length: 7 }, (_, i) => {
         const a = (i / 7) * Math.PI * 2;
@@ -2056,7 +2302,7 @@ function Plant({
             castShadow
           >
             <sphereGeometry args={[0.18, 8, 6]} />
-            <meshLambertMaterial color={i % 2 ? '#2f7d4a' : '#1f6b41'} />
+            <meshLambertMaterial color={i % 2 ? '#6f9189' : '#4f7470'} />
           </mesh>
         );
       })}

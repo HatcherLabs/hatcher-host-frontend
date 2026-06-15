@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { ArrowLeft, LayoutDashboard } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { cityBuildingHref } from '@/components/city/v3/cityNavigation';
@@ -38,15 +39,17 @@ export function BackToCity({ agentId }: Props = {}) {
     >
       <Link
         href={target.href}
-        className="rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-base)]/80 px-3 py-2 text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--text-primary)] backdrop-blur transition hover:border-[var(--accent)] hover:bg-[rgba(74,222,128,0.06)] hover:text-[var(--accent)]"
+        className="inline-flex items-center gap-2 rounded-full border border-[#d6b177]/35 bg-[rgba(21,16,11,0.76)] px-3.5 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#f6ead8] shadow-[0_12px_30px_rgba(10,7,4,0.22)] backdrop-blur transition hover:border-[#f3d296]/80 hover:bg-[rgba(31,24,15,0.9)]"
       >
-        ← {target.label}
+        <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
+        {target.label}
       </Link>
       {dashboardHref && target.href !== dashboardHref && (
         <Link
           href={dashboardHref}
-          className="rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-base)]/70 px-3 py-2 text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--text-muted)] backdrop-blur transition hover:border-[var(--accent)] hover:bg-[rgba(74,222,128,0.06)] hover:text-[var(--accent)]"
+          className="inline-flex items-center gap-2 rounded-full border border-[#d6b177]/22 bg-[rgba(21,16,11,0.58)] px-3.5 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#d8c2a0] shadow-[0_12px_30px_rgba(10,7,4,0.18)] backdrop-blur transition hover:border-[#f3d296]/70 hover:bg-[rgba(31,24,15,0.86)] hover:text-[#f6ead8]"
         >
+          <LayoutDashboard className="h-3.5 w-3.5" aria-hidden />
           {t('toDashboard')}
         </Link>
       )}

@@ -72,7 +72,7 @@ export function EgressCard({ agentId }: { agentId: string }) {
           <div className="grid grid-cols-3 gap-2">
             <div className="rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-card)] p-3">
               <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.12em] text-[var(--text-muted)]">
-                <CheckCircle2 size={12} className="text-emerald-400" />
+                <CheckCircle2 size={12} className="text-[var(--color-success)]" />
                 Allowed
               </div>
               <div className="mt-1 text-lg font-semibold tabular-nums text-[var(--text-primary)]">
@@ -81,7 +81,7 @@ export function EgressCard({ agentId }: { agentId: string }) {
             </div>
             <div className="rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-card)] p-3">
               <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.12em] text-[var(--text-muted)]">
-                <AlertTriangle size={12} className="text-amber-400" />
+                <AlertTriangle size={12} className="text-[var(--color-warning)]" />
                 Blocked
               </div>
               <div className="mt-1 text-lg font-semibold tabular-nums text-[var(--text-primary)]">
@@ -90,7 +90,7 @@ export function EgressCard({ agentId }: { agentId: string }) {
             </div>
             <div className="rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-card)] p-3">
               <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.12em] text-[var(--text-muted)]">
-                <Globe2 size={12} className="text-sky-400" />
+                <Globe2 size={12} className="text-[var(--color-info)]" />
                 Hosts
               </div>
               <div className="mt-1 text-lg font-semibold tabular-nums text-[var(--text-primary)]">
@@ -100,7 +100,7 @@ export function EgressCard({ agentId }: { agentId: string }) {
           </div>
 
           {error ? (
-            <div className="rounded-[3px] border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-300">
+            <div className="rounded-[3px] border border-[var(--color-destructive-border)] bg-[var(--color-destructive-bg)] px-3 py-2 text-xs text-[var(--color-destructive)]">
               {error}
             </div>
           ) : null}
@@ -115,7 +115,7 @@ export function EgressCard({ agentId }: { agentId: string }) {
                   <div key={host.host} className="flex items-center justify-between gap-3 text-xs">
                     <span className="min-w-0 truncate font-mono text-[var(--text-secondary)]">{host.host}</span>
                     <span className="shrink-0 text-[var(--text-muted)]">
-                      <span className="text-emerald-400">{host.allowed}</span> / {host.blocked} blocked
+                      <span className="text-[var(--color-success)]">{host.allowed}</span> / {host.blocked} blocked
                     </span>
                   </div>
                 ))}
@@ -140,7 +140,7 @@ export function EgressCard({ agentId }: { agentId: string }) {
                       </div>
                     </div>
                     <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                      event.allowed ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'
+                      event.allowed ? 'bg-[var(--color-success-bg)] text-[var(--color-success)]' : 'bg-[var(--color-destructive-bg)] text-[var(--color-destructive)]'
                     }`}>
                       {event.allowed ? 'Allowed' : 'Blocked'}
                     </span>

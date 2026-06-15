@@ -18,6 +18,7 @@ import { DOCS_URL } from '@/lib/config';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
 import { LocaleSwitcher } from './LocaleSwitcher';
 import { VersionBadge } from './VersionBadge';
+import { formatFeatureKey } from '@/lib/feature-labels';
 
 function isActive(pathname: string, href: string) {
   if (pathname === href) return true;
@@ -224,19 +225,19 @@ export function Header() {
                   <svg viewBox="0 0 28 28" width="28" height="28" fill="none" aria-label="Hatcher logo" role="img">
                     <defs>
                       <linearGradient id="eggShell" x1="14" y1="3" x2="14" y2="27" gradientUnits="userSpaceOnUse">
-                        <stop offset="0%" stopColor="#2a2a38" />
+                        <stop offset="0%" stopColor="#10110f" />
                         <stop offset="50%" stopColor="var(--bg-elevated)" />
                         <stop offset="100%" stopColor="var(--bg-card-solid)" />
                       </linearGradient>
                       <radialGradient id="eggInnerGlow" cx="50%" cy="40%" r="40%">
-                        <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.35" />
-                        <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
+                        <stop offset="0%" stopColor="#73a4b9" stopOpacity="0.32" />
+                        <stop offset="100%" stopColor="#73a4b9" stopOpacity="0" />
                       </radialGradient>
                     </defs>
-                    <path d="M14 4 C8.5 4, 5 10, 5 15.5 C5 21, 9 26, 14 26 C19 26, 23 21, 23 15.5 C23 10, 19.5 4, 14 4Z" fill="url(#eggShell)" stroke="rgba(139,92,246,0.5)" strokeWidth="0.8" />
+                    <path d="M14 4 C8.5 4, 5 10, 5 15.5 C5 21, 9 26, 14 26 C19 26, 23 21, 23 15.5 C23 10, 19.5 4, 14 4Z" fill="url(#eggShell)" stroke="rgba(115,164,185,0.65)" strokeWidth="0.8" />
                     <path d="M14 4 C8.5 4, 5 10, 5 15.5 C5 21, 9 26, 14 26 C19 26, 23 21, 23 15.5 C23 10, 19.5 4, 14 4Z" fill="url(#eggInnerGlow)" />
-                    <path d="M10 14.5 L12.5 12.5 L11 10.5 L13.5 9 L12 7" stroke="#8b5cf6" strokeWidth="0.7" strokeLinecap="round" fill="none" opacity="0.6" />
-                    <circle cx="12" cy="11" r="1.5" fill="#8b5cf6" opacity="0.3" />
+                    <path d="M10 14.5 L12.5 12.5 L11 10.5 L13.5 9 L12 7" stroke="#4a778b" strokeWidth="0.7" strokeLinecap="round" fill="none" opacity="0.62" />
+                    <circle cx="12" cy="11" r="1.5" fill="#4a778b" opacity="0.28" />
                     <ellipse cx="11" cy="10" rx="2.5" ry="4" fill="white" opacity="0.04" transform="rotate(-15 11 10)" />
                   </svg>
                 </span>
@@ -389,6 +390,7 @@ export function Header() {
                             <div className="min-w-0 flex-1">
                               <p className="text-xs text-[var(--text-primary)] font-medium truncate group-hover:text-purple-300 transition-colors">{user.username}</p>
                               <p className="text-[10px] text-[var(--text-secondary)] truncate">{user.email}</p>
+                              <p className="mt-1 text-[10px] font-medium text-[var(--text-muted)] truncate">{formatFeatureKey(user.tier)} tier</p>
                               {aiCreditBalance !== null && aiCreditBalance > 0 && (
                                 <span
                                   onClick={(e) => { e.stopPropagation(); e.preventDefault(); setDropdownOpen(false); window.location.href = '/dashboard/billing'; }}
@@ -483,7 +485,7 @@ export function Header() {
 
             {/* Hamburger -- mobile only */}
             <button
-              className="lg:hidden flex flex-col justify-center items-center w-10 h-10 rounded-lg hover:bg-[rgba(139,92,246,0.1)] transition-colors gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+              className="lg:hidden flex flex-col justify-center items-center w-10 h-10 rounded-lg hover:bg-[var(--bg-hover)] transition-colors gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
               onClick={() => setMobileOpen(o => !o)}
               aria-label={mobileOpen ? t('closeNav') : t('openNav')}
               aria-expanded={mobileOpen}

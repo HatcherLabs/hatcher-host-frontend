@@ -82,9 +82,9 @@ function LiveMockup({ liveLabel }: { liveLabel: string }) {
         <span className={styles.livePip} aria-hidden />
         <span className={styles.liveText}>{liveLabel}</span>
       </div>
-      <div className={styles.mockRow}><span className={styles.mockKey}>room</span><span className={styles.mockVal}>3d cockpit ready</span></div>
+      <div className={styles.mockRow}><span className={styles.mockKey}>runtime</span><span className={styles.mockVal}>ready</span></div>
       <div className={styles.mockRow}><span className={styles.mockKey}>integrations</span><span className={styles.mockVal}>connected</span></div>
-      <div className={styles.mockRow}><span className={styles.mockKey}>chat</span><span className={styles.mockVal}>open →</span></div>
+      <div className={styles.mockRow}><span className={styles.mockKey}>logs</span><span className={styles.mockVal}>streaming →</span></div>
     </div>
   );
 }

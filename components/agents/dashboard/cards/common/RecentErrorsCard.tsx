@@ -32,11 +32,11 @@ export interface RecentErrorsCardProps {
 function levelStyle(level: ErrorEntry['level']) {
   switch (level) {
     case 'FATAL':
-      return { border: 'border-red-500/40',  bg: 'bg-red-500/10',       text: 'text-red-400',  icon: XCircle };
+      return { border: 'border-[var(--color-destructive-border)]', bg: 'bg-[var(--color-destructive-bg)]', text: 'text-[var(--color-destructive)]', icon: XCircle };
     case 'ERROR':
-      return { border: 'border-red-500/30',  bg: 'bg-red-500/[0.06]',   text: 'text-red-400',  icon: XCircle };
+      return { border: 'border-[var(--color-destructive-border)]', bg: 'bg-[var(--color-destructive-bg)]', text: 'text-[var(--color-destructive)]', icon: XCircle };
     case 'WARN':
-      return { border: 'border-amber-500/30', bg: 'bg-amber-500/[0.06]', text: 'text-amber-400', icon: AlertTriangle };
+      return { border: 'border-[var(--color-warning-border)]', bg: 'bg-[var(--color-warning-bg)]', text: 'text-[var(--color-warning)]', icon: AlertTriangle };
     default:
       return { border: 'border-[var(--border-default)]', bg: 'bg-[var(--bg-card)]', text: 'text-[var(--text-muted)]', icon: AlertTriangle };
   }
@@ -83,7 +83,7 @@ export function RecentErrorsCard({
     return (
       <GlassCard>
         <div className="flex items-center gap-2 mb-2">
-          <AlertTriangle size={14} className="text-amber-400" />
+          <AlertTriangle size={14} className="text-[var(--color-warning)]" />
           <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Recent errors</h3>
         </div>
         <p className="text-xs text-[var(--text-muted)]">Agent is paused.</p>
@@ -107,7 +107,7 @@ export function RecentErrorsCard({
     return (
       <GlassCard>
         <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
-          <AlertTriangle size={14} className="text-amber-400" />
+          <AlertTriangle size={14} className="text-[var(--color-warning)]" />
           Error feed unavailable: {error}
         </div>
       </GlassCard>
@@ -119,7 +119,7 @@ export function RecentErrorsCard({
       <GlassCard>
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <CheckCircle size={14} className="text-emerald-400" />
+            <CheckCircle size={14} className="text-[var(--color-success)]" />
             <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Recent errors</h3>
           </div>
           {sourceFile && (
@@ -135,7 +135,7 @@ export function RecentErrorsCard({
     <GlassCard>
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <AlertTriangle size={14} className="text-red-400" />
+          <AlertTriangle size={14} className="text-[var(--color-destructive)]" />
           <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Recent errors</h3>
           <span className="text-[10px] text-[var(--text-muted)]">
             {entries.length} {countLabel}

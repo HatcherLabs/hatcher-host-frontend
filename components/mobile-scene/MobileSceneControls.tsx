@@ -88,7 +88,7 @@ export function MobileSceneActionButton({
       type="button"
       disabled={disabled}
       onClick={onClick}
-      className="pointer-events-auto absolute bottom-5 right-4 z-40 inline-flex min-h-14 min-w-24 items-center justify-center rounded-full border border-emerald-200/35 bg-emerald-300 px-4 text-sm font-semibold text-black shadow-[0_14px_38px_rgba(0,0,0,0.35)] transition hover:bg-emerald-200 disabled:pointer-events-none disabled:border-white/12 disabled:bg-white/18 disabled:text-white/45 md:hidden"
+      className="pointer-events-auto absolute bottom-5 right-4 z-40 inline-flex min-h-14 min-w-24 items-center justify-center rounded-full border border-[#f3d296]/55 bg-[#f3d296] px-4 text-sm font-semibold text-[#17110a] shadow-[0_14px_38px_rgba(0,0,0,0.35)] transition hover:bg-[#ffe4ad] disabled:pointer-events-none disabled:border-white/12 disabled:bg-white/18 disabled:text-white/45 md:hidden"
       style={{
         bottom: 'max(1.25rem, calc(env(safe-area-inset-bottom) + 1rem))',
         right: 'max(1rem, calc(env(safe-area-inset-right) + 1rem))',

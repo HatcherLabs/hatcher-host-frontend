@@ -362,21 +362,21 @@ export default function SupportPage() {
                       transition={{ delay: 0.15, type: 'spring', stiffness: 200, damping: 15 }}
                     >
                       <div
-                        className="absolute inset-0 rounded-full"
-                        style={{
-                          background: 'radial-gradient(circle, rgba(74,222,128,0.2) 0%, transparent 70%)',
-                          transform: 'scale(2)',
-                        }}
+	                        className="absolute inset-0 rounded-full"
+	                        style={{
+	                          background: 'radial-gradient(circle, rgba(115,164,185,0.2) 0%, transparent 70%)',
+	                          transform: 'scale(2)',
+	                        }}
                       />
                       <div
-                        className="relative w-16 h-16 rounded-full flex items-center justify-center"
-                        style={{
-                          background: 'rgba(74,222,128,0.12)',
-                          border: '1px solid rgba(74,222,128,0.25)',
-                          boxShadow: '0 0 24px rgba(74,222,128,0.15)',
-                        }}
-                      >
-                        <CheckCircle2 size={32} className="text-[#4ADE80]" />
+	                        className="relative w-16 h-16 rounded-full flex items-center justify-center"
+	                        style={{
+	                          background: 'var(--color-accent-bg)',
+	                          border: '1px solid var(--color-accent-border)',
+	                          boxShadow: '0 0 24px rgba(115,164,185,0.16)',
+	                        }}
+	                      >
+	                        <CheckCircle2 size={32} className="text-[var(--accent)]" />
                       </div>
                     </motion.div>
 

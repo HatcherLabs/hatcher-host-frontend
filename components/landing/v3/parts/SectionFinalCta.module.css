@@ -1,18 +1,48 @@
-.section { background: var(--bg-base); border-top: 1px solid var(--border-line); }
+.section {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--bg-base) 94%, var(--accent) 4%), var(--bg-base));
+  border-top: 1px solid var(--border-line);
+}
 
 .inner {
-  max-width: 720px;
+  position: relative;
+  overflow: hidden;
+  width: min(940px, calc(100% - 40px));
+  max-width: 940px;
   margin: 0 auto;
-  padding: 96px 20px;
+  box-sizing: border-box;
+  padding: clamp(56px, 8vw, 84px) 28px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 24px;
   text-align: center;
+  border: 1px solid var(--border-default);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 42%),
+    linear-gradient(180deg, color-mix(in srgb, var(--bg-card) 94%, var(--accent) 4%), var(--bg-card));
+  box-shadow: var(--shadow-card);
+}
+
+.inner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent, color-mix(in srgb, var(--text-primary) 4%, transparent), transparent),
+    repeating-linear-gradient(90deg, transparent 0 44px, color-mix(in srgb, var(--text-primary) 2%, transparent) 44px 45px);
+  opacity: 0.5;
+}
+
+.inner > * {
+  position: relative;
+  z-index: 1;
 }
 
 .headline {
-  font-family: var(--font-mono);
+  font-family: var(--font-inter), var(--font-body);
   font-size: clamp(28px, 4vw, 44px);
   font-weight: 700;
   color: var(--text-primary);
@@ -22,7 +52,7 @@
 .ctaRow { display: inline-flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
 
 .meta {
-  font-family: var(--font-mono);
+  font-family: var(--font-inter), var(--font-body);
   font-size: 12px;
   color: var(--text-muted);
   display: inline-flex;

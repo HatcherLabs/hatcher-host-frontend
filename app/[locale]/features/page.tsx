@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react';
 import Image from 'next/image';
-import dynamic from 'next/dynamic';
 import { Link } from '@/i18n/routing';
 import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 import {
@@ -28,12 +27,8 @@ import styles from './page.module.css';
 const PLAY_STORE_URL =
   'https://play.google.com/store/apps/details?id=host.hatcher.app';
 const SOLANA_MOBILE_URL = 'https://solanamobile.com/';
-const RoomAvatarPreview = dynamic(() => import('./RoomAvatarPreview'), {
-  ssr: false,
-  loading: () => <div className={styles.roomAvatarLoading} />,
-});
 
-type Tone = 'green' | 'cyan' | 'amber' | 'rose' | 'violet' | 'blue';
+type Tone = 'copper' | 'cyan' | 'amber' | 'rose' | 'violet' | 'blue';
 type Visual =
   | 'email'
   | 'city'
@@ -73,7 +68,7 @@ const FEATURES: Feature[] = [
       'Daily follow-ups',
     ],
     icon: Mail,
-    tone: 'green',
+    tone: 'copper',
   },
   {
     id: 'city',
@@ -180,7 +175,7 @@ const FEATURES: Feature[] = [
       'Code-aware agents',
     ],
     icon: Github,
-    tone: 'green',
+    tone: 'copper',
   },
   {
     id: 'a2a',
@@ -421,10 +416,10 @@ function StorePhone() {
       <div className={styles.storePhone}>
         <div className={styles.storeHeroArt}>
           <Image
-            src="/landing-v3/robot-hatch-hero.png"
+            src="/landing-v3/hero-agent-infrastructure.png"
             alt="Hatcher app store banner"
-            width={640}
-            height={320}
+            width={1672}
+            height={941}
             className={styles.storeHeroImage}
             priority
           />
@@ -507,7 +502,7 @@ function CityVisual() {
     <div className={`${styles.previewPanel} ${styles.cityPreview}`}>
       <div className={styles.cityShot}>
         <Image
-          src="/landing-v3/hatcher-city-live-network.webp"
+          src="/features/city-current.png"
           alt="Hatcher City live agent network"
           fill
           sizes="(max-width: 980px) 100vw, 420px"
@@ -528,26 +523,13 @@ function RoomVisual() {
     <div className={`${styles.previewPanel} ${styles.roomPreviewPanel}`}>
       <div className={styles.roomScene}>
         <Image
-          src="/landing-v3/agent-room-cockpit.png"
-          alt="Hatcher 3D agent room cockpit"
+          src="/features/room-current.png"
+          alt="Current Hatcher 3D agent room"
           fill
           sizes="(max-width: 980px) 100vw, 420px"
           className={styles.roomSceneImage}
           unoptimized
         />
-        <div className={styles.roomSceneShade} />
-        <div className={styles.roomAvatarStage} aria-hidden>
-          <RoomAvatarPreview />
-        </div>
-        <div className={styles.roomConsole}>
-          <span>avatar</span>
-          <span>eyes</span>
-          <span>terminal</span>
-        </div>
-        <div className={styles.roomStatusBadge}>
-          <span />
-          live room
-        </div>
       </div>
     </div>
   );

@@ -2,6 +2,8 @@
 
 Local GLB avatars used by the Hatcher agent room.
 
+- `hatcher-hatchling-service.glb` - Hatcher signature service hatchling, optimized for the agent room default avatar pool.
+- `hatcher-hatchling-operator.glb` - Hatcher signature operator hatchling, optimized for the agent room default avatar pool.
 - `ready-player.glb` - three.js examples `readyplayer.me`.
 - `xbot.glb` - three.js examples `Xbot`.
 - `soldier.glb` - three.js examples `Soldier`.

@@ -154,9 +154,9 @@ function StatusTile({
   icon: typeof CheckCircle2;
 }) {
   const toneClass = tone === 'good'
-    ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200'
+    ? 'border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success)]'
     : tone === 'warn'
-      ? 'border-amber-500/30 bg-amber-500/10 text-amber-100'
+      ? 'border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] text-[var(--color-warning)]'
       : 'border-[var(--border-subtle)] bg-black/20 text-[var(--text-muted)]';
 
   return (
@@ -433,7 +433,7 @@ export function EarnFiWalletPanel({ agentId }: { agentId: string }) {
       </div>
 
       {error && (
-        <div className="mt-4 rounded-md border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-xs text-amber-100">
+        <div className="mt-4 rounded-md border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-3 py-2 text-xs text-[var(--color-warning)]">
           {error}
         </div>
       )}
@@ -482,8 +482,8 @@ export function EarnFiWalletPanel({ agentId }: { agentId: string }) {
               </div>
               <span className={`rounded-full border px-2 py-1 font-mono text-[10px] uppercase ${
                 config?.registered
-                  ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200'
-                  : 'border-amber-500/30 bg-amber-500/10 text-amber-100'
+                  ? 'border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success)]'
+                  : 'border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] text-[var(--color-warning)]'
               }`}>
                 {config?.registered ? 'registered' : 'pending'}
               </span>
@@ -621,7 +621,7 @@ export function EarnFiWalletPanel({ agentId }: { agentId: string }) {
             </div>
 
             {disabledReason && (
-              <p className="mt-2 text-[11px] text-amber-100/80">{disabledReason}.</p>
+              <p className="mt-2 text-[11px] text-[var(--color-warning)]">{disabledReason}.</p>
             )}
             <button
               type="button"

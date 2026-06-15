@@ -29,10 +29,10 @@ const EMOTE_SHORT: Record<RoomEmoteId, string> = {
 };
 
 const EMOTE_TONE: Record<RoomEmoteId, string> = {
-  wave: 'border-[#8be0ff]/45 bg-[#122234] text-[#d6f6ff]',
+  wave: 'border-[#9ed5e7]/38 bg-[#142126] text-[#d7eff5]',
   dance: 'border-[#ff5fa2]/45 bg-[#311728] text-[#ffe1ef]',
   think: 'border-[#b088ff]/45 bg-[#211633] text-[#eadcff]',
-  scan: 'border-[#39ff88]/45 bg-[#102719] text-[#d8ffe5]',
+  scan: 'border-[#9ed5e7]/38 bg-[#142126] text-[#d7eff5]',
   work: 'border-[#ffd166]/45 bg-[#2a2110] text-[#fff1c7]',
   celebrate: 'border-[#ffd166]/55 bg-[#302411] text-[#fff2c9]',
   alert: 'border-[#ff6b8a]/55 bg-[#32131a] text-[#ffe1e8]',

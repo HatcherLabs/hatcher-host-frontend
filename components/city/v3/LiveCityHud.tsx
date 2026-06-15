@@ -50,7 +50,7 @@ export function LiveCityHud({
     <div className="pointer-events-none absolute inset-0 z-10 hidden md:block">
       <div className="absolute left-4 right-4 top-4 flex flex-wrap items-start justify-between gap-3">
         <div className="rounded-lg border border-white/10 bg-black/55 px-4 py-3 text-white shadow-2xl backdrop-blur-xl">
-          <p className="text-[10px] uppercase tracking-[0.24em] text-emerald-300/80">
+          <p className="text-[10px] uppercase tracking-[0.24em] text-cyan-200/85">
             Hatcher City
           </p>
           <h1 className="text-xl font-semibold tracking-tight">Live Agent Network</h1>
@@ -64,7 +64,7 @@ export function LiveCityHud({
           </div>
           <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
             <div
-              className="h-full rounded-full bg-emerald-300 shadow-[0_0_18px_rgba(57,255,136,0.55)]"
+              className="h-full rounded-full bg-cyan-200 shadow-[0_0_18px_rgba(115,164,185,0.48)]"
               style={{
                 width: `${Math.min(
                   100,
@@ -74,8 +74,8 @@ export function LiveCityHud({
             />
           </div>
           <div className="mt-3 flex flex-wrap gap-1.5 text-[10px] font-medium uppercase tracking-[0.12em] text-white/55">
-            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-2 py-1 text-emerald-200">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_10px_rgba(57,255,136,0.8)]" />
+            <span className="inline-flex items-center gap-1 rounded-full border border-cyan-200/25 bg-cyan-200/10 px-2 py-1 text-cyan-100">
+              <span className="h-1.5 w-1.5 rounded-full bg-cyan-200 shadow-[0_0_10px_rgba(115,164,185,0.72)]" />
               live
             </span>
             <span className="inline-flex items-center gap-1 rounded-full border border-amber-300/20 bg-amber-300/10 px-2 py-1 text-amber-200">
@@ -83,7 +83,7 @@ export function LiveCityHud({
               yours
             </span>
             <span className="inline-flex items-center gap-1 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-2 py-1 text-cyan-100">
-              <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_10px_rgba(103,232,249,0.75)]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_10px_rgba(115,164,185,0.72)]" />
               public
             </span>
           </div>
@@ -117,7 +117,7 @@ export function LiveCityHud({
           )}
           <Link
             href="/create"
-            className="rounded-lg border border-emerald-300/25 bg-emerald-300 px-3 py-2 text-xs font-semibold text-black transition hover:bg-emerald-200"
+            className="rounded-lg border border-cyan-200/30 bg-cyan-200 px-3 py-2 text-xs font-semibold text-slate-950 transition hover:bg-cyan-100"
           >
             Create agent
           </Link>
