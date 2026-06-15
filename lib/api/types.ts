@@ -160,6 +160,66 @@ export interface AgentCommCallResponse {
   targetAgentId?: string;
 }
 
+export interface CovenantConnector {
+  id: string;
+  userId: string;
+  agentId: string | null;
+  name: string;
+  tokenPrefix: string | null;
+  pairingCode: string | null;
+  status: "pending" | "online" | "offline" | "revoked" | string;
+  metadata: unknown;
+  lastSeenAt: string | null;
+  expiresAt: string | null;
+  revokedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CovenantTask {
+  id: string;
+  dispatchId: string;
+  userId: string;
+  agentId: string;
+  connectorId: string;
+  status: string;
+  intentText: string;
+  context: unknown;
+  grants: unknown;
+  result: unknown;
+  proof: unknown;
+  trace: unknown;
+  errorCode: string | null;
+  errorMessage: string | null;
+  intentId: string | null;
+  replyTo: string | null;
+  deadlineMs: number;
+  acceptedAt: string | null;
+  completedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateCovenantConnectorResponse {
+  connector: CovenantConnector;
+  token: string;
+  pairingCode: string;
+}
+
+export interface CovenantDispatchBody {
+  connectorId?: string;
+  text: string;
+  context?: Record<string, unknown>;
+  grants?: Array<{ scope: string; constraints?: Record<string, unknown> }>;
+  deadlineMs?: number;
+  replyTo?: string;
+}
+
+export interface CovenantDispatchResponse {
+  task: CovenantTask;
+  sent: boolean;
+}
+
 export interface AgentGithubTestResponse {
   tokenConfigured: boolean;
   tokenValid: boolean;

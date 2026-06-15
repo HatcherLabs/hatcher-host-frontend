@@ -15,6 +15,11 @@ import type {
   AgentGithubTestResponse,
   AgentCommLogsResponse,
   AgentCommPermissionsResponse,
+  CovenantConnector,
+  CovenantDispatchBody,
+  CovenantDispatchResponse,
+  CovenantTask,
+  CreateCovenantConnectorResponse,
   AgentPassport,
   AgentPassportNetworkId,
   AgentWalletPrivateKeyResponse,
@@ -3106,6 +3111,56 @@ export const api = {
       method: "POST",
       body: JSON.stringify(body),
     }),
+
+  // ─── Covenant Local Connector ─────────────────────────────
+  getCovenantConnectors: (agentId: string) =>
+    req<{ connectors: CovenantConnector[] }>(
+      `/agents/${agentId}/covenant/connectors`,
+    ),
+
+  createCovenantConnector: (
+    agentId: string,
+    body: { name?: string } = {},
+  ) =>
+    req<CreateCovenantConnectorResponse>(
+      `/agents/${agentId}/covenant/connectors`,
+      {
+        method: "POST",
+        body: JSON.stringify(body),
+      },
+    ),
+
+  revokeCovenantConnector: (agentId: string, connectorId: string) =>
+    req<{ connector: CovenantConnector }>(
+      `/agents/${agentId}/covenant/connectors/${connectorId}`,
+      { method: "DELETE" },
+    ),
+
+  pingCovenantConnector: (agentId: string, connectorId: string) =>
+    req<{ connectorId: string; sent: boolean; ts: number }>(
+      `/agents/${agentId}/covenant/connectors/${connectorId}/ping`,
+      { method: "POST" },
+    ),
+
+  dispatchCovenantTask: (agentId: string, body: CovenantDispatchBody) =>
+    req<CovenantDispatchResponse>(`/agents/${agentId}/covenant/dispatch`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  getCovenantTasks: (agentId: string, limit = 20) =>
+    req<{ tasks: CovenantTask[] }>(
+      `/agents/${agentId}/covenant/tasks?limit=${encodeURIComponent(String(limit))}`,
+    ),
+
+  getCovenantTask: (agentId: string, taskId: string) =>
+    req<{ task: CovenantTask }>(`/agents/${agentId}/covenant/tasks/${taskId}`),
+
+  cancelCovenantTask: (agentId: string, taskId: string) =>
+    req<{ task: CovenantTask; sent: boolean }>(
+      `/agents/${agentId}/covenant/tasks/${taskId}/cancel`,
+      { method: "POST" },
+    ),
 
   testAgentGithubAccess: (agentId: string, repo?: string) =>
     req<AgentGithubTestResponse>(`/agents/${agentId}/dev/github/test`, {
