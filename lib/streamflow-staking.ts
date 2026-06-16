@@ -1,6 +1,6 @@
 import BN from 'bn.js';
-import type { Connection } from '@solana/web3.js';
-import { PublicKey, Transaction } from '@solana/web3.js';
+import type { Connection, TransactionInstruction } from '@solana/web3.js';
+import { PublicKey, Transaction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 import type { WalletContextState } from '@solana/wallet-adapter-react';
 import type { SignerWalletAdapter } from '@solana/wallet-adapter-base';
 import {
@@ -29,7 +29,15 @@ const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ
 const TOKEN_2022_PROGRAM_ID = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
 const HATCHER_MINT = new PublicKey(HATCH_TOKEN_MINT);
 const HATCHER_REWARD_POOL_NONCE = 0;
+const MAX_SOLANA_TRANSACTION_BYTES = 1232;
 let resolvedHatcherTokenProgramId: PublicKey | null = null;
+
+type VersionedTransactionContext = {
+  transaction: VersionedTransaction;
+  blockhash: string;
+  lastValidBlockHeight: number;
+  minContextSlot: number;
+};
 
 function cluster(): ICluster {
   if (SOLANA_NETWORK === 'devnet') return ICluster.Devnet;
@@ -62,6 +70,81 @@ async function getHatcherTokenProgramId(connection: Connection): Promise<PublicK
 
   resolvedHatcherTokenProgramId = TOKEN_2022_PROGRAM_ID;
   return resolvedHatcherTokenProgramId;
+}
+
+function assertSingleWalletSigner(transaction: VersionedTransaction, walletPublicKey: PublicKey): void {
+  const requiredSignerCount = transaction.message.header.numRequiredSignatures;
+  const signerKeys = transaction.message.staticAccountKeys.slice(0, requiredSignerCount);
+  if (requiredSignerCount !== 1 || !signerKeys[0]?.equals(walletPublicKey)) {
+    throw new Error('For Phantom safety, staking transactions must require exactly one wallet signature.');
+  }
+}
+
+async function buildPreflightedVersionedTransaction(params: {
+  connection: Connection;
+  payer: PublicKey;
+  instructions: TransactionInstruction[];
+}): Promise<VersionedTransactionContext> {
+  const { context, value } = await params.connection.getLatestBlockhashAndContext('confirmed');
+  const transaction = new VersionedTransaction(
+    new TransactionMessage({
+      payerKey: params.payer,
+      recentBlockhash: value.blockhash,
+      instructions: params.instructions,
+    }).compileToV0Message(),
+  );
+
+  assertSingleWalletSigner(transaction, params.payer);
+
+  const transactionBytes = transaction.serialize().length;
+  if (transactionBytes > MAX_SOLANA_TRANSACTION_BYTES) {
+    throw new Error('This staking transaction is too large for one Phantom signing request. Refresh and try again.');
+  }
+
+  const simulation = await params.connection.simulateTransaction(transaction, {
+    sigVerify: false,
+    replaceRecentBlockhash: true,
+    commitment: 'confirmed',
+  });
+  if (simulation.value.err) {
+    throw new Error('Staking transaction failed preflight simulation. Refresh staking data and try again.');
+  }
+
+  return {
+    transaction,
+    blockhash: value.blockhash,
+    lastValidBlockHeight: value.lastValidBlockHeight,
+    minContextSlot: context.slot,
+  };
+}
+
+async function signAndSendVersionedTransaction(params: {
+  wallet: WalletContextState;
+  connection: Connection;
+  transactionContext: VersionedTransactionContext;
+}): Promise<string> {
+  if (!params.wallet.signTransaction) {
+    throw new Error('Connect a wallet that supports Solana transaction signing.');
+  }
+
+  const signed = await params.wallet.signTransaction(params.transactionContext.transaction);
+  const signature = await params.connection.sendRawTransaction(signed.serialize(), {
+    skipPreflight: false,
+    preflightCommitment: 'confirmed',
+    minContextSlot: params.transactionContext.minContextSlot,
+    maxRetries: 3,
+  });
+  const confirmation = await params.connection.confirmTransaction({
+    signature,
+    blockhash: params.transactionContext.blockhash,
+    lastValidBlockHeight: params.transactionContext.lastValidBlockHeight,
+  }, 'confirmed');
+
+  if (confirmation.value.err) {
+    throw new Error('Staking transaction failed after broadcast. Refresh staking data and try again.');
+  }
+
+  return signature;
 }
 
 export async function fetchHatcherWalletBalance(
@@ -141,7 +224,8 @@ export async function stakeHatcherWithStreamflow(params: {
     commitment: 'confirmed',
   });
   const tokenProgramId = await getHatcherTokenProgramId(client.connection);
-  const result = await client.stakeAndCreateEntries({
+  const invoker = params.wallet as unknown as SignerWalletAdapter;
+  const { ixs } = await client.prepareStakeAndCreateEntriesInstructions({
     stakePool: params.stakePoolAddress,
     stakePoolMint: HATCHER_MINT,
     tokenProgramId,
@@ -155,10 +239,20 @@ export async function stakeHatcherWithStreamflow(params: {
       rewardPoolType: 'dynamic',
     }],
   }, {
-    invoker: params.wallet as unknown as SignerWalletAdapter,
+    invoker,
+  });
+  const transactionContext = await buildPreflightedVersionedTransaction({
+    connection: client.connection,
+    payer: params.wallet.publicKey,
+    instructions: ixs,
+  });
+  const txId = await signAndSendVersionedTransaction({
+    wallet: params.wallet,
+    connection: client.connection,
+    transactionContext,
   });
 
-  return { txId: result.txId };
+  return { txId };
 }
 
 async function fetchHatcherRewardStatusFromClient(params: {
