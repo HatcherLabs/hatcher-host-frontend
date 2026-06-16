@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 import type { Connection, TransactionInstruction } from '@solana/web3.js';
-import { PublicKey, Transaction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
+import { PublicKey, Transaction } from '@solana/web3.js';
 import type { WalletContextState } from '@solana/wallet-adapter-react';
 import type { SignerWalletAdapter } from '@solana/wallet-adapter-base';
 import {
@@ -32,8 +32,8 @@ const HATCHER_REWARD_POOL_NONCE = 0;
 const MAX_SOLANA_TRANSACTION_BYTES = 1232;
 let resolvedHatcherTokenProgramId: PublicKey | null = null;
 
-type VersionedTransactionContext = {
-  transaction: VersionedTransaction;
+type StakingTransactionContext = {
+  transaction: Transaction;
   blockhash: string;
   lastValidBlockHeight: number;
   minContextSlot: number;
@@ -72,40 +72,38 @@ async function getHatcherTokenProgramId(connection: Connection): Promise<PublicK
   return resolvedHatcherTokenProgramId;
 }
 
-function assertSingleWalletSigner(transaction: VersionedTransaction, walletPublicKey: PublicKey): void {
-  const requiredSignerCount = transaction.message.header.numRequiredSignatures;
-  const signerKeys = transaction.message.staticAccountKeys.slice(0, requiredSignerCount);
+function assertSingleWalletSigner(transaction: Transaction, walletPublicKey: PublicKey): void {
+  const message = transaction.compileMessage();
+  const requiredSignerCount = message.header.numRequiredSignatures;
+  const signerKeys = message.accountKeys.slice(0, requiredSignerCount);
   if (requiredSignerCount !== 1 || !signerKeys[0]?.equals(walletPublicKey)) {
     throw new Error('For Phantom safety, staking transactions must require exactly one wallet signature.');
   }
 }
 
-async function buildPreflightedVersionedTransaction(params: {
+async function buildPreflightedStakingTransaction(params: {
   connection: Connection;
   payer: PublicKey;
   instructions: TransactionInstruction[];
-}): Promise<VersionedTransactionContext> {
+}): Promise<StakingTransactionContext> {
   const { context, value } = await params.connection.getLatestBlockhashAndContext('confirmed');
-  const transaction = new VersionedTransaction(
-    new TransactionMessage({
-      payerKey: params.payer,
-      recentBlockhash: value.blockhash,
-      instructions: params.instructions,
-    }).compileToV0Message(),
-  );
+  const transaction = new Transaction({
+    feePayer: params.payer,
+    recentBlockhash: value.blockhash,
+  });
+  transaction.add(...params.instructions);
 
   assertSingleWalletSigner(transaction, params.payer);
 
-  const transactionBytes = transaction.serialize().length;
+  const transactionBytes = transaction.serialize({
+    requireAllSignatures: false,
+    verifySignatures: false,
+  }).length;
   if (transactionBytes > MAX_SOLANA_TRANSACTION_BYTES) {
     throw new Error('This staking transaction is too large for one Phantom signing request. Refresh and try again.');
   }
 
-  const simulation = await params.connection.simulateTransaction(transaction, {
-    sigVerify: false,
-    replaceRecentBlockhash: true,
-    commitment: 'confirmed',
-  });
+  const simulation = await params.connection.simulateTransaction(transaction);
   if (simulation.value.err) {
     throw new Error('Staking transaction failed preflight simulation. Refresh staking data and try again.');
   }
@@ -118,10 +116,10 @@ async function buildPreflightedVersionedTransaction(params: {
   };
 }
 
-async function signAndSendVersionedTransaction(params: {
+async function signAndSendStakingTransaction(params: {
   wallet: WalletContextState;
   connection: Connection;
-  transactionContext: VersionedTransactionContext;
+  transactionContext: StakingTransactionContext;
 }): Promise<string> {
   if (!params.wallet.signTransaction) {
     throw new Error('Connect a wallet that supports Solana transaction signing.');
@@ -241,12 +239,12 @@ export async function stakeHatcherWithStreamflow(params: {
   }, {
     invoker,
   });
-  const transactionContext = await buildPreflightedVersionedTransaction({
+  const transactionContext = await buildPreflightedStakingTransaction({
     connection: client.connection,
     payer: params.wallet.publicKey,
     instructions: ixs,
   });
-  const txId = await signAndSendVersionedTransaction({
+  const txId = await signAndSendStakingTransaction({
     wallet: params.wallet,
     connection: client.connection,
     transactionContext,

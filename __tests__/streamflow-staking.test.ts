@@ -2,8 +2,8 @@ import {
   Keypair,
   PublicKey,
   SystemProgram,
+  Transaction,
   TransactionInstruction,
-  VersionedTransaction,
 } from '@solana/web3.js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { WalletContextState } from '@solana/wallet-adapter-react';
@@ -103,7 +103,7 @@ describe('streamflow staking rewards', () => {
     stakingMocks.simulateTransaction.mockResolvedValue({ value: { err: null } });
   });
 
-  it('pre-simulates stake transactions before asking Phantom to sign', async () => {
+  it('pre-simulates legacy stake transactions before asking Phantom to sign', async () => {
     const calls: string[] = [];
     const keypair = Keypair.generate();
     stakingMocks.simulateTransaction.mockImplementationOnce(async () => {
@@ -122,7 +122,7 @@ describe('streamflow staking rewards', () => {
       publicKey: keypair.publicKey,
       signTransaction: vi.fn(async (tx) => {
         calls.push('sign');
-        if (tx instanceof VersionedTransaction) tx.sign([keypair]);
+        if (tx instanceof Transaction) tx.partialSign(keypair);
         return tx;
       }),
     } as unknown as WalletContextState;
@@ -137,12 +137,7 @@ describe('streamflow staking rewards', () => {
     expect(stakingMocks.stakeAndCreateEntries).not.toHaveBeenCalled();
     expect(stakingMocks.prepareStakeAndCreateEntriesInstructions).toHaveBeenCalledTimes(1);
     expect(stakingMocks.simulateTransaction).toHaveBeenCalledWith(
-      expect.any(VersionedTransaction),
-      expect.objectContaining({
-        sigVerify: false,
-        replaceRecentBlockhash: true,
-        commitment: 'confirmed',
-      }),
+      expect.any(Transaction),
     );
     expect(wallet.signTransaction).toHaveBeenCalledTimes(1);
     expect(stakingMocks.sendRawTransaction).toHaveBeenCalledWith(
