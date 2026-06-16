@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 // it on any material edit (scope, retention, third-parties). GDPR
 // requires material changes to be communicated to users — the
 // sendPrivacyUpdated email hook in services/email.ts handles that.
-const LAST_UPDATED = 'June 15, 2026';
+const LAST_UPDATED = 'June 16, 2026';
 
 export default function PrivacyPolicyPage() {
   return (
@@ -39,7 +39,7 @@ export default function PrivacyPolicyPage() {
             <ul className="space-y-2 text-sm">
               <li>• We collect only what we need to run your account and your agents.</li>
               <li>• We never sell your data, and we never train AI on your chats or configs.</li>
-              <li>• AI-powered features may send your prompts, chat messages, voice transcripts, agent configs, and related context to Hatcher and selected model providers for inference.</li>
+              <li>• AI-powered features may send prompts, chat messages, voice transcripts, agent configs, and related context to Hatcher and selected model providers for inference; the iOS app asks for permission before third-party AI processing.</li>
               <li>• You can export or delete everything from your{' '}
                 <Link href="/dashboard/settings" className="text-[var(--color-accent)] hover:underline">Settings</Link>{' '}
                 page.
@@ -93,6 +93,7 @@ export default function PrivacyPolicyPage() {
               <li>Agent configurations — name, description, avatar, prompts, personality, plugin list</li>
               <li>Agent creation descriptions, voice transcripts, session context, and tool-call content you provide</li>
               <li>Chat history with your agents (PostgreSQL, scoped to your account)</li>
+              <li>Voice input transcripts and speech-related request metadata when you use voice features</li>
               <li>Files you upload to or create within agent workspaces</li>
               <li>Agent activity logs and performance metrics</li>
               <li>Integration tokens (Telegram bot token, Discord, Twitter, etc.) — encrypted at rest with AES-256-GCM</li>
@@ -109,6 +110,7 @@ export default function PrivacyPolicyPage() {
             <ul className="list-disc pl-6 space-y-1.5">
               <li>Transaction signatures for on-chain payments (SOL, USDC, $HATCHER, $KAUSA)</li>
               <li>Stripe handles all card data — we never see or store card numbers, CVC, or expiry</li>
+              <li>Apple App Store transaction identifiers and subscription product IDs for in-app purchases</li>
               <li>Invoice line items (tier, addon, amount, currency, timestamp)</li>
             </ul>
           </section>
@@ -192,6 +194,21 @@ export default function PrivacyPolicyPage() {
               We use the following sub-processors. Each has their own privacy policy — by using Hatcher you consent
               to the data flows listed:
             </p>
+            <p className="mt-3">
+              For AI features, the content sent for processing can include your prompts, chat messages, agent
+              instructions, selected model/provider, uploaded or generated context files, voice transcripts, tool
+              inputs/outputs, and routing or usage metadata needed to return the response and meter AI Credits.
+              Hatcher routes this data through Hatcher&apos;s backend and may share it with UsePod, OpenRouter, Xiaomi
+              MiMo, AceData, IDLE/OpenServ, or the model provider you select. When you use BYOK, requests are routed
+              to the provider attached to your own key. The iOS app asks for permission before sending personal data
+              for third-party AI processing.
+            </p>
+            <p className="mt-3">
+              We require our AI sub-processors and other service providers to protect personal data with security,
+              confidentiality, and transfer safeguards that are the same or equivalent to the protections described
+              in this Policy, including Data Processing Agreements, standard contractual terms, or provider terms
+              where applicable.
+            </p>
             <div className="overflow-x-auto mt-3">
               <table className="w-full text-sm border border-[var(--border-default)] rounded-lg overflow-hidden">
                 <thead className="bg-[var(--bg-elevated)]">
@@ -209,6 +226,8 @@ export default function PrivacyPolicyPage() {
                   <tr><td className="px-3 py-2">OpenRouter</td><td className="px-3 py-2">LLM inference (hosted key)</td><td className="px-3 py-2">AI prompts, chat messages, voice transcripts, agent configs, session context, and generated outputs when routed to hosted models</td><td className="px-3 py-2">USA</td></tr>
                   <tr><td className="px-3 py-2">Xiaomi MiMo</td><td className="px-3 py-2">LLM inference (direct partner route)</td><td className="px-3 py-2">AI prompts, chat messages, voice transcripts, agent configs, session context, and generated outputs when selected</td><td className="px-3 py-2">Partner infrastructure</td></tr>
                   <tr><td className="px-3 py-2">AceData</td><td className="px-3 py-2">LLM inference and data/media tools (direct partner route)</td><td className="px-3 py-2">AI prompts, chat messages, voice transcripts, agent configs, session context, files/tool-call content, and generated outputs when selected</td><td className="px-3 py-2">Partner infrastructure</td></tr>
+                  <tr><td className="px-3 py-2">IDLE / OpenServ</td><td className="px-3 py-2">Partner-hosted AI inference and agent services</td><td className="px-3 py-2">AI prompts, chat messages, voice transcripts, agent configs, session context, and generated outputs when selected</td><td className="px-3 py-2">Partner infrastructure</td></tr>
+                  <tr><td className="px-3 py-2">Apple</td><td className="px-3 py-2">In-app purchase processing</td><td className="px-3 py-2">App Store transaction identifiers and subscription status</td><td className="px-3 py-2">Global</td></tr>
                   <tr><td className="px-3 py-2">Stripe</td><td className="px-3 py-2">Card payments</td><td className="px-3 py-2">Email, billing address, card token</td><td className="px-3 py-2">Ireland / USA</td></tr>
                   <tr><td className="px-3 py-2">Resend</td><td className="px-3 py-2">Transactional email</td><td className="px-3 py-2">Email address, email content</td><td className="px-3 py-2">EU / USA</td></tr>
                   <tr><td className="px-3 py-2">PostHog</td><td className="px-3 py-2">Product analytics (opt-in)</td><td className="px-3 py-2">Anonymized events, session IDs</td><td className="px-3 py-2">EU</td></tr>
