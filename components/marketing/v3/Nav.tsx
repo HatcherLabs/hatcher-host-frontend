@@ -15,6 +15,7 @@ import {
   Boxes,
   Building2,
   CircleDollarSign,
+  Clock,
   CreditCard,
   FileText,
   GitBranch,
@@ -404,6 +405,8 @@ function NavItemIcon({ itemKey }: { itemKey: string }) {
       return <CircleDollarSign {...iconProps} />;
     case 'token':
       return <CreditCard {...iconProps} />;
+    case 'staking':
+      return <Clock {...iconProps} />;
     case 'whitepaper':
       return <FileText {...iconProps} />;
     case 'blog':

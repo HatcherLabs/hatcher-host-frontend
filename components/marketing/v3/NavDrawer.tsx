@@ -10,6 +10,7 @@ import {
   Bot,
   Boxes,
   Building2,
+  Clock,
   Coins,
   FileText,
   GitBranch,
@@ -51,6 +52,8 @@ function DrawerIcon({ itemKey }: { itemKey: string }) {
       return <Coins {...props} />;
     case 'token':
       return <TerminalSquare {...props} />;
+    case 'staking':
+      return <Clock {...props} />;
     case 'whitepaper':
       return <FileText {...props} />;
     case 'blog':

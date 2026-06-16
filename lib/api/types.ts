@@ -60,6 +60,65 @@ export interface AgentFeature {
   createdAt: string;
 }
 
+export type StakingPoolKey = "7d" | "30d" | "90d";
+
+export interface StakingPoolConfig {
+  key: StakingPoolKey;
+  label: string;
+  durationDays: number;
+  rewardShareBps: number;
+  maxStakeHatcher: number;
+  monthlyRewardBudgetHatcher: number;
+  weeklyRewardBudgetHatcher: number;
+  aiCreditsPerDayPerMillion: number;
+  poolAddress: string | null;
+  configured: boolean;
+  estimatedAprAtCap: number;
+  streamflowUrl: string | null;
+}
+
+export interface StakingConfigResponse {
+  reserveHatcher: number;
+  monthlyEmissionHatcher: number;
+  weeklyEmissionHatcher: number;
+  aiCreditsPerWalletMonthlyCap: number;
+  aiCreditsGlobalMonthlyCap: number;
+  aiCreditExpiryDays: number;
+  rewardModel: "continuous_funding";
+  rewardToken: "HATCHER";
+  aiCreditReward: true;
+  pools: StakingPoolConfig[];
+}
+
+export interface StakingStakeEntry {
+  stakeEntryAddress: string;
+  depositNonce: number;
+  poolKey: StakingPoolKey;
+  poolAddress: string;
+  walletAddress: string;
+  stakedHatcher: number;
+  createdAt: string;
+  unlockAt: string;
+  durationDays: number;
+  claimableAiCredits: number;
+  claimedAiCredits: number;
+}
+
+export interface UserStakingSummary {
+  userId: string;
+  walletAddress: string | null;
+  configured: boolean;
+  claimableAiCredits: number;
+  activeStakes: StakingStakeEntry[];
+}
+
+export interface StakingClaimResponse {
+  creditsGranted: number;
+  balance: number;
+  cappedByWallet: boolean;
+  cappedByGlobal: boolean;
+}
+
 /**
  * Agent as returned by the API (serialized dates, optional joined relations).
  * Differs from shared Agent which is the full DB model with Date fields and AgentConfig.

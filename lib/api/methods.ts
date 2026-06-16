@@ -109,6 +109,9 @@ import type {
   OobeX402BalanceResponse,
   OobeX402CallBody,
   OobeX402CallResponse,
+  StakingClaimResponse,
+  StakingConfigResponse,
+  UserStakingSummary,
 } from "./types";
 import type { TierConfig, AdminOverviewExtras } from "@hatcher/shared";
 
@@ -298,6 +301,20 @@ export const api = {
   /** Unlink the Solana wallet currently attached to the account. */
   disconnectWallet: () =>
     req<{ walletAddress: null }>("/auth/wallet", { method: "DELETE" }),
+
+  /** Get a message that the connected Solana wallet must sign before account linking. */
+  getWalletChallenge: (walletAddress: string) =>
+    req<{ message: string; nonce: string }>("/auth/challenge", {
+      method: "POST",
+      body: JSON.stringify({ walletAddress }),
+    }),
+
+  /** Link or replace the Solana wallet attached to the current account. */
+  linkWallet: (walletAddress: string, signature: string) =>
+    req<{ walletAddress: string }>("/auth/link-wallet", {
+      method: "POST",
+      body: JSON.stringify({ walletAddress, signature }),
+    }),
 
   /** GDPR data export — downloads all user data as JSON */
   exportData: async (): Promise<Blob> => {
@@ -3229,6 +3246,17 @@ export const api = {
         createdAt: string;
       }>;
     }>(`/ai-credits/history?limit=${limit}`),
+
+  getStakingConfig: () =>
+    req<StakingConfigResponse>("/staking/config"),
+
+  getMyStaking: () =>
+    req<UserStakingSummary>("/staking/me"),
+
+  claimStakingAiCredits: () =>
+    req<StakingClaimResponse>("/staking/claim-ai-credits", {
+      method: "POST",
+    }),
 
   /** Submit thumbs up/down feedback for a message */
   submitFeedback: (agentId: string, messageId: string, rating: "up" | "down") =>
