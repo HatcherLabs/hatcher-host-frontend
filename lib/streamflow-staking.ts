@@ -120,6 +120,7 @@ async function signAndSendStakingTransaction(params: {
   wallet: WalletContextState;
   connection: Connection;
   transactionContext: StakingTransactionContext;
+  onTransactionSubmitted?: (txId: string) => void;
 }): Promise<string> {
   if (!params.wallet.signTransaction) {
     throw new Error('Connect a wallet that supports Solana transaction signing.');
@@ -132,6 +133,7 @@ async function signAndSendStakingTransaction(params: {
     minContextSlot: params.transactionContext.minContextSlot,
     maxRetries: 3,
   });
+  params.onTransactionSubmitted?.(signature);
   const confirmation = await params.connection.confirmTransaction({
     signature,
     blockhash: params.transactionContext.blockhash,
@@ -205,6 +207,7 @@ export async function stakeHatcherWithStreamflow(params: {
   stakePoolAddress: string;
   amountBaseUnits: bigint;
   durationDays: number;
+  onTransactionSubmitted?: (txId: string) => void;
 }): Promise<{ txId: string }> {
   if (!params.wallet.publicKey || !params.wallet.signTransaction) {
     throw new Error('Connect a wallet that supports Solana transaction signing.');
@@ -248,6 +251,7 @@ export async function stakeHatcherWithStreamflow(params: {
     wallet: params.wallet,
     connection: client.connection,
     transactionContext,
+    onTransactionSubmitted: params.onTransactionSubmitted,
   });
 
   return { txId };

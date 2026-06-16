@@ -118,6 +118,9 @@ describe('streamflow staking rewards', () => {
       calls.push('confirm');
       return { value: { err: null } };
     });
+    const onTransactionSubmitted = vi.fn(() => {
+      calls.push('submitted');
+    });
     const wallet = {
       publicKey: keypair.publicKey,
       signTransaction: vi.fn(async (tx) => {
@@ -132,6 +135,7 @@ describe('streamflow staking rewards', () => {
       stakePoolAddress: '7BVxRYGoTJjr3bgvDhpJggJrnUhyYoGPbnxTRAWuDmtH',
       amountBaseUnits: 1_000_000n,
       durationDays: 7,
+      onTransactionSubmitted,
     })).resolves.toEqual({ txId: 'stake-tx' });
 
     expect(stakingMocks.stakeAndCreateEntries).not.toHaveBeenCalled();
@@ -148,7 +152,8 @@ describe('streamflow staking rewards', () => {
         minContextSlot: 42,
       }),
     );
-    expect(calls).toEqual(['simulate', 'sign', 'broadcast', 'confirm']);
+    expect(onTransactionSubmitted).toHaveBeenCalledWith('stake-tx');
+    expect(calls).toEqual(['simulate', 'sign', 'broadcast', 'submitted', 'confirm']);
   });
 
   it('stops before Phantom signing when stake preflight simulation fails', async () => {

@@ -15,6 +15,7 @@ import { ArrowUpRight, Coins, Lock, RefreshCcw, Sparkles, Wallet } from 'lucide-
 import { Link, useRouter } from '@/i18n/routing';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
+import { resolveStakingLinkedWalletAddress } from '@/lib/staking-state';
 import {
   baseUnitsToHatcherString,
   claimHatcherRewardsWithStreamflow,
@@ -115,13 +116,13 @@ function PoolSelectorCard({
     <button
       type="button"
       onClick={() => onSelect(pool.key)}
-      className={`w-full overflow-hidden rounded-lg border p-5 text-left transition hover:bg-[var(--bg-elevated)] ${
+      className={`min-w-0 w-full overflow-hidden rounded-lg border p-4 text-left transition hover:bg-[var(--bg-elevated)] sm:p-5 ${
         selected
           ? 'border-[var(--accent)] bg-[var(--bg-elevated)]'
           : 'border-[var(--border-default)] bg-[var(--bg-card)]'
       }`}
     >
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex min-w-0 items-start justify-between gap-3 sm:gap-4">
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase text-[var(--text-muted)]">Lock period</p>
           <h2 className="mt-1 text-2xl font-semibold text-[var(--text-primary)]">{pool.label}</h2>
@@ -137,16 +138,16 @@ function PoolSelectorCard({
         </span>
       </div>
 
-      <div className="mt-5 grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
-        <div>
+      <div className="mt-5 grid min-w-0 grid-cols-2 gap-3 text-sm sm:grid-cols-3">
+        <div className="min-w-0">
           <p className="text-[var(--text-muted)]">Reward share</p>
           <p className="font-semibold text-[var(--accent)]">{rewardShare(pool)}</p>
         </div>
-        <div>
+        <div className="min-w-0">
           <p className="text-[var(--text-muted)]">Powered by</p>
           <p className="font-semibold text-[var(--text-primary)]">Streamflow</p>
         </div>
-        <div className="col-span-2 sm:col-span-1">
+        <div className="col-span-2 min-w-0 sm:col-span-1">
           <p className="text-[var(--text-muted)]">AI Credits</p>
           <p className="break-words font-semibold text-[var(--text-primary)]">
             {pool.aiCreditsPerDayPerMillion}/day
@@ -179,6 +180,7 @@ export function StakingClient() {
   const [claimingHatcherStake, setClaimingHatcherStake] = useState<string | null>(null);
   const [hatcherRewardStatuses, setHatcherRewardStatuses] = useState<Record<string, HatcherRewardUiStatus>>({});
   const [linkingWallet, setLinkingWallet] = useState(false);
+  const [optimisticLinkedWalletAddress, setOptimisticLinkedWalletAddress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [balanceError, setBalanceError] = useState<string | null>(null);
   const [claimResult, setClaimResult] = useState<StakingClaimResponse | null>(null);
@@ -220,7 +222,11 @@ export function StakingClient() {
   }, [config, selectedPoolKey]);
 
   const connectedWalletAddress = wallet.publicKey?.toBase58() ?? null;
-  const linkedWalletAddress = user?.walletAddress ?? summary?.walletAddress ?? null;
+  const linkedWalletAddress = resolveStakingLinkedWalletAddress({
+    userWalletAddress: user?.walletAddress,
+    summaryWalletAddress: summary?.walletAddress,
+    optimisticLinkedWalletAddress,
+  });
   const walletMatchesAccount = Boolean(
     connectedWalletAddress && linkedWalletAddress && connectedWalletAddress === linkedWalletAddress,
   );
@@ -240,6 +246,16 @@ export function StakingClient() {
     if (!config?.pools.length) return null;
     return config.pools.map((pool) => `${pool.label}: ${rewardShare(pool)}`).join(' / ');
   }, [config]);
+
+  useEffect(() => {
+    if (
+      optimisticLinkedWalletAddress
+      && connectedWalletAddress
+      && optimisticLinkedWalletAddress !== connectedWalletAddress
+    ) {
+      setOptimisticLinkedWalletAddress(null);
+    }
+  }, [connectedWalletAddress, optimisticLinkedWalletAddress]);
 
   const amountBaseUnits = useMemo(
     () => parseHatcherAmountToBaseUnits(stakeAmount),
@@ -400,18 +416,20 @@ export function StakingClient() {
     const walletAddress = await ensureConnectedWallet();
     if (linkedWalletAddress === walletAddress) return walletAddress;
 
-    const signer = walletRef.current.signMessage;
-    if (!signer) throw new Error('This wallet does not support message signing. Use Phantom, Solflare, or another compatible Solana wallet.');
+    if (!walletRef.current.signMessage) {
+      throw new Error('This wallet does not support message signing. Use Phantom, Solflare, or another compatible Solana wallet.');
+    }
 
     setLinkingWallet(true);
     try {
       const challenge = await api.getWalletChallenge(walletAddress);
       if (!challenge.success) throw new Error(challenge.error);
 
-      const signature = await signer(new TextEncoder().encode(challenge.data.message));
+      const signature = await walletRef.current.signMessage(new TextEncoder().encode(challenge.data.message));
       const linked = await api.linkWallet(walletAddress, signatureToBase64(signature));
       if (!linked.success) throw new Error(linked.error);
 
+      setOptimisticLinkedWalletAddress(linked.data.walletAddress);
       await refreshUser();
       await load();
       return linked.data.walletAddress;
@@ -490,6 +508,7 @@ export function StakingClient() {
         stakePoolAddress: selectedPool.poolAddress,
         amountBaseUnits: amount,
         durationDays: selectedPool.durationDays,
+        onTransactionSubmitted: setStakeTxId,
       });
 
       setStakeTxId(result.txId);
@@ -574,11 +593,11 @@ export function StakingClient() {
   };
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[var(--bg-base)] px-4 py-10 text-[var(--text-primary)]">
-      <div className="mx-auto w-full max-w-6xl">
+    <main className="min-h-screen max-w-full overflow-x-hidden bg-[var(--bg-base)] px-0 py-10 text-[var(--text-primary)]">
+      <div className="mx-auto box-border w-full min-w-0 max-w-6xl overflow-hidden px-3 sm:px-4">
         <div className="mb-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="mb-3 inline-flex items-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] px-3 py-1.5 text-xs font-semibold text-[var(--text-secondary)]">
+          <div className="min-w-0">
+            <p className="mb-3 inline-flex max-w-full items-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] px-3 py-1.5 text-xs font-semibold text-[var(--text-secondary)]">
               <Sparkles size={14} aria-hidden />
               Continuous Streamflow staking
             </p>
@@ -595,7 +614,7 @@ export function StakingClient() {
               void load();
               void loadWalletBalance();
             }}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] sm:w-auto"
           >
             <RefreshCcw size={16} aria-hidden />
             Refresh
@@ -608,13 +627,13 @@ export function StakingClient() {
           </div>
         )}
 
-        <section className="mb-8 grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-          <div>
+        <section className="mb-8 grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+          <div className="min-w-0">
             <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
               <Lock size={16} aria-hidden />
               Choose a rewards pool
             </div>
-            <div className="grid gap-4">
+            <div className="grid min-w-0 grid-cols-1 gap-4">
               {(config?.pools ?? []).map((pool) => (
                 <PoolSelectorCard
                   key={pool.key}
@@ -636,16 +655,16 @@ export function StakingClient() {
               event.preventDefault();
               void submitStake();
             }}
-            className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-5"
+            className="min-w-0 overflow-hidden rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-4 sm:p-5"
           >
-            <div className="flex items-start justify-between gap-4">
-              <div>
+            <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase text-[var(--text-muted)]">Stake & Earn</p>
                 <h2 className="mt-1 text-2xl font-semibold text-[var(--text-primary)]">
                   {selectedPool ? selectedPool.label : 'Select pool'}
                 </h2>
               </div>
-              <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-2 text-right">
+              <div className="w-full rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-2 text-left sm:w-auto sm:text-right">
                 <p className="text-xs text-[var(--text-muted)]">Reward share</p>
                 <p className="text-lg font-semibold text-[var(--accent)]">
                   {selectedPool ? rewardShare(selectedPool) : '-'}
@@ -654,7 +673,7 @@ export function StakingClient() {
             </div>
 
             <div className="mt-6">
-              <div className="mb-2 flex items-center justify-between gap-3 text-sm">
+              <div className="mb-2 flex min-w-0 flex-col items-start gap-2 text-sm sm:flex-row sm:items-center sm:justify-between">
                 <label htmlFor="staking-amount" className="font-semibold text-[var(--text-primary)]">
                   Amount
                 </label>
@@ -662,22 +681,22 @@ export function StakingClient() {
                   type="button"
                   onClick={() => void loadWalletBalance()}
                   disabled={!connectedWalletAddress || balanceLoading}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex max-w-full items-center gap-1.5 break-words text-left text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <RefreshCcw size={13} aria-hidden />
                   Balance: {balanceLabel}
                 </button>
               </div>
-              <div className="flex min-h-14 items-center rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-4">
+              <div className="flex min-h-16 w-full min-w-0 max-w-full flex-col items-stretch justify-center gap-1 overflow-hidden rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-2 sm:min-h-14 sm:flex-row sm:items-center sm:gap-0 sm:px-4 sm:py-0">
                 <input
                   id="staking-amount"
                   inputMode="decimal"
                   value={stakeAmount}
                   onChange={(event) => setStakeAmount(event.target.value)}
                   placeholder="0"
-                  className="min-w-0 flex-1 bg-transparent text-2xl font-semibold text-[var(--text-primary)] outline-none placeholder:text-[var(--text-muted)]"
+                  className="min-w-0 w-full flex-1 bg-transparent text-xl font-semibold text-[var(--text-primary)] outline-none placeholder:text-[var(--text-muted)] sm:text-2xl"
                 />
-                <span className="ml-3 shrink-0 text-sm font-semibold text-[var(--text-muted)]">HATCHER</span>
+                <span className="max-w-full shrink-0 truncate text-[11px] font-semibold uppercase leading-none text-[var(--text-muted)] sm:ml-3 sm:max-w-none sm:text-sm sm:normal-case sm:leading-normal">HATCHER</span>
               </div>
               {amountInvalid && (
                 <p className="mt-2 text-xs font-medium text-amber-400">Use a numeric HATCHER amount.</p>
@@ -693,7 +712,7 @@ export function StakingClient() {
               )}
             </div>
 
-            <div className="mt-4 grid grid-cols-4 gap-2">
+            <div className="mt-4 grid min-w-0 grid-cols-2 gap-2 sm:grid-cols-4">
               {STAKE_PERCENTAGES.map((percent) => (
                 <button
                   key={percent}
@@ -704,7 +723,7 @@ export function StakingClient() {
                     }
                   }}
                   disabled={walletBalanceBaseUnits === null || walletBalanceBaseUnits <= 0n || balanceLoading}
-                  className="rounded-lg border border-[var(--border-default)] px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="min-w-0 rounded-lg border border-[var(--border-default)] px-2 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50 sm:px-3"
                 >
                   {percent}%
                 </button>
@@ -712,21 +731,21 @@ export function StakingClient() {
             </div>
 
             <div className="mt-6 grid gap-3 border-t border-[var(--border-default)] pt-5 text-sm sm:grid-cols-2">
-              <div>
+              <div className="min-w-0">
                 <p className="text-[var(--text-muted)]">Lock period</p>
                 <p className="font-semibold text-[var(--text-primary)]">{selectedPool?.label ?? '-'}</p>
               </div>
-              <div>
+              <div className="min-w-0">
                 <p className="text-[var(--text-muted)]">Unlock date</p>
                 <p className="font-semibold text-[var(--text-primary)]">{futureUnlockDate(selectedPool)}</p>
               </div>
-              <div>
+              <div className="min-w-0">
                 <p className="text-[var(--text-muted)]">AI Credits</p>
-                <p className="font-semibold text-[var(--text-primary)]">
+                <p className="break-words font-semibold text-[var(--text-primary)]">
                   {selectedPool ? `${selectedPool.aiCreditsPerDayPerMillion}/day per 1M $HATCHER` : '-'}
                 </p>
               </div>
-              <div>
+              <div className="min-w-0">
                 <p className="text-[var(--text-muted)]">HATCHER rewards</p>
                 <p className="font-semibold text-[var(--text-primary)]">Distributed by Streamflow</p>
               </div>
@@ -759,10 +778,10 @@ export function StakingClient() {
           </form>
         </section>
 
-        <section className="grid gap-6 lg:grid-cols-[1fr_0.7fr]">
-          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)]">
+        <section className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.7fr)]">
+          <div className="min-w-0 overflow-hidden rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)]">
             <div className="flex flex-col gap-4 border-b border-[var(--border-default)] p-5 md:flex-row md:items-start md:justify-between">
-              <div>
+              <div className="min-w-0">
                 <h2 className="text-lg font-semibold">Your active stakes</h2>
                 <p className="mt-1 text-sm text-[var(--text-muted)]">
                   Linked wallet: {shortAddress(linkedWalletAddress)}
@@ -779,12 +798,12 @@ export function StakingClient() {
                   </p>
                 )}
               </div>
-              <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+              <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row md:shrink-0">
                 <button
                   type="button"
                   onClick={() => void connectAndLinkWallet(walletMatchesAccount)}
                   disabled={linkingWallet || authLoading}
-                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--bg-base)] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--bg-base)] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                 >
                   <Wallet size={16} aria-hidden />
                   {walletActionLabel()}
@@ -793,7 +812,7 @@ export function StakingClient() {
                   type="button"
                   onClick={() => void claim()}
                   disabled={claiming || !canClaimAiCredits}
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--accent-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--accent-hover)] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                 >
                   <Sparkles size={16} aria-hidden />
                   {claiming ? 'Claiming' : 'Claim credits'}
@@ -813,37 +832,37 @@ export function StakingClient() {
                   const hatcherClaimDisabled = Boolean(claimingHatcherStake) || !hatcherClaimable;
 
                   return (
-                    <div key={stake.stakeEntryAddress} className="grid gap-3 p-5 md:grid-cols-6">
-                      <div>
+                    <div key={stake.stakeEntryAddress} className="grid min-w-0 gap-3 p-5 md:grid-cols-6">
+                      <div className="min-w-0">
                         <p className="text-xs text-[var(--text-muted)]">Pool</p>
                         <p className="font-semibold">{stake.poolKey}</p>
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <p className="text-xs text-[var(--text-muted)]">Staked</p>
-                        <p className="font-semibold">{formatNumber(stake.stakedHatcher, 2)} HATCHER</p>
+                        <p className="break-words font-semibold">{formatNumber(stake.stakedHatcher, 2)} HATCHER</p>
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <p className="text-xs text-[var(--text-muted)]">Unlock</p>
                         <p className="font-semibold">{formatDate(stake.unlockAt)}</p>
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <p className="text-xs text-[var(--text-muted)]">AI Credits</p>
                         <p className="font-semibold">{formatNumber(stake.claimableAiCredits)} claimable</p>
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <p className="text-xs text-[var(--text-muted)]">HATCHER rewards</p>
                         <p className="font-semibold">{hatcherRewardStatusLabel(hatcherStatus)}</p>
                         {hatcherStatus?.error && (
                           <p className="mt-1 text-xs text-amber-400">{hatcherStatus.error}</p>
                         )}
                       </div>
-                      <div className="flex items-start md:justify-end">
+                      <div className="flex min-w-0 items-start md:justify-end">
                         <button
                           type="button"
                           onClick={() => void claimHatcherRewards(stake)}
                           disabled={hatcherClaimDisabled}
                           title={hatcherRewardClaimReason(hatcherStatus)}
-                          className="inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-2 text-xs font-semibold text-[var(--text-primary)] hover:bg-[var(--bg-base)] disabled:cursor-not-allowed disabled:opacity-50"
+                          className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-2 text-xs font-semibold text-[var(--text-primary)] hover:bg-[var(--bg-base)] disabled:cursor-not-allowed disabled:opacity-50 md:w-auto"
                         >
                           <Coins size={14} aria-hidden />
                           {claimingHatcherStake === stake.stakeEntryAddress
@@ -862,19 +881,19 @@ export function StakingClient() {
             </div>
           </div>
 
-          <aside className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-5">
+          <aside className="min-w-0 overflow-hidden rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-5">
             <div className="flex items-center gap-2">
               <Coins size={17} aria-hidden />
               <h2 className="text-lg font-semibold">Reward controls</h2>
             </div>
             <div className="mt-4 space-y-4 text-sm text-[var(--text-secondary)]">
-              <p>
+              <p className="break-words">
                 HATCHER reward deposits are split by tier{rewardSplitSummary ? `: ${rewardSplitSummary}.` : '.'}
               </p>
-              <p>
+              <p className="break-words">
                 Within each pool, HATCHER rewards are proportional to the wallet's share of total staked HATCHER.
               </p>
-              <p>
+              <p className="break-words">
                 AI Credits are fixed by tier, capped at{' '}
                 <strong className="text-[var(--text-primary)]">{formatNumber(config?.aiCreditsPerWalletMonthlyCap ?? 100000)} per wallet per month</strong>, and expire after{' '}
                 <strong className="text-[var(--text-primary)]">{config?.aiCreditExpiryDays ?? 90} days</strong>.
@@ -886,7 +905,7 @@ export function StakingClient() {
               )}
               <Link
                 href="/token"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)] hover:text-[var(--accent-hover)]"
+                className="inline-flex max-w-full flex-wrap items-center gap-2 text-sm font-semibold text-[var(--accent)] hover:text-[var(--accent-hover)]"
               >
                 View token mechanics <ArrowUpRight size={15} aria-hidden />
               </Link>
@@ -899,7 +918,7 @@ export function StakingClient() {
             href="https://streamflow.finance/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
+            className="inline-flex max-w-full flex-wrap items-center justify-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] px-3 py-2 text-center text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
           >
             Powered by Streamflow <ArrowUpRight size={15} aria-hidden />
           </a>
