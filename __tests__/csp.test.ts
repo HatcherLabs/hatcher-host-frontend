@@ -48,4 +48,13 @@ describe('CSP', () => {
     expect(csp).not.toContain('widget.qwerti.ai');
     expect(csp).not.toContain('api.qwerti.ai');
   });
+
+  it('allows the Mirari dashboard embed origin in browser-facing directives', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    const csp = buildCsp('testnonce', false);
+
+    expect(getDirective(csp, 'frame-src')).toContain('https://entermirari.cloud');
+    expect(getDirective(csp, 'connect-src')).toContain('https://entermirari.cloud');
+    expect(getDirective(csp, 'img-src')).toContain('https://entermirari.cloud');
+  });
 });
