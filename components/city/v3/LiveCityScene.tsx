@@ -46,6 +46,7 @@ import { agentFocusTargetFor, type AgentFocusTarget } from './agentFocusTarget';
 import { publicAgentChatHref } from './activeAgentList';
 import { LIVE_CITY_TIERS, type LiveCityGrid, type LiveCityTimeMode } from './liveCityHandoff';
 import { layoutLiveCity, type LiveAgentMarkerLayout, type LiveBuildingLayout } from './liveLayout';
+import { CITY_RENDER_BUDGET } from './cityRenderBudget';
 import { LiveAgentMarkers } from './LiveAgentMarkers';
 import { LiveActivityPulses } from './LiveActivityPulses';
 import { LiveBuildings } from './LiveBuildings';
@@ -220,7 +221,7 @@ function LiveCitySceneBody({
   const layout = useMemo(
     () =>
       layoutLiveCity(agents, {
-        maxBuildings: Math.max(2_500, users.length),
+        maxBuildings: Math.max(CITY_RENDER_BUDGET.minimumGridBuildings, users.length),
         routeLimit: 0,
         users,
       }),

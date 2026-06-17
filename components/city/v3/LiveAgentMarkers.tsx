@@ -12,6 +12,7 @@ import { CityAvatar } from './CityAvatar';
 import { useDispatchStore } from '@/lib/agent-dispatch/store';
 import { skinById } from '@/lib/agent-dispatch/config';
 import { cityAgentDisplayName } from './cityDisplay';
+import { CITY_RENDER_BUDGET } from './cityRenderBudget';
 
 interface Props {
   markers: LiveAgentMarkerLayout[];
@@ -121,6 +122,7 @@ function LiveRobotAgent({
     [marker.pathNodes, marker.x, marker.z],
   );
   const trail = useMemo(() => {
+    if (!CITY_RENDER_BUDGET.agentTrails) return null;
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute(
       'position',
@@ -140,6 +142,7 @@ function LiveRobotAgent({
   }, []);
 
   useEffect(() => {
+    if (!trail) return;
     const positions = trail.geometry.attributes.position as THREE.BufferAttribute;
     const colors = trail.geometry.attributes.color as THREE.BufferAttribute;
     for (let i = 0; i < TRAIL_LEN; i++) {
@@ -153,8 +156,10 @@ function LiveRobotAgent({
   useEffect(() => {
     const poseRegistry = poseRef?.current;
     return () => {
-      trail.geometry.dispose();
-      (trail.material as THREE.Material).dispose();
+      if (trail) {
+        trail.geometry.dispose();
+        (trail.material as THREE.Material).dispose();
+      }
       poseRegistry?.delete(marker.agentId);
     };
   }, [marker.agentId, poseRef, trail]);
@@ -170,7 +175,7 @@ function LiveRobotAgent({
     const dxCam = pose.x - camera.position.x;
     const dzCam = pose.z - camera.position.z;
     const far = dxCam * dxCam + dzCam * dzCam > 4900;
-    trail.visible = !far;
+    if (trail) trail.visible = !far;
     const bob = Math.sin((elapsed + marker.phase) * 18) * 0.025;
     const swing = far ? 0 : Math.sin((elapsed + marker.phase) * 9) * 0.55;
 
@@ -208,18 +213,20 @@ function LiveRobotAgent({
         material.opacity = pulse;
       }
 
-      const positions = trail.geometry.attributes.position as THREE.BufferAttribute;
-      const colors = trail.geometry.attributes.color as THREE.BufferAttribute;
-      for (let i = TRAIL_LEN - 1; i > 0; i--) {
-        positions.setXYZ(i, positions.getX(i - 1), positions.getY(i - 1), positions.getZ(i - 1));
+      if (trail) {
+        const positions = trail.geometry.attributes.position as THREE.BufferAttribute;
+        const colors = trail.geometry.attributes.color as THREE.BufferAttribute;
+        for (let i = TRAIL_LEN - 1; i > 0; i--) {
+          positions.setXYZ(i, positions.getX(i - 1), positions.getY(i - 1), positions.getZ(i - 1));
+        }
+        positions.setXYZ(0, pose.x, 0.55, pose.z);
+        for (let i = 0; i < TRAIL_LEN; i++) {
+          const fade = 1 - i / TRAIL_LEN;
+          colors.setXYZ(i, colorObject.r * fade, colorObject.g * fade, colorObject.b * fade);
+        }
+        positions.needsUpdate = true;
+        colors.needsUpdate = true;
       }
-      positions.setXYZ(0, pose.x, 0.55, pose.z);
-      for (let i = 0; i < TRAIL_LEN; i++) {
-        const fade = 1 - i / TRAIL_LEN;
-        colors.setXYZ(i, colorObject.r * fade, colorObject.g * fade, colorObject.b * fade);
-      }
-      positions.needsUpdate = true;
-      colors.needsUpdate = true;
     }
 
     if (delta > 0.2 && groupRef.current) {
@@ -252,7 +259,7 @@ function LiveRobotAgent({
 
   return (
     <group>
-      <primitive object={trail} />
+      {trail && <primitive object={trail} />}
       <group
         ref={groupRef}
         onClick={handlePointer}

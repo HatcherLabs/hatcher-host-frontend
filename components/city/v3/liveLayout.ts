@@ -1,4 +1,5 @@
 import type { CityAgent, CityStatus, CityUser } from '@/components/city/types';
+import { CITY_RENDER_BUDGET } from './cityRenderBudget';
 import {
   cityGridFor,
   deriveHandoffBuildingVisual,
@@ -97,7 +98,7 @@ export interface LiveCityLayoutOptions {
   users?: CityUser[];
 }
 
-const DEFAULT_MAX_BUILDINGS = 2_500;
+const DEFAULT_MAX_BUILDINGS = CITY_RENDER_BUDGET.minimumGridBuildings;
 const DEFAULT_ROUTE_LIMIT = 18;
 const OWNER_WEIGHT = 200_000;
 

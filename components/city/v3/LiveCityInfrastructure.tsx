@@ -17,6 +17,7 @@ import {
   TERRAIN_SIZE,
   terrainHeightAt,
 } from './liveCityEnvironment';
+import { CITY_RENDER_BUDGET } from './cityRenderBudget';
 
 interface InfrastructureProps {
   grid: LiveCityGrid;
@@ -35,7 +36,9 @@ export function LiveCityInfrastructure({ grid, timeMode }: InfrastructureProps) 
       <Terrain grid={grid} timeMode={timeMode} />
       <MountainRing timeMode={timeMode} />
       <StreetGrid grid={grid} />
-      <CitySignalBackbone grid={grid} timeMode={timeMode} />
+      {CITY_RENDER_BUDGET.signalBackbone && (
+        <CitySignalBackbone grid={grid} timeMode={timeMode} />
+      )}
       <StreetLights grid={grid} timeMode={timeMode} />
       <TreeRing grid={grid} timeMode={timeMode} />
     </group>
@@ -261,9 +264,9 @@ function StreetGrid({ grid }: GridProps) {
           <RoadCurbs road={road} />
         </group>
       ))}
-      <IntersectionNodes grid={grid} />
-      <CrosswalkNodes grid={grid} />
-      {stripeMarks.map((mark) => (
+      {CITY_RENDER_BUDGET.intersectionAccents && <IntersectionNodes grid={grid} />}
+      {CITY_RENDER_BUDGET.crosswalkStripes && <CrosswalkNodes grid={grid} />}
+      {CITY_RENDER_BUDGET.roadStripeMarks && stripeMarks.map((mark) => (
             <mesh key={mark.key} position={[mark.x, 0.001, mark.z]}>
               <boxGeometry args={[mark.width, 0.045, mark.depth]} />
               <meshBasicMaterial
