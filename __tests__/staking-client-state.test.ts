@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  bytesToBase64,
   formatRewardFundingSources,
   formatStakingTokenAmount,
   formatStakingWalletStepNotice,
@@ -73,15 +74,27 @@ describe('staking linked wallet state', () => {
     expect(shouldUseWalletSignInForLinking({
       walletName: 'Mobile Wallet Adapter',
       signInSupported: true,
+      isMobileRuntime: true,
     })).toBe(true);
     expect(shouldUseWalletSignInForLinking({
       walletName: 'Phantom',
       signInSupported: true,
+      isMobileRuntime: false,
     })).toBe(false);
+    expect(shouldUseWalletSignInForLinking({
+      walletName: 'Phantom',
+      signInSupported: true,
+      isMobileRuntime: true,
+    })).toBe(true);
     expect(shouldUseWalletSignInForLinking({
       walletName: 'Mobile Wallet Adapter',
       signInSupported: false,
+      isMobileRuntime: true,
     })).toBe(false);
+  });
+
+  it('encodes signed wallet message bytes for link-wallet verification', () => {
+    expect(bytesToBase64(new TextEncoder().encode('Sign in to Hatcher'))).toBe('U2lnbiBpbiB0byBIYXRjaGVy');
   });
 
   it('keeps the SIWS statement aligned with the API verifier', () => {

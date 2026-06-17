@@ -16,6 +16,7 @@ import { Link, useRouter } from '@/i18n/routing';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import {
+  bytesToBase64,
   formatRewardFundingSources,
   formatStakingTokenAmount,
   formatStakingWalletStepNotice,
@@ -98,10 +99,11 @@ function canClaimHatcherReward(status: HatcherRewardUiStatus | undefined): boole
   return Boolean(status && !status.loading && !status.error && status.rewardEntryExists && status.canClaim);
 }
 
-function signatureToBase64(signature: Uint8Array): string {
-  let binary = '';
-  for (const byte of signature) binary += String.fromCharCode(byte);
-  return btoa(binary);
+function isMobileWalletLinkRuntime(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  const userAgent = navigator.userAgent || '';
+  return /Android|iPhone|iPad|iPod|Mobile/i.test(userAgent)
+    || (/Macintosh|Mac OS/i.test(userAgent) && navigator.maxTouchPoints > 1);
 }
 
 class WalletFlowStepRequiredError extends Error {
@@ -479,6 +481,7 @@ export function StakingClient() {
     if (shouldUseWalletSignInForLinking({
       walletName: walletRef.current.wallet?.adapter.name,
       signInSupported: Boolean(walletRef.current.signIn),
+      isMobileRuntime: isMobileWalletLinkRuntime(),
     })) {
       const signed = await walletRef.current.signIn!({
         domain: window.location.host,
@@ -494,8 +497,8 @@ export function StakingClient() {
       }
       const linked = await api.linkWallet(
         walletAddress,
-        signatureToBase64(signed.signature),
-        signatureToBase64(signed.signedMessage),
+        bytesToBase64(signed.signature),
+        bytesToBase64(signed.signedMessage),
       );
       if (!linked.success) throw new Error(linked.error);
 
@@ -509,8 +512,13 @@ export function StakingClient() {
       throw new Error('This wallet does not support message signing. Use Phantom, Solflare, or another compatible Solana wallet.');
     }
 
-    const signature = await walletRef.current.signMessage(new TextEncoder().encode(challenge.data.message));
-    const linked = await api.linkWallet(walletAddress, signatureToBase64(signature));
+    const messageBytes = new TextEncoder().encode(challenge.data.message);
+    const signature = await walletRef.current.signMessage(messageBytes);
+    const linked = await api.linkWallet(
+      walletAddress,
+      bytesToBase64(signature),
+      bytesToBase64(messageBytes),
+    );
     if (!linked.success) throw new Error(linked.error);
 
     setOptimisticLinkedWalletAddress(linked.data.walletAddress);

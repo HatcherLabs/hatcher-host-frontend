@@ -17,11 +17,19 @@ export const WALLET_LINK_SIWS_STATEMENT = 'Link this wallet to Hatcher for staki
 export function shouldUseWalletSignInForLinking({
   walletName,
   signInSupported,
+  isMobileRuntime = false,
 }: {
   walletName: string | null | undefined;
   signInSupported: boolean;
+  isMobileRuntime?: boolean;
 }): boolean {
-  return signInSupported && isMobileWalletAdapterName(walletName);
+  return signInSupported && (isMobileRuntime || isMobileWalletAdapterName(walletName));
+}
+
+export function bytesToBase64(bytes: Uint8Array): string {
+  let binary = '';
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary);
 }
 
 export type StakingWalletStep = 'sign-in' | 'connect-wallet' | 'link-wallet' | 'ready';
