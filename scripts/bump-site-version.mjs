@@ -36,6 +36,47 @@ export function updatePackageVersions({ packageJson, packageLockJson }) {
   return { nextVersion, packageJson, packageLockJson };
 }
 
+const VERSION_QUERY_PATTERN = /v=\d+\.\d+\.\d+/g;
+const SITE_VERSION_CONSTANT_PATTERN =
+  /export const SITE_VERSION = '\d+\.\d+\.\d+';/;
+
+export function updateVersionedAssetReferences({
+  siteAssetsSource,
+  manifestJson,
+  siteVersionAssetsTestSource,
+  version,
+}) {
+  const nextVersionQuery = `v=${version}`;
+  const nextSiteAssetsSource = siteAssetsSource
+    .replace(
+      SITE_VERSION_CONSTANT_PATTERN,
+      `export const SITE_VERSION = '${version}';`,
+    )
+    .replace(VERSION_QUERY_PATTERN, nextVersionQuery);
+
+  const nextManifestJson = {
+    ...manifestJson,
+    icons: Array.isArray(manifestJson.icons)
+      ? manifestJson.icons.map((icon) => ({
+          ...icon,
+          src:
+            typeof icon.src === 'string'
+              ? icon.src.replace(VERSION_QUERY_PATTERN, nextVersionQuery)
+              : icon.src,
+        }))
+      : manifestJson.icons,
+  };
+
+  return {
+    siteAssetsSource: nextSiteAssetsSource,
+    manifestJson: nextManifestJson,
+    siteVersionAssetsTestSource: siteVersionAssetsTestSource.replace(
+      VERSION_QUERY_PATTERN,
+      nextVersionQuery,
+    ),
+  };
+}
+
 export function buildVersionCommitMessage(version) {
   return `chore: bump site version to v${version}`;
 }
@@ -51,14 +92,38 @@ async function writeJson(filePath, data) {
 async function main() {
   const packagePath = path.join(rootDir, 'package.json');
   const packageLockPath = path.join(rootDir, 'package-lock.json');
+  const siteAssetsPath = path.join(rootDir, 'lib/site-assets.ts');
+  const manifestPath = path.join(rootDir, 'public/manifest.json');
+  const siteVersionAssetsTestPath = path.join(
+    rootDir,
+    '__tests__/site-version-assets.test.ts',
+  );
 
   const packageJson = await readJson(packagePath);
   const packageLockJson = await readJson(packageLockPath);
+  const siteAssetsSource = await readFile(siteAssetsPath, 'utf8');
+  const manifestJson = await readJson(manifestPath);
+  const siteVersionAssetsTestSource = await readFile(
+    siteVersionAssetsTestPath,
+    'utf8',
+  );
   const { nextVersion } = updatePackageVersions({ packageJson, packageLockJson });
+  const versionedAssets = updateVersionedAssetReferences({
+    siteAssetsSource,
+    manifestJson,
+    siteVersionAssetsTestSource,
+    version: nextVersion,
+  });
   const commitMessage = buildVersionCommitMessage(nextVersion);
 
   await writeJson(packagePath, packageJson);
   await writeJson(packageLockPath, packageLockJson);
+  await writeFile(siteAssetsPath, versionedAssets.siteAssetsSource);
+  await writeJson(manifestPath, versionedAssets.manifestJson);
+  await writeFile(
+    siteVersionAssetsTestPath,
+    versionedAssets.siteVersionAssetsTestSource,
+  );
 
   if (process.env.GITHUB_OUTPUT) {
     await writeFile(
