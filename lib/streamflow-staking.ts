@@ -142,12 +142,59 @@ async function preparePreflightedWalletTransaction(params: {
   };
 }
 
+function isMobileWalletRuntime(wallet: WalletContextState): boolean {
+  if (wallet.wallet?.adapter.name === 'Mobile Wallet Adapter') return true;
+  if (typeof navigator === 'undefined') return false;
+
+  const userAgent = navigator.userAgent || '';
+  return /Android|iPhone|iPad|iPod|Mobile/i.test(userAgent)
+    || (/Macintosh|Mac OS/i.test(userAgent) && navigator.maxTouchPoints > 1);
+}
+
+async function signAndBroadcastPreparedTransaction(params: {
+  wallet: WalletContextState;
+  connection: Connection;
+  prepared: Awaited<ReturnType<typeof preparePreflightedWalletTransaction>>;
+  onTransactionSubmitted?: (txId: string) => void;
+}): Promise<string> {
+  if (!params.wallet.signTransaction) {
+    throw new Error('Connect a wallet that supports Solana transaction signing.');
+  }
+
+  const signed = await params.wallet.signTransaction(params.prepared.tx);
+  const txId = await params.connection.sendRawTransaction(signed.serialize(), {
+    preflightCommitment: 'confirmed',
+    skipPreflight: false,
+    maxRetries: 3,
+  });
+  params.onTransactionSubmitted?.(txId);
+
+  const confirmation = await params.connection.confirmTransaction({
+    signature: txId,
+    blockhash: params.prepared.blockhash,
+    lastValidBlockHeight: params.prepared.lastValidBlockHeight,
+  }, 'confirmed');
+  if (confirmation.value.err) {
+    throw new Error('Staking transaction failed after broadcast. Refresh staking data and try again.');
+  }
+
+  return txId;
+}
+
 async function sendPreparedWalletTransaction(params: {
   wallet: WalletContextState;
   connection: Connection;
   prepared: Awaited<ReturnType<typeof preparePreflightedWalletTransaction>>;
   onTransactionSubmitted?: (txId: string) => void;
 }): Promise<string> {
+  if (isMobileWalletRuntime(params.wallet)) {
+    return signAndBroadcastPreparedTransaction(params);
+  }
+
+  if (!params.wallet.sendTransaction) {
+    return signAndBroadcastPreparedTransaction(params);
+  }
+
   const txId = await params.wallet.sendTransaction(params.prepared.tx, params.connection, {
     preflightCommitment: 'confirmed',
     skipPreflight: false,
@@ -229,8 +276,8 @@ export async function stakeHatcherWithStreamflow(params: {
   durationDays: number;
   onTransactionSubmitted?: (txId: string) => void;
 }): Promise<StakeHatcherResult> {
-  if (!params.wallet.publicKey || !params.wallet.sendTransaction) {
-    throw new Error('Connect a wallet that supports Solana transaction sending.');
+  if (!params.wallet.publicKey || (!params.wallet.sendTransaction && !params.wallet.signTransaction)) {
+    throw new Error('Connect a wallet that supports Solana transaction signing.');
   }
   if (params.amountBaseUnits <= 0n) {
     throw new Error('Enter an amount greater than zero.');

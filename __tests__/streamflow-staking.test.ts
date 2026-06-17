@@ -3,7 +3,7 @@ import {
   PublicKey,
   VersionedTransaction,
 } from '@solana/web3.js';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { WalletContextState } from '@solana/wallet-adapter-react';
 import { claimHatcherRewardsWithStreamflow, stakeHatcherWithStreamflow } from '@/lib/streamflow-staking';
 
@@ -61,6 +61,10 @@ vi.mock('@streamflow/staking', () => ({
 }));
 
 describe('streamflow staking rewards', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   beforeEach(() => {
     stakingMocks.claimRewards.mockClear();
     stakingMocks.createRewardEntry.mockClear();
@@ -138,6 +142,36 @@ describe('streamflow staking rewards', () => {
     expect(stakingMocks.sendRawTransaction).not.toHaveBeenCalled();
   });
 
+  it('prepares the Streamflow receipt token account through signTransaction on mobile', async () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148',
+      maxTouchPoints: 5,
+    });
+    const keypair = Keypair.generate();
+    const stakeMint = Keypair.generate().publicKey;
+    stakingMocks.deriveStakeMintPDA.mockReturnValueOnce(stakeMint);
+    stakingMocks.getAccountInfo.mockResolvedValue(null);
+    const wallet = {
+      publicKey: keypair.publicKey,
+      signTransaction: vi.fn(async (transaction) => transaction),
+      sendTransaction: vi.fn(async () => 'prepare-ata-tx'),
+    } as unknown as WalletContextState;
+
+    await expect(stakeHatcherWithStreamflow({
+      wallet,
+      stakePoolAddress: '7BVxRYGoTJjr3bgvDhpJggJrnUhyYoGPbnxTRAWuDmtH',
+      amountBaseUnits: 1_000_000n,
+      durationDays: 7,
+    })).resolves.toEqual({ txId: 'stake-tx', preparedOnly: true });
+
+    expect(wallet.signTransaction).toHaveBeenCalledWith(expect.any(VersionedTransaction));
+    expect(wallet.sendTransaction).not.toHaveBeenCalled();
+    expect(stakingMocks.sendRawTransaction).toHaveBeenCalledWith(
+      expect.any(Uint8Array),
+      expect.objectContaining({ preflightCommitment: 'confirmed' }),
+    );
+  });
+
   it('stakes through the Streamflow SDK when the receipt token account exists', async () => {
     const walletKeypair = Keypair.generate();
     const tokenProgramId = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
@@ -190,6 +224,47 @@ describe('streamflow staking rewards', () => {
       expect.objectContaining({ sigVerify: false }),
     );
     expect(stakingMocks.sendRawTransaction).not.toHaveBeenCalled();
+  });
+
+  it('stakes through signTransaction on mobile after preparing Streamflow instructions', async () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 Chrome/126 Mobile Safari/537.36',
+      maxTouchPoints: 5,
+    });
+    const walletKeypair = Keypair.generate();
+    const tokenProgramId = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
+    stakingMocks.getAccountInfo.mockResolvedValue({
+      owner: tokenProgramId,
+    });
+    const onTransactionSubmitted = vi.fn();
+    const wallet = {
+      publicKey: walletKeypair.publicKey,
+      signTransaction: vi.fn(async (transaction) => transaction),
+      sendTransaction: vi.fn(async () => 'sdk-stake-tx'),
+    } as unknown as WalletContextState;
+
+    await expect(stakeHatcherWithStreamflow({
+      wallet,
+      stakePoolAddress: '7BVxRYGoTJjr3bgvDhpJggJrnUhyYoGPbnxTRAWuDmtH',
+      amountBaseUnits: 1_000_000n,
+      durationDays: 7,
+      onTransactionSubmitted,
+    })).resolves.toEqual({ txId: 'stake-tx' });
+
+    expect(stakingMocks.prepareStakeAndCreateEntriesInstructions).toHaveBeenCalledWith(
+      expect.objectContaining({
+        stakePool: '7BVxRYGoTJjr3bgvDhpJggJrnUhyYoGPbnxTRAWuDmtH',
+        tokenProgramId,
+      }),
+      { invoker: wallet },
+    );
+    expect(wallet.signTransaction).toHaveBeenCalledWith(expect.any(VersionedTransaction));
+    expect(wallet.sendTransaction).not.toHaveBeenCalled();
+    expect(stakingMocks.sendRawTransaction).toHaveBeenCalledWith(
+      expect.any(Uint8Array),
+      expect.objectContaining({ preflightCommitment: 'confirmed' }),
+    );
+    expect(onTransactionSubmitted).toHaveBeenCalledWith('stake-tx');
   });
 
   it('claims existing reward entries without creating rent-bearing accounts', async () => {
