@@ -142,15 +142,6 @@ async function preparePreflightedWalletTransaction(params: {
   };
 }
 
-function isMobileWalletRuntime(wallet: WalletContextState): boolean {
-  if (wallet.wallet?.adapter.name === 'Mobile Wallet Adapter') return true;
-  if (typeof navigator === 'undefined') return false;
-
-  const userAgent = navigator.userAgent || '';
-  return /Android|iPhone|iPad|iPod|Mobile/i.test(userAgent)
-    || (/Macintosh|Mac OS/i.test(userAgent) && navigator.maxTouchPoints > 1);
-}
-
 async function signAndBroadcastPreparedTransaction(params: {
   wallet: WalletContextState;
   connection: Connection;
@@ -187,31 +178,27 @@ async function sendPreparedWalletTransaction(params: {
   prepared: Awaited<ReturnType<typeof preparePreflightedWalletTransaction>>;
   onTransactionSubmitted?: (txId: string) => void;
 }): Promise<string> {
-  if (isMobileWalletRuntime(params.wallet)) {
-    return signAndBroadcastPreparedTransaction(params);
+  if (params.wallet.sendTransaction) {
+    const txId = await params.wallet.sendTransaction(params.prepared.tx, params.connection, {
+      preflightCommitment: 'confirmed',
+      skipPreflight: false,
+      maxRetries: 3,
+    });
+    params.onTransactionSubmitted?.(txId);
+
+    const confirmation = await params.connection.confirmTransaction({
+      signature: txId,
+      blockhash: params.prepared.blockhash,
+      lastValidBlockHeight: params.prepared.lastValidBlockHeight,
+    }, 'confirmed');
+    if (confirmation.value.err) {
+      throw new Error('Staking transaction failed after broadcast. Refresh staking data and try again.');
+    }
+
+    return txId;
   }
 
-  if (!params.wallet.sendTransaction) {
-    return signAndBroadcastPreparedTransaction(params);
-  }
-
-  const txId = await params.wallet.sendTransaction(params.prepared.tx, params.connection, {
-    preflightCommitment: 'confirmed',
-    skipPreflight: false,
-    maxRetries: 3,
-  });
-  params.onTransactionSubmitted?.(txId);
-
-  const confirmation = await params.connection.confirmTransaction({
-    signature: txId,
-    blockhash: params.prepared.blockhash,
-    lastValidBlockHeight: params.prepared.lastValidBlockHeight,
-  }, 'confirmed');
-  if (confirmation.value.err) {
-    throw new Error('Staking transaction failed after broadcast. Refresh staking data and try again.');
-  }
-
-  return txId;
+  return signAndBroadcastPreparedTransaction(params);
 }
 
 export async function fetchHatcherWalletBalance(
@@ -349,6 +336,60 @@ export async function stakeHatcherWithStreamflow(params: {
   return { txId };
 }
 
+export function isStakeUnlocked(unlockAt: string | Date, now = new Date()): boolean {
+  const unlockDate = typeof unlockAt === 'string' ? new Date(unlockAt) : unlockAt;
+  return !Number.isNaN(unlockDate.getTime()) && unlockDate.getTime() <= now.getTime();
+}
+
+export async function unstakeHatcherWithStreamflow(params: {
+  wallet: WalletContextState;
+  stakePoolAddress: string;
+  depositNonce: number;
+  unlockAt: string | Date;
+  onTransactionSubmitted?: (txId: string) => void;
+}): Promise<{ txId: string }> {
+  if (!params.wallet.publicKey || (!params.wallet.sendTransaction && !params.wallet.signTransaction)) {
+    throw new Error('Connect a wallet that supports Solana transaction signing.');
+  }
+  if (!isStakeUnlocked(params.unlockAt)) {
+    throw new Error('This stake is still locked. Unstake is available after the lock period ends.');
+  }
+
+  const client = new SolanaStakingClient({
+    clusterUrl: SOLANA_RPC_BROWSER_ENDPOINT,
+    cluster: cluster(),
+    commitment: 'confirmed',
+  });
+  const tokenProgramId = await getHatcherTokenProgramId(client.connection);
+  const invoker = params.wallet as unknown as SignerWalletAdapter;
+
+  const { ixs } = await client.prepareUnstakeAndClaimInstructions({
+    stakePool: params.stakePoolAddress,
+    stakePoolMint: HATCHER_MINT,
+    tokenProgramId,
+    nonce: params.depositNonce,
+    rewardPools: [{
+      nonce: HATCHER_REWARD_POOL_NONCE,
+      mint: HATCHER_MINT,
+      tokenProgramId,
+      rewardPoolType: 'dynamic',
+    }],
+  }, { invoker });
+
+  const prepared = await preparePreflightedWalletTransaction({
+    connection: client.connection,
+    payer: params.wallet.publicKey,
+    instructions: ixs,
+  });
+  const txId = await sendPreparedWalletTransaction({
+    wallet: params.wallet,
+    connection: client.connection,
+    prepared,
+    onTransactionSubmitted: params.onTransactionSubmitted,
+  });
+  return { txId };
+}
+
 async function fetchHatcherRewardStatusFromClient(params: {
   client: SolanaStakingClient;
   walletAddress: string;
@@ -435,7 +476,7 @@ export async function claimHatcherRewardsWithStreamflow(params: {
   stakeEntryAddress: string;
   depositNonce: number;
 }): Promise<{ txIds: string[] }> {
-  if (!params.wallet.publicKey || !params.wallet.signTransaction) {
+  if (!params.wallet.publicKey || (!params.wallet.sendTransaction && !params.wallet.signTransaction)) {
     throw new Error('Connect a wallet that supports Solana transaction signing.');
   }
 
@@ -459,7 +500,7 @@ export async function claimHatcherRewardsWithStreamflow(params: {
   const invoker = params.wallet as unknown as SignerWalletAdapter;
   const stakePool = new PublicKey(params.stakePoolAddress);
 
-  const claimed = await client.claimRewards({
+  const { ixs } = await client.prepareClaimRewardsInstructions({
     stakePool,
     stakePoolMint: HATCHER_MINT,
     tokenProgramId,
@@ -469,5 +510,16 @@ export async function claimHatcherRewardsWithStreamflow(params: {
     rewardPoolType: 'dynamic',
   }, { invoker });
 
-  return { txIds: [claimed.txId] };
+  const prepared = await preparePreflightedWalletTransaction({
+    connection: client.connection,
+    payer: params.wallet.publicKey,
+    instructions: ixs,
+  });
+  const txId = await sendPreparedWalletTransaction({
+    wallet: params.wallet,
+    connection: client.connection,
+    prepared,
+  });
+
+  return { txIds: [txId] };
 }

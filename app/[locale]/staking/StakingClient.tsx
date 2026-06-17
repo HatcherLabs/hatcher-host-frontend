@@ -32,10 +32,12 @@ import {
   claimHatcherRewardsWithStreamflow,
   fetchHatcherWalletBalance,
   fetchHatcherRewardStatusWithStreamflow,
+  isStakeUnlocked,
   MIN_HATCHER_STAKE_BASE_UNITS,
   parseHatcherAmountToBaseUnits,
   percentOfHatcherBalance,
   stakeHatcherWithStreamflow,
+  unstakeHatcherWithStreamflow,
   type HatcherRewardStatus,
 } from '@/lib/streamflow-staking';
 import type {
@@ -209,8 +211,10 @@ export function StakingClient() {
   const [balanceLoading, setBalanceLoading] = useState(false);
   const [staking, setStaking] = useState(false);
   const [stakeTxId, setStakeTxId] = useState<string | null>(null);
+  const [unstakeTxId, setUnstakeTxId] = useState<string | null>(null);
   const [hatcherRewardTxId, setHatcherRewardTxId] = useState<string | null>(null);
   const [claimingHatcherStake, setClaimingHatcherStake] = useState<string | null>(null);
+  const [unstakingStake, setUnstakingStake] = useState<string | null>(null);
   const [hatcherRewardStatuses, setHatcherRewardStatuses] = useState<Record<string, HatcherRewardUiStatus>>({});
   const [linkingWallet, setLinkingWallet] = useState(false);
   const [optimisticLinkedWalletAddress, setOptimisticLinkedWalletAddress] = useState<string | null>(null);
@@ -615,6 +619,7 @@ export function StakingClient() {
     setError(null);
     setClaimResult(null);
     setStakeTxId(null);
+    setUnstakeTxId(null);
     setHatcherRewardTxId(null);
     setNotice(null);
 
@@ -717,7 +722,7 @@ export function StakingClient() {
     setNotice(null);
     setClaimResult(null);
     setHatcherRewardTxId(null);
-    if (claimingHatcherStake) return;
+    if (claimingHatcherStake || unstakingStake) return;
 
     setClaimingHatcherStake(stake.stakeEntryAddress);
     try {
@@ -747,7 +752,52 @@ export function StakingClient() {
     } finally {
       setClaimingHatcherStake(null);
     }
-  }, [claimingHatcherStake, connectWalletOnly, load, loadWalletBalance]);
+  }, [claimingHatcherStake, connectWalletOnly, load, loadWalletBalance, unstakingStake]);
+
+  const unstakeHatcherStake = useCallback(async (stake: StakingStakeEntry) => {
+    setError(null);
+    setNotice(null);
+    setClaimResult(null);
+    setStakeTxId(null);
+    setUnstakeTxId(null);
+    if (claimingHatcherStake || unstakingStake) return;
+
+    if (!isStakeUnlocked(stake.unlockAt)) {
+      setError(`This stake unlocks on ${formatDate(stake.unlockAt)}.`);
+      return;
+    }
+
+    setUnstakingStake(stake.stakeEntryAddress);
+    try {
+      const wasConnected = Boolean(walletRef.current.connected && walletRef.current.publicKey);
+      const walletAddress = await connectWalletOnly();
+      if (walletAddress !== stake.walletAddress) {
+        throw new Error('Connect the wallet that owns this stake before unstaking.');
+      }
+      if (!wasConnected) {
+        await loadWalletBalance();
+        setNotice('Wallet connected. Tap Unstake again to submit the unstake transaction.');
+        return;
+      }
+
+      const result = await unstakeHatcherWithStreamflow({
+        wallet: walletRef.current,
+        stakePoolAddress: stake.poolAddress,
+        depositNonce: stake.depositNonce,
+        unlockAt: stake.unlockAt,
+        onTransactionSubmitted: setUnstakeTxId,
+      });
+
+      setUnstakeTxId(result.txId);
+      setNotice('Stake unstaked. Streamflow will return the unlocked HATCHER and available rewards to your wallet.');
+      await Promise.all([load(), loadWalletBalance()]);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Could not unstake HATCHER';
+      if (message !== 'Cancelled') setError(message);
+    } finally {
+      setUnstakingStake(null);
+    }
+  }, [claimingHatcherStake, connectWalletOnly, load, loadWalletBalance, unstakingStake]);
 
   const claim = async () => {
     setClaiming(true);
@@ -980,6 +1030,12 @@ export function StakingClient() {
               </div>
             )}
 
+            {unstakeTxId && (
+              <div className="mt-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-300">
+                Unstake transaction submitted: {shortAddress(unstakeTxId)}
+              </div>
+            )}
+
             {hatcherRewardTxId && (
               <div className="mt-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-300">
                 HATCHER reward claim submitted: {shortAddress(hatcherRewardTxId)}
@@ -1051,7 +1107,9 @@ export function StakingClient() {
                 summary?.activeStakes.map((stake) => {
                   const hatcherStatus = hatcherRewardStatuses[stake.stakeEntryAddress];
                   const hatcherClaimable = canClaimHatcherReward(hatcherStatus);
-                  const hatcherClaimDisabled = Boolean(claimingHatcherStake) || !hatcherClaimable;
+                  const stakeUnlocked = isStakeUnlocked(stake.unlockAt);
+                  const hatcherClaimDisabled = Boolean(claimingHatcherStake || unstakingStake) || !hatcherClaimable;
+                  const unstakeDisabled = Boolean(claimingHatcherStake || unstakingStake) || !stakeUnlocked;
 
                   return (
                     <div key={stake.stakeEntryAddress} className="grid min-w-0 gap-3 p-5 md:grid-cols-6">
@@ -1078,7 +1136,7 @@ export function StakingClient() {
                           <p className="mt-1 text-xs text-amber-400">{hatcherStatus.error}</p>
                         )}
                       </div>
-                      <div className="flex min-w-0 items-start md:justify-end">
+                      <div className="flex min-w-0 flex-col items-stretch gap-2 md:items-end">
                         <button
                           type="button"
                           onClick={() => void claimHatcherRewards(stake)}
@@ -1093,7 +1151,21 @@ export function StakingClient() {
                               ? 'Checking'
                               : hatcherClaimable
                                 ? 'Claim HATCHER'
-                                : 'No rewards'}
+                              : 'No rewards'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => void unstakeHatcherStake(stake)}
+                          disabled={unstakeDisabled}
+                          title={stakeUnlocked ? 'Unstake unlocked HATCHER and available rewards' : `Locked until ${formatDate(stake.unlockAt)}`}
+                          className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/15 disabled:cursor-not-allowed disabled:opacity-50 md:w-auto"
+                        >
+                          {stakeUnlocked ? <ArrowUpRight size={14} aria-hidden /> : <Lock size={14} aria-hidden />}
+                          {unstakingStake === stake.stakeEntryAddress
+                            ? 'Unstaking'
+                            : stakeUnlocked
+                              ? 'Unstake'
+                              : 'Locked'}
                         </button>
                       </div>
                     </div>
