@@ -1,3 +1,5 @@
+import { isMobileWalletAdapterName } from '@/lib/wallet-adapter-state';
+
 export function resolveStakingLinkedWalletAddress({
   userWalletAddress,
   summaryWalletAddress,
@@ -8,6 +10,18 @@ export function resolveStakingLinkedWalletAddress({
   optimisticLinkedWalletAddress: string | null | undefined;
 }): string | null {
   return optimisticLinkedWalletAddress ?? userWalletAddress ?? summaryWalletAddress ?? null;
+}
+
+export const WALLET_LINK_SIWS_STATEMENT = 'Link this wallet to Hatcher for staking rewards and AI Credits.';
+
+export function shouldUseWalletSignInForLinking({
+  walletName,
+  signInSupported,
+}: {
+  walletName: string | null | undefined;
+  signInSupported: boolean;
+}): boolean {
+  return signInSupported && isMobileWalletAdapterName(walletName);
 }
 
 export type StakingWalletStep = 'sign-in' | 'connect-wallet' | 'link-wallet' | 'ready';

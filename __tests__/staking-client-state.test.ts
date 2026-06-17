@@ -5,6 +5,8 @@ import {
   formatStakingWalletStepNotice,
   resolveStakingLinkedWalletAddress,
   resolveStakingWalletStep,
+  shouldUseWalletSignInForLinking,
+  WALLET_LINK_SIWS_STATEMENT,
 } from '@/lib/staking-state';
 
 describe('staking linked wallet state', () => {
@@ -64,6 +66,27 @@ describe('staking linked wallet state', () => {
     );
     expect(formatStakingWalletStepNotice('link-wallet')).toBe(
       'Wallet linked. Tap Stake HATCHER again to submit the staking transaction.',
+    );
+  });
+
+  it('uses wallet-adapter signIn only for Mobile Wallet Adapter linking', () => {
+    expect(shouldUseWalletSignInForLinking({
+      walletName: 'Mobile Wallet Adapter',
+      signInSupported: true,
+    })).toBe(true);
+    expect(shouldUseWalletSignInForLinking({
+      walletName: 'Phantom',
+      signInSupported: true,
+    })).toBe(false);
+    expect(shouldUseWalletSignInForLinking({
+      walletName: 'Mobile Wallet Adapter',
+      signInSupported: false,
+    })).toBe(false);
+  });
+
+  it('keeps the SIWS statement aligned with the API verifier', () => {
+    expect(WALLET_LINK_SIWS_STATEMENT).toBe(
+      'Link this wallet to Hatcher for staking rewards and AI Credits.',
     );
   });
 });

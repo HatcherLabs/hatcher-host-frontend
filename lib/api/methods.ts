@@ -310,10 +310,10 @@ export const api = {
     }),
 
   /** Link or replace the Solana wallet attached to the current account. */
-  linkWallet: (walletAddress: string, signature: string) =>
+  linkWallet: (walletAddress: string, signature: string, signedMessage?: string) =>
     req<{ walletAddress: string }>("/auth/link-wallet", {
       method: "POST",
-      body: JSON.stringify({ walletAddress, signature }),
+      body: JSON.stringify({ walletAddress, signature, ...(signedMessage ? { signedMessage } : {}) }),
     }),
 
   /** GDPR data export — downloads all user data as JSON */

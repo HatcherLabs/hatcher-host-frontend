@@ -21,6 +21,8 @@ import {
   formatStakingWalletStepNotice,
   resolveStakingLinkedWalletAddress,
   resolveStakingWalletStep,
+  shouldUseWalletSignInForLinking,
+  WALLET_LINK_SIWS_STATEMENT,
 } from '@/lib/staking-state';
 import { isWalletTrustRevokedError, isWalletUserCancellationError } from '@/lib/wallet-errors';
 import { buildPhantomBrowseUrl } from '@/lib/wallet-links';
@@ -471,12 +473,41 @@ export function StakingClient() {
   }, [setWalletModalVisible]);
 
   const signAndLinkWallet = useCallback(async (walletAddress: string): Promise<string> => {
+    const challenge = await api.getWalletChallenge(walletAddress);
+    if (!challenge.success) throw new Error(challenge.error);
+
+    if (shouldUseWalletSignInForLinking({
+      walletName: walletRef.current.wallet?.adapter.name,
+      signInSupported: Boolean(walletRef.current.signIn),
+    })) {
+      const signed = await walletRef.current.signIn!({
+        domain: window.location.host,
+        address: walletAddress,
+        statement: WALLET_LINK_SIWS_STATEMENT,
+        uri: window.location.origin,
+        version: '1',
+        nonce: challenge.data.nonce,
+        issuedAt: new Date().toISOString(),
+      });
+      if (signed.account.address !== walletAddress) {
+        throw new Error('The signed wallet does not match the connected wallet. Switch wallets and try again.');
+      }
+      const linked = await api.linkWallet(
+        walletAddress,
+        signatureToBase64(signed.signature),
+        signatureToBase64(signed.signedMessage),
+      );
+      if (!linked.success) throw new Error(linked.error);
+
+      setOptimisticLinkedWalletAddress(linked.data.walletAddress);
+      await refreshUser();
+      await load();
+      return linked.data.walletAddress;
+    }
+
     if (!walletRef.current.signMessage) {
       throw new Error('This wallet does not support message signing. Use Phantom, Solflare, or another compatible Solana wallet.');
     }
-
-    const challenge = await api.getWalletChallenge(walletAddress);
-    if (!challenge.success) throw new Error(challenge.error);
 
     const signature = await walletRef.current.signMessage(new TextEncoder().encode(challenge.data.message));
     const linked = await api.linkWallet(walletAddress, signatureToBase64(signature));
