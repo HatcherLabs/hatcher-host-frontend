@@ -1,6 +1,7 @@
 import {
   Keypair,
   PublicKey,
+  VersionedTransaction,
 } from '@solana/web3.js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { WalletContextState } from '@solana/wallet-adapter-react';
@@ -8,7 +9,6 @@ import { claimHatcherRewardsWithStreamflow, stakeHatcherWithStreamflow } from '@
 
 const stakingMocks = vi.hoisted(() => ({
   claimRewards: vi.fn(async () => ({ txId: 'claim-tx' })),
-  createAtaBatch: vi.fn(async () => 'prepare-ata-tx'),
   createRewardEntry: vi.fn(async () => ({ txId: 'create-entry-tx' })),
   deriveStakeMintPDA: vi.fn(),
   stakeAndCreateEntries: vi.fn(async () => ({ txId: 'sdk-stake-tx' })),
@@ -26,11 +26,6 @@ const stakingMocks = vi.hoisted(() => ({
   prepareStakeAndCreateEntriesInstructions: vi.fn(async (): Promise<{ ixs: unknown[] }> => ({ ixs: [] })),
   rewardEntryFetchNullable: vi.fn(async (): Promise<unknown> => ({ accountedAmount: { toString: () => '100' } })),
   simulateTransaction: vi.fn(async (): Promise<{ value: { err: unknown | null } }> => ({ value: { err: null } })),
-}));
-
-vi.mock('@streamflow/common', async (importOriginal) => ({
-  ...await importOriginal<typeof import('@streamflow/common')>(),
-  createAtaBatch: stakingMocks.createAtaBatch,
 }));
 
 vi.mock('@streamflow/staking', () => ({
@@ -68,7 +63,6 @@ vi.mock('@streamflow/staking', () => ({
 describe('streamflow staking rewards', () => {
   beforeEach(() => {
     stakingMocks.claimRewards.mockClear();
-    stakingMocks.createAtaBatch.mockClear();
     stakingMocks.createRewardEntry.mockClear();
     stakingMocks.deriveStakeMintPDA.mockClear();
     stakingMocks.stakeAndCreateEntries.mockClear();
@@ -83,7 +77,6 @@ describe('streamflow staking rewards', () => {
     stakingMocks.getAccountInfo.mockResolvedValue({
       owner: new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'),
     });
-    stakingMocks.createAtaBatch.mockResolvedValue('prepare-ata-tx');
     stakingMocks.deriveStakeMintPDA.mockReturnValue(Keypair.generate().publicKey);
     stakingMocks.stakeAndCreateEntries.mockResolvedValue({ txId: 'sdk-stake-tx' });
     stakingMocks.prepareClaimRewardsInstructions.mockResolvedValue({
@@ -116,12 +109,12 @@ describe('streamflow staking rewards', () => {
   it('prepares the Streamflow receipt token account separately when it is missing', async () => {
     const keypair = Keypair.generate();
     const stakeMint = Keypair.generate().publicKey;
-    const tokenProgramId = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
     stakingMocks.deriveStakeMintPDA.mockReturnValueOnce(stakeMint);
     stakingMocks.getAccountInfo.mockResolvedValue(null);
     const wallet = {
       publicKey: keypair.publicKey,
       signTransaction: vi.fn(),
+      sendTransaction: vi.fn(async () => 'prepare-ata-tx'),
     } as unknown as WalletContextState;
 
     await expect(stakeHatcherWithStreamflow({
@@ -132,18 +125,16 @@ describe('streamflow staking rewards', () => {
     })).resolves.toEqual({ txId: 'prepare-ata-tx', preparedOnly: true });
 
     expect(stakingMocks.stakeAndCreateEntries).not.toHaveBeenCalled();
-    expect(stakingMocks.createAtaBatch).toHaveBeenCalledWith(
+    expect(wallet.sendTransaction).toHaveBeenCalledWith(
+      expect.any(VersionedTransaction),
       expect.anything(),
-      wallet,
-      [expect.objectContaining({
-        mint: stakeMint,
-        owner: keypair.publicKey,
-        programId: tokenProgramId,
-      })],
-      'confirmed',
+      expect.objectContaining({ preflightCommitment: 'confirmed' }),
     );
     expect(stakingMocks.prepareStakeAndCreateEntriesInstructions).not.toHaveBeenCalled();
-    expect(stakingMocks.simulateTransaction).not.toHaveBeenCalled();
+    expect(stakingMocks.simulateTransaction).toHaveBeenCalledWith(
+      expect.any(VersionedTransaction),
+      expect.objectContaining({ sigVerify: false }),
+    );
     expect(stakingMocks.sendRawTransaction).not.toHaveBeenCalled();
   });
 
@@ -157,6 +148,7 @@ describe('streamflow staking rewards', () => {
     const wallet = {
       publicKey: walletKeypair.publicKey,
       signTransaction: vi.fn(),
+      sendTransaction: vi.fn(async () => 'sdk-stake-tx'),
     } as unknown as WalletContextState;
 
     await expect(stakeHatcherWithStreamflow({
@@ -167,9 +159,8 @@ describe('streamflow staking rewards', () => {
       onTransactionSubmitted,
     })).resolves.toEqual({ txId: 'sdk-stake-tx' });
 
-    expect(stakingMocks.createAtaBatch).not.toHaveBeenCalled();
-    expect(stakingMocks.prepareStakeAndCreateEntriesInstructions).not.toHaveBeenCalled();
-    expect(stakingMocks.stakeAndCreateEntries).toHaveBeenCalledWith(
+    expect(stakingMocks.stakeAndCreateEntries).not.toHaveBeenCalled();
+    expect(stakingMocks.prepareStakeAndCreateEntriesInstructions).toHaveBeenCalledWith(
       expect.objectContaining({
         amount: expect.objectContaining({ toString: expect.any(Function) }),
         duration: expect.objectContaining({ toString: expect.any(Function) }),
@@ -186,11 +177,18 @@ describe('streamflow staking rewards', () => {
       }),
       {
         invoker: wallet,
-        computeLimit: 'autoSimulate',
       },
     );
+    expect(wallet.sendTransaction).toHaveBeenCalledWith(
+      expect.any(VersionedTransaction),
+      expect.anything(),
+      expect.objectContaining({ preflightCommitment: 'confirmed' }),
+    );
     expect(onTransactionSubmitted).toHaveBeenCalledWith('sdk-stake-tx');
-    expect(stakingMocks.simulateTransaction).not.toHaveBeenCalled();
+    expect(stakingMocks.simulateTransaction).toHaveBeenCalledWith(
+      expect.any(VersionedTransaction),
+      expect.objectContaining({ sigVerify: false }),
+    );
     expect(stakingMocks.sendRawTransaction).not.toHaveBeenCalled();
   });
 

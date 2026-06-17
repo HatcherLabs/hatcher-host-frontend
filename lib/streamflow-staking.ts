@@ -1,6 +1,6 @@
 import BN from 'bn.js';
-import type { Connection } from '@solana/web3.js';
-import { PublicKey, Transaction } from '@solana/web3.js';
+import type { Connection, VersionedTransaction } from '@solana/web3.js';
+import { PublicKey, SystemProgram, Transaction, TransactionInstruction } from '@solana/web3.js';
 import type { WalletContextState } from '@solana/wallet-adapter-react';
 import type { SignerWalletAdapter } from '@solana/wallet-adapter-base';
 import {
@@ -10,7 +10,7 @@ import {
   deriveStakeEntryPDA,
   deriveStakeMintPDA,
 } from '@streamflow/staking';
-import { createAtaBatch, ICluster } from '@streamflow/common';
+import { ICluster, prepareTransaction } from '@streamflow/common';
 import {
   HATCH_TOKEN_MINT,
   SOLANA_NETWORK,
@@ -83,6 +83,90 @@ function associatedTokenAddress(
   return address;
 }
 
+function createAssociatedTokenAccountIdempotentInstruction(params: {
+  payer: PublicKey;
+  associatedToken: PublicKey;
+  owner: PublicKey;
+  mint: PublicKey;
+  tokenProgramId: PublicKey;
+}): TransactionInstruction {
+  return new TransactionInstruction({
+    programId: ASSOCIATED_TOKEN_PROGRAM_ID,
+    keys: [
+      { pubkey: params.payer, isSigner: true, isWritable: true },
+      { pubkey: params.associatedToken, isSigner: false, isWritable: true },
+      { pubkey: params.owner, isSigner: false, isWritable: false },
+      { pubkey: params.mint, isSigner: false, isWritable: false },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+      { pubkey: params.tokenProgramId, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.from([1]),
+  });
+}
+
+async function preparePreflightedWalletTransaction(params: {
+  connection: Connection;
+  payer: PublicKey;
+  instructions: TransactionInstruction[];
+}): Promise<{
+  tx: VersionedTransaction;
+  blockhash: string;
+  lastValidBlockHeight: number;
+}> {
+  const { tx, hash } = await prepareTransaction(
+    params.connection,
+    params.instructions,
+    params.payer,
+    'confirmed',
+  );
+
+  if (
+    tx.message.header.numRequiredSignatures !== 1
+    || !tx.message.staticAccountKeys[0]?.equals(params.payer)
+  ) {
+    throw new Error('Staking transaction must be signed only by the connected wallet.');
+  }
+
+  const simulation = await params.connection.simulateTransaction(tx, {
+    sigVerify: false,
+    replaceRecentBlockhash: true,
+  });
+  if (simulation.value.err) {
+    throw new Error('Staking transaction failed preflight simulation. Refresh staking data and try again.');
+  }
+
+  return {
+    tx,
+    blockhash: hash.blockhash,
+    lastValidBlockHeight: hash.lastValidBlockHeight,
+  };
+}
+
+async function sendPreparedWalletTransaction(params: {
+  wallet: WalletContextState;
+  connection: Connection;
+  prepared: Awaited<ReturnType<typeof preparePreflightedWalletTransaction>>;
+  onTransactionSubmitted?: (txId: string) => void;
+}): Promise<string> {
+  const txId = await params.wallet.sendTransaction(params.prepared.tx, params.connection, {
+    preflightCommitment: 'confirmed',
+    skipPreflight: false,
+    maxRetries: 3,
+  });
+  params.onTransactionSubmitted?.(txId);
+
+  const confirmation = await params.connection.confirmTransaction({
+    signature: txId,
+    blockhash: params.prepared.blockhash,
+    lastValidBlockHeight: params.prepared.lastValidBlockHeight,
+  }, 'confirmed');
+  if (confirmation.value.err) {
+    throw new Error('Staking transaction failed after broadcast. Refresh staking data and try again.');
+  }
+
+  return txId;
+}
+
 export async function fetchHatcherWalletBalance(
   connection: Connection,
   owner: PublicKey,
@@ -145,8 +229,8 @@ export async function stakeHatcherWithStreamflow(params: {
   durationDays: number;
   onTransactionSubmitted?: (txId: string) => void;
 }): Promise<StakeHatcherResult> {
-  if (!params.wallet.publicKey || !params.wallet.signTransaction) {
-    throw new Error('Connect a wallet that supports Solana transaction signing.');
+  if (!params.wallet.publicKey || !params.wallet.sendTransaction) {
+    throw new Error('Connect a wallet that supports Solana transaction sending.');
   }
   if (params.amountBaseUnits <= 0n) {
     throw new Error('Enter an amount greater than zero.');
@@ -168,20 +252,26 @@ export async function stakeHatcherWithStreamflow(params: {
   const receiptAccountInfo = await client.connection.getAccountInfo(receiptTokenAccount, 'confirmed');
 
   if (!receiptAccountInfo) {
-    const txId = await createAtaBatch(
-      client.connection,
-      invoker,
-      [{
-        mint: stakeMint,
+    const prepared = await preparePreflightedWalletTransaction({
+      connection: client.connection,
+      payer: params.wallet.publicKey,
+      instructions: [createAssociatedTokenAccountIdempotentInstruction({
+        payer: params.wallet.publicKey,
+        associatedToken: receiptTokenAccount,
         owner: params.wallet.publicKey,
-        programId: tokenProgramId,
-      }],
-      'confirmed',
-    );
+        mint: stakeMint,
+        tokenProgramId,
+      })],
+    });
+    const txId = await sendPreparedWalletTransaction({
+      wallet: params.wallet,
+      connection: client.connection,
+      prepared,
+    });
     return { txId, preparedOnly: true };
   }
 
-  const staked = await client.stakeAndCreateEntries({
+  const { ixs } = await client.prepareStakeAndCreateEntriesInstructions({
     stakePool: params.stakePoolAddress,
     stakePoolMint: HATCHER_MINT,
     tokenProgramId,
@@ -196,11 +286,20 @@ export async function stakeHatcherWithStreamflow(params: {
     }],
   }, {
     invoker,
-    computeLimit: 'autoSimulate',
   });
 
-  params.onTransactionSubmitted?.(staked.txId);
-  return { txId: staked.txId };
+  const prepared = await preparePreflightedWalletTransaction({
+    connection: client.connection,
+    payer: params.wallet.publicKey,
+    instructions: ixs,
+  });
+  const txId = await sendPreparedWalletTransaction({
+    wallet: params.wallet,
+    connection: client.connection,
+    prepared,
+    onTransactionSubmitted: params.onTransactionSubmitted,
+  });
+  return { txId };
 }
 
 async function fetchHatcherRewardStatusFromClient(params: {
