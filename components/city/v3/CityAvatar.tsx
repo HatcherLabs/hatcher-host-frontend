@@ -4,7 +4,7 @@ import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { clone as cloneSkeleton } from 'three/examples/jsm/utils/SkeletonUtils.js';
-import { getGlbAvatarModel } from '@/components/agent-room/v2/stations/AgentBody';
+import { getGlbAvatarModel } from '@/components/agent-room/v2/stations/avatarModelConfig';
 
 // City walkers are miniatures next to the buildings — render every avatar at a
 // consistent walker height regardless of its room (human-scale) target.
