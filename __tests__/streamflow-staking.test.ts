@@ -1,9 +1,6 @@
 import {
   Keypair,
   PublicKey,
-  SystemProgram,
-  Transaction,
-  TransactionInstruction,
 } from '@solana/web3.js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { WalletContextState } from '@solana/wallet-adapter-react';
@@ -11,7 +8,9 @@ import { claimHatcherRewardsWithStreamflow, stakeHatcherWithStreamflow } from '@
 
 const stakingMocks = vi.hoisted(() => ({
   claimRewards: vi.fn(async () => ({ txId: 'claim-tx' })),
+  createAtaBatch: vi.fn(async () => 'prepare-ata-tx'),
   createRewardEntry: vi.fn(async () => ({ txId: 'create-entry-tx' })),
+  deriveStakeMintPDA: vi.fn(),
   stakeAndCreateEntries: vi.fn(async () => ({ txId: 'sdk-stake-tx' })),
   getAccountInfo: vi.fn(async (): Promise<unknown> => ({ owner: { equals: () => true } })),
   getLatestBlockhashAndContext: vi.fn(async (): Promise<unknown> => ({
@@ -29,8 +28,10 @@ const stakingMocks = vi.hoisted(() => ({
   simulateTransaction: vi.fn(async (): Promise<{ value: { err: unknown | null } }> => ({ value: { err: null } })),
 }));
 
-const ASSOCIATED_TOKEN_PROGRAM_ID = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
-const STREAMFLOW_STAKE_PROGRAM_ID = new PublicKey('STAKEvGqQTtzJZH6BWDcbpzXXn2BBerPAgQ3EGLN2GH');
+vi.mock('@streamflow/common', async (importOriginal) => ({
+  ...await importOriginal<typeof import('@streamflow/common')>(),
+  createAtaBatch: stakingMocks.createAtaBatch,
+}));
 
 vi.mock('@streamflow/staking', () => ({
   SolanaStakingClient: class MockSolanaStakingClient {
@@ -58,6 +59,7 @@ vi.mock('@streamflow/staking', () => ({
   },
   deriveRewardPoolPDA: vi.fn(() => 'reward-pool'),
   deriveRewardEntryPDA: vi.fn(() => 'reward-entry'),
+  deriveStakeMintPDA: stakingMocks.deriveStakeMintPDA,
   deriveStakeEntryPDA: vi.fn(() => ({
     equals: () => true,
   })),
@@ -66,7 +68,9 @@ vi.mock('@streamflow/staking', () => ({
 describe('streamflow staking rewards', () => {
   beforeEach(() => {
     stakingMocks.claimRewards.mockClear();
+    stakingMocks.createAtaBatch.mockClear();
     stakingMocks.createRewardEntry.mockClear();
+    stakingMocks.deriveStakeMintPDA.mockClear();
     stakingMocks.stakeAndCreateEntries.mockClear();
     stakingMocks.getAccountInfo.mockClear();
     stakingMocks.getLatestBlockhashAndContext.mockClear();
@@ -79,6 +83,9 @@ describe('streamflow staking rewards', () => {
     stakingMocks.getAccountInfo.mockResolvedValue({
       owner: new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'),
     });
+    stakingMocks.createAtaBatch.mockResolvedValue('prepare-ata-tx');
+    stakingMocks.deriveStakeMintPDA.mockReturnValue(Keypair.generate().publicKey);
+    stakingMocks.stakeAndCreateEntries.mockResolvedValue({ txId: 'sdk-stake-tx' });
     stakingMocks.prepareClaimRewardsInstructions.mockResolvedValue({
       ixs: [{
         keys: [],
@@ -106,31 +113,50 @@ describe('streamflow staking rewards', () => {
     stakingMocks.simulateTransaction.mockResolvedValue({ value: { err: null } });
   });
 
-  it('pre-simulates legacy stake transactions before asking Phantom to sign', async () => {
-    const calls: string[] = [];
+  it('prepares the Streamflow receipt token account separately when it is missing', async () => {
     const keypair = Keypair.generate();
-    stakingMocks.simulateTransaction.mockImplementationOnce(async () => {
-      calls.push('simulate');
-      return { value: { err: null } };
-    });
-    stakingMocks.sendRawTransaction.mockImplementationOnce(async () => {
-      calls.push('broadcast');
-      return 'stake-tx';
-    });
-    stakingMocks.confirmTransaction.mockImplementationOnce(async () => {
-      calls.push('confirm');
-      return { value: { err: null } };
-    });
-    const onTransactionSubmitted = vi.fn(() => {
-      calls.push('submitted');
-    });
+    const stakeMint = Keypair.generate().publicKey;
+    const tokenProgramId = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
+    stakingMocks.deriveStakeMintPDA.mockReturnValueOnce(stakeMint);
+    stakingMocks.getAccountInfo.mockResolvedValue(null);
     const wallet = {
       publicKey: keypair.publicKey,
-      signTransaction: vi.fn(async (tx) => {
-        calls.push('sign');
-        if (tx instanceof Transaction) tx.partialSign(keypair);
-        return tx;
-      }),
+      signTransaction: vi.fn(),
+    } as unknown as WalletContextState;
+
+    await expect(stakeHatcherWithStreamflow({
+      wallet,
+      stakePoolAddress: '7BVxRYGoTJjr3bgvDhpJggJrnUhyYoGPbnxTRAWuDmtH',
+      amountBaseUnits: 1_000_000n,
+      durationDays: 7,
+    })).resolves.toEqual({ txId: 'prepare-ata-tx', preparedOnly: true });
+
+    expect(stakingMocks.stakeAndCreateEntries).not.toHaveBeenCalled();
+    expect(stakingMocks.createAtaBatch).toHaveBeenCalledWith(
+      expect.anything(),
+      wallet,
+      [expect.objectContaining({
+        mint: stakeMint,
+        owner: keypair.publicKey,
+        programId: tokenProgramId,
+      })],
+      'confirmed',
+    );
+    expect(stakingMocks.prepareStakeAndCreateEntriesInstructions).not.toHaveBeenCalled();
+    expect(stakingMocks.simulateTransaction).not.toHaveBeenCalled();
+    expect(stakingMocks.sendRawTransaction).not.toHaveBeenCalled();
+  });
+
+  it('stakes through the Streamflow SDK when the receipt token account exists', async () => {
+    const walletKeypair = Keypair.generate();
+    const tokenProgramId = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
+    stakingMocks.getAccountInfo.mockResolvedValue({
+      owner: tokenProgramId,
+    });
+    const onTransactionSubmitted = vi.fn();
+    const wallet = {
+      publicKey: walletKeypair.publicKey,
+      signTransaction: vi.fn(),
     } as unknown as WalletContextState;
 
     await expect(stakeHatcherWithStreamflow({
@@ -139,122 +165,32 @@ describe('streamflow staking rewards', () => {
       amountBaseUnits: 1_000_000n,
       durationDays: 7,
       onTransactionSubmitted,
-    })).resolves.toEqual({ txId: 'stake-tx' });
+    })).resolves.toEqual({ txId: 'sdk-stake-tx' });
 
-    expect(stakingMocks.stakeAndCreateEntries).not.toHaveBeenCalled();
-    expect(stakingMocks.prepareStakeAndCreateEntriesInstructions).toHaveBeenCalledTimes(1);
-    expect(stakingMocks.simulateTransaction).toHaveBeenCalledWith(
-      expect.any(Transaction),
-    );
-    expect(wallet.signTransaction).toHaveBeenCalledTimes(1);
-    expect(stakingMocks.sendRawTransaction).toHaveBeenCalledWith(
-      expect.any(Uint8Array),
+    expect(stakingMocks.createAtaBatch).not.toHaveBeenCalled();
+    expect(stakingMocks.prepareStakeAndCreateEntriesInstructions).not.toHaveBeenCalled();
+    expect(stakingMocks.stakeAndCreateEntries).toHaveBeenCalledWith(
       expect.objectContaining({
-        skipPreflight: false,
-        preflightCommitment: 'confirmed',
-        minContextSlot: 42,
+        amount: expect.objectContaining({ toString: expect.any(Function) }),
+        duration: expect.objectContaining({ toString: expect.any(Function) }),
+        nonce: expect.any(Number),
+        rewardPools: [expect.objectContaining({
+          mint: expect.any(PublicKey),
+          nonce: 0,
+          rewardPoolType: 'dynamic',
+          tokenProgramId,
+        })],
+        stakePool: '7BVxRYGoTJjr3bgvDhpJggJrnUhyYoGPbnxTRAWuDmtH',
+        stakePoolMint: expect.any(PublicKey),
+        tokenProgramId,
       }),
+      {
+        invoker: wallet,
+        computeLimit: 'autoSimulate',
+      },
     );
-    expect(onTransactionSubmitted).toHaveBeenCalledWith('stake-tx');
-    expect(calls).toEqual(['simulate', 'sign', 'broadcast', 'submitted', 'confirm']);
-  });
-
-  it('creates the Streamflow stake receipt token account before staking', async () => {
-    const walletKeypair = Keypair.generate();
-    const stakeMint = Keypair.generate().publicKey;
-    const tokenProgramId = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
-    const [stakeReceiptAccount] = PublicKey.findProgramAddressSync(
-      [walletKeypair.publicKey.toBuffer(), tokenProgramId.toBuffer(), stakeMint.toBuffer()],
-      ASSOCIATED_TOKEN_PROGRAM_ID,
-    );
-    stakingMocks.prepareStakeAndCreateEntriesInstructions.mockResolvedValueOnce({
-      ixs: [new TransactionInstruction({
-        keys: [
-          { pubkey: Keypair.generate().publicKey, isSigner: false, isWritable: true },
-          { pubkey: Keypair.generate().publicKey, isSigner: false, isWritable: true },
-          { pubkey: Keypair.generate().publicKey, isSigner: false, isWritable: true },
-          { pubkey: Keypair.generate().publicKey, isSigner: false, isWritable: true },
-          { pubkey: stakeReceiptAccount, isSigner: false, isWritable: true },
-          { pubkey: walletKeypair.publicKey, isSigner: true, isWritable: true },
-          { pubkey: walletKeypair.publicKey, isSigner: false, isWritable: false },
-          { pubkey: Keypair.generate().publicKey, isSigner: false, isWritable: true },
-          { pubkey: stakeMint, isSigner: false, isWritable: true },
-          { pubkey: Keypair.generate().publicKey, isSigner: false, isWritable: true },
-          { pubkey: tokenProgramId, isSigner: false, isWritable: false },
-          { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
-        ],
-        programId: STREAMFLOW_STAKE_PROGRAM_ID,
-        data: Buffer.alloc(0),
-      })],
-    });
-
-    const wallet = {
-      publicKey: walletKeypair.publicKey,
-      signTransaction: vi.fn(async (tx) => {
-        if (tx instanceof Transaction) tx.partialSign(walletKeypair);
-        return tx;
-      }),
-    } as unknown as WalletContextState;
-
-    await expect(stakeHatcherWithStreamflow({
-      wallet,
-      stakePoolAddress: '7BVxRYGoTJjr3bgvDhpJggJrnUhyYoGPbnxTRAWuDmtH',
-      amountBaseUnits: 1_000_000n,
-      durationDays: 7,
-    })).resolves.toEqual({ txId: 'stake-tx' });
-
-    const simulateCalls = stakingMocks.simulateTransaction.mock.calls as unknown as Array<[Transaction]>;
-    const simulatedTransaction = simulateCalls[0]?.[0];
-    expect(simulatedTransaction).toBeInstanceOf(Transaction);
-    expect(simulatedTransaction.instructions[0]?.programId.equals(ASSOCIATED_TOKEN_PROGRAM_ID)).toBe(true);
-    expect(simulatedTransaction.instructions[0]?.keys[1]?.pubkey.equals(stakeReceiptAccount)).toBe(true);
-    expect([...(simulatedTransaction.instructions[0]?.data ?? [])]).toEqual([1]);
-    expect(simulatedTransaction.instructions[1]?.programId.equals(STREAMFLOW_STAKE_PROGRAM_ID)).toBe(true);
-  });
-
-  it('stops before Phantom signing when stake preflight simulation fails', async () => {
-    const wallet = {
-      publicKey: Keypair.generate().publicKey,
-      signTransaction: vi.fn(),
-    } as unknown as WalletContextState;
-    stakingMocks.simulateTransaction.mockResolvedValueOnce({
-      value: { err: { InstructionError: [0, 'Custom'] } },
-    });
-
-    await expect(stakeHatcherWithStreamflow({
-      wallet,
-      stakePoolAddress: '7BVxRYGoTJjr3bgvDhpJggJrnUhyYoGPbnxTRAWuDmtH',
-      amountBaseUnits: 1_000_000n,
-      durationDays: 7,
-    })).rejects.toThrow('failed preflight simulation');
-
-    expect(wallet.signTransaction).not.toHaveBeenCalled();
-    expect(stakingMocks.sendRawTransaction).not.toHaveBeenCalled();
-  });
-
-  it('stops before Phantom signing when a stake transaction needs multiple signatures', async () => {
-    const extraSigner = Keypair.generate().publicKey;
-    stakingMocks.prepareStakeAndCreateEntriesInstructions.mockResolvedValueOnce({
-      ixs: [new TransactionInstruction({
-        keys: [{ pubkey: extraSigner, isSigner: true, isWritable: true }],
-        programId: SystemProgram.programId,
-        data: Buffer.alloc(0),
-      })],
-    });
-    const wallet = {
-      publicKey: Keypair.generate().publicKey,
-      signTransaction: vi.fn(),
-    } as unknown as WalletContextState;
-
-    await expect(stakeHatcherWithStreamflow({
-      wallet,
-      stakePoolAddress: '7BVxRYGoTJjr3bgvDhpJggJrnUhyYoGPbnxTRAWuDmtH',
-      amountBaseUnits: 1_000_000n,
-      durationDays: 7,
-    })).rejects.toThrow('exactly one wallet signature');
-
+    expect(onTransactionSubmitted).toHaveBeenCalledWith('sdk-stake-tx');
     expect(stakingMocks.simulateTransaction).not.toHaveBeenCalled();
-    expect(wallet.signTransaction).not.toHaveBeenCalled();
     expect(stakingMocks.sendRawTransaction).not.toHaveBeenCalled();
   });
 

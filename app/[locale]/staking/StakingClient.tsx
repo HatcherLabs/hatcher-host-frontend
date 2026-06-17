@@ -658,6 +658,12 @@ export function StakingClient() {
         onTransactionSubmitted: setStakeTxId,
       });
 
+      if (result.preparedOnly) {
+        setNotice('Streamflow staking account prepared. Tap Stake HATCHER again to submit the staking transaction.');
+        await loadWalletBalance();
+        return;
+      }
+
       setStakeTxId(result.txId);
       setStakeAmount('');
       await Promise.all([load(), loadWalletBalance()]);
@@ -898,7 +904,7 @@ export function StakingClient() {
                 <p className="mt-2 text-xs font-medium text-amber-400">Balance unavailable: {balanceError}</p>
               )}
               <p className="mt-2 text-xs leading-5 text-[var(--text-muted)]">
-                Minimum stake is 1 HATCHER. Keep a small SOL balance available for Solana rent and network fees.
+                Minimum stake is 1 HATCHER. Keep a small SOL balance available for Solana rent and network fees. First-time staking may require one Streamflow receipt account setup.
               </p>
             </div>
 

@@ -1,7 +1,6 @@
 import BN from 'bn.js';
 import type { Connection } from '@solana/web3.js';
-import { PublicKey, SystemProgram, Transaction, TransactionInstruction } from '@solana/web3.js';
-import { Buffer } from 'buffer';
+import { PublicKey, Transaction } from '@solana/web3.js';
 import type { WalletContextState } from '@solana/wallet-adapter-react';
 import type { SignerWalletAdapter } from '@solana/wallet-adapter-base';
 import {
@@ -9,8 +8,9 @@ import {
   deriveRewardEntryPDA,
   deriveRewardPoolPDA,
   deriveStakeEntryPDA,
+  deriveStakeMintPDA,
 } from '@streamflow/staking';
-import { ICluster } from '@streamflow/common';
+import { createAtaBatch, ICluster } from '@streamflow/common';
 import {
   HATCH_TOKEN_MINT,
   SOLANA_NETWORK,
@@ -29,17 +29,13 @@ export type HatcherRewardStatus = {
 const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
 const TOKEN_2022_PROGRAM_ID = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
 const ASSOCIATED_TOKEN_PROGRAM_ID = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
-const STREAMFLOW_STAKE_PROGRAM_ID = new PublicKey('STAKEvGqQTtzJZH6BWDcbpzXXn2BBerPAgQ3EGLN2GH');
 const HATCHER_MINT = new PublicKey(HATCH_TOKEN_MINT);
 const HATCHER_REWARD_POOL_NONCE = 0;
-const MAX_SOLANA_TRANSACTION_BYTES = 1232;
 let resolvedHatcherTokenProgramId: PublicKey | null = null;
 
-type StakingTransactionContext = {
-  transaction: Transaction;
-  blockhash: string;
-  lastValidBlockHeight: number;
-  minContextSlot: number;
+export type StakeHatcherResult = {
+  txId: string;
+  preparedOnly?: boolean;
 };
 
 function cluster(): ICluster {
@@ -75,15 +71,6 @@ async function getHatcherTokenProgramId(connection: Connection): Promise<PublicK
   return resolvedHatcherTokenProgramId;
 }
 
-function assertSingleWalletSigner(transaction: Transaction, walletPublicKey: PublicKey): void {
-  const message = transaction.compileMessage();
-  const requiredSignerCount = message.header.numRequiredSignatures;
-  const signerKeys = message.accountKeys.slice(0, requiredSignerCount);
-  if (requiredSignerCount !== 1 || !signerKeys[0]?.equals(walletPublicKey)) {
-    throw new Error('For Phantom safety, staking transactions must require exactly one wallet signature.');
-  }
-}
-
 function associatedTokenAddress(
   mint: PublicKey,
   owner: PublicKey,
@@ -94,128 +81,6 @@ function associatedTokenAddress(
     ASSOCIATED_TOKEN_PROGRAM_ID,
   );
   return address;
-}
-
-function createAssociatedTokenAccountIdempotentInstruction(params: {
-  payer: PublicKey;
-  associatedToken: PublicKey;
-  owner: PublicKey;
-  mint: PublicKey;
-  tokenProgramId: PublicKey;
-}): TransactionInstruction {
-  return new TransactionInstruction({
-    programId: ASSOCIATED_TOKEN_PROGRAM_ID,
-    keys: [
-      { pubkey: params.payer, isSigner: true, isWritable: true },
-      { pubkey: params.associatedToken, isSigner: false, isWritable: true },
-      { pubkey: params.owner, isSigner: false, isWritable: false },
-      { pubkey: params.mint, isSigner: false, isWritable: false },
-      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
-      { pubkey: params.tokenProgramId, isSigner: false, isWritable: false },
-    ],
-    data: Buffer.from([1]),
-  });
-}
-
-function prepareStreamflowStakeReceiptAtaInstructions(
-  stakeInstructions: TransactionInstruction[],
-  walletPublicKey: PublicKey,
-): TransactionInstruction[] {
-  const stakeInstruction = stakeInstructions[0];
-  if (!stakeInstruction?.programId.equals(STREAMFLOW_STAKE_PROGRAM_ID) || stakeInstruction.keys.length < 11) {
-    return [];
-  }
-
-  const receiptTokenAccount = stakeInstruction.keys[4]?.pubkey;
-  const payer = stakeInstruction.keys[5]?.pubkey;
-  const authority = stakeInstruction.keys[6]?.pubkey;
-  const stakeMint = stakeInstruction.keys[8]?.pubkey;
-  const tokenProgramId = stakeInstruction.keys[10]?.pubkey;
-  if (!receiptTokenAccount || !payer || !authority || !stakeMint || !tokenProgramId) {
-    return [];
-  }
-  if (!payer.equals(walletPublicKey)) {
-    throw new Error('Streamflow staking transaction payer changed. Refresh staking data and try again.');
-  }
-
-  const expectedReceiptTokenAccount = associatedTokenAddress(stakeMint, authority, tokenProgramId);
-  if (!expectedReceiptTokenAccount.equals(receiptTokenAccount)) {
-    throw new Error('Streamflow staking receipt account changed. Refresh staking data and try again.');
-  }
-
-  return [createAssociatedTokenAccountIdempotentInstruction({
-    payer,
-    associatedToken: receiptTokenAccount,
-    owner: authority,
-    mint: stakeMint,
-    tokenProgramId,
-  })];
-}
-
-async function buildPreflightedStakingTransaction(params: {
-  connection: Connection;
-  payer: PublicKey;
-  instructions: TransactionInstruction[];
-}): Promise<StakingTransactionContext> {
-  const { context, value } = await params.connection.getLatestBlockhashAndContext('confirmed');
-  const transaction = new Transaction({
-    feePayer: params.payer,
-    recentBlockhash: value.blockhash,
-  });
-  transaction.add(...params.instructions);
-
-  assertSingleWalletSigner(transaction, params.payer);
-
-  const transactionBytes = transaction.serialize({
-    requireAllSignatures: false,
-    verifySignatures: false,
-  }).length;
-  if (transactionBytes > MAX_SOLANA_TRANSACTION_BYTES) {
-    throw new Error('This staking transaction is too large for one Phantom signing request. Refresh and try again.');
-  }
-
-  const simulation = await params.connection.simulateTransaction(transaction);
-  if (simulation.value.err) {
-    throw new Error('Staking transaction failed preflight simulation. Refresh staking data and try again.');
-  }
-
-  return {
-    transaction,
-    blockhash: value.blockhash,
-    lastValidBlockHeight: value.lastValidBlockHeight,
-    minContextSlot: context.slot,
-  };
-}
-
-async function signAndSendStakingTransaction(params: {
-  wallet: WalletContextState;
-  connection: Connection;
-  transactionContext: StakingTransactionContext;
-  onTransactionSubmitted?: (txId: string) => void;
-}): Promise<string> {
-  if (!params.wallet.signTransaction) {
-    throw new Error('Connect a wallet that supports Solana transaction signing.');
-  }
-
-  const signed = await params.wallet.signTransaction(params.transactionContext.transaction);
-  const signature = await params.connection.sendRawTransaction(signed.serialize(), {
-    skipPreflight: false,
-    preflightCommitment: 'confirmed',
-    minContextSlot: params.transactionContext.minContextSlot,
-    maxRetries: 3,
-  });
-  params.onTransactionSubmitted?.(signature);
-  const confirmation = await params.connection.confirmTransaction({
-    signature,
-    blockhash: params.transactionContext.blockhash,
-    lastValidBlockHeight: params.transactionContext.lastValidBlockHeight,
-  }, 'confirmed');
-
-  if (confirmation.value.err) {
-    throw new Error('Staking transaction failed after broadcast. Refresh staking data and try again.');
-  }
-
-  return signature;
 }
 
 export async function fetchHatcherWalletBalance(
@@ -279,7 +144,7 @@ export async function stakeHatcherWithStreamflow(params: {
   amountBaseUnits: bigint;
   durationDays: number;
   onTransactionSubmitted?: (txId: string) => void;
-}): Promise<{ txId: string }> {
+}): Promise<StakeHatcherResult> {
   if (!params.wallet.publicKey || !params.wallet.signTransaction) {
     throw new Error('Connect a wallet that supports Solana transaction signing.');
   }
@@ -297,7 +162,26 @@ export async function stakeHatcherWithStreamflow(params: {
   });
   const tokenProgramId = await getHatcherTokenProgramId(client.connection);
   const invoker = params.wallet as unknown as SignerWalletAdapter;
-  const { ixs } = await client.prepareStakeAndCreateEntriesInstructions({
+  const stakePool = new PublicKey(params.stakePoolAddress);
+  const stakeMint = deriveStakeMintPDA(client.getCurrentProgramId('stakePoolProgram'), stakePool);
+  const receiptTokenAccount = associatedTokenAddress(stakeMint, params.wallet.publicKey, tokenProgramId);
+  const receiptAccountInfo = await client.connection.getAccountInfo(receiptTokenAccount, 'confirmed');
+
+  if (!receiptAccountInfo) {
+    const txId = await createAtaBatch(
+      client.connection,
+      invoker,
+      [{
+        mint: stakeMint,
+        owner: params.wallet.publicKey,
+        programId: tokenProgramId,
+      }],
+      'confirmed',
+    );
+    return { txId, preparedOnly: true };
+  }
+
+  const staked = await client.stakeAndCreateEntries({
     stakePool: params.stakePoolAddress,
     stakePoolMint: HATCHER_MINT,
     tokenProgramId,
@@ -312,21 +196,11 @@ export async function stakeHatcherWithStreamflow(params: {
     }],
   }, {
     invoker,
-  });
-  const setupIxs = prepareStreamflowStakeReceiptAtaInstructions(ixs, params.wallet.publicKey);
-  const transactionContext = await buildPreflightedStakingTransaction({
-    connection: client.connection,
-    payer: params.wallet.publicKey,
-    instructions: [...setupIxs, ...ixs],
-  });
-  const txId = await signAndSendStakingTransaction({
-    wallet: params.wallet,
-    connection: client.connection,
-    transactionContext,
-    onTransactionSubmitted: params.onTransactionSubmitted,
+    computeLimit: 'autoSimulate',
   });
 
-  return { txId };
+  params.onTransactionSubmitted?.(staked.txId);
+  return { txId: staked.txId };
 }
 
 async function fetchHatcherRewardStatusFromClient(params: {
