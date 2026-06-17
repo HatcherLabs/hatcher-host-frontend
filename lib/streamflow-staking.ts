@@ -1,6 +1,7 @@
 import BN from 'bn.js';
-import type { Connection, TransactionInstruction } from '@solana/web3.js';
-import { PublicKey, Transaction } from '@solana/web3.js';
+import type { Connection } from '@solana/web3.js';
+import { PublicKey, SystemProgram, Transaction, TransactionInstruction } from '@solana/web3.js';
+import { Buffer } from 'buffer';
 import type { WalletContextState } from '@solana/wallet-adapter-react';
 import type { SignerWalletAdapter } from '@solana/wallet-adapter-base';
 import {
@@ -27,6 +28,8 @@ export type HatcherRewardStatus = {
 
 const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
 const TOKEN_2022_PROGRAM_ID = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
+const ASSOCIATED_TOKEN_PROGRAM_ID = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
+const STREAMFLOW_STAKE_PROGRAM_ID = new PublicKey('STAKEvGqQTtzJZH6BWDcbpzXXn2BBerPAgQ3EGLN2GH');
 const HATCHER_MINT = new PublicKey(HATCH_TOKEN_MINT);
 const HATCHER_REWARD_POOL_NONCE = 0;
 const MAX_SOLANA_TRANSACTION_BYTES = 1232;
@@ -79,6 +82,74 @@ function assertSingleWalletSigner(transaction: Transaction, walletPublicKey: Pub
   if (requiredSignerCount !== 1 || !signerKeys[0]?.equals(walletPublicKey)) {
     throw new Error('For Phantom safety, staking transactions must require exactly one wallet signature.');
   }
+}
+
+function associatedTokenAddress(
+  mint: PublicKey,
+  owner: PublicKey,
+  tokenProgramId: PublicKey,
+): PublicKey {
+  const [address] = PublicKey.findProgramAddressSync(
+    [owner.toBuffer(), tokenProgramId.toBuffer(), mint.toBuffer()],
+    ASSOCIATED_TOKEN_PROGRAM_ID,
+  );
+  return address;
+}
+
+function createAssociatedTokenAccountIdempotentInstruction(params: {
+  payer: PublicKey;
+  associatedToken: PublicKey;
+  owner: PublicKey;
+  mint: PublicKey;
+  tokenProgramId: PublicKey;
+}): TransactionInstruction {
+  return new TransactionInstruction({
+    programId: ASSOCIATED_TOKEN_PROGRAM_ID,
+    keys: [
+      { pubkey: params.payer, isSigner: true, isWritable: true },
+      { pubkey: params.associatedToken, isSigner: false, isWritable: true },
+      { pubkey: params.owner, isSigner: false, isWritable: false },
+      { pubkey: params.mint, isSigner: false, isWritable: false },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+      { pubkey: params.tokenProgramId, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.from([1]),
+  });
+}
+
+function prepareStreamflowStakeReceiptAtaInstructions(
+  stakeInstructions: TransactionInstruction[],
+  walletPublicKey: PublicKey,
+): TransactionInstruction[] {
+  const stakeInstruction = stakeInstructions[0];
+  if (!stakeInstruction?.programId.equals(STREAMFLOW_STAKE_PROGRAM_ID) || stakeInstruction.keys.length < 11) {
+    return [];
+  }
+
+  const receiptTokenAccount = stakeInstruction.keys[4]?.pubkey;
+  const payer = stakeInstruction.keys[5]?.pubkey;
+  const authority = stakeInstruction.keys[6]?.pubkey;
+  const stakeMint = stakeInstruction.keys[8]?.pubkey;
+  const tokenProgramId = stakeInstruction.keys[10]?.pubkey;
+  if (!receiptTokenAccount || !payer || !authority || !stakeMint || !tokenProgramId) {
+    return [];
+  }
+  if (!payer.equals(walletPublicKey)) {
+    throw new Error('Streamflow staking transaction payer changed. Refresh staking data and try again.');
+  }
+
+  const expectedReceiptTokenAccount = associatedTokenAddress(stakeMint, authority, tokenProgramId);
+  if (!expectedReceiptTokenAccount.equals(receiptTokenAccount)) {
+    throw new Error('Streamflow staking receipt account changed. Refresh staking data and try again.');
+  }
+
+  return [createAssociatedTokenAccountIdempotentInstruction({
+    payer,
+    associatedToken: receiptTokenAccount,
+    owner: authority,
+    mint: stakeMint,
+    tokenProgramId,
+  })];
 }
 
 async function buildPreflightedStakingTransaction(params: {
@@ -242,10 +313,11 @@ export async function stakeHatcherWithStreamflow(params: {
   }, {
     invoker,
   });
+  const setupIxs = prepareStreamflowStakeReceiptAtaInstructions(ixs, params.wallet.publicKey);
   const transactionContext = await buildPreflightedStakingTransaction({
     connection: client.connection,
     payer: params.wallet.publicKey,
-    instructions: ixs,
+    instructions: [...setupIxs, ...ixs],
   });
   const txId = await signAndSendStakingTransaction({
     wallet: params.wallet,

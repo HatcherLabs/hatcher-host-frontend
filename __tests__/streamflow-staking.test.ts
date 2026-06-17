@@ -29,6 +29,9 @@ const stakingMocks = vi.hoisted(() => ({
   simulateTransaction: vi.fn(async (): Promise<{ value: { err: unknown | null } }> => ({ value: { err: null } })),
 }));
 
+const ASSOCIATED_TOKEN_PROGRAM_ID = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
+const STREAMFLOW_STAKE_PROGRAM_ID = new PublicKey('STAKEvGqQTtzJZH6BWDcbpzXXn2BBerPAgQ3EGLN2GH');
+
 vi.mock('@streamflow/staking', () => ({
   SolanaStakingClient: class MockSolanaStakingClient {
     connection = {
@@ -154,6 +157,59 @@ describe('streamflow staking rewards', () => {
     );
     expect(onTransactionSubmitted).toHaveBeenCalledWith('stake-tx');
     expect(calls).toEqual(['simulate', 'sign', 'broadcast', 'submitted', 'confirm']);
+  });
+
+  it('creates the Streamflow stake receipt token account before staking', async () => {
+    const walletKeypair = Keypair.generate();
+    const stakeMint = Keypair.generate().publicKey;
+    const tokenProgramId = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
+    const [stakeReceiptAccount] = PublicKey.findProgramAddressSync(
+      [walletKeypair.publicKey.toBuffer(), tokenProgramId.toBuffer(), stakeMint.toBuffer()],
+      ASSOCIATED_TOKEN_PROGRAM_ID,
+    );
+    stakingMocks.prepareStakeAndCreateEntriesInstructions.mockResolvedValueOnce({
+      ixs: [new TransactionInstruction({
+        keys: [
+          { pubkey: Keypair.generate().publicKey, isSigner: false, isWritable: true },
+          { pubkey: Keypair.generate().publicKey, isSigner: false, isWritable: true },
+          { pubkey: Keypair.generate().publicKey, isSigner: false, isWritable: true },
+          { pubkey: Keypair.generate().publicKey, isSigner: false, isWritable: true },
+          { pubkey: stakeReceiptAccount, isSigner: false, isWritable: true },
+          { pubkey: walletKeypair.publicKey, isSigner: true, isWritable: true },
+          { pubkey: walletKeypair.publicKey, isSigner: false, isWritable: false },
+          { pubkey: Keypair.generate().publicKey, isSigner: false, isWritable: true },
+          { pubkey: stakeMint, isSigner: false, isWritable: true },
+          { pubkey: Keypair.generate().publicKey, isSigner: false, isWritable: true },
+          { pubkey: tokenProgramId, isSigner: false, isWritable: false },
+          { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+        ],
+        programId: STREAMFLOW_STAKE_PROGRAM_ID,
+        data: Buffer.alloc(0),
+      })],
+    });
+
+    const wallet = {
+      publicKey: walletKeypair.publicKey,
+      signTransaction: vi.fn(async (tx) => {
+        if (tx instanceof Transaction) tx.partialSign(walletKeypair);
+        return tx;
+      }),
+    } as unknown as WalletContextState;
+
+    await expect(stakeHatcherWithStreamflow({
+      wallet,
+      stakePoolAddress: '7BVxRYGoTJjr3bgvDhpJggJrnUhyYoGPbnxTRAWuDmtH',
+      amountBaseUnits: 1_000_000n,
+      durationDays: 7,
+    })).resolves.toEqual({ txId: 'stake-tx' });
+
+    const simulateCalls = stakingMocks.simulateTransaction.mock.calls as unknown as Array<[Transaction]>;
+    const simulatedTransaction = simulateCalls[0]?.[0];
+    expect(simulatedTransaction).toBeInstanceOf(Transaction);
+    expect(simulatedTransaction.instructions[0]?.programId.equals(ASSOCIATED_TOKEN_PROGRAM_ID)).toBe(true);
+    expect(simulatedTransaction.instructions[0]?.keys[1]?.pubkey.equals(stakeReceiptAccount)).toBe(true);
+    expect([...(simulatedTransaction.instructions[0]?.data ?? [])]).toEqual([1]);
+    expect(simulatedTransaction.instructions[1]?.programId.equals(STREAMFLOW_STAKE_PROGRAM_ID)).toBe(true);
   });
 
   it('stops before Phantom signing when stake preflight simulation fails', async () => {
