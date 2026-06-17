@@ -7,6 +7,7 @@ import {
   type LiveCityTierKey,
 } from './liveCityHandoff';
 import type { LiveBuildingLayout } from './liveLayout';
+import { CITY_RENDER_BUDGET } from './cityRenderBudget';
 
 interface Props {
   buildings: LiveBuildingLayout[];
@@ -248,10 +249,12 @@ function FreeBuilding({
         <sphereGeometry args={[1, 28, 14]} />
         <primitive object={materials.freeShell} attach="material" />
       </mesh>
-      <mesh position={[0, height * 0.98, depth * 0.12]} scale={[width * 0.3, 0.22, 0.08]} castShadow>
-        <sphereGeometry args={[1, 18, 10]} />
-        <primitive object={materials.cyanGlass} attach="material" />
-      </mesh>
+      {CITY_RENDER_BUDGET.cyanBuildingCaps && (
+        <mesh position={[0, height * 0.98, depth * 0.12]} scale={[width * 0.3, 0.22, 0.08]} castShadow>
+          <sphereGeometry args={[1, 18, 10]} />
+          <primitive object={materials.cyanGlass} attach="material" />
+        </mesh>
+      )}
       <mesh position={[spec.doorOffset, height * 0.34, depth * 0.52]} castShadow>
         <boxGeometry args={[width * 0.22, height * 0.38, 0.06]} />
         <primitive object={materials.darkPanel} attach="material" />
@@ -302,10 +305,12 @@ function FreeStudioBuilding({
         <boxGeometry args={[width * 0.26, height * 0.06, 0.035]} />
         <primitive object={materials.cyanLine} attach="material" />
       </mesh>
-      <mesh position={[0, height + 0.22, 0]} scale={[width * 0.36, 0.28, depth * 0.28]} castShadow receiveShadow>
-        <sphereGeometry args={[1, 18, 10]} />
-        <primitive object={materials.cyanGlass} attach="material" />
-      </mesh>
+      {CITY_RENDER_BUDGET.cyanBuildingCaps && (
+        <mesh position={[0, height + 0.22, 0]} scale={[width * 0.36, 0.28, depth * 0.28]} castShadow receiveShadow>
+          <sphereGeometry args={[1, 18, 10]} />
+          <primitive object={materials.cyanGlass} attach="material" />
+        </mesh>
+      )}
       {signalNode && <SignalNode spec={signalNode} materials={materials} />}
     </group>
   );
@@ -452,10 +457,12 @@ function ProBuilding({
         <cylinderGeometry args={[spec.shaftRadius * 0.82, spec.shaftRadius, spec.shaftHeight, 8]} />
         <primitive object={facadeMaterial} attach="material" />
       </mesh>
-      <mesh position={[0, spec.baseHeight + spec.shaftHeight * 0.52, spec.shaftRadius * 0.86]}>
-        <boxGeometry args={[spec.shaftRadius * 0.92, spec.shaftHeight * 0.76, 0.055]} />
-        <primitive object={materials.cyanGlass} attach="material" />
-      </mesh>
+      {CITY_RENDER_BUDGET.cyanBuildingCaps && (
+        <mesh position={[0, spec.baseHeight + spec.shaftHeight * 0.52, spec.shaftRadius * 0.86]}>
+          <boxGeometry args={[spec.shaftRadius * 0.92, spec.shaftHeight * 0.76, 0.055]} />
+          <primitive object={materials.cyanGlass} attach="material" />
+        </mesh>
+      )}
       <mesh position={[0, spec.deckY, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[spec.deckRadius, spec.deckRadius * 0.92, 0.32, 8]} />
         <primitive object={materials.warmGold} attach="material" />
@@ -853,10 +860,12 @@ function StarterAtriumPods({
             <cylinderGeometry args={[0.18, 0.22, height * 0.38, 14]} />
             <primitive object={materials.starterTank} attach="material" />
           </mesh>
-          <mesh position={[0, height * 0.24, 0]} scale={[0.24, 0.16, 0.24]}>
-            <sphereGeometry args={[1, 12, 8]} />
-            <primitive object={materials.cyanGlass} attach="material" />
-          </mesh>
+          {CITY_RENDER_BUDGET.cyanBuildingCaps && (
+            <mesh position={[0, height * 0.24, 0]} scale={[0.24, 0.16, 0.24]}>
+              <sphereGeometry args={[1, 12, 8]} />
+              <primitive object={materials.cyanGlass} attach="material" />
+            </mesh>
+          )}
         </group>
       ))}
     </group>
@@ -922,10 +931,12 @@ function CampusSatellites({
             <cylinderGeometry args={[0.28, 0.34, 0.48, 12]} />
             <primitive object={materials.ivoryShell} attach="material" />
           </mesh>
-          <mesh position={[0, 0.34, 0]} scale={[0.28, 0.14, 0.28]}>
-            <sphereGeometry args={[1, 14, 8]} />
-            <primitive object={materials.cyanGlass} attach="material" />
-          </mesh>
+          {CITY_RENDER_BUDGET.cyanBuildingCaps && (
+            <mesh position={[0, 0.34, 0]} scale={[0.28, 0.14, 0.28]}>
+              <sphereGeometry args={[1, 14, 8]} />
+              <primitive object={materials.cyanGlass} attach="material" />
+            </mesh>
+          )}
         </group>
       ))}
     </group>
