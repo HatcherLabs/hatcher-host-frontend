@@ -9,13 +9,13 @@ import {
 } from '../lib/site-assets';
 
 describe('site version and public preview assets', () => {
-  it('ships the redesign as site version 1.4.0', () => {
+  it('ships the redesign as site version 1.4.7', () => {
     const packageJson = JSON.parse(
       readFileSync(join(process.cwd(), 'package.json'), 'utf8'),
     ) as { version: string };
 
-    expect(packageJson.version).toBe('1.4.0');
-    expect(SITE_VERSION).toBe('1.4.0');
+    expect(packageJson.version).toBe('1.4.7');
+    expect(SITE_VERSION).toBe('1.4.7');
   });
 
   it('uses cache-busted favicon and manifest icon URLs', () => {
@@ -23,9 +23,9 @@ describe('site version and public preview assets', () => {
       readFileSync(join(process.cwd(), 'public/manifest.json'), 'utf8'),
     ) as { icons: Array<{ src: string }> };
 
-    expect(ICON_PATHS.svg).toBe('/icon.svg?v=1.4.0');
-    expect(ICON_PATHS.icon192).toBe('/icons/icon-192.png?v=1.4.0');
-    expect(ICON_PATHS.icon512).toBe('/icons/icon-512.png?v=1.4.0');
+    expect(ICON_PATHS.svg).toBe('/icon.svg?v=1.4.7');
+    expect(ICON_PATHS.icon192).toBe('/icons/icon-192.png?v=1.4.7');
+    expect(ICON_PATHS.icon512).toBe('/icons/icon-512.png?v=1.4.7');
     expect(manifest.icons.map((icon) => icon.src)).toEqual([
       ICON_PATHS.svg,
       ICON_PATHS.icon192,
@@ -37,7 +37,7 @@ describe('site version and public preview assets', () => {
     const image = buildSocialPreviewImage('https://hatcher.host');
 
     expect(SOCIAL_PREVIEW_PATH).toContain('/og?');
-    expect(SOCIAL_PREVIEW_PATH).toContain('v=1.4.0');
+    expect(SOCIAL_PREVIEW_PATH).toContain('v=1.4.7');
     expect(SOCIAL_PREVIEW_PATH).not.toContain('hero-agent-infrastructure');
     expect(image).toMatchObject({
       url: expect.stringContaining('https://hatcher.host/og?'),
@@ -45,6 +45,6 @@ describe('site version and public preview assets', () => {
       height: 630,
       alt: 'Hatcher - AI Agent Infrastructure',
     });
-    expect(image.url).toContain('v=1.4.0');
+    expect(image.url).toContain('v=1.4.7');
   });
 });

@@ -77,6 +77,8 @@ interface Props {
   pulseAts: Map<string, number>;
   canEnterBuilding?: boolean;
   viewerUsername?: string | null;
+  realAvatarsEnabled?: boolean;
+  onSceneReady?: () => void;
 }
 
 const EMPTY_COUNTS: CityResponse['counts'] = {
@@ -159,6 +161,8 @@ export function LiveCityScene({
   pulseAts,
   canEnterBuilding = false,
   viewerUsername = null,
+  realAvatarsEnabled = true,
+  onSceneReady,
 }: Props) {
   const router = useRouter();
   const buildingHref = cityBuildingHref();
@@ -176,6 +180,8 @@ export function LiveCityScene({
         canEnterBuilding={canEnterBuilding}
         viewerUsername={viewerUsername}
         onBuildingEnterClick={() => router.push(buildingHref)}
+        realAvatarsEnabled={realAvatarsEnabled}
+        onSceneReady={onSceneReady}
       />
     </QualityProvider>
   );
@@ -189,6 +195,8 @@ function LiveCitySceneBody({
   pulseAts,
   canEnterBuilding = false,
   viewerUsername = null,
+  realAvatarsEnabled = true,
+  onSceneReady,
   onDashboardClick,
   onPublicChatClick,
   onBuildingEnterClick,
@@ -336,6 +344,7 @@ function LiveCitySceneBody({
         }}
       >
         <color attach="background" args={[lighting.background]} />
+        <SceneReadyReporter onReady={onSceneReady} />
         <fog attach="fog" args={[lighting.fog, lighting.fogNear, lighting.fogFar]} />
         <ambientLight intensity={lighting.ambient} color="#ffffff" />
         <hemisphereLight
@@ -369,6 +378,7 @@ function LiveCitySceneBody({
           <LiveAgentMarkers
             markers={layout.markers}
             poseRef={agentPosesRef}
+            realAvatarsEnabled={realAvatarsEnabled}
             onMarkerClick={(agentId) => {
               setSelectedOwnerKey(null);
               setSelectedAgentId(agentId);
@@ -497,6 +507,16 @@ function LiveCitySceneBody({
       )}
     </div>
   );
+}
+
+function SceneReadyReporter({ onReady }: { onReady?: () => void }) {
+  const firedRef = useRef(false);
+  useFrame(() => {
+    if (firedRef.current) return;
+    firedRef.current = true;
+    onReady?.();
+  });
+  return null;
 }
 
 function LiveCityMobileMenu({

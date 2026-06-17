@@ -7,7 +7,7 @@ import * as THREE from 'three';
 import { liveAgentColor } from './LiveCityColors';
 import { makeLiveAgentLoopPath, sampleLiveAgentPath, type LiveAgentPose } from './liveAgentMotion';
 import type { LiveAgentMarkerLayout } from './liveLayout';
-import { getGlbAvatarModel } from '@/components/agent-room/v2/stations/AgentBody';
+import { getGlbAvatarModel } from '@/components/agent-room/v2/stations/avatarModelConfig';
 import { CityAvatar } from './CityAvatar';
 import { useDispatchStore } from '@/lib/agent-dispatch/store';
 import { skinById } from '@/lib/agent-dispatch/config';
@@ -17,6 +17,7 @@ interface Props {
   markers: LiveAgentMarkerLayout[];
   onMarkerClick?: (agentId: string) => void;
   poseRef?: MutableRefObject<Map<string, LiveAgentPose>>;
+  realAvatarsEnabled?: boolean;
 }
 
 const TRAIL_LEN = 22;
@@ -40,7 +41,12 @@ function cityWalkerStatusLabel(status: LiveAgentMarkerLayout['status']): string 
   }
 }
 
-export function LiveAgentMarkers({ markers, onMarkerClick, poseRef }: Props) {
+export function LiveAgentMarkers({
+  markers,
+  onMarkerClick,
+  poseRef,
+  realAvatarsEnabled = true,
+}: Props) {
   // Your equipped dispatch skin colors your own walkers (default = the usual gold).
   const equippedSkin = useDispatchStore((s) => s.equippedSkin);
   const mineColor = useMemo(
@@ -49,6 +55,7 @@ export function LiveAgentMarkers({ markers, onMarkerClick, poseRef }: Props) {
   );
   const avatarIds = useMemo(() => {
     const ids = new Set<string>();
+    if (!realAvatarsEnabled) return ids;
     const eligible = (m: LiveAgentMarkerLayout) =>
       !!m.avatar && getGlbAvatarModel(m.avatar) !== null;
     // Your own agents first — you want to see them as themselves.
@@ -61,7 +68,7 @@ export function LiveAgentMarkers({ markers, onMarkerClick, poseRef }: Props) {
       if (!ids.has(m.agentId) && eligible(m)) ids.add(m.agentId);
     }
     return ids;
-  }, [markers]);
+  }, [markers, realAvatarsEnabled]);
 
   if (markers.length === 0) return null;
 
