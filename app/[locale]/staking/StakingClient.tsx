@@ -980,13 +980,16 @@ export function StakingClient() {
             </div>
             <div className="mt-4 space-y-4 text-sm text-[var(--text-secondary)]">
               <p className="break-words">
-                HATCHER reward deposits are continuously funded from {fundingSourcesLabel}. Top-ups are added to Streamflow staking pools instead of using a one-time fixed pool.
+                HATCHER rewards use a continuous funding model instead of a one-time fixed pool. Creator fees, buybacks, and the dev wallet can keep adding top-ups into the Streamflow staking pools over time.
               </p>
               <p className="break-words">
-                Tier allocation follows the campaign split{rewardSplitSummary ? `: ${rewardSplitSummary}.` : ' across 7, 30, and 90 day locks.'}
+                Funding sources are {fundingSourcesLabel}. When new rewards are added, the campaign allocation is routed by lock tier{rewardSplitSummary ? `: ${rewardSplitSummary}.` : ' across 7, 30, and 90 day locks.'}
               </p>
               <p className="break-words">
-                Within each tier, HATCHER rewards are proportional to the wallet's share of total staked HATCHER in that Streamflow pool.
+                Each Streamflow pool distributes its own reward balance pro-rata. Your HATCHER rewards depend on your wallet's share of total staked HATCHER in that tier, plus how long the position stays active.
+              </p>
+              <p className="break-words">
+                Additional top-ups increase the reward balance available to that tier. The page tracks total staked live so rewards can be evaluated against the current pool size, not only the initial campaign cap.
               </p>
               <p className="break-words">
                 AI Credits are fixed by tier, capped at{' '}
