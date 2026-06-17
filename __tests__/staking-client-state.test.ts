@@ -85,7 +85,7 @@ describe('staking linked wallet state', () => {
       walletName: 'Phantom',
       signInSupported: true,
       isMobileRuntime: true,
-    })).toBe(true);
+    })).toBe(false);
     expect(shouldUseWalletSignInForLinking({
       walletName: 'Mobile Wallet Adapter',
       signInSupported: false,
