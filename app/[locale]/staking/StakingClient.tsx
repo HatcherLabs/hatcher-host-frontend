@@ -15,7 +15,13 @@ import { ArrowUpRight, Coins, Lock, RefreshCcw, Sparkles, Wallet } from 'lucide-
 import { Link, useRouter } from '@/i18n/routing';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { resolveStakingLinkedWalletAddress } from '@/lib/staking-state';
+import {
+  formatRewardFundingSources,
+  formatStakingTokenAmount,
+  resolveStakingLinkedWalletAddress,
+} from '@/lib/staking-state';
+import { isWalletTrustRevokedError, isWalletUserCancellationError } from '@/lib/wallet-errors';
+import { buildPhantomBrowseUrl } from '@/lib/wallet-links';
 import {
   baseUnitsToHatcherString,
   claimHatcherRewardsWithStreamflow,
@@ -58,6 +64,11 @@ function rewardShare(pool: StakingPoolConfig): string {
   return `${pool.rewardShareBps / 100}%`;
 }
 
+function formatApr(value: number | null | undefined): string {
+  if (!value || !Number.isFinite(value) || value <= 0) return '-';
+  return `${formatNumber(value, 2)}%`;
+}
+
 function shortAddress(address: string | null | undefined): string {
   if (!address) return 'none';
   return `${address.slice(0, 4)}...${address.slice(-4)}`;
@@ -93,6 +104,10 @@ async function waitForConnectedWallet(walletRef: MutableRefObject<WalletContextS
   const start = Date.now();
   while (!walletRef.current.connected || !walletRef.current.publicKey) {
     if (Date.now() - start > 60_000) throw new Error('Wallet connection timed out');
+    const current = walletRef.current;
+    if (!current.wallet && !current.connecting && Date.now() - start > 1_000) {
+      throw new Error('Cancelled');
+    }
     await new Promise((resolve) => setTimeout(resolve, 200));
   }
   return walletRef.current.publicKey.toBase58();
@@ -144,14 +159,15 @@ function PoolSelectorCard({
           <p className="font-semibold text-[var(--accent)]">{rewardShare(pool)}</p>
         </div>
         <div className="min-w-0">
-          <p className="text-[var(--text-muted)]">Powered by</p>
-          <p className="font-semibold text-[var(--text-primary)]">Streamflow</p>
+          <p className="text-[var(--text-muted)]">Staked</p>
+          <p className="font-semibold text-[var(--text-primary)]">
+            {formatStakingTokenAmount(pool.totalStakedHatcher ?? 0, 2)}
+          </p>
         </div>
         <div className="col-span-2 min-w-0 sm:col-span-1">
-          <p className="text-[var(--text-muted)]">AI Credits</p>
+          <p className="text-[var(--text-muted)]">APR at cap</p>
           <p className="break-words font-semibold text-[var(--text-primary)]">
-            {pool.aiCreditsPerDayPerMillion}/day
-            <span className="block">per 1M $HATCHER</span>
+            {formatApr(pool.estimatedAprAtCap)}
           </p>
         </div>
       </div>
@@ -181,6 +197,7 @@ export function StakingClient() {
   const [hatcherRewardStatuses, setHatcherRewardStatuses] = useState<Record<string, HatcherRewardUiStatus>>({});
   const [linkingWallet, setLinkingWallet] = useState(false);
   const [optimisticLinkedWalletAddress, setOptimisticLinkedWalletAddress] = useState<string | null>(null);
+  const [phantomBrowseUrl, setPhantomBrowseUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [balanceError, setBalanceError] = useState<string | null>(null);
   const [claimResult, setClaimResult] = useState<StakingClaimResponse | null>(null);
@@ -215,6 +232,11 @@ export function StakingClient() {
   }, [load]);
 
   useEffect(() => {
+    const target = new URL('/staking', window.location.origin);
+    setPhantomBrowseUrl(buildPhantomBrowseUrl(target.toString(), window.location.origin));
+  }, []);
+
+  useEffect(() => {
     if (!config?.pools.length) return;
     if (!config.pools.some((pool) => pool.key === selectedPoolKey)) {
       setSelectedPoolKey(config.pools[0]?.key ?? '90d');
@@ -246,6 +268,10 @@ export function StakingClient() {
     if (!config?.pools.length) return null;
     return config.pools.map((pool) => `${pool.label}: ${rewardShare(pool)}`).join(' / ');
   }, [config]);
+  const fundingSourcesLabel = useMemo(
+    () => formatRewardFundingSources(config?.rewardFundingSources ?? []),
+    [config?.rewardFundingSources],
+  );
 
   useEffect(() => {
     if (
@@ -407,6 +433,47 @@ export function StakingClient() {
     return waitForConnectedWallet(walletRef);
   }, [setWalletModalVisible]);
 
+  const forceReconnectWallet = useCallback(async (): Promise<string> => {
+    const current = walletRef.current;
+    try {
+      await current.disconnect();
+    } catch {
+      // Continue to re-prompt even if the adapter cannot disconnect cleanly.
+    }
+    try {
+      current.select(null as unknown as never);
+    } catch {
+      // Some wallet adapters do not expose select.
+    }
+    try {
+      localStorage.removeItem('walletName');
+      localStorage.removeItem('WalletAdapterWalletName');
+    } catch {
+      // Storage can be unavailable in private browser contexts.
+    }
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    setWalletModalVisible(true);
+    return waitForConnectedWallet(walletRef);
+  }, [setWalletModalVisible]);
+
+  const signAndLinkWallet = useCallback(async (walletAddress: string): Promise<string> => {
+    if (!walletRef.current.signMessage) {
+      throw new Error('This wallet does not support message signing. Use Phantom, Solflare, or another compatible Solana wallet.');
+    }
+
+    const challenge = await api.getWalletChallenge(walletAddress);
+    if (!challenge.success) throw new Error(challenge.error);
+
+    const signature = await walletRef.current.signMessage(new TextEncoder().encode(challenge.data.message));
+    const linked = await api.linkWallet(walletAddress, signatureToBase64(signature));
+    if (!linked.success) throw new Error(linked.error);
+
+    setOptimisticLinkedWalletAddress(linked.data.walletAddress);
+    await refreshUser();
+    await load();
+    return linked.data.walletAddress;
+  }, [load, refreshUser]);
+
   const linkConnectedWallet = useCallback(async (): Promise<string> => {
     if (!isAuthenticated) {
       router.push('/login?return=/staking');
@@ -416,27 +483,20 @@ export function StakingClient() {
     const walletAddress = await ensureConnectedWallet();
     if (linkedWalletAddress === walletAddress) return walletAddress;
 
-    if (!walletRef.current.signMessage) {
-      throw new Error('This wallet does not support message signing. Use Phantom, Solflare, or another compatible Solana wallet.');
-    }
-
     setLinkingWallet(true);
     try {
-      const challenge = await api.getWalletChallenge(walletAddress);
-      if (!challenge.success) throw new Error(challenge.error);
-
-      const signature = await walletRef.current.signMessage(new TextEncoder().encode(challenge.data.message));
-      const linked = await api.linkWallet(walletAddress, signatureToBase64(signature));
-      if (!linked.success) throw new Error(linked.error);
-
-      setOptimisticLinkedWalletAddress(linked.data.walletAddress);
-      await refreshUser();
-      await load();
-      return linked.data.walletAddress;
+      try {
+        return await signAndLinkWallet(walletAddress);
+      } catch (err) {
+        if (isWalletUserCancellationError(err)) throw new Error('Cancelled');
+        if (!isWalletTrustRevokedError(err)) throw err;
+        const reconnectedWalletAddress = await forceReconnectWallet();
+        return signAndLinkWallet(reconnectedWalletAddress);
+      }
     } finally {
       setLinkingWallet(false);
     }
-  }, [ensureConnectedWallet, isAuthenticated, linkedWalletAddress, load, refreshUser, router]);
+  }, [ensureConnectedWallet, forceReconnectWallet, isAuthenticated, linkedWalletAddress, router, signAndLinkWallet]);
 
   const connectAndLinkWallet = useCallback(async (forceSwitch = false) => {
     setError(null);
@@ -449,13 +509,7 @@ export function StakingClient() {
 
     try {
       if (forceSwitch && walletRef.current.connected) {
-        try {
-          await walletRef.current.disconnect();
-        } catch {
-          // Continue to wallet modal even if the adapter could not disconnect cleanly.
-        }
-        await new Promise((resolve) => setTimeout(resolve, 150));
-        setWalletModalVisible(true);
+        await forceReconnectWallet();
       }
 
       await linkConnectedWallet();
@@ -469,8 +523,8 @@ export function StakingClient() {
     isAuthenticated,
     linkConnectedWallet,
     loadWalletBalance,
+    forceReconnectWallet,
     router,
-    setWalletModalVisible,
   ]);
 
   const submitStake = useCallback(async () => {
@@ -605,8 +659,28 @@ export function StakingClient() {
               Hatcher Staking
             </h1>
             <p className="mt-3 max-w-[330px] break-words text-sm leading-6 text-[var(--text-secondary)] sm:max-w-3xl md:text-base">
-              Stake directly from your wallet for HATCHER rewards and fixed AI Credits by lock tier.
+              Stake directly from your wallet for HATCHER rewards, fixed AI Credits, and continuously funded pool top-ups by lock tier.
             </p>
+            <div className="mt-5 grid min-w-0 grid-cols-1 gap-3 text-sm sm:grid-cols-3">
+              <div className="min-w-0 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-3">
+                <p className="text-xs font-semibold uppercase text-[var(--text-muted)]">Total staked</p>
+                <p className="mt-1 break-words text-lg font-semibold text-[var(--text-primary)]">
+                  {config ? formatStakingTokenAmount(config.totalStakedHatcher ?? 0, 2) : '-'}
+                </p>
+              </div>
+              <div className="min-w-0 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-3">
+                <p className="text-xs font-semibold uppercase text-[var(--text-muted)]">Monthly rewards</p>
+                <p className="mt-1 break-words text-lg font-semibold text-[var(--text-primary)]">
+                  {config ? formatStakingTokenAmount(config.monthlyEmissionHatcher) : '-'}
+                </p>
+              </div>
+              <div className="min-w-0 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-3">
+                <p className="text-xs font-semibold uppercase text-[var(--text-muted)]">Funding</p>
+                <p className="mt-1 break-words text-sm font-semibold text-[var(--text-primary)]">
+                  {fundingSourcesLabel}
+                </p>
+              </div>
+            </div>
           </div>
           <button
             type="button"
@@ -747,7 +821,17 @@ export function StakingClient() {
               </div>
               <div className="min-w-0">
                 <p className="text-[var(--text-muted)]">HATCHER rewards</p>
-                <p className="font-semibold text-[var(--text-primary)]">Distributed by Streamflow</p>
+                <p className="font-semibold text-[var(--text-primary)]">Streamflow pool top-ups</p>
+              </div>
+              <div className="min-w-0">
+                <p className="text-[var(--text-muted)]">Pool staked</p>
+                <p className="break-words font-semibold text-[var(--text-primary)]">
+                  {selectedPool ? formatStakingTokenAmount(selectedPool.totalStakedHatcher ?? 0, 2) : '-'}
+                </p>
+              </div>
+              <div className="min-w-0">
+                <p className="text-[var(--text-muted)]">APR at cap</p>
+                <p className="font-semibold text-[var(--text-primary)]">{formatApr(selectedPool?.estimatedAprAtCap)}</p>
               </div>
             </div>
 
@@ -775,6 +859,14 @@ export function StakingClient() {
             <p className="mt-4 text-xs leading-5 text-[var(--text-muted)]">
               The connected wallet is linked to your Hatcher account before staking so AI Credits accrue to the same account.
             </p>
+            {phantomBrowseUrl && (
+              <a
+                href={phantomBrowseUrl}
+                className="mt-3 inline-flex text-xs font-semibold text-[var(--accent)] hover:text-[var(--accent-hover)]"
+              >
+                Mobile wallet not opening? Open staking in Phantom.
+              </a>
+            )}
           </form>
         </section>
 
@@ -888,10 +980,13 @@ export function StakingClient() {
             </div>
             <div className="mt-4 space-y-4 text-sm text-[var(--text-secondary)]">
               <p className="break-words">
-                HATCHER reward deposits are split by tier{rewardSplitSummary ? `: ${rewardSplitSummary}.` : '.'}
+                HATCHER reward deposits are continuously funded from {fundingSourcesLabel}. Top-ups are added to Streamflow staking pools instead of using a one-time fixed pool.
               </p>
               <p className="break-words">
-                Within each pool, HATCHER rewards are proportional to the wallet's share of total staked HATCHER.
+                Tier allocation follows the campaign split{rewardSplitSummary ? `: ${rewardSplitSummary}.` : ' across 7, 30, and 90 day locks.'}
+              </p>
+              <p className="break-words">
+                Within each tier, HATCHER rewards are proportional to the wallet's share of total staked HATCHER in that Streamflow pool.
               </p>
               <p className="break-words">
                 AI Credits are fixed by tier, capped at{' '}

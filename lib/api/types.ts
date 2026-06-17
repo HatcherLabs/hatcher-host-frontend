@@ -74,6 +74,9 @@ export interface StakingPoolConfig {
   poolAddress: string | null;
   configured: boolean;
   estimatedAprAtCap: number;
+  currentApr: number;
+  activeStakeCount: number;
+  totalStakedHatcher: number;
   streamflowUrl: string | null;
 }
 
@@ -87,6 +90,8 @@ export interface StakingConfigResponse {
   rewardModel: "continuous_funding";
   rewardToken: "HATCHER";
   aiCreditReward: true;
+  rewardFundingSources: Array<"creator fees" | "buybacks" | "dev wallet">;
+  totalStakedHatcher: number;
   pools: StakingPoolConfig[];
 }
 
