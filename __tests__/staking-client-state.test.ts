@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest';
 import {
   formatRewardFundingSources,
   formatStakingTokenAmount,
+  formatStakingWalletStepNotice,
   resolveStakingLinkedWalletAddress,
+  resolveStakingWalletStep,
 } from '@/lib/staking-state';
 
 describe('staking linked wallet state', () => {
@@ -30,6 +32,38 @@ describe('staking linked wallet state', () => {
   it('formats continuous reward funding sources for page copy', () => {
     expect(formatRewardFundingSources(['creator fees', 'buybacks', 'dev wallet'])).toBe(
       'creator fees, buybacks, and dev wallet',
+    );
+  });
+
+  it('keeps mobile wallet connect, link signing, and staking as separate user steps', () => {
+    expect(resolveStakingWalletStep({
+      isAuthenticated: true,
+      connectedWalletAddress: null,
+      linkedWalletAddress: null,
+      walletMatchesAccount: false,
+    })).toBe('connect-wallet');
+
+    expect(resolveStakingWalletStep({
+      isAuthenticated: true,
+      connectedWalletAddress: 'connected-wallet',
+      linkedWalletAddress: null,
+      walletMatchesAccount: false,
+    })).toBe('link-wallet');
+
+    expect(resolveStakingWalletStep({
+      isAuthenticated: true,
+      connectedWalletAddress: 'connected-wallet',
+      linkedWalletAddress: 'connected-wallet',
+      walletMatchesAccount: true,
+    })).toBe('ready');
+  });
+
+  it('explains why the user must tap again after wallet preparation steps', () => {
+    expect(formatStakingWalletStepNotice('connect-wallet')).toBe(
+      'Wallet connected. Tap Link wallet to sign and link it before staking.',
+    );
+    expect(formatStakingWalletStepNotice('link-wallet')).toBe(
+      'Wallet linked. Tap Stake HATCHER again to submit the staking transaction.',
     );
   });
 });

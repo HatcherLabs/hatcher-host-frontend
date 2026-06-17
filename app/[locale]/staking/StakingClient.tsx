@@ -18,7 +18,9 @@ import { useAuth } from '@/lib/auth-context';
 import {
   formatRewardFundingSources,
   formatStakingTokenAmount,
+  formatStakingWalletStepNotice,
   resolveStakingLinkedWalletAddress,
+  resolveStakingWalletStep,
 } from '@/lib/staking-state';
 import { isWalletTrustRevokedError, isWalletUserCancellationError } from '@/lib/wallet-errors';
 import { buildPhantomBrowseUrl } from '@/lib/wallet-links';
@@ -98,6 +100,17 @@ function signatureToBase64(signature: Uint8Array): string {
   let binary = '';
   for (const byte of signature) binary += String.fromCharCode(byte);
   return btoa(binary);
+}
+
+class WalletFlowStepRequiredError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'WalletFlowStepRequiredError';
+  }
+}
+
+function isWalletFlowStepRequiredError(error: unknown): error is WalletFlowStepRequiredError {
+  return error instanceof WalletFlowStepRequiredError;
 }
 
 async function waitForConnectedWallet(walletRef: MutableRefObject<WalletContextState>): Promise<string> {
@@ -199,6 +212,7 @@ export function StakingClient() {
   const [optimisticLinkedWalletAddress, setOptimisticLinkedWalletAddress] = useState<string | null>(null);
   const [phantomBrowseUrl, setPhantomBrowseUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [balanceError, setBalanceError] = useState<string | null>(null);
   const [claimResult, setClaimResult] = useState<StakingClaimResponse | null>(null);
 
@@ -252,6 +266,12 @@ export function StakingClient() {
   const walletMatchesAccount = Boolean(
     connectedWalletAddress && linkedWalletAddress && connectedWalletAddress === linkedWalletAddress,
   );
+  const walletStep = resolveStakingWalletStep({
+    isAuthenticated,
+    connectedWalletAddress,
+    linkedWalletAddress,
+    walletMatchesAccount,
+  });
   const canClaimAiCredits = Boolean(
     summary
       && summary.claimableAiCredits > 0
@@ -296,10 +316,7 @@ export function StakingClient() {
       && walletBalanceBaseUnits !== null
       && amountBaseUnits > walletBalanceBaseUnits,
   );
-  const needsAccountPrep = !isAuthenticated
-    || !connectedWalletAddress
-    || !linkedWalletAddress
-    || !walletMatchesAccount;
+  const needsAccountPrep = walletStep !== 'ready';
   const poolReady = Boolean(selectedPool?.configured && selectedPool.poolAddress);
   const stakeSubmitDisabled = staking
     || linkingWallet
@@ -319,9 +336,9 @@ export function StakingClient() {
     if (linkingWallet) return 'Preparing wallet';
     if (authLoading) return 'Loading';
     if (!poolReady) return 'Pool pending';
-    if (!isAuthenticated) return 'Sign in to stake';
-    if (!connectedWalletAddress) return 'Connect & link wallet';
-    if (!linkedWalletAddress || !walletMatchesAccount) return 'Link wallet & stake';
+    if (walletStep === 'sign-in') return 'Sign in to stake';
+    if (walletStep === 'connect-wallet') return 'Connect wallet';
+    if (walletStep === 'link-wallet') return 'Link wallet';
     if (!amountEntered) return 'Enter amount';
     if (amountInvalid) return 'Invalid amount';
     if (!amountPositive) return 'Enter amount';
@@ -335,13 +352,10 @@ export function StakingClient() {
     amountTooLow,
     amountTooHigh,
     authLoading,
-    connectedWalletAddress,
-    isAuthenticated,
-    linkedWalletAddress,
     linkingWallet,
     poolReady,
     staking,
-    walletMatchesAccount,
+    walletStep,
   ]);
 
   const loadWalletBalance = useCallback(async () => {
@@ -415,7 +429,7 @@ export function StakingClient() {
     };
   }, [summary?.activeStakes]);
 
-  const ensureConnectedWallet = useCallback(async (): Promise<string> => {
+  const connectWalletOnly = useCallback(async (): Promise<string> => {
     const current = walletRef.current;
     if (current.connected && current.publicKey) return current.publicKey.toBase58();
 
@@ -474,13 +488,18 @@ export function StakingClient() {
     return linked.data.walletAddress;
   }, [load, refreshUser]);
 
-  const linkConnectedWallet = useCallback(async (): Promise<string> => {
+  const linkCurrentWallet = useCallback(async (): Promise<string> => {
     if (!isAuthenticated) {
       router.push('/login?return=/staking');
       throw new Error('Sign in to Hatcher before staking so AI Credits can be assigned to your account.');
     }
 
-    const walletAddress = await ensureConnectedWallet();
+    const publicKey = walletRef.current.publicKey;
+    if (!walletRef.current.connected || !publicKey) {
+      throw new Error('Connect your wallet before linking it.');
+    }
+
+    const walletAddress = publicKey.toBase58();
     if (linkedWalletAddress === walletAddress) return walletAddress;
 
     setLinkingWallet(true);
@@ -490,16 +509,17 @@ export function StakingClient() {
       } catch (err) {
         if (isWalletUserCancellationError(err)) throw new Error('Cancelled');
         if (!isWalletTrustRevokedError(err)) throw err;
-        const reconnectedWalletAddress = await forceReconnectWallet();
-        return signAndLinkWallet(reconnectedWalletAddress);
+        await forceReconnectWallet();
+        throw new WalletFlowStepRequiredError('Wallet permission was refreshed. Tap Link wallet again to sign and finish linking.');
       }
     } finally {
       setLinkingWallet(false);
     }
-  }, [ensureConnectedWallet, forceReconnectWallet, isAuthenticated, linkedWalletAddress, router, signAndLinkWallet]);
+  }, [forceReconnectWallet, isAuthenticated, linkedWalletAddress, router, signAndLinkWallet]);
 
   const connectAndLinkWallet = useCallback(async (forceSwitch = false) => {
     setError(null);
+    setNotice(null);
     setClaimResult(null);
     if (authLoading) return;
     if (!isAuthenticated) {
@@ -509,19 +529,44 @@ export function StakingClient() {
 
     try {
       if (forceSwitch && walletRef.current.connected) {
-        await forceReconnectWallet();
+        const walletAddress = await forceReconnectWallet();
+        await loadWalletBalance();
+        setNotice(
+          linkedWalletAddress === walletAddress
+            ? 'Wallet connected. You can stake now.'
+            : 'Wallet connected. Tap Link connected wallet to sign and link it.',
+        );
+        return;
       }
 
-      await linkConnectedWallet();
+      if (!walletRef.current.connected || !walletRef.current.publicKey) {
+        const walletAddress = await connectWalletOnly();
+        await loadWalletBalance();
+        setNotice(
+          linkedWalletAddress === walletAddress
+            ? 'Wallet connected. Tap Stake HATCHER again to submit the staking transaction.'
+            : formatStakingWalletStepNotice('connect-wallet'),
+        );
+        return;
+      }
+
+      await linkCurrentWallet();
       await loadWalletBalance();
+      setNotice('Wallet linked. You can stake now.');
     } catch (err) {
+      if (isWalletFlowStepRequiredError(err)) {
+        setNotice(err.message);
+        return;
+      }
       const message = err instanceof Error ? err.message : 'Could not link wallet';
       if (message !== 'Cancelled') setError(message);
     }
   }, [
     authLoading,
+    connectWalletOnly,
     isAuthenticated,
-    linkConnectedWallet,
+    linkedWalletAddress,
+    linkCurrentWallet,
     loadWalletBalance,
     forceReconnectWallet,
     router,
@@ -532,6 +577,7 @@ export function StakingClient() {
     setClaimResult(null);
     setStakeTxId(null);
     setHatcherRewardTxId(null);
+    setNotice(null);
 
     if (authLoading || staking || linkingWallet) return;
     if (!selectedPool?.poolAddress || !selectedPool.configured) {
@@ -543,9 +589,24 @@ export function StakingClient() {
       return;
     }
 
-    setStaking(true);
     try {
-      await linkConnectedWallet();
+      if (walletStep === 'connect-wallet') {
+        const walletAddress = await connectWalletOnly();
+        await loadWalletBalance();
+        setNotice(
+          linkedWalletAddress === walletAddress
+            ? 'Wallet connected. Tap Stake HATCHER again to submit the staking transaction.'
+            : formatStakingWalletStepNotice('connect-wallet'),
+        );
+        return;
+      }
+
+      if (walletStep === 'link-wallet') {
+        await linkCurrentWallet();
+        await loadWalletBalance();
+        setNotice(formatStakingWalletStepNotice('link-wallet'));
+        return;
+      }
 
       const amount = parseHatcherAmountToBaseUnits(stakeAmount);
       if (!amount || amount <= 0n) throw new Error('Enter a HATCHER amount greater than zero.');
@@ -557,6 +618,7 @@ export function StakingClient() {
       const balance = walletBalanceBaseUnits ?? await fetchHatcherWalletBalance(connection, publicKey);
       if (amount > balance) throw new Error('Insufficient HATCHER balance.');
 
+      setStaking(true);
       const result = await stakeHatcherWithStreamflow({
         wallet: walletRef.current,
         stakePoolAddress: selectedPool.poolAddress,
@@ -569,6 +631,10 @@ export function StakingClient() {
       setStakeAmount('');
       await Promise.all([load(), loadWalletBalance()]);
     } catch (err) {
+      if (isWalletFlowStepRequiredError(err)) {
+        setNotice(err.message);
+        return;
+      }
       const message = err instanceof Error ? err.message : 'Could not stake HATCHER';
       if (message !== 'Cancelled') setError(message);
     } finally {
@@ -576,9 +642,11 @@ export function StakingClient() {
     }
   }, [
     authLoading,
+    connectWalletOnly,
     connection,
     isAuthenticated,
-    linkConnectedWallet,
+    linkedWalletAddress,
+    linkCurrentWallet,
     linkingWallet,
     load,
     loadWalletBalance,
@@ -587,12 +655,13 @@ export function StakingClient() {
     stakeAmount,
     staking,
     walletBalanceBaseUnits,
+    walletStep,
   ]);
 
   const walletActionLabel = useCallback((): string => {
     if (authLoading || linkingWallet) return 'Preparing wallet';
     if (!isAuthenticated) return 'Sign in to link wallet';
-    if (!connectedWalletAddress) return 'Connect & link wallet';
+    if (!connectedWalletAddress) return 'Connect wallet';
     if (!linkedWalletAddress) return 'Link connected wallet';
     if (!walletMatchesAccount) return 'Link connected wallet';
     return 'Switch wallet';
@@ -600,15 +669,22 @@ export function StakingClient() {
 
   const claimHatcherRewards = useCallback(async (stake: StakingStakeEntry) => {
     setError(null);
+    setNotice(null);
     setClaimResult(null);
     setHatcherRewardTxId(null);
     if (claimingHatcherStake) return;
 
     setClaimingHatcherStake(stake.stakeEntryAddress);
     try {
-      const walletAddress = await ensureConnectedWallet();
+      const wasConnected = Boolean(walletRef.current.connected && walletRef.current.publicKey);
+      const walletAddress = await connectWalletOnly();
       if (walletAddress !== stake.walletAddress) {
         throw new Error('Connect the wallet that owns this stake before claiming HATCHER rewards.');
+      }
+      if (!wasConnected) {
+        await loadWalletBalance();
+        setNotice('Wallet connected. Tap Claim HATCHER rewards again to submit the claim transaction.');
+        return;
       }
 
       const result = await claimHatcherRewardsWithStreamflow({
@@ -626,7 +702,7 @@ export function StakingClient() {
     } finally {
       setClaimingHatcherStake(null);
     }
-  }, [claimingHatcherStake, ensureConnectedWallet, load, loadWalletBalance]);
+  }, [claimingHatcherStake, connectWalletOnly, load, loadWalletBalance]);
 
   const claim = async () => {
     setClaiming(true);
@@ -698,6 +774,12 @@ export function StakingClient() {
         {error && (
           <div className="mb-6 rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200">
             {error}
+          </div>
+        )}
+
+        {notice && (
+          <div className="mb-6 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm text-emerald-200">
+            {notice}
           </div>
         )}
 
