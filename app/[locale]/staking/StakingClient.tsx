@@ -25,7 +25,10 @@ import {
   shouldUseWalletSignInForLinking,
   WALLET_LINK_SIWS_STATEMENT,
 } from '@/lib/staking-state';
-import { estimateStakingRewards } from '@/lib/staking-reward-estimator';
+import {
+  estimateActiveStakeRewards,
+  estimateStakingRewards,
+} from '@/lib/staking-reward-estimator';
 import { isWalletTrustRevokedError, isWalletUserCancellationError } from '@/lib/wallet-errors';
 import { buildPhantomBrowseUrl } from '@/lib/wallet-links';
 import {
@@ -297,6 +300,9 @@ export function StakingClient() {
     if (!config?.pools.length) return null;
     return config.pools.find((pool) => pool.key === selectedPoolKey) ?? config.pools[0] ?? null;
   }, [config, selectedPoolKey]);
+  const stakingPoolsByKey = useMemo(() => new Map(
+    (config?.pools ?? []).map((pool) => [pool.key, pool]),
+  ), [config?.pools]);
 
   const rewardSplitSummary = useMemo(() => {
     if (!config?.pools.length) return null;
@@ -1146,6 +1152,9 @@ export function StakingClient() {
                 <p className="mt-1 text-sm text-[var(--text-muted)]">
                   Claimable AI Credits: {formatNumber(summary?.claimableAiCredits ?? 0)}
                 </p>
+                <p className="mt-1 text-sm text-[var(--text-muted)]">
+                  Reward estimates use current pool size and configured lock budgets. Streamflow top-ups and new stakes can change them.
+                </p>
                 {connectedWalletAddress && linkedWalletAddress && !walletMatchesAccount && (
                   <p className="mt-2 text-sm font-medium text-amber-400">
                     Link the connected wallet before staking if you want AI Credits on this account.
@@ -1186,6 +1195,10 @@ export function StakingClient() {
                   const stakeUnlocked = isStakeUnlocked(stake.unlockAt);
                   const hatcherClaimDisabled = Boolean(claimingHatcherStake || unstakingStake) || !hatcherClaimable;
                   const unstakeDisabled = Boolean(claimingHatcherStake || unstakingStake) || !stakeUnlocked;
+                  const activeStakeEstimate = estimateActiveStakeRewards(
+                    stakingPoolsByKey.get(stake.poolKey),
+                    stake.stakedHatcher,
+                  );
 
                   return (
                     <div key={stake.stakeEntryAddress} className="grid min-w-0 gap-3 p-5 md:grid-cols-6">
@@ -1208,6 +1221,17 @@ export function StakingClient() {
                       <div className="min-w-0">
                         <p className="text-xs text-[var(--text-muted)]">HATCHER rewards</p>
                         <p className="font-semibold">{hatcherRewardStatusLabel(hatcherStatus)}</p>
+                        <p className="mt-2 text-xs text-[var(--text-muted)]">Est. full-lock rewards</p>
+                        <p className="break-words text-sm font-semibold text-[var(--text-primary)]">
+                          {activeStakeEstimate
+                            ? `~${formatStakingTokenAmount(activeStakeEstimate.estimatedHatcherRewards, 2)}`
+                            : '-'}
+                        </p>
+                        <p className="mt-1 text-xs text-[var(--text-muted)]">
+                          {activeStakeEstimate
+                            ? `${formatEstimatePercent(activeStakeEstimate.poolSharePercent)} pool share`
+                            : 'Pool total unavailable'}
+                        </p>
                         {hatcherStatus?.error && (
                           <p className="mt-1 text-xs text-amber-400">{hatcherStatus.error}</p>
                         )}
