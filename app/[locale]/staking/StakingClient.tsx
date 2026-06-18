@@ -25,6 +25,7 @@ import {
   shouldUseWalletSignInForLinking,
   WALLET_LINK_SIWS_STATEMENT,
 } from '@/lib/staking-state';
+import { estimateStakingRewards } from '@/lib/staking-reward-estimator';
 import { isWalletTrustRevokedError, isWalletUserCancellationError } from '@/lib/wallet-errors';
 import { buildPhantomBrowseUrl } from '@/lib/wallet-links';
 import {
@@ -74,6 +75,11 @@ function rewardShare(pool: StakingPoolConfig): string {
 function formatApr(value: number | null | undefined): string {
   if (!value || !Number.isFinite(value) || value <= 0) return '-';
   return `${formatNumber(value, 2)}%`;
+}
+
+function formatEstimatePercent(value: number): string {
+  if (!Number.isFinite(value) || value <= 0) return '-';
+  return `${formatNumber(value, value < 0.01 ? 4 : 2)}%`;
 }
 
 function shortAddress(address: string | null | undefined): string {
@@ -324,6 +330,10 @@ export function StakingClient() {
       && walletBalanceBaseUnits !== null
       && amountBaseUnits > walletBalanceBaseUnits,
   );
+  const rewardEstimate = useMemo(() => {
+    if (!selectedPool || amountBaseUnits === null || amountBaseUnits < MIN_HATCHER_STAKE_BASE_UNITS) return null;
+    return estimateStakingRewards(selectedPool, Number(amountBaseUnits) / 1_000_000);
+  }, [amountBaseUnits, selectedPool]);
   const needsAccountPrep = walletStep !== 'ready';
   const poolReady = Boolean(selectedPool?.configured && selectedPool.poolAddress);
   const stakeSubmitDisabled = staking
@@ -982,6 +992,72 @@ export function StakingClient() {
                   {percent}%
                 </button>
               ))}
+            </div>
+
+            <div className="mt-6 border-t border-[var(--border-default)] pt-5">
+              <div className="flex min-w-0 flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold uppercase text-[var(--text-muted)]">Reward estimate</p>
+                  <h3 className="mt-1 text-lg font-semibold text-[var(--text-primary)]">
+                    {rewardEstimate
+                      ? `${formatStakingTokenAmount(rewardEstimate.estimatedHatcherRewards, 2)} estimated`
+                      : 'Enter an amount to simulate rewards'}
+                  </h3>
+                </div>
+                <p className="text-xs font-medium text-[var(--text-muted)]">
+                  {selectedPool ? selectedPool.label : 'Select pool'}
+                </p>
+              </div>
+
+              {rewardEstimate ? (
+                <>
+                  <div className="mt-4 grid min-w-0 gap-3 text-sm sm:grid-cols-2">
+                    <div className="min-w-0">
+                      <p className="text-[var(--text-muted)]">Your pool share</p>
+                      <p className="font-semibold text-[var(--text-primary)]">
+                        {formatEstimatePercent(rewardEstimate.poolSharePercent)}
+                      </p>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[var(--text-muted)]">Reward pool estimate</p>
+                      <p className="break-words font-semibold text-[var(--text-primary)]">
+                        {formatStakingTokenAmount(rewardEstimate.rewardBudgetForLock, 2)}
+                      </p>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[var(--text-muted)]">Pool after stake</p>
+                      <p className="break-words font-semibold text-[var(--text-primary)]">
+                        {formatStakingTokenAmount(rewardEstimate.poolTotalAfterStake, 2)}
+                      </p>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[var(--text-muted)]">APR after stake</p>
+                      <p className="font-semibold text-[var(--text-primary)]">
+                        {formatApr(rewardEstimate.estimatedAprAfterStake)}
+                      </p>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[var(--text-muted)]">AI Credits for full lock</p>
+                      <p className="font-semibold text-[var(--text-primary)]">
+                        {formatNumber(rewardEstimate.estimatedAiCredits)}
+                      </p>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[var(--text-muted)]">Based on stake</p>
+                      <p className="break-words font-semibold text-[var(--text-primary)]">
+                        {formatStakingTokenAmount(rewardEstimate.amountHatcher, 2)}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="mt-3 text-xs leading-5 text-[var(--text-muted)]">
+                    Estimate only. HATCHER rewards depend on live pool size, Streamflow reward balance, and future top-ups. If more users stake in this pool, your share changes.
+                  </p>
+                </>
+              ) : (
+                <p className="mt-3 text-xs leading-5 text-[var(--text-muted)]">
+                  Add at least 1 HATCHER to preview pool share, estimated HATCHER rewards, AI Credits, and APR before submitting a transaction.
+                </p>
+              )}
             </div>
 
             <div className="mt-6 grid gap-3 border-t border-[var(--border-default)] pt-5 text-sm sm:grid-cols-2">
