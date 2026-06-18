@@ -71,6 +71,8 @@ import type {
   OrbisConfigStatus,
   OrbisSearchParams,
   OrbisSearchResponse,
+  Mpp32ConfigBody,
+  Mpp32ConfigStatus,
   MirariConfigStatus,
   MirariDreamResult,
   MirariDreamBody,
@@ -627,6 +629,16 @@ export const api = {
   callAgentOrbisApi: (id: string, body: OrbisCallBody) =>
     req<OrbisCallResponse>(`/agents/${id}/orbis/call`, {
       method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  /** MPP32 signed-settlement broker controls. */
+  getAgentMpp32Config: (id: string) =>
+    req<Mpp32ConfigStatus>(`/agents/${id}/mpp32/config`),
+
+  updateAgentMpp32Config: (id: string, body: Mpp32ConfigBody) =>
+    req<Mpp32ConfigStatus>(`/agents/${id}/mpp32/config`, {
+      method: "PATCH",
       body: JSON.stringify(body),
     }),
 

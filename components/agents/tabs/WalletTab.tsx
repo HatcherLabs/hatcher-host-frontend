@@ -40,6 +40,7 @@ import { ClawVilleWalletPanel } from './ClawVilleWalletPanel';
 import { OrbisWalletPanel } from './OrbisWalletPanel';
 import { MirariWalletPanel } from './MirariWalletPanel';
 import { XonaPartnerResourcesPanel } from './XonaPartnerResourcesPanel';
+import { Mpp32WalletPanel } from './Mpp32WalletPanel';
 
 interface ReputationState {
   upCount: number;
@@ -59,7 +60,7 @@ interface ReputationState {
 
 type WalletPanel = 'passport' | AgentPassportNetworkId;
 type WalletSection = 'overview' | 'networks' | 'providers' | 'security';
-type ProviderPanelId = 'xona' | 'conduit' | 'earnfi' | 'oobe' | 'clawville' | 'kausalayer' | 'mirari' | 'orbis';
+type ProviderPanelId = 'xona' | 'conduit' | 'earnfi' | 'oobe' | 'clawville' | 'kausalayer' | 'mirari' | 'mpp32' | 'orbis';
 
 const TAB_ORDER: WalletPanel[] = ['passport', 'skale', 'solana', 'base'];
 const NETWORK_ORDER: AgentPassportNetworkId[] = ['skale', 'solana', 'base'];
@@ -83,6 +84,7 @@ const SOLANA_PROVIDERS: ReadonlyArray<{ id: ProviderPanelId; label: string; desc
   { id: 'clawville', label: 'ClawVille', description: 'Identity wallet and access state.', network: 'Solana' },
   { id: 'kausalayer', label: 'KausaLayer', description: 'Private pockets and saved wallets.', network: 'Solana' },
   { id: 'mirari', label: 'Mirari', description: 'Signal ingest and live mirror.', network: 'Solana' },
+  { id: 'mpp32', label: 'MPP32', description: 'Signed AGTP intelligence and x402 settlement.', network: 'Solana' },
 ];
 
 const BASE_PROVIDERS: ReadonlyArray<{ id: ProviderPanelId; label: string; description: string; network: 'Base' }> = [
@@ -105,6 +107,12 @@ function iconForPanel(panel: WalletPanel) {
 
 export function shouldShowMirariPanelForWallet(networkId: AgentPassportNetworkId): boolean {
   return networkId === 'solana';
+}
+
+export function getProviderPanelIdsForWallet(networkId: AgentPassportNetworkId): ProviderPanelId[] {
+  if (networkId === 'solana') return SOLANA_PROVIDERS.map((provider) => provider.id);
+  if (networkId === 'base') return BASE_PROVIDERS.map((provider) => provider.id);
+  return [];
 }
 
 function readInitialWalletPanel(): WalletPanel {
@@ -817,6 +825,8 @@ function ProviderPanel({ provider, agentId }: { provider: ProviderPanelId; agent
       return <KausalayerWalletPanel agentId={agentId} />;
     case 'mirari':
       return <MirariWalletPanel agentId={agentId} />;
+    case 'mpp32':
+      return <Mpp32WalletPanel agentId={agentId} />;
     case 'orbis':
       return <OrbisWalletPanel agentId={agentId} />;
     default:
