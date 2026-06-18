@@ -6,9 +6,8 @@ import {
   CLAWVILLE_SPECIES_OPTIONS,
   ClawVilleWalletPanel,
   clampClawVilleStatValue,
-  coerceClawVilleStatInputValue,
   describeClawVilleLaunchError,
-  sanitizeClawVilleStatInput,
+  validateClawVilleStatsInput,
 } from './ClawVilleWalletPanel';
 
 describe('ClawVilleWalletPanel', () => {
@@ -23,7 +22,7 @@ describe('ClawVilleWalletPanel', () => {
     expect(html).toContain('Phanes');
     expect(html).toContain('Hatcher 8');
     expect(html).toContain('Personality preset');
-    expect(html).toContain('Increase hp');
+    expect(html).toContain('title="1-500"');
     expect(html).not.toMatch(/staging/i);
   });
 
@@ -35,16 +34,33 @@ describe('ClawVilleWalletPanel', () => {
     expect(clampClawVilleStatValue('speed', Number.NaN)).toBe(1);
   });
 
-  it('keeps stat text entry editable while enforcing numeric limits', () => {
-    expect(sanitizeClawVilleStatInput('hp', '')).toBe('');
-    expect(sanitizeClawVilleStatInput('hp', 'abc42')).toBe('42');
-    expect(sanitizeClawVilleStatInput('hp', '9999')).toBe('500');
-    expect(coerceClawVilleStatInputValue('speed', '')).toBe(1);
-    expect(coerceClawVilleStatInputValue('speed', '0')).toBe(1);
-    expect(coerceClawVilleStatInputValue('attack', '009')).toBe(9);
+  it('validates stat text before building a numeric payload', () => {
+    expect(validateClawVilleStatsInput({
+      hp: '500',
+      attack: '1',
+      defense: '75',
+      speed: '100',
+    })).toEqual({
+      ok: true,
+      stats: { hp: 500, attack: 1, defense: 75, speed: 100 },
+    });
+
+    expect(validateClawVilleStatsInput({
+      hp: '501',
+      attack: '1',
+      defense: '75',
+      speed: '100',
+    })).toEqual({ ok: false, error: 'HP must be between 1 and 500.' });
+
+    expect(validateClawVilleStatsInput({
+      hp: '100',
+      attack: 'abc',
+      defense: '75',
+      speed: '100',
+    })).toEqual({ ok: false, error: 'Attack must be a whole number.' });
   });
 
-  it('renders stat inputs without native number spinners', () => {
+  it('renders plain stat text inputs without increment controls', () => {
     const html = renderToStaticMarkup(
       <ToastProvider>
         <ClawVilleWalletPanel agentId="agent-1" />
@@ -53,6 +69,8 @@ describe('ClawVilleWalletPanel', () => {
 
     expect(html).not.toContain('type="number"');
     expect(html).toContain('inputMode="numeric"');
+    expect(html).not.toContain('Increase hp');
+    expect(html).not.toContain('Decrease hp');
   });
 
   it('offers only known Hatcher avatar species keys', () => {
