@@ -607,6 +607,8 @@ export interface Mpp32ConfigStatus {
   baseUrl: string;
   settlement: "x402";
   agtpIdentityMode: "x402_only" | "hmac_sha256";
+  payerConfigured: boolean;
+  payerSource: "mpp32" | "xona" | "conduit" | "none";
   network: string;
   maxPerCallUsdc: number;
   maxResponseBytes: number;
@@ -621,7 +623,6 @@ export interface Mpp32ConfigBody {
   enabled?: boolean;
   dailyBudgetUsd?: number;
   maxPerCallUsd?: number;
-  authorityScope?: string[];
 }
 
 export type MirariRuntime = "hermes" | "openclaw";

@@ -8,12 +8,10 @@ describe('MPP32 wallet panel helpers', () => {
       enabled: true,
       dailyBudgetUsd: '1.5',
       maxPerCallUsd: '0.02',
-      authorityScope: '/api/intelligence\n/api/proxy/mpp32-intelligence',
     })).toEqual({
       enabled: true,
       dailyBudgetUsd: 1.5,
       maxPerCallUsd: 0.02,
-      authorityScope: ['/api/intelligence', '/api/proxy/mpp32-intelligence'],
     });
   });
 
@@ -22,7 +20,6 @@ describe('MPP32 wallet panel helpers', () => {
       enabled: true,
       dailyBudgetUsd: '0',
       maxPerCallUsd: '0.02',
-      authorityScope: '/api/proxy/mpp32-intelligence',
     })).toThrow('Daily budget must be a positive USD amount');
   });
 });

@@ -20,14 +20,12 @@ export interface Mpp32SettingsFormState {
   enabled: boolean;
   dailyBudgetUsd: string;
   maxPerCallUsd: string;
-  authorityScope: string;
 }
 
 const DEFAULT_FORM: Mpp32SettingsFormState = {
   enabled: false,
   dailyBudgetUsd: '1',
   maxPerCallUsd: '0.02',
-  authorityScope: '/api/proxy/mpp32-intelligence',
 };
 
 function parseUsd(value: string, label: string): number {
@@ -38,21 +36,11 @@ function parseUsd(value: string, label: string): number {
   return parsed;
 }
 
-function parseScopes(value: string): string[] {
-  const seen = new Set<string>();
-  for (const raw of value.split(/[\n,]+/)) {
-    const scope = raw.trim();
-    if (scope) seen.add(scope);
-  }
-  return [...seen];
-}
-
 export function buildMpp32SettingsPayload(form: Mpp32SettingsFormState): Mpp32ConfigBody {
   return {
     enabled: form.enabled,
     dailyBudgetUsd: parseUsd(form.dailyBudgetUsd, 'Daily budget'),
     maxPerCallUsd: parseUsd(form.maxPerCallUsd, 'Max per call'),
-    authorityScope: parseScopes(form.authorityScope),
   };
 }
 
@@ -61,7 +49,6 @@ function formFromConfig(config: Mpp32ConfigStatus): Mpp32SettingsFormState {
     enabled: config.settings.enabled,
     dailyBudgetUsd: String(config.settings.dailyBudgetUsd),
     maxPerCallUsd: String(config.settings.maxPerCallUsd),
-    authorityScope: config.settings.authorityScope.join('\n'),
   };
 }
 
@@ -169,7 +156,7 @@ export function Mpp32WalletPanel({ agentId }: { agentId: string }) {
             Signed token intelligence for this agent
           </h3>
           <p className="mt-1 max-w-3xl text-xs leading-relaxed text-[var(--text-secondary)]">
-            Hatcher signs AGTP identity server-side, pays MPP32 with the agent Solana wallet, and charges AI Credits only after settled x402 responses.
+            Hatcher signs AGTP identity server-side, pays MPP32 from a Hatcher payer wallet, and charges this owner once in AI Credits after settled x402 responses.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2 text-[11px]">
@@ -205,7 +192,7 @@ export function Mpp32WalletPanel({ agentId }: { agentId: string }) {
             <StatusTile
               label="Settlement"
               value={config?.settlement ?? 'x402'}
-              description="Capture requires a successful upstream response."
+              description="Hatcher pays upstream; AI Credits are charged after settlement."
               tone={configured ? 'good' : 'warn'}
               icon={ShieldCheck}
             />
@@ -217,10 +204,10 @@ export function Mpp32WalletPanel({ agentId }: { agentId: string }) {
               icon={KeyRound}
             />
             <StatusTile
-              label="Network"
-              value={config?.network ?? 'solana'}
-              description={`Max per call ${config ? `$${config.maxPerCallUsdc}` : '-'}.`}
-              tone="muted"
+              label="Payer"
+              value={config?.payerConfigured ? 'hatcher' : 'not configured'}
+              description={`Network ${config?.network ?? 'solana'}; max per call ${config ? `$${config.maxPerCallUsdc}` : '-'}.`}
+              tone={config?.payerConfigured ? 'good' : 'warn'}
               icon={Power}
             />
             <StatusTile
@@ -274,15 +261,15 @@ export function Mpp32WalletPanel({ agentId }: { agentId: string }) {
         </div>
 
         <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-4">
-          <label className="block">
+          <div>
             <span className="text-xs text-[var(--text-muted)]">Authority scope</span>
-            <textarea
-              value={form.authorityScope}
-              onChange={(event) => setForm((prev) => ({ ...prev, authorityScope: event.target.value }))}
-              rows={5}
-              className="config-input mt-1 min-h-[120px] resize-y text-sm"
-            />
-          </label>
+            <div className="mt-1 rounded-md border border-[var(--border-subtle)] bg-black/20 px-3 py-2 font-mono text-xs text-[var(--text-secondary)]">
+              {config?.settings.authorityScope.join(', ') || '/api/proxy/mpp32-intelligence'}
+            </div>
+            <p className="mt-2 text-xs leading-relaxed text-[var(--text-muted)]">
+              Fixed server-side for MPP32 intelligence calls.
+            </p>
+          </div>
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <button
               type="button"
