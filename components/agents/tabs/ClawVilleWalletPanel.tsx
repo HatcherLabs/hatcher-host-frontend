@@ -7,6 +7,8 @@ import {
   Copy,
   ExternalLink,
   Gamepad2,
+  Minus,
+  Plus,
   RefreshCw,
   ShieldCheck,
   Sparkles,
@@ -38,6 +40,64 @@ function formatDate(value: string | null | undefined): string {
 
 function prettyJson(value: unknown): string {
   return JSON.stringify(value, null, 2);
+}
+
+export const CLAWVILLE_SPECIES_OPTIONS = [
+  { value: 'phanes', label: 'Phanes' },
+  { value: 'hatcher_1', label: 'Hatcher 1' },
+  { value: 'hatcher_2', label: 'Hatcher 2' },
+  { value: 'hatcher_3', label: 'Hatcher 3' },
+  { value: 'hatcher_4', label: 'Hatcher 4' },
+  { value: 'hatcher_5', label: 'Hatcher 5' },
+  { value: 'hatcher_6', label: 'Hatcher 6' },
+  { value: 'hatcher_7', label: 'Hatcher 7' },
+  { value: 'hatcher_8', label: 'Hatcher 8' },
+] as const;
+
+const CLAWVILLE_PERSONALITY_PRESETS = [
+  { value: 'custom', label: 'Custom', text: '' },
+  { value: 'guide', label: 'Helpful guide', text: 'Helpful, concise, curious, and welcoming to players exploring ClawVille.' },
+  { value: 'scout', label: 'World scout', text: 'Observant, energetic, and focused on discovering buildings, NPCs, quests, and useful routes.' },
+  { value: 'strategist', label: 'Strategist', text: 'Calm, analytical, and tactical, with clear advice for planning actions and resource decisions.' },
+] as const;
+
+const CLAWVILLE_STAT_LIMITS = {
+  hp: { min: 1, max: 500, step: 10 },
+  attack: { min: 1, max: 100, step: 1 },
+  defense: { min: 1, max: 100, step: 1 },
+  speed: { min: 1, max: 100, step: 1 },
+} as const;
+
+type ClawVilleStatKey = keyof typeof CLAWVILLE_STAT_LIMITS;
+type ClawVilleForm = {
+  mode: 'avatar' | 'override';
+  name: string;
+  species: typeof CLAWVILLE_SPECIES_OPTIONS[number]['value'];
+  personality: string;
+  personalityPreset: typeof CLAWVILLE_PERSONALITY_PRESETS[number]['value'];
+  hp: number;
+  attack: number;
+  defense: number;
+  speed: number;
+};
+
+function normalizeClawVilleSpecies(value: string | null | undefined): ClawVilleForm['species'] {
+  const normalized = value?.trim().toLowerCase();
+  const option = CLAWVILLE_SPECIES_OPTIONS.find((item) => item.value === normalized);
+  return option?.value ?? 'phanes';
+}
+
+export function clampClawVilleStatValue(key: ClawVilleStatKey, value: number): number {
+  const limit = CLAWVILLE_STAT_LIMITS[key];
+  const rounded = Number.isFinite(value) ? Math.round(value) : limit.min;
+  return Math.min(limit.max, Math.max(limit.min, rounded));
+}
+
+export function describeClawVilleLaunchError(error: string, code?: string): string {
+  if (code === 'CLAWVILLE_UPSTREAM_FAILED' && /(?:not_found|404)/i.test(error)) {
+    return 'ClawVille could not find this avatar in the current environment. Re-register the avatar, then launch again.';
+  }
+  return error || 'Could not open ClawVille.';
 }
 
 function StatusTile({
@@ -78,11 +138,12 @@ export function ClawVilleWalletPanel({ agentId }: { agentId: string }) {
   const [launching, setLaunching] = useState(false);
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<ClawVilleForm>({
     mode: 'avatar' as 'avatar' | 'override',
     name: '',
-    species: '',
+    species: 'phanes',
     personality: '',
+    personalityPreset: 'custom',
     hp: 100,
     attack: 12,
     defense: 10,
@@ -97,11 +158,11 @@ export function ClawVilleWalletPanel({ agentId }: { agentId: string }) {
       if (res.success) {
         setConfig(res.data);
         setForm((current) => ({
-          ...current,
-          mode: (res.data.registration.mode === 'override' ? 'override' : 'avatar'),
-          name: res.data.registration.name ?? current.name,
-          species: res.data.registration.species ?? current.species,
-        }));
+	          ...current,
+	          mode: (res.data.registration.mode === 'override' ? 'override' : 'avatar'),
+	          name: res.data.registration.name ?? current.name,
+	          species: normalizeClawVilleSpecies(res.data.registration.species ?? current.species),
+	        }));
       } else {
         setError(res.error);
       }
@@ -127,16 +188,19 @@ export function ClawVilleWalletPanel({ agentId }: { agentId: string }) {
     },
   }), [form]);
 
-  const save = async () => {
+  const save = async (forceRegister = false) => {
     setSaving(true);
     setError(null);
     try {
-      const res = config?.registered
+      const shouldRegister = forceRegister || !config?.registered;
+      const res = !shouldRegister
         ? await api.patchAgentClawVille(agentId, payload as ClawVillePatchBody)
         : await api.registerAgentClawVille(agentId, payload);
       if (res.success) {
         setConfig(res.data.local);
-        toast.success(config?.registered ? 'ClawVille avatar updated' : 'Agent registered in ClawVille');
+        toast.success(shouldRegister
+          ? (config?.registered ? 'ClawVille avatar re-registered' : 'Agent registered in ClawVille')
+          : 'ClawVille avatar updated');
       } else {
         setError(res.error);
       }
@@ -158,7 +222,9 @@ export function ClawVilleWalletPanel({ agentId }: { agentId: string }) {
       const launchRes = await api.launchAgentClawVille(agentId);
       if (!launchRes.success) {
         if (launchWindow) launchWindow.close();
-        setError(launchRes.error);
+        const message = describeClawVilleLaunchError(launchRes.error, launchRes.code);
+        setError(message);
+        toast.error(message);
         return;
       }
 
@@ -167,6 +233,11 @@ export function ClawVilleWalletPanel({ agentId }: { agentId: string }) {
       } else {
         window.location.assign(launchRes.data.launchUrl);
       }
+    } catch (launchError) {
+      if (launchWindow) launchWindow.close();
+      const message = launchError instanceof Error ? launchError.message : 'Could not open ClawVille.';
+      setError(message);
+      toast.error(message);
     } finally {
       setLaunching(false);
     }
@@ -189,7 +260,7 @@ export function ClawVilleWalletPanel({ agentId }: { agentId: string }) {
   };
 
   const unregister = async () => {
-    if (!window.confirm('Remove this agent from ClawVille staging?')) return;
+    if (!window.confirm('Remove this agent from ClawVille?')) return;
     setSaving(true);
     setError(null);
     try {
@@ -212,6 +283,23 @@ export function ClawVilleWalletPanel({ agentId }: { agentId: string }) {
   };
 
   const registration = config?.registration;
+
+  const setStat = (key: ClawVilleStatKey, value: number) => {
+    setForm((current) => ({ ...current, [key]: clampClawVilleStatValue(key, value) }));
+  };
+
+  const adjustStat = (key: ClawVilleStatKey, delta: number) => {
+    setForm((current) => ({ ...current, [key]: clampClawVilleStatValue(key, current[key] + delta) }));
+  };
+
+  const selectPersonalityPreset = (value: ClawVilleForm['personalityPreset']) => {
+    const preset = CLAWVILLE_PERSONALITY_PRESETS.find((item) => item.value === value);
+    setForm((current) => ({
+      ...current,
+      personalityPreset: value,
+      personality: preset && preset.value !== 'custom' ? preset.text : current.personality,
+    }));
+  };
 
   return (
     <GlassCard className="p-5">
@@ -259,13 +347,13 @@ export function ClawVilleWalletPanel({ agentId }: { agentId: string }) {
           description={registration?.registeredAt ? `Registered ${formatDate(registration.registeredAt)}` : 'Register when ClawVille allowlists the Hatcher public key.'}
           icon={Bot}
         />
-        <StatusTile
-          label="Wallet"
-          value={short(registration?.walletAddress)}
-          tone={registration?.walletAddress ? 'good' : 'muted'}
-          description="Read-only custodial ClawVille identity wallet returned by staging."
-          icon={Wallet}
-        />
+	        <StatusTile
+	          label="Wallet"
+	          value={short(registration?.walletAddress)}
+	          tone={registration?.walletAddress ? 'good' : 'muted'}
+	          description="Read-only custodial ClawVille identity wallet."
+	          icon={Wallet}
+	        />
         <StatusTile
           label="Protocol"
           value={registration?.protocol?.version ? `v${registration.protocol.version}` : '-'}
@@ -314,42 +402,84 @@ export function ClawVilleWalletPanel({ agentId }: { agentId: string }) {
                 placeholder="Agent avatar name"
               />
             </label>
-            <label className="space-y-1 text-xs text-[var(--text-muted)]">
-              <span>Species</span>
-              <input
-                value={form.species}
-                onChange={(event) => setForm((current) => ({ ...current, species: event.target.value }))}
-                className="input w-full"
-                maxLength={50}
-                placeholder="phanes"
-              />
-            </label>
-          </div>
-          <label className="mt-2 block space-y-1 text-xs text-[var(--text-muted)]">
-            <span>Personality</span>
-            <textarea
-              value={form.personality}
-              onChange={(event) => setForm((current) => ({ ...current, personality: event.target.value }))}
-              className="input min-h-[72px] w-full resize-y"
-              maxLength={400}
-              placeholder="How this avatar behaves inside ClawVille"
-            />
-          </label>
-          <div className="mt-2 grid grid-cols-4 gap-2">
-            {(['hp', 'attack', 'defense', 'speed'] as const).map((key) => (
-              <label key={key} className="space-y-1 text-xs text-[var(--text-muted)]">
-                <span className="capitalize">{key}</span>
-                <input
-                  type="number"
-                  min={key === 'hp' ? 1 : 1}
-                  max={key === 'hp' ? 500 : 100}
-                  value={form[key]}
-                  onChange={(event) => setForm((current) => ({ ...current, [key]: Number(event.target.value) }))}
-                  className="input w-full"
-                />
-              </label>
-            ))}
-          </div>
+	            <label className="space-y-1 text-xs text-[var(--text-muted)]">
+	              <span>Species</span>
+	              <select
+	                value={form.species}
+	                onChange={(event) => setForm((current) => ({
+	                  ...current,
+	                  species: normalizeClawVilleSpecies(event.target.value),
+	                }))}
+	                className="input w-full"
+	              >
+	                {CLAWVILLE_SPECIES_OPTIONS.map((option) => (
+	                  <option key={option.value} value={option.value}>{option.label}</option>
+	                ))}
+	              </select>
+	            </label>
+	          </div>
+	          <label className="mt-2 block space-y-1 text-xs text-[var(--text-muted)]">
+	            <span>Personality preset</span>
+	            <select
+	              value={form.personalityPreset}
+	              onChange={(event) => selectPersonalityPreset(event.target.value as ClawVilleForm['personalityPreset'])}
+	              className="input w-full"
+	            >
+	              {CLAWVILLE_PERSONALITY_PRESETS.map((option) => (
+	                <option key={option.value} value={option.value}>{option.label}</option>
+	              ))}
+	            </select>
+	          </label>
+	          <label className="mt-2 block space-y-1 text-xs text-[var(--text-muted)]">
+	            <span>Personality</span>
+	            <textarea
+	              value={form.personality}
+	              onChange={(event) => setForm((current) => ({
+	                ...current,
+	                personality: event.target.value,
+	                personalityPreset: 'custom',
+	              }))}
+	              className="input min-h-[72px] w-full resize-y"
+	              maxLength={400}
+	              placeholder="How this avatar behaves inside ClawVille"
+	            />
+	          </label>
+	          <div className="mt-2 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+	            {(['hp', 'attack', 'defense', 'speed'] as const).map((key) => (
+	              <label key={key} className="space-y-1 text-xs text-[var(--text-muted)]">
+	                <span className="capitalize">{key}</span>
+	                <div className="grid grid-cols-[32px_minmax(0,1fr)_32px] gap-1">
+	                  <button
+	                    type="button"
+	                    aria-label={`Decrease ${key}`}
+	                    onClick={() => adjustStat(key, -CLAWVILLE_STAT_LIMITS[key].step)}
+	                    className="btn-secondary flex h-9 items-center justify-center px-0"
+	                  >
+	                    <Minus size={13} />
+	                  </button>
+	                  <input
+	                    type="number"
+	                    inputMode="numeric"
+	                    min={CLAWVILLE_STAT_LIMITS[key].min}
+	                    max={CLAWVILLE_STAT_LIMITS[key].max}
+	                    step={CLAWVILLE_STAT_LIMITS[key].step}
+	                    value={form[key]}
+	                    onChange={(event) => setStat(key, Number(event.target.value))}
+	                    onBlur={(event) => setStat(key, Number(event.target.value))}
+	                    className="input h-9 w-full text-center"
+	                  />
+	                  <button
+	                    type="button"
+	                    aria-label={`Increase ${key}`}
+	                    onClick={() => adjustStat(key, CLAWVILLE_STAT_LIMITS[key].step)}
+	                    className="btn-secondary flex h-9 items-center justify-center px-0"
+	                  >
+	                    <Plus size={13} />
+	                  </button>
+	                </div>
+	              </label>
+	            ))}
+	          </div>
           <div className="mt-3 flex flex-wrap gap-2">
             {config?.registered ? (
               <>
@@ -357,12 +487,16 @@ export function ClawVilleWalletPanel({ agentId }: { agentId: string }) {
                   <Gamepad2 size={14} />
                   {launching ? 'Opening...' : 'Enter ClawVille'}
                 </button>
-                <button type="button" onClick={() => void save()} className="btn-secondary inline-flex items-center gap-2" disabled={saving || launching || loading}>
-                  <Sparkles size={14} />
-                  {saving ? 'Saving...' : 'Update avatar'}
-                </button>
-              </>
-            ) : (
+	                <button type="button" onClick={() => void save()} className="btn-secondary inline-flex items-center gap-2" disabled={saving || launching || loading}>
+	                  <Sparkles size={14} />
+	                  {saving ? 'Saving...' : 'Update avatar'}
+	                </button>
+	                <button type="button" onClick={() => void save(true)} className="btn-secondary inline-flex items-center gap-2" disabled={saving || launching || loading}>
+	                  <RefreshCw size={14} />
+	                  Re-register avatar
+	                </button>
+	              </>
+	            ) : (
               <button type="button" onClick={() => void save()} className="btn-primary inline-flex items-center gap-2" disabled={saving || launching || loading}>
                 <Gamepad2 size={14} />
                 {saving ? 'Saving...' : 'Register avatar'}
