@@ -6,7 +6,9 @@ import {
   CLAWVILLE_SPECIES_OPTIONS,
   ClawVilleWalletPanel,
   clampClawVilleStatValue,
+  coerceClawVilleStatInputValue,
   describeClawVilleLaunchError,
+  sanitizeClawVilleStatInput,
 } from './ClawVilleWalletPanel';
 
 describe('ClawVilleWalletPanel', () => {
@@ -31,6 +33,26 @@ describe('ClawVilleWalletPanel', () => {
     expect(clampClawVilleStatValue('attack', 0)).toBe(1);
     expect(clampClawVilleStatValue('attack', 999)).toBe(100);
     expect(clampClawVilleStatValue('speed', Number.NaN)).toBe(1);
+  });
+
+  it('keeps stat text entry editable while enforcing numeric limits', () => {
+    expect(sanitizeClawVilleStatInput('hp', '')).toBe('');
+    expect(sanitizeClawVilleStatInput('hp', 'abc42')).toBe('42');
+    expect(sanitizeClawVilleStatInput('hp', '9999')).toBe('500');
+    expect(coerceClawVilleStatInputValue('speed', '')).toBe(1);
+    expect(coerceClawVilleStatInputValue('speed', '0')).toBe(1);
+    expect(coerceClawVilleStatInputValue('attack', '009')).toBe(9);
+  });
+
+  it('renders stat inputs without native number spinners', () => {
+    const html = renderToStaticMarkup(
+      <ToastProvider>
+        <ClawVilleWalletPanel agentId="agent-1" />
+      </ToastProvider>,
+    );
+
+    expect(html).not.toContain('type="number"');
+    expect(html).toContain('inputMode="numeric"');
   });
 
   it('offers only known Hatcher avatar species keys', () => {
