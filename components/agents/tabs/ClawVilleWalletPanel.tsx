@@ -7,8 +7,6 @@ import {
   Copy,
   ExternalLink,
   Gamepad2,
-  Minus,
-  Plus,
   RefreshCw,
   ShieldCheck,
   Sparkles,
@@ -69,16 +67,21 @@ const CLAWVILLE_STAT_LIMITS = {
 } as const;
 
 type ClawVilleStatKey = keyof typeof CLAWVILLE_STAT_LIMITS;
+type ClawVilleStatsInput = Record<ClawVilleStatKey, string>;
+type ClawVilleStatsPayload = NonNullable<ClawVilleRegisterBody['stats']>;
 type ClawVilleForm = {
   mode: 'avatar' | 'override';
   name: string;
   species: typeof CLAWVILLE_SPECIES_OPTIONS[number]['value'];
   personality: string;
   personalityPreset: typeof CLAWVILLE_PERSONALITY_PRESETS[number]['value'];
-  hp: string;
-  attack: string;
-  defense: string;
-  speed: string;
+} & ClawVilleStatsInput;
+
+const CLAWVILLE_STAT_LABELS: Record<ClawVilleStatKey, string> = {
+  hp: 'HP',
+  attack: 'Attack',
+  defense: 'Defense',
+  speed: 'Speed',
 };
 
 function normalizeClawVilleSpecies(value: string | null | undefined): ClawVilleForm['species'] {
@@ -93,17 +96,32 @@ export function clampClawVilleStatValue(key: ClawVilleStatKey, value: number): n
   return Math.min(limit.max, Math.max(limit.min, rounded));
 }
 
-export function sanitizeClawVilleStatInput(key: ClawVilleStatKey, rawValue: string): string {
-  const digits = rawValue.replace(/\D/g, '');
-  if (!digits) return '';
-  const parsed = Number.parseInt(digits, 10);
-  if (!Number.isFinite(parsed)) return '';
-  return String(Math.min(CLAWVILLE_STAT_LIMITS[key].max, parsed));
-}
+export function validateClawVilleStatsInput(input: ClawVilleStatsInput):
+  | { ok: true; stats: ClawVilleStatsPayload }
+  | { ok: false; error: string } {
+  const stats: ClawVilleStatsPayload = {};
 
-export function coerceClawVilleStatInputValue(key: ClawVilleStatKey, rawValue: string): number {
-  const sanitized = sanitizeClawVilleStatInput(key, rawValue);
-  return clampClawVilleStatValue(key, sanitized ? Number.parseInt(sanitized, 10) : Number.NaN);
+  for (const key of ['hp', 'attack', 'defense', 'speed'] as const) {
+    const rawValue = input[key].trim();
+    const label = CLAWVILLE_STAT_LABELS[key];
+    const limit = CLAWVILLE_STAT_LIMITS[key];
+
+    if (!rawValue) {
+      return { ok: false, error: `${label} is required.` };
+    }
+    if (!/^\d+$/.test(rawValue)) {
+      return { ok: false, error: `${label} must be a whole number.` };
+    }
+
+    const value = Number(rawValue);
+    if (!Number.isSafeInteger(value) || value < limit.min || value > limit.max) {
+      return { ok: false, error: `${label} must be between ${limit.min} and ${limit.max}.` };
+    }
+
+    stats[key] = value;
+  }
+
+  return { ok: true, stats };
 }
 
 export function describeClawVilleLaunchError(error: string, code?: string): string {
@@ -188,23 +206,33 @@ export function ClawVilleWalletPanel({ agentId }: { agentId: string }) {
     void load();
   }, [load]);
 
-  const payload = useMemo<ClawVilleRegisterBody>(() => ({
+  const payloadBase = useMemo<ClawVilleRegisterBody>(() => ({
     mode: form.mode,
     ...(form.name.trim() ? { name: form.name.trim() } : {}),
     ...(form.species.trim() ? { species: form.species.trim() } : {}),
     ...(form.personality.trim() ? { personality: form.personality.trim() } : {}),
-    stats: {
-      hp: coerceClawVilleStatInputValue('hp', form.hp),
-      attack: coerceClawVilleStatInputValue('attack', form.attack),
-      defense: coerceClawVilleStatInputValue('defense', form.defense),
-      speed: coerceClawVilleStatInputValue('speed', form.speed),
-    },
-  }), [form]);
+  }), [form.mode, form.name, form.personality, form.species]);
 
   const save = async (forceRegister = false) => {
+    const statsResult = validateClawVilleStatsInput({
+      hp: form.hp,
+      attack: form.attack,
+      defense: form.defense,
+      speed: form.speed,
+    });
+    if (!statsResult.ok) {
+      setError(statsResult.error);
+      toast.error(statsResult.error);
+      return;
+    }
+
     setSaving(true);
     setError(null);
     try {
+      const payload: ClawVilleRegisterBody = {
+        ...payloadBase,
+        stats: statsResult.stats,
+      };
       const shouldRegister = forceRegister || !config?.registered;
       const res = !shouldRegister
         ? await api.patchAgentClawVille(agentId, payload as ClawVillePatchBody)
@@ -298,18 +326,7 @@ export function ClawVilleWalletPanel({ agentId }: { agentId: string }) {
   const registration = config?.registration;
 
   const setStatInput = (key: ClawVilleStatKey, value: string) => {
-    setForm((current) => ({ ...current, [key]: sanitizeClawVilleStatInput(key, value) }));
-  };
-
-  const commitStatInput = (key: ClawVilleStatKey, value: string) => {
-    setForm((current) => ({ ...current, [key]: String(coerceClawVilleStatInputValue(key, value)) }));
-  };
-
-  const adjustStat = (key: ClawVilleStatKey, delta: number) => {
-    setForm((current) => ({
-      ...current,
-      [key]: String(clampClawVilleStatValue(key, coerceClawVilleStatInputValue(key, current[key]) + delta)),
-    }));
+    setForm((current) => ({ ...current, [key]: value }));
   };
 
   const selectPersonalityPreset = (value: ClawVilleForm['personalityPreset']) => {
@@ -468,34 +485,15 @@ export function ClawVilleWalletPanel({ agentId }: { agentId: string }) {
 	            {(['hp', 'attack', 'defense', 'speed'] as const).map((key) => (
 	              <label key={key} className="space-y-1 text-xs text-[var(--text-muted)]">
 	                <span className="capitalize">{key}</span>
-	                <div className="grid grid-cols-[32px_minmax(0,1fr)_32px] gap-1">
-	                  <button
-	                    type="button"
-	                    aria-label={`Decrease ${key}`}
-	                    onClick={() => adjustStat(key, -CLAWVILLE_STAT_LIMITS[key].step)}
-	                    className="btn-secondary flex h-9 items-center justify-center px-0"
-	                  >
-	                    <Minus size={13} />
-	                  </button>
-	                  <input
-	                    type="text"
-	                    inputMode="numeric"
-	                    pattern="[0-9]*"
-	                    title={`${CLAWVILLE_STAT_LIMITS[key].min}-${CLAWVILLE_STAT_LIMITS[key].max}`}
-	                    value={form[key]}
-	                    onChange={(event) => setStatInput(key, event.target.value)}
-	                    onBlur={(event) => commitStatInput(key, event.target.value)}
-	                    className="input h-9 w-full text-center"
-	                  />
-	                  <button
-	                    type="button"
-	                    aria-label={`Increase ${key}`}
-	                    onClick={() => adjustStat(key, CLAWVILLE_STAT_LIMITS[key].step)}
-	                    className="btn-secondary flex h-9 items-center justify-center px-0"
-	                  >
-	                    <Plus size={13} />
-	                  </button>
-	                </div>
+	                <input
+	                  type="text"
+	                  inputMode="numeric"
+	                  pattern="[0-9]*"
+	                  title={`${CLAWVILLE_STAT_LIMITS[key].min}-${CLAWVILLE_STAT_LIMITS[key].max}`}
+	                  value={form[key]}
+	                  onChange={(event) => setStatInput(key, event.target.value)}
+	                  className="input h-9 w-full text-center"
+	                />
 	              </label>
 	            ))}
 	          </div>
