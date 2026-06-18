@@ -75,10 +75,10 @@ type ClawVilleForm = {
   species: typeof CLAWVILLE_SPECIES_OPTIONS[number]['value'];
   personality: string;
   personalityPreset: typeof CLAWVILLE_PERSONALITY_PRESETS[number]['value'];
-  hp: number;
-  attack: number;
-  defense: number;
-  speed: number;
+  hp: string;
+  attack: string;
+  defense: string;
+  speed: string;
 };
 
 function normalizeClawVilleSpecies(value: string | null | undefined): ClawVilleForm['species'] {
@@ -91,6 +91,19 @@ export function clampClawVilleStatValue(key: ClawVilleStatKey, value: number): n
   const limit = CLAWVILLE_STAT_LIMITS[key];
   const rounded = Number.isFinite(value) ? Math.round(value) : limit.min;
   return Math.min(limit.max, Math.max(limit.min, rounded));
+}
+
+export function sanitizeClawVilleStatInput(key: ClawVilleStatKey, rawValue: string): string {
+  const digits = rawValue.replace(/\D/g, '');
+  if (!digits) return '';
+  const parsed = Number.parseInt(digits, 10);
+  if (!Number.isFinite(parsed)) return '';
+  return String(Math.min(CLAWVILLE_STAT_LIMITS[key].max, parsed));
+}
+
+export function coerceClawVilleStatInputValue(key: ClawVilleStatKey, rawValue: string): number {
+  const sanitized = sanitizeClawVilleStatInput(key, rawValue);
+  return clampClawVilleStatValue(key, sanitized ? Number.parseInt(sanitized, 10) : Number.NaN);
 }
 
 export function describeClawVilleLaunchError(error: string, code?: string): string {
@@ -144,10 +157,10 @@ export function ClawVilleWalletPanel({ agentId }: { agentId: string }) {
     species: 'phanes',
     personality: '',
     personalityPreset: 'custom',
-    hp: 100,
-    attack: 12,
-    defense: 10,
-    speed: 12,
+    hp: '100',
+    attack: '12',
+    defense: '10',
+    speed: '12',
   });
 
   const load = useCallback(async () => {
@@ -181,10 +194,10 @@ export function ClawVilleWalletPanel({ agentId }: { agentId: string }) {
     ...(form.species.trim() ? { species: form.species.trim() } : {}),
     ...(form.personality.trim() ? { personality: form.personality.trim() } : {}),
     stats: {
-      hp: form.hp,
-      attack: form.attack,
-      defense: form.defense,
-      speed: form.speed,
+      hp: coerceClawVilleStatInputValue('hp', form.hp),
+      attack: coerceClawVilleStatInputValue('attack', form.attack),
+      defense: coerceClawVilleStatInputValue('defense', form.defense),
+      speed: coerceClawVilleStatInputValue('speed', form.speed),
     },
   }), [form]);
 
@@ -284,12 +297,19 @@ export function ClawVilleWalletPanel({ agentId }: { agentId: string }) {
 
   const registration = config?.registration;
 
-  const setStat = (key: ClawVilleStatKey, value: number) => {
-    setForm((current) => ({ ...current, [key]: clampClawVilleStatValue(key, value) }));
+  const setStatInput = (key: ClawVilleStatKey, value: string) => {
+    setForm((current) => ({ ...current, [key]: sanitizeClawVilleStatInput(key, value) }));
+  };
+
+  const commitStatInput = (key: ClawVilleStatKey, value: string) => {
+    setForm((current) => ({ ...current, [key]: String(coerceClawVilleStatInputValue(key, value)) }));
   };
 
   const adjustStat = (key: ClawVilleStatKey, delta: number) => {
-    setForm((current) => ({ ...current, [key]: clampClawVilleStatValue(key, current[key] + delta) }));
+    setForm((current) => ({
+      ...current,
+      [key]: String(clampClawVilleStatValue(key, coerceClawVilleStatInputValue(key, current[key]) + delta)),
+    }));
   };
 
   const selectPersonalityPreset = (value: ClawVilleForm['personalityPreset']) => {
@@ -458,14 +478,13 @@ export function ClawVilleWalletPanel({ agentId }: { agentId: string }) {
 	                    <Minus size={13} />
 	                  </button>
 	                  <input
-	                    type="number"
+	                    type="text"
 	                    inputMode="numeric"
-	                    min={CLAWVILLE_STAT_LIMITS[key].min}
-	                    max={CLAWVILLE_STAT_LIMITS[key].max}
-	                    step={CLAWVILLE_STAT_LIMITS[key].step}
+	                    pattern="[0-9]*"
+	                    title={`${CLAWVILLE_STAT_LIMITS[key].min}-${CLAWVILLE_STAT_LIMITS[key].max}`}
 	                    value={form[key]}
-	                    onChange={(event) => setStat(key, Number(event.target.value))}
-	                    onBlur={(event) => setStat(key, Number(event.target.value))}
+	                    onChange={(event) => setStatInput(key, event.target.value)}
+	                    onBlur={(event) => commitStatInput(key, event.target.value)}
 	                    className="input h-9 w-full text-center"
 	                  />
 	                  <button
