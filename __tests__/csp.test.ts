@@ -65,5 +65,16 @@ describe('CSP', () => {
     const csp = buildCsp('testnonce', false);
 
     expect(getDirective(csp, 'connect-src')).toContain('http://172.29.246.51:3011');
+    expect(getDirective(csp, 'connect-src')).toContain('ws://172.29.246.51:3011');
+  });
+
+  it('allows the configured local API origin in development', () => {
+    vi.stubEnv('NODE_ENV', 'development');
+    vi.stubEnv('NEXT_PUBLIC_API_URL', 'http://localhost:3101');
+
+    const csp = buildCsp('testnonce', false);
+
+    expect(getDirective(csp, 'connect-src')).toContain('http://localhost:3101');
+    expect(getDirective(csp, 'connect-src')).toContain('ws://localhost:3101');
   });
 });

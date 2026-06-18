@@ -13,7 +13,11 @@ function configuredApiConnectSource(): string {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   if (!apiUrl) return '';
   try {
-    return ` ${new URL(apiUrl).origin}`;
+    const url = new URL(apiUrl);
+    const ws = process.env.NODE_ENV === 'development'
+      ? ` ${url.protocol === 'https:' ? 'wss' : 'ws'}://${url.host}`
+      : '';
+    return ` ${url.origin}${ws}`;
   } catch {
     return '';
   }
