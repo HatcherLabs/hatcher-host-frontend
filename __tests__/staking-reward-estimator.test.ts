@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { estimateStakingRewards } from '@/lib/staking-reward-estimator';
+import {
+  estimateActiveStakeRewards,
+  estimateStakingRewards,
+} from '@/lib/staking-reward-estimator';
 import type { StakingPoolConfig } from '@/lib/api';
 
 function stakingPool(overrides: Partial<StakingPoolConfig> = {}): StakingPoolConfig {
@@ -83,5 +86,43 @@ describe('staking reward estimator', () => {
     expect(estimateStakingRewards(pool, -1)).toBeNull();
     expect(estimateStakingRewards(pool, Number.NaN)).toBeNull();
     expect(estimateStakingRewards(null, 1_000_000)).toBeNull();
+  });
+
+  it('estimates active stake rewards from the current pool total', () => {
+    const estimate = estimateActiveStakeRewards(stakingPool({
+      totalStakedHatcher: 10_000_000,
+    }), 1_000_000);
+
+    expect(estimate).toMatchObject({
+      stakeHatcher: 1_000_000,
+      poolTotalHatcher: 10_000_000,
+      rewardBudgetForLock: 375_000,
+      estimatedHatcherRewards: 37_500,
+    });
+    expect(estimate?.poolShareFraction).toBeCloseTo(0.1);
+    expect(estimate?.poolSharePercent).toBeCloseTo(10);
+  });
+
+  it('uses the weekly budget when estimating active 7 day stakes', () => {
+    const estimate = estimateActiveStakeRewards(stakingPool({
+      key: '7d',
+      label: '7 days',
+      durationDays: 7,
+      monthlyRewardBudgetHatcher: 250_000,
+      weeklyRewardBudgetHatcher: 57_692,
+      totalStakedHatcher: 2_000_000,
+    }), 1_000_000);
+
+    expect(estimate?.estimatedHatcherRewards).toBe(28_846);
+    expect(estimate?.poolSharePercent).toBe(50);
+  });
+
+  it('does not estimate active stake rewards without a live pool total', () => {
+    const pool = stakingPool({ totalStakedHatcher: 0 });
+
+    expect(estimateActiveStakeRewards(pool, 1_000_000)).toBeNull();
+    expect(estimateActiveStakeRewards(stakingPool(), 0)).toBeNull();
+    expect(estimateActiveStakeRewards(stakingPool(), Number.NaN)).toBeNull();
+    expect(estimateActiveStakeRewards(null, 1_000_000)).toBeNull();
   });
 });

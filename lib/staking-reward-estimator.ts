@@ -12,6 +12,15 @@ export type StakingRewardEstimate = {
   estimatedAprAfterStake: number;
 };
 
+export type ActiveStakeRewardEstimate = {
+  stakeHatcher: number;
+  poolTotalHatcher: number;
+  poolShareFraction: number;
+  poolSharePercent: number;
+  rewardBudgetForLock: number;
+  estimatedHatcherRewards: number;
+};
+
 function rewardBudgetForLock(pool: StakingPoolConfig): number {
   if (pool.key === '7d') return pool.weeklyRewardBudgetHatcher;
   return pool.monthlyRewardBudgetHatcher * (pool.durationDays / 30);
@@ -41,5 +50,25 @@ export function estimateStakingRewards(
     estimatedHatcherRewards: rewardBudget * poolShareFraction,
     estimatedAiCredits: Math.floor((amountHatcher / 1_000_000) * pool.aiCreditsPerDayPerMillion * pool.durationDays),
     estimatedAprAfterStake: (pool.monthlyRewardBudgetHatcher * 12 / poolTotalAfterStake) * 100,
+  };
+}
+
+export function estimateActiveStakeRewards(
+  pool: StakingPoolConfig | null | undefined,
+  stakeHatcher: number,
+): ActiveStakeRewardEstimate | null {
+  if (!pool || !Number.isFinite(stakeHatcher) || stakeHatcher <= 0) return null;
+  if (!Number.isFinite(pool.totalStakedHatcher) || pool.totalStakedHatcher <= 0) return null;
+
+  const poolTotalHatcher = pool.totalStakedHatcher;
+  const poolShareFraction = Math.min(1, stakeHatcher / poolTotalHatcher);
+  const rewardBudget = rewardBudgetForLock(pool);
+  return {
+    stakeHatcher,
+    poolTotalHatcher,
+    poolShareFraction,
+    poolSharePercent: poolShareFraction * 100,
+    rewardBudgetForLock: rewardBudget,
+    estimatedHatcherRewards: rewardBudget * poolShareFraction,
   };
 }
