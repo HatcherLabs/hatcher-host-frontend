@@ -11,7 +11,7 @@ import {
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import type { WalletContextState } from '@solana/wallet-adapter-react';
-import { ArrowUpRight, Coins, Lock, RefreshCcw, Sparkles, Wallet } from 'lucide-react';
+import { ArrowUpRight, ChevronDown, Coins, Lock, RefreshCcw, Sparkles, Wallet } from 'lucide-react';
 import { Link, useRouter } from '@/i18n/routing';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
@@ -29,6 +29,7 @@ import {
   estimateActiveStakeRewards,
   estimateStakingRewards,
 } from '@/lib/staking-reward-estimator';
+import { groupActiveStakesByPool } from '@/lib/staking-active-stakes';
 import { isWalletTrustRevokedError, isWalletUserCancellationError } from '@/lib/wallet-errors';
 import { buildPhantomBrowseUrl } from '@/lib/wallet-links';
 import {
@@ -300,9 +301,10 @@ export function StakingClient() {
     if (!config?.pools.length) return null;
     return config.pools.find((pool) => pool.key === selectedPoolKey) ?? config.pools[0] ?? null;
   }, [config, selectedPoolKey]);
-  const stakingPoolsByKey = useMemo(() => new Map(
-    (config?.pools ?? []).map((pool) => [pool.key, pool]),
-  ), [config?.pools]);
+  const activeStakeGroups = useMemo(() => groupActiveStakesByPool(
+    summary?.activeStakes ?? [],
+    config?.pools ?? [],
+  ), [config?.pools, summary?.activeStakes]);
 
   const rewardSplitSummary = useMemo(() => {
     if (!config?.pools.length) return null;
@@ -1155,6 +1157,9 @@ export function StakingClient() {
                 <p className="mt-1 text-sm text-[var(--text-muted)]">
                   Reward estimates use current pool size and configured lock budgets. Streamflow top-ups and new stakes can change them.
                 </p>
+                <p className="mt-1 text-sm text-[var(--text-muted)]">
+                  Positions are grouped by pool for readability; each Streamflow position keeps its own unlock date and actions.
+                </p>
                 {connectedWalletAddress && linkedWalletAddress && !walletMatchesAccount && (
                   <p className="mt-2 text-sm font-medium text-amber-400">
                     Link the connected wallet before staking if you want AI Credits on this account.
@@ -1183,94 +1188,175 @@ export function StakingClient() {
               </div>
             </div>
 
-            <div className="divide-y divide-[var(--border-default)]">
-              {(summary?.activeStakes ?? []).length === 0 ? (
+            <div>
+              {activeStakeGroups.length === 0 ? (
                 <div className="p-6 text-sm text-[var(--text-muted)]">
                   No active Streamflow stakes found for your linked Solana wallet.
                 </div>
               ) : (
-                summary?.activeStakes.map((stake) => {
-                  const hatcherStatus = hatcherRewardStatuses[stake.stakeEntryAddress];
-                  const hatcherClaimable = canClaimHatcherReward(hatcherStatus);
-                  const stakeUnlocked = isStakeUnlocked(stake.unlockAt);
-                  const hatcherClaimDisabled = Boolean(claimingHatcherStake || unstakingStake) || !hatcherClaimable;
-                  const unstakeDisabled = Boolean(claimingHatcherStake || unstakingStake) || !stakeUnlocked;
-                  const activeStakeEstimate = estimateActiveStakeRewards(
-                    stakingPoolsByKey.get(stake.poolKey),
-                    stake.stakedHatcher,
-                  );
+                <div className="space-y-3 p-4 sm:p-5">
+                  {activeStakeGroups.map((group) => {
+                    const claimableHatcherPositionCount = group.stakes.filter((stake) => (
+                      canClaimHatcherReward(hatcherRewardStatuses[stake.stakeEntryAddress])
+                    )).length;
+                    const unlockedStakeCount = group.stakes.filter((stake) => isStakeUnlocked(stake.unlockAt)).length;
 
-                  return (
-                    <div key={stake.stakeEntryAddress} className="grid min-w-0 gap-3 p-5 md:grid-cols-6">
-                      <div className="min-w-0">
-                        <p className="text-xs text-[var(--text-muted)]">Pool</p>
-                        <p className="font-semibold">{stake.poolKey}</p>
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-xs text-[var(--text-muted)]">Staked</p>
-                        <p className="break-words font-semibold">{formatNumber(stake.stakedHatcher, 2)} HATCHER</p>
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-xs text-[var(--text-muted)]">Unlock</p>
-                        <p className="font-semibold">{formatDate(stake.unlockAt)}</p>
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-xs text-[var(--text-muted)]">AI Credits</p>
-                        <p className="font-semibold">{formatNumber(stake.claimableAiCredits)} claimable</p>
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-xs text-[var(--text-muted)]">HATCHER rewards</p>
-                        <p className="font-semibold">{hatcherRewardStatusLabel(hatcherStatus)}</p>
-                        <p className="mt-2 text-xs text-[var(--text-muted)]">Est. full-lock rewards</p>
-                        <p className="break-words text-sm font-semibold text-[var(--text-primary)]">
-                          {activeStakeEstimate
-                            ? `~${formatStakingTokenAmount(activeStakeEstimate.estimatedHatcherRewards, 2)}`
-                            : '-'}
-                        </p>
-                        <p className="mt-1 text-xs text-[var(--text-muted)]">
-                          {activeStakeEstimate
-                            ? `${formatEstimatePercent(activeStakeEstimate.poolSharePercent)} pool share`
-                            : 'Pool total unavailable'}
-                        </p>
-                        {hatcherStatus?.error && (
-                          <p className="mt-1 text-xs text-amber-400">{hatcherStatus.error}</p>
-                        )}
-                      </div>
-                      <div className="flex min-w-0 flex-col items-stretch gap-2 md:items-end">
-                        <button
-                          type="button"
-                          onClick={() => void claimHatcherRewards(stake)}
-                          disabled={hatcherClaimDisabled}
-                          title={hatcherRewardClaimReason(hatcherStatus)}
-                          className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-2 text-xs font-semibold text-[var(--text-primary)] hover:bg-[var(--bg-base)] disabled:cursor-not-allowed disabled:opacity-50 md:w-auto"
-                        >
-                          <Coins size={14} aria-hidden />
-                          {claimingHatcherStake === stake.stakeEntryAddress
-                            ? 'Claiming'
-                            : hatcherStatus?.loading
-                              ? 'Checking'
-                              : hatcherClaimable
-                                ? 'Claim HATCHER'
-                              : 'No rewards'}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => void unstakeHatcherStake(stake)}
-                          disabled={unstakeDisabled}
-                          title={stakeUnlocked ? 'Unstake unlocked HATCHER and available rewards' : `Locked until ${formatDate(stake.unlockAt)}`}
-                          className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/15 disabled:cursor-not-allowed disabled:opacity-50 md:w-auto"
-                        >
-                          {stakeUnlocked ? <ArrowUpRight size={14} aria-hidden /> : <Lock size={14} aria-hidden />}
-                          {unstakingStake === stake.stakeEntryAddress
-                            ? 'Unstaking'
-                            : stakeUnlocked
-                              ? 'Unstake'
-                              : 'Locked'}
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })
+                    return (
+                      <details
+                        key={group.poolKey}
+                        className="group overflow-hidden rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)]"
+                      >
+                        <summary className="flex cursor-pointer list-none flex-col gap-4 p-4 transition hover:bg-[var(--bg-elevated)] sm:p-5 [&::-webkit-details-marker]:hidden">
+                          <div className="flex min-w-0 items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <p className="text-xs font-semibold uppercase text-[var(--text-muted)]">Pool</p>
+                              <div className="mt-1 flex min-w-0 flex-wrap items-center gap-2">
+                                <h3 className="break-words text-xl font-semibold text-[var(--text-primary)]">
+                                  {group.poolLabel}
+                                </h3>
+                                <span className="rounded-lg border border-[var(--border-default)] px-2 py-0.5 text-xs font-semibold text-[var(--text-muted)]">
+                                  {group.positionCount === 1 ? '1 position' : `${group.positionCount} positions`}
+                                </span>
+                                {unlockedStakeCount > 0 && (
+                                  <span className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-xs font-semibold text-emerald-300">
+                                    {unlockedStakeCount === 1 ? '1 unlocked' : `${unlockedStakeCount} unlocked`}
+                                  </span>
+                                )}
+                                {claimableHatcherPositionCount > 0 && (
+                                  <span className="rounded-lg border border-[var(--accent)]/30 bg-[var(--accent)]/10 px-2 py-0.5 text-xs font-semibold text-[var(--accent)]">
+                                    {claimableHatcherPositionCount === 1
+                                      ? '1 HATCHER claimable'
+                                      : `${claimableHatcherPositionCount} HATCHER claimable`}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <ChevronDown
+                              size={18}
+                              aria-hidden
+                              className="mt-1 shrink-0 text-[var(--text-muted)] transition group-open:rotate-180"
+                            />
+                          </div>
+
+                          <div className="grid min-w-0 grid-cols-2 gap-3 text-sm sm:grid-cols-3 xl:grid-cols-5">
+                            <div className="min-w-0">
+                              <p className="text-xs text-[var(--text-muted)]">Total staked</p>
+                              <p className="break-words font-semibold text-[var(--text-primary)]">
+                                {formatStakingTokenAmount(group.totalStakedHatcher, 2)}
+                              </p>
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-xs text-[var(--text-muted)]">Est. rewards</p>
+                              <p className="break-words font-semibold text-[var(--text-primary)]">
+                                {group.estimatedHatcherRewards !== null
+                                  ? `~${formatStakingTokenAmount(group.estimatedHatcherRewards, 2)}`
+                                  : '-'}
+                              </p>
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-xs text-[var(--text-muted)]">Pool share</p>
+                              <p className="font-semibold text-[var(--text-primary)]">
+                                {group.poolSharePercent !== null
+                                  ? formatEstimatePercent(group.poolSharePercent)
+                                  : '-'}
+                              </p>
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-xs text-[var(--text-muted)]">Next unlock</p>
+                              <p className="font-semibold text-[var(--text-primary)]">
+                                {group.nextUnlockAt ? formatDate(group.nextUnlockAt) : 'Unknown'}
+                              </p>
+                            </div>
+                            <div className="col-span-2 min-w-0 sm:col-span-1">
+                              <p className="text-xs text-[var(--text-muted)]">AI Credits</p>
+                              <p className="font-semibold text-[var(--text-primary)]">
+                                {formatNumber(group.totalClaimableAiCredits)} claimable
+                              </p>
+                            </div>
+                          </div>
+                        </summary>
+
+                        <div className="divide-y divide-[var(--border-default)] border-t border-[var(--border-default)]">
+                          {group.stakes.map((stake) => {
+                            const hatcherStatus = hatcherRewardStatuses[stake.stakeEntryAddress];
+                            const hatcherClaimable = canClaimHatcherReward(hatcherStatus);
+                            const stakeUnlocked = isStakeUnlocked(stake.unlockAt);
+                            const hatcherClaimDisabled = Boolean(claimingHatcherStake || unstakingStake) || !hatcherClaimable;
+                            const unstakeDisabled = Boolean(claimingHatcherStake || unstakingStake) || !stakeUnlocked;
+                            const activeStakeEstimate = estimateActiveStakeRewards(group.pool, stake.stakedHatcher);
+
+                            return (
+                              <div key={stake.stakeEntryAddress} className="grid min-w-0 gap-3 p-4 md:grid-cols-5">
+                                <div className="min-w-0">
+                                  <p className="text-xs text-[var(--text-muted)]">Staked</p>
+                                  <p className="break-words font-semibold">{formatNumber(stake.stakedHatcher, 2)} HATCHER</p>
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="text-xs text-[var(--text-muted)]">Unlock</p>
+                                  <p className="font-semibold">{formatDate(stake.unlockAt)}</p>
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="text-xs text-[var(--text-muted)]">AI Credits</p>
+                                  <p className="font-semibold">{formatNumber(stake.claimableAiCredits)} claimable</p>
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="text-xs text-[var(--text-muted)]">HATCHER rewards</p>
+                                  <p className="font-semibold">{hatcherRewardStatusLabel(hatcherStatus)}</p>
+                                  <p className="mt-2 text-xs text-[var(--text-muted)]">Est. full-lock rewards</p>
+                                  <p className="break-words text-sm font-semibold text-[var(--text-primary)]">
+                                    {activeStakeEstimate
+                                      ? `~${formatStakingTokenAmount(activeStakeEstimate.estimatedHatcherRewards, 2)}`
+                                      : '-'}
+                                  </p>
+                                  <p className="mt-1 text-xs text-[var(--text-muted)]">
+                                    {activeStakeEstimate
+                                      ? `${formatEstimatePercent(activeStakeEstimate.poolSharePercent)} pool share`
+                                      : 'Pool total unavailable'}
+                                  </p>
+                                  {hatcherStatus?.error && (
+                                    <p className="mt-1 text-xs text-amber-400">{hatcherStatus.error}</p>
+                                  )}
+                                </div>
+                                <div className="flex min-w-0 flex-col items-stretch gap-2 md:items-end">
+                                  <button
+                                    type="button"
+                                    onClick={() => void claimHatcherRewards(stake)}
+                                    disabled={hatcherClaimDisabled}
+                                    title={hatcherRewardClaimReason(hatcherStatus)}
+                                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-2 text-xs font-semibold text-[var(--text-primary)] hover:bg-[var(--bg-base)] disabled:cursor-not-allowed disabled:opacity-50 md:w-auto"
+                                  >
+                                    <Coins size={14} aria-hidden />
+                                    {claimingHatcherStake === stake.stakeEntryAddress
+                                      ? 'Claiming'
+                                      : hatcherStatus?.loading
+                                        ? 'Checking'
+                                        : hatcherClaimable
+                                          ? 'Claim HATCHER'
+                                          : 'No rewards'}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => void unstakeHatcherStake(stake)}
+                                    disabled={unstakeDisabled}
+                                    title={stakeUnlocked ? 'Unstake unlocked HATCHER and available rewards' : `Locked until ${formatDate(stake.unlockAt)}`}
+                                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/15 disabled:cursor-not-allowed disabled:opacity-50 md:w-auto"
+                                  >
+                                    {stakeUnlocked ? <ArrowUpRight size={14} aria-hidden /> : <Lock size={14} aria-hidden />}
+                                    {unstakingStake === stake.stakeEntryAddress
+                                      ? 'Unstaking'
+                                      : stakeUnlocked
+                                        ? 'Unstake'
+                                        : 'Locked'}
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </details>
+                    );
+                  })}
+                </div>
               )}
             </div>
           </div>
