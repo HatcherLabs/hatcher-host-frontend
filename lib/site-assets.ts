@@ -1,4 +1,4 @@
-export const SITE_VERSION = '1.4.18';
+export const SITE_VERSION = '1.4.19';
 export const DEFAULT_SITE_URL = 'https://hatcher.host';
 
 export const ICON_PATHS = {
