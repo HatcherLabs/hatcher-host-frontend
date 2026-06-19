@@ -9,8 +9,19 @@ const GOOGLE_ADS_HOSTS = [
 
 const MIRARI_HOST = 'https://entermirari.cloud';
 
+function configuredApiConnectSource(): string {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (!apiUrl) return '';
+  try {
+    return ` ${new URL(apiUrl).origin}`;
+  } catch {
+    return '';
+  }
+}
+
 export function buildCsp(nonce: string, isEmbedRoute: boolean): string {
   const isDev = process.env.NODE_ENV === 'development';
+  const apiConnect = configuredApiConnectSource();
   const devConnect = isDev
     ? ' http://localhost:3001 ws://localhost:3001 http://localhost:8080 http://127.0.0.1:3001 ws://127.0.0.1:3001 http://127.0.0.1:8080'
     : '';
@@ -31,7 +42,7 @@ export function buildCsp(nonce: string, isEmbedRoute: boolean): string {
     "font-src 'self' https://fonts.gstatic.com",
     `img-src 'self' data: blob: https: ${MIRARI_HOST} ${GOOGLE_ADS_HOSTS}`,
     `media-src 'self' data: blob: https: ${GOOGLE_ADS_HOSTS}`,
-    `connect-src 'self' blob: https://api.hatcher.host wss://api.hatcher.host ${MIRARI_HOST} https://*.solana.com wss://*.solana.com https://*.helius-rpc.com wss://*.helius-rpc.com https://api.dexscreener.com https://threejs.org ${GOOGLE_ADS_HOSTS}${devConnect}`,
+    `connect-src 'self' blob: https://api.hatcher.host wss://api.hatcher.host ${MIRARI_HOST} https://*.solana.com wss://*.solana.com https://*.helius-rpc.com wss://*.helius-rpc.com https://api.dexscreener.com https://threejs.org ${GOOGLE_ADS_HOSTS}${apiConnect}${devConnect}`,
     `frame-src 'self' ${MIRARI_HOST} https://www.tradingview.com https://s.tradingview.com https://tradingview.com https://www.tradingview-widget.com https://www.geckoterminal.com https://geckoterminal.com https://dexscreener.com https://www.dexscreener.com`,
     "base-uri 'self'",
     "form-action 'self'",
