@@ -5,6 +5,11 @@ import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 import {
+  APP_STORE_URL,
+  GOOGLE_PLAY_URL,
+  SOLANA_MOBILE_URL,
+} from '@/lib/mobile-app-links';
+import {
   ArrowRight,
   Bot,
   Building2,
@@ -23,10 +28,6 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import styles from './page.module.css';
-
-const PLAY_STORE_URL =
-  'https://play.google.com/store/apps/details?id=host.hatcher.app';
-const SOLANA_MOBILE_URL = 'https://solanamobile.com/';
 
 type Tone = 'copper' | 'cyan' | 'amber' | 'rose' | 'violet' | 'blue';
 type Visual =
@@ -148,15 +149,15 @@ const FEATURES: Feature[] = [
   {
     id: 'mobile',
     kicker: 'Mobile',
-    title: 'Android and Solana Mobile',
-    short: 'Hatcher in your pocket, with app-store surfaces.',
+    title: 'iOS, Android, and Solana Mobile',
+    short: 'Hatcher in your pocket, with App Store and mobile surfaces.',
     detail:
-      'The mobile experience gives users a compact way to monitor agents, open city entry points, jump into rooms, and chat with running workers. Hatcher is available through Google Play and prepared for Solana Mobile distribution.',
+      'The mobile experience gives users a compact way to monitor agents, open city entry points, jump into rooms, and chat with running workers. Hatcher is available through the App Store and Google Play, with Solana Mobile distribution prepared.',
     bullets: [
+      'App Store',
       'Google Play',
       'Solana Mobile',
       'Agent overview',
-      'Room entry points',
     ],
     icon: Smartphone,
     tone: 'blue',
@@ -229,6 +230,7 @@ const SURFACES = [
   '3D city',
   '3D building',
   '3D room',
+  'iOS app',
   'Android app',
   'Solana Mobile',
   'Hatcher CLI',
@@ -353,7 +355,7 @@ export default function FeaturesPage() {
         <section className={`${styles.section} ${styles.mobileSection}`}>
           <div className={styles.mobileCopy}>
             <p className={styles.eyebrow}>Mobile access</p>
-            <h2>Agents on web, Android, and Solana Mobile.</h2>
+            <h2>Agents on web, iOS, Android, and Solana Mobile.</h2>
             <p>
               Launch, inspect, and return to active agents from the surfaces
               your users already use. The mobile apps keep the agent experience
@@ -366,7 +368,19 @@ export default function FeaturesPage() {
           >
             <a
               className={styles.storeBadge}
-              href={PLAY_STORE_URL}
+              href={APP_STORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Smartphone aria-hidden />
+              <span>
+                <small>Download on the</small>
+                App Store
+              </span>
+            </a>
+            <a
+              className={styles.storeBadge}
+              href={GOOGLE_PLAY_URL}
               target="_blank"
               rel="noopener noreferrer"
             >
