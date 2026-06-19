@@ -30,6 +30,11 @@ export interface AutrLiveTraderAction {
   caller: string;
   reason: string;
   wallet_pubkey: string | null;
+  execution_status?: 'live_submitted' | 'live_failed' | 'live_skipped' | null;
+  execution_signature?: string | null;
+  execution_solscan_url?: string | null;
+  execution_error?: string | null;
+  execution_updated_at?: string | null;
   sol_delta_sol: string;
   realized_pnl_sol: string;
   cash_after_sol: string;
@@ -155,6 +160,8 @@ export function snapshotActivityKey(snapshot: AutrLiveTraderSnapshot): string {
     snapshot.total_pnl_lamports,
     snapshot.valuation_status,
     latest?.proposal_id ?? 'none',
+    latest?.execution_status ?? 'no-execution',
+    latest?.execution_signature ?? 'no-signature',
   ].join(':');
 }
 

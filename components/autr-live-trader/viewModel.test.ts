@@ -131,6 +131,9 @@ describe('AUTR live trader view model', () => {
         caller: 'alpha_cartel',
         reason: 'Mirrored production signal',
         wallet_pubkey: 'BtGuT8JGrhr7Cf9P7r2K4WDSs5t7FNFRiq3qdcRexcmT',
+        execution_status: 'live_submitted',
+        execution_signature: '3dCnnHDnPDvfRqXfYnBxbTtrt32v5UivRS2aRLtxb5w2ZqFc5JHR5NoAeVDa8W3uJX4kAFj5fNpFXySVJm3CBU9q',
+        execution_solscan_url: 'https://solscan.io/tx/3dCnnHDnPDvfRqXfYnBxbTtrt32v5UivRS2aRLtxb5w2ZqFc5JHR5NoAeVDa8W3uJX4kAFj5fNpFXySVJm3CBU9q',
         sol_delta_sol: '-0.001000000',
         realized_pnl_sol: '0.000000000',
         cash_after_sol: '1.999000000',
@@ -139,6 +142,8 @@ describe('AUTR live trader view model', () => {
 
     expect(snapshotActivityKey(updated)).not.toBe(idleKey);
     expect(snapshotActivityKey(updated)).toContain('e5ea8c9e-0958-4d29-83b7-f8c042ff3c4a');
+    expect(snapshotActivityKey(updated)).toContain('live_submitted');
+    expect(snapshotActivityKey(updated)).toContain('3dCnnHDnPDvfRqXfYnBxbTtrt32v5UivRS2aRLtxb5w2ZqFc5JHR5NoAeVDa8W3uJX4kAFj5fNpFXySVJm3CBU9q');
   });
 
   it('changes the activity key when live valuation changes without a new signal', () => {

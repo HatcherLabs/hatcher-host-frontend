@@ -363,6 +363,7 @@ function ActionRow({ action }: { action: AutrLiveTraderAction }) {
               <span className={`rounded-md border px-2 py-0.5 text-[11px] font-semibold ${toneStyles[tone]}`}>
                 {actionStatusLabel(action.status)}
               </span>
+              <ExecutionBadge action={action} />
             </div>
             <p className="mt-1 line-clamp-2 text-xs leading-5 text-[var(--text-secondary)]">{action.reason}</p>
           </div>
@@ -376,6 +377,50 @@ function ActionRow({ action }: { action: AutrLiveTraderAction }) {
       <div className="mt-3 truncate font-mono text-xs text-[var(--text-dim)]">{shortAddress(action.token_mint, 8, 8)}</div>
     </div>
   );
+}
+
+function ExecutionBadge({ action }: { action: AutrLiveTraderAction }) {
+  if (action.execution_signature && action.execution_solscan_url) {
+    const isFailed = action.execution_status === 'live_failed';
+    return (
+      <a
+        href={action.execution_solscan_url}
+        target="_blank"
+        rel="noreferrer"
+        title={action.execution_error ?? action.execution_signature}
+        className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-semibold ${
+          isFailed ? toneStyles.danger : toneStyles.success
+        }`}
+      >
+        {isFailed ? 'TX failed' : 'TX'} {shortAddress(action.execution_signature, 4, 6)}
+        <ExternalLink className="h-3 w-3" />
+      </a>
+    );
+  }
+
+  if (action.execution_status === 'live_failed') {
+    return (
+      <span
+        title={action.execution_error ?? undefined}
+        className={`rounded-md border px-2 py-0.5 text-[11px] font-semibold ${toneStyles.danger}`}
+      >
+        TX failed
+      </span>
+    );
+  }
+
+  if (action.execution_status === 'live_skipped') {
+    return (
+      <span
+        title={action.execution_error ?? undefined}
+        className={`rounded-md border px-2 py-0.5 text-[11px] font-semibold ${toneStyles.warning}`}
+      >
+        TX skipped
+      </span>
+    );
+  }
+
+  return null;
 }
 
 function DetailLine({ label, value }: { label: string; value: string }) {
