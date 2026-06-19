@@ -595,6 +595,36 @@ export interface OrbisCallResponse {
   data: unknown;
 }
 
+export interface Mpp32AgentSettings {
+  enabled: boolean;
+  dailyBudgetUsd: number;
+  maxPerCallUsd: number;
+  authorityScope: string[];
+}
+
+export interface Mpp32ConfigStatus {
+  enabled: boolean;
+  baseUrl: string;
+  settlement: "x402";
+  agtpIdentityMode: "x402_only" | "hmac_sha256";
+  payerConfigured: boolean;
+  payerSource: "mpp32" | "xona" | "conduit" | "none";
+  network: string;
+  maxPerCallUsdc: number;
+  maxResponseBytes: number;
+  partnerHeaders: {
+    source: "X-Partner-Source";
+    callerId: "X-Partner-Caller-Id";
+  };
+  settings: Mpp32AgentSettings;
+}
+
+export interface Mpp32ConfigBody {
+  enabled?: boolean;
+  dailyBudgetUsd?: number;
+  maxPerCallUsd?: number;
+}
+
 export type MirariRuntime = "hermes" | "openclaw";
 export type MirariSignalKind = "drift" | "contradiction" | "skill_misfire" | "focus_hit" | "judge_score";
 export type MirariDreamMode = "stress_test" | "replay" | "consolidate";
