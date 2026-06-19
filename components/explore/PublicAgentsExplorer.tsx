@@ -169,7 +169,7 @@ function PublicAgentCard({
             <div className="mt-2 flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-md bg-[var(--bg-muted)] px-2 py-1 text-xs font-medium text-[var(--text-secondary)]">
                 <MessageSquare className="h-3 w-3" />
-                {copy.publicChat}
+                {agent.capabilityLabel ?? copy.publicChat}
               </span>
               <span
                 className="inline-flex items-center gap-1.5 rounded-md bg-[var(--bg-muted)] px-2 py-1 text-xs font-medium text-[var(--text-secondary)]"
@@ -201,7 +201,7 @@ function PublicAgentCard({
             className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-md bg-[var(--color-accent)] px-4 text-sm font-semibold text-[var(--bg-base)] transition-opacity hover:opacity-90"
           >
             <MessageSquare className="h-4 w-4" />
-            {copy.chatCta}
+            {agent.ctaLabel ?? copy.chatCta}
           </Link>
         </div>
       </div>

@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
+  AUTR_LIVE_TRADER_AGENT,
   filterExploreAgents,
   getExploreStats,
+  publicAgentHref,
   sortExploreAgents,
   type PublicExploreAgent,
+  withAutrLiveTraderAgent,
 } from './publicAgents';
 
 function agent(id: string, overrides: Partial<PublicExploreAgent> = {}): PublicExploreAgent {
@@ -71,6 +74,15 @@ describe('public agent explore helpers', () => {
     ]);
   });
 
+  it('keeps priority public agents ahead of high-usage live agents', () => {
+    expect(
+      sortExploreAgents([
+        agent('busy-live', { status: 'running', messageCount: 500 }),
+        agent('priority-live', { status: 'running', messageCount: 0, featuredPriority: 100 }),
+      ]).map((item) => item.id),
+    ).toEqual(['priority-live', 'busy-live']);
+  });
+
   it('summarizes visible public agents for the page header', () => {
     expect(
       getExploreStats([
@@ -78,5 +90,20 @@ describe('public agent explore helpers', () => {
         agent('b', { status: 'sleeping', messageCount: 5 }),
       ]),
     ).toEqual({ total: 2, live: 1, interactions: 17 });
+  });
+
+  it('adds the AUTR live trader card once and routes it to the custom dashboard', () => {
+    const agents = withAutrLiveTraderAgent([agent('regular')]);
+
+    expect(agents[0]).toMatchObject({
+      id: AUTR_LIVE_TRADER_AGENT.id,
+      name: 'AUTR Live Trader',
+      framework: 'autr',
+      status: 'running',
+      capabilityLabel: 'Live trader',
+      ctaLabel: 'View trader',
+    });
+    expect(publicAgentHref(agents[0])).toBe('/autr-live-trader');
+    expect(withAutrLiveTraderAgent(agents).filter((item) => item.id === AUTR_LIVE_TRADER_AGENT.id)).toHaveLength(1);
   });
 });
