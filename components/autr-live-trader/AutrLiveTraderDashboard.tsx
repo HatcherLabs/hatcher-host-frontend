@@ -101,7 +101,7 @@ export function AutrLiveTraderDashboard({ initialSnapshot, apiUrl, deployUrl }: 
       ? 'Partial live mark'
       : 'Cost basis fallback';
   const activePositions = snapshot.positions.filter((position) => position.status === 'open');
-  const visiblePositions = activePositions.length > 0 ? activePositions : snapshot.positions.slice(0, 4);
+  const visiblePositions = activePositions;
   const pollSeconds = AUTR_LIVE_POLL_INTERVAL_MS / 1000;
 
   return (
