@@ -940,6 +940,7 @@
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 10px;
+  max-width: 512px;
 }
 
 .storeBadge {

@@ -1,13 +1,15 @@
 // components/landing/v3/parts/SectionHero.tsx
 'use client';
 import { Link } from '@/i18n/routing';
+import {
+  APP_STORE_URL,
+  GOOGLE_PLAY_URL,
+  SOLANA_MOBILE_URL,
+} from '@/lib/mobile-app-links';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { PhosphorButton } from '../shared/PhosphorButton';
 import styles from './SectionHero.module.css';
-
-const GOOGLE_PLAY_URL = 'https://play.google.com/store/apps/details?id=host.hatcher.app';
-const SOLANA_MOBILE_URL = 'https://solanamobile.com/';
 
 export function SectionHero() {
   const t = useTranslations('landingV3.hero');
@@ -42,6 +44,15 @@ export function SectionHero() {
             {t('ctaSignup')}
           </Link>
           <div className={styles.appLinks} aria-label="Mobile app links">
+            <a
+              className={styles.appLink}
+              href={APP_STORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span>{t('ctaAppStoreKicker')}</span>
+              <strong>{t('ctaAppStore')}</strong>
+            </a>
             <a
               className={styles.appLink}
               href={GOOGLE_PLAY_URL}

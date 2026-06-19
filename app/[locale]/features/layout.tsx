@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { buildLanguagesMap } from '@/lib/seo';
 
 export const metadata: Metadata = {
-  title: 'Hatcher Features - AI agents, CLI, mobile, 3D city',
+  title: 'Hatcher Features - AI agents, CLI, iOS, Android, 3D city',
   description:
     'Explore Hatcher features: agent email, 3D city and rooms, skills, CLI, GitHub workflows, mobile apps, and managed OpenClaw or Hermes agents.',
   keywords: [
@@ -11,6 +11,9 @@ export const metadata: Metadata = {
     'OpenClaw',
     'Hermes',
     'agent CLI',
+    'iOS app',
+    'App Store',
+    'Android app',
     'Solana Mobile',
     'AI agent hosting',
   ],
