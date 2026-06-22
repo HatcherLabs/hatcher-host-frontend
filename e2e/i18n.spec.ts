@@ -75,8 +75,23 @@ test.describe('i18n', () => {
     const values = await Promise.all(
       hreflangs.map((l) => l.getAttribute('hreflang')),
     );
-    // buildLanguagesMap('/pricing') emits all 5 locales + x-default
-    expect(values).toEqual(expect.arrayContaining(['en', 'zh', 'de', 'fr', 'ro']));
+    // buildLanguagesMap('/pricing') emits all supported locales + x-default
+    expect(values).toEqual(
+      expect.arrayContaining([
+        'en',
+        'zh',
+        'de',
+        'fr',
+        'ro',
+        'es',
+        'pt-BR',
+        'id',
+        'vi',
+        'ja',
+        'hi',
+        'tr',
+      ]),
+    );
   });
 
   test('og:locale matches the locale on /zh (landing)', async ({ page }) => {
@@ -118,9 +133,22 @@ test.describe('i18n', () => {
     expect(res?.status()).toBe(404);
   });
 
-  test('all 5 locales render pricing successfully', async ({ page }) => {
+  test('all supported locales render pricing successfully', async ({ page }) => {
     // en uses no prefix (localePrefix: 'as-needed'); others use /<locale>/pricing
-    const routes = ['/pricing', '/zh/pricing', '/de/pricing', '/fr/pricing', '/ro/pricing'];
+    const routes = [
+      '/pricing',
+      '/zh/pricing',
+      '/de/pricing',
+      '/fr/pricing',
+      '/ro/pricing',
+      '/es/pricing',
+      '/pt-BR/pricing',
+      '/id/pricing',
+      '/vi/pricing',
+      '/ja/pricing',
+      '/hi/pricing',
+      '/tr/pricing',
+    ];
     for (const route of routes) {
       const res = await page.goto(route, { waitUntil: 'domcontentloaded' });
       expect(res?.status(), `status for ${route}`).toBe(200);

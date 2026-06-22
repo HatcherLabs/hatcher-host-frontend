@@ -1,0 +1,2594 @@
+{
+  "common": {
+    "appName": "Hatcher",
+    "tagline": "マネージドAIエージェントホスティング ·クリプトネイティブ"
+  },
+  "nav": {
+    "pricing": "価格設定",
+    "docs": "ドキュメンタリー",
+    "roadmap": "ロードマップ",
+    "login": "ログイン",
+    "signup": "サインアップ",
+    "frameworks": "フレームワーク",
+    "token": "トークン",
+    "blog": "ブログ",
+    "changelog": "変更ログ",
+    "help": "助けて",
+    "dashboard": "ダッシュボード",
+    "myAgents": "私のエージェントたち",
+    "create": "作成",
+    "city": "都市",
+    "analytics": "分析",
+    "skale": "SKALE 財布",
+    "team": "チーム",
+    "billing": "請求",
+    "settings": "舞台設定",
+    "support": "支援",
+    "logout": "サインアウト",
+    "signIn": "サインイン",
+    "signUp": "登録",
+    "credits": "クレジット",
+    "affiliate": "提携局",
+    "admin": "管理",
+    "adminPanel": "管理パネル",
+    "openNav": "ナビゲーションメニューを開く",
+    "closeNav": "ナビゲーションメニューを閉じる",
+    "affiliateDashboard": "アフィリエイトダッシュボード",
+    "affiliatePending": "審査中の申請書",
+    "affiliateRejected": "アフィリエイトとして再申請してください",
+    "affiliateBecome": "アフィリエイトになる",
+    "userMenu": {
+      "sub_myAgents": "閲覧、編集、デプロイ。",
+      "sub_create": "孵化するエージェントを説明してください。",
+      "sub_analytics": "AI Credits、トークン、トレンド。",
+      "sub_billing": "ティア、アドオン、クレジット。",
+      "sub_wallets": "Solana決済ウォレット。",
+      "sub_team": "メンバーとコラボレーション。",
+      "sub_settings": "プロフィール、APIキー、好み。",
+      "sub_support": "助けてください、医師、連絡してください。",
+      "sub_affiliate": "パートナーへの紹介と報告。",
+      "sub_admin": "ホームの操作。",
+      "sub_signOut": "このデバイスでのセッション終了。",
+      "tierSuffix": "階層"
+    },
+    "groups": {
+      "build": "建設",
+      "explore": "探索",
+      "resources": "資料",
+      "hatchAgentLabel": "ハッチエージェント(チャット)",
+      "hatchAgentSub": "ランタイム、ツール、ワークフローについて説明してください。",
+      "myAgentsLabel": "私のエージェントたち",
+      "myAgentsSub": "ランニングエージェントのためのダッシュボード。",
+      "publicAgentsLabel": "公的代理人",
+      "publicAgentsSub": "コミュニティの担当者と話してみてください。",
+      "featuresLabel": "特徴",
+      "featuresSub": "実行時間、ワークスペース、ツール、ルーム、CLI。",
+      "cityLabel": "Hatcher City",
+      "citySub": "生きたエージェントたちの3Dの世界を歩くようなものです。",
+      "frameworksLabel": "フレームワーク",
+      "frameworksSub": "OpenClaw ·Hermes。",
+      "pricingLabel": "価格設定",
+      "pricingSub": "無料・スターター・長所 ·ビジネス ·創設。",
+      "tokenLabel": "$HATCHER",
+      "tokenSub": "公共料金の支払い、割引、そして焼却整備士。",
+      "stakingLabel": "杭打ち",
+      "stakingSub": "$HATCHER報酬に加えて、さらにAI Credits。",
+      "whitepaperLabel": "ホワイトペーパー",
+      "whitepaperSub": "プラットフォーム、トークン、クレジット、ロードマップ。",
+      "blogLabel": "ブログ",
+      "blogSub": "メモ、リリース、詳細な調査。",
+      "roadmapLabel": "ロードマップ",
+      "roadmapSub": "次に何を出荷するか。",
+      "changelogLabel": "変更ログ",
+      "changelogSub": "何がいつ変わったのか。"
+    },
+    "hatchAgent": "ハッチエージェント"
+  },
+  "notifications": {
+    "heading": "通知",
+    "empty": "通知なし",
+    "markRead": "マークが読んだ",
+    "markReadAriaLabel": "すべての通知を既読としてマークしてください",
+    "clear": "クリア",
+    "clearAriaLabel": "すべての通知をクリア",
+    "unreadAriaLabel": "通知、未読{count}",
+    "allReadAriaLabel": "通知"
+  },
+  "footer": {
+    "columns": {
+      "product": "製品",
+      "resources": "資料",
+      "community": "コミュニティ"
+    },
+    "links": {
+      "createAgent": "エージェント作成",
+      "dashboard": "ダッシュボード",
+      "pricing": "価格設定",
+      "affiliate": "提携局",
+      "status": "現状",
+      "documentation": "文書",
+      "support": "支援",
+      "blog": "ブログ",
+      "changelog": "変更ログ",
+      "security": "セキュリティ",
+      "roadmap": "ロードマップ",
+      "terms": "用語",
+      "privacy": "プライバシー",
+      "cookies": "クッキー",
+      "impressum": "インプレッサム",
+      "docs": "ドキュメンタリー"
+    },
+    "copyright": "© {year} HatcherLabs。無断転載を禁じます。",
+    "companyInfo": "HHXテクノロジーSRL ·CUI 45318471 ·ティミショアラ、ルーマニア",
+    "legalNotice": "法的ページ(プライバシー、利用規約、インプレッサム、クッキー)は英語のみで利用可能です。",
+    "tag": "マネージドAIエージェントホスティング ·ルーマニア",
+    "colBuild": "建設",
+    "colExplore": "探索",
+    "colResources": "資料",
+    "colLegal": "法的",
+    "itemHatchAgent": "ハッチエージェント",
+    "itemMyAgents": "私のエージェントたち",
+    "itemPublicAgents": "公的代理人",
+    "itemFeatures": "特徴",
+    "itemCity": "Hatcher City",
+    "itemFrameworks": "フレームワーク",
+    "itemPricing": "価格設定",
+    "itemToken": "$HATCHER",
+    "itemStaking": "杭打ち",
+    "itemWhitepaper": "ホワイトペーパー",
+    "itemBlog": "ブログ",
+    "itemRoadmap": "ロードマップ",
+    "itemChangelog": "変更ログ",
+    "itemSecurity": "セキュリティ",
+    "itemPrivacy": "プライバシー",
+    "itemTerms": "用語",
+    "itemCookies": "クッキー",
+    "itemImpressum": "インプレッサム",
+    "poweredBy": "提供"
+  },
+  "landing": {
+    "affiliateBanner": {
+      "live": "アフィリエイトプログラムが稼働中です",
+      "earn": "— 最大で",
+      "pct": "40%",
+      "perReferral": "すべての紹介で",
+      "dismissAriaLabel": "アフィリエイトバナーを解消"
+    },
+    "tokenBanner": {
+      "learnMore": "詳しくは→"
+    },
+    "hero": {
+      "eyebrow": "マネージドAIエージェントホスティング ·クリプトネイティブ",
+      "headlinePrefix": "ハッチ・ユー",
+      "typewriterWords": [
+        "AIエージェント",
+        "フィットネスコーチ",
+        "クリプトトラッカー",
+        "勉強仲間",
+        "トラベルプランナー",
+        "パーソナルアシスタント"
+      ],
+      "body": "OpenClawかHermesを選んでください。設定。発射まで60秒。コードも管理も不要です。20+プラットフォーム、ホストされたUsePod/OpenRouterモデル、そしてBYOK。",
+      "ctaPrimary": "無料で始めましょう",
+      "ctaSecondary": "ドキュメントを読んでください",
+      "agentPreviewOnline": "CryptoHelper — オンライン"
+    },
+    "stats": {
+      "users": "ユーザー",
+      "agents": "エージェント",
+      "activeNow": "現在活動中"
+    },
+    "agentDiscovery": {
+      "eyebrow": "AIエージェントのために",
+      "heading": "サブエージェントの軍団を指揮せよ",
+      "body": "地元のコーディングエージェントが艦隊司令官になります。このプロンプトを貼り付けてください — あなたの名前でHatcherに登録され、常時接続のサブエージェント(Telegramボット、リサーチループ、Discordモッド、モニター)を起動し、セッション終了後も長く制御し続けます。",
+      "promptLabel": "プロンプト",
+      "copyLabel": "了解",
+      "copiedLabel": "コピー",
+      "copyAriaLabel": "コピープロンプト",
+      "copiedAriaLabel": "コピー",
+      "step01": "このプロンプトをAIコーディングエージェントに送ってください。Claude Code、Cursor、OpenClaw、Hermes、またはURLを取得しシェルコマンドを実行できるエージェントなどです。",
+      "step02": "エージェントはあなたのメールアドレスでアカウントを登録し、認証リンクを送ります。",
+      "step03": "確認をクリックします。Hatcher設定を作成し、デプロイし、実行中のAIを渡します。",
+      "viewSkillMd": "ご覧 skill.md",
+      "githubSource": "GitHub出典"
+    },
+    "howItWorks": {
+      "eyebrow": "仕組み",
+      "heading": "3ステップ。60秒。",
+      "subheading": "コーディングもセットアップガイドも設定ファイルもありません。",
+      "steps": [
+        {
+          "num": "01",
+          "title": "フレームワークを選びましょう",
+          "desc": "スキル重視の自動化にはOpenClaw、メモリ付きで長時間実行できる適応型エージェントにはHermesを選びましょう。"
+        },
+        {
+          "num": "02",
+          "title": "構成",
+          "desc": "名前、性格、統合。シンプルなフォームに記入してください — 設定ファイルもYAMLも使いません。"
+        },
+        {
+          "num": "03",
+          "title": "展開",
+          "desc": "ワンクリック。エージェントは60秒以内に接続されたすべてのプラットフォームでライブ配信されます。"
+        }
+      ],
+      "cta": "今すぐ試してみて"
+    },
+    "useCases": {
+      "eyebrow": "ユースケース",
+      "heading": "何を孵化させるつもりですか?",
+      "subheading": "個人の生産性からビジネス自動化まで、エージェントがあなたのルールを決めます。",
+      "items": [
+        {
+          "title": "パーソナルアシスタント",
+          "desc": "カレンダー、メール、リマインダー — Telegramから。"
+        },
+        {
+          "title": "フィットネスコーチ",
+          "desc": "運動、ルーティン、日々の責任感。"
+        },
+        {
+          "title": "食と栄養",
+          "desc": "食事を記録し、カロリーを計算し、レシピの提案をしましょう。"
+        },
+        {
+          "title": "暗号トラッカー",
+          "desc": "トークン価格、ポートフォリオアラート、オンチェーンデータ。"
+        },
+        {
+          "title": "勉強仲間",
+          "desc": "クイズを出したり、教科書を要約したり、宿題を手伝ったりします。"
+        },
+        {
+          "title": "旅行プランナー",
+          "desc": "フライトを探し、旅程を計画し、地元のおすすめを選びましょう。"
+        },
+        {
+          "title": "予算管理者",
+          "desc": "支出、貯蓄目標、週次報告書を追跡しましょう。"
+        },
+        {
+          "title": "研究助手",
+          "desc": "ウェブ検索、記事の要約、レポート作成。"
+        },
+        {
+          "title": "カスタマーサポート",
+          "desc": "DiscordやWhatsAppでFAQに24時間いつでも答えましょう。"
+        }
+      ],
+      "footer": "そして、他にも分かりやすい英語で説明できるものは何でも。"
+    },
+    "frameworks": {
+      "eyebrow": "フレームワーク",
+      "heading": "二つのフレームワークです。プラットフォームは一つ。",
+      "subheading": "自分のエージェントに合ったものを選びましょう。いつでも切り替えてください。",
+      "items": [
+        {
+          "name": "OpenClaw",
+          "tag": "オールラウンダー",
+          "desc": "強力なツール、プラグイン、ブラウザのコントロール。",
+          "features": "2500+ スキル ·ブラウザ自動化 ·ファイル管理"
+        },
+        {
+          "name": "Hermes",
+          "tag": "理由",
+          "desc": "記憶力と推論を重視するスマートファースト設計。",
+          "features": "77のバンドルドスキル ·深い記憶 ·マルチモデル"
+        }
+      ]
+    },
+    "city": {
+      "eyebrow": "★ 新作",
+      "heading": "Hatcher Cityの全エージェントに会いましょう。",
+      "body": "すべてのパブリックエージェントが建物である、ライブ3Dの街。地区はカテゴリー別、色はフレームワーク別、金のビームはあなたの地区を示す。ドラッグ、ズーム、クリックで建物を開けてください。",
+      "videoAriaLabel": "オープンHatcher City",
+      "label": "ハッチャー・シティ",
+      "exploreCta": "全艦隊を探→",
+      "enterCta": "都市の登場"
+    },
+    "features": {
+      "eyebrow": "プラットフォーム",
+      "heading": "エージェントに必要なすべて",
+      "items": [
+        {
+          "title": "即時展開",
+          "desc": "ゼロから60秒以内に稼働する薬剤。"
+        },
+        {
+          "title": "全プラットフォーム",
+          "desc": "Telegram、Discord、Twitter、WhatsApp、Slack。"
+        },
+        {
+          "title": "自分の鍵を持ってきてください",
+          "desc": "自分のLLM APIキーを使わずにAI Credits。"
+        },
+        {
+          "title": "デフォルトで安全です",
+          "desc": "孤立したコンテナ、暗号化された秘密、共有データなし。"
+        },
+        {
+          "title": "ライブ分析",
+          "desc": "リアルタイムの統計、使用状況の追跡、パフォーマンス指標。"
+        },
+        {
+          "title": "チャットとボイス",
+          "desc": "テキストチャット、ボイスコール、リアルタイムストリーミング――箱から出してご利用いただけます。"
+        }
+      ]
+    },
+    "pricing": {
+      "eyebrow": "価格設定",
+      "heading": "自由に始めて、準備ができたら成長します",
+      "subheading": "すべてのプランにすべてのプラットフォームが含まれています。ホスティングAIやウェブ検索はAI Creditsを利用しています。BYOKは引き続き医療提供者の支払いです。",
+      "popularLabel": "人気者",
+      "tiers": [
+        {
+          "name": "無料",
+          "price": "$0",
+          "sub": "/月",
+          "features": [
+            "1人のAIエージェント",
+            "月AI Credits 500",
+            "2 GBワークスペース",
+            "全プラットフォーム",
+            "ファイルマネージャー+フルログ"
+          ],
+          "cta": "始めましょう"
+        },
+        {
+          "name": "スターター",
+          "price": "$6.99",
+          "sub": "/月",
+          "features": [
+            "1人のAIエージェント",
+            "月AI Credits 3,000",
+            "10 GBワークスペース",
+            "BYOK 直接請求",
+            "常に活発に"
+          ],
+          "cta": "スターターを選んでください"
+        },
+        {
+          "name": "長所",
+          "price": "$19.99",
+          "sub": "/月",
+          "features": [
+            "3 AIエージェント",
+            "月15,000 AI Credits",
+            "25 GB ワークスペース",
+            "BYOK 直接請求",
+            "専用リソース"
+          ],
+          "cta": "プロを選んでください"
+        },
+        {
+          "name": "ビジネス",
+          "price": "$49.99",
+          "sub": "/月",
+          "features": [
+            "5人のAIエージェント",
+            "月AI Credits 40,000",
+            "50 GBワークスペース",
+            "常時稼働のコンテナ",
+            "チームコラボレーション"
+          ],
+          "cta": "ビジネスを選んでください"
+        }
+      ],
+      "addonsNote": "エージェント、AI Credits、ストレージが必要ですか?必要なときに追加の容量を追加しましょう。",
+      "addonsCta": "詳細な価格→"
+    },
+    "founding": {
+      "eyebrow": "限定オファー ·創設メンバー",
+      "heading": "一度支払って、永遠に持ち続ける。",
+      "oneTime": "一度きり",
+      "subheading": "固定価格、月額料金なし、すべてのビジネス階層機能が永遠に利用可能です。20名しかありません。",
+      "availableSpotsLabel": "空席",
+      "checking": "確認中...",
+      "soldOut": "完売",
+      "spotsLeft": "残{remaining} {max}",
+      "loadingAvailability": "積み込みの状況...",
+      "allTaken": "{max}の創設地点はすべて埋まっています。標準ティアはまだ利用可能です。",
+      "claimed": "請求された{max} {claimed} ·彼らがいなくなったら、このオファーも終わりです。",
+      "includedHeading": "すべてを含めて、永遠に",
+      "includedItems": [
+        "10人のエージェントが含まれていました",
+        "常にオン(睡眠なし)",
+        "月額25,000 AI Credits",
+        "ウェブ検索はAI Credits",
+        "2 CPU ·4 GB RAM per agent",
+        "40 GBワークスペース",
+        "ファイルマネージャー+フルログ",
+        "優先支援",
+        "創設Discord役割+Telegramタグ",
+        "永久に固定された価格"
+      ],
+      "ctaSoldOut": "完売",
+      "ctaClaim": "自分の場所を確保しましょう"
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "heading": "よくある質問",
+      "items": [
+        {
+          "q": "本当に無料なのでしょうか?",
+          "a": "はい。無料プランでは、エージェント1名、月AI Credits 500、2GBのワークスペース、ファイルマネージャー、フルログ、全プラットフォームへのアクセスが可能です。クレジットカードは不要です。BYOK(自分のLLMキーを持ち込む)はどの階層でもプロバイダー支払いのままです。"
+        },
+        {
+          "q": "コーディングの知識は必要ですか?",
+          "a": "全然そんなことない!エージェントを作成するのは、フォームを記入するようなものです。名前を決め、何をしてほしいか説明し、プラットフォームを選び、立ち上げるだけです。"
+        },
+        {
+          "q": "「Bring Your Own Key」とは何ですか?",
+          "a": "自分でOpenAI、Anthropic、Google、OpenRouter、または他の対応LLMキーを接続してください。BYOK使用量は直接プロバイダーに支払われ、Hatcher AI Creditsは支払われません。"
+        },
+        {
+          "q": "私のエージェントはどこに走っているのでしょうか?",
+          "a": "クラウドサーバーで24時間365日稼働しています。パソコンを電源を入れたままにしたり、何かをインストールする必要はありません。"
+        }
+      ]
+    },
+    "finalCta": {
+      "heading": "最初のエージェントを派遣する準備はできていますか?",
+      "body": "無料プランには1つのエージェント、月額500のAI Credits、ファイルマネージャー、フルログ、2GBのワークスペースが含まれています。BYOK直接請求です。クレジットカードは不要です。",
+      "ctaPrimary": "エージェントを作成しましょう",
+      "ctaSecondary": "価格設定を参照",
+      "trustNoCreditCard": "クレジットカードは使えません",
+      "trustFreeAi": "無料のAIも含まれます",
+      "trustDeploy60s": "60秒で展開",
+      "trustAllPlatforms": "全プラットフォーム"
+    }
+  },
+  "auth": {
+    "login": {
+      "heading": "お帰りなさい",
+      "subheading": "Hatcherアカウントにサインインしてください",
+      "panelTagline": "Hatcher",
+      "panelHeadlinePrefix": "ハッチ、君の",
+      "panelHeadlineAccent": "AIエージェント。",
+      "panelBody": "枠組みを決めましょう。設定。発射まで60秒。コードもインフラもありません。",
+      "statsUsers": "ユーザー",
+      "statsAgents": "エージェント",
+      "statsOnline": "オンライン中",
+      "emailLabel": "メール",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "パスワード",
+      "passwordPlaceholder": "パスワードを入力してください",
+      "forgotLink": "パスワードを忘れましたか?",
+      "submit": "サインイン",
+      "submitLoading": "サインイン中...",
+      "registerPrompt": "アカウントを持っていませんか?",
+      "registerLink": "登録"
+    },
+    "register": {
+      "heading": "アカウント作成",
+      "subheading": "Hatcherから始めましょう",
+      "panelTagline": "Hatcher",
+      "panelHeadlinePrefix": "ハッチ、君の",
+      "panelHeadlineAccent": "AIエージェント。",
+      "panelBody": "無料版にはAI Creditsが含まれています。BYOK使用費は直接プロバイダーに支払われます。クレジットカードは不要です。",
+      "statsUsers": "ユーザー",
+      "statsAgents": "エージェント",
+      "statsOnline": "オンライン中",
+      "referralBadge": "{referrer}紹介で、二人とも{credit}!",
+      "emailLabel": "メール",
+      "emailPlaceholder": "you@example.com",
+      "emailTaken": "すでに登録済みです。",
+      "emailTakenLink": "代わりにサインインしてください",
+      "emailInvalid": "有効なメールアドレスを入力してください。",
+      "usernameLabel": "ユーザー名",
+      "usernamePlaceholder": "cooluser123",
+      "usernameTaken": "このユーザー名はすでに使われています。別のものを選んでください。",
+      "usernameInvalid": "3〜30の文字、数字、ハイフン、または下線。",
+      "usernameHint": "文字、数字、ハイフン、アンダースコアのみ",
+      "passwordLabel": "パスワード",
+      "passwordPlaceholder": "強力なパスワードを入力してください",
+      "passwordHint": "必須含めるべき:8+文字、大文字、小文字、数字、特殊文字",
+      "confirmPasswordLabel": "パスワード確認",
+      "confirmPasswordPlaceholder": "パスワードを繰り返してください",
+      "strengthLabels": {
+        "veryWeak": "とても弱い",
+        "weak": "弱い",
+        "fair": "フェア",
+        "strong": "ストロング",
+        "veryStrong": "とても強い"
+      },
+      "strengthChecks": {
+        "length": "8+キャラクター",
+        "lowercase": "小文字",
+        "uppercase": "大文字",
+        "number": "番号",
+        "special": "特殊キャラクター"
+      },
+      "submit": "アカウント作成",
+      "submitLoading": "アカウント作成中...",
+      "loginPrompt": "すでにアカウントをお持ちですか?",
+      "loginLink": "サインイン",
+      "errors": {
+        "emailTaken": "このメールアドレスはすでに登録済みです。代わりにサインインを試してみてください。",
+        "usernameTaken": "このユーザー名はすでに使われています。別のものを選んでください。",
+        "passwordMismatch": "パスワードが一致しません",
+        "passwordTooShort": "パスワードは最低8文字でなければなりません",
+        "passwordComplexity": "パスワードには大文字、小文字、数字、特殊文字が含まれていなければなりません"
+      }
+    },
+    "forgotPassword": {
+      "heading": "パスワードを忘れましたか?",
+      "subheading": "メールアドレスを入力していただければ、リセットリンクをお送りします",
+      "emailLabel": "メール",
+      "emailPlaceholder": "you@example.com",
+      "submit": "リセットリンクを送信",
+      "submitLoading": "送信中...",
+      "backToLogin": "サインインに戻る",
+      "successHeading": "メールを確認してください",
+      "successBody": "<bold>{email}</bold>のアカウントが存在する場合は、パスワードリセットのリンクを送信しました。受信箱と迷惑メールフォルダを確認してください。",
+      "successBackLink": "サインインに戻る",
+      "genericError": "何かがうまくいかなかった。もう一度お試しください。"
+    },
+    "resetPassword": {
+      "heading": "新しいパスワードを設定しましょう",
+      "subheading": "以下に新しいパスワードを入力してください",
+      "newPasswordLabel": "新しいパスワード",
+      "newPasswordPlaceholder": "8+キャラ、上位、下位、番号、特殊",
+      "passwordRequirements": "8+文字を大文字、小文字、数字、特殊文字で使います。",
+      "confirmPasswordLabel": "パスワード確認",
+      "confirmPasswordPlaceholder": "パスワードを繰り返してください",
+      "passwordMismatch": "パスワードが一致しません",
+      "submit": "パスワードリセット",
+      "submitLoading": "リセット中...",
+      "backToLogin": "サインインに戻る",
+      "successHeading": "パスワードリセット",
+      "successBody": "パスワードが更新されました。新しいパスワードでサインインできるようになりました。",
+      "successCta": "サインイン",
+      "invalidHeading": "無効なリセットリンク",
+      "invalidBody": "このリセットリンクは欠落しているか無効です。新しいものをリクエストしてください。",
+      "invalidCta": "新しいリセットリンクをリクエスト",
+      "genericError": "リセットは失敗しました。リンクが切れている可能性があります。"
+    },
+    "verifyEmail": {
+      "loadingHeading": "メールの確認中...",
+      "successHeading": "メール 認証済み!",
+      "successBody": "あなたのアカウントは現在アクティブです。エージェント作成を始めましょう。",
+      "successCta": "ダッシュボードへ",
+      "errorHeading": "検証に失敗",
+      "errorBody": "認証リンクは無効か期限切れです。",
+      "errorCta": "ログインへ",
+      "noTokenHeading": "メールを確認してください",
+      "noTokenBody": "認証リンクをあなたのメールアドレスに送りました。リンクをクリックしてアカウントを有効化してください。",
+      "noTokenHint": "届いていなかったの?迷惑メールフォルダを確認するか、再送信のためにログインしてみてください。"
+    }
+  },
+  "pricing": {
+    "eyebrow": "価格設定",
+    "heading": "プランを選びましょう",
+    "subheading": "どんなフレームワークでも無料で始めましょう。準備ができたらスケールしてください。すべての統合がすべてのティアに含まれています。BYOKすべての階層でプロバイダーの支払いを維持しています。",
+    "hatcherDiscountBanner": "プランや特典は$HATCHERで10%オフにしましょう。",
+    "hatcherDiscountLine": "$HATCHER価格:${price}",
+    "hatcherDiscountAnnual": "年間$HATCHER価格は${price}",
+    "billingToggle": {
+      "monthly": "月刊",
+      "annual": "年次",
+      "annualDiscount": "−15%"
+    },
+    "tierBadges": {
+      "popular": "人気者",
+      "limited": "限定"
+    },
+    "priceUnit": {
+      "perMonth": "/mo",
+      "once": "一度だけ"
+    },
+    "annualSavings": "${annualTotal}年・セーブ${saved}",
+    "switchToAnnual": "年次に切り替えれば15%節約できます",
+    "payOnce": "一度支払えば、永遠に持ち続けます",
+    "availability": "入手可能性",
+    "availabilityLoading": "装填",
+    "soldOut": "完売",
+    "slotsLeft": "残{remaining} {max}",
+    "tierCta": {
+      "free": "始めましょう",
+      "paid": "{tierName}を選んでください"
+    },
+    "tiers": {
+      "free": {
+        "agents": "エージェント1名含まれます",
+        "messages": "月AI Credits 500",
+        "cpu": "1 CPU",
+        "ram": "1GB RAM",
+        "storage": "2 GBワークスペース",
+        "sleep": "12時間のアイドル後のオートスリープ",
+        "features": [
+          "UsePod/OpenRouterでホストモデル",
+          "ウェブ検索はAI Credits",
+          "ファイルマネージャー+完全なログが含まれています",
+          "すべての統合(Telegram、Discord、Twitterなど)"
+        ],
+        "missing": []
+      },
+      "starter": {
+        "agents": "エージェント1名含まれます",
+        "messages": "月AI Credits 3,000",
+        "cpu": "1 CPU",
+        "ram": "1.5GB RAM",
+        "storage": "10 GBワークスペース",
+        "sleep": "常に活発に",
+        "features": [
+          "UsePod/OpenRouterでホストモデル",
+          "ウェブ検索はAI Credits",
+          "ファイルマネージャー+完全なログが含まれています",
+          "すべての統合"
+        ],
+        "missing": []
+      },
+      "pro": {
+        "agents": "3人のエージェントが含まれていました",
+        "messages": "月15,000 AI Credits",
+        "cpu": "1.5 CPU",
+        "ram": "2GB RAM",
+        "storage": "25 GB ワークスペース",
+        "sleep": "常に活発に",
+        "features": [
+          "UsePod/OpenRouterでホストモデル",
+          "ウェブ検索はAI Credits",
+          "ファイルマネージャー+完全なログが含まれています",
+          "すべての統合"
+        ],
+        "missing": []
+      },
+      "business": {
+        "agents": "5人のエージェントを含む",
+        "messages": "月AI Credits 40,000",
+        "cpu": "2 CPU",
+        "ram": "3GB RAM",
+        "storage": "50 GBワークスペース",
+        "sleep": "常に活発に",
+        "features": [
+          "UsePod/OpenRouterでホストモデル",
+          "ウェブ検索はAI Credits",
+          "ファイルマネージャーが含まれています",
+          "完全なログも含まれています",
+          "優先支援",
+          "チームコラボレーション",
+          "すべての統合"
+        ],
+        "missing": []
+      },
+      "founding_member": {
+        "agents": "10人のエージェントが含まれていました",
+        "messages": "月額25,000 AI Credits",
+        "cpu": "2 CPU",
+        "ram": "4GB RAM",
+        "storage": "40 GBワークスペース",
+        "sleep": "常に活発に",
+        "features": [
+          "$99 一度限りのアクセス — 生涯アクセス",
+          "UsePod/OpenRouterでホストモデル",
+          "ウェブ検索はAI Credits",
+          "ファイルマネージャー+完全なログが含まれています",
+          "優先支援",
+          "すべての統合",
+          "創設Discord役割+Telegramタグ"
+        ],
+        "missing": []
+      }
+    },
+    "addons": {
+      "heading": "特典",
+      "subheading": "容量が必要な場合はAIクレジットパックや追加のエージェントスロットを追加しましょう。",
+      "annualDiscount": "年間15%オフ",
+      "hatcherDiscount": "$HATCHER:${price}",
+      "groups": {
+        "extraAgents": {
+          "label": "エクストラエージェント",
+          "items": [
+            {
+              "name": "+1エージェント",
+              "period": "/mo",
+              "description": "スロット1つ追加"
+            },
+            {
+              "name": "+3 エージェント",
+              "period": "/mo",
+              "description": "スロットが3つ追加"
+            },
+            {
+              "name": "+5人のエージェント",
+              "period": "/mo",
+              "description": "5スロット追加"
+            },
+            {
+              "name": "+10 エージェント",
+              "period": "/mo",
+              "description": "スロットが10個追加"
+            }
+          ]
+        },
+        "aiCredits": {
+          "label": "AI Credits",
+          "items": [
+            {
+              "name": "5,000 AI Credits",
+              "period": "一度きり",
+              "description": "ホスティングモデルとウェブ検索"
+            },
+            {
+              "name": "1万AI Credits",
+              "period": "一度きり",
+              "description": "より重いモデルランと研究"
+            },
+            {
+              "name": "25,000 AI Credits",
+              "period": "一度きり",
+              "description": "より大きなエージェントワークロード"
+            },
+            {
+              "name": "5万AI Credits",
+              "period": "一度きり",
+              "description": "大量のホスティング利用"
+            }
+          ]
+        },
+        "perAgent": {
+          "label": "プラグイン+スキル",
+          "items": [
+            {
+              "name": "含まれるプラグイン",
+              "period": "収録",
+              "description": "すべての階層に含まれています"
+            }
+          ]
+        }
+      }
+    },
+    "integrations": {
+      "heading": "すべての統合は無料です",
+      "badge": "すべての階層",
+      "body": "Telegram、Discord、WhatsApp、Slack、Signal、iMessage、その他14+プラットフォームがすべてのティアで無料で提供されています。追加料金は一切ありません。",
+      "note": "すべての価格はUSDで記載されています。カード、SOL、USDCでSolana、$HATCHER、または$KAUSAで支払います。$HATCHER支払いは10%割引、ホスティングモデルやウェブ検索の利用はAI Creditsで計測され、BYOKは自分のプロバイダーキーで直接支払います。"
+    },
+    "compareTable": {
+      "heading": "プランの比較",
+      "subheading": "各ティアに何が含まれているか一目で確認できます",
+      "featureColumn": "特徴",
+      "onceSuffix": "一度だけ",
+      "rows": {
+        "agents": "エージェントは含まれます",
+        "messages": "月額AI Credits",
+        "searches": "ウェブ検索",
+        "byok": "BYOKプロバイダーの利用",
+        "cpuRam": "CPU / RAM",
+        "storage": "保管",
+        "autoSleep": "オートスリープ",
+        "fileManager": "ファイルマネージャー",
+        "fullLogs": "全記録",
+        "teamCollab": "チームコラボレーション",
+        "prioritySupport": "優先支援",
+        "plugins": "プラグイン+スキル",
+        "integrations": "すべての統合",
+        "byokKey": "BYOK(自身のLLMキー)",
+        "defaultLlm": "モデル選択"
+      },
+      "values": {
+        "unlimited": "無制限",
+        "alwaysOn": "常にオン",
+        "addon": "アドオン",
+        "llama4Scout": "プロバイダー/モデルセレクタ"
+      }
+    },
+    "faq": {
+      "heading": "よくある質問",
+      "items": [
+        {
+          "q": "BYOK(Bring Your Own Key)とは何ですか?",
+          "a": "BYOK、対応しているLLMプロバイダー(OpenAI、Anthropic、Google、xAI、OpenRouterなど)で自分のAPIキーを使えます。これはすべての階層で常に無料で、プロバイダーに直接支払い、Hatcherマークアップはありません。Hatcher AI Creditsでの使用BYOK計測はしません。"
+        },
+        {
+          "q": "エクストラはどのように機能するのですか?",
+          "a": "AIクレジットパックは、ホストモデルやウェブ検索の一度限りのチャージです。追加のエージェントスロットは別途容量を増やします。"
+        },
+        {
+          "q": "共有リソースと専用リソースの違いは何ですか?",
+          "a": "共有リソースとは、エージェントが同じサーバー上の他者とCPUやRAMを共有することを意味します。パフォーマンスは維持されますが、負荷によって変動することがあります。専用リソース(ProやBusiness)は、エージェントに他の誰も使えないCPUとRAMを保証します。"
+        },
+        {
+          "q": "どのような支払い方法が受け入れられていますか?",
+          "a": "カード、SOL、USDCでSolana、$HATCHER、$KAUSAで支払うことができます。暗号資産価格はUSDで表示され、Jupiterを通じてライブレートで換算されます。"
+        },
+        {
+          "q": "ティアをダウングレードできますか?",
+          "a": "はい。いつでもサブスクリプションを解約でき、請求期間終了時にティアは無料に戻ります。フリー制限を超えるエージェントは一時停止されます。"
+        },
+        {
+          "q": "オートスリープとは何ですか?",
+          "a": "フリーエージェントは12時間の不動の後は眠ります。スターター、プロ、ビジネス、創設メンバーのエージェントは常に自動スリープなしでアクティブです。"
+        },
+        {
+          "q": "無料プランでどのLLMが手に入るのでしょうか?",
+          "a": "ホスト利用はあなたのAIクレジット残高から請求され、選択したHatcher対応プロバイダーを経由します。利用可能な場合はフォールバックも可能です。サポートされているホストモデルから選択できます。BYOK AIクレジットメーター Hatcher回避し、プロバイダーに直接支払うことができます。"
+        },
+        {
+          "q": "創設メンバーの階層とは何ですか?",
+          "a": "創設メンバーは一度限りの$99支払いで、生涯にわたり10人のエージェント、月25,000の月AI Credits、2つのCPU/4 GB RAM、40 GBのワークスペース、常にアクティブなエージェント、ファイルマネージャー、フルログ、優先サポート、創設者役割+TelegramのタグHatcher Discord生涯アクセス権を提供します。月額料金は一切かかりません。20枠まで制限されており、全員がなくなったらこの階層は終わりです。"
+        }
+      ]
+    },
+    "help": {
+      "text": "プラン選びをお探しですか?",
+      "emailLabel": "メールでお問い合わせください",
+      "discordLabel": "Discord",
+      "telegramLabel": "Telegram"
+    },
+    "cta": {
+      "heading": "エージェントを派遣する準備はできていますか?",
+      "body": "欲しいエージェントを説明し、数秒で展開します。ホストされたAI Creditsから無料で始めましょう。パワーが必要ならアップグレードしましょう。",
+      "createAgent": "エージェント作成",
+      "seeFrameworks": "フレームワークを参照"
+    },
+    "footerNote": "すべての価格はUSDで、カード、SOL、USDC Solana、$HATCHER、または$KAUSAで支払えます。ホスティングモデルおよびウェブ検索の使用はAI Creditsで計測されます。BYOKは自分のプロバイダーキーで直接支払われます。"
+  },
+  "dashboard": {
+    "common": {
+      "loading": "読み込み中...",
+      "authenticating": "認証中...",
+      "signInRequired": "サインイン必須",
+      "signIn": "サインイン",
+      "refresh": "リフレッシュ",
+      "save": "セーブ",
+      "cancel": "キャンセル",
+      "delete": "削除",
+      "create": "作成",
+      "invite": "招待",
+      "share": "シェア",
+      "unshare": "アンシェア",
+      "copy": "了解",
+      "copied": "コピーしました!",
+      "close": "閉じる",
+      "confirm": "確認してください",
+      "back": "戻る",
+      "noDescription": "特徴なし",
+      "clear": "クリア"
+    },
+    "agents": {
+      "eyebrow": "ダッシュボード",
+      "heading": "私のエージェントたち",
+      "subtitleEmpty": "最初のエージェントを作成し、始めましょう。",
+      "createCta": "エージェントを作成",
+      "searchPlaceholder": "捜索エージェント...( / )",
+      "filterAll": "全員",
+      "frameworkAll": "すべてのフレームワーク",
+      "sortNewest": "最新",
+      "sortAZ": "A-Z",
+      "sortMessages": "最も活動的",
+      "sortActive": "最後の活動",
+      "emptyTitle": "まだエージェントはいません",
+      "emptyDescription": "最初のAIエージェントを作成し、60秒で展開します。",
+      "emptyActionLabel": "エージェント作成",
+      "emptySecondaryLabel": "フレームワークを参照",
+      "noMatchTitle": "一致するエージェントはいません",
+      "noMatchDescription": "検索条件やフィルター条件を調整してみてください。",
+      "signInDescription": "エージェントにアクセスするにはアカウントにサインインしてください。",
+      "featuresCount": "{count}特徴",
+      "featuresCountPlural": "{count}特徴",
+      "agentsCount": "{count}エージェント合計・{active}活動中",
+      "agentsCountPlural": "{count}人の総数・{active}活動中",
+      "details": "詳細",
+      "tourCreateTitle": "最初のエージェントを作成しましょう",
+      "tourCreateDescription": "OpenClawまたはHermesで初めてのAIエージェントをハットするには、こちらをクリックしてください。",
+      "tourFilterTitle": "フレームワークによるフィルター",
+      "tourFilterDescription": "OpenClawは自動化に最適です。Hermesは適応型記憶のワークフローに最適です。",
+      "tourSearchTitle": "検索・探索",
+      "tourSearchDescription": "エージェントを探したり、すぐにChat-to-Hatchを始めましょう。",
+      "tourPlanTitle": "あなたの計画",
+      "tourPlanDescription": "1人のエージェント、月500 AI Credits、ツール同梱で無料でスタートします。いつでもアップグレードできます。",
+      "statTotal": "合計",
+      "statActive": "現役",
+      "statSleeping": "眠っている",
+      "statMeshReady": "メッシュ準備完了",
+      "viewAgents": "エージェント",
+      "viewOrchestration": "オーケストレーション",
+      "meshTitle": "エージェントオーケストレーションメッシュ",
+      "meshSubtitle": "同一所有者エージェントを接続し、境界タスクを派遣し、一箇所から最近のエージェント間活動をチェックできます。",
+      "meshSource": "ソースエージェント",
+      "meshTarget": "標的エージェント",
+      "meshSelectTarget": "ターゲット選択",
+      "meshNoAgents": "コール可能なエージェントはいない",
+      "meshModeSync": "同期",
+      "meshModeAsync": "非同期",
+      "meshTaskLabel": "任務",
+      "meshTaskPlaceholder": "あるエージェントに、別のエージェントのために調査、レビュー、要約、または限定タスクの実行を依頼する...",
+      "meshSend": "ディスパッチタスク",
+      "meshRefresh": "リフレッシュ",
+      "meshEnableAll": "メッシュを有効にする",
+      "meshEnableAgent": "有効化",
+      "meshOpenDev": "開発者タブ",
+      "meshAvailable": "利用可能",
+      "meshDisabled": "障害者",
+      "meshRecent": "最近のメッシュ活動",
+      "meshNoLogs": "エージェント同士の電話はまだない。",
+      "msgsShort": "相互作用",
+      "cardOpen": "3Dルーム",
+      "cardOpenTooltip": "3Dルームの登場",
+      "actionStop": "やめて",
+      "actionStart": "開始",
+      "actionRestart": "再開",
+      "noResultsAction": "クリアフィルター"
+    },
+    "billing": {
+      "eyebrow": "アカウント",
+      "heading": "請求とプラン",
+      "breadcrumbDashboard": "ダッシュボード",
+      "breadcrumbBilling": "請求",
+      "connectWallet": "コネクトウォレット",
+      "connectedWallet": "コネクテッドウォレット",
+      "switchWallet": "スイッチウォレット",
+      "disconnect": "切断",
+      "loadingBilling": "請求の読み込み中...",
+      "signInDescription": "プランと請求を管理するためにサインインしてください。",
+      "creditsBalance": "AI Credits バランス",
+      "creditsUsd": "AI Credits",
+      "creditsDesc": "AI CreditsはホストされたLLM、ウェブ検索、リサーチ、抽出、クロールツールに使用されます。",
+      "recentTransactions": "最近の取引",
+      "currentTier": "現行計画",
+      "freeTier": "フリーティア",
+      "active": "現役",
+      "agentUsage": "エージェントの使用",
+      "agentsOf": "使用された{limit}剤の{count}",
+      "agentsOver": "{over}限界を超えた",
+      "slotsRemaining": "残{slots}枠",
+      "slotsRemainingPlural": "残{slots}スロット",
+      "activeAddons": "現役特典",
+      "expires": "期限切れ{date}",
+      "extend": "エクステンダー",
+      "extend30Days": "延長+30日(${price})",
+      "upgradeAnnual": "年次(${price}年)へのアップグレード",
+      "annualDiscount": "-15%",
+      "renew": "更新",
+      "renewFor": "更新は再開始${price}",
+      "planExpired": "プランが切れた場合 — ティアを維持するために更新",
+      "planExpiring": "{days}日で期限切れ — 今すぐ更新してください",
+      "planExpiringPlural": "期限切れは{days}日です — 今すぐ更新してください",
+      "planActiveUntil": "活動は{date}まで",
+      "noCharge": "料金はかかりません",
+      "lifetimePrice": "生涯",
+      "lifetimePriceFull": "${price}生涯",
+      "monthlyPrice": "${price} / 30日",
+      "unlimitedMessages": "AI Credits",
+      "messagesPerDay": "{count} AI Credits",
+      "byokUnlimited": "",
+      "upgradeSection": "プランをアップグレードしましょう",
+      "upgradeDesc": "より多くのエージェント、AI Credits、計算能力を増やしましょう。",
+      "addonsSection": "特典",
+      "addonsDesc": "現在のプランに余分な容量を積み重ねましょう。",
+      "accountAddons": "アカウントレベルの特典",
+      "perAgentAddons": "エージェントごとの特典",
+      "annualBilling": "年間請求",
+      "annualBillingDesc": "15%オフ — 定期特典",
+      "hatcherDiscountTitle": "$HATCHERで10%オフ",
+      "hatcherDiscountBody": "$HATCHER on Solana プラン、AIクレジットパック、追加のエージェントスロットを活用しましょう。割引はウォレットの確認前に適用されます。",
+      "monthly": "月刊",
+      "annual": "年次",
+      "monthSuffix": "/ 30日間",
+      "annualSuffix": "/ 年",
+      "yearSuffix": "/ 年",
+      "paymentHistory": "支払い履歴",
+      "noPaymentsYet": "まだ支払いはありません",
+      "noPaymentsDesc": "支払い履歴はここに表示されます。",
+      "status": {
+        "confirmed": "確認済み",
+        "pending": "保留中",
+        "failed": "失敗",
+        "refunded": "返金済み"
+      },
+      "selectAgent": "選択エージェント",
+      "choosePayment": "支払い方法を選択する",
+      "applyToAgent": "エージェントに応募する:",
+      "noAgentsFound": "エージェントは見つからなかった。まずエージェントを作成しましょう。",
+      "payWithSol": "支払ってSOL",
+      "solDesc": "Solana ウォレット決済",
+      "payWithHatcher": "支払って$HATCHER",
+      "hatcherDesc": "SolanaのHATCHERトークン",
+      "hatcherDiscountDesc": "$HATCHERで10%オフ:{price}",
+      "payWithKausa": "支払って$KAUSA",
+      "kausaDesc": "KausaLayerパートナートークンはSolana",
+      "payWithUsdcSolana": "USDCで支払うSolana",
+      "usdcSolanaDesc": "SPLはウォレット経由でUSDC Solana",
+      "payWithCryptoNow": "CryptoNowで支払う",
+      "cryptnowDesc": "ホストされたSOL/USDCチェックアウト",
+      "payWithUsdc": "支払ってUSDC",
+      "usdcDesc": "ステーブルコイン — 1 USDC = $1",
+      "payWithCard": "カードで支払う",
+      "cardDesc": "クレジットカード/デビットカードStripe",
+      "foundingSlots": "残{remaining} {max}スロット",
+      "foundingSoldOut": "完売",
+      "oneTimeSuffix": "一度きり",
+      "oneTimeAgent": "一度きりのエージェント",
+      "annualAgent": "/ 年/エージェント",
+      "monthAgent": "/ 30日間 / エージェント",
+      "manageBilling": "請求管理",
+      "successPayment": "支払い成功!あなたのアカウントはアップグレードされます。振り返るのに少し時間がかかるかもしれません。",
+      "canceledPayment": "支払いはキャンセルされました。起訴はされませんでした。"
+    },
+    "analytics": {
+      "eyebrow": "ダッシュボード",
+      "heading": "使用分析",
+      "subheading": "アカウント全体のやり取り、ホスト利用率、AI Credits。",
+      "signInDescription": "分析を見るにはサインインしてください。",
+      "interactionVolume": "相互作用体積",
+      "messageVolume": "相互作用体積",
+      "last14Days": "最後の14日間",
+      "last30Days": "過去30日間",
+      "frameworks": "フレームワーク",
+      "agentStatus": "エージェントとしての地位",
+      "totalMessages": "エージェント間の相互作用",
+      "noMessageData": "まだ取引データはありません — エージェントとチャットを始めましょう!",
+      "noAgentsYet": "まだエージェントはいません",
+      "noAgentsEmpty": "まだエージェントはいない。分析を始めるために最初のエージェントを作成しましょう。",
+      "createAgent": "エージェント作成",
+      "totalAgents": "総エージェント数",
+      "totalAgentsSub": "活動{active}",
+      "messages": "相互作用",
+      "messagesAllTime": "全ての時代",
+      "llmCalls": "LLMコールズ",
+      "llmCallsAllTime": "全ての時代",
+      "aiCreditsBalance": "AI Credits",
+      "monthlyGrant": "{count}月額助成金",
+      "aiCreditsUsed": "AI Credits使用例",
+      "hostedUsage": "ホスティング利用",
+      "hostedUsageSubheading": "ホストされたLLM、ウェブ検索、調査、抽出、クロールはアカウントAI Creditsを消費します。BYOK使用はこのメーターをバイパスします。",
+      "remainingBalance": "残高",
+      "usedLast30": "直近30日間の使用",
+      "usageByKind": "種類別の用途",
+      "tokensProcessed": "処理されたトークン",
+      "inputTokens": "入力",
+      "outputTokens": "出力",
+      "noHostedUsageYet": "まだホストでの利用はありません。BYOK使用はAI Creditsを消費しません。",
+      "last14DaysLabel": "最後の14日間",
+      "last14DaysSub": "ユーザーとのやり取り",
+      "today": "現在",
+      "noDataYet": "まだ相互作用のデータはありません"
+    },
+    "team": {
+      "eyebrow": "協力",
+      "heading": "チーム",
+      "subheading": "エージェントを共有し、他者と協力するチームを作りましょう。",
+      "signInTitle": "Teamsにアクセスするにはサインイン",
+      "signInDesc": "TeamsはAIエージェントの協力を他者と共有できるようにします。",
+      "createTeamTitle": "チームを作る",
+      "createTeamDesc": "チームを作ることで協力を始めましょう。その後、メンバーを招待し、エージェントを共有できます。",
+      "teamNamePlaceholder": "チーム名...",
+      "createBtn": "作成",
+      "creating": "創造...",
+      "membersHeading": "メンバー",
+      "inviteMemberHeading": "招待メンバー",
+      "emailPlaceholder": "メールアドレス...",
+      "invite": "招待",
+      "roleAdmin": "管理",
+      "roleMember": "メンバー",
+      "roleViewer": "ビューアー",
+      "roleOwner": "オーナー",
+      "you": "(あなた)",
+      "sharedAgentsHeading": "共有エージェント",
+      "noSharedAgents": "まだこのチームと共有したエージェントはいない。",
+      "yourAgentsHeading": "あなたのエージェントたち",
+      "byLabel": "{username}",
+      "memberCount": "{count}メンバー",
+      "memberCountPlural": "{count}メンバー",
+      "agentSharedCount": "{count}エージェントが共有した",
+      "agentSharedCountPlural": "{count}エージェントが共有した",
+      "leaveTeam": "出て行け",
+      "leaveTeamTitle": "リーブチーム",
+      "leaveTeamDesc": "本当にこのチームを辞めたいのか?共有エージェントへのアクセスをすべて失います。",
+      "leaveTeamConfirm": "リーブチーム",
+      "deleteTeam": "チームを削除",
+      "deleteTeamTitle": "チームを削除",
+      "deleteTeamDesc": "本当にこのチームを完全に削除したいのですか?共有エージェントはすべてアンシェアされます。",
+      "deleteTeamConfirm": "チームを削除",
+      "errors": {
+        "loadFailed": "チームデータの読み込みに失敗しました",
+        "createFailed": "チーム作りに失敗",
+        "inviteFailed": "メンバーを招待しませんでした",
+        "removeFailed": "メンバーの削除に失敗しました",
+        "leaveFailed": "チームを離れなかった",
+        "deleteFailed": "チームの削除に失敗しました",
+        "shareFailed": "エージェントの共有に失敗しました",
+        "unshareFailed": "エージェントのアンシェアに失敗しました",
+        "roleFailed": "役割の更新に失敗しました"
+      }
+    },
+    "affiliate": {
+      "eyebrow": "ダッシュボード",
+      "heading": "アフィリエイトダッシュボード",
+      "signInTitle": "サインイン必須",
+      "signInDesc": "アフィリエイトダッシュボードを見るにはサインインしてください。",
+      "yourReferralLink": "あなたの紹介リンク",
+      "referralLinkDesc": "このリンクからの新規登録は、生涯にわたりあなたの名義に帰属されます。最初のエージェントが作ったら、二人とも500 AI Creditsをもらえます。",
+      "aiCreditRewardTitle": "紹介AI Credits",
+      "aiCreditRewardDesc": "アフィリエイト紹介は、紹介されたユーザーが最初のエージェントを作成した後、両方のアカウントにまたも{credit}を与えます。",
+      "claimAiCredits": "請求AI Credits",
+      "claimingAiCredits": "主張...",
+      "aiCreditsCol": "AI Credits",
+      "aiCreditsClaimed": "主張",
+      "aiCreditsPending": "保留中",
+      "shareOnX": "Xでシェア",
+      "telegram": "Telegram",
+      "copyLink": "了解",
+      "copiedLink": "コピー",
+      "refresh": "リフレッシュ",
+      "frozenTitle": "アカウント凍結",
+      "codeLabel": "コード",
+      "totalReferrals": "総紹介件数",
+      "paidLabel": "{count}支払った",
+      "pending30d": "保留中(30日保留)",
+      "payableNow": "今すぐ支払う",
+      "lifetimeEarned": "生涯獲得",
+      "paidOut": "{amount}支払った",
+      "referralsTable": "紹介",
+      "noReferrals": "まだ紹介はありません。リンクを共有してください!",
+      "commissionsTable": "委嘱作品",
+      "noCommissions": "まだコミッションはありません。",
+      "payoutsTable": "配当",
+      "noPayouts": "まだ支払いはありません。",
+      "loadMore": "もっと読み込む",
+      "signupCol": "サインアップ",
+      "emailCol": "メール",
+      "statusCol": "現状",
+      "tierCol": "ティア",
+      "dateCol": "日付",
+      "sourceCol": "出典",
+      "amountCol": "金額",
+      "cashCol": "現金",
+      "creditsCol": "クレジット",
+      "noteCol": "注記",
+      "statusPaid": "有料",
+      "statusFree": "無料",
+      "statusPending": "保留中",
+      "statusPayable": "支払額",
+      "statusPaidOut": "有料",
+      "statusVoided": "無効化",
+      "flagged": "フラグ",
+      "untilDate": "{date}まで",
+      "sourceSubscription": "購読",
+      "sourceFoundingMember": "創設メンバー",
+      "payoutSettings": "配当設定",
+      "payoutMode": "モード",
+      "payoutAddress": "支払いアドレス",
+      "creditsOnly": "現金支払い先の住所が必要です",
+      "changePrefs": "支払いの好みを変更する必要がありますか?",
+      "contactSupport": "サポートに連絡してください",
+      "modeCashOnly": "現金のみ(20%)",
+      "modeCreditsOnly": "引退",
+      "modeHybrid": "引退"
+    },
+    "settings": {
+      "eyebrow": "アカウント",
+      "heading": "舞台設定",
+      "subheading": "アカウント、セキュリティ、設定を管理しましょう。",
+      "tabs": {
+        "profile": "プロフィール",
+        "security": "セキュリティ",
+        "notifications": "通知",
+        "billing": "請求",
+        "danger": "デンジャーゾーン"
+      },
+      "profile": {
+        "sectionTitle": "プロフィール",
+        "changePhoto": "写真を変える",
+        "uploadPhoto": "写真をアップロード",
+        "remove": "削除",
+        "joinedLabel": "参加した{date}",
+        "usernameLabel": "ユーザー名",
+        "usernamePlaceholder": "your_username",
+        "usernameHint": "3〜30文字、文字、数字、_または-",
+        "emailLabel": "メールアドレス",
+        "emailPlaceholder": "you@example.com",
+        "saveChanges": "セーブの変更",
+        "saving": "セーブ...",
+        "walletTitle": "コネクテッドウォレット",
+        "walletLinkedDesc": "最初のオンチェーン決済から自動的にリンクされます。SOL、USDC、または$HATCHERで支払う際に使用。",
+        "walletViewSolscan": "Solscan",
+        "walletDisconnect": "切り離したウォレット",
+        "walletNone": "ウォレットはまだリンクされていません。Solana財布は、請求ページから初めてオンチェーン決済を行うと自動的に接続されます。",
+        "referralTitle": "紹介プログラム",
+        "referralDesc": "友人をHatcherに招待しましょう。最初のエージェントを作るときに{credit}を手に入れます。",
+        "referralCode": "紹介コード",
+        "shareLink": "共有リンク",
+        "referred": "参照",
+        "earned": "獲得",
+        "claimRewards": "保留中の報酬の請求",
+        "claiming": "主張..."
+      },
+      "security": {
+        "changePasswordTitle": "パスワード変更",
+        "currentPassword": "現在のパスワード",
+        "currentPasswordPlaceholder": "現在のパスワードを入力してください",
+        "newPassword": "新しいパスワード",
+        "newPasswordPlaceholder": "最低8キャラ、上、下、番号、特殊",
+        "confirmPassword": "新しいパスワードを確認",
+        "confirmPasswordPlaceholder": "新しいパスワードを繰り返してください",
+        "changePasswordBtn": "パスワード変更",
+        "changing": "変わる...",
+        "apiKeysTitle": "API 鍵",
+        "apiKeysDesc": "プログラム的アクセス用の複数のAPIキーを作成しましょう。各キーは{prefix}プレフィックスを使用します。完全な鍵は作成時に{emphasis}示されています。",
+        "apiKeysEmphasis": "たった一度だけ",
+        "manageKeys": "キー管理",
+        "newKeyCreated": "新しいキーを作成しました — 今すぐコピーしてください!",
+        "noKeysYet": "まだAPI鍵はない。下に作成してください。",
+        "keyLabelPlaceholder": "ラベル(例:「プロダクション」)",
+        "createKey": "キーを作成",
+        "creating": "創造...",
+        "keysLimit": "最大10鍵までアクティブキー。各キーは完全なAPIアクセス権を持っています。",
+        "reqToday": "{count} 今日の要請 ·今週{week}",
+        "lastUsed": "最終使用{date}",
+        "save": "セーブ"
+      },
+      "notifications": {
+        "sectionTitle": "通知",
+        "pushLabel": "プッシュ通知",
+        "pushDesc": "リアルタイム更新のためのブラウザプッシュ通知",
+        "agentsLabel": "エージェントアラート",
+        "agentsDesc": "担当者の状態が変わったり、クラッシュしたり、対応が必要なときに通知を受け取ります",
+        "billingLabel": "請求アラート",
+        "billingDesc": "支払い確認、サブスクリプション更新、クレジット"
+      },
+      "billing": {
+        "sectionTitle": "請求",
+        "currentPlan": "現行計画",
+        "hatcherCredits": "ハッチャーのクレジット",
+        "creditsAutoApplied": "チェックアウト時に自動的に適用",
+        "manageBilling": "請求管理"
+      },
+      "danger": {
+        "sectionTitle": "デンジャーゾーン",
+        "exportTitle": "データをエクスポートする",
+        "exportDesc": "プロフィール、エージェント、チャット履歴、支払い、紹介、サポートチケットなど、すべてのアカウントデータを含むJSONファイルをダウンロードしてください。",
+        "exportBtn": "データをエクスポートする",
+        "exporting": "輸出中...",
+        "deleteTitle": "アカウント削除",
+        "deleteDesc": "アカウント、すべての代理店、支払い履歴、設定を完全に削除してください。この行為は不可逆的です。",
+        "deleteBtn": "アカウント削除",
+        "deleting": "削除中...",
+        "dialogTitle": "アカウントを削除すべきですか?",
+        "dialogDesc": "これにより、すべてのエージェント、データ、支払い履歴が永久に削除されます。この行動は取り消される{emphasis}。",
+        "dialogEmphasis": "できない",
+        "confirmPassword": "パスワードを確認してください",
+        "passwordPlaceholder": "現在のパスワード",
+        "cancelBtn": "キャンセル"
+      }
+    },
+    "apiKeys": {
+      "eyebrow": "舞台設定",
+      "heading": "APIキー",
+      "subheading": "{docsLink}のプログラム的アクセスキーを管理してください。各キーは{prefix}で始まります。",
+      "docsLinkLabel": "Hatcher API",
+      "backToSettings": "設定に戻る",
+      "newKeyAlert": "キー作成 — 今すぐコピー!",
+      "newKeyAlertSub": "これが唯一、全ての鍵が表示される場面です。安全な場所に保管してください。",
+      "noKeysTitle": "まだAPIキーは出ていません",
+      "noKeysDesc": "始めるために最初の鍵を作成しましょう",
+      "loading": "鍵を読み込む...",
+      "createSectionTitle": "新しいキーを作成",
+      "createSectionDesc": "キーには説明的な名前(例:「ローカル開発」や「CI/CDパイプライン」)を付けましょう。",
+      "keyLabelPlaceholder": "キーラベル...",
+      "createKey": "キーを作成",
+      "creating": "創造...",
+      "usageNote": "{header}ヘッダーのAPIキーを使ってください。利用可能なすべてのエンドポイントについては{docsLink}を参照してください。",
+      "headerExample": "認可:持ち主hk_...",
+      "docsLinkLabel2": "API参考文献",
+      "copiedLabel": "コピーしました!",
+      "copyLabel": "了解",
+      "dismissLabel": "解雇",
+      "revokeTitle": "キー API取り消せ",
+      "revokeDesc": "このキーは永久に無効化され、それを使用しているアプリケーションは即座に動作を停止します。これは取り消せない。",
+      "revokeConfirm": "リヴォークキー",
+      "neverUsed": "一度も使われたことがない",
+      "lastUsed": "最終使用{time}",
+      "created": "創造{date}",
+      "reqStats": "{today} 今日の要請 ·今週{week}",
+      "saveBtn": "セーブ",
+      "cancelBtn": "キャンセル"
+    },
+    "quickStats": {
+      "totalAgents": "総エージェント数",
+      "dailyMessages": "AI Credits",
+      "unlimited": "∞",
+      "accountWide": "口座残高",
+      "activeNow": "現在活動中",
+      "noAgentsRunning": "エージェントは逃げていません",
+      "agentsOnline": "{count}オンライン代理店",
+      "agentsOnlinePlural": "{count}オンラインエージェント",
+      "accountTier": "アカウントティア",
+      "lifetimeAccess": "生涯アクセス",
+      "prioritySupport": "優先支援",
+      "upgradePlan": "アップグレード計画"
+    },
+    "agentDetail": {
+      "tabs": {
+        "dashboard": "ダッシュボード",
+        "chat": "チャット",
+        "mail": "郵便",
+        "terminal": "ターミナル",
+        "dev": "開発者",
+        "config": "構成",
+        "integrations": "統合",
+        "plugins": "プラグインとスキル",
+        "logs": "ログ",
+        "stats": "統計",
+        "memory": "記憶",
+        "sessions": "セッション",
+        "knowledge": "知識",
+        "addons": "特典",
+        "wallet": "財布",
+        "kausalayer": "KausaLayer",
+        "files": "ファイル",
+        "workspace": "ワークスペース",
+        "schedules": "スケジュール",
+        "workflows": "ワークフロー"
+      },
+      "sidebarGroups": {
+        "operate": "作動",
+        "configure": "構成",
+        "monitor": "モニター",
+        "advanced": "上級"
+      },
+      "nav": {
+        "allAgents": "全エージェント"
+      },
+      "header": {
+        "easy": "簡単だ",
+        "advanced": "上級",
+        "restart": "再開",
+        "restarting": "再起動中...",
+        "stop": "やめて",
+        "stopping": "止まる...",
+        "start": "開始",
+        "starting": "始まる...",
+        "share": "シェア",
+        "room": "部屋",
+        "clone": "クローン",
+        "delete": "削除",
+        "deleting": "削除中...",
+        "confirm": "確認してください",
+        "cancel": "キャンセル"
+      },
+      "notFound": {
+        "code": "404",
+        "title": "エージェントが見つかりません",
+        "description": "ID「{id}」のエージェントは見つかりませんでした。",
+        "backToAgents": "エージェントに戻る"
+      },
+      "statusPoll": {
+        "agentReady": "エージェントが話す準備ができています!"
+      },
+      "chat": {
+        "live": "ライブ",
+        "liveTitle": "WebSocketを使ったリアルタイムストリーミング",
+        "voiceButton": "声",
+        "voiceCallTitle": "音声通話開始",
+        "autoRead": "自動読み取り",
+        "autoReadTitle": "自動読み取り応答",
+        "emptyTitle": "会話を始めてみてください{agentName}",
+        "emptySubtitle": "回答はリアルタイムで表示されます",
+        "loadEarlier": "以前のメッセージ({count}古いもの)を読み込む",
+        "listening": "聞いてる...",
+        "thinking": "考えて...",
+        "speaking": "話している...",
+        "tapToSpeak": "話すにはマイクをタップしてください",
+        "agentStartingUp": "エージェントが起動します、少々お待ちください...",
+        "uploading": "アップロード中...",
+        "poweredBy": "動力源:{provider}",
+        "today": "現在",
+        "unlimited": "無制限",
+        "enterToSend": "送信はEnter、新しい行はShift+Enterで行を送ります。",
+        "signInToChat": "このエージェントとチャットするにはサインインしてください。",
+        "limitReached": "AI Credits疲れ切っている。",
+        "upgradeToPro": "プロへのアップグレード",
+        "limitReachedSuffix": "さらに詳しく知りたい方は、Unlimitedで自分のキーを持っていくかも。",
+        "agentNotRunning": "エージェントは逃げていない。",
+        "startFromOverview": "概要タブからチャットを始めてください。",
+        "waitingForAgent": "エージェントの開始を待っている...",
+        "messagePlaceholder": "メッセージ{agentName}...",
+        "sendMessage": "メッセージを送信",
+        "stopResponse": "停止対応",
+        "attachFiles": "ファイルを添付 — エージェントの知識に保存",
+        "stopRecording": "録画をやめろ",
+        "startVoice": "音声入力を始めましょう",
+        "errors": {
+          "rateLimit": "AI Credits疲れ切っている。",
+          "llmDown": "AIサービスは一時的に利用できません。これは通常1分以内に解消します。",
+          "timeout": "エージェントの返事が遅すぎた。",
+          "network": "接続が途絶えました。インターネット接続を確認してください。",
+          "generic": "何かがうまくいかなかった。",
+          "retry": "再挑戦"
+        },
+        "voiceCall": {
+          "listening": "聞いてる...",
+          "thinking": "考えて...",
+          "speaking": "話している...",
+          "tapToSpeak": "話すにはマイクをタップしてください"
+        }
+      },
+      "mail": {
+        "title": "エージェント・メール",
+        "subtitle": "エージェントのメールボックス、自動返信モード、メッセージ履歴、手動送信メールの管理。",
+        "mailbox": "郵便受け住所",
+        "copy": "了解",
+        "copied": "郵便受け住所をコピーしました",
+        "copyFailed": "コピー失敗",
+        "refresh": "リフレッシュ",
+        "refreshing": "さっぱりした...",
+        "autoSend": "自動送信",
+        "autoSendOn": "自動送信がオンになっています",
+        "autoSendOff": "自動送信はオフです",
+        "runtimeActive": "自動返信はエージェントがすでにアクティブ中でしか機能しません。",
+        "runtimeInactive": "自動返信はエージェントがすでにアクティブ中でしか機能しません。返信に頼る前にエージェントを起動してください。",
+        "messageList": "メッセージ",
+        "messageCount": "{count}メッセージが読み込まれました",
+        "details": "メッセージの詳細",
+        "noSelection": "メッセージを選択して検査してください。",
+        "emptyTitle": "まだ郵便物は来ていません",
+        "emptySubtitle": "このメールボックスを使用した後、受信および発信メッセージがここに表示されます。",
+        "untitled": "話題なし",
+        "from": "そこから",
+        "to": "へ",
+        "subject": "主題",
+        "created": "日付",
+        "body": "本文",
+        "noBody": "ボディコンプレッションなし",
+        "filters": {
+          "all": "全員",
+          "inbound": "インバウンド",
+          "outbound": "出発"
+        },
+        "directions": {
+          "inbound": "インバウンド",
+          "outbound": "出発"
+        },
+        "statusLabels": {
+          "queued": "キューに並んでいます",
+          "sent": "送信",
+          "delivered": "配達済み",
+          "failed": "失敗",
+          "received": "受領",
+          "unknown": "不明"
+        },
+        "errors": {
+          "mailbox": "メールボックスを読み込みませんでした。",
+          "messages": "メールメッセージが読み込めませんでした。",
+          "settings": "メール設定を更新できませんでした。"
+        },
+        "composer": {
+          "title": "手動送信",
+          "subtitle": "エージェントのメールボックスから1回だけ送信してください。",
+          "toPlaceholder": "recipient@example.com",
+          "subjectPlaceholder": "主題",
+          "bodyPlaceholder": "メール本文を書いて...",
+          "validation": "受領者、対象者、そして本体が必須です。",
+          "failed": "メールを送信できませんでした。",
+          "sent": "メール待ち",
+          "send": "メール送信",
+          "sending": "送信中..."
+        }
+      },
+      "logs": {
+        "searchPlaceholder": "検索ログ...",
+        "all": "全員",
+        "connected": "接続",
+        "reconnecting": "再接続",
+        "pinned": "ピン",
+        "scroll": "スクロール",
+        "refresh": "リフレッシュ",
+        "loading": "読み込み中...",
+        "download": "ダウンロード",
+        "pinnedToBottom": "底に押し付けられて",
+        "noLogs": "まだログは入手できません。",
+        "noLogsMatching": "「{query}」と一致するログはありません。",
+        "noLevelLogs": "{level}ログは見つかりませんでした。",
+        "entries": "項目{count}",
+        "autoScrollEnabled": "自動スクロール有効 — 下部にピン留め",
+        "autoScrollDisabled": "自動スクロール無効",
+        "fullLogsGate": {
+          "title": "直近{count}ログラインの表示",
+          "description": "全てのティアにフルログが付属しています。完全な履歴がまだ利用できない場合はエージェントを更新してください。",
+          "descriptionEmpty": "全てのティアにフルログが付属しています。完全な履歴がまだ利用できない場合はエージェントを更新してください。",
+          "unlock": "リフレッシュ"
+        }
+      },
+      "integrations": {
+        "showingFor": "{framework}と互換性のある統合を示す",
+        "connected": "{configured}/{total}接続",
+        "encryptedNote": "API鍵とトークンは保存前にAES-256-GCMで暗号化されます。一度保存されると、秘密の値は二度と表示されず、マスクされたプレースホルダーのみが表示されます。",
+        "mainIntegrations": "主な統合",
+        "mainIntegrationsFree": "全ランクで無料",
+        "otherPlatforms": "その他のプラットフォーム",
+        "communityExtensions": "コミュニティ拡張",
+        "allPlatformsFree": "すべてのプラットフォームは無料で含まれており、認証情報の設定は下記にご確認ください",
+        "allFreeNote": "すべての連携はすべてのティアで無料です。資格を追加して行ってください。",
+        "howToGetKey": "APIキーを手に入れる方法→",
+        "howToSetup": "{name} →の設定方法",
+        "saving": "セーブ...",
+        "saveCredentials": "認証情報を保存する",
+        "badges": {
+          "recommended": "おすすめ",
+          "native": "ネイティブ",
+          "community": "コミュニティ",
+          "planned": "計画",
+          "quickSetup": "簡単なセットアップ",
+          "qrPairing": "QRペアリング",
+          "free": "無料",
+          "connected": "接続",
+          "alwaysActive": "常にアクティブ"
+        },
+        "legend": {
+          "native": "ネイティブ — 組み込みのサポート",
+          "community": "コミュニティ — npm拡張機能",
+          "planned": "予定中 — 近日公開"
+        },
+        "pairing": {
+          "whoCanMessage": "誰があなたの代理人にメッセージを送れるのですか?",
+          "everyone": "みんな",
+          "specificNumbers": "具体的な数字",
+          "save": "セーブ",
+          "anyoneCanMessage": "誰でもあなたのエージェントにメッセージを送ることができます。",
+          "onlyListedNumbers": "担当者にメッセージを送れるのは、記載されている番号だけです。",
+          "restartAfterChange": "エージェントを変更した後、再スタートしてください。",
+          "setBeforePairing": "ペアリング前にセットしましょう。電話番号はE.164形式(+1234567890)。",
+          "savedRestart": "救われた!エージェントを再スタートして応募してください。",
+          "connected": "{name} コネクテッド",
+          "disconnected": "{name}切断",
+          "messagesForwarded": "メッセージはあなたの担当者に転送されます",
+          "sessionExpired": "セッションが終了しました。再ペアリングするか切断してクリーンアップしてください。",
+          "rePair": "再ペアリング",
+          "disconnect": "切断",
+          "disconnectConfirm": "{name}切断?再利用するには再ペアリングが必要です。",
+          "agentMustRun": "あなたのエージェントはペアリングに走っているに違い{name}。まずはエージェントを始めてください。",
+          "generatingQr": "QRコードの生成には~30秒かかります...",
+          "pairButton": "ペア{name}",
+          "refreshQr": "QRコードをリフレッシュする",
+          "tapOutsideToClose": "外側をタップして閉じる"
+        },
+        "webhook": {
+          "label": "ウェブフック",
+          "inboundHttp": "インバウンドHTTP",
+          "triggerFrom": "外部サービス(Zapier、GitHubなど)からエージェントをトリガーしてください。",
+          "webhookUrl": "ウェブフックURL",
+          "alwaysActive": "常にアクティブ",
+          "bearerToken": "ベアラートークン",
+          "exampleRequest": "例のリクエスト",
+          "revealToken": "リビールトークン",
+          "hideToken": "隠しトークン",
+          "copyUrl": "URLをコピー",
+          "copyToken": "コピートークン",
+          "note": "このURLを使って外部サービス(Zapier、GitHub、n8nなど)からエージェントをトリガーしてください。メッセージフィールドを含むJSONボディでPOSTリクエストを送信します。必要に応じてエージェントは自動的にスリープから覚醒します。",
+          "alreadyConfigured": "すでに設定済み"
+        },
+        "domains": {
+          "channelBehavior": "チャネル挙動",
+          "allowedUserIds": "許可されたユーザーID(カンマ区切り)",
+          "allowedGroupIds": "許可されたグループID(カンマ区切り)"
+        }
+      },
+      "memory": {
+        "refresh": "リフレッシュ",
+        "noMemory": "メモリファイルは見つかりませんでした。",
+        "noMemoryDescription": "あなたのエージェントはまだ記憶ファイルを作成していません。",
+        "dailyLogs": "デイリーログ",
+        "noDailyLogs": "まだ日々のログはありません。",
+        "loading": "メモリの読み込み中...",
+        "error": "メモリの読み込みに失敗しました"
+      },
+      "knowledge": {
+        "uploadTitle": "知識ファイルのアップロード",
+        "filename": "ファイル名",
+        "filenamePlaceholder": "例:company-info.txt",
+        "content": "内容",
+        "contentPlaceholder": "知識コンテンツをここに貼り付けてください...",
+        "upload": "アップロード",
+        "uploading": "アップロード中...",
+        "cancel": "キャンセル",
+        "addFile": "ファイル追加",
+        "noFiles": "まだ知識ファイルはありません。",
+        "noFilesDescription": "代理人が参照できる書類をアップロードしましょう。",
+        "preview": "プレビュー",
+        "delete": "削除",
+        "loading": "読み込み中...",
+        "error": "知識ファイルの読み込みに失敗しました",
+        "refresh": "リフレッシュ"
+      },
+      "stats": {
+        "range7d": "7日間",
+        "range30d": "30日間",
+        "totalMessages": "トータルメッセージ",
+        "avgPerDay": "平均 / 日数",
+        "peakDay": "ピークデイ",
+        "framework": "フレームワーク",
+        "noData": "まだ分析データはありません。",
+        "noDataDescription": "統計を見始めるためにメッセージを送ってみてください。",
+        "errorRate": "エラー率",
+        "responseTimes": "応答時間",
+        "avgResponse": "平均応答",
+        "p50": "P50",
+        "p95": "P95",
+        "topTopics": "トップトピック",
+        "hourlyActivity": "時間ごとの活動",
+        "byokActive": "BYOK 現役",
+        "totalTokens": "トータルトークン",
+        "estimatedCost": "推定費用",
+        "refresh": "リフレッシュ"
+      },
+      "terminal": {
+        "connecting": "接続中...",
+        "connected": "接続",
+        "disconnected": "切断",
+        "error": "接続エラー",
+        "reconnect": "再接続",
+        "agentNotActive": "端末を使用するにはエージェントがアクティブでなければなりません。",
+        "startAgent": "スタートエージェント",
+        "sendMessage": "メッセージを送って...",
+        "send": "送信",
+        "sending": "送信中..."
+      },
+      "plugins": {
+        "skillsTab": "スキル",
+        "pluginsTab": "プラグイン",
+        "searchPlaceholder": "検索スキルとプラグイン...",
+        "install": "設置",
+        "installing": "インストール中...",
+        "installed": "設置",
+        "uninstall": "アンインストール",
+        "uninstalling": "アンインストール中...",
+        "noInstalled": "スキルやプラグインはインストールしていません。",
+        "noInstalledDescription": "下のマーケットプレイスで閲覧・設置してください。",
+        "recommended": "おすすめ",
+        "available": "利用可能",
+        "source": "出典",
+        "requiresRestart": "再起動が必要",
+        "refresh": "リフレッシュ",
+        "limitReached": "プラグインやスキルはすべてのティアに含まれています。"
+      },
+      "workflows": {
+        "new": "新しいワークフロー",
+        "noWorkflows": "まだワークフローはありません。",
+        "noWorkflowsDescription": "エージェントを自動化するための最初のワークフローを作成しましょう。",
+        "enable": "有効化",
+        "disable": "無効化",
+        "delete": "削除",
+        "save": "セーブ",
+        "run": "逃げろ",
+        "running": "走って...",
+        "name": "ワークフロー名",
+        "trigger": "トリガー",
+        "lastRun": "ラストラン",
+        "status": "現状",
+        "active": "現役",
+        "inactive": "非稼働"
+      },
+      "files": {
+        "noFiles": "ファイルは見つかりませんでした。",
+        "noFilesDescription": "ファイルマネージャーは空です。",
+        "upload": "アップロード",
+        "delete": "削除",
+        "download": "ダウンロード",
+        "refresh": "リフレッシュ",
+        "locked": "ファイルマネージャーはすべての階層に含まれています。アクセスがまだブロックされている場合はエージェントをリフレッシュしてください。",
+        "unlock": "アンロック"
+      },
+      "workspace": {
+        "noFiles": "ワークスペースファイルは見つかりませんでした。",
+        "refresh": "リフレッシュ",
+        "loading": "ワークスペースの読み込み中..."
+      },
+      "addons": {
+        "title": "特典",
+        "description": "エージェントに追加の能力を増やしましょう。",
+        "noAddons": "まだ追加は購入していません。",
+        "purchase": "購入",
+        "active": "現役",
+        "expires": "期限切れ{date}",
+        "lifetime": "生涯"
+      },
+      "schedules": {
+        "new": "新スケジュール",
+        "noSchedules": "まだスケジュールは決まっていません。",
+        "noSchedulesDescription": "エージェントを自動的に動かすスケジュールを作成しましょう。",
+        "enable": "有効化",
+        "disable": "無効化",
+        "delete": "削除",
+        "save": "セーブ",
+        "name": "スケジュール名",
+        "cron": "クロン表現",
+        "nextRun": "次の運行",
+        "lastRun": "ラストラン",
+        "status": "現状",
+        "active": "現役",
+        "inactive": "非稼働"
+      },
+      "sidebar": {
+        "switchAgent": "スイッチエージェント",
+        "enter3DRoom": "3Dルームの登場",
+        "enter3DRoomSubtitle": "オープン空間ワークスペース",
+        "enter3DRoomTooltip": "エージェントの空間ワークスペースを開く"
+      }
+    }
+  },
+  "settings": {
+    "redirect": "設定にリダイレクトします..."
+  },
+  "explorePage": {
+    "eyebrow": "公的代理人",
+    "title": "パブリックAIエージェントとのチャット",
+    "body": "公開チャットを有効にした所有者の代理店を閲覧してください。各セッションはブラウザ上で実行され、エージェントのライブのライブHatcher設定を経由します。",
+    "cityCta": "オープンHatcher City",
+    "emptyTitle": "まだパブリックチャットエージェントはいません",
+    "emptyBody": "公開プロフィールは今もなおHatcher Cityに掲載されています。エージェントは、所有者がパブリックチャットを有効にするとここに表示されます。",
+    "fallbackDescription": "ブラウザチャットセッションに対応できるパブリックの Hatcher エージェント。",
+    "interactions": "相互作用",
+    "publicChat": "公開チャット",
+    "chatCta": "チャット",
+    "statsAgents": "公的代理人{count}",
+    "statsLive": "{count}今生きている",
+    "statsInteractions": "{count}相互作用",
+    "searchPlaceholder": "公的代理人を検索",
+    "filterAll": "全員",
+    "filterOpenClaw": "OpenClaw",
+    "filterHermes": "Hermes",
+    "filterLive": "ライブのみ",
+    "showingCount": "{count} 表示",
+    "noResultsTitle": "一致するエージェントはいません",
+    "noResultsBody": "別の検索、フレームワーク、またはライブフィルターを試してみてください。",
+    "frameworkLabel": "フレームワーク",
+    "featured": "特集作品",
+    "ownerFallback": "コミュニティエージェント",
+    "avatarLabel": "3Dパブリックエージェントアバター",
+    "statusRunning": "ライブ",
+    "statusSleeping": "眠っている",
+    "statusPaused": "一時停止",
+    "statusCrashed": "注意が必要です"
+  },
+  "agentPublic": {
+    "back": {
+      "toCity": "シティに戻る",
+      "toMyAgents": "エージェントたちに戻る",
+      "toDashboard": "ダッシュボードに戻る"
+    },
+    "status": {
+      "active": "現役",
+      "sleeping": "眠っている",
+      "paused": "一時停止",
+      "archived": "アーカイブ済み",
+      "error": "エラー",
+      "killed": "殺害",
+      "restarting": "再スタート"
+    },
+    "profile": {
+      "featuresCount": "{count}特徴",
+      "featuresCountPlural": "{count}特徴",
+      "frameworkFeatures": "フレームワークの特徴",
+      "by": "著者"
+    },
+    "share": {
+      "button": "シェア",
+      "copied": "コピーしました!"
+    },
+    "errors": {
+      "connectionError": "接続エラー",
+      "notFound": "エージェントが見つかりません",
+      "somethingWrong": "何かがうまくいかなかった",
+      "defaultMessage": "このエージェントは存在しないか、削除されています。",
+      "goBack": "戻れ",
+      "myAgents": "私のエージェントたち"
+    },
+    "owner": {
+      "heading": "管理しな{name}",
+      "body": "このエージェントは君のものだ。ダッシュボードにアクセスしてチャットや設定をしてください。",
+      "manageAgent": "エージェント管理",
+      "openChat": "オープンチャット"
+    },
+    "analytics": {
+      "heading": "エージェントアナリティクス",
+      "messages": "相互作用",
+      "daysActive": "活動中の日々",
+      "uptime": "稼働時間",
+      "status": "現状",
+      "framework": "フレームワーク",
+      "created": "創設"
+    },
+    "deploy": {
+      "heading": "同様のエージェントを展開してください",
+      "body": "Hatcherで自分だけの{framework}エージェントを作成してください。開始許可、展開は60秒で完了。",
+      "cta": "類似エージェントの展開",
+      "myAgents": "私のエージェントたち"
+    },
+    "publicChat": {
+      "eyebrow": "パブリックエージェントチャット",
+      "heading": "お話し{name}",
+      "usernamePlaceholder": "ユーザー名を選択してください",
+      "start": "チャットを始めてください",
+      "starting": "始まる...",
+      "newSession": "新会期",
+      "empty": "このエージェントと新しい公開セッションを始めてください。",
+      "messagePlaceholder": "メッセージを{username}",
+      "thinking": "調査中...",
+      "send": "メッセージを送信",
+      "errors": {
+        "session": "公開チャットセッションを開始できませんでした。",
+        "message": "このメッセージは送れませんでした。"
+      }
+    },
+    "errorPage": {
+      "heading": "エージェントのロード失敗",
+      "body": "このエージェントの詳細は読み込めなかった。削除されたか接続の問題があるかもしれません。",
+      "errorId": "エラーID:{id}",
+      "tryAgain": "もう一度試してみて",
+      "browseAgents": "ブラウズエージェント"
+    },
+    "statusPage": {
+      "poweredBy": "提供",
+      "uptimeLabel": "稼働時間は24時間",
+      "messages": "相互作用",
+      "days": "日々",
+      "since": "なぜなら",
+      "framework": "フレームワーク",
+      "lastActive": "最後の稼働時間:{date} at {time}",
+      "viewProfile": "プロフィールを見る",
+      "notFound": {
+        "heading": "エージェントが見つかりません",
+        "body": "このエージェントは存在しないか、公には見えません。",
+        "browseAgents": "ブラウズエージェント"
+      }
+    }
+  },
+  "city": {
+    "category": {
+      "district": "地区",
+      "breadcrumbCity": "Hatcher City",
+      "statAgents": "エージェント",
+      "statRunning": "走ってる",
+      "statShareOfCity": "市のシェア",
+      "seeIn3d": "3Dで見てみ→",
+      "emptyState": "この地区にはまだエージェントはいない。",
+      "emptyStateCta": "最初に作りましょう。",
+      "otherDistricts": "その他の地区",
+      "msgs": "MSGS"
+    }
+  },
+  "frameworks": {
+    "eyebrow": "フレームワーク",
+    "heading": "適切なフレームワークを選ぶ",
+    "subheading": "Hatcherは、スキル重視の自動化向けOpenClawと、適応型長期実行エージェント向けHermesという2つの本番エージェントフレームワークに焦点を当てています。",
+    "deployCta": "エージェントを展開する",
+    "docsLink": "全文ドキュメント",
+    "atAGlance": "一目で",
+    "featureMatrix": "特徴行列",
+    "featureCol": "特徴",
+    "bestFor": "一番...",
+    "bestForSubheading": "どのフレームワークを選べばいいのか迷っていますか?使い方に合わせてください。",
+    "benchmarks": "パフォーマンスベンチマーク",
+    "benchmarksSubheading": "共有インフラ上のコールドスタート時間とベースラインメモリ使用Hatcher。実際の値は設定によって異なります。",
+    "coldStart": "コールドスタート時間",
+    "memoryUsage": "ベースラインメモリ使用量",
+    "lowerFaster": "低いほど速い",
+    "lowerLeaner": "低いほど薄い",
+    "benchmarkCallout": "OpenClawは、最も幅広いスキル層と自動化が必要なときに最適です。Hermesメモリを多用する研究ワークフローを持つ適応型エージェントにとってはよりスリムです。",
+    "configExamples": "構成例",
+    "configSubheading": "各フレームワークには独自の設定フォーマットがあります。典型的なセットアップはこういうものです。",
+    "configRef": "完全な構成参照→",
+    "docsSuffix": "ドキュメント",
+    "llmSupport": "LLMのサポート",
+    "llmSubheading": "両フレームワークはプロバイダー課金の利用に対応できるBYOK(Bring Your Own Key)をサポートしています。ホスト型LLMはHatcherサポートプロバイダーとAI Creditsメーター利用を経由します。",
+    "byokNote": "* BYOK常に無料 — プロバイダー有料の利用は、Hatcher AI Creditsなしで。",
+    "byokSetupLink": "セットアップガイドBYOKご覧ください→",
+    "decisionGuide": "クイックディシズムガイド",
+    "readyCta": "展開の準備はできていますか?",
+    "readySubheading": "フレームワークを選び、エージェントを設定し、60秒以内に稼働を開始しましょう。無料プランも含めて。",
+    "deployFirstAgent": "最初のエージェントを展開してください",
+    "viewPricing": "価格表示",
+    "decisions": [
+      {
+        "condition": "最大限のツールと自動化が欲しいです",
+        "pick": "OpenClaw"
+      },
+      {
+        "condition": "時間をかけて学び続けられるエージェントが欲しいです",
+        "pick": "Hermes"
+      },
+      {
+        "condition": "マルチチャネルのメッセージングとトリガーが必要です",
+        "pick": "OpenClaw"
+      },
+      {
+        "condition": "メモリを多用する研究助手が必要だ",
+        "pick": "Hermes"
+      },
+      {
+        "condition": "マルチチャンネルメッセージング(Telegram + Discord + WhatsApp)が必要です。",
+        "pick": "OpenClawかHermes"
+      },
+      {
+        "condition": "ファイル、ログ、スキルが入ったワークスペースエージェントが欲しいです",
+        "pick": "OpenClaw"
+      }
+    ]
+  },
+  "token": {
+    "liveLabel": "ユーティリティトークンSolana",
+    "heading": "$HATCHER",
+    "subheading": "$HATCHERは、対象となるHatcherサブスクリプション、エクストラ、割引、オンチェーンバーンメカニクスに対するユーティリティ支払いオプションです。",
+    "caLabel": "CA:",
+    "viewDexscreener": "デックススクリーンナーでのビュー",
+    "viewSolscan": "見Solscan",
+    "burnBadge": "$HATCHER支払いの10%が同じ取引でオンチェーンで焼却されます。",
+    "burnsEyebrow": "オンチェーン燃焼",
+    "burnsHeading": "バーントラッカー",
+    "burnsBody": "ライブバーンデータは$HATCHERミントのSolana Token-2022燃焼指示から計算されます。トラッカーは6時間ごとにチェーン上で更新されるか、手動でリフレッシュを依頼したときに行われます。",
+    "burnsRefresh": "チェーン上でのリフレッシュ",
+    "burnsRefreshing": "さっぱりした",
+    "burnsError": "燃焼データは一時的に利用できません。最後にキャッシュされたスナップショットが利用可能になり次第表示されます。",
+    "burnsTotalLabel": "トータル・バーンド",
+    "burnsTxLabel": "バーン TX",
+    "burnsTxHelper": "{count} TXスキャン済み",
+    "burnsSupplyLabel": "サプライ・バーンド",
+    "burnsSupplyHelper": "現在の供給比率と燃焼分",
+    "burnsLatestLabel": "最新の燃焼",
+    "burnsNoBurnsShort": "まだ火傷はありません",
+    "burnsUpdated": "更新{time}",
+    "burnsUpdating": "更新",
+    "burnsPeriodHeading": "燃焼速度",
+    "burns24h": "24時間",
+    "burns7d": "7日間",
+    "burns30d": "30日間",
+    "burnsSourceNote": "公式ミントの明示的なSPLバーンとバーニングの説明書のみがカウントされます。失敗した取引や通常の送金は無視されます。",
+    "burnsFeedHeading": "最近の火傷",
+    "burnsUnknownTime": "不明の時間",
+    "burnsNoBurns": "バーン取引はまだ見つかっていない。",
+    "burnsNoBurnsBody": "$HATCHER支払いがオンチェーンバーン指示を作成すると、ここにSolscanリンクが表示されます。",
+    "createAgentCta": "フリーエージェントを作成",
+    "viewPricing": "価格表示",
+    "plannedUtilityLabel": "ユーティリティ",
+    "whatPowers": "$HATCHERどこに位置するのか",
+    "ecosystemDesc": "本格的な請求面初:明確な合計額、サポートされた支払いレール、そしてユーティリティに特化したトークン処理。",
+    "keyDetails": "主な詳細",
+    "networkLabel": "ネットワーク",
+    "networkValue": "Solana",
+    "splToken": "SPLトークン",
+    "statusLabel": "現状",
+    "statusValue": "プラットフォームユーティリティとして提供",
+    "trading": "ユーティリティ",
+    "contractLabel": "契約",
+    "platformLabel": "プラットフォーム",
+    "platformValue": "無料ティア開始 — トークンチェックアウトは有料ティアや特典に対応しています",
+    "stayInLoop": "Hatcherを制御面として使う",
+    "stayInLoopBody": "エージェントを配置し、請求を管理し、ワークフローに合った支払いラインを選びましょう。",
+    "followOnX": "Xのフォロー"
+  },
+  "roadmap": {
+    "liveLabel": "ライブ",
+    "heading": "ロードマップ",
+    "subheading": "私たちが築いたもの、今出荷予定のもの、そしてこれから向かう場所。私たちは公共の場で建築をします — ついていきましょう",
+    "followHandle": "X /@hatcherlabs",
+    "checkChangelog": "ライブチェンジログ",
+    "featureRequest": "機能リクエストがありますか?私たちはすべてを読みます。",
+    "submitRequest": "リクエストを提出してください",
+    "followOnX": "Xのフォロー"
+  },
+  "blog": {
+    "eyebrow": "ブログ",
+    "heading": "Hatcherブログ",
+    "subheading": "AIエージェントとHatcherプラットフォームに関するガイド、チュートリアル、洞察。",
+    "searchPlaceholder": "記事を検索してください...",
+    "allCategory": "全員",
+    "latestLabel": "最新",
+    "readLabel": "読む",
+    "resultsCount": "{count}「{query}」の結果",
+    "resultsCountPlural": "「{query}」の{count}結果",
+    "noArticles": "記事は見つかりませんでした",
+    "noArticlesCategory": "このカテゴリには記事が見つかりません。",
+    "noArticlesSearch": "「{query}」に関する記事は見つかりませんでした。",
+    "clearFilters": "クリアフィルター",
+    "backToBlog": "ブログに戻る",
+    "relatedArticles": "関連記事"
+  },
+  "changelog": {
+    "betaLabel": "Beta",
+    "heading": "変更ログ",
+    "subheading": "私たちは毎日改良品を発送しています。変わった点は以下の通りです。",
+    "noCommits": "コミットは見つかりませんでした。",
+    "errorMessage": "何かがうまくいかなかった。",
+    "tryAgain": "もう一度試してみて"
+  },
+  "help": {
+    "eyebrow": "資料",
+    "heading": "ヘルプセンター",
+    "subheading": "答えを見つけ、ガイドを閲覧し、サポートに連絡しましょう。",
+    "searchPlaceholder": "すべての質問を検索...例:「BYOK」「レートリミット」「Telegram」",
+    "resultCount": "{count}結果",
+    "resultCountPlural": "{count}結果",
+    "matchCount": "{count}試合",
+    "matchCountPlural": "{count}試合",
+    "noMatchHeading": "一致する問題は見つかりませんでした",
+    "noMatchBody": "異なるキーワードを試したり、ドキュメントを閲覧したりしましょう。",
+    "documentationLink": "記録",
+    "contactHeading": "お問い合わせ",
+    "contactBody": "探しているものが見つからない?",
+    "openTicket": "サポートチケットを開設してください",
+    "contactOr": "または直接連絡を取ることもできます:",
+    "technicalHelp": "技術的なサポート",
+    "generalInquiries": "一般調査",
+    "communitySupport": "地域社会の支援",
+    "communityChat": "コミュニティチャット",
+    "stillNeedHelp": "まだ助けが必要ですか?",
+    "ticketResponse": "サポートチケットを提出すれば、24時間以内にチームからご連絡いたします。",
+    "quickLinks": {
+      "documentation": "文書",
+      "discord": "Discord コミュニティ",
+      "telegram": "Telegramグループ",
+      "submitTicket": "チケットを送信",
+      "emailSupport": "メールサポート"
+    }
+  },
+  "status": {
+    "eyebrow": "現状",
+    "heading": "プラットフォームの現状",
+    "subheading": "Hatcherインフラのリアルタイムの健康状態。",
+    "navLabel": "Hatcher 現状",
+    "autoRefresh": "自動リフレッシュ30",
+    "operational": "全システム稼働",
+    "degraded": "一部のシステムは劣化しました",
+    "down": "サービスの中断を検出",
+    "statusOperational": "運用",
+    "statusDegraded": "劣化",
+    "statusDown": "伏せろ",
+    "lastChecked": "最終確認日:",
+    "refresh": "リフレッシュ",
+    "checking": "システムのチェック...",
+    "errorMessage": "APIに届かない。ステータスは利用できません。",
+    "activeAgents": "アクティブエージェント",
+    "totalAgents": "総エージェント数",
+    "components": "構成要素",
+    "updatedAt": "更新{time}",
+    "loading": "読み込み中...",
+    "backToHatcher": "← Hatcherに戻る"
+  },
+  "shortcuts": {
+    "backToDashboard": "ダッシュボードに戻る",
+    "heading": "キーボードショートカット",
+    "subheading": "キーボードショートカットでHatcherを速く移動できます",
+    "quickTipLabel": "ちょっとしたアドバイス",
+    "quickTipBody": "どこでもボタンを押してコマンドパレットを開きます。ページ、エージェント、アクションを即座に検索できます。",
+    "footerNote": "テキストフィールドを入力する際にショートカットは無効にします。macOSではCtrlの代わりにCmdを使ってください。"
+  },
+  "create": {
+    "errorHeading": "作成エラー",
+    "errorBody": "エージェントの設定中に何か問題が起きました。あなたの進歩は失われていません。",
+    "errorIdLabel": "エラーID:",
+    "tryAgain": "もう一度試してみて",
+    "dashboard": "ダッシュボード"
+  },
+  "support": {
+    "eyebrow": "助けて",
+    "heading": "支援",
+    "subheading": "エージェントや請求、その他何でもサポートを受けてください。",
+    "quickLinks": {
+      "documentation": "文書",
+      "documentationDesc": "ガイドとAPI参照を閲覧する",
+      "faq": "FAQ",
+      "faqDesc": "よくある質問に答えました",
+      "followUs": "フォローしてください",
+      "followUsDesc": "最新情報とお知らせ"
+    },
+    "directContact": "または直接メールでお問い合わせください。",
+    "joinDiscord": "ぜひ私たちのDiscordに参加してください",
+    "telegramLabel": "Telegram",
+    "communitySupport": "地域社会の支援のために",
+    "submitTicketHeading": "チケットを提出してください",
+    "signInPrompt": "サポートチケットを送信するにはサインインしてください。",
+    "signIn": "サインイン",
+    "ticketSubmitted": "チケット提出",
+    "ticketSubmittedBody": "ご要望を受理しており、まもなくご連絡いたします。アップデートがあれば通知が届きます。",
+    "submitAnother": "別のチケットを送信",
+    "subjectLabel": "主題",
+    "subjectPlaceholder": "あなたの問題について簡単に説明します",
+    "categoryLabel": "カテゴリー",
+    "priorityLabel": "優先順位",
+    "relatedAgentLabel": "関連エージェント",
+    "relatedAgentOptional": "(任意)",
+    "selectAgent": "エージェントを選べ...",
+    "messageLabel": "メッセージ",
+    "messagePlaceholder": "あなたの問題を詳しく説明してください...",
+    "submitTicket": "チケットを送信",
+    "submitting": "服従...",
+    "signInError": "チケットの提出にはサインインしてください。",
+    "subjectRequired": "対象者が必要です。",
+    "messageRequired": "メッセージが必要です。",
+    "failedSubmit": "チケットの提出に失敗しました。もう一度お試しください。",
+    "recentTickets": "最近のチケット",
+    "noTickets": "まだチケットはない",
+    "noTicketsDesc": "ご提出いただいたサポートチケットはここに表示されます。最初のチケットを作成して、上から始めましょう。",
+    "backToTop": "トップへ戻る",
+    "ticketCount": "{count}チケット",
+    "ticketCountPlural": "{count}チケット"
+  },
+  "affiliate": {
+    "eyebrow": "アフィリエイトプログラム",
+    "heading": "Hatcherに連れてくるユーザー一人ひとりから収益を得ましょう。",
+    "subheading": "紹介した有料ユーザーごとに20%の定期現金コミッションを獲得できます。帰属はリンクベースで、参照されたアカウントの存続期間中に維持されます。また、紹介されたユーザーが最初のエージェントを作成すると、両アカウントとも500 AI Creditsを受け取ります。",
+    "applyNowCta": "今すぐ応募",
+    "howItWorksLink": "仕組み",
+    "pickYourPayout": "委員会の構成",
+    "threeWays": "現金手数料、単純な台帳。",
+    "threeWaysSubheading": "アフィリエイト収益は現金のみで、対象となる有料収益に対して20%の定期報酬が支払われ、コミッションが支払われる前に30日間の保留期間があります。500 AI Credits紹介の報酬は両アカウントに別々に付与されます。",
+    "popularLabel": "人気者",
+    "foundingBonusLabel": "創設メンバーボーナス",
+    "foundingBonusHeading": "創設メンバーに現金ボーナス$20一律→紹介してください。",
+    "foundingBonusBody": "$99生涯ティアは、紹介するアフィリエイトに対して一度きりの定額$20を支払います。これは、そのユーザーの後のアドオンやエージェントによる購入から得た収益に加えてです。デフォルトの支払い方法に関係なく現金で支払われました。",
+    "applyLabel": "応募してください",
+    "howItWorksLabel": "仕組み",
+    "fourSteps": "四歩、驚きゼロ。",
+    "faqLabel": "よくある質問",
+    "everythingYoudAsk": "応募前に聞くべきことはすべて。",
+    "readyHeading": "Hatcherとパートナーを組む準備はできていますか?",
+    "readyBody": "申請は数分で終わります。承認は3〜5日で終わります。あなたが連れてくるすべてのユーザーの生涯にわたる定期的なコミッションです。",
+    "seePricing": "価格設定を参照",
+    "apply": {
+      "backLink": "アフィリエイトプログラムに戻る",
+      "loading": "読み込み中...",
+      "eyebrow": "Hatcherアフィリエイトに応募してください",
+      "heading": "あなたについて教えてください。",
+      "subheading": "あなたのプラットフォームやオーディエンスについていくつか詳しく説明します。すべての申請書を手作業で審査します — 正直に、具体的に。",
+      "underReview": "審査中 — またご連絡いたします。",
+      "reviewTime": "見込み審査時間:",
+      "reviewDays": "3〜5日間",
+      "reviewEmailNote": "決定が下された瞬間にメールが届きます。",
+      "submitted": "申請書提出",
+      "submittedDate": "提出",
+      "platformsLabel": "プラットフォーム",
+      "followers": "信者",
+      "slugLabel": "要求されたスラッグ",
+      "slugPreview": "プレビュー:hatcher.host/r/{slug}",
+      "payoutModeLabel": "支払いモード",
+      "payoutAddressLabel": "支払い先住所",
+      "pitchLabel": "音高",
+      "successHeading": "申請書は提出しました。",
+      "successBody": "3〜5日以内にレビューを行い、結果をメールでお送りします。その間に、承認されたら何を共有するか自由に具体的に決めてください。",
+      "backToAffiliate": "アフィリエイトプログラムに戻る",
+      "yourPlatforms": "あなたのプラットフォーム",
+      "platformCount": "{count} / {max}",
+      "platformLabel": "プラットフォーム{n}",
+      "removeLabel": "削除",
+      "addPlatform": "もう一つのプラットフォームを追加",
+      "platformTypeField": "プラットフォームの種類",
+      "handleField": "ハンドル",
+      "handleHint": "例:@hatcher、@solana、/channel/xyz",
+      "audienceField": "オーディエンスサイズ(任意)",
+      "urlField": "URL(任意)",
+      "slugField": "カスタム紹介リンク(任意)",
+      "slugPrefix": "hatcher.host/r/",
+      "slugPlaceholder": "あなたの名前",
+      "slugBlankHint": "自動生成コードのために空欄を残す",
+      "slugPreviewGood": "リンクはhatcher.host/r/{slug}",
+      "pitchField": "音高",
+      "pitchPlaceholder": "なぜHatcherとパートナーを組みたいのですか?どのようなコンテンツやオーディエンスにリーチしますか?",
+      "pitchCharHint": "50〜2000人のキャラクター",
+      "payoutModeField": "支払いモード",
+      "solAddressField": "SOLウォレットアドレス(base58、32–44キャラ)",
+      "solAddressPlaceholder": "eg. 21L6VVRAuxk87sXggz8exhPCm1w4qWyKEs6SDauyyRAW",
+      "submitBtn": "申請書を提出してください",
+      "submitting": "服従...",
+      "rejectedLabel": "以前の申請は却下されました",
+      "validatePlatformMin": "少なくとも一つのプラットフォームを追加してください",
+      "validatePlatformMax": "最大{max}プラットフォーム",
+      "validateHandleRequired": "必須",
+      "validateHandleMax": "最大100文字",
+      "validateAudienceNumber": "整数に違いない",
+      "validateUrlInvalid": "有効なURLでなければなりません",
+      "validatePitchMin": "ピッチは最低50文字でなければなりません",
+      "validatePitchMax": "ピッチは最大2000文字まででなければなりません",
+      "validateAddressRequired": "現金アフィリエイトの支払いには必須",
+      "validateAddressFormat": "有効なSolana base58アドレス(32–44 chars)でなければなりません",
+      "slugTooShort": "短すぎる — 最低3文字",
+      "slugTooLong": "長すぎる — 最大30文字まで",
+      "slugInvalidChars": "a–z、0–9、およびハイフンのみ(-で始まることも終わることもできません)",
+      "slugReserved": "そのスラッグは予約されている — 別の人を選んでください"
+    }
+  },
+  "docs": {
+    "eyebrow": "文書",
+    "heading": "文書",
+    "subheading": "HatcherでAIエージェントを構築、展開、管理するために必要なすべてが揃っています。",
+    "searchPlaceholder": "ドキュメント検索...",
+    "searchComingSoon": "捜索はまもなく行われます",
+    "apiReferenceHeading": "API 参考文献",
+    "apiReferenceBody": "cURL、JavaScript、Pythonによる例を含む完全なエンドポイントドキュメント。認証、レート制限、エラーコード。",
+    "apiReferenceLink": "エンドポイントの探索",
+    "integrationsHeading": "統合ガイド",
+    "integrationsBody": "Telegram、Discord、WhatsApp、Slack、Twitter/X、Signalのステップバイステップのセットアップ。認証情報から最初のメッセージまで。",
+    "integrationsLink": "プラットフォームの閲覧",
+    "popularTopics": "人気トピック",
+    "readMore": "続きを読む",
+    "cantFind": "探しているものが見つからない?",
+    "cantFindBody": "サポートチームとコミュニティが、Hatcherを最大限に活用できるようサポートします。",
+    "contactSupport": "サポートに連絡",
+    "helpCenter": "ヘルプセンター",
+    "quickLinks": [
+      {
+        "title": "はじめに",
+        "description": "最初のAIエージェントを60秒以内にセットアップしてください。クイックスタートガイド、前提条件、そしてファーストデプロイメント。"
+      },
+      {
+        "title": "エージェント構成",
+        "description": "Chat-to-Hatchを使い、OpenClawかHermesを選び、ランタイム、ファイル、統合、モデルルーティングを調整してください。"
+      },
+      {
+        "title": "AI Credits",
+        "description": "月次AI Creditsや一度限りのチャージアップが、ホストされたLLM、ウェブ検索、リサーチ、抽出、クロールツールをどのように支えているかをご覧ください。"
+      },
+      {
+        "title": "BYOK セットアップ",
+        "description": "OpenAI、Anthropic、Google、xAI、OpenRouterなどのプロバイダーキーをご自身で持参しましょう。BYOK Hatcher AI Credits使わない。"
+      },
+      {
+        "title": "フレームワーク",
+        "description": "フレームワーク適合、モデルルーティング、BYOK、ホストされたランタイム動作を含むOpenClawとHermesを比較してください。"
+      },
+      {
+        "title": "プラットフォーム統合",
+        "description": "すべてのティアに含まれる Telegram、Discord、Slack、Twitter/X、Signal、ウェブフック、その他のチャネルを接続できます。"
+      },
+      {
+        "title": "Hatcher CLI",
+        "description": "@hatcherlabs/CLIをインストールし、ハッチャーを実行し、エージェントを作成し、チャット、ターミナルアタッチ、GitHub設定、シェルからの通話A2A。"
+      },
+      {
+        "title": "開発者ワークフロー",
+        "description": "GitHubを接続し、ターミナルセッションを管理し、エージェント間通信を有効にし、所有エージェントをオーケストレーションします。"
+      },
+      {
+        "title": "Androidアプリ",
+        "description": "Androidアプリをインストールし、サインインし、エージェントを管理し、モバイル端末からプッシュ通知を受け取ることができます。"
+      },
+      {
+        "title": "API 参考文献",
+        "description": "REST APIエージェント、請求、AI Credits、支払い、パブリックチャット、管理運用のエンドポイントです。"
+      }
+    ],
+    "topics": [
+      {
+        "label": "エージェントをChat-to-Hatch"
+      },
+      {
+        "label": "AI Creditsの使い方"
+      },
+      {
+        "label": "ホストモデルとBYOK"
+      },
+      {
+        "label": "Androidプッシュ通知"
+      },
+      {
+        "label": "Telegram統合の設定"
+      },
+      {
+        "label": "対応する支払い方法"
+      }
+    ]
+  },
+  "shared": {
+    "tiers": {
+      "free": {
+        "name": "無料",
+        "description": "エージェント1台、月額500 AI Credits、ワークスペース2 GB"
+      },
+      "starter": {
+        "name": "スターター",
+        "description": "エージェント1台、月3,000件の月AI Credits、10GBのワークスペース"
+      },
+      "pro": {
+        "name": "長所",
+        "description": "エージェント3台、月間15,000件のAI Credits、25GBのワークスペース"
+      },
+      "business": {
+        "name": "ビジネス",
+        "description": "エージェントは5人、月AI Creditsは40,000人、ワークスペースは50GB、常にアクティブです"
+      },
+      "founding_member": {
+        "name": "創設メンバー",
+        "description": "10人のエージェント、月間25,000人の月AI Credits、40GBのワークスペース、生涯アクセス"
+      }
+    },
+    "addons": {
+      "agents_plus1": {
+        "name": "+1エージェント",
+        "description": "追加のエージェントスロット1つ"
+      },
+      "agents_plus3": {
+        "name": "+3 エージェント",
+        "description": "追加エージェントスロット3"
+      },
+      "agents_plus5": {
+        "name": "+5人のエージェント",
+        "description": "追加エージェントスロット5"
+      },
+      "agents_plus10": {
+        "name": "+10 エージェント",
+        "description": "追加エージェントスロット10"
+      },
+      "ai_credits_5000": {
+        "name": "5,000 AI Credits",
+        "description": "ホストモデルとウェブ検索の一回限りの補充"
+      },
+      "ai_credits_10000": {
+        "name": "1万AI Credits",
+        "description": "重いモデルランや研究のための一度限りの補充"
+      },
+      "ai_credits_25000": {
+        "name": "25,000 AI Credits",
+        "description": "大規模なエージェントワークロードに対する一度限りの補充"
+      },
+      "ai_credits_50000": {
+        "name": "5万AI Credits",
+        "description": "大量のホスト使用に対する一度限りの補充"
+      }
+    },
+    "frameworks": {
+      "openclaw": {
+        "name": "OpenClaw",
+        "description": "3,200+のコミュニティスキル、マルチチャネルメッセージングゲートウェイ、自律的なタスク実行を備えたセルフホスト型AIアシスタント。"
+      },
+      "hermes": {
+        "name": "Hermesエージェント",
+        "description": "Nous Researchによる自律型AIエージェントで、永続メモリ、40+ツール、スキルシステム、マルチプラットフォームメッセージングゲートウェイを備えています。"
+      }
+    },
+    "agentStatus": {
+      "active": "現役",
+      "sleeping": "眠っている",
+      "paused": "一時停止",
+      "archived": "アーカイブ済み",
+      "error": "エラー",
+      "killed": "殺害",
+      "restarting": "再スタート",
+      "stopping": "停止"
+    }
+  },
+  "localeSwitcher": {
+    "label": "言語の変更"
+  },
+  "agentRoom": {
+    "back": {
+      "toCity": "シティに戻る",
+      "toDashboard": "ダッシュボードに戻る",
+      "toAgents": "エージェントに戻る",
+      "toBuilding": "建物に戻る",
+      "toHouse": "ハウスに戻る"
+    }
+  },
+  "chatToHatch": {
+    "backLink": "←ダッシュボード",
+    "eyebrow": "自然言語エージェントビルダー",
+    "h1Prefix": "説明して。",
+    "h1Accent": "孵化させろ。",
+    "authChecking": "チェックセッション中...",
+    "assistantTitle": "Hatcher 助手",
+    "assistantSub": "Hatcher AIによって提供されています ·意図を完全なエージェント設定に解析します",
+    "live": "ライブ",
+    "assistantWho": "Hatcher",
+    "intro": "必要なエージェントを説明してください:何をするのか、どこで動作するのか、そして何を使えるかを教えてください。Hatcherは、展開前にレビューのためにフレームワーク、モデル、ツール、アイデンティティ、ランタイムドラフトを作成します。",
+    "thinking": "考えて...",
+    "placeholder": "私のStripeを監視し、毎朝親切な #revenue 要約をDiscordに投稿しているエージェントです。",
+    "send": "送信",
+    "sendRefine": "リファイン",
+    "previewTitle": "エージェントプレビュー",
+    "previewEmpty": "空っぽ",
+    "previewReady": "孵化準備完了",
+    "previewNeedsFix": "修正が必要",
+    "emptyHint": "まず左側のエージェントを描写してください。",
+    "reset": "推奨にリセット",
+    "resetTooltip": "すべてのフィールドをアシスタントの推奨値に戻す",
+    "labelName": "名称",
+    "labelDescription": "概要",
+    "labelPersonality": "性格",
+    "labelSystemPrompt": "SOUL.md / システムプロンプト",
+    "labelFramework": "フレームワーク",
+    "labelFrameworkReason": "なぜこの枠組みなのか",
+    "labelSkills": "設置スキル",
+    "labelPlugins": "インストールするプラグイン",
+    "labelInstallPlan": "設置計画",
+    "labelGreeting": "例文挨拶",
+    "labelModel": "ホストモデル",
+    "labelModelProvider": "AIルート",
+    "labelAvatar": "アバターのアイデア",
+    "labelAvatarVariant": "3Dアバター",
+    "labelAvatarPalette": "パレット",
+    "labelAvatarEmblem": "エンブレム",
+    "labelAvatarAccessory": "付属品",
+    "labelAvatarMood": "ムード",
+    "frameworkOpenClaw": "ブラウザ、ファイル、コード、リサーチ、そしてエージェントツールの使用。",
+    "frameworkHermes": "高速APIネイティブな自動化、ウェブフック、メッセージング、スケジューラー。",
+    "placeholderName": "代理人名",
+    "placeholderDescription": "このエージェントが何をしているのかを一文だけ説明する。",
+    "placeholderPersonality": "短い調子の指示 — 例えば簡潔で技術的、謝罪なし。",
+    "placeholderSystemPrompt": "マルチパラグラフシステムプロンプト — 役割、行動、声、ツール。",
+    "addSkill": "スキルを増やしましょう",
+    "addPlugin": "プラグインを追加",
+    "removeChip": "{name}を消してください",
+    "slugUrl": "URL",
+    "hatchBtn": "エージェントをデプロイしてください",
+    "hatchBtnLoading": "展開中...",
+    "footHint": "すべてのフィールドは編集可能です。デプロイ後は、エージェントコントロールルームから設定の精細化、スキルインストール、ログの検査、SOUL.md の更新が可能です。",
+    "errName_min": "名前には最低3文字が必要です。",
+    "errName_max": "名前が長すぎます(最大50人)。",
+    "errName_regex": "名前は文字、数字、スペース、そして : ' を使うことができます。( ) そして ただ。",
+    "errDesc_max": "説明が長すぎます(最大140人)。",
+    "errAssistant": "孵化助手は返事をしなかった。言い換えてみてください。",
+    "errNetwork": "ネットワークエラー — APIに到達可能か?",
+    "errCreate": "エージェントを作ることができなかった。説明を修正してもう一度試してみてください。",
+    "errCreateNetwork": "エージェント作成時のネットワークエラー。"
+  },
+  "landingV3": {
+    "hero": {
+      "boxLabel": "展開",
+      "headline1": "発売開始",
+      "headline2": "AIエージェントは数分で完成します。",
+      "sub": "必要なものを説明してください。Hatcher、モデル、ツール、ウォレット、スケジュール、ライブコントロールを備えたホストエージェントに変えます。",
+      "ctaPrimary": "最初のエージェントを作成しましょう",
+      "ctaGhost": "ライブエージェントを探る",
+      "ctaSignup": "無料アカウントを作成",
+      "ctaAppStoreKicker": "ダウンロード",
+      "ctaAppStore": "App Store",
+      "ctaPlayStoreKicker": "始めよう",
+      "ctaPlayStore": "Google Play",
+      "ctaSolanaMobileKicker": "利用可能",
+      "ctaSolanaMobile": "Solana モバイル",
+      "ctaFeatures": "すべての特徴を見る"
+    },
+    "flow": {
+      "boxLabel": "仕組み",
+      "title": "アイデアから実体エージェントまでの三つのステップ",
+      "tile1Title": "入力したいものを入力する",
+      "tile1Body": "ワークフローをわかりやすい英語で説明してください。Hatcherそれを構造化エージェント仕様書に変換します。",
+      "tile1Example": "Summarize Crypto News Daily(暗号通貨ニュース)を毎日まとめる",
+      "tile2Title": "設定を見直してください",
+      "tile2Body": "ローンチ前にフレームワーク、モデル、ツール、統合、ランタイム設定、AI Creditsを確認しましょう。",
+      "tile3Title": "ランタイムを起動してください",
+      "tile3Body": "チャット、ログ、ファイル、統合、端末アクセス、ライブコントロールを備えたホストされたランタイムに展開します。",
+      "cta": "あなたのものを作りましょう",
+      "ctaFeatures": "すべての特徴を見る",
+      "liveLabel": "エージェント・ライブ"
+    },
+    "useCases": {
+      "boxLabel": "エージェントができること",
+      "title": "簡単に、みんなが理解してくれるエージェントたち",
+      "body": "まずは平易な言葉でリクエストをしましょう。Hatcher、適切なフレームワーク、ツール、連携、空間、構築を備えたホストエージェントに変えます。",
+      "items": {
+        "crypto": {
+          "eyebrow": "市場",
+          "title": "暗号通貨ニューススカウト",
+          "body": "チャット、メール、Telegramを通じてトークンのニュース、ウォレットの動向、価格、日々の要約を追跡できます。"
+        },
+        "polymarket": {
+          "eyebrow": "予測市場",
+          "title": "ポリマーケット監視者",
+          "body": "市場、オッズシフト、ボリュームの急増を追い、論文に注意が必要な場合はアラートを送信しましょう。"
+        },
+        "trader": {
+          "eyebrow": "取引",
+          "title": "トレーダー・コパイロット",
+          "body": "ウォッチリスト、リスクノート、リサーチリンク、アラートを維持しつつ、すべての意思決定をコントロールしましょう。"
+        },
+        "community": {
+          "eyebrow": "コミュニティ",
+          "title": "TelegramまたはDiscord演算子",
+          "body": "FAQへの回答、チャンネルの管理、スレッドの要約、重要なメッセージのルーティングなどです。"
+        },
+        "research": {
+          "eyebrow": "研究",
+          "title": "日々のリサーチループ",
+          "body": "ウェブを検索し、資料を読み、ブリーフを作成し、重要なことを生きた記憶に残しましょう。"
+        },
+        "email": {
+          "eyebrow": "運用",
+          "title": "メールとタスクアシスタント",
+          "body": "受信箱の更新や返信の草稿、リマインダーの準備、そしてルーティン作業をスムーズに進めましょう。"
+        }
+      },
+      "footer": "すべての建物に自分の場所があり、入れる部屋があり、点検できるログがあります。",
+      "cta": "Chat-to-Hatchで創作"
+    },
+    "rooms": {
+      "boxLabel": "制御室",
+      "title": "すべてのエージェントがライブワークスペースを手に入れます",
+      "body": "Hatcher City空間層として残りますが、コアな製品体験は精密なコントロールルームです。チャット、ログ、ファイル、設定、統合、ターミナル、ステータスが一か所にまとめられています。",
+      "stationAvatar": "アバター",
+      "stationSkills": "スキルワークベンチ",
+      "stationIntegrations": "インテグレーションズラック",
+      "stationStatus": "ステータスコンソール",
+      "stationLogs": "丸太の壁",
+      "stationStats": "スタッツ・ホログラム",
+      "stationMemory": "メモリーシェルフ",
+      "stationConfig": "設定ターミナル"
+    },
+    "city": {
+      "boxLabel": "Hatcher City",
+      "title": "エージェントのネットワーク、歩いて行ける",
+      "body": "自分のエージェントの建物を主張しましょう。街を歩き回り、動いているエージェントを見つけ、建物に入ってすべての部屋を管理しましょう。",
+      "cta": "登場Hatcher City",
+      "districts": "25地区 ·グリッド5×5"
+    },
+    "frameworks": {
+      "boxLabel": "フレームワーク",
+      "seeAll": "すべてを見る→",
+      "tagOpenclaw": "マルチスキルアシスタント",
+      "tagHermes": "自律エージェント"
+    },
+    "pricing": {
+      "boxLabel": "価格設定",
+      "seeFull": "詳細な価格→",
+      "lifetime": "$99生涯",
+      "free": "$0",
+      "perMonth": "/mo",
+      "agentSingular": "エージェント",
+      "agentPlural": "エージェント",
+      "msgsPerDay": "AI Credits/mo"
+    },
+    "ecosystem": {
+      "boxLabel": "生態系",
+      "title": "エージェントインフラ向けに構築",
+      "sub": "OpenClawおよびHermesランタイム、ホスティングモデルやBYOK、そして支払い、アイデンティティ、プロバイダーワークフローのためのオプションの暗号ネイティブレールなどがあります。",
+      "frameworksLabel": "フレームワーク",
+      "chainsLabel": "鎖"
+    },
+    "team": {
+      "boxLabel": "チーム",
+      "title": "建設者たちHatcher",
+      "cristianName": "クリスチャン",
+      "cristianRole": "開発者/CEO",
+      "ioanaName": "イオアナ",
+      "ioanaRole": "CMO / マーケティング",
+      "johnName": "John",
+      "johnRole": "開発者",
+      "moiseName": "モイーズ",
+      "moiseRole": "米国代表 / コミュニティ",
+      "anonymousOneName": "匿名開発者",
+      "anonymousOneRole": "開発者",
+      "anonymousTwoName": "匿名開発者",
+      "anonymousTwoRole": "開発者",
+      "founderTag": "創設者",
+      "growthTag": "成長",
+      "builderTag": "ビルダー",
+      "communityTag": "コミュニティ",
+      "anonymousTag": "私立"
+    },
+    "finalCta": {
+      "boxLabel": "準備",
+      "headline": "最初のエージェントを配置しろ。",
+      "ctaPrimary": "ハッチエージェント",
+      "ctaGhost": "エージェントを見る",
+      "metaFrameworks": "OpenClaw + Hermes",
+      "metaNoCard": "クレジットカードは使えません"
+    },
+    "cli": {
+      "boxLabel": "CLI",
+      "title": "端末からHatcher実行してください",
+      "sub": "Hatcher CLIをインストールし、APIキーを作成し、`hatcher`を実行します。平易な英語からエージェントを作成し、チャットし、ライブランタイムにアタッチし、シェルを離れずに開発者のワークフローを管理しましょう。",
+      "apiKeyHint": "アカウント→ APIキーでAPIキーを生成→キーを作成してください。",
+      "ctaKey": "キー API作成",
+      "ctaDocs": "CLIドキュメンタリー",
+      "terminalLabel": "Hatcher CLI",
+      "features": {
+        "hatch": {
+          "title": "Chat-to-Hatch",
+          "body": "1つのプロンプトを設定済みのOpenClawまたはHermesエージェントに変換します。"
+        },
+        "terminal": {
+          "title": "ライブターミナル",
+          "body": "`hatcher terminal`と一緒にランニングフレームワークセッションに参加してください。"
+        },
+        "dev": {
+          "title": "開発ワークフロー",
+          "body": "GitHubアクセス、通話、セッション、ログ、オーケストレーションを一つのCLIからA2Aしてください。"
+        }
+      }
+    }
+  }
+}
