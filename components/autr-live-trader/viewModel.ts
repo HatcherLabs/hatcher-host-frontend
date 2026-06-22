@@ -4,10 +4,12 @@ export type AutrActionStatus =
   | 'paper_buy_skipped_insufficient_balance'
   | 'paper_buy_skipped_missing_output_amount'
   | 'paper_buy_skipped_invalid_route'
+  | 'paper_buy_skipped_onchain_delta'
   | 'paper_buy_skipped_max_positions'
   | 'paper_sell_skipped_no_position'
   | 'paper_sell_skipped_unpriced'
-  | 'paper_sell_skipped_invalid_route';
+  | 'paper_sell_skipped_invalid_route'
+  | 'paper_sell_skipped_onchain_delta';
 
 export interface AutrLiveTraderAction {
   proposal_id: string;
@@ -112,15 +114,21 @@ const actionStatusLabels: Record<AutrActionStatus, string> = {
   paper_buy_skipped_insufficient_balance: 'BUY skipped',
   paper_buy_skipped_missing_output_amount: 'BUY skipped',
   paper_buy_skipped_invalid_route: 'BUY skipped',
+  paper_buy_skipped_onchain_delta: 'BUY unfilled',
   paper_buy_skipped_max_positions: 'BUY skipped',
   paper_sell_skipped_no_position: 'SELL skipped',
   paper_sell_skipped_unpriced: 'SELL unpriced',
   paper_sell_skipped_invalid_route: 'SELL skipped',
+  paper_sell_skipped_onchain_delta: 'SELL unfilled',
 };
 
 export function shortAddress(value: string, head = 6, tail = 6): string {
   if (value.length <= head + tail + 3) return value;
   return `${value.slice(0, head)}...${value.slice(-tail)}`;
+}
+
+export function dexscreenerSolanaTokenUrl(mint: string): string {
+  return `https://dexscreener.com/solana/${encodeURIComponent(mint)}`;
 }
 
 export function formatSignedSol(value: string): string {
@@ -133,7 +141,12 @@ export function actionTone(status: AutrActionStatus): DashboardTone {
   if (status === 'paper_buy_filled') return 'success';
   if (status === 'paper_sell_filled') return 'accent';
   if (status.includes('unpriced') || status.includes('max_positions')) return 'warning';
-  if (status.includes('invalid') || status.includes('insufficient') || status.includes('missing_output')) return 'danger';
+  if (
+    status.includes('invalid')
+    || status.includes('insufficient')
+    || status.includes('missing_output')
+    || status.includes('onchain_delta')
+  ) return 'danger';
   return 'muted';
 }
 
