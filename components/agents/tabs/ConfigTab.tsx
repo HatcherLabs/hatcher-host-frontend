@@ -959,7 +959,7 @@ export function ConfigTab() {
                     <span
                       className="inline-flex items-center gap-1.5 rounded border border-[var(--border-subtle)] bg-[var(--bg-panel)] px-2 py-1"
                       title={selectedHostedModel.providerKey === 'xiaomi'
-                        ? 'Inference routes directly through Xiaomi MiMo during the launch promo. Avoid sensitive data unless you accept the partner route.'
+                        ? 'Inference routes through UsePod with OpenRouter fallback for Xiaomi MiMo. AI Credit billing applies.'
                         : selectedHostedModel.providerKey === 'acedata'
                           ? 'Inference routes through AceData first with OpenRouter fallback when needed. Review partner policy before using sensitive data.'
                         : selectedHostedModel.providerKey === 'openserv'
@@ -1344,7 +1344,7 @@ export function ConfigTab() {
                         <span
                           className="inline-flex h-fit items-center gap-1.5 text-xs text-[var(--text-secondary)]"
                           title={hostedModelPrivacy(model) === 'partner'
-                            ? 'Partner-hosted inference. Good for explicit partner routes like IDLE, Xiaomi MiMo, or AceData; review partner policy for sensitive data.'
+                            ? 'Partner-hosted inference. IDLE and AceData use explicit partner routes; Xiaomi MiMo is routed through UsePod/OpenRouter.'
                             : 'Hatcher-managed route. UsePod primary with OpenRouter fallback where needed.'}
                         >
                           <Info className="h-3 w-3" />

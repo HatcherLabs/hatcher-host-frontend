@@ -376,7 +376,7 @@ const HOSTED_MODELS: HostedModel[] = [
     'Partner',
     'Low',
     '1M',
-    'Free launch promo',
+    'AI Credits',
   ],
   [
     'xiaomi/mimo-v2.5',
@@ -386,7 +386,7 @@ const HOSTED_MODELS: HostedModel[] = [
     'Balanced',
     'Low',
     '1M',
-    'Free launch promo',
+    'AI Credits',
   ],
   [
     'xiaomi/mimo-v2-pro',
@@ -396,7 +396,7 @@ const HOSTED_MODELS: HostedModel[] = [
     'Partner',
     'Low',
     '1M',
-    'Free launch promo',
+    'AI Credits',
   ],
   [
     'xiaomi/mimo-v2-omni',
@@ -406,7 +406,7 @@ const HOSTED_MODELS: HostedModel[] = [
     'Multimodal',
     'Low',
     '256K',
-    'Free launch promo',
+    'AI Credits',
   ],
   [
     'acedata/claude-opus-4-8',
