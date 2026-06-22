@@ -12,6 +12,13 @@ const OG_LOCALE_MAP: Record<string, string> = {
   de: 'de_DE',
   fr: 'fr_FR',
   ro: 'ro_RO',
+  es: 'es_ES',
+  'pt-BR': 'pt_BR',
+  id: 'id_ID',
+  vi: 'vi_VN',
+  ja: 'ja_JP',
+  hi: 'hi_IN',
+  tr: 'tr_TR',
 };
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://hatcher.host';

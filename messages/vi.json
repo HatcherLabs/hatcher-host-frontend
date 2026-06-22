@@ -1,0 +1,2594 @@
+{
+  "common": {
+    "appName": "Hatcher",
+    "tagline": "Lưu trữ tác nhân AI được quản lý · Có nguồn gốc từ tiền điện tử"
+  },
+  "nav": {
+    "pricing": "Định giá",
+    "docs": "Tài liệu",
+    "roadmap": "Lộ trình",
+    "login": "Đăng nhập",
+    "signup": "Đăng ký",
+    "frameworks": "Khung",
+    "token": "Mã thông báo",
+    "blog": "Blog",
+    "changelog": "Nhật ký thay đổi",
+    "help": "Trợ giúp",
+    "dashboard": "Trang tổng quan",
+    "myAgents": "Tác nhân của tôi",
+    "create": "Tạo",
+    "city": "Thành phố",
+    "analytics": "Phân tích",
+    "skale": "Ví SKALE",
+    "team": "đội",
+    "billing": "Thanh toán",
+    "settings": "Cài đặt",
+    "support": "Hỗ trợ",
+    "logout": "Đăng xuất",
+    "signIn": "Đăng nhập",
+    "signUp": "Đăng ký",
+    "credits": "tín chỉ",
+    "affiliate": "liên kết",
+    "admin": "Quản trị viên",
+    "adminPanel": "Bảng quản trị",
+    "openNav": "Mở menu điều hướng",
+    "closeNav": "Đóng menu điều hướng",
+    "affiliateDashboard": "Trang tổng quan liên kết",
+    "affiliatePending": "Đơn đăng ký đang được xem xét",
+    "affiliateRejected": "Đăng ký lại với tư cách là chi nhánh",
+    "affiliateBecome": "Trở thành một chi nhánh",
+    "userMenu": {
+      "sub_myAgents": "Duyệt, chỉnh sửa, triển khai.",
+      "sub_create": "Mô tả một tác nhân để nở.",
+      "sub_analytics": "AI Credits, mã thông báo, xu hướng.",
+      "sub_billing": "Cấp, tiện ích bổ sung, tín dụng.",
+      "sub_wallets": "Ví thanh toán Solana.",
+      "sub_team": "Thành viên và sự hợp tác.",
+      "sub_settings": "Hồ sơ, khóa API, prefs.",
+      "sub_support": "Trợ giúp, tài liệu, liên hệ.",
+      "sub_affiliate": "Giới thiệu và báo cáo đối tác.",
+      "sub_admin": "Điều khiển nền tảng.",
+      "sub_signOut": "Kết thúc phiên trên thiết bị này.",
+      "tierSuffix": "bậc"
+    },
+    "groups": {
+      "build": "xây dựng",
+      "explore": "Khám phá",
+      "resources": "Tài nguyên",
+      "hatchAgentLabel": "Tác nhân nở (trò chuyện)",
+      "hatchAgentSub": "Mô tả thời gian chạy, công cụ và quy trình làm việc.",
+      "myAgentsLabel": "Tác nhân của tôi",
+      "myAgentsSub": "Bảng điều khiển cho các tác nhân đang điều hành của bạn.",
+      "publicAgentsLabel": "Tác nhân công",
+      "publicAgentsSub": "Trò chuyện với các tác nhân cộng đồng.",
+      "featuresLabel": "Tính năng",
+      "featuresSub": "Thời gian chạy, không gian làm việc, công cụ, phòng và CLI.",
+      "cityLabel": "Hatcher City",
+      "citySub": "Bước vào thế giới 3D của các tác nhân trực tiếp.",
+      "frameworksLabel": "Khung",
+      "frameworksSub": "OpenClaw · Hermes.",
+      "pricingLabel": "Định giá",
+      "pricingSub": "Miễn phí · Người mới bắt đầu · Chuyên nghiệp · Kinh doanh · Sáng lập.",
+      "tokenLabel": "$HATCHER",
+      "tokenSub": "Thanh toán tiện ích, giảm giá và cơ chế đốt cháy.",
+      "stakingLabel": "đặt cược",
+      "stakingSub": "Phần thưởng $HATCHER cộng với AI Credits.",
+      "whitepaperLabel": "Sách trắng",
+      "whitepaperSub": "Nền tảng, mã thông báo, tín dụng, lộ trình.",
+      "blogLabel": "Blog",
+      "blogSub": "Ghi chú, phát hành, lặn sâu.",
+      "roadmapLabel": "Lộ trình",
+      "roadmapSub": "Những gì chúng tôi gửi tiếp theo.",
+      "changelogLabel": "Nhật ký thay đổi",
+      "changelogSub": "Điều gì đã thay đổi và khi nào."
+    },
+    "hatchAgent": "tác nhân nở"
+  },
+  "notifications": {
+    "heading": "Thông báo",
+    "empty": "Không có thông báo",
+    "markRead": "Đánh dấu đã đọc",
+    "markReadAriaLabel": "Đánh dấu tất cả thông báo là đã đọc",
+    "clear": "Xóa",
+    "clearAriaLabel": "Xóa tất cả thông báo",
+    "unreadAriaLabel": "Thông báo, {count} chưa đọc",
+    "allReadAriaLabel": "Thông báo"
+  },
+  "footer": {
+    "columns": {
+      "product": "sản phẩm",
+      "resources": "Tài nguyên",
+      "community": "cộng đồng"
+    },
+    "links": {
+      "createAgent": "Tạo tác nhân",
+      "dashboard": "Trang tổng quan",
+      "pricing": "Định giá",
+      "affiliate": "liên kết",
+      "status": "Trạng thái",
+      "documentation": "Tài liệu",
+      "support": "Hỗ trợ",
+      "blog": "Blog",
+      "changelog": "Nhật ký thay đổi",
+      "security": "Bảo mật",
+      "roadmap": "Lộ trình",
+      "terms": "Điều khoản",
+      "privacy": "Quyền riêng tư",
+      "cookies": "Cookie",
+      "impressum": "ấn tượng",
+      "docs": "Tài liệu"
+    },
+    "copyright": "© {year} HatcherLabs. Mọi quyền được bảo lưu.",
+    "companyInfo": "HHX TECHNOLOGY SRL · CUI 45318471 · Timișoara, România",
+    "legalNotice": "Các trang pháp lý (Quyền riêng tư, Điều khoản, Ấn tượng, Cookie) chỉ có sẵn bằng tiếng Anh.",
+    "tag": "Dịch vụ lưu trữ tác nhân AI được quản lý · Romania",
+    "colBuild": "xây dựng",
+    "colExplore": "Khám phá",
+    "colResources": "Tài nguyên",
+    "colLegal": "pháp lý",
+    "itemHatchAgent": "tác nhân nở",
+    "itemMyAgents": "Tác nhân của tôi",
+    "itemPublicAgents": "Tác nhân công",
+    "itemFeatures": "Tính năng",
+    "itemCity": "Hatcher City",
+    "itemFrameworks": "Khung",
+    "itemPricing": "Định giá",
+    "itemToken": "$HATCHER",
+    "itemStaking": "đặt cược",
+    "itemWhitepaper": "Sách trắng",
+    "itemBlog": "Blog",
+    "itemRoadmap": "Lộ trình",
+    "itemChangelog": "Nhật ký thay đổi",
+    "itemSecurity": "Bảo mật",
+    "itemPrivacy": "Quyền riêng tư",
+    "itemTerms": "Điều khoản",
+    "itemCookies": "Cookie",
+    "itemImpressum": "ấn tượng",
+    "poweredBy": "Được cung cấp bởi"
+  },
+  "landing": {
+    "affiliateBanner": {
+      "live": "Chương trình liên kết đang hoạt động",
+      "earn": "— kiếm được tới",
+      "pct": "40%",
+      "perReferral": "trên mỗi lượt giới thiệu",
+      "dismissAriaLabel": "Loại bỏ biểu ngữ liên kết"
+    },
+    "tokenBanner": {
+      "learnMore": "Tìm hiểu thêm →"
+    },
+    "hero": {
+      "eyebrow": "Lưu trữ tác nhân AI được quản lý · Có nguồn gốc từ tiền điện tử",
+      "headlinePrefix": "nở của bạn",
+      "typewriterWords": [
+        "Đặc vụ AI",
+        "Huấn luyện viên thể hình",
+        "Trình theo dõi tiền điện tử",
+        "Bạn học",
+        "Người lập kế hoạch du lịch",
+        "Trợ lý cá nhân"
+      ],
+      "body": "Chọn OpenClaw hoặc Hermes. Cấu hình. Khởi động trong 60 giây. Không cần mã, không cần quản lý cơ sở hạ tầng. Hơn 20 nền tảng, lưu trữ các mô hình UsePod/OpenRouter và BYOK.",
+      "ctaPrimary": "Bắt đầu miễn phí",
+      "ctaSecondary": "Đọc tài liệu",
+      "agentPreviewOnline": "Người trợ giúp tiền điện tử — Trực tuyến"
+    },
+    "stats": {
+      "users": "Người dùng",
+      "agents": "Tác nhân",
+      "activeNow": "Đang hoạt động"
+    },
+    "agentDiscovery": {
+      "eyebrow": "Dành cho tác nhân AI",
+      "heading": "Chỉ huy một đội quân cấp dưới",
+      "body": "Tác nhân mã hóa địa phương của bạn sẽ trở thành chỉ huy hạm đội. Dán lời nhắc này — nó đăng ký trên Hatcher dưới tên của bạn, khởi động các tác nhân phụ luôn bật (bot Telegram, vòng lặp nghiên cứu, mod Discord, màn hình) và tiếp tục kiểm soát chúng rất lâu sau khi phiên của bạn kết thúc.",
+      "promptLabel": "Lời nhắc",
+      "copyLabel": "Sao chép",
+      "copiedLabel": "Đã sao chép",
+      "copyAriaLabel": "Sao chép lời nhắc",
+      "copiedAriaLabel": "Đã sao chép",
+      "step01": "Gửi lời nhắc này tới tác nhân mã hóa AI của bạn — Claude Code, Cursor, OpenClaw, Hermes hoặc bất kỳ tác nhân nào có thể tìm nạp URL và chạy lệnh shell.",
+      "step02": "Tác nhân đăng ký một tài khoản bằng email của bạn và gửi cho bạn một liên kết xác minh.",
+      "step03": "Nhấp vào xác minh. Hatcher phác thảo cấu hình, triển khai và trao cho bạn AI đang chạy.",
+      "viewSkillMd": "Xem kỹ năng.md",
+      "githubSource": "Nguồn GitHub"
+    },
+    "howItWorks": {
+      "eyebrow": "Nó hoạt động như thế nào",
+      "heading": "3 bước. 60 giây.",
+      "subheading": "Không có mã hóa, không có hướng dẫn thiết lập, không có tập tin cấu hình.",
+      "steps": [
+        {
+          "num": "01",
+          "title": "Chọn một khung",
+          "desc": "Chọn OpenClaw để tự động hóa đòi hỏi nhiều kỹ năng hoặc Hermes cho các tác nhân chạy dài thích ứng có bộ nhớ."
+        },
+        {
+          "num": "02",
+          "title": "Cấu hình",
+          "desc": "Tên, tính cách, sự hòa nhập. Điền vào biểu mẫu đơn giản — không có tệp cấu hình, không có YAML."
+        },
+        {
+          "num": "03",
+          "title": "Triển khai",
+          "desc": "Một cú nhấp chuột. Tác nhân của bạn sẽ hoạt động trên mọi nền tảng được kết nối trong vòng chưa đầy 60 giây."
+        }
+      ],
+      "cta": "Hãy thử ngay bây giờ"
+    },
+    "useCases": {
+      "eyebrow": "Trường hợp sử dụng",
+      "heading": "Bạn sẽ nở cái gì?",
+      "subheading": "Từ năng suất cá nhân đến tự động hóa kinh doanh — người đại diện của bạn, quy tắc của bạn.",
+      "items": [
+        {
+          "title": "Trợ lý cá nhân",
+          "desc": "Lịch, email, lời nhắc — từ Telegram."
+        },
+        {
+          "title": "Huấn luyện viên thể hình",
+          "desc": "Tập luyện, thói quen, trách nhiệm hàng ngày."
+        },
+        {
+          "title": "Thực phẩm & dinh dưỡng",
+          "desc": "Đăng nhập bữa ăn, đếm lượng calo, gợi ý công thức nấu ăn."
+        },
+        {
+          "title": "Trình theo dõi tiền điện tử",
+          "desc": "Giá token, cảnh báo danh mục đầu tư, dữ liệu trên chuỗi."
+        },
+        {
+          "title": "Bạn học",
+          "desc": "Đố bạn, tóm tắt sách giáo khoa, giúp làm bài tập về nhà."
+        },
+        {
+          "title": "Người lập kế hoạch du lịch",
+          "desc": "Tìm chuyến bay, lên kế hoạch hành trình, lựa chọn địa phương."
+        },
+        {
+          "title": "Người quản lý ngân sách",
+          "desc": "Theo dõi chi phí, mục tiêu tiết kiệm, báo cáo hàng tuần."
+        },
+        {
+          "title": "Trợ lý nghiên cứu",
+          "desc": "Tìm kiếm trên web, tổng hợp bài viết, tổng hợp báo cáo."
+        },
+        {
+          "title": "Hỗ trợ khách hàng",
+          "desc": "Trả lời Câu hỏi thường gặp trên Discord hoặc WhatsApp, 24/7."
+        }
+      ],
+      "footer": "Và bất cứ điều gì khác bạn có thể mô tả bằng tiếng Anh đơn giản."
+    },
+    "frameworks": {
+      "eyebrow": "Khung",
+      "heading": "Hai khuôn khổ. Một nền tảng.",
+      "subheading": "Chọn một trong những phù hợp với tác nhân của bạn. Chuyển đổi bất cứ khi nào bạn muốn.",
+      "items": [
+        {
+          "name": "OpenClaw",
+          "tag": "người toàn diện",
+          "desc": "Các công cụ, plugin và kiểm soát trình duyệt mạnh mẽ.",
+          "features": "Hơn 2500 kỹ năng · Tự động hóa trình duyệt · Quản lý tập tin"
+        },
+        {
+          "name": "Hermes",
+          "tag": "lý luận",
+          "desc": "Thiết kế thông minh đầu tiên cho trí nhớ và lý luận phong phú.",
+          "features": "77 kỹ năng đi kèm · Trí nhớ sâu sắc · Đa mô hình"
+        }
+      ]
+    },
+    "city": {
+      "eyebrow": "★ MỚI",
+      "heading": "Xem mọi tác nhân trong Hatcher City.",
+      "body": "Một thành phố 3D sống động nơi mỗi cơ quan công quyền là một tòa nhà. Các quận theo danh mục, màu sắc theo khung, dầm vàng đánh dấu của bạn. Kéo, thu phóng, nhấp vào bất kỳ tòa nhà nào để mở nó.",
+      "videoAriaLabel": "Mở Hatcher City",
+      "label": "THÀNH PHỐ HATCHER",
+      "exploreCta": "Khám phá toàn bộ hạm đội →",
+      "enterCta": "Nhập thành phố"
+    },
+    "features": {
+      "eyebrow": "Nền tảng",
+      "heading": "Mọi thứ mà tác nhân của bạn cần",
+      "items": [
+        {
+          "title": "Triển khai ngay lập tức",
+          "desc": "Từ số 0 đến tác nhân đang hoạt động trong vòng chưa đầy 60 giây."
+        },
+        {
+          "title": "Tất cả nền tảng",
+          "desc": "Telegram, Discord, Twitter, WhatsApp, Slack."
+        },
+        {
+          "title": "Mang theo chìa khóa riêng của bạn",
+          "desc": "Sử dụng khóa LLM API của riêng bạn mà không tốn AI Credits."
+        },
+        {
+          "title": "Bảo mật theo mặc định",
+          "desc": "Vùng chứa biệt lập, bí mật được mã hóa, không có dữ liệu chia sẻ."
+        },
+        {
+          "title": "Phân tích trực tiếp",
+          "desc": "Thống kê thời gian thực, theo dõi sử dụng, số liệu hiệu suất."
+        },
+        {
+          "title": "Trò chuyện và giọng nói",
+          "desc": "Trò chuyện bằng văn bản, cuộc gọi thoại, phát trực tuyến theo thời gian thực — ngay lập tức."
+        }
+      ]
+    },
+    "pricing": {
+      "eyebrow": "Định giá",
+      "heading": "Bắt đầu miễn phí, phát triển khi sẵn sàng",
+      "subheading": "Tất cả các nền tảng được bao gồm trên mọi gói. AI được lưu trữ trên máy chủ và tìm kiếm trên web sử dụng AI Credits; BYOK vẫn được nhà cung cấp thanh toán.",
+      "popularLabel": "phổ biến",
+      "tiers": [
+        {
+          "name": "miễn phí",
+          "price": "$0",
+          "sub": "/tháng",
+          "features": [
+            "1 đặc vụ AI",
+            "500 AI Credits/tháng",
+            "Không gian làm việc 2 GB",
+            "Tất cả nền tảng",
+            "Trình quản lý tệp + Nhật ký đầy đủ"
+          ],
+          "cta": "Bắt đầu"
+        },
+        {
+          "name": "người mới bắt đầu",
+          "price": "$6.99",
+          "sub": "/tháng",
+          "features": [
+            "1 đặc vụ AI",
+            "3.000 AI Credits/tháng",
+            "Không gian làm việc 10 GB",
+            "BYOK thanh toán trực tiếp",
+            "Luôn hoạt động"
+          ],
+          "cta": "Chọn người bắt đầu"
+        },
+        {
+          "name": "chuyên nghiệp",
+          "price": "$19.99",
+          "sub": "/tháng",
+          "features": [
+            "3 đặc vụ AI",
+            "15.000 AI Credits/tháng",
+            "Không gian làm việc 25 GB",
+            "BYOK thanh toán trực tiếp",
+            "Tài nguyên chuyên dụng"
+          ],
+          "cta": "Chọn chuyên nghiệp"
+        },
+        {
+          "name": "Kinh doanh",
+          "price": "$49.99",
+          "sub": "/tháng",
+          "features": [
+            "5 đặc vụ AI",
+            "40.000 AI Credits/tháng",
+            "Không gian làm việc 50 GB",
+            "Thùng chứa luôn bật",
+            "Hợp tác nhóm"
+          ],
+          "cta": "Chọn doanh nghiệp"
+        }
+      ],
+      "addonsNote": "Cần thêm tác nhân, AI Credits hoặc kho lưu trữ? Bổ sung thêm dung lượng khi bạn cần.",
+      "addonsCta": "Xem giá đầy đủ →"
+    },
+    "founding": {
+      "eyebrow": "Ưu đãi có hạn · Thành viên sáng lập",
+      "heading": "Trả tiền một lần, giữ mãi mãi.",
+      "oneTime": "một lần",
+      "subheading": "Giá cố định, không tính phí hàng tháng, tất cả các tính năng cấp Doanh nghiệp mãi mãi. Chỉ có 20 suất.",
+      "availableSpotsLabel": "Điểm có sẵn",
+      "checking": "Đang kiểm tra…",
+      "soldOut": "Bán hết",
+      "spotsLeft": "{remaining} của {max} còn lại",
+      "loadingAvailability": "Đang tải tình trạng sẵn có…",
+      "allTaken": "Tất cả các điểm nền tảng {max} đã được thực hiện. Các bậc tiêu chuẩn vẫn có sẵn.",
+      "claimed": "{claimed} của {max} đã yêu cầu · khi họ hết, ưu đãi này sẽ không còn nữa.",
+      "includedHeading": "Bao gồm mọi thứ, mãi mãi",
+      "includedItems": [
+        "Bao gồm 10 tác nhân",
+        "Luôn bật (không ngủ)",
+        "25.000 AI Credits/tháng",
+        "Tìm kiếm trên web sử dụng AI Credits",
+        "2 CPU · RAM 4 GB cho mỗi tác nhân",
+        "Không gian làm việc 40 GB",
+        "Trình quản lý tệp + Nhật ký đầy đủ",
+        "Hỗ trợ ưu tiên",
+        "Vai trò sáng lập Discord + thẻ Telegram",
+        "Giá bị khóa vĩnh viễn"
+      ],
+      "ctaSoldOut": "Bán hết",
+      "ctaClaim": "Yêu cầu vị trí của bạn"
+    },
+    "faq": {
+      "eyebrow": "Câu hỏi thường gặp",
+      "heading": "Câu hỏi thường gặp",
+      "items": [
+        {
+          "q": "Nó có thực sự miễn phí không?",
+          "a": "Vâng. Gói miễn phí cung cấp cho bạn 1 tác nhân, 500 AI Credits/tháng, không gian làm việc 2 GB, Trình quản lý tệp, Nhật ký đầy đủ và quyền truy cập vào tất cả các nền tảng. Không cần thẻ tín dụng. BYOK (mang theo khóa LLM của riêng bạn) vẫn được nhà cung cấp thanh toán ở mọi cấp độ."
+        },
+        {
+          "q": "Tôi có cần biết cách viết mã không?",
+          "a": "Không hề! Tạo nhân viên hỗ trợ cũng giống như điền vào biểu mẫu — chọn tên, mô tả những gì bạn muốn nhân viên đó làm, chọn nền tảng và khởi chạy."
+        },
+        {
+          "q": "\"Mang theo chìa khóa riêng của bạn\" là gì?",
+          "a": "Kết nối OpenAI, Anthropic, Google, OpenRouter của riêng bạn hoặc khóa LLM được hỗ trợ khác. Việc sử dụng BYOK được thanh toán trực tiếp cho nhà cung cấp của bạn và không chi tiêu Hatcher AI Credits."
+        },
+        {
+          "q": "Tác nhân của tôi hoạt động ở đâu?",
+          "a": "Trên máy chủ đám mây của chúng tôi 24/7. Không cần phải bật máy tính hoặc cài đặt bất cứ thứ gì."
+        }
+      ]
+    },
+    "finalCta": {
+      "heading": "Sẵn sàng triển khai tác nhân đầu tiên của bạn?",
+      "body": "Bậc miễn phí bao gồm 1 tác nhân, 500 AI Credits/tháng, Trình quản lý tệp, Nhật ký đầy đủ và không gian làm việc 2 GB. BYOK thanh toán trực tiếp. Không cần thẻ tín dụng.",
+      "ctaPrimary": "Tạo tác nhân của bạn",
+      "ctaSecondary": "Xem giá",
+      "trustNoCreditCard": "Không có thẻ tín dụng",
+      "trustFreeAi": "Bao gồm AI miễn phí",
+      "trustDeploy60s": "Triển khai trong thập niên 60",
+      "trustAllPlatforms": "Tất cả nền tảng"
+    }
+  },
+  "auth": {
+    "login": {
+      "heading": "Chào mừng trở lại",
+      "subheading": "Đăng nhập vào tài khoản Hatcher của bạn",
+      "panelTagline": "Hatcher",
+      "panelHeadlinePrefix": "nở của bạn",
+      "panelHeadlineAccent": "Tác nhân AI.",
+      "panelBody": "Chọn một khuôn khổ. Cấu hình. Khởi động trong 60 giây. Không có mã, không có cơ sở hạ tầng.",
+      "statsUsers": "Người dùng",
+      "statsAgents": "Tác nhân",
+      "statsOnline": "Trực tuyến ngay bây giờ",
+      "emailLabel": "Email",
+      "emailPlaceholder": "bạn@example.com",
+      "passwordLabel": "Mật khẩu",
+      "passwordPlaceholder": "Nhập mật khẩu của bạn",
+      "forgotLink": "Quên mật khẩu?",
+      "submit": "Đăng nhập",
+      "submitLoading": "Đang đăng nhập...",
+      "registerPrompt": "Bạn chưa có tài khoản?",
+      "registerLink": "Đăng ký"
+    },
+    "register": {
+      "heading": "Tạo tài khoản",
+      "subheading": "Bắt đầu với Hatcher",
+      "panelTagline": "Hatcher",
+      "panelHeadlinePrefix": "nở của bạn",
+      "panelHeadlineAccent": "Tác nhân AI.",
+      "panelBody": "Cấp miễn phí bao gồm AI Credits. Việc sử dụng BYOK được thanh toán trực tiếp cho nhà cung cấp của bạn. Không cần thẻ tín dụng.",
+      "statsUsers": "Người dùng",
+      "statsAgents": "Tác nhân",
+      "statsOnline": "Trực tuyến ngay bây giờ",
+      "referralBadge": "Được giới thiệu bởi {referrer} - cả hai bạn đều nhận được {credit}!",
+      "emailLabel": "Email",
+      "emailPlaceholder": "bạn@example.com",
+      "emailTaken": "Đã đăng ký rồi.",
+      "emailTakenLink": "Thay vào đó hãy đăng nhập",
+      "emailInvalid": "Nhập địa chỉ email hợp lệ.",
+      "usernameLabel": "Tên người dùng",
+      "usernamePlaceholder": "cooluser123",
+      "usernameTaken": "Tên người dùng này đã được sử dụng. Chọn cái khác.",
+      "usernameInvalid": "3–30 chữ cái, số, dấu gạch ngang hoặc dấu gạch dưới.",
+      "usernameHint": "Chỉ chữ cái, số, dấu gạch nối và dấu gạch dưới",
+      "passwordLabel": "Mật khẩu",
+      "passwordPlaceholder": "Nhập mật khẩu mạnh",
+      "passwordHint": "Phải bao gồm: 8 ký tự trở lên, chữ hoa, chữ thường, số và ký tự đặc biệt",
+      "confirmPasswordLabel": "Xác nhận mật khẩu",
+      "confirmPasswordPlaceholder": "Lặp lại mật khẩu của bạn",
+      "strengthLabels": {
+        "veryWeak": "Rất yếu",
+        "weak": "yếu",
+        "fair": "Công bằng",
+        "strong": "mạnh mẽ",
+        "veryStrong": "Rất mạnh"
+      },
+      "strengthChecks": {
+        "length": "8+ ký tự",
+        "lowercase": "Chữ thường",
+        "uppercase": "Chữ in hoa",
+        "number": "Số",
+        "special": "Ký tự đặc biệt"
+      },
+      "submit": "Tạo tài khoản",
+      "submitLoading": "Đang tạo tài khoản...",
+      "loginPrompt": "Đã có tài khoản?",
+      "loginLink": "Đăng nhập",
+      "errors": {
+        "emailTaken": "Email này đã được đăng ký. Thay vào đó hãy thử đăng nhập.",
+        "usernameTaken": "Tên người dùng này đã được sử dụng. Chọn một cái khác.",
+        "passwordMismatch": "Mật khẩu không khớp",
+        "passwordTooShort": "Mật khẩu phải có ít nhất 8 ký tự",
+        "passwordComplexity": "Mật khẩu phải có chữ hoa, chữ thường, số và ký tự đặc biệt"
+      }
+    },
+    "forgotPassword": {
+      "heading": "Quên mật khẩu?",
+      "subheading": "Nhập email của bạn và chúng tôi sẽ gửi cho bạn một liên kết đặt lại",
+      "emailLabel": "Email",
+      "emailPlaceholder": "bạn@example.com",
+      "submit": "Gửi liên kết đặt lại",
+      "submitLoading": "Đang gửi...",
+      "backToLogin": "Quay lại để đăng nhập",
+      "successHeading": "Kiểm tra email của bạn",
+      "successBody": "Nếu tài khoản <bold>{email}</bold> tồn tại, chúng tôi đã gửi liên kết đặt lại mật khẩu. Kiểm tra hộp thư đến và thư mục thư rác của bạn.",
+      "successBackLink": "Quay lại để đăng nhập",
+      "genericError": "Đã xảy ra lỗi. Vui lòng thử lại."
+    },
+    "resetPassword": {
+      "heading": "Đặt mật khẩu mới",
+      "subheading": "Nhập mật khẩu mới của bạn bên dưới",
+      "newPasswordLabel": "Mật khẩu mới",
+      "newPasswordPlaceholder": "8+ ký tự, chữ hoa, chữ thường, số, đặc biệt",
+      "passwordRequirements": "Sử dụng hơn 8 ký tự bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.",
+      "confirmPasswordLabel": "Xác nhận mật khẩu",
+      "confirmPasswordPlaceholder": "Lặp lại mật khẩu của bạn",
+      "passwordMismatch": "Mật khẩu không khớp",
+      "submit": "Đặt lại mật khẩu",
+      "submitLoading": "Đang đặt lại...",
+      "backToLogin": "Quay lại để đăng nhập",
+      "successHeading": "Đặt lại mật khẩu",
+      "successBody": "Mật khẩu của bạn đã được cập nhật. Bây giờ bạn có thể đăng nhập bằng mật khẩu mới của mình.",
+      "successCta": "Đăng nhập",
+      "invalidHeading": "Liên kết đặt lại không hợp lệ",
+      "invalidBody": "Liên kết đặt lại này bị thiếu hoặc không hợp lệ. Vui lòng yêu cầu một cái mới.",
+      "invalidCta": "Yêu cầu liên kết đặt lại mới",
+      "genericError": "Đặt lại không thành công. Liên kết có thể đã hết hạn."
+    },
+    "verifyEmail": {
+      "loadingHeading": "Đang xác minh email của bạn...",
+      "successHeading": "Email đã được xác minh!",
+      "successBody": "Tài khoản của bạn hiện đang hoạt động. Bạn có thể bắt đầu tạo tác nhân.",
+      "successCta": "Đi tới Trang tổng quan",
+      "errorHeading": "Xác minh không thành công",
+      "errorBody": "Liên kết xác minh không hợp lệ hoặc đã hết hạn.",
+      "errorCta": "Đi tới Đăng nhập",
+      "noTokenHeading": "Kiểm tra email của bạn",
+      "noTokenBody": "Chúng tôi đã gửi liên kết xác minh tới email của bạn. Nhấp vào liên kết để kích hoạt tài khoản của bạn.",
+      "noTokenHint": "Không nhận được nó? Kiểm tra thư mục thư rác của bạn hoặc thử đăng nhập để gửi lại."
+    }
+  },
+  "pricing": {
+    "eyebrow": "Định giá",
+    "heading": "Chọn kế hoạch của bạn",
+    "subheading": "Bắt đầu miễn phí với bất kỳ khuôn khổ nào. Chia tỷ lệ khi sẵn sàng. Tất cả các tích hợp được bao gồm trên mọi cấp độ. BYOK vẫn được nhà cung cấp thanh toán ở mọi cấp độ.",
+    "hatcherDiscountBanner": "Thanh toán bằng $HATCHER để được giảm giá 10% cho các gói và dịch vụ bổ sung.",
+    "hatcherDiscountLine": "Giá $HATCHER: ${price}",
+    "hatcherDiscountAnnual": "$HATCHER giá hàng năm: ${price}",
+    "billingToggle": {
+      "monthly": "hàng tháng",
+      "annual": "hàng năm",
+      "annualDiscount": "−15%"
+    },
+    "tierBadges": {
+      "popular": "phổ biến",
+      "limited": "Bị giới hạn"
+    },
+    "priceUnit": {
+      "perMonth": "/tháng",
+      "once": "một lần"
+    },
+    "annualSavings": "${annualTotal}/năm · tiết kiệm ${saved}",
+    "switchToAnnual": "Chuyển sang hàng năm, tiết kiệm 15%",
+    "payOnce": "Trả tiền một lần, giữ mãi mãi",
+    "availability": "sẵn có",
+    "availabilityLoading": "Đang tải",
+    "soldOut": "Bán hết",
+    "slotsLeft": "{remaining} của {max} còn lại",
+    "tierCta": {
+      "free": "Bắt đầu",
+      "paid": "Chọn {tierName}"
+    },
+    "tiers": {
+      "free": {
+        "agents": "Bao gồm 1 tác nhân",
+        "messages": "500 AI Credits/tháng",
+        "cpu": "1 CPU",
+        "ram": "RAM 1GB",
+        "storage": "Không gian làm việc 2 GB",
+        "sleep": "Tự động ngủ sau 12h không hoạt động",
+        "features": [
+          "Các mô hình được lưu trữ thông qua UsePod/OpenRouter",
+          "Tìm kiếm trên web sử dụng AI Credits",
+          "Trình quản lý tệp + Nhật ký đầy đủ được bao gồm",
+          "Tất cả các tích hợp (Telegram, Discord, Twitter, v.v.)"
+        ],
+        "missing": []
+      },
+      "starter": {
+        "agents": "Bao gồm 1 tác nhân",
+        "messages": "3.000 AI Credits/tháng",
+        "cpu": "1 CPU",
+        "ram": "RAM 1,5 GB",
+        "storage": "Không gian làm việc 10 GB",
+        "sleep": "Luôn hoạt động",
+        "features": [
+          "Các mô hình được lưu trữ thông qua UsePod/OpenRouter",
+          "Tìm kiếm trên web sử dụng AI Credits",
+          "Trình quản lý tệp + Nhật ký đầy đủ được bao gồm",
+          "Tất cả tích hợp"
+        ],
+        "missing": []
+      },
+      "pro": {
+        "agents": "Bao gồm 3 tác nhân",
+        "messages": "15.000 AI Credits/tháng",
+        "cpu": "CPU 1.5",
+        "ram": "RAM 2GB",
+        "storage": "Không gian làm việc 25 GB",
+        "sleep": "Luôn hoạt động",
+        "features": [
+          "Các mô hình được lưu trữ thông qua UsePod/OpenRouter",
+          "Tìm kiếm trên web sử dụng AI Credits",
+          "Trình quản lý tệp + Nhật ký đầy đủ được bao gồm",
+          "Tất cả tích hợp"
+        ],
+        "missing": []
+      },
+      "business": {
+        "agents": "Bao gồm 5 tác nhân",
+        "messages": "40.000 AI Credits/tháng",
+        "cpu": "2 CPU",
+        "ram": "RAM 3GB",
+        "storage": "Không gian làm việc 50 GB",
+        "sleep": "Luôn hoạt động",
+        "features": [
+          "Các mô hình được lưu trữ thông qua UsePod/OpenRouter",
+          "Tìm kiếm trên web sử dụng AI Credits",
+          "Bao gồm Trình quản lý tệp",
+          "Bao gồm nhật ký đầy đủ",
+          "Hỗ trợ ưu tiên",
+          "Hợp tác nhóm",
+          "Tất cả tích hợp"
+        ],
+        "missing": []
+      },
+      "founding_member": {
+        "agents": "Bao gồm 10 tác nhân",
+        "messages": "25.000 AI Credits/tháng",
+        "cpu": "2 CPU",
+        "ram": "RAM 4GB",
+        "storage": "Không gian làm việc 40 GB",
+        "sleep": "Luôn hoạt động",
+        "features": [
+          "$99 một lần — truy cập trọn đời",
+          "Các mô hình được lưu trữ thông qua UsePod/OpenRouter",
+          "Tìm kiếm trên web sử dụng AI Credits",
+          "Trình quản lý tệp + Nhật ký đầy đủ được bao gồm",
+          "Hỗ trợ ưu tiên",
+          "Tất cả tích hợp",
+          "Vai trò sáng lập Discord + thẻ Telegram"
+        ],
+        "missing": []
+      }
+    },
+    "addons": {
+      "heading": "Tiện ích bổ sung",
+      "subheading": "Thêm gói Tín dụng AI hoặc các vị trí tác nhân bổ sung khi bạn cần thêm dung lượng.",
+      "annualDiscount": "Giảm 15% hàng năm",
+      "hatcherDiscount": "$HATCHER: ${price}",
+      "groups": {
+        "extraAgents": {
+          "label": "Tác nhân bổ sung",
+          "items": [
+            {
+              "name": "+1 Tác nhân",
+              "period": "/tháng",
+              "description": "thêm 1 khe nữa"
+            },
+            {
+              "name": "+3 Tác nhân",
+              "period": "/tháng",
+              "description": "3 khe bổ sung"
+            },
+            {
+              "name": "+5 Tác nhân",
+              "period": "/tháng",
+              "description": "5 khe bổ sung"
+            },
+            {
+              "name": "+10 Tác nhân",
+              "period": "/tháng",
+              "description": "10 khe bổ sung"
+            }
+          ]
+        },
+        "aiCredits": {
+          "label": "AI Credits",
+          "items": [
+            {
+              "name": "5.000 AI Credits",
+              "period": "một lần",
+              "description": "Mô hình lưu trữ và tìm kiếm trên web"
+            },
+            {
+              "name": "10.000 AI Credits",
+              "period": "một lần",
+              "description": "Chạy và nghiên cứu mô hình nặng hơn"
+            },
+            {
+              "name": "25.000 AI Credits",
+              "period": "một lần",
+              "description": "Khối lượng công việc tác nhân lớn hơn"
+            },
+            {
+              "name": "50.000 AI Credits",
+              "period": "một lần",
+              "description": "Mức sử dụng được lưu trữ với số lượng lớn"
+            }
+          ]
+        },
+        "perAgent": {
+          "label": "Plugin + Kỹ năng",
+          "items": [
+            {
+              "name": "Đã bao gồm plugin",
+              "period": "bao gồm",
+              "description": "Bao gồm trên mỗi tầng"
+            }
+          ]
+        }
+      }
+    },
+    "integrations": {
+      "heading": "Tất cả tích hợp miễn phí",
+      "badge": "mỗi tầng",
+      "body": "Telegram, Discord, WhatsApp, Slack, Signal, iMessage và hơn 14 nền tảng khác được cung cấp miễn phí trên tất cả các cấp. Không có phí bổ sung, bao giờ hết.",
+      "note": "Tất cả giá đều được niêm yết bằng USD. Thanh toán bằng thẻ, SOL, USDC trên Solana, $HATCHER hoặc $KAUSA. Thanh toán $HATCHER được giảm giá 10%; mô hình lưu trữ và mức sử dụng tìm kiếm trên web được đo lường bằng AI Credits, trong khi BYOK được thanh toán trực tiếp bằng khóa nhà cung cấp của riêng bạn."
+    },
+    "compareTable": {
+      "heading": "So sánh các gói",
+      "subheading": "Xem nhanh những gì mỗi cấp bao gồm",
+      "featureColumn": "tính năng",
+      "onceSuffix": "một lần",
+      "rows": {
+        "agents": "Bao gồm tác nhân",
+        "messages": "AI Credits/tháng",
+        "searches": "Tìm kiếm trên web",
+        "byok": "Cách sử dụng nhà cung cấp BYOK",
+        "cpuRam": "CPU/RAM",
+        "storage": "Lưu trữ",
+        "autoSleep": "Tự động ngủ",
+        "fileManager": "Trình quản lý tệp",
+        "fullLogs": "Nhật ký đầy đủ",
+        "teamCollab": "Hợp tác nhóm",
+        "prioritySupport": "Hỗ trợ ưu tiên",
+        "plugins": "Plugin + Kỹ năng",
+        "integrations": "Tất cả tích hợp",
+        "byokKey": "BYOK (khóa LLM riêng)",
+        "defaultLlm": "Lựa chọn mô hình"
+      },
+      "values": {
+        "unlimited": "Không giới hạn",
+        "alwaysOn": "Luôn bật",
+        "addon": "Tiện ích bổ sung",
+        "llama4Scout": "Bộ chọn nhà cung cấp/mô hình"
+      }
+    },
+    "faq": {
+      "heading": "Câu hỏi thường gặp",
+      "items": [
+        {
+          "q": "BYOK (Mang theo chìa khóa riêng của bạn) là gì?",
+          "a": "BYOK cho phép bạn sử dụng khóa API của riêng mình cho bất kỳ nhà cung cấp LLM nào được hỗ trợ (OpenAI, Anthropic, Google, xAI, OpenRouter, v.v.). Điều này luôn miễn phí ở tất cả các cấp -- bạn thanh toán trực tiếp cho nhà cung cấp, không có đánh dấu Hatcher. Hatcher không đo mức sử dụng BYOK bằng AI Credits."
+        },
+        {
+          "q": "Tính năng bổ sung hoạt động như thế nào?",
+          "a": "Gói Tín dụng AI là gói nạp tiền một lần cho các mô hình được lưu trữ và tìm kiếm trên web. Khe cắm tác nhân bổ sung tăng công suất riêng biệt."
+        },
+        {
+          "q": "Sự khác biệt giữa tài nguyên được chia sẻ và dành riêng là gì?",
+          "a": "Tài nguyên được chia sẻ có nghĩa là tác nhân của bạn chia sẻ CPU và RAM với những người khác trên cùng một máy chủ -- vẫn hoạt động nhưng có thể thay đổi khi tải. Các tài nguyên chuyên dụng (Pro và Business) cung cấp cho tác nhân của bạn CPU và RAM được đảm bảo mà không ai khác có thể sử dụng."
+        },
+        {
+          "q": "Những phương thức thanh toán nào được chấp nhận?",
+          "a": "Bạn có thể thanh toán bằng thẻ, SOL, USDC trên Solana, $HATCHER hoặc $KAUSA. Giá tiền điện tử được niêm yết bằng USD và được quy đổi theo tỷ giá trực tiếp thông qua Sao Mộc."
+        },
+        {
+          "q": "Tôi có thể hạ cấp bậc của mình không?",
+          "a": "Vâng. Bạn có thể hủy đăng ký của mình bất kỳ lúc nào và cấp độ của bạn sẽ trở lại Miễn phí khi kết thúc thời hạn thanh toán. Tác nhân vượt quá giới hạn miễn phí của bạn sẽ bị tạm dừng."
+        },
+        {
+          "q": "Tự động ngủ là gì?",
+          "a": "Các tác nhân miễn phí sẽ ngủ sau 12 giờ không hoạt động. Các tác nhân Thành viên Starter, Pro, Business và Founder luôn hoạt động mà không có chế độ tự động ngủ."
+        },
+        {
+          "q": "Tôi nhận được LLM gì với bậc miễn phí?",
+          "a": "Việc sử dụng trên máy chủ được tính phí từ số dư Tín dụng AI của bạn và định tuyến thông qua nhà cung cấp được Hatcher hỗ trợ đã chọn, với các khoản dự phòng nếu có. Bạn có thể chọn từ các mô hình lưu trữ được hỗ trợ; BYOK bỏ qua việc đo lường Tín dụng AI của Hatcher vì bạn thanh toán trực tiếp cho nhà cung cấp của mình."
+        },
+        {
+          "q": "Cấp Thành viên sáng lập là gì?",
+          "a": "Thành viên sáng lập là khoản thanh toán $99 một lần cho phép bạn truy cập trọn đời vào Hatcher: 10 tác nhân, 25.000 AI Credits/tháng, 2 CPU / RAM 4 GB, không gian làm việc 40 GB, tác nhân luôn hoạt động, Trình quản lý tệp, Nhật ký đầy đủ, hỗ trợ ưu tiên và vai trò Sáng lập Discord + thẻ Telegram. Không có phí hàng tháng, bao giờ hết. Giới hạn ở 20 điểm - khi hết chỗ, cấp độ này sẽ biến mất."
+        }
+      ]
+    },
+    "help": {
+      "text": "Cần giúp đỡ trong việc lựa chọn một kế hoạch?",
+      "emailLabel": "Gửi email cho chúng tôi",
+      "discordLabel": "Discord",
+      "telegramLabel": "Telegram"
+    },
+    "cta": {
+      "heading": "Sẵn sàng triển khai tác nhân của bạn?",
+      "body": "Mô tả tác nhân bạn muốn và triển khai trong vài giây. Bắt đầu miễn phí với AI Credits được lưu trữ. Nâng cấp khi bạn cần thêm năng lượng.",
+      "createAgent": "Tạo tác nhân",
+      "seeFrameworks": "Xem khung"
+    },
+    "footerNote": "Tất cả giá bằng USD, thanh toán bằng thẻ, SOL, USDC trên Solana, $HATCHER hoặc $KAUSA. Mô hình lưu trữ và mức sử dụng tìm kiếm trên web được đo lường bằng AI Credits; BYOK được thanh toán trực tiếp bằng khóa nhà cung cấp của riêng bạn."
+  },
+  "dashboard": {
+    "common": {
+      "loading": "Đang tải...",
+      "authenticating": "Đang xác thực...",
+      "signInRequired": "Yêu cầu đăng nhập",
+      "signIn": "Đăng nhập",
+      "refresh": "Làm mới",
+      "save": "Lưu",
+      "cancel": "Hủy bỏ",
+      "delete": "Xóa",
+      "create": "Tạo",
+      "invite": "Mời",
+      "share": "Chia sẻ",
+      "unshare": "Hủy chia sẻ",
+      "copy": "Sao chép",
+      "copied": "Đã sao chép!",
+      "close": "Đóng",
+      "confirm": "Xác nhận",
+      "back": "Quay lại",
+      "noDescription": "Không có mô tả",
+      "clear": "Xóa"
+    },
+    "agents": {
+      "eyebrow": "Trang tổng quan",
+      "heading": "Tác nhân của tôi",
+      "subtitleEmpty": "Tạo tác nhân đầu tiên của bạn để bắt đầu.",
+      "createCta": "Tạo tác nhân",
+      "searchPlaceholder": "Tác nhân tìm kiếm... ( / )",
+      "filterAll": "Tất cả",
+      "frameworkAll": "Tất cả các khung",
+      "sortNewest": "Mới nhất",
+      "sortAZ": "A-Z",
+      "sortMessages": "Tích cực nhất",
+      "sortActive": "Hoạt động lần cuối",
+      "emptyTitle": "Chưa có tác nhân",
+      "emptyDescription": "Tạo tác nhân AI đầu tiên của bạn và triển khai nó sau 60 giây.",
+      "emptyActionLabel": "Tạo tác nhân",
+      "emptySecondaryLabel": "Xem khung",
+      "noMatchTitle": "Không có tác nhân phù hợp",
+      "noMatchDescription": "Hãy thử điều chỉnh tiêu chí tìm kiếm hoặc bộ lọc của bạn.",
+      "signInDescription": "Đăng nhập vào tài khoản của bạn để truy cập các tác nhân của bạn.",
+      "featuresCount": "Tính năng {count}",
+      "featuresCountPlural": "Tính năng {count}",
+      "agentsCount": "Tổng số tác nhân {count} · {active} đang hoạt động",
+      "agentsCountPlural": "Tổng số tác nhân {count} · {active} đang hoạt động",
+      "details": "Chi tiết",
+      "tourCreateTitle": "Tạo tác nhân đầu tiên của bạn",
+      "tourCreateDescription": "Nhấp vào đây để ấp tác nhân AI đầu tiên của bạn với OpenClaw hoặc Hermes.",
+      "tourFilterTitle": "Lọc theo khung",
+      "tourFilterDescription": "OpenClaw là lựa chọn tốt nhất cho tự động hóa; Hermes là giải pháp tốt nhất cho quy trình làm việc của bộ nhớ thích ứng.",
+      "tourSearchTitle": "Tìm kiếm & Khám phá",
+      "tourSearchDescription": "Tìm kiếm tác nhân hoặc khởi chạy Chat-to-Hatch để bắt đầu nhanh chóng.",
+      "tourPlanTitle": "Kế hoạch của bạn",
+      "tourPlanDescription": "Bắt đầu miễn phí với 1 tác nhân, 500 AI Credits/tháng và các công cụ đi kèm. Nâng cấp bất cứ lúc nào.",
+      "statTotal": "Tổng cộng",
+      "statActive": "Đang hoạt động",
+      "statSleeping": "đang ngủ",
+      "statMeshReady": "Lưới đã sẵn sàng",
+      "viewAgents": "Tác nhân",
+      "viewOrchestration": "Hòa âm",
+      "meshTitle": "Lưới điều phối tác nhân",
+      "meshSubtitle": "Kết nối các tổng đài viên cùng chủ sở hữu, gửi các nhiệm vụ bị giới hạn và kiểm tra hoạt động gần đây giữa các tổng đài viên từ một nơi.",
+      "meshSource": "Tác nhân nguồn",
+      "meshTarget": "Tác nhân mục tiêu",
+      "meshSelectTarget": "Chọn mục tiêu",
+      "meshNoAgents": "Không có tác nhân có thể gọi được",
+      "meshModeSync": "Đồng bộ hóa",
+      "meshModeAsync": "Không đồng bộ",
+      "meshTaskLabel": "Nhiệm vụ",
+      "meshTaskPlaceholder": "Yêu cầu một tổng đài viên nghiên cứu, xem xét, tóm tắt hoặc thực hiện một nhiệm vụ giới hạn cho một tổng đài viên khác...",
+      "meshSend": "Nhiệm vụ điều động",
+      "meshRefresh": "Làm mới",
+      "meshEnableAll": "Kích hoạt lưới",
+      "meshEnableAgent": "Kích hoạt",
+      "meshOpenDev": "Tab nhà phát triển",
+      "meshAvailable": "Có sẵn",
+      "meshDisabled": "Đã tắt",
+      "meshRecent": "Hoạt động lưới gần đây",
+      "meshNoLogs": "Chưa có cuộc gọi từ tác nhân đến tác nhân nào.",
+      "msgsShort": "tương tác",
+      "cardOpen": "Phòng 3D",
+      "cardOpenTooltip": "Vào phòng 3D",
+      "actionStop": "Dừng lại",
+      "actionStart": "Bắt đầu",
+      "actionRestart": "Khởi động lại",
+      "noResultsAction": "Xóa bộ lọc"
+    },
+    "billing": {
+      "eyebrow": "Tài khoản",
+      "heading": "Thanh toán & kế hoạch",
+      "breadcrumbDashboard": "Trang tổng quan",
+      "breadcrumbBilling": "Thanh toán",
+      "connectWallet": "Kết nối ví",
+      "connectedWallet": "Ví được kết nối",
+      "switchWallet": "Chuyển đổi ví",
+      "disconnect": "Ngắt kết nối",
+      "loadingBilling": "Đang tải thanh toán...",
+      "signInDescription": "Đăng nhập để quản lý gói và thanh toán của bạn.",
+      "creditsBalance": "Số dư AI Credits",
+      "creditsUsd": "AI Credits",
+      "creditsDesc": "AI Credits được sử dụng cho các công cụ LLM được lưu trữ, tìm kiếm trên web, nghiên cứu, trích xuất và thu thập thông tin.",
+      "recentTransactions": "Giao dịch gần đây",
+      "currentTier": "Gói hiện tại",
+      "freeTier": "Bậc miễn phí",
+      "active": "Đang hoạt động",
+      "agentUsage": "Cách sử dụng tác nhân",
+      "agentsOf": "{count} của tác nhân {limit} được sử dụng",
+      "agentsOver": "{over} vượt quá giới hạn",
+      "slotsRemaining": "Còn lại khe {slots}",
+      "slotsRemainingPlural": "Còn lại các khe {slots}",
+      "activeAddons": "Tiện ích bổ sung đang hoạt động",
+      "expires": "Hết hạn {date}",
+      "extend": "Gia hạn",
+      "extend30Days": "Gia hạn +30 ngày (${price})",
+      "upgradeAnnual": "Nâng cấp lên hàng năm (${price})",
+      "annualDiscount": "-15%",
+      "renew": "Gia hạn",
+      "renewFor": "Gia hạn cho ${price}",
+      "planExpired": "Gói đã hết hạn — hãy gia hạn để duy trì cấp độ của bạn",
+      "planExpiring": "Hết hạn sau ngày {days} — hãy gia hạn ngay",
+      "planExpiringPlural": "Hết hạn sau {days} ngày — hãy gia hạn ngay",
+      "planActiveUntil": "Hoạt động cho đến {date}",
+      "noCharge": "Không tính phí",
+      "lifetimePrice": "trọn đời",
+      "lifetimePriceFull": "${price} trọn đời",
+      "monthlyPrice": "${price} / 30 ngày",
+      "unlimitedMessages": "AI Credits",
+      "messagesPerDay": "{count} AI Credits",
+      "byokUnlimited": "",
+      "upgradeSection": "Nâng cấp gói của bạn",
+      "upgradeDesc": "Nhận thêm tác nhân, AI Credits và sức mạnh tính toán.",
+      "addonsSection": "Tiện ích bổ sung",
+      "addonsDesc": "Tăng thêm dung lượng cho gói hiện tại của bạn.",
+      "accountAddons": "Tiện ích bổ sung cấp tài khoản",
+      "perAgentAddons": "Tiện ích bổ sung cho mỗi tác nhân",
+      "annualBilling": "Thanh toán hàng năm",
+      "annualBillingDesc": "Giảm giá 15% - các khoản bổ sung định kỳ",
+      "hatcherDiscountTitle": "Giảm 10% với $HATCHER",
+      "hatcherDiscountBody": "Sử dụng $HATCHER trên Solana cho các gói, gói Tín dụng AI và các vị trí tác nhân bổ sung. Giảm giá được áp dụng trước khi xác nhận ví.",
+      "monthly": "hàng tháng",
+      "annual": "hàng năm",
+      "monthSuffix": "/ 30 ngày",
+      "annualSuffix": "/ năm",
+      "yearSuffix": "/ năm",
+      "paymentHistory": "Lịch sử thanh toán",
+      "noPaymentsYet": "Chưa có khoản thanh toán nào",
+      "noPaymentsDesc": "Lịch sử thanh toán của bạn sẽ xuất hiện ở đây.",
+      "status": {
+        "confirmed": "Đã xác nhận",
+        "pending": "Đang chờ xử lý",
+        "failed": "thất bại",
+        "refunded": "Đã hoàn tiền"
+      },
+      "selectAgent": "Chọn tác nhân",
+      "choosePayment": "Chọn phương thức thanh toán",
+      "applyToAgent": "Áp dụng cho tác nhân:",
+      "noAgentsFound": "Không tìm thấy tác nhân nào. Tạo một tác nhân đầu tiên.",
+      "payWithSol": "Thanh toán bằng SOL",
+      "solDesc": "Thanh toán bằng ví Solana",
+      "payWithHatcher": "Thanh toán bằng $HATCHER",
+      "hatcherDesc": "Mã thông báo HATCHER trên Solana",
+      "hatcherDiscountDesc": "Giảm 10% với $HATCHER: {price}",
+      "payWithKausa": "Thanh toán bằng $KAUSA",
+      "kausaDesc": "Mã thông báo đối tác KausaLayer trên Solana",
+      "payWithUsdcSolana": "Thanh toán bằng USDC trên Solana",
+      "usdcSolanaDesc": "SPL USDC qua ví Solana",
+      "payWithCryptoNow": "Thanh toán qua CryptoNow",
+      "cryptnowDesc": "Đã lưu trữ thanh toán SOL / USDC",
+      "payWithUsdc": "Thanh toán bằng USDC",
+      "usdcDesc": "Stablecoin — 1 USDC = $1",
+      "payWithCard": "Thanh toán bằng thẻ",
+      "cardDesc": "Thẻ tín dụng/thẻ ghi nợ qua Stripe",
+      "foundingSlots": "{remaining} trong số các khe {max} còn lại",
+      "foundingSoldOut": "Bán hết",
+      "oneTimeSuffix": "một lần",
+      "oneTimeAgent": "một lần/tác nhân",
+      "annualAgent": "/năm/tác nhân",
+      "monthAgent": "/ 30 ngày/ tác nhân",
+      "manageBilling": "Quản lý thanh toán",
+      "successPayment": "Thanh toán thành công! Tài khoản của bạn đang được nâng cấp. Có thể mất một chút thời gian để suy ngẫm.",
+      "canceledPayment": "Thanh toán đã bị hủy. Không có khoản phí nào được thực hiện."
+    },
+    "analytics": {
+      "eyebrow": "Trang tổng quan",
+      "heading": "Phân tích sử dụng",
+      "subheading": "Tương tác trên toàn tài khoản, mức sử dụng được lưu trữ trên máy chủ và AI Credits.",
+      "signInDescription": "Đăng nhập để xem phân tích.",
+      "interactionVolume": "Khối lượng tương tác",
+      "messageVolume": "Khối lượng tương tác",
+      "last14Days": "14 ngày qua",
+      "last30Days": "30 ngày qua",
+      "frameworks": "Khung",
+      "agentStatus": "Trạng thái tác nhân",
+      "totalMessages": "Tương tác tác nhân",
+      "noMessageData": "Chưa có dữ liệu tương tác - hãy bắt đầu trò chuyện với tác nhân của bạn!",
+      "noAgentsYet": "Chưa có tác nhân",
+      "noAgentsEmpty": "Chưa có tác nhân nào. Tạo tác nhân đầu tiên của bạn để bắt đầu xem phân tích.",
+      "createAgent": "Tạo tác nhân",
+      "totalAgents": "Tổng tác nhân",
+      "totalAgentsSub": "{active} đang hoạt động",
+      "messages": "Tương tác",
+      "messagesAllTime": "Mọi lúc",
+      "llmCalls": "Cuộc gọi LLM",
+      "llmCallsAllTime": "Mọi lúc",
+      "aiCreditsBalance": "AI Credits",
+      "monthlyGrant": "{count} trợ cấp hàng tháng",
+      "aiCreditsUsed": "AI Credits Đã qua sử dụng",
+      "hostedUsage": "Cách sử dụng được lưu trữ",
+      "hostedUsageSubheading": "LLM được lưu trữ, tìm kiếm trên web, nghiên cứu, trích xuất và thu thập dữ liệu sử dụng tài khoản AI Credits. Việc sử dụng BYOK bỏ qua đồng hồ đo này.",
+      "remainingBalance": "Số dư còn lại",
+      "usedLast30": "Đã sử dụng 30 ngày qua",
+      "usageByKind": "Cách sử dụng theo loại",
+      "tokensProcessed": "Mã thông báo đã được xử lý",
+      "inputTokens": "đầu vào",
+      "outputTokens": "đầu ra",
+      "noHostedUsageYet": "Chưa có cách sử dụng được lưu trữ nào. Việc sử dụng BYOK không tiêu tốn AI Credits.",
+      "last14DaysLabel": "14 ngày qua",
+      "last14DaysSub": "Tương tác của người dùng",
+      "today": "hôm nay",
+      "noDataYet": "Chưa có dữ liệu tương tác"
+    },
+    "team": {
+      "eyebrow": "Hợp tác",
+      "heading": "đội",
+      "subheading": "Tạo một nhóm để chia sẻ các tác nhân và cộng tác với những người khác.",
+      "signInTitle": "Đăng nhập để truy cập Nhóm",
+      "signInDesc": "Các nhóm cho phép bạn cộng tác với những người khác trên các tác nhân AI của bạn.",
+      "createTeamTitle": "Tạo nhóm của bạn",
+      "createTeamDesc": "Bắt đầu cộng tác bằng cách tạo một nhóm. Sau đó, bạn có thể mời các thành viên và chia sẻ tác nhân của mình.",
+      "teamNamePlaceholder": "Tên đội...",
+      "createBtn": "Tạo",
+      "creating": "Đang tạo...",
+      "membersHeading": "Thành viên",
+      "inviteMemberHeading": "Mời thành viên",
+      "emailPlaceholder": "Địa chỉ email...",
+      "invite": "Mời",
+      "roleAdmin": "Quản trị viên",
+      "roleMember": "Thành viên",
+      "roleViewer": "Người xem",
+      "roleOwner": "chủ sở hữu",
+      "you": "(bạn)",
+      "sharedAgentsHeading": "Tác nhân chia sẻ",
+      "noSharedAgents": "Chưa có tác nhân nào được chia sẻ với nhóm này.",
+      "yourAgentsHeading": "Tác nhân của bạn",
+      "byLabel": "bởi {username}",
+      "memberCount": "Thành viên {count}",
+      "memberCountPlural": "Thành viên {count}",
+      "agentSharedCount": "Tác nhân {count} được chia sẻ",
+      "agentSharedCountPlural": "Tác nhân {count} chia sẻ",
+      "leaveTeam": "Rời khỏi",
+      "leaveTeamTitle": "Rời khỏi đội",
+      "leaveTeamDesc": "Bạn có chắc chắn muốn rời khỏi đội này không? Bạn sẽ mất quyền truy cập vào tất cả các tác nhân được chia sẻ.",
+      "leaveTeamConfirm": "Rời khỏi đội",
+      "deleteTeam": "Xóa đội",
+      "deleteTeamTitle": "Xóa đội",
+      "deleteTeamDesc": "Bạn có chắc chắn muốn xóa vĩnh viễn nhóm này không? Tất cả các tác nhân được chia sẻ sẽ không được chia sẻ.",
+      "deleteTeamConfirm": "Xóa đội",
+      "errors": {
+        "loadFailed": "Không thể tải dữ liệu nhóm",
+        "createFailed": "Không tạo được nhóm",
+        "inviteFailed": "Không thể mời thành viên",
+        "removeFailed": "Không thể xóa thành viên",
+        "leaveFailed": "Không thể rời khỏi nhóm",
+        "deleteFailed": "Không thể xóa nhóm",
+        "shareFailed": "Không thể chia sẻ tác nhân",
+        "unshareFailed": "Không thể hủy chia sẻ tác nhân",
+        "roleFailed": "Không cập nhật được vai trò"
+      }
+    },
+    "affiliate": {
+      "eyebrow": "Trang tổng quan",
+      "heading": "Trang tổng quan liên kết",
+      "signInTitle": "Yêu cầu đăng nhập",
+      "signInDesc": "Đăng nhập để xem bảng điều khiển liên kết của bạn.",
+      "yourReferralLink": "Liên kết giới thiệu của bạn",
+      "referralLinkDesc": "Đăng ký mới thông qua liên kết này được coi là thuộc về bạn suốt đời. Cả hai bạn đều nhận được 500 AI Credits sau khi họ tạo tác nhân đầu tiên.",
+      "aiCreditRewardTitle": "Giới thiệu AI Credits",
+      "aiCreditRewardDesc": "Các lượt giới thiệu liên kết cũng cấp {credit} cho cả hai tài khoản sau khi người dùng được giới thiệu tạo tác nhân đầu tiên của họ.",
+      "claimAiCredits": "Yêu cầu AI Credits",
+      "claimingAiCredits": "Đang yêu cầu...",
+      "aiCreditsCol": "AI Credits",
+      "aiCreditsClaimed": "Đã xác nhận quyền sở hữu",
+      "aiCreditsPending": "Đang chờ xử lý",
+      "shareOnX": "Chia sẻ trên X",
+      "telegram": "Telegram",
+      "copyLink": "Sao chép",
+      "copiedLink": "Đã sao chép",
+      "refresh": "Làm mới",
+      "frozenTitle": "Tài khoản bị đóng băng",
+      "codeLabel": "Mã",
+      "totalReferrals": "Tổng số lượt giới thiệu",
+      "paidLabel": "{count} đã thanh toán",
+      "pending30d": "Đang chờ xử lý (giữ 30 ngày)",
+      "payableNow": "Có thể thanh toán ngay",
+      "lifetimeEarned": "Kiếm được trọn đời",
+      "paidOut": "{amount} đã được thanh toán",
+      "referralsTable": "Giới thiệu",
+      "noReferrals": "Chưa có giới thiệu nào. Chia sẻ liên kết của bạn!",
+      "commissionsTable": "Hoa hồng",
+      "noCommissions": "Chưa có hoa hồng.",
+      "payoutsTable": "Xuất chi",
+      "noPayouts": "Chưa có khoản thanh toán nào.",
+      "loadMore": "Tải thêm",
+      "signupCol": "Đăng ký",
+      "emailCol": "Email",
+      "statusCol": "Trạng thái",
+      "tierCol": "cấp",
+      "dateCol": "Ngày",
+      "sourceCol": "Nguồn",
+      "amountCol": "Số tiền",
+      "cashCol": "Tiền mặt",
+      "creditsCol": "Tín dụng",
+      "noteCol": "Lưu ý",
+      "statusPaid": "Đã trả tiền",
+      "statusFree": "miễn phí",
+      "statusPending": "Đang chờ xử lý",
+      "statusPayable": "Phải trả",
+      "statusPaidOut": "Đã trả tiền",
+      "statusVoided": "Vô hiệu",
+      "flagged": "Đã gắn cờ",
+      "untilDate": "cho đến {date}",
+      "sourceSubscription": "Đăng ký",
+      "sourceFoundingMember": "Thành viên sáng lập",
+      "payoutSettings": "Cài đặt thanh toán",
+      "payoutMode": "Chế độ",
+      "payoutAddress": "Địa chỉ thanh toán",
+      "creditsOnly": "Cần có địa chỉ thanh toán tiền mặt",
+      "changePrefs": "Cần thay đổi tùy chọn thanh toán?",
+      "contactSupport": "Liên hệ hỗ trợ",
+      "modeCashOnly": "Chỉ tiền mặt (20%)",
+      "modeCreditsOnly": "Đã nghỉ hưu",
+      "modeHybrid": "Đã nghỉ hưu"
+    },
+    "settings": {
+      "eyebrow": "Tài khoản",
+      "heading": "Cài đặt",
+      "subheading": "Quản lý tài khoản, bảo mật và tùy chọn của bạn.",
+      "tabs": {
+        "profile": "Hồ sơ",
+        "security": "Bảo mật",
+        "notifications": "Thông báo",
+        "billing": "Thanh toán",
+        "danger": "Vùng nguy hiểm"
+      },
+      "profile": {
+        "sectionTitle": "Hồ sơ",
+        "changePhoto": "Thay đổi ảnh",
+        "uploadPhoto": "Tải ảnh lên",
+        "remove": "Xóa",
+        "joinedLabel": "Đã tham gia {date}",
+        "usernameLabel": "Tên người dùng",
+        "usernamePlaceholder": "tên người dùng của bạn",
+        "usernameHint": "3–30 ký tự, chữ cái, số, _ hoặc -",
+        "emailLabel": "Địa chỉ email",
+        "emailPlaceholder": "bạn@example.com",
+        "saveChanges": "Lưu thay đổi",
+        "saving": "Đang lưu...",
+        "walletTitle": "Ví được kết nối",
+        "walletLinkedDesc": "Được liên kết tự động từ khoản thanh toán trực tuyến đầu tiên của bạn. Được sử dụng khi thanh toán bằng SOL, USDC hoặc $HATCHER.",
+        "walletViewSolscan": "Solscan",
+        "walletDisconnect": "Ngắt kết nối ví",
+        "walletNone": "Chưa có ví nào được liên kết. Ví Solana của bạn tự động kết nối vào lần đầu tiên bạn thực hiện thanh toán trực tuyến từ trang thanh toán.",
+        "referralTitle": "Chương trình giới thiệu",
+        "referralDesc": "Mời bạn bè tham gia Hatcher. Cả hai bạn đều nhận được {credit} khi họ tạo tác nhân đầu tiên.",
+        "referralCode": "Mã giới thiệu",
+        "shareLink": "Chia sẻ liên kết",
+        "referred": "Được giới thiệu",
+        "earned": "kiếm được",
+        "claimRewards": "Yêu cầu phần thưởng đang chờ xử lý",
+        "claiming": "Đang yêu cầu..."
+      },
+      "security": {
+        "changePasswordTitle": "Thay đổi mật khẩu",
+        "currentPassword": "Mật khẩu hiện tại",
+        "currentPasswordPlaceholder": "Nhập mật khẩu hiện tại",
+        "newPassword": "Mật khẩu mới",
+        "newPasswordPlaceholder": "Tối thiểu 8 ký tự, chữ hoa, chữ thường, số, đặc biệt",
+        "confirmPassword": "Xác nhận mật khẩu mới",
+        "confirmPasswordPlaceholder": "Lặp lại mật khẩu mới",
+        "changePasswordBtn": "Thay đổi mật khẩu",
+        "changing": "Đang thay đổi...",
+        "apiKeysTitle": "Phím API",
+        "apiKeysDesc": "Tạo nhiều khóa API để truy cập theo chương trình. Mỗi khóa sử dụng tiền tố {prefix}. Khóa đầy đủ được hiển thị {emphasis} khi tạo.",
+        "apiKeysEmphasis": "chỉ một lần",
+        "manageKeys": "Quản lý khóa",
+        "newKeyCreated": "Đã tạo khóa mới - sao chép ngay bây giờ!",
+        "noKeysYet": "Chưa có khóa API. Tạo một cái bên dưới.",
+        "keyLabelPlaceholder": "Nhãn (ví dụ: \"Sản xuất\")",
+        "createKey": "Tạo khóa",
+        "creating": "Đang tạo...",
+        "keysLimit": "Tối đa 10 phím hoạt động. Mỗi khóa có đầy đủ quyền truy cập API.",
+        "reqToday": "{count} yêu cầu hôm nay · {week} tuần này",
+        "lastUsed": "{date} được sử dụng lần cuối",
+        "save": "Lưu"
+      },
+      "notifications": {
+        "sectionTitle": "Thông báo",
+        "pushLabel": "Thông báo đẩy",
+        "pushDesc": "Thông báo đẩy của trình duyệt để cập nhật theo thời gian thực",
+        "agentsLabel": "Cảnh báo tác nhân",
+        "agentsDesc": "Nhận thông báo khi nhân viên thay đổi trạng thái, gặp sự cố hoặc cần chú ý",
+        "billingLabel": "Cảnh báo thanh toán",
+        "billingDesc": "Xác nhận thanh toán, gia hạn đăng ký và tín dụng"
+      },
+      "billing": {
+        "sectionTitle": "Thanh toán",
+        "currentPlan": "Gói hiện tại",
+        "hatcherCredits": "Tín dụng HATCHER",
+        "creditsAutoApplied": "Tự động áp dụng khi thanh toán",
+        "manageBilling": "Quản lý thanh toán"
+      },
+      "danger": {
+        "sectionTitle": "Vùng nguy hiểm",
+        "exportTitle": "Xuất dữ liệu của tôi",
+        "exportDesc": "Tải xuống tệp JSON chứa tất cả dữ liệu tài khoản của bạn: hồ sơ, tác nhân, lịch sử trò chuyện, thanh toán, giới thiệu, phiếu hỗ trợ, v.v.",
+        "exportBtn": "Xuất dữ liệu của tôi",
+        "exporting": "Đang xuất...",
+        "deleteTitle": "Xóa tài khoản",
+        "deleteDesc": "Xóa vĩnh viễn tài khoản của bạn, tất cả tác nhân, lịch sử thanh toán và cấu hình. Hành động này là không thể đảo ngược.",
+        "deleteBtn": "Xóa tài khoản",
+        "deleting": "Đang xóa...",
+        "dialogTitle": "Xóa tài khoản của bạn?",
+        "dialogDesc": "Thao tác này sẽ xóa vĩnh viễn tất cả tác nhân, dữ liệu và lịch sử thanh toán của bạn. Hành động này {emphasis} được hoàn tác.",
+        "dialogEmphasis": "không thể",
+        "confirmPassword": "Xác nhận mật khẩu của bạn",
+        "passwordPlaceholder": "Mật khẩu hiện tại của bạn",
+        "cancelBtn": "Hủy bỏ"
+      }
+    },
+    "apiKeys": {
+      "eyebrow": "Cài đặt",
+      "heading": "Phím API",
+      "subheading": "Quản lý các khóa truy cập theo chương trình cho {docsLink}. Mỗi phím bắt đầu bằng {prefix}.",
+      "docsLinkLabel": "Hatcher API",
+      "backToSettings": "Quay lại Cài đặt",
+      "newKeyAlert": "Đã tạo khóa - sao chép ngay bây giờ!",
+      "newKeyAlertSub": "Đây là lần duy nhất khóa đầy đủ sẽ được hiển thị. Hãy cất giữ nó ở nơi nào đó an toàn.",
+      "noKeysTitle": "Chưa có khóa API",
+      "noKeysDesc": "Tạo khóa đầu tiên của bạn để bắt đầu",
+      "loading": "Đang tải khóa...",
+      "createSectionTitle": "Tạo khóa mới",
+      "createSectionDesc": "Đặt tên mô tả cho khóa của bạn (ví dụ: \"Nhà phát triển cục bộ\", \"Đường ống CI/CD\").",
+      "keyLabelPlaceholder": "Nhãn chìa khóa...",
+      "createKey": "Tạo khóa",
+      "creating": "Đang tạo...",
+      "usageNote": "Sử dụng khóa API của bạn trong tiêu đề {header}. Xem {docsLink} để biết tất cả các điểm cuối có sẵn.",
+      "headerExample": "Ủy quyền: Người mang hk_...",
+      "docsLinkLabel2": "Tài liệu tham khảo API",
+      "copiedLabel": "Đã sao chép!",
+      "copyLabel": "Sao chép",
+      "dismissLabel": "Loại bỏ",
+      "revokeTitle": "Thu hồi khóa API",
+      "revokeDesc": "Khóa này sẽ bị vô hiệu vĩnh viễn và mọi ứng dụng sử dụng nó sẽ ngừng hoạt động ngay lập tức. Điều này không thể hoàn tác được.",
+      "revokeConfirm": "Thu hồi khóa",
+      "neverUsed": "Chưa bao giờ sử dụng",
+      "lastUsed": "{time} được sử dụng lần cuối",
+      "created": "Đã tạo {date}",
+      "reqStats": "{today} yêu cầu hôm nay · {week} tuần này",
+      "saveBtn": "Lưu",
+      "cancelBtn": "Hủy bỏ"
+    },
+    "quickStats": {
+      "totalAgents": "Tổng tác nhân",
+      "dailyMessages": "AI Credits",
+      "unlimited": "∞",
+      "accountWide": "số dư tài khoản",
+      "activeNow": "Đang hoạt động",
+      "noAgentsRunning": "Không có tác nhân nào đang chạy",
+      "agentsOnline": "Tác nhân {count} trực tuyến",
+      "agentsOnlinePlural": "Tác nhân {count} trực tuyến",
+      "accountTier": "Cấp tài khoản",
+      "lifetimeAccess": "Truy cập trọn đời",
+      "prioritySupport": "Hỗ trợ ưu tiên",
+      "upgradePlan": "kế hoạch nâng cấp"
+    },
+    "agentDetail": {
+      "tabs": {
+        "dashboard": "Trang tổng quan",
+        "chat": "Trò chuyện",
+        "mail": "Thư",
+        "terminal": "thiết bị đầu cuối",
+        "dev": "Nhà phát triển",
+        "config": "Cấu hình",
+        "integrations": "Tích hợp",
+        "plugins": "Plugin & Kỹ năng",
+        "logs": "Nhật ký",
+        "stats": "Thống kê",
+        "memory": "Bộ nhớ",
+        "sessions": "Phiên",
+        "knowledge": "Kiến thức",
+        "addons": "Tiện ích bổ sung",
+        "wallet": "Ví",
+        "kausalayer": "KausaLayer",
+        "files": "Tập tin",
+        "workspace": "Không gian làm việc",
+        "schedules": "Lịch trình",
+        "workflows": "Quy trình làm việc"
+      },
+      "sidebarGroups": {
+        "operate": "vận hành",
+        "configure": "Cấu hình",
+        "monitor": "Màn hình",
+        "advanced": "Nâng cao"
+      },
+      "nav": {
+        "allAgents": "Tất cả tác nhân"
+      },
+      "header": {
+        "easy": "Dễ dàng",
+        "advanced": "Nâng cao",
+        "restart": "Khởi động lại",
+        "restarting": "Đang khởi động lại...",
+        "stop": "Dừng lại",
+        "stopping": "Đang dừng...",
+        "start": "Bắt đầu",
+        "starting": "Đang bắt đầu...",
+        "share": "Chia sẻ",
+        "room": "phòng",
+        "clone": "bản sao",
+        "delete": "Xóa",
+        "deleting": "Đang xóa...",
+        "confirm": "Xác nhận",
+        "cancel": "Hủy bỏ"
+      },
+      "notFound": {
+        "code": "404",
+        "title": "Tác nhân không tìm thấy",
+        "description": "Không thể tìm thấy tác nhân có ID \"{id}\".",
+        "backToAgents": "Quay lại Tác nhân"
+      },
+      "statusPoll": {
+        "agentReady": "Tác nhân đã sẵn sàng trò chuyện!"
+      },
+      "chat": {
+        "live": "Trực tiếp",
+        "liveTitle": "Truyền phát thời gian thực qua WebSocket",
+        "voiceButton": "Giọng nói",
+        "voiceCallTitle": "Bắt đầu cuộc gọi thoại",
+        "autoRead": "Tự động đọc",
+        "autoReadTitle": "Phản hồi tự động đọc",
+        "emptyTitle": "Bắt đầu cuộc trò chuyện với {agentName}",
+        "emptySubtitle": "Phản hồi xuất hiện trong thời gian thực",
+        "loadEarlier": "Tải tin nhắn trước đó ({count} cũ hơn)",
+        "listening": "Đang nghe...",
+        "thinking": "Đang suy nghĩ...",
+        "speaking": "Đang nói...",
+        "tapToSpeak": "Nhấn vào micrô để nói",
+        "agentStartingUp": "Tác nhân đang bắt đầu, vui lòng đợi...",
+        "uploading": "Đang tải lên…",
+        "poweredBy": "Được cung cấp bởi {provider}",
+        "today": "hôm nay",
+        "unlimited": "không giới hạn",
+        "enterToSend": "Enter để gửi, Shift+Enter cho dòng mới",
+        "signInToChat": "Đăng nhập để trò chuyện với tác nhân này.",
+        "limitReached": "AI Credits đã cạn kiệt.",
+        "upgradeToPro": "Nâng cấp lên Pro",
+        "limitReachedSuffix": "để biết thêm hoặc mang theo chìa khóa của riêng bạn không giới hạn.",
+        "agentNotRunning": "Tác nhân không chạy.",
+        "startFromOverview": "Bắt đầu từ tab Tổng quan để trò chuyện.",
+        "waitingForAgent": "Đang chờ tác nhân bắt đầu...",
+        "messagePlaceholder": "Tin nhắn {agentName}...",
+        "sendMessage": "Gửi tin nhắn",
+        "stopResponse": "Dừng phản hồi",
+        "attachFiles": "Đính kèm tệp - được lưu vào thông tin của tác nhân",
+        "stopRecording": "Dừng ghi",
+        "startVoice": "Bắt đầu nhập bằng giọng nói",
+        "errors": {
+          "rateLimit": "AI Credits đã cạn kiệt.",
+          "llmDown": "Dịch vụ AI tạm thời không khả dụng. Điều này thường giải quyết trong vòng một phút.",
+          "timeout": "Tác nhân mất quá nhiều thời gian để trả lời.",
+          "network": "Mất kết nối. Kiểm tra kết nối internet của bạn.",
+          "generic": "Đã xảy ra lỗi.",
+          "retry": "Thử lại"
+        },
+        "voiceCall": {
+          "listening": "Đang nghe...",
+          "thinking": "Đang suy nghĩ...",
+          "speaking": "Đang nói...",
+          "tapToSpeak": "Nhấn vào micrô để nói"
+        }
+      },
+      "mail": {
+        "title": "Thư tác nhân",
+        "subtitle": "Quản lý hộp thư tác nhân, chế độ trả lời tự động, lịch sử tin nhắn và email gửi đi thủ công.",
+        "mailbox": "Địa chỉ hộp thư",
+        "copy": "Sao chép",
+        "copied": "Đã sao chép địa chỉ hộp thư",
+        "copyFailed": "Sao chép không thành công",
+        "refresh": "Làm mới",
+        "refreshing": "Đang làm mới...",
+        "autoSend": "Tự động gửi trả lời",
+        "autoSendOn": "Tự động gửi đang bật",
+        "autoSendOff": "Tự động gửi bị tắt",
+        "runtimeActive": "Trả lời tự động chỉ hoạt động khi tổng đài viên đã hoạt động.",
+        "runtimeInactive": "Trả lời tự động chỉ hoạt động khi tổng đài viên đã hoạt động. Khởi động tác nhân trước khi dựa vào các câu trả lời.",
+        "messageList": "Tin nhắn",
+        "messageCount": "Đã tải tin nhắn {count}",
+        "details": "Chi tiết tin nhắn",
+        "noSelection": "Chọn một tin nhắn để kiểm tra nó.",
+        "emptyTitle": "Chưa có thư",
+        "emptySubtitle": "Các tin nhắn gửi đến và gửi đi sẽ xuất hiện ở đây sau khi hộp thư này được sử dụng.",
+        "untitled": "Không có chủ đề",
+        "from": "Từ",
+        "to": "Đến",
+        "subject": "chủ đề",
+        "created": "Ngày",
+        "body": "Thân hình",
+        "noBody": "Không có nội dung cơ thể",
+        "filters": {
+          "all": "Tất cả",
+          "inbound": "Trong nước",
+          "outbound": "Đi"
+        },
+        "directions": {
+          "inbound": "Trong nước",
+          "outbound": "Đi"
+        },
+        "statusLabels": {
+          "queued": "Đã xếp hàng",
+          "sent": "Đã gửi",
+          "delivered": "Đã giao",
+          "failed": "thất bại",
+          "received": "Đã nhận",
+          "unknown": "Không xác định"
+        },
+        "errors": {
+          "mailbox": "Không thể tải hộp thư.",
+          "messages": "Không thể tải thư.",
+          "settings": "Không thể cập nhật cài đặt thư."
+        },
+        "composer": {
+          "title": "Gửi thủ công",
+          "subtitle": "Gửi một email đi từ hộp thư tác nhân.",
+          "toPlaceholder": "người nhận@example.com",
+          "subjectPlaceholder": "chủ đề",
+          "bodyPlaceholder": "Viết nội dung email...",
+          "validation": "Người nhận, chủ đề và nội dung là bắt buộc.",
+          "failed": "Không thể gửi email.",
+          "sent": "Email xếp hàng đợi",
+          "send": "Gửi email",
+          "sending": "Đang gửi..."
+        }
+      },
+      "logs": {
+        "searchPlaceholder": "Nhật ký tìm kiếm...",
+        "all": "Tất cả",
+        "connected": "Đã kết nối",
+        "reconnecting": "Đang kết nối lại",
+        "pinned": "Đã ghim",
+        "scroll": "Cuộn",
+        "refresh": "Làm mới",
+        "loading": "Đang tải...",
+        "download": "Tải xuống",
+        "pinnedToBottom": "được ghim xuống dưới cùng",
+        "noLogs": "Chưa có nhật ký nào.",
+        "noLogsMatching": "Không có nhật ký nào khớp với \"{query}\".",
+        "noLevelLogs": "Không tìm thấy nhật ký {level}.",
+        "entries": "Các mục nhập {count}",
+        "autoScrollEnabled": "Đã bật tự động cuộn - được ghim xuống cuối",
+        "autoScrollDisabled": "Tự động cuộn bị vô hiệu hóa",
+        "fullLogsGate": {
+          "title": "Hiển thị các dòng nhật ký {count} cuối cùng",
+          "description": "Nhật ký đầy đủ được bao gồm trên mỗi cấp. Làm mới tác nhân nếu lịch sử đầy đủ vẫn không có sẵn.",
+          "descriptionEmpty": "Nhật ký đầy đủ được bao gồm trên mỗi cấp. Làm mới tác nhân nếu lịch sử đầy đủ vẫn không có sẵn.",
+          "unlock": "Làm mới"
+        }
+      },
+      "integrations": {
+        "showingFor": "Hiển thị các tích hợp tương thích với {framework}",
+        "connected": "Đã kết nối {configured}/{total}",
+        "encryptedNote": "Khóa và mã thông báo API được mã hóa bằng AES-256-GCM trước khi lưu trữ. Sau khi được lưu, các giá trị bí mật sẽ không bao giờ được hiển thị lại — chỉ các phần giữ chỗ bị che mới xuất hiện.",
+        "mainIntegrations": "Tích hợp chính",
+        "mainIntegrationsFree": "Miễn phí trên tất cả các tầng",
+        "otherPlatforms": "Nền tảng khác",
+        "communityExtensions": "Tiện ích mở rộng cộng đồng",
+        "allPlatformsFree": "Tất cả các nền tảng được bao gồm miễn phí - định cấu hình thông tin xác thực bên dưới",
+        "allFreeNote": "Tất cả các tích hợp đều miễn phí trên mọi cấp độ. Chỉ cần thêm thông tin đăng nhập của bạn và đi.",
+        "howToGetKey": "Cách lấy khóa API của bạn →",
+        "howToSetup": "Cách thiết lập {name} →",
+        "saving": "Đang lưu...",
+        "saveCredentials": "Lưu thông tin xác thực",
+        "badges": {
+          "recommended": "Được đề xuất",
+          "native": "Bản địa",
+          "community": "cộng đồng",
+          "planned": "Đã lên kế hoạch",
+          "quickSetup": "Thiết lập nhanh",
+          "qrPairing": "Ghép nối QR",
+          "free": "miễn phí",
+          "connected": "Đã kết nối",
+          "alwaysActive": "Luôn hoạt động"
+        },
+        "legend": {
+          "native": "Bản địa - hỗ trợ tích hợp",
+          "community": "Cộng đồng - tiện ích mở rộng npm",
+          "planned": "Đã lên kế hoạch - sắp ra mắt"
+        },
+        "pairing": {
+          "whoCanMessage": "Ai có thể nhắn tin cho tác nhân của bạn?",
+          "everyone": "mọi người",
+          "specificNumbers": "Con số cụ thể",
+          "save": "Lưu",
+          "anyoneCanMessage": "Bất cứ ai cũng có thể nhắn tin cho tác nhân của bạn.",
+          "onlyListedNumbers": "Chỉ những số được liệt kê mới có thể nhắn tin cho tác nhân của bạn.",
+          "restartAfterChange": "Khởi động lại tác nhân sau khi thay đổi.",
+          "setBeforePairing": "Đặt trước khi ghép nối. Số điện thoại ở định dạng E.164 (+1234567890).",
+          "savedRestart": "Đã lưu! Khởi động lại tác nhân để áp dụng.",
+          "connected": "{name} Đã kết nối",
+          "disconnected": "{name} Đã ngắt kết nối",
+          "messagesForwarded": "Tin nhắn sẽ được chuyển tiếp đến tác nhân của bạn",
+          "sessionExpired": "Phiên đã hết hạn. Ghép nối lại hoặc ngắt kết nối để dọn dẹp.",
+          "rePair": "Ghép nối lại",
+          "disconnect": "Ngắt kết nối",
+          "disconnectConfirm": "Ngắt kết nối {name}? Bạn sẽ cần phải ghép nối lại để sử dụng lại.",
+          "agentMustRun": "Tác nhân của bạn phải đang chạy để ghép nối {name}. Bắt đầu tác nhân đầu tiên.",
+          "generatingQr": "Tạo mã QR - quá trình này mất ~30 giây...",
+          "pairButton": "Cặp {name}",
+          "refreshQr": "Làm mới mã QR",
+          "tapOutsideToClose": "Nhấn vào bên ngoài để đóng"
+        },
+        "webhook": {
+          "label": "Webhook",
+          "inboundHttp": "HTTP gửi đến",
+          "triggerFrom": "Kích hoạt tác nhân của bạn từ các dịch vụ bên ngoài (Zapier, GitHub, v.v.)",
+          "webhookUrl": "URL webhook",
+          "alwaysActive": "Luôn hoạt động",
+          "bearerToken": "Mã thông báo mang",
+          "exampleRequest": "Yêu cầu mẫu",
+          "revealToken": "Tiết lộ mã thông báo",
+          "hideToken": "Ẩn mã thông báo",
+          "copyUrl": "Sao chép URL",
+          "copyToken": "Sao chép mã thông báo",
+          "note": "Sử dụng URL này để kích hoạt tác nhân của bạn từ các dịch vụ bên ngoài (Zapier, GitHub, n8n, v.v.). Gửi yêu cầu POST có nội dung JSON chứa trường thông báo. Tác nhân sẽ tự động đánh thức khỏi chế độ ngủ nếu cần.",
+          "alreadyConfigured": "đã được cấu hình"
+        },
+        "domains": {
+          "channelBehavior": "Hành vi kênh",
+          "allowedUserIds": "ID người dùng được phép (được phân tách bằng dấu phẩy)",
+          "allowedGroupIds": "ID nhóm được phép (được phân tách bằng dấu phẩy)"
+        }
+      },
+      "memory": {
+        "refresh": "Làm mới",
+        "noMemory": "Không tìm thấy tập tin bộ nhớ.",
+        "noMemoryDescription": "Tác nhân của bạn chưa tạo bất kỳ tệp bộ nhớ nào.",
+        "dailyLogs": "Nhật ký hàng ngày",
+        "noDailyLogs": "Chưa có nhật ký hàng ngày.",
+        "loading": "Đang tải bộ nhớ...",
+        "error": "Không thể tải kỷ niệm"
+      },
+      "knowledge": {
+        "uploadTitle": "Tải lên tệp kiến thức",
+        "filename": "Tên tệp",
+        "filenamePlaceholder": "ví dụ: công ty-info.txt",
+        "content": "Nội dung",
+        "contentPlaceholder": "Dán nội dung kiến thức của bạn vào đây...",
+        "upload": "Tải lên",
+        "uploading": "Đang tải lên...",
+        "cancel": "Hủy bỏ",
+        "addFile": "Thêm tập tin",
+        "noFiles": "Chưa có tập tin kiến ​​thức nào.",
+        "noFilesDescription": "Tải lên tài liệu mà tác nhân của bạn có thể tham khảo.",
+        "preview": "Xem trước",
+        "delete": "Xóa",
+        "loading": "Đang tải...",
+        "error": "Không tải được tệp kiến thức",
+        "refresh": "Làm mới"
+      },
+      "stats": {
+        "range7d": "7 ngày",
+        "range30d": "30 ngày",
+        "totalMessages": "Tổng số tin nhắn",
+        "avgPerDay": "Trung bình / Ngày",
+        "peakDay": "Ngày cao điểm",
+        "framework": "Khung",
+        "noData": "Chưa có dữ liệu phân tích.",
+        "noDataDescription": "Gửi một số tin nhắn để bắt đầu xem số liệu thống kê.",
+        "errorRate": "Tỷ lệ lỗi",
+        "responseTimes": "Thời gian phản hồi",
+        "avgResponse": "Phản hồi trung bình",
+        "p50": "P50",
+        "p95": "P95",
+        "topTopics": "Chủ đề hàng đầu",
+        "hourlyActivity": "Hoạt động hàng giờ",
+        "byokActive": "BYOK Đang hoạt động",
+        "totalTokens": "Tổng số token",
+        "estimatedCost": "Ước tính. Chi phí",
+        "refresh": "Làm mới"
+      },
+      "terminal": {
+        "connecting": "Đang kết nối...",
+        "connected": "Đã kết nối",
+        "disconnected": "Đã ngắt kết nối",
+        "error": "Lỗi kết nối",
+        "reconnect": "Kết nối lại",
+        "agentNotActive": "Tác nhân phải hoạt động để sử dụng thiết bị đầu cuối.",
+        "startAgent": "Bắt đầu tác nhân",
+        "sendMessage": "Gửi tin nhắn...",
+        "send": "Gửi",
+        "sending": "Đang gửi..."
+      },
+      "plugins": {
+        "skillsTab": "Kỹ năng",
+        "pluginsTab": "Plugin",
+        "searchPlaceholder": "Kỹ năng tìm kiếm và plugin...",
+        "install": "cài đặt",
+        "installing": "Đang cài đặt...",
+        "installed": "Đã cài đặt",
+        "uninstall": "Gỡ cài đặt",
+        "uninstalling": "Đang gỡ cài đặt...",
+        "noInstalled": "Không có kỹ năng hoặc plugin nào được cài đặt.",
+        "noInstalledDescription": "Duyệt và cài đặt từ thị trường bên dưới.",
+        "recommended": "Được đề xuất",
+        "available": "Có sẵn",
+        "source": "Nguồn",
+        "requiresRestart": "Yêu cầu khởi động lại",
+        "refresh": "Làm mới",
+        "limitReached": "Các plugin và kỹ năng được bao gồm ở mọi cấp độ."
+      },
+      "workflows": {
+        "new": "Quy trình làm việc mới",
+        "noWorkflows": "Chưa có quy trình làm việc nào.",
+        "noWorkflowsDescription": "Tạo quy trình làm việc đầu tiên để tự động hóa tác nhân của bạn.",
+        "enable": "Kích hoạt",
+        "disable": "Vô hiệu hóa",
+        "delete": "Xóa",
+        "save": "Lưu",
+        "run": "Chạy",
+        "running": "Đang chạy...",
+        "name": "Tên quy trình làm việc",
+        "trigger": "Trình kích hoạt",
+        "lastRun": "Lần chạy cuối cùng",
+        "status": "Trạng thái",
+        "active": "Đang hoạt động",
+        "inactive": "Không hoạt động"
+      },
+      "files": {
+        "noFiles": "Không tìm thấy tập tin nào.",
+        "noFilesDescription": "Trình quản lý tập tin trống.",
+        "upload": "Tải lên",
+        "delete": "Xóa",
+        "download": "Tải xuống",
+        "refresh": "Làm mới",
+        "locked": "Trình quản lý tệp được bao gồm trên mọi tầng. Làm mới tác nhân nếu quyền truy cập vẫn bị chặn.",
+        "unlock": "Mở khóa"
+      },
+      "workspace": {
+        "noFiles": "Không tìm thấy tập tin không gian làm việc.",
+        "refresh": "Làm mới",
+        "loading": "Đang tải không gian làm việc..."
+      },
+      "addons": {
+        "title": "Tiện ích bổ sung",
+        "description": "Mở rộng tác nhân của bạn với các khả năng bổ sung.",
+        "noAddons": "Chưa có tính năng bổ sung nào được mua.",
+        "purchase": "Mua hàng",
+        "active": "Đang hoạt động",
+        "expires": "Hết hạn {date}",
+        "lifetime": "Trọn đời"
+      },
+      "schedules": {
+        "new": "Lịch trình mới",
+        "noSchedules": "Chưa có lịch trình nào.",
+        "noSchedulesDescription": "Tạo lịch trình để chạy tác nhân của bạn một cách tự động.",
+        "enable": "Kích hoạt",
+        "disable": "Vô hiệu hóa",
+        "delete": "Xóa",
+        "save": "Lưu",
+        "name": "Tên lịch trình",
+        "cron": "Biểu thức Cron",
+        "nextRun": "Lần chạy tiếp theo",
+        "lastRun": "Lần chạy cuối cùng",
+        "status": "Trạng thái",
+        "active": "Đang hoạt động",
+        "inactive": "Không hoạt động"
+      },
+      "sidebar": {
+        "switchAgent": "Chuyển đổi tác nhân",
+        "enter3DRoom": "Vào phòng 3D",
+        "enter3DRoomSubtitle": "Không gian làm việc không gian mở",
+        "enter3DRoomTooltip": "Mở không gian làm việc không gian của tác nhân"
+      }
+    }
+  },
+  "settings": {
+    "redirect": "Đang chuyển hướng đến cài đặt..."
+  },
+  "explorePage": {
+    "eyebrow": "Tác nhân công",
+    "title": "Trò chuyện với các tác nhân AI công cộng",
+    "body": "Duyệt các tác nhân có chủ sở hữu kích hoạt trò chuyện công khai. Mỗi phiên chạy trong trình duyệt của bạn và định tuyến thông qua cấu hình Hatcher trực tiếp của tác nhân.",
+    "cityCta": "Mở Hatcher City",
+    "emptyTitle": "Chưa có tác nhân trò chuyện công khai nào",
+    "emptyBody": "Hồ sơ công khai vẫn xuất hiện trong Hatcher City. Tác nhân hiển thị ở đây khi chủ sở hữu của họ bật trò chuyện công khai.",
+    "fallbackDescription": "Một tác nhân Hatcher công khai sẵn sàng cho các phiên trò chuyện trên trình duyệt.",
+    "interactions": "tương tác",
+    "publicChat": "Trò chuyện công khai",
+    "chatCta": "Trò chuyện",
+    "statsAgents": "Tác nhân công {count}",
+    "statsLive": "{count} đang trực tiếp",
+    "statsInteractions": "Tương tác {count}",
+    "searchPlaceholder": "Tìm kiếm tác nhân công cộng",
+    "filterAll": "Tất cả",
+    "filterOpenClaw": "OpenClaw",
+    "filterHermes": "Hermes",
+    "filterLive": "Chỉ sống",
+    "showingCount": "{count} được hiển thị",
+    "noResultsTitle": "Không có tác nhân phù hợp",
+    "noResultsBody": "Hãy thử tìm kiếm, khung hoặc bộ lọc trực tiếp khác.",
+    "frameworkLabel": "Khung",
+    "featured": "Nổi bật",
+    "ownerFallback": "tác nhân cộng đồng",
+    "avatarLabel": "Hình đại diện tác nhân công 3D",
+    "statusRunning": "Trực tiếp",
+    "statusSleeping": "đang ngủ",
+    "statusPaused": "Đã tạm dừng",
+    "statusCrashed": "Cần chú ý"
+  },
+  "agentPublic": {
+    "back": {
+      "toCity": "Trở lại Thành phố",
+      "toMyAgents": "Quay lại Tác nhân của tôi",
+      "toDashboard": "Quay lại Trang tổng quan"
+    },
+    "status": {
+      "active": "Đang hoạt động",
+      "sleeping": "đang ngủ",
+      "paused": "Đã tạm dừng",
+      "archived": "Đã lưu trữ",
+      "error": "Lỗi",
+      "killed": "bị giết",
+      "restarting": "Khởi động lại"
+    },
+    "profile": {
+      "featuresCount": "Tính năng {count}",
+      "featuresCountPlural": "Tính năng {count}",
+      "frameworkFeatures": "Tính năng khung",
+      "by": "bởi"
+    },
+    "share": {
+      "button": "Chia sẻ",
+      "copied": "Đã sao chép!"
+    },
+    "errors": {
+      "connectionError": "Lỗi kết nối",
+      "notFound": "Tác nhân không tìm thấy",
+      "somethingWrong": "Đã xảy ra lỗi",
+      "defaultMessage": "Tác nhân này không tồn tại hoặc đã bị xóa.",
+      "goBack": "Quay lại",
+      "myAgents": "Tác nhân của tôi"
+    },
+    "owner": {
+      "heading": "Quản lý {name}",
+      "body": "Bạn sở hữu tác nhân này. Đi tới trang tổng quan của bạn để trò chuyện hoặc định cấu hình nó.",
+      "manageAgent": "Quản lý tác nhân",
+      "openChat": "Mở trò chuyện"
+    },
+    "analytics": {
+      "heading": "Phân tích tác nhân",
+      "messages": "Tương tác",
+      "daysActive": "Số ngày hoạt động",
+      "uptime": "Thời gian hoạt động",
+      "status": "Trạng thái",
+      "framework": "Khung",
+      "created": "Đã tạo"
+    },
+    "deploy": {
+      "heading": "Triển khai một tác nhân tương tự",
+      "body": "Tạo tác nhân {framework} của riêng bạn trên Hatcher. Bắt đầu miễn phí, triển khai trong 60 giây.",
+      "cta": "Triển khai tác nhân tương tự",
+      "myAgents": "Tác nhân của tôi"
+    },
+    "publicChat": {
+      "eyebrow": "Trò chuyện tác nhân công cộng",
+      "heading": "Trò chuyện với {name}",
+      "usernamePlaceholder": "Chọn tên người dùng",
+      "start": "Bắt đầu trò chuyện",
+      "starting": "Đang bắt đầu...",
+      "newSession": "Phiên mới",
+      "empty": "Bắt đầu một phiên công khai mới với tác nhân này.",
+      "messagePlaceholder": "Tin nhắn dưới dạng {username}",
+      "thinking": "Đang nghiên cứu...",
+      "send": "Gửi tin nhắn",
+      "errors": {
+        "session": "Không thể bắt đầu phiên trò chuyện công khai.",
+        "message": "Không thể gửi tin nhắn này."
+      }
+    },
+    "errorPage": {
+      "heading": "Không thể tải tác nhân",
+      "body": "Chúng tôi không thể tải thông tin chi tiết của tác nhân này. Nó có thể đã bị xóa hoặc có vấn đề về kết nối.",
+      "errorId": "ID lỗi: {id}",
+      "tryAgain": "Thử lại",
+      "browseAgents": "Duyệt tác nhân"
+    },
+    "statusPage": {
+      "poweredBy": "Được cung cấp bởi",
+      "uptimeLabel": "thời gian hoạt động 24h",
+      "messages": "Tương tác",
+      "days": "ngày",
+      "since": "Kể từ khi",
+      "framework": "khuôn khổ",
+      "lastActive": "Hoạt động lần cuối: {date} tại {time}",
+      "viewProfile": "Xem hồ sơ",
+      "notFound": {
+        "heading": "Tác nhân không tìm thấy",
+        "body": "Tác nhân này không tồn tại hoặc không hiển thị công khai.",
+        "browseAgents": "Duyệt tác nhân"
+      }
+    }
+  },
+  "city": {
+    "category": {
+      "district": "Quận",
+      "breadcrumbCity": "Hatcher City",
+      "statAgents": "tác nhân",
+      "statRunning": "đang chạy",
+      "statShareOfCity": "chia sẻ của thành phố",
+      "seeIn3d": "Xem nó ở dạng 3D →",
+      "emptyState": "Chưa có tác nhân nào ở quận này.",
+      "emptyStateCta": "Hãy là người đầu tiên xây dựng một.",
+      "otherDistricts": "Các quận khác",
+      "msgs": "tin nhắn"
+    }
+  },
+  "frameworks": {
+    "eyebrow": "Khung",
+    "heading": "Chọn khung phù hợp",
+    "subheading": "Hatcher tập trung vào hai khung tác nhân sản xuất: OpenClaw dành cho tự động hóa đòi hỏi nhiều kỹ năng và Hermes dành cho các tác nhân thích ứng dài hạn.",
+    "deployCta": "Triển khai một tác nhân",
+    "docsLink": "Tài liệu đầy đủ",
+    "atAGlance": "Trong nháy mắt",
+    "featureMatrix": "Ma trận tính năng",
+    "featureCol": "tính năng",
+    "bestFor": "Tốt nhất cho...",
+    "bestForSubheading": "Bạn không chắc chắn nên chọn khung nào? Phù hợp với trường hợp sử dụng của bạn.",
+    "benchmarks": "Điểm chuẩn hiệu suất",
+    "benchmarksSubheading": "Thời gian khởi động nguội và mức sử dụng bộ nhớ cơ bản trên cơ sở hạ tầng dùng chung Hatcher. Giá trị thực tế thay đổi tùy theo cấu hình.",
+    "coldStart": "Thời gian khởi động nguội",
+    "memoryUsage": "Mức sử dụng bộ nhớ cơ bản",
+    "lowerFaster": "Thấp hơn là nhanh hơn",
+    "lowerLeaner": "Thấp hơn là gầy hơn",
+    "benchmarkCallout": "OpenClaw là lựa chọn tốt nhất khi bạn cần bề mặt kỹ năng và tự động hóa rộng nhất. Hermes gọn gàng hơn dành cho các tác nhân thích ứng có quy trình nghiên cứu đòi hỏi nhiều bộ nhớ.",
+    "configExamples": "Ví dụ cấu hình",
+    "configSubheading": "Mỗi khung có định dạng cấu hình riêng. Đây là cách thiết lập thông thường.",
+    "configRef": "Tham khảo cấu hình đầy đủ →",
+    "docsSuffix": "tài liệu",
+    "llmSupport": "Hỗ trợ LLM",
+    "llmSubheading": "Cả hai khung đều hỗ trợ BYOK (Mang theo khóa riêng của bạn) để sử dụng do nhà cung cấp trả phí. LLM được lưu trữ định tuyến thông qua các nhà cung cấp được Hatcher hỗ trợ và sử dụng đồng hồ đo với AI Credits.",
+    "byokNote": "* BYOK luôn miễn phí — việc sử dụng do nhà cung cấp trả phí mà không cần Hatcher AI Credits.",
+    "byokSetupLink": "Xem hướng dẫn cài đặt BYOK →",
+    "decisionGuide": "Hướng dẫn quyết định nhanh",
+    "readyCta": "Sẵn sàng triển khai?",
+    "readySubheading": "Chọn một khung, định cấu hình tác nhân của bạn và đi vào hoạt động sau chưa đầy 60 giây. Đã bao gồm bậc miễn phí.",
+    "deployFirstAgent": "Triển khai tác nhân đầu tiên của bạn",
+    "viewPricing": "Xem giá",
+    "decisions": [
+      {
+        "condition": "Tôi muốn có các công cụ tối đa và tự động hóa",
+        "pick": "OpenClaw"
+      },
+      {
+        "condition": "Tôi muốn một tác nhân học hỏi theo thời gian",
+        "pick": "Hermes"
+      },
+      {
+        "condition": "Tôi cần nhắn tin và kích hoạt đa kênh",
+        "pick": "OpenClaw"
+      },
+      {
+        "condition": "Tôi cần một trợ lý nghiên cứu nặng về trí nhớ",
+        "pick": "Hermes"
+      },
+      {
+        "condition": "Tôi cần nhắn tin đa kênh (Telegram + Discord + WhatsApp)",
+        "pick": "OpenClaw hoặc Hermes"
+      },
+      {
+        "condition": "Tôi muốn một tác nhân không gian làm việc có các tệp, nhật ký và kỹ năng",
+        "pick": "OpenClaw"
+      }
+    ]
+  },
+  "token": {
+    "liveLabel": "Token tiện ích trên Solana",
+    "heading": "$HATCHER",
+    "subheading": "$HATCHER là một tùy chọn thanh toán tiện ích cho các đăng ký Hatcher đủ điều kiện, các khoản bổ sung, giảm giá và cơ chế ghi trên chuỗi.",
+    "caLabel": "CA:",
+    "viewDexscreener": "Xem trên Dexscreener",
+    "viewSolscan": "Xem trên Solscan",
+    "burnBadge": "10% của mỗi khoản thanh toán $HATCHER được đốt trên chuỗi trong cùng một giao dịch.",
+    "burnsEyebrow": "Bỏng trên dây chuyền",
+    "burnsHeading": "Trình theo dõi vết bỏng",
+    "burnsBody": "Dữ liệu ghi trực tiếp được tính toán từ hướng dẫn ghi Solana Token-2022 cho xưởng đúc $HATCHER. Trình theo dõi làm mới trên chuỗi cứ sau 6 giờ hoặc khi bạn yêu cầu làm mới thủ công.",
+    "burnsRefresh": "Làm mới trên chuỗi",
+    "burnsRefreshing": "Làm mới",
+    "burnsError": "Dữ liệu ghi tạm thời không khả dụng. Ảnh chụp nhanh được lưu trong bộ nhớ đệm cuối cùng sẽ được hiển thị khi có sẵn.",
+    "burnsTotalLabel": "Tổng số bị đốt cháy",
+    "burnsTxLabel": "Ghi TX",
+    "burnsTxHelper": "{count} tx được quét",
+    "burnsSupplyLabel": "Nguồn cung bị đốt cháy",
+    "burnsSupplyHelper": "Chia sẻ nguồn cung hiện tại cộng với lượng tiêu hao",
+    "burnsLatestLabel": "Ghi mới nhất",
+    "burnsNoBurnsShort": "Chưa có vết bỏng nào",
+    "burnsUpdated": "Đã cập nhật {time}",
+    "burnsUpdating": "Đang cập nhật",
+    "burnsPeriodHeading": "Tốc độ đốt cháy",
+    "burns24h": "24 giờ",
+    "burns7d": "7 ngày",
+    "burns30d": "30 ngày",
+    "burnsSourceNote": "Chỉ các hướng dẫn ghi và ghi SPL rõ ràng được kiểm tra cho cơ sở đúc tiền chính thức mới được tính. Các giao dịch thất bại và chuyển khoản thông thường sẽ bị bỏ qua.",
+    "burnsFeedHeading": "Vết bỏng gần đây",
+    "burnsUnknownTime": "thời gian không xác định",
+    "burnsNoBurns": "Chưa tìm thấy giao dịch đốt nào.",
+    "burnsNoBurnsBody": "Khi các khoản thanh toán $HATCHER tạo ra các hướng dẫn ghi trên chuỗi, chúng sẽ xuất hiện ở đây cùng với các liên kết Solscan.",
+    "createAgentCta": "Tạo tác nhân miễn phí",
+    "viewPricing": "Xem giá",
+    "plannedUtilityLabel": "Tiện ích",
+    "whatPowers": "Nơi $HATCHER phù hợp",
+    "ecosystemDesc": "Bề mặt thanh toán nghiêm túc trước tiên: tổng số rõ ràng, đường ray thanh toán được hỗ trợ và xử lý mã thông báo tập trung vào tiện ích.",
+    "keyDetails": "Chi tiết chính",
+    "networkLabel": "Mạng",
+    "networkValue": "Solana",
+    "splToken": "Mã thông báo SPL",
+    "statusLabel": "Trạng thái",
+    "statusValue": "Có sẵn dưới dạng tiện ích nền tảng",
+    "trading": "Tiện ích",
+    "contractLabel": "hợp đồng",
+    "platformLabel": "Nền tảng",
+    "platformValue": "Hiện đã có cấp miễn phí — thanh toán bằng mã thông báo hỗ trợ các cấp trả phí đủ điều kiện và các tính năng bổ sung",
+    "stayInLoop": "Sử dụng Hatcher làm mặt phẳng điều khiển",
+    "stayInLoopBody": "Triển khai các tác nhân, quản lý thanh toán và chọn phương thức thanh toán phù hợp với quy trình làm việc của bạn.",
+    "followOnX": "Theo dõi X"
+  },
+  "roadmap": {
+    "liveLabel": "Trực tiếp",
+    "heading": "Lộ trình",
+    "subheading": "Những gì chúng tôi đã xây dựng, những gì hiện đang được vận chuyển và chúng tôi đang hướng tới đâu. Chúng tôi xây dựng công khai — hãy theo dõi tiếp",
+    "followHandle": "X /@hatcherlabs",
+    "checkChangelog": "nhật ký thay đổi trực tiếp",
+    "featureRequest": "Có một yêu cầu tính năng? Chúng tôi đọc mọi thứ.",
+    "submitRequest": "Gửi yêu cầu",
+    "followOnX": "Theo dõi X"
+  },
+  "blog": {
+    "eyebrow": "Blog",
+    "heading": "Blog Hatcher",
+    "subheading": "Hướng dẫn, hướng dẫn và thông tin chi tiết về tác nhân AI và nền tảng Hatcher.",
+    "searchPlaceholder": "Tìm kiếm bài viết...",
+    "allCategory": "Tất cả",
+    "latestLabel": "Mới nhất",
+    "readLabel": "đọc",
+    "resultsCount": "Kết quả {count} cho \"{query}\"",
+    "resultsCountPlural": "Kết quả {count} cho \"{query}\"",
+    "noArticles": "Không tìm thấy bài viết nào",
+    "noArticlesCategory": "Không có bài viết được tìm thấy trong thể loại này.",
+    "noArticlesSearch": "Không tìm thấy bài viết nào cho \"{query}\".",
+    "clearFilters": "Xóa bộ lọc",
+    "backToBlog": "Quay lại Blog",
+    "relatedArticles": "bài viết liên quan"
+  },
+  "changelog": {
+    "betaLabel": "bản thử nghiệm",
+    "heading": "Nhật ký thay đổi",
+    "subheading": "Chúng tôi gửi những cải tiến mỗi ngày. Đây là những gì đã thay đổi.",
+    "noCommits": "Không tìm thấy cam kết nào.",
+    "errorMessage": "Đã xảy ra lỗi.",
+    "tryAgain": "Thử lại"
+  },
+  "help": {
+    "eyebrow": "Tài nguyên",
+    "heading": "Trung tâm trợ giúp",
+    "subheading": "Tìm câu trả lời, duyệt hướng dẫn và liên hệ với bộ phận hỗ trợ.",
+    "searchPlaceholder": "Tìm kiếm tất cả các câu hỏi... ví dụ: \"BYOK\", \"giới hạn tỷ lệ\", \"Telegram\"",
+    "resultCount": "Kết quả {count}",
+    "resultCountPlural": "Kết quả {count}",
+    "matchCount": "Trận đấu {count}",
+    "matchCountPlural": "{count} phù hợp",
+    "noMatchHeading": "Không tìm thấy câu hỏi phù hợp",
+    "noMatchBody": "Hãy thử các từ khóa khác nhau hoặc duyệt tài liệu.",
+    "documentationLink": "tài liệu",
+    "contactHeading": "Liên hệ với chúng tôi",
+    "contactBody": "Không thể tìm thấy những gì bạn đang tìm kiếm?",
+    "openTicket": "Mở một vé hỗ trợ",
+    "contactOr": "hoặc liên hệ trực tiếp:",
+    "technicalHelp": "Trợ giúp kỹ thuật",
+    "generalInquiries": "Thắc mắc chung",
+    "communitySupport": "Hỗ trợ cộng đồng",
+    "communityChat": "Trò chuyện cộng đồng",
+    "stillNeedHelp": "Vẫn cần giúp đỡ?",
+    "ticketResponse": "Gửi một vé hỗ trợ và nhóm của chúng tôi sẽ liên hệ lại với bạn trong vòng 24 giờ.",
+    "quickLinks": {
+      "documentation": "Tài liệu",
+      "discord": "Cộng đồng Discord",
+      "telegram": "Nhóm Telegram",
+      "submitTicket": "Gửi vé",
+      "emailSupport": "Hỗ trợ qua email"
+    }
+  },
+  "status": {
+    "eyebrow": "Trạng thái",
+    "heading": "Trạng thái nền tảng",
+    "subheading": "Tình trạng thời gian thực của cơ sở hạ tầng Hatcher.",
+    "navLabel": "Trạng thái Hatcher",
+    "autoRefresh": "Tự động làm mới 30 giây",
+    "operational": "Tất cả các hệ thống hoạt động",
+    "degraded": "Một số hệ thống xuống cấp",
+    "down": "Đã phát hiện gián đoạn dịch vụ",
+    "statusOperational": "hoạt động",
+    "statusDegraded": "xuống cấp",
+    "statusDown": "xuống",
+    "lastChecked": "Kiểm tra lần cuối:",
+    "refresh": "Làm mới",
+    "checking": "Kiểm tra hệ thống...",
+    "errorMessage": "Không thể kết nối API. Trạng thái không có sẵn.",
+    "activeAgents": "Tác nhân hoạt động",
+    "totalAgents": "Tổng tác nhân",
+    "components": "Linh kiện",
+    "updatedAt": "Đã cập nhật {time}",
+    "loading": "Đang tải...",
+    "backToHatcher": "← Quay lại Hatcher"
+  },
+  "shortcuts": {
+    "backToDashboard": "Quay lại Trang tổng quan",
+    "heading": "Phím tắt",
+    "subheading": "Điều hướng Hatcher nhanh hơn bằng phím tắt",
+    "quickTipLabel": "Mẹo nhanh",
+    "quickTipBody": "Nhấn vào bất cứ đâu để mở bảng lệnh. Tìm kiếm trang, tác nhân hoặc hành động ngay lập tức.",
+    "footerNote": "Phím tắt bị tắt khi nhập vào trường văn bản. Trên macOS, sử dụng Cmd thay vì Ctrl."
+  },
+  "create": {
+    "errorHeading": "Lỗi tạo",
+    "errorBody": "Đã xảy ra lỗi khi thiết lập đại diện của bạn. Sự tiến bộ của bạn vẫn chưa bị mất.",
+    "errorIdLabel": "ID lỗi:",
+    "tryAgain": "Thử lại",
+    "dashboard": "Trang tổng quan"
+  },
+  "support": {
+    "eyebrow": "Trợ giúp",
+    "heading": "Hỗ trợ",
+    "subheading": "Nhận trợ giúp về tác nhân, thanh toán hoặc bất cứ điều gì khác.",
+    "quickLinks": {
+      "documentation": "Tài liệu",
+      "documentationDesc": "Duyệt hướng dẫn và tham khảo API",
+      "faq": "Câu hỏi thường gặp",
+      "faqDesc": "Các câu hỏi thường gặp đã được trả lời",
+      "followUs": "Theo dõi chúng tôi",
+      "followUsDesc": "Cập nhật và thông báo"
+    },
+    "directContact": "Hoặc gửi email trực tiếp cho chúng tôi tại",
+    "joinDiscord": "Tham gia Discord của chúng tôi",
+    "telegramLabel": "Telegram",
+    "communitySupport": "để hỗ trợ cộng đồng",
+    "submitTicketHeading": "Gửi một vé",
+    "signInPrompt": "Đăng nhập để gửi một vé hỗ trợ.",
+    "signIn": "Đăng nhập",
+    "ticketSubmitted": "Đã gửi vé",
+    "ticketSubmittedBody": "Chúng tôi đã nhận được yêu cầu của bạn và sẽ liên hệ lại với bạn ngay. Bạn sẽ được thông báo khi có bản cập nhật.",
+    "submitAnother": "Gửi một vé khác",
+    "subjectLabel": "chủ đề",
+    "subjectPlaceholder": "Mô tả ngắn gọn vấn đề của bạn",
+    "categoryLabel": "Danh mục",
+    "priorityLabel": "Ưu tiên",
+    "relatedAgentLabel": "Tác nhân liên quan",
+    "relatedAgentOptional": "(tùy chọn)",
+    "selectAgent": "Chọn tác nhân...",
+    "messageLabel": "Tin nhắn",
+    "messagePlaceholder": "Mô tả chi tiết vấn đề của bạn...",
+    "submitTicket": "Gửi vé",
+    "submitting": "Đang gửi...",
+    "signInError": "Vui lòng đăng nhập để gửi một vé.",
+    "subjectRequired": "Chủ đề là bắt buộc.",
+    "messageRequired": "Tin nhắn là bắt buộc.",
+    "failedSubmit": "Không thể gửi vé. Vui lòng thử lại.",
+    "recentTickets": "Vé gần đây",
+    "noTickets": "Chưa có vé",
+    "noTicketsDesc": "Vé hỗ trợ đã gửi của bạn sẽ xuất hiện ở đây. Tạo vé đầu tiên của bạn ở trên để bắt đầu.",
+    "backToTop": "Quay lại đầu trang",
+    "ticketCount": "Vé {count}",
+    "ticketCountPlural": "Vé {count}"
+  },
+  "affiliate": {
+    "eyebrow": "Chương trình liên kết",
+    "heading": "Kiếm tiền từ mọi người dùng bạn mang đến Hatcher.",
+    "subheading": "Kiếm 20% hoa hồng tiền mặt định kỳ cho mỗi người dùng trả phí mà bạn giới thiệu. Phân bổ dựa trên liên kết và gắn bó lâu dài với tài khoản được giới thiệu. Cả hai tài khoản cũng nhận được 500 AI Credits sau khi người dùng được giới thiệu tạo tác nhân đầu tiên của họ.",
+    "applyNowCta": "Đăng ký ngay bây giờ",
+    "howItWorksLink": "Nó hoạt động như thế nào",
+    "pickYourPayout": "Cơ cấu hoa hồng",
+    "threeWays": "Hoa hồng tiền mặt, sổ cái đơn giản.",
+    "threeWaysSubheading": "Thu nhập của đơn vị liên kết chỉ bằng tiền mặt: 20% định kỳ trên doanh thu được thanh toán đủ điều kiện, tạm giữ trong 30 ngày trước khi thanh toán hoa hồng. Phần thưởng giới thiệu 500 AI Credits được cấp riêng cho cả hai tài khoản.",
+    "popularLabel": "phổ biến",
+    "foundingBonusLabel": "Tiền thưởng thành viên sáng lập",
+    "foundingBonusHeading": "Giới thiệu Thành viên sáng lập → phần thưởng tiền mặt $20 cố định.",
+    "foundingBonusBody": "Cấp trọn đời của $99 trả một khoản $20 cố định một lần cho đơn vị liên kết giới thiệu — ngoài bất kỳ khoản tiền nào họ kiếm được từ việc mua tiện ích bổ sung hoặc tác nhân sau này của người dùng đó. Thanh toán bằng tiền mặt bất kể chế độ thanh toán mặc định của bạn.",
+    "applyLabel": "Áp dụng",
+    "howItWorksLabel": "Nó hoạt động như thế nào",
+    "fourSteps": "Bốn bước, không có bất ngờ.",
+    "faqLabel": "Thường xuyên hỏi",
+    "everythingYoudAsk": "Tất cả mọi thứ bạn hỏi trước khi áp dụng.",
+    "readyHeading": "Bạn đã sẵn sàng hợp tác với Hatcher chưa?",
+    "readyBody": "Ứng dụng mất một vài phút. Phê duyệt trong 3–5 ngày. Hoa hồng định kỳ trọn đời cho mỗi người dùng mà bạn giới thiệu.",
+    "seePricing": "Xem giá",
+    "apply": {
+      "backLink": "Quay lại Chương trình liên kết",
+      "loading": "Đang tải…",
+      "eyebrow": "Áp dụng cho các chi nhánh của Hatcher",
+      "heading": "Hãy cho chúng tôi biết về bạn.",
+      "subheading": "Một số chi tiết về nền tảng và đối tượng của bạn. Chúng tôi xem xét mọi đơn đăng ký theo cách thủ công - hãy trung thực, cụ thể.",
+      "underReview": "Đang xem xét — chúng tôi sẽ liên hệ.",
+      "reviewTime": "Thời gian xem xét dự kiến:",
+      "reviewDays": "3–5 ngày",
+      "reviewEmailNote": "Bạn sẽ nhận được email ngay khi có quyết định.",
+      "submitted": "Đơn đăng ký đã được gửi",
+      "submittedDate": "Đã gửi",
+      "platformsLabel": "Nền tảng",
+      "followers": "người theo dõi",
+      "slugLabel": "sên được yêu cầu",
+      "slugPreview": "xem trước: Hatcher.host/r/{slug}",
+      "payoutModeLabel": "Chế độ thanh toán",
+      "payoutAddressLabel": "Địa chỉ thanh toán",
+      "pitchLabel": "Cao độ",
+      "successHeading": "Đơn đăng ký đã được gửi.",
+      "successBody": "Chúng tôi sẽ xem xét trong vòng 3–5 ngày và gửi kết quả qua email cho bạn. Trong thời gian chờ đợi, vui lòng chỉ ra nội dung bạn sẽ chia sẻ sau khi được phê duyệt.",
+      "backToAffiliate": "Quay lại Chương trình liên kết",
+      "yourPlatforms": "Nền tảng của bạn",
+      "platformCount": "{count} / {max}",
+      "platformLabel": "Nền tảng {n}",
+      "removeLabel": "Xóa",
+      "addPlatform": "Thêm nền tảng khác",
+      "platformTypeField": "Loại nền tảng",
+      "handleField": "xử lý",
+      "handleHint": "ví dụ: @hatcher, @solana, /channel/xyz",
+      "audienceField": "Quy mô đối tượng (tùy chọn)",
+      "urlField": "URL (tùy chọn)",
+      "slugField": "Liên kết giới thiệu tùy chỉnh (tùy chọn)",
+      "slugPrefix": "Hatcher.host/r/",
+      "slugPlaceholder": "tên của bạn",
+      "slugBlankHint": "Để trống cho mã được tạo tự động",
+      "slugPreviewGood": "Liên kết của bạn sẽ là Hatcher.host/r/{slug}",
+      "pitchField": "Cao độ",
+      "pitchPlaceholder": "Tại sao bạn muốn hợp tác với Hatcher? Bạn sẽ tiếp cận loại nội dung hoặc đối tượng nào?",
+      "pitchCharHint": "50–2000 ký tự",
+      "payoutModeField": "Chế độ thanh toán",
+      "solAddressField": "Địa chỉ ví SOL (base58, 32–44 ký tự)",
+      "solAddressPlaceholder": "ví dụ: 21L6VVRAuxk87sXggz8exhPCm1w4qWyKEs6SDauyyRAW",
+      "submitBtn": "Gửi đơn đăng ký",
+      "submitting": "Đang gửi…",
+      "rejectedLabel": "Đơn đăng ký trước đó bị từ chối",
+      "validatePlatformMin": "Thêm ít nhất một nền tảng",
+      "validatePlatformMax": "Nền tảng {max} tối đa",
+      "validateHandleRequired": "Bắt buộc",
+      "validateHandleMax": "Tối đa 100 ký tự",
+      "validateAudienceNumber": "Phải là số nguyên",
+      "validateUrlInvalid": "Phải là một URL hợp lệ",
+      "validatePitchMin": "Quảng cáo chiêu hàng phải có ít nhất 50 ký tự",
+      "validatePitchMax": "Quảng cáo chiêu hàng phải có tối đa 2000 ký tự",
+      "validateAddressRequired": "Cần thiết cho các khoản thanh toán liên kết bằng tiền mặt",
+      "validateAddressFormat": "Phải là địa chỉ Solana base58 hợp lệ (32–44 ký tự)",
+      "slugTooShort": "Quá ngắn — tối thiểu 3 ký tự",
+      "slugTooLong": "Quá dài - tối đa 30 ký tự",
+      "slugInvalidChars": "Chỉ a–z, 0–9 và dấu gạch ngang (không thể bắt đầu/kết thúc bằng -)",
+      "slugReserved": "Con sên đó đã được bảo lưu - hãy chọn con sên khác"
+    }
+  },
+  "docs": {
+    "eyebrow": "Tài liệu",
+    "heading": "Tài liệu",
+    "subheading": "Mọi thứ bạn cần để xây dựng, triển khai và quản lý các tác nhân AI với Hatcher.",
+    "searchPlaceholder": "Tìm kiếm tài liệu...",
+    "searchComingSoon": "Tìm kiếm sắp ra mắt",
+    "apiReferenceHeading": "Tham khảo API",
+    "apiReferenceBody": "Tài liệu điểm cuối đầy đủ với các ví dụ bằng cURL, JavaScript và Python. Xác thực, giới hạn tỷ lệ và mã lỗi.",
+    "apiReferenceLink": "Khám phá điểm cuối",
+    "integrationsHeading": "Hướng dẫn tích hợp",
+    "integrationsBody": "Thiết lập từng bước cho Telegram, Discord, WhatsApp, Slack, Twitter/X và Signal. Từ thông tin xác thực đến tin nhắn đầu tiên.",
+    "integrationsLink": "Duyệt nền tảng",
+    "popularTopics": "Chủ đề phổ biến",
+    "readMore": "Đọc thêm",
+    "cantFind": "Không thể tìm thấy những gì bạn đang tìm kiếm?",
+    "cantFindBody": "Nhóm hỗ trợ và cộng đồng của chúng tôi sẵn sàng giúp bạn tận dụng tối đa Hatcher.",
+    "contactSupport": "Liên hệ hỗ trợ",
+    "helpCenter": "Trung tâm trợ giúp",
+    "quickLinks": [
+      {
+        "title": "Bắt đầu",
+        "description": "Thiết lập tác nhân AI đầu tiên của bạn trong vòng chưa đầy 60 giây. Hướng dẫn bắt đầu nhanh, điều kiện tiên quyết và triển khai lần đầu."
+      },
+      {
+        "title": "Cấu hình tác nhân",
+        "description": "Sử dụng Chat-to-Hatch, chọn OpenClaw hoặc Hermes và điều chỉnh thời gian chạy, tệp, tích hợp và định tuyến mô hình."
+      },
+      {
+        "title": "AI Credits",
+        "description": "Xem cách AI Credits hàng tháng và các lần nạp tiền một lần cung cấp năng lượng cho các LLM, công cụ tìm kiếm, nghiên cứu, trích xuất và thu thập dữ liệu trên web."
+      },
+      {
+        "title": "Cài đặt BYOK",
+        "description": "Mang theo khóa nhà cung cấp của riêng bạn cho OpenAI, Anthropic, Google, xAI, OpenRouter, v.v. BYOK không bao giờ chi tiêu Hatcher AI Credits."
+      },
+      {
+        "title": "Khung",
+        "description": "So sánh OpenClaw và Hermes, bao gồm cả khung phù hợp, định tuyến mô hình, BYOK và hành vi thời gian chạy được lưu trữ."
+      },
+      {
+        "title": "Tích hợp nền tảng",
+        "description": "Kết nối Telegram, Discord, Slack, Twitter/X, Signal, webhooks và các kênh khác có ở mọi cấp độ."
+      },
+      {
+        "title": "Hatcher CLI",
+        "description": "Cài đặt @hatcherlabs/cli, chạy Hatcher, tạo tác nhân, trò chuyện, đính kèm thiết bị đầu cuối, thiết lập GitHub và các cuộc gọi A2A từ shell của bạn."
+      },
+      {
+        "title": "Quy trình làm việc của nhà phát triển",
+        "description": "Kết nối GitHub, quản lý các phiên cuối, cho phép liên lạc giữa các tác nhân và điều phối các tác nhân thuộc sở hữu."
+      },
+      {
+        "title": "Ứng dụng Android",
+        "description": "Cài đặt ứng dụng Android, đăng nhập, quản lý tác nhân và nhận thông báo đẩy từ thiết bị di động của bạn."
+      },
+      {
+        "title": "Tham khảo API",
+        "description": "Điểm cuối REST API dành cho các tác nhân, thanh toán, AI Credits, thanh toán, trò chuyện công khai và hoạt động quản trị viên."
+      }
+    ],
+    "topics": [
+      {
+        "label": "Mô tả một tác nhân với Chat-to-Hatch"
+      },
+      {
+        "label": "AI Credits được chi tiêu như thế nào"
+      },
+      {
+        "label": "Các mô hình được lưu trữ và BYOK"
+      },
+      {
+        "label": "Thông báo đẩy của Android"
+      },
+      {
+        "label": "Thiết lập tích hợp Telegram"
+      },
+      {
+        "label": "Các phương thức thanh toán được hỗ trợ"
+      }
+    ]
+  },
+  "shared": {
+    "tiers": {
+      "free": {
+        "name": "miễn phí",
+        "description": "1 tác nhân, 500 AI Credits/tháng, không gian làm việc 2 GB"
+      },
+      "starter": {
+        "name": "người mới bắt đầu",
+        "description": "1 tác nhân, 3.000 AI Credits/tháng, không gian làm việc 10 GB"
+      },
+      "pro": {
+        "name": "chuyên nghiệp",
+        "description": "3 tác nhân, 15.000 AI Credits/tháng, không gian làm việc 25 GB"
+      },
+      "business": {
+        "name": "Kinh doanh",
+        "description": "5 tác nhân, 40.000 AI Credits/tháng, không gian làm việc 50 GB, luôn hoạt động"
+      },
+      "founding_member": {
+        "name": "Thành viên sáng lập",
+        "description": "10 tác nhân, 25.000 AI Credits/tháng, không gian làm việc 40 GB, truy cập trọn đời"
+      }
+    },
+    "addons": {
+      "agents_plus1": {
+        "name": "+1 Tác nhân",
+        "description": "Thêm 1 vị trí tác nhân"
+      },
+      "agents_plus3": {
+        "name": "+3 Tác nhân",
+        "description": "3 vị trí tác nhân bổ sung"
+      },
+      "agents_plus5": {
+        "name": "+5 Tác nhân",
+        "description": "5 vị trí tác nhân bổ sung"
+      },
+      "agents_plus10": {
+        "name": "+10 Tác nhân",
+        "description": "10 vị trí tác nhân bổ sung"
+      },
+      "ai_credits_5000": {
+        "name": "5.000 AI Credits",
+        "description": "Nạp tiền một lần cho các mô hình được lưu trữ và tìm kiếm trên web"
+      },
+      "ai_credits_10000": {
+        "name": "10.000 AI Credits",
+        "description": "Nạp tiền một lần để chạy và nghiên cứu mô hình nặng hơn"
+      },
+      "ai_credits_25000": {
+        "name": "25.000 AI Credits",
+        "description": "Nạp tiền một lần cho khối lượng công việc lớn hơn của tác nhân"
+      },
+      "ai_credits_50000": {
+        "name": "50.000 AI Credits",
+        "description": "Nạp tiền một lần để sử dụng trên máy chủ với số lượng lớn"
+      }
+    },
+    "frameworks": {
+      "openclaw": {
+        "name": "OpenClaw",
+        "description": "Trợ lý AI tự lưu trữ với hơn 3.200 kỹ năng cộng đồng, cổng nhắn tin đa kênh và thực thi nhiệm vụ tự động."
+      },
+      "hermes": {
+        "name": "Tác nhân Hermes",
+        "description": "Tác nhân AI tự động của Nous Research với bộ nhớ liên tục, hơn 40 công cụ, hệ thống kỹ năng và cổng nhắn tin đa nền tảng."
+      }
+    },
+    "agentStatus": {
+      "active": "Đang hoạt động",
+      "sleeping": "đang ngủ",
+      "paused": "Đã tạm dừng",
+      "archived": "Đã lưu trữ",
+      "error": "Lỗi",
+      "killed": "bị giết",
+      "restarting": "Khởi động lại",
+      "stopping": "Đang dừng"
+    }
+  },
+  "localeSwitcher": {
+    "label": "Thay đổi ngôn ngữ"
+  },
+  "agentRoom": {
+    "back": {
+      "toCity": "Trở lại Thành phố",
+      "toDashboard": "Quay lại Trang tổng quan",
+      "toAgents": "Quay lại Tác nhân",
+      "toBuilding": "Quay lại tòa nhà",
+      "toHouse": "Trở lại Nhà"
+    }
+  },
+  "chatToHatch": {
+    "backLink": "← Trang tổng quan",
+    "eyebrow": "Trình tạo tác nhân ngôn ngữ tự nhiên",
+    "h1Prefix": "Hãy mô tả nó.",
+    "h1Accent": "Hãy nở nó.",
+    "authChecking": "Đang kiểm tra phiên…",
+    "assistantTitle": "Trợ lý Hatcher",
+    "assistantSub": "Được hỗ trợ bởi Hatcher AI · phân tích ý định thành cấu hình tác nhân đầy đủ",
+    "live": "Trực tiếp",
+    "assistantWho": "Hatcher",
+    "intro": "Mô tả tác nhân bạn cần: nó làm gì, hoạt động ở đâu và nó được phép sử dụng những gì. Hatcher chuẩn bị bản phác thảo khung, mô hình, công cụ, danh tính và thời gian chạy để xem xét trước khi triển khai.",
+    "thinking": "Đang suy nghĩ…",
+    "placeholder": "Một tác nhân theo dõi webhooks Stripe của tôi và đăng bản tóm tắt thân thiện về #revenue trên Discord mỗi sáng.",
+    "send": "Gửi",
+    "sendRefine": "Tinh chỉnh",
+    "previewTitle": "Xem trước tác nhân",
+    "previewEmpty": "trống",
+    "previewReady": "Sẵn sàng nở",
+    "previewNeedsFix": "Cần sửa chữa",
+    "emptyHint": "Mô tả một tác nhân ở bên trái để bắt đầu.",
+    "reset": "Đặt lại về đề xuất",
+    "resetTooltip": "Hoàn nguyên tất cả các trường về giá trị đề xuất của trợ lý",
+    "labelName": "Tên",
+    "labelDescription": "Mô tả",
+    "labelPersonality": "Tính cách",
+    "labelSystemPrompt": "SOUL.md / dấu nhắc hệ thống",
+    "labelFramework": "Khung",
+    "labelFrameworkReason": "Tại sao khuôn khổ này",
+    "labelSkills": "Kỹ năng cài đặt",
+    "labelPlugins": "Các plugin để cài đặt",
+    "labelInstallPlan": "Gói cài đặt",
+    "labelGreeting": "Lời chào mẫu",
+    "labelModel": "Mô hình được lưu trữ",
+    "labelModelProvider": "lộ trình AI",
+    "labelAvatar": "Ý tưởng hình đại diện",
+    "labelAvatarVariant": "Hình đại diện 3D",
+    "labelAvatarPalette": "Bảng màu",
+    "labelAvatarEmblem": "biểu tượng",
+    "labelAvatarAccessory": "phụ kiện",
+    "labelAvatarMood": "tâm trạng",
+    "frameworkOpenClaw": "Trình duyệt, tập tin, mã, nghiên cứu và sử dụng công cụ tác nhân.",
+    "frameworkHermes": "Tự động hóa, webhooks, nhắn tin và lập lịch nhanh chóng dựa trên API.",
+    "placeholderName": "Tên tác nhân",
+    "placeholderDescription": "Một câu ngắn mô tả những gì tác nhân này làm.",
+    "placeholderPersonality": "Hướng âm ngắn - ví dụ: ngắn gọn, kỹ thuật, không có lời xin lỗi.",
+    "placeholderSystemPrompt": "Lời nhắc hệ thống nhiều đoạn - vai trò, hành vi, giọng nói, công cụ.",
+    "addSkill": "thêm kỹ năng",
+    "addPlugin": "thêm plugin",
+    "removeChip": "Xóa {name}",
+    "slugUrl": "URL",
+    "hatchBtn": "Triển khai tác nhân",
+    "hatchBtnLoading": "Đang triển khai…",
+    "footHint": "Mọi trường đều có thể chỉnh sửa được. Sau khi triển khai, bạn có thể tinh chỉnh cấu hình, cài đặt kỹ năng, kiểm tra nhật ký và cập nhật SOUL.md từ phòng điều khiển tác nhân.",
+    "errName_min": "Tên cần ít nhất 3 ký tự.",
+    "errName_max": "Tên quá dài (tối đa 50).",
+    "errName_regex": "Tên có thể sử dụng chữ cái, số, dấu cách và - : ' . ( ) & chỉ một.",
+    "errDesc_max": "Mô tả quá dài (tối đa 140).",
+    "errAssistant": "Trợ lý ấp trứng không trả lời. Hãy thử diễn đạt lại.",
+    "errNetwork": "Lỗi mạng - API có thể truy cập được không?",
+    "errCreate": "Không thể tạo tác nhân. Hãy tinh chỉnh mô tả và thử lại.",
+    "errCreateNetwork": "Lỗi mạng khi tạo tác nhân."
+  },
+  "landingV3": {
+    "hero": {
+      "boxLabel": "Triển khai",
+      "headline1": "Khởi động sản xuất",
+      "headline2": "Tác nhân AI trong vài phút.",
+      "sub": "Mô tả những gì bạn cần. Hatcher biến nó thành một tác nhân được lưu trữ với các mô hình, công cụ, ví, lịch trình và điều khiển trực tiếp sẵn sàng chạy.",
+      "ctaPrimary": "Tạo tác nhân đầu tiên của bạn",
+      "ctaGhost": "Khám phá các tác nhân trực tiếp",
+      "ctaSignup": "Tạo một tài khoản miễn phí",
+      "ctaAppStoreKicker": "Tải xuống trên",
+      "ctaAppStore": "Cửa hàng ứng dụng",
+      "ctaPlayStoreKicker": "Bắt nó lên",
+      "ctaPlayStore": "Google Play",
+      "ctaSolanaMobileKicker": "Có sẵn trên",
+      "ctaSolanaMobile": "Solana Di động",
+      "ctaFeatures": "Xem tất cả các tính năng"
+    },
+    "flow": {
+      "boxLabel": "Nó hoạt động như thế nào",
+      "title": "Ba bước từ ý tưởng đến tác nhân trực tiếp",
+      "tile1Title": "Nhập những gì bạn muốn",
+      "tile1Body": "Mô tả quy trình làm việc bằng tiếng Anh đơn giản. Hatcher biến nó thành thông số tác nhân có cấu trúc.",
+      "tile1Example": "tổng hợp tin tức tiền điện tử hàng ngày",
+      "tile2Title": "Xem lại cấu hình",
+      "tile2Body": "Xem lại khung, mô hình, công cụ, tích hợp, cài đặt thời gian chạy và AI Credits trước khi khởi chạy.",
+      "tile3Title": "Khởi chạy thời gian chạy",
+      "tile3Body": "Triển khai vào thời gian chạy được lưu trữ với tính năng trò chuyện, nhật ký, tệp, tiện ích tích hợp, quyền truy cập thiết bị đầu cuối và điều khiển trực tiếp.",
+      "cta": "Tạo của bạn",
+      "ctaFeatures": "Xem tất cả các tính năng",
+      "liveLabel": "tác nhân trực tiếp"
+    },
+    "useCases": {
+      "boxLabel": "Tác nhân có thể làm gì",
+      "title": "Tác nhân dễ dàng mọi người thực sự hiểu",
+      "body": "Bắt đầu với một yêu cầu bằng ngôn ngữ đơn giản. Hatcher biến nó thành một tác nhân được lưu trữ với khung, công cụ, tích hợp, phòng và tòa nhà phù hợp.",
+      "items": {
+        "crypto": {
+          "eyebrow": "Thị trường",
+          "title": "Trinh sát tin tức về tiền điện tử",
+          "body": "Theo dõi tin tức về mã thông báo, hoạt động ví, giá cả và tóm tắt hàng ngày thông qua trò chuyện, email hoặc Telegram."
+        },
+        "polymarket": {
+          "eyebrow": "Thị trường dự đoán",
+          "title": "Người theo dõi đa thị trường",
+          "body": "Theo dõi thị trường, thay đổi tỷ lệ cược, tăng đột biến về khối lượng và gửi thông báo khi luận điểm cần được chú ý."
+        },
+        "trader": {
+          "eyebrow": "Giao dịch",
+          "title": "phi công phụ của thương nhân",
+          "body": "Duy trì danh sách theo dõi, ghi chú rủi ro, liên kết nghiên cứu và cảnh báo trong khi bạn luôn kiểm soát mọi quyết định."
+        },
+        "community": {
+          "eyebrow": "Cộng đồng",
+          "title": "Toán tử Telegram hoặc Discord",
+          "body": "Trả lời các câu hỏi thường gặp, kiểm duyệt các kênh, tóm tắt chủ đề và gửi các thông báo quan trọng đến bạn."
+        },
+        "research": {
+          "eyebrow": "Nghiên cứu",
+          "title": "Vòng nghiên cứu hàng ngày",
+          "body": "Tìm kiếm trên web, đọc các nguồn, biên soạn tóm tắt và ghi nhớ trực tiếp những gì quan trọng."
+        },
+        "email": {
+          "eyebrow": "Hoạt động",
+          "title": "Trợ lý email và tác vụ",
+          "body": "Đọc nội dung cập nhật trong hộp thư đến, thư trả lời nháp, chuẩn bị lời nhắc và tiếp tục tiến hành công việc thường ngày."
+        }
+      },
+      "footer": "Mỗi người đều có một vị trí trong tòa nhà của bạn, một căn phòng mà bạn có thể vào và nhật ký mà bạn có thể kiểm tra.",
+      "cta": "Tạo với Chat-to-Hatch"
+    },
+    "rooms": {
+      "boxLabel": "Phòng điều khiển",
+      "title": "Mỗi tác nhân đều có một không gian làm việc trực tiếp",
+      "body": "Hatcher City vẫn là một lớp không gian, nhưng trải nghiệm sản phẩm cốt lõi là một phòng điều khiển chính xác: trò chuyện, nhật ký, tệp, cấu hình, tích hợp, thiết bị đầu cuối và trạng thái ở cùng một nơi.",
+      "stationAvatar": "Hình đại diện",
+      "stationSkills": "Bàn làm việc kỹ năng",
+      "stationIntegrations": "Giá tích hợp",
+      "stationStatus": "Bảng điều khiển trạng thái",
+      "stationLogs": "tường gỗ",
+      "stationStats": "Hình ba chiều thống kê",
+      "stationMemory": "Kệ kỷ niệm",
+      "stationConfig": "Cấu hình thiết bị đầu cuối"
+    },
+    "city": {
+      "boxLabel": "Hatcher City",
+      "title": "Mạng lưới tác nhân, có thể đi lại được",
+      "body": "Yêu cầu xây dựng tác nhân của riêng bạn. Đi bộ trong thành phố, tìm các đặc vụ đang hoạt động di chuyển trong đó, sau đó vào tòa nhà của bạn để quản lý mọi phòng.",
+      "cta": "Nhập Hatcher City",
+      "districts": "25 quận · lưới 5×5"
+    },
+    "frameworks": {
+      "boxLabel": "Khung",
+      "seeAll": "Xem tất cả →",
+      "tagOpenclaw": "Trợ lý đa kỹ năng",
+      "tagHermes": "Tác nhân tự chủ"
+    },
+    "pricing": {
+      "boxLabel": "Định giá",
+      "seeFull": "Xem giá đầy đủ →",
+      "lifetime": "$99 trọn đời",
+      "free": "$0",
+      "perMonth": "/tháng",
+      "agentSingular": "tác nhân",
+      "agentPlural": "tác nhân",
+      "msgsPerDay": "AI Credits/tháng"
+    },
+    "ecosystem": {
+      "boxLabel": "Hệ sinh thái",
+      "title": "Được xây dựng cho cơ sở hạ tầng tác nhân",
+      "sub": "Thời gian chạy OpenClaw và Hermes, mô hình được lưu trữ hoặc BYOK và các đường dẫn gốc tiền điện tử tùy chọn cho các quy trình thanh toán, nhận dạng và nhà cung cấp.",
+      "frameworksLabel": "Khung",
+      "chainsLabel": "Dây chuyền"
+    },
+    "team": {
+      "boxLabel": "đội",
+      "title": "Những con người xây dựng Hatcher",
+      "cristianName": "Cristian",
+      "cristianRole": "Nhà phát triển/Giám đốc điều hành",
+      "ioanaName": "Ioana",
+      "ioanaRole": "CMO / Tiếp thị",
+      "johnName": "John",
+      "johnRole": "Nhà phát triển",
+      "moiseName": "Moise",
+      "moiseRole": "Đại diện / Cộng đồng Hoa Kỳ",
+      "anonymousOneName": "Nhà phát triển ẩn danh",
+      "anonymousOneRole": "Nhà phát triển",
+      "anonymousTwoName": "Nhà phát triển ẩn danh",
+      "anonymousTwoRole": "Nhà phát triển",
+      "founderTag": "người sáng lập",
+      "growthTag": "tăng trưởng",
+      "builderTag": "người xây dựng",
+      "communityTag": "cộng đồng",
+      "anonymousTag": "riêng tư"
+    },
+    "finalCta": {
+      "boxLabel": "Sẵn sàng",
+      "headline": "Triển khai tác nhân đầu tiên của bạn.",
+      "ctaPrimary": "tác nhân nở",
+      "ctaGhost": "Xem tác nhân",
+      "metaFrameworks": "OpenClaw + Hermes",
+      "metaNoCard": "không có thẻ tín dụng"
+    },
+    "cli": {
+      "boxLabel": "CLI",
+      "title": "Chạy Hatcher từ thiết bị đầu cuối của bạn",
+      "sub": "Cài đặt Hatcher CLI, tạo khóa API, sau đó chạy `hatcher`. Xây dựng các tác nhân từ tiếng Anh đơn giản, trò chuyện với họ, đính kèm vào thời gian chạy trực tiếp của họ và quản lý quy trình làm việc của nhà phát triển mà không cần rời khỏi vỏ của bạn.",
+      "apiKeyHint": "Tạo khóa API trong Tài khoản → Khóa API → Tạo khóa.",
+      "ctaKey": "Tạo khóa API",
+      "ctaDocs": "Tài liệu CLI",
+      "terminalLabel": "Hatcher CLI",
+      "features": {
+        "hatch": {
+          "title": "Chat-to-Hatch",
+          "body": "Biến một lời nhắc thành tác nhân OpenClaw hoặc Hermes được định cấu hình."
+        },
+        "terminal": {
+          "title": "Thiết bị đầu cuối trực tiếp",
+          "body": "Đính kèm phiên khung đang chạy với `hatcher terminal`."
+        },
+        "dev": {
+          "title": "Quy trình làm việc của nhà phát triển",
+          "body": "Sử dụng quyền truy cập GitHub, cuộc gọi, phiên, nhật ký và điều phối A2A từ một CLI."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,2594 @@
+{
+  "common": {
+    "appName": "Hatcher",
+    "tagline": "Alojamiento de agente de IA administrado · Criptonativo"
+  },
+  "nav": {
+    "pricing": "Precios",
+    "docs": "Documentos",
+    "roadmap": "Hoja de ruta",
+    "login": "Iniciar sesión",
+    "signup": "Regístrate",
+    "frameworks": "Marcos",
+    "token": "ficha",
+    "blog": "Blog",
+    "changelog": "Registro de cambios",
+    "help": "Ayuda",
+    "dashboard": "Panel de control",
+    "myAgents": "Mis agentes",
+    "create": "crear",
+    "city": "ciudad",
+    "analytics": "Analítica",
+    "skale": "Carteras SKALE",
+    "team": "equipo",
+    "billing": "Facturación",
+    "settings": "Configuración",
+    "support": "Soporte",
+    "logout": "Cerrar sesión",
+    "signIn": "Iniciar sesión",
+    "signUp": "Regístrate",
+    "credits": "créditos",
+    "affiliate": "afiliado",
+    "admin": "administrador",
+    "adminPanel": "Panel de administración",
+    "openNav": "Abrir menú de navegación",
+    "closeNav": "Cerrar menú de navegación",
+    "affiliateDashboard": "Panel de afiliados",
+    "affiliatePending": "Solicitud bajo revisión",
+    "affiliateRejected": "Volver a aplicar como afiliado",
+    "affiliateBecome": "Conviértete en afiliado",
+    "userMenu": {
+      "sub_myAgents": "Explorar, editar, implementar.",
+      "sub_create": "Describe un agente para nacer.",
+      "sub_analytics": "AI Credits, tokens, tendencias.",
+      "sub_billing": "Nivel, complementos, créditos.",
+      "sub_wallets": "Carteras de pago Solana.",
+      "sub_team": "Miembros y colaboración.",
+      "sub_settings": "Perfil, claves API, preferencias.",
+      "sub_support": "Ayuda, documentos, contacto.",
+      "sub_affiliate": "Referencias e informes de socios.",
+      "sub_admin": "Controles de plataforma.",
+      "sub_signOut": "Finalice la sesión en este dispositivo.",
+      "tierSuffix": "nivel"
+    },
+    "groups": {
+      "build": "construir",
+      "explore": "Explorar",
+      "resources": "Recursos",
+      "hatchAgentLabel": "Agente de Hatch (chat)",
+      "hatchAgentSub": "Describir el tiempo de ejecución, las herramientas y el flujo de trabajo.",
+      "myAgentsLabel": "mis agentes",
+      "myAgentsSub": "Panel de control para sus agentes en ejecución.",
+      "publicAgentsLabel": "Agentes públicos",
+      "publicAgentsSub": "Chatea con agentes de la comunidad.",
+      "featuresLabel": "Características",
+      "featuresSub": "Tiempo de ejecución, espacio de trabajo, herramientas, salas y CLI.",
+      "cityLabel": "Hatcher City",
+      "citySub": "Camina por un mundo 3D de agentes en vivo.",
+      "frameworksLabel": "Marcos",
+      "frameworksSub": "OpenClaw · Hermes.",
+      "pricingLabel": "Precios",
+      "pricingSub": "Gratis · Starter · Pro · Business · Fundación.",
+      "tokenLabel": "$HATCHER",
+      "tokenSub": "Pagos de servicios públicos, descuentos y mecánica de quemaduras.",
+      "stakingLabel": "Replantear",
+      "stakingSub": "Recompensas $HATCHER más AI Credits.",
+      "whitepaperLabel": "Libro blanco",
+      "whitepaperSub": "Plataforma, token, créditos, hoja de ruta.",
+      "blogLabel": "Blog",
+      "blogSub": "Notas, lanzamientos, inmersiones profundas.",
+      "roadmapLabel": "Hoja de ruta",
+      "roadmapSub": "Lo que enviamos a continuación.",
+      "changelogLabel": "Registro de cambios",
+      "changelogSub": "Qué cambió y cuándo."
+    },
+    "hatchAgent": "agente de eclosión"
+  },
+  "notifications": {
+    "heading": "Notificaciones",
+    "empty": "Sin notificaciones",
+    "markRead": "marcar leído",
+    "markReadAriaLabel": "Marcar todas las notificaciones como leídas",
+    "clear": "Borrar",
+    "clearAriaLabel": "Borrar todas las notificaciones",
+    "unreadAriaLabel": "Notificaciones, {count} no leído",
+    "allReadAriaLabel": "Notificaciones"
+  },
+  "footer": {
+    "columns": {
+      "product": "Producto",
+      "resources": "Recursos",
+      "community": "Comunidad"
+    },
+    "links": {
+      "createAgent": "Crear agente",
+      "dashboard": "Panel de control",
+      "pricing": "Precios",
+      "affiliate": "afiliado",
+      "status": "Estado",
+      "documentation": "Documentación",
+      "support": "Soporte",
+      "blog": "Blog",
+      "changelog": "Registro de cambios",
+      "security": "Seguridad",
+      "roadmap": "Hoja de ruta",
+      "terms": "Términos",
+      "privacy": "Privacidad",
+      "cookies": "galletas",
+      "impressum": "Impresión",
+      "docs": "Documentos"
+    },
+    "copyright": "© {year} HatcherLabs. Reservados todos los derechos.",
+    "companyInfo": "HHX TECHNOLOGY SRL · CUI 45318471 · Timișoara, Rumania",
+    "legalNotice": "Las páginas legales (Privacidad, Términos, Pie de imprenta, Cookies) están disponibles únicamente en inglés.",
+    "tag": "Alojamiento gestionado de agentes de IA · Rumania",
+    "colBuild": "construir",
+    "colExplore": "Explorar",
+    "colResources": "Recursos",
+    "colLegal": "Legales",
+    "itemHatchAgent": "agente de eclosión",
+    "itemMyAgents": "mis agentes",
+    "itemPublicAgents": "Agentes públicos",
+    "itemFeatures": "Características",
+    "itemCity": "Hatcher City",
+    "itemFrameworks": "Marcos",
+    "itemPricing": "Precios",
+    "itemToken": "$HATCHER",
+    "itemStaking": "Replantear",
+    "itemWhitepaper": "Libro blanco",
+    "itemBlog": "Blog",
+    "itemRoadmap": "Hoja de ruta",
+    "itemChangelog": "Registro de cambios",
+    "itemSecurity": "Seguridad",
+    "itemPrivacy": "Privacidad",
+    "itemTerms": "Términos",
+    "itemCookies": "galletas",
+    "itemImpressum": "Impresión",
+    "poweredBy": "Desarrollado por"
+  },
+  "landing": {
+    "affiliateBanner": {
+      "live": "El programa de afiliados está activo",
+      "earn": "- ganar hasta",
+      "pct": "40%",
+      "perReferral": "en cada referencia",
+      "dismissAriaLabel": "Descartar banner de afiliado"
+    },
+    "tokenBanner": {
+      "learnMore": "Más información →"
+    },
+    "hero": {
+      "eyebrow": "Alojamiento de agente de IA administrado · Criptonativo",
+      "headlinePrefix": "Incuba tu",
+      "typewriterWords": [
+        "Agente de IA",
+        "Entrenador físico",
+        "Rastreador de criptomonedas",
+        "compañero de estudio",
+        "Planificador de viajes",
+        "asistente personal"
+      ],
+      "body": "Elija OpenClaw o Hermes. Configurar. Lanzamiento en 60 segundos. No se requiere código ni infraestructura que administrar. Más de 20 plataformas, modelos alojados UsePod/OpenRouter y BYOK.",
+      "ctaPrimary": "Empiece gratis",
+      "ctaSecondary": "Leer documentos",
+      "agentPreviewOnline": "CryptoHelper - En línea"
+    },
+    "stats": {
+      "users": "Usuarios",
+      "agents": "Agentes",
+      "activeNow": "Activo ahora"
+    },
+    "agentDiscovery": {
+      "eyebrow": "Para agentes de IA",
+      "heading": "Dirige un ejército de subagentes",
+      "body": "Su agente de codificación local se convierte en comandante de flota. Pegue este mensaje: se registra en Hatcher a su nombre, activa subagentes siempre activos (bots Telegram, bucles de investigación, mods Discord, monitores) y sigue controlándolos mucho después de que finaliza su sesión.",
+      "promptLabel": "rápido",
+      "copyLabel": "Copiar",
+      "copiedLabel": "Copiado",
+      "copyAriaLabel": "Copiar mensaje",
+      "copiedAriaLabel": "Copiado",
+      "step01": "Envíe este mensaje a su agente de codificación de IA: Claude Code, Cursor, OpenClaw, Hermes o cualquier agente que pueda recuperar URL y ejecutar comandos de shell.",
+      "step02": "El agente registra una cuenta con su correo electrónico y le envía un enlace de verificación.",
+      "step03": "Haga clic en verificar. Hatcher redacta la configuración, la implementa y le entrega una IA en ejecución.",
+      "viewSkillMd": "Ver habilidad.md",
+      "githubSource": "Fuente GitHub"
+    },
+    "howItWorks": {
+      "eyebrow": "como funciona",
+      "heading": "3 pasos. 60 segundos.",
+      "subheading": "Sin codificación, sin guías de configuración, sin archivos de configuración.",
+      "steps": [
+        {
+          "num": "01",
+          "title": "Elige un marco",
+          "desc": "Elija OpenClaw para una automatización que requiere muchas habilidades o Hermes para agentes adaptables de larga duración con memoria."
+        },
+        {
+          "num": "02",
+          "title": "Configurar",
+          "desc": "Nombre, personalidad, integraciones. Complete un formulario simple: sin archivos de configuración, sin YAML."
+        },
+        {
+          "num": "03",
+          "title": "Implementar",
+          "desc": "Un clic. Su agente está activo en todas las plataformas conectadas en menos de 60 segundos."
+        }
+      ],
+      "cta": "Pruébalo ahora"
+    },
+    "useCases": {
+      "eyebrow": "Casos de uso",
+      "heading": "¿Qué incubarás?",
+      "subheading": "Desde la productividad personal hasta la automatización empresarial: su agente, sus reglas.",
+      "items": [
+        {
+          "title": "asistente personal",
+          "desc": "Calendario, correos electrónicos, recordatorios: de Telegram."
+        },
+        {
+          "title": "Entrenador físico",
+          "desc": "Entrenamientos, rutinas, responsabilidad diaria."
+        },
+        {
+          "title": "Alimentación y nutrición",
+          "desc": "Registre comidas, cuente calorías, sugerencias de recetas."
+        },
+        {
+          "title": "Rastreador de criptomonedas",
+          "desc": "Precios de tokens, alertas de cartera, datos en cadena."
+        },
+        {
+          "title": "compañero de estudio",
+          "desc": "Cuestionarte, resumir libros de texto, ayudarte con la tarea."
+        },
+        {
+          "title": "Planificador de viajes",
+          "desc": "Encuentre vuelos, planifique itinerarios y selecciones locales."
+        },
+        {
+          "title": "gerente de presupuesto",
+          "desc": "Seguimiento de gastos, objetivos de ahorro, informes semanales."
+        },
+        {
+          "title": "asistente de investigación",
+          "desc": "Búsqueda web, resumir artículos, compilar informes."
+        },
+        {
+          "title": "Atención al cliente",
+          "desc": "Responda preguntas frecuentes en Discord o WhatsApp, 24 horas al día, 7 días a la semana."
+        }
+      ],
+      "footer": "Y cualquier otra cosa que puedas describir en un lenguaje sencillo."
+    },
+    "frameworks": {
+      "eyebrow": "Marcos",
+      "heading": "Dos marcos. Una plataforma.",
+      "subheading": "Elija el que se adapte a su agente. Cambia cuando quieras.",
+      "items": [
+        {
+          "name": "OpenClaw",
+          "tag": "todoterreno",
+          "desc": "Potentes herramientas, complementos y control del navegador.",
+          "features": "Más de 2500 habilidades · Automatización del navegador · Gestión de archivos"
+        },
+        {
+          "name": "Hermes",
+          "tag": "razonamiento",
+          "desc": "Diseño inteligente para una memoria y un razonamiento ricos.",
+          "features": "77 habilidades incluidas · Memoria profunda · Multimodelo"
+        }
+      ]
+    },
+    "city": {
+      "eyebrow": "★ NUEVO",
+      "heading": "Vea todos los agentes en Hatcher City.",
+      "body": "Una ciudad viva en 3D donde cada agente público es un edificio. Distritos por categoría, colores por marco, vigas doradas marcan el tuyo. Arrastre, haga zoom y haga clic en cualquier edificio para abrirlo.",
+      "videoAriaLabel": "Abrir Hatcher City",
+      "label": "CIUDAD HATCHER",
+      "exploreCta": "Explora la flota completa →",
+      "enterCta": "Introduce la ciudad"
+    },
+    "features": {
+      "eyebrow": "Plataforma",
+      "heading": "Todo lo que tu agente necesita",
+      "items": [
+        {
+          "title": "Implementación instantánea",
+          "desc": "De cero a agente en ejecución en menos de 60 segundos."
+        },
+        {
+          "title": "Todas las plataformas",
+          "desc": "Telegram, Discord, Twitter, WhatsApp, Slack."
+        },
+        {
+          "title": "Trae tu propia llave",
+          "desc": "Utilice su propia clave LLM API sin gastar AI Credits."
+        },
+        {
+          "title": "Seguro por defecto",
+          "desc": "Contenedores aislados, secretos cifrados, sin datos compartidos."
+        },
+        {
+          "title": "Análisis en vivo",
+          "desc": "Estadísticas en tiempo real, seguimiento de uso, métricas de rendimiento."
+        },
+        {
+          "title": "Chat y voz",
+          "desc": "Chat de texto, llamadas de voz, transmisión en tiempo real, listo para usar."
+        }
+      ]
+    },
+    "pricing": {
+      "eyebrow": "Precios",
+      "heading": "Comience gratis, crezca cuando esté listo",
+      "subheading": "Todas las plataformas incluidas en cada plan. La IA alojada y la búsqueda web utilizan AI Credits; BYOK sigue siendo pagado por el proveedor.",
+      "popularLabel": "populares",
+      "tiers": [
+        {
+          "name": "Gratis",
+          "price": "$0",
+          "sub": "/mes",
+          "features": [
+            "1 agente de IA",
+            "500 AI Credits/mes",
+            "Espacio de trabajo de 2 GB",
+            "Todas las plataformas",
+            "Administrador de archivos + Registros completos"
+          ],
+          "cta": "empezar"
+        },
+        {
+          "name": "entrante",
+          "price": "$6.99",
+          "sub": "/mes",
+          "features": [
+            "1 agente de IA",
+            "3000 AI Credits/mes",
+            "Espacio de trabajo de 10 GB",
+            "Facturación directa BYOK",
+            "Siempre activo"
+          ],
+          "cta": "Elige el iniciador"
+        },
+        {
+          "name": "profesional",
+          "price": "$19.99",
+          "sub": "/mes",
+          "features": [
+            "3 agentes de IA",
+            "15.000 AI Credits/mes",
+            "Espacio de trabajo de 25 GB",
+            "Facturación directa BYOK",
+            "Recursos dedicados"
+          ],
+          "cta": "Elige profesional"
+        },
+        {
+          "name": "Negocios",
+          "price": "$49.99",
+          "sub": "/mes",
+          "features": [
+            "5 agentes de IA",
+            "40.000 AI Credits/mes",
+            "Espacio de trabajo de 50 GB",
+            "Contenedores siempre activos",
+            "Colaboración en equipo"
+          ],
+          "cta": "Elija Negocio"
+        }
+      ],
+      "addonsNote": "¿Necesita más agentes, AI Credits o almacenamiento? Agregue capacidad adicional cuando la necesite.",
+      "addonsCta": "Ver precios completos →"
+    },
+    "founding": {
+      "eyebrow": "Oferta limitada · Miembro fundador",
+      "heading": "Paga una vez y quédate para siempre.",
+      "oneTime": "una sola vez",
+      "subheading": "Precio fijo, sin tarifas mensuales, todas las funciones de nivel Business para siempre. Sólo 20 plazas.",
+      "availableSpotsLabel": "Plazas disponibles",
+      "checking": "Comprobando…",
+      "soldOut": "Agotado",
+      "spotsLeft": "{remaining} de {max} izquierda",
+      "loadingAvailability": "Cargando disponibilidad…",
+      "allTaken": "Se toman todos los puntos de fundación {max}. Los niveles estándar aún están disponibles.",
+      "claimed": "{claimed} de {max} reclamado · una vez que se agotan, esta oferta desaparece.",
+      "includedHeading": "Todo incluido, para siempre.",
+      "includedItems": [
+        "10 agentes incluidos",
+        "Siempre activo (sin dormir)",
+        "25.000 AI Credits/mes",
+        "La búsqueda web utiliza AI Credits",
+        "2 CPU · 4 GB de RAM por agente",
+        "Espacio de trabajo de 40 GB",
+        "Administrador de archivos + Registros completos",
+        "Apoyo prioritario",
+        "Rol fundador de Discord + etiqueta Telegram",
+        "Precio bloqueado para siempre"
+      ],
+      "ctaSoldOut": "Agotado",
+      "ctaClaim": "Reclama tu lugar"
+    },
+    "faq": {
+      "eyebrow": "Preguntas frecuentes",
+      "heading": "Preguntas comunes",
+      "items": [
+        {
+          "q": "¿Es realmente gratis?",
+          "a": "Sí. El plan gratuito le brinda 1 agente, 500 AI Credits/mes, 2 GB de espacio de trabajo, administrador de archivos, registros completos y acceso a todas las plataformas. No se requiere tarjeta de crédito. BYOK (traiga su propia clave LLM) sigue siendo pagado por el proveedor en cualquier nivel."
+        },
+        {
+          "q": "¿Necesito saber codificar?",
+          "a": "¡En absoluto! Crear un agente es como completar un formulario: elija un nombre, describa lo que quiere que haga, elija plataformas y ejecútelo."
+        },
+        {
+          "q": "¿Qué es \"Trae tu propia llave\"?",
+          "a": "Conecte su propia clave OpenAI, Anthropic, Google, OpenRouter u otra clave LLM compatible. El uso de BYOK se paga directamente a su proveedor y no gasta Hatcher AI Credits."
+        },
+        {
+          "q": "¿Dónde corre mi agente?",
+          "a": "En nuestros servidores en la nube 24 horas al día, 7 días a la semana. No es necesario mantener la computadora encendida ni instalar nada."
+        }
+      ]
+    },
+    "finalCta": {
+      "heading": "¿Listo para implementar su primer agente?",
+      "body": "El nivel gratuito incluye 1 agente, 500 AI Credits/mes, administrador de archivos, registros completos y 2 GB de espacio de trabajo. Facturación directa BYOK. No se requiere tarjeta de crédito.",
+      "ctaPrimary": "Crea tu agente",
+      "ctaSecondary": "Ver precios",
+      "trustNoCreditCard": "Sin tarjeta de crédito",
+      "trustFreeAi": "IA gratuita incluida",
+      "trustDeploy60s": "Implementar en los años 60",
+      "trustAllPlatforms": "Todas las plataformas"
+    }
+  },
+  "auth": {
+    "login": {
+      "heading": "Bienvenido de nuevo",
+      "subheading": "Inicie sesión en su cuenta Hatcher",
+      "panelTagline": "Hatcher",
+      "panelHeadlinePrefix": "Incuba tu",
+      "panelHeadlineAccent": "Agente de IA.",
+      "panelBody": "Elige un marco. Configurar. Lanzamiento en 60 segundos. Sin código, sin infraestructura.",
+      "statsUsers": "Usuarios",
+      "statsAgents": "Agentes",
+      "statsOnline": "En línea ahora",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "tu@ejemplo.com",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "Introduce tu contraseña",
+      "forgotLink": "¿Olvidaste tu contraseña?",
+      "submit": "Iniciar sesión",
+      "submitLoading": "Iniciando sesión...",
+      "registerPrompt": "¿No tienes una cuenta?",
+      "registerLink": "Regístrate"
+    },
+    "register": {
+      "heading": "Crear cuenta",
+      "subheading": "Comience con Hatcher",
+      "panelTagline": "Hatcher",
+      "panelHeadlinePrefix": "Incuba tu",
+      "panelHeadlineAccent": "Agente de IA.",
+      "panelBody": "El nivel gratuito incluye AI Credits. El uso de BYOK se paga directamente a su proveedor. No se requiere tarjeta de crédito.",
+      "statsUsers": "Usuarios",
+      "statsAgents": "Agentes",
+      "statsOnline": "En línea ahora",
+      "referralBadge": "Referido por {referrer}: ¡ambos obtienen {credit}!",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "tu@ejemplo.com",
+      "emailTaken": "Ya registrado.",
+      "emailTakenLink": "Inicia sesión en su lugar",
+      "emailInvalid": "Ingrese una dirección de correo electrónico válida.",
+      "usernameLabel": "Nombre de usuario",
+      "usernamePlaceholder": "cooluser123",
+      "usernameTaken": "Este nombre de usuario ya está en uso. Elige otro.",
+      "usernameInvalid": "De 3 a 30 letras, números, guiones o guiones bajos.",
+      "usernameHint": "Sólo letras, números, guiones y guiones bajos",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "Ingrese una contraseña segura",
+      "passwordHint": "Debe incluir: más de 8 caracteres, mayúsculas, minúsculas, números y caracteres especiales",
+      "confirmPasswordLabel": "Confirmar contraseña",
+      "confirmPasswordPlaceholder": "Repite tu contraseña",
+      "strengthLabels": {
+        "veryWeak": "Muy débil",
+        "weak": "Débil",
+        "fair": "Feria",
+        "strong": "fuerte",
+        "veryStrong": "muy fuerte"
+      },
+      "strengthChecks": {
+        "length": "8+ personajes",
+        "lowercase": "letra minúscula",
+        "uppercase": "letra mayúscula",
+        "number": "Número",
+        "special": "Carácter especial"
+      },
+      "submit": "Crear cuenta",
+      "submitLoading": "Creando cuenta...",
+      "loginPrompt": "¿Ya tienes una cuenta?",
+      "loginLink": "Iniciar sesión",
+      "errors": {
+        "emailTaken": "Este correo electrónico ya está registrado. Intenta iniciar sesión en su lugar.",
+        "usernameTaken": "Este nombre de usuario ya está en uso. Elige uno diferente.",
+        "passwordMismatch": "Las contraseñas no coinciden",
+        "passwordTooShort": "La contraseña debe tener al menos 8 caracteres.",
+        "passwordComplexity": "La contraseña debe contener mayúsculas, minúsculas, números y un carácter especial."
+      }
+    },
+    "forgotPassword": {
+      "heading": "¿Olvidaste tu contraseña?",
+      "subheading": "Ingresa tu correo electrónico y te enviaremos un enlace de reinicio",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "tu@ejemplo.com",
+      "submit": "Enviar enlace de reinicio",
+      "submitLoading": "Enviando...",
+      "backToLogin": "Volver para iniciar sesión",
+      "successHeading": "Revisa tu correo electrónico",
+      "successBody": "Si existe una cuenta para <bold>{email}</bold>, le enviamos un enlace para restablecer la contraseña. Revisa tu bandeja de entrada y carpeta de spam.",
+      "successBackLink": "Volver para iniciar sesión",
+      "genericError": "Algo salió mal. Por favor inténtalo de nuevo."
+    },
+    "resetPassword": {
+      "heading": "Establecer nueva contraseña",
+      "subheading": "Ingrese su nueva contraseña a continuación",
+      "newPasswordLabel": "Nueva contraseña",
+      "newPasswordPlaceholder": "Más de 8 caracteres, superior, inferior, numérico, especial",
+      "passwordRequirements": "Utilice más de 8 caracteres con mayúsculas, minúsculas, números y caracteres especiales.",
+      "confirmPasswordLabel": "Confirmar contraseña",
+      "confirmPasswordPlaceholder": "Repite tu contraseña",
+      "passwordMismatch": "Las contraseñas no coinciden",
+      "submit": "Restablecer contraseña",
+      "submitLoading": "Restableciendo...",
+      "backToLogin": "Volver para iniciar sesión",
+      "successHeading": "Restablecer contraseña",
+      "successBody": "Su contraseña ha sido actualizada. Ahora puedes iniciar sesión con tu nueva contraseña.",
+      "successCta": "Iniciar sesión",
+      "invalidHeading": "Enlace de reinicio no válido",
+      "invalidBody": "Este enlace de restablecimiento falta o no es válido. Por favor solicite uno nuevo.",
+      "invalidCta": "Solicitar nuevo enlace de reinicio",
+      "genericError": "El reinicio falló. Es posible que el enlace haya caducado."
+    },
+    "verifyEmail": {
+      "loadingHeading": "Verificando tu correo electrónico...",
+      "successHeading": "Correo electrónico verificado!",
+      "successBody": "Su cuenta ya está activa. Puedes empezar a crear agentes.",
+      "successCta": "Ir al panel",
+      "errorHeading": "Verificación fallida",
+      "errorBody": "El enlace de verificación no es válido o ha caducado.",
+      "errorCta": "Ir a Iniciar sesión",
+      "noTokenHeading": "Revisa tu correo electrónico",
+      "noTokenBody": "Le enviamos un enlace de verificación a su correo electrónico. Haga clic en el enlace para activar su cuenta.",
+      "noTokenHint": "¿No lo recibiste? Revisa tu carpeta de spam o intenta iniciar sesión para reenviar."
+    }
+  },
+  "pricing": {
+    "eyebrow": "Precios",
+    "heading": "Elige tu plan",
+    "subheading": "Comience gratis con cualquier marco. Escale cuando esté listo. Todas las integraciones incluidas en todos los niveles. BYOK sigue siendo pagado por el proveedor en todos los niveles.",
+    "hatcherDiscountBanner": "Pague con $HATCHER para obtener un 10 % de descuento en planes y extras.",
+    "hatcherDiscountLine": "Precio de $HATCHER: ${price}",
+    "hatcherDiscountAnnual": "Precio anual de $HATCHER: ${price}",
+    "billingToggle": {
+      "monthly": "Mensual",
+      "annual": "Anual",
+      "annualDiscount": "−15%"
+    },
+    "tierBadges": {
+      "popular": "populares",
+      "limited": "Limitado"
+    },
+    "priceUnit": {
+      "perMonth": "/mes",
+      "once": "una vez"
+    },
+    "annualSavings": "${annualTotal}/año · guardar ${saved}",
+    "switchToAnnual": "Cambie a anual, ahorre 15%",
+    "payOnce": "Paga una vez y quédate para siempre",
+    "availability": "Disponibilidad",
+    "availabilityLoading": "Cargando",
+    "soldOut": "Agotado",
+    "slotsLeft": "{remaining} de {max} izquierda",
+    "tierCta": {
+      "free": "empezar",
+      "paid": "Elija {tierName}"
+    },
+    "tiers": {
+      "free": {
+        "agents": "1 agente incluido",
+        "messages": "500 AI Credits/mes",
+        "cpu": "1 CPU",
+        "ram": "1 GB de RAM",
+        "storage": "Espacio de trabajo de 2 GB",
+        "sleep": "Reposo automático después de 12 horas de inactividad",
+        "features": [
+          "Modelos alojados a través de UsePod/OpenRouter",
+          "La búsqueda web utiliza AI Credits",
+          "Administrador de archivos + Registros completos incluidos",
+          "Todas las integraciones (Telegram, Discord, Twitter, etc.)"
+        ],
+        "missing": []
+      },
+      "starter": {
+        "agents": "1 agente incluido",
+        "messages": "3000 AI Credits/mes",
+        "cpu": "1 CPU",
+        "ram": "1,5 GB de RAM",
+        "storage": "Espacio de trabajo de 10 GB",
+        "sleep": "Siempre activo",
+        "features": [
+          "Modelos alojados a través de UsePod/OpenRouter",
+          "La búsqueda web utiliza AI Credits",
+          "Administrador de archivos + Registros completos incluidos",
+          "Todas las integraciones"
+        ],
+        "missing": []
+      },
+      "pro": {
+        "agents": "3 agentes incluidos",
+        "messages": "15.000 AI Credits/mes",
+        "cpu": "1,5 CPU",
+        "ram": "2 GB de RAM",
+        "storage": "Espacio de trabajo de 25 GB",
+        "sleep": "Siempre activo",
+        "features": [
+          "Modelos alojados a través de UsePod/OpenRouter",
+          "La búsqueda web utiliza AI Credits",
+          "Administrador de archivos + Registros completos incluidos",
+          "Todas las integraciones"
+        ],
+        "missing": []
+      },
+      "business": {
+        "agents": "5 agentes incluidos",
+        "messages": "40.000 AI Credits/mes",
+        "cpu": "2 procesadores",
+        "ram": "3 GB de RAM",
+        "storage": "Espacio de trabajo de 50 GB",
+        "sleep": "Siempre activo",
+        "features": [
+          "Modelos alojados a través de UsePod/OpenRouter",
+          "La búsqueda web utiliza AI Credits",
+          "Administrador de archivos incluido",
+          "Registros completos incluidos",
+          "Apoyo prioritario",
+          "Colaboración en equipo",
+          "Todas las integraciones"
+        ],
+        "missing": []
+      },
+      "founding_member": {
+        "agents": "10 agentes incluidos",
+        "messages": "25.000 AI Credits/mes",
+        "cpu": "2 procesadores",
+        "ram": "4 GB de RAM",
+        "storage": "Espacio de trabajo de 40 GB",
+        "sleep": "Siempre activo",
+        "features": [
+          "$99 una sola vez: acceso de por vida",
+          "Modelos alojados a través de UsePod/OpenRouter",
+          "La búsqueda web utiliza AI Credits",
+          "Administrador de archivos + Registros completos incluidos",
+          "Apoyo prioritario",
+          "Todas las integraciones",
+          "Rol fundador de Discord + etiqueta Telegram"
+        ],
+        "missing": []
+      }
+    },
+    "addons": {
+      "heading": "Extras",
+      "subheading": "Agregue paquetes de crédito AI o espacios adicionales para agentes cuando necesite más capacidad.",
+      "annualDiscount": "15% de descuento anual",
+      "hatcherDiscount": "$HATCHER: ${price}",
+      "groups": {
+        "extraAgents": {
+          "label": "Agentes adicionales",
+          "items": [
+            {
+              "name": "+1 Agente",
+              "period": "/mes",
+              "description": "1 ranura adicional"
+            },
+            {
+              "name": "+3 Agentes",
+              "period": "/mes",
+              "description": "3 espacios adicionales"
+            },
+            {
+              "name": "+5 Agentes",
+              "period": "/mes",
+              "description": "5 espacios adicionales"
+            },
+            {
+              "name": "+10 Agentes",
+              "period": "/mes",
+              "description": "10 espacios adicionales"
+            }
+          ]
+        },
+        "aiCredits": {
+          "label": "AI Credits",
+          "items": [
+            {
+              "name": "5,000 AI Credits",
+              "period": "una sola vez",
+              "description": "Modelos alojados y búsqueda web"
+            },
+            {
+              "name": "10,000 AI Credits",
+              "period": "una sola vez",
+              "description": "Ejecuciones e investigaciones de modelos más intensas"
+            },
+            {
+              "name": "25,000 AI Credits",
+              "period": "una sola vez",
+              "description": "Cargas de trabajo de agentes más grandes"
+            },
+            {
+              "name": "50,000 AI Credits",
+              "period": "una sola vez",
+              "description": "Uso alojado de gran volumen"
+            }
+          ]
+        },
+        "perAgent": {
+          "label": "Complementos + Habilidades",
+          "items": [
+            {
+              "name": "Complementos incluidos",
+              "period": "incluido",
+              "description": "Incluido en cada nivel"
+            }
+          ]
+        }
+      }
+    },
+    "integrations": {
+      "heading": "Todas las integraciones gratis",
+      "badge": "cada nivel",
+      "body": "Telegram, Discord, WhatsApp, Slack, Signal, iMessage y más de 14 plataformas más se incluyen de forma gratuita en todos los niveles. Sin cargo extra, nunca.",
+      "note": "Todos los precios están listados en USD. Pague con tarjeta, SOL, USDC en Solana, $HATCHER o $KAUSA. Los pagos de $HATCHER obtienen un 10% de descuento; El uso del modelo alojado y de la búsqueda web se mide con AI Credits, mientras que BYOK se paga directamente con su propia clave de proveedor."
+    },
+    "compareTable": {
+      "heading": "Comparar planes",
+      "subheading": "Vea lo que incluye cada nivel de un vistazo",
+      "featureColumn": "Característica",
+      "onceSuffix": "una vez",
+      "rows": {
+        "agents": "Agentes incluidos",
+        "messages": "AI Credits/mes",
+        "searches": "búsqueda web",
+        "byok": "Uso del proveedor BYOK",
+        "cpuRam": "Procesador/RAM",
+        "storage": "Almacenamiento",
+        "autoSleep": "Reposo automático",
+        "fileManager": "Administrador de archivos",
+        "fullLogs": "Registros completos",
+        "teamCollab": "Colaboración en equipo",
+        "prioritySupport": "Apoyo prioritario",
+        "plugins": "Complementos + Habilidades",
+        "integrations": "Todas las integraciones",
+        "byokKey": "BYOK (clave LLM propia)",
+        "defaultLlm": "Selección de modelo"
+      },
+      "values": {
+        "unlimited": "Ilimitado",
+        "alwaysOn": "Siempre activo",
+        "addon": "complemento",
+        "llama4Scout": "Selector de proveedor/modelo"
+      }
+    },
+    "faq": {
+      "heading": "Preguntas frecuentes",
+      "items": [
+        {
+          "q": "¿Qué es BYOK (Traiga su propia clave)?",
+          "a": "BYOK le permite usar su propia clave API para cualquier proveedor de LLM compatible (OpenAI, Anthropic, Google, xAI, OpenRouter y más). Esto siempre es gratuito en todos los niveles: usted paga al proveedor directamente, sin margen de beneficio Hatcher. Hatcher no mide el uso de BYOK con AI Credits."
+        },
+        {
+          "q": "¿Cómo funcionan los extras?",
+          "a": "Los paquetes de crédito AI son recargas únicas para modelos alojados y búsqueda web. Las ranuras de agentes adicionales aumentan la capacidad por separado."
+        },
+        {
+          "q": "¿Cuál es la diferencia entre recursos compartidos y dedicados?",
+          "a": "Los recursos compartidos significan que su agente comparte CPU y RAM con otros en el mismo servidor; sigue teniendo rendimiento, pero puede variar bajo carga. Los recursos dedicados (Pro y Business) le brindan a su agente CPU y RAM garantizadas que nadie más puede usar."
+        },
+        {
+          "q": "¿Qué métodos de pago se aceptan?",
+          "a": "Puede pagar con tarjeta, SOL, USDC en Solana, $HATCHER o $KAUSA. Los precios de las criptomonedas se cotizan en USD y se convierten a tasas en vivo a través de Júpiter."
+        },
+        {
+          "q": "¿Puedo bajar de nivel?",
+          "a": "Sí. Puede cancelar su suscripción en cualquier momento y su nivel volverá a ser Gratis al final del período de facturación. Los agentes que excedan su límite gratuito serán pausados."
+        },
+        {
+          "q": "¿Qué es el sueño automático?",
+          "a": "Los agentes libres duermen tras 12 horas de inactividad. Los agentes Starter, Pro, Business y Founding Member siempre están activos sin suspensión automática."
+        },
+        {
+          "q": "¿Qué LLM obtengo con el nivel gratuito?",
+          "a": "El uso alojado se cobra de su saldo de crédito de IA y se enruta a través del proveedor compatible con Hatcher seleccionado, con alternativas cuando estén disponibles. Puede elegir entre modelos alojados compatibles; BYOK omite la medición de crédito de IA de Hatcher porque usted le paga a su proveedor directamente."
+        },
+        {
+          "q": "¿Cuál es el nivel de Miembro Fundador?",
+          "a": "El miembro fundador es un pago único de $99 que le brinda acceso de por vida a Hatcher: 10 agentes, 25 000 AI Credits/mes, 2 CPU/4 GB de RAM, 40 GB de espacio de trabajo, agentes siempre activos, administrador de archivos, registros completos, soporte prioritario y rol fundador de Discord + etiqueta Telegram. Sin cuotas mensuales, nunca. Limitado a 20 lugares; una vez que se agotan, este nivel desaparece."
+        }
+      ]
+    },
+    "help": {
+      "text": "¿Necesita ayuda para elegir un plan?",
+      "emailLabel": "Envíenos un correo electrónico",
+      "discordLabel": "Discord",
+      "telegramLabel": "Telegram"
+    },
+    "cta": {
+      "heading": "¿Listo para implementar su agente?",
+      "body": "Describe el agente que deseas e implementa en segundos. Comience gratis con AI Credits alojado. Actualízate cuando necesites más potencia.",
+      "createAgent": "Crear agente",
+      "seeFrameworks": "Ver marcos"
+    },
+    "footerNote": "Todos los precios en USD, pagaderos con tarjeta, SOL, USDC en Solana, $HATCHER o $KAUSA. El uso del modelo alojado y de la búsqueda web se mide con AI Credits; BYOK se paga directamente con su propia clave de proveedor."
+  },
+  "dashboard": {
+    "common": {
+      "loading": "Cargando...",
+      "authenticating": "Autenticando...",
+      "signInRequired": "Iniciar sesión requerido",
+      "signIn": "Iniciar sesión",
+      "refresh": "Actualizar",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "delete": "Eliminar",
+      "create": "crear",
+      "invite": "invitar",
+      "share": "Compartir",
+      "unshare": "Dejar de compartir",
+      "copy": "Copiar",
+      "copied": "¡Copiado!",
+      "close": "Cerrar",
+      "confirm": "Confirmar",
+      "back": "Atrás",
+      "noDescription": "Sin descripción",
+      "clear": "Borrar"
+    },
+    "agents": {
+      "eyebrow": "Panel de control",
+      "heading": "mis agentes",
+      "subtitleEmpty": "Crea tu primer agente para comenzar.",
+      "createCta": "Crear agente",
+      "searchPlaceholder": "Buscar agentes... ( / )",
+      "filterAll": "Todos",
+      "frameworkAll": "Todos los marcos",
+      "sortNewest": "Lo más nuevo",
+      "sortAZ": "AZ",
+      "sortMessages": "Más activo",
+      "sortActive": "Último activo",
+      "emptyTitle": "Aún no hay agentes",
+      "emptyDescription": "Cree su primer agente de IA e impleméntelo en 60 segundos.",
+      "emptyActionLabel": "Crear agente",
+      "emptySecondaryLabel": "Ver marcos",
+      "noMatchTitle": "No hay agentes coincidentes",
+      "noMatchDescription": "Intente ajustar sus criterios de búsqueda o filtrado.",
+      "signInDescription": "Inicie sesión en su cuenta para acceder a sus agentes.",
+      "featuresCount": "Función {count}",
+      "featuresCountPlural": "Características de {count}",
+      "agentsCount": "Total de agentes {count} · {active} activo",
+      "agentsCountPlural": "Total de agentes {count} · {active} activo",
+      "details": "Detalles",
+      "tourCreateTitle": "Crea tu primer agente",
+      "tourCreateDescription": "Haga clic aquí para crear su primer agente de IA con OpenClaw o Hermes.",
+      "tourFilterTitle": "Filtrar por marco",
+      "tourFilterDescription": "OpenClaw es mejor para la automatización; Hermes es mejor para flujos de trabajo de memoria adaptativa.",
+      "tourSearchTitle": "Buscar y explorar",
+      "tourSearchDescription": "Busque agentes o inicie Chat-to-Hatch para comenzar rápidamente.",
+      "tourPlanTitle": "Tu Plan",
+      "tourPlanDescription": "Comience gratis con 1 agente, 500 AI Credits/mes y herramientas incluidas. Actualice en cualquier momento.",
+      "statTotal": "totales",
+      "statActive": "Activo",
+      "statSleeping": "durmiendo",
+      "statMeshReady": "Malla lista",
+      "viewAgents": "Agentes",
+      "viewOrchestration": "Orquestación",
+      "meshTitle": "Malla de orquestación de agentes",
+      "meshSubtitle": "Conecte agentes del mismo propietario, envíe tareas limitadas e inspeccione la actividad reciente de agente a agente desde un solo lugar.",
+      "meshSource": "Agente fuente",
+      "meshTarget": "Agente objetivo",
+      "meshSelectTarget": "Seleccionar objetivo",
+      "meshNoAgents": "No hay agentes llamables",
+      "meshModeSync": "Sincronizar",
+      "meshModeAsync": "asíncrono",
+      "meshTaskLabel": "Tarea",
+      "meshTaskPlaceholder": "Pídale a un agente que investigue, revise, resuma o ejecute una tarea delimitada para otro agente...",
+      "meshSend": "Tarea de despacho",
+      "meshRefresh": "Actualizar",
+      "meshEnableAll": "Habilitar malla",
+      "meshEnableAgent": "Habilitar",
+      "meshOpenDev": "Pestaña de desarrollo",
+      "meshAvailable": "Disponible",
+      "meshDisabled": "Discapacitado",
+      "meshRecent": "Actividad reciente de la malla",
+      "meshNoLogs": "Aún no hay llamadas de agente a agente.",
+      "msgsShort": "interacciones",
+      "cardOpen": "Sala 3D",
+      "cardOpenTooltip": "Ingrese a la sala 3D",
+      "actionStop": "Detener",
+      "actionStart": "Empezar",
+      "actionRestart": "Reiniciar",
+      "noResultsAction": "Limpiar filtros"
+    },
+    "billing": {
+      "eyebrow": "cuenta",
+      "heading": "Facturación y planes",
+      "breadcrumbDashboard": "Panel de control",
+      "breadcrumbBilling": "Facturación",
+      "connectWallet": "Conectar billetera",
+      "connectedWallet": "Cartera conectada",
+      "switchWallet": "Cambiar billetera",
+      "disconnect": "Desconectar",
+      "loadingBilling": "Cargando facturación...",
+      "signInDescription": "Inicia sesión para administrar tu plan y facturación.",
+      "creditsBalance": "Saldo AI Credits",
+      "creditsUsd": "AI Credits",
+      "creditsDesc": "AI Credits se utilizan para LLM alojados, búsqueda web, herramientas de investigación, extracción y rastreo.",
+      "recentTransactions": "Transacciones recientes",
+      "currentTier": "Plan actual",
+      "freeTier": "Nivel gratuito",
+      "active": "Activo",
+      "agentUsage": "Uso del agente",
+      "agentsOf": "{count} de los agentes {limit} utilizados",
+      "agentsOver": "{over} por encima del límite",
+      "slotsRemaining": "Ranura {slots} restante",
+      "slotsRemainingPlural": "Quedan ranuras {slots}",
+      "activeAddons": "Extras activos",
+      "expires": "Vence {date}",
+      "extend": "Extender",
+      "extend30Days": "Ampliar +30 días (${price})",
+      "upgradeAnnual": "Actualización a anual (${price})",
+      "annualDiscount": "-15%",
+      "renew": "Renovar",
+      "renewFor": "Renovar para ${price}",
+      "planExpired": "El plan expiró: renueva para mantener tu nivel",
+      "planExpiring": "Vence el día {days}: renovar ahora",
+      "planExpiringPlural": "Vence en {days} días: renovar ahora",
+      "planActiveUntil": "Activo hasta {date}",
+      "noCharge": "Sin cargo",
+      "lifetimePrice": "toda la vida",
+      "lifetimePriceFull": "Vida útil de ${price}",
+      "monthlyPrice": "${price} / 30 días",
+      "unlimitedMessages": "AI Credits",
+      "messagesPerDay": "{count} AI Credits",
+      "byokUnlimited": "",
+      "upgradeSection": "Actualice su plan",
+      "upgradeDesc": "Obtenga más agentes, AI Credits y potencia informática.",
+      "addonsSection": "Extras",
+      "addonsDesc": "Acumule capacidad adicional en su plan actual.",
+      "accountAddons": "Extras a nivel de cuenta",
+      "perAgentAddons": "Extras por agente",
+      "annualBilling": "Facturación anual",
+      "annualBillingDesc": "15 % de descuento: extras recurrentes",
+      "hatcherDiscountTitle": "10% de descuento con $HATCHER",
+      "hatcherDiscountBody": "Utilice $HATCHER en Solana para planes, paquetes de créditos de IA y espacios adicionales para agentes. El descuento se aplica antes de la confirmación de la billetera.",
+      "monthly": "Mensual",
+      "annual": "Anual",
+      "monthSuffix": "/ 30 días",
+      "annualSuffix": "/ año",
+      "yearSuffix": "/ año",
+      "paymentHistory": "Historial de pagos",
+      "noPaymentsYet": "Aún no hay pagos",
+      "noPaymentsDesc": "Su historial de pagos aparecerá aquí.",
+      "status": {
+        "confirmed": "Confirmado",
+        "pending": "Pendiente",
+        "failed": "Fallido",
+        "refunded": "Reembolsado"
+      },
+      "selectAgent": "Seleccionar Agente",
+      "choosePayment": "Elija el método de pago",
+      "applyToAgent": "Aplicar al agente:",
+      "noAgentsFound": "No se encontraron agentes. Primero crea un agente.",
+      "payWithSol": "Paga con SOL",
+      "solDesc": "Pago de billetera Solana",
+      "payWithHatcher": "Paga con $HATCHER",
+      "hatcherDesc": "Token HATCHER en Solana",
+      "hatcherDiscountDesc": "10% de descuento con $HATCHER: {price}",
+      "payWithKausa": "Paga con $KAUSA",
+      "kausaDesc": "Token de socio KausaLayer en Solana",
+      "payWithUsdcSolana": "Pague con USDC en Solana",
+      "usdcSolanaDesc": "SPL USDC a través de la billetera Solana",
+      "payWithCryptoNow": "Pagar a través de CryptoNow",
+      "cryptnowDesc": "Pago alojado en SOL / USDC",
+      "payWithUsdc": "Paga con USDC",
+      "usdcDesc": "Moneda estable: 1 USDC = $1",
+      "payWithCard": "Pagar con Tarjeta",
+      "cardDesc": "Tarjeta de crédito/débito a través de Stripe",
+      "foundingSlots": "{remaining} de ranuras {max} restantes",
+      "foundingSoldOut": "Agotado",
+      "oneTimeSuffix": "una sola vez",
+      "oneTimeAgent": "una sola vez / agente",
+      "annualAgent": "/ año / agente",
+      "monthAgent": "/ 30 días / agente",
+      "manageBilling": "Administrar facturación",
+      "successPayment": "¡Pago exitoso! Su cuenta se está actualizando. Puede que le lleve un momento reflexionar.",
+      "canceledPayment": "El pago fue cancelado. No se hicieron cargos."
+    },
+    "analytics": {
+      "eyebrow": "Panel de control",
+      "heading": "Análisis de uso",
+      "subheading": "Interacciones en toda la cuenta, uso alojado y AI Credits.",
+      "signInDescription": "Inicie sesión para ver análisis.",
+      "interactionVolume": "Volumen de interacción",
+      "messageVolume": "Volumen de interacción",
+      "last14Days": "Últimos 14 días",
+      "last30Days": "últimos 30 días",
+      "frameworks": "Marcos",
+      "agentStatus": "Estado del agente",
+      "totalMessages": "Interacciones con agentes",
+      "noMessageData": "Aún no hay datos de interacción: ¡empiece a chatear con sus agentes!",
+      "noAgentsYet": "Aún no hay agentes",
+      "noAgentsEmpty": "Aún no hay agentes. Crea tu primer agente para comenzar a ver análisis.",
+      "createAgent": "Crear agente",
+      "totalAgents": "Agentes totales",
+      "totalAgentsSub": "{active} activo",
+      "messages": "Interacciones",
+      "messagesAllTime": "Todo el tiempo",
+      "llmCalls": "Convocatorias de Maestría en Derecho",
+      "llmCallsAllTime": "Todo el tiempo",
+      "aiCreditsBalance": "AI Credits",
+      "monthlyGrant": "Subvención mensual {count}",
+      "aiCreditsUsed": "AI Credits Usado",
+      "hostedUsage": "Uso alojado",
+      "hostedUsageSubheading": "LLM alojado, búsqueda web, investigación, extracción y rastreo consumen la cuenta AI Credits. El uso de BYOK omite este medidor.",
+      "remainingBalance": "Saldo restante",
+      "usedLast30": "Usado los últimos 30 días.",
+      "usageByKind": "Uso por tipo",
+      "tokensProcessed": "Tokens procesados",
+      "inputTokens": "Entrada",
+      "outputTokens": "Salida",
+      "noHostedUsageYet": "Aún no hay uso alojado. El uso de BYOK no gasta AI Credits.",
+      "last14DaysLabel": "Últimos 14 días",
+      "last14DaysSub": "Interacciones del usuario",
+      "today": "hoy",
+      "noDataYet": "Aún no hay datos de interacción"
+    },
+    "team": {
+      "eyebrow": "Colaboración",
+      "heading": "equipo",
+      "subheading": "Crea un equipo para compartir agentes y colaborar con otros.",
+      "signInTitle": "Inicia sesión para acceder a Teams",
+      "signInDesc": "Los equipos te permiten colaborar con otros en tus agentes de IA.",
+      "createTeamTitle": "Crea tu equipo",
+      "createTeamDesc": "Empieza a colaborar creando un equipo. Luego puede invitar miembros y compartir sus agentes.",
+      "teamNamePlaceholder": "Nombre del equipo...",
+      "createBtn": "crear",
+      "creating": "Creando...",
+      "membersHeading": "Miembros",
+      "inviteMemberHeading": "Invitar miembro",
+      "emailPlaceholder": "Dirección de correo electrónico...",
+      "invite": "invitar",
+      "roleAdmin": "administrador",
+      "roleMember": "Miembro",
+      "roleViewer": "Visor",
+      "roleOwner": "propietario",
+      "you": "(tú)",
+      "sharedAgentsHeading": "Agentes compartidos",
+      "noSharedAgents": "Ningún agente ha compartido con este equipo todavía.",
+      "yourAgentsHeading": "Tus agentes",
+      "byLabel": "por {username}",
+      "memberCount": "Miembro {count}",
+      "memberCountPlural": "Miembros de {count}",
+      "agentSharedCount": "Agente {count} compartido",
+      "agentSharedCountPlural": "Agentes {count} compartidos",
+      "leaveTeam": "salir",
+      "leaveTeamTitle": "Dejar equipo",
+      "leaveTeamDesc": "¿Estás seguro de que quieres dejar este equipo? Perderá el acceso a todos los agentes compartidos.",
+      "leaveTeamConfirm": "Dejar equipo",
+      "deleteTeam": "Eliminar equipo",
+      "deleteTeamTitle": "Eliminar equipo",
+      "deleteTeamDesc": "¿Estás seguro de que deseas eliminar permanentemente este equipo? Todos los agentes compartidos dejarán de estar compartidos.",
+      "deleteTeamConfirm": "Eliminar equipo",
+      "errors": {
+        "loadFailed": "No se pudieron cargar los datos del equipo",
+        "createFailed": "No se pudo crear el equipo",
+        "inviteFailed": "No se pudo invitar al miembro",
+        "removeFailed": "No se pudo eliminar el miembro",
+        "leaveFailed": "No pude dejar el equipo",
+        "deleteFailed": "No se pudo eliminar el equipo",
+        "shareFailed": "No se pudo compartir el agente",
+        "unshareFailed": "No se pudo dejar de compartir el agente",
+        "roleFailed": "No se pudo actualizar el rol"
+      }
+    },
+    "affiliate": {
+      "eyebrow": "Panel de control",
+      "heading": "Panel de afiliados",
+      "signInTitle": "Iniciar sesión requerido",
+      "signInDesc": "Inicie sesión para ver su panel de afiliados.",
+      "yourReferralLink": "Su enlace de referencia",
+      "referralLinkDesc": "Los nuevos registros a través de este enlace se le atribuyen de por vida. Ambos obtendrán 500 AI Credits una vez que creen su primer agente.",
+      "aiCreditRewardTitle": "Referencia AI Credits",
+      "aiCreditRewardDesc": "Las referencias de afiliados también otorgan {credit} a ambas cuentas después de que el usuario recomendado crea su primer agente.",
+      "claimAiCredits": "Reclamar AI Credits",
+      "claimingAiCredits": "Reclamando...",
+      "aiCreditsCol": "AI Credits",
+      "aiCreditsClaimed": "Reclamado",
+      "aiCreditsPending": "Pendiente",
+      "shareOnX": "Compartir en X",
+      "telegram": "Telegram",
+      "copyLink": "Copiar",
+      "copiedLink": "Copiado",
+      "refresh": "Actualizar",
+      "frozenTitle": "Cuenta congelada",
+      "codeLabel": "Código",
+      "totalReferrals": "Referencias totales",
+      "paidLabel": "{count} pagado",
+      "pending30d": "Pendiente (retención de 30 días)",
+      "payableNow": "Pagadero ahora",
+      "lifetimeEarned": "Vida ganada",
+      "paidOut": "{amount} pagado",
+      "referralsTable": "Referencias",
+      "noReferrals": "Aún no hay referencias. ¡Comparte tu enlace!",
+      "commissionsTable": "Comisiones",
+      "noCommissions": "Aún no hay comisiones.",
+      "payoutsTable": "Pagos",
+      "noPayouts": "Aún no hay pagos.",
+      "loadMore": "Cargar más",
+      "signupCol": "Regístrate",
+      "emailCol": "Correo electrónico",
+      "statusCol": "Estado",
+      "tierCol": "Nivel",
+      "dateCol": "Fecha",
+      "sourceCol": "Fuente",
+      "amountCol": "Cantidad",
+      "cashCol": "efectivo",
+      "creditsCol": "Créditos",
+      "noteCol": "Nota",
+      "statusPaid": "Pagado",
+      "statusFree": "Gratis",
+      "statusPending": "Pendiente",
+      "statusPayable": "por pagar",
+      "statusPaidOut": "Pagado",
+      "statusVoided": "anulado",
+      "flagged": "Marcado",
+      "untilDate": "hasta {date}",
+      "sourceSubscription": "Suscripción",
+      "sourceFoundingMember": "Miembro fundador",
+      "payoutSettings": "Configuración de pago",
+      "payoutMode": "Modo",
+      "payoutAddress": "Dirección de pago",
+      "creditsOnly": "Se requiere dirección de pago en efectivo",
+      "changePrefs": "¿Necesita cambiar las preferencias de pago?",
+      "contactSupport": "Contactar con soporte",
+      "modeCashOnly": "Sólo efectivo (20%)",
+      "modeCreditsOnly": "jubilado",
+      "modeHybrid": "jubilado"
+    },
+    "settings": {
+      "eyebrow": "cuenta",
+      "heading": "Configuración",
+      "subheading": "Administre su cuenta, seguridad y preferencias.",
+      "tabs": {
+        "profile": "Perfil",
+        "security": "Seguridad",
+        "notifications": "Notificaciones",
+        "billing": "Facturación",
+        "danger": "Zona de peligro"
+      },
+      "profile": {
+        "sectionTitle": "Perfil",
+        "changePhoto": "Cambiar foto",
+        "uploadPhoto": "Subir foto",
+        "remove": "Quitar",
+        "joinedLabel": "Se unió a {date}",
+        "usernameLabel": "Nombre de usuario",
+        "usernamePlaceholder": "tu_nombre de usuario",
+        "usernameHint": "3 a 30 caracteres, letras, números, _ o -",
+        "emailLabel": "Dirección de correo electrónico",
+        "emailPlaceholder": "tu@ejemplo.com",
+        "saveChanges": "Guardar cambios",
+        "saving": "Guardando...",
+        "walletTitle": "Cartera conectada",
+        "walletLinkedDesc": "Vinculado automáticamente desde su primer pago en cadena. Se utiliza al pagar con SOL, USDC o $HATCHER.",
+        "walletViewSolscan": "Solscan",
+        "walletDisconnect": "Desconectar billetera",
+        "walletNone": "Aún no hay ninguna billetera vinculada. Su billetera Solana se conecta automáticamente la primera vez que realiza un pago en cadena desde la página de facturación.",
+        "referralTitle": "Programa de referencia",
+        "referralDesc": "Invita amigos a Hatcher. Ambos obtienen {credit} cuando crean su primer agente.",
+        "referralCode": "Código de referencia",
+        "shareLink": "Compartir enlace",
+        "referred": "Referido",
+        "earned": "Ganado",
+        "claimRewards": "Reclamar recompensas pendientes",
+        "claiming": "Reclamando..."
+      },
+      "security": {
+        "changePasswordTitle": "Cambiar contraseña",
+        "currentPassword": "Contraseña actual",
+        "currentPasswordPlaceholder": "Ingrese la contraseña actual",
+        "newPassword": "Nueva contraseña",
+        "newPasswordPlaceholder": "Mínimo 8 caracteres, superior, inferior, número, especial",
+        "confirmPassword": "Confirmar nueva contraseña",
+        "confirmPasswordPlaceholder": "Repetir nueva contraseña",
+        "changePasswordBtn": "Cambiar contraseña",
+        "changing": "Cambiando...",
+        "apiKeysTitle": "Teclas API",
+        "apiKeysDesc": "Cree varias claves API para acceso programático. Cada clave utiliza el prefijo {prefix}. La clave completa se muestra {emphasis} en el momento de la creación.",
+        "apiKeysEmphasis": "solo una vez",
+        "manageKeys": "Administrar claves",
+        "newKeyCreated": "Nueva clave creada: ¡cópiala ahora!",
+        "noKeysYet": "Aún no hay claves API. Crea uno a continuación.",
+        "keyLabelPlaceholder": "Etiqueta (por ejemplo, \"Producción\")",
+        "createKey": "Crear clave",
+        "creating": "Creando...",
+        "keysLimit": "Hasta 10 claves activas. Cada clave tiene acceso completo a API.",
+        "reqToday": "{count} requerido hoy · {week} esta semana",
+        "lastUsed": "{date} usado por última vez",
+        "save": "Guardar"
+      },
+      "notifications": {
+        "sectionTitle": "Notificaciones",
+        "pushLabel": "Notificaciones push",
+        "pushDesc": "Notificaciones push del navegador para actualizaciones en tiempo real",
+        "agentsLabel": "Alertas de agentes",
+        "agentsDesc": "Reciba notificaciones cuando los agentes cambien de estado, fallen o necesiten atención",
+        "billingLabel": "Alertas de facturación",
+        "billingDesc": "Confirmaciones de pago, renovaciones de suscripción y créditos."
+      },
+      "billing": {
+        "sectionTitle": "Facturación",
+        "currentPlan": "Plan actual",
+        "hatcherCredits": "Créditos",
+        "creditsAutoApplied": "Se aplica automáticamente al finalizar la compra",
+        "manageBilling": "Administrar facturación"
+      },
+      "danger": {
+        "sectionTitle": "Zona de peligro",
+        "exportTitle": "Exportar mis datos",
+        "exportDesc": "Descargue un archivo JSON que contiene todos los datos de su cuenta: perfil, agentes, historial de chat, pagos, referencias, tickets de soporte y más.",
+        "exportBtn": "Exportar mis datos",
+        "exporting": "Exportando...",
+        "deleteTitle": "Eliminar cuenta",
+        "deleteDesc": "Elimina permanentemente tu cuenta, todos los agentes, el historial de pagos y la configuración. Esta acción es irreversible.",
+        "deleteBtn": "Eliminar cuenta",
+        "deleting": "Eliminando...",
+        "dialogTitle": "¿Eliminar tu cuenta?",
+        "dialogDesc": "Esto eliminará permanentemente todos sus agentes, datos e historial de pagos. Esta acción {emphasis} se deshará.",
+        "dialogEmphasis": "no puedo",
+        "confirmPassword": "Confirma tu contraseña",
+        "passwordPlaceholder": "Tu contraseña actual",
+        "cancelBtn": "Cancelar"
+      }
+    },
+    "apiKeys": {
+      "eyebrow": "Configuración",
+      "heading": "Teclas API",
+      "subheading": "Administre claves de acceso programáticas para {docsLink}. Cada clave comienza con {prefix}.",
+      "docsLinkLabel": "Hatcher API",
+      "backToSettings": "Volver a configuración",
+      "newKeyAlert": "Clave creada: ¡cópiala ahora!",
+      "newKeyAlertSub": "Esta es la única vez que se mostrará la clave completa. Guárdelo en un lugar seguro.",
+      "noKeysTitle": "Aún no hay claves API",
+      "noKeysDesc": "Crea tu primera clave para comenzar",
+      "loading": "Cargando claves...",
+      "createSectionTitle": "Crear nueva clave",
+      "createSectionDesc": "Asigne a su clave un nombre descriptivo (por ejemplo, \"Desarrollador local\", \"Canalización de CI/CD\").",
+      "keyLabelPlaceholder": "Etiqueta clave...",
+      "createKey": "Crear clave",
+      "creating": "Creando...",
+      "usageNote": "Utilice su clave API en el encabezado {header}. Consulte {docsLink} para conocer todos los puntos finales disponibles.",
+      "headerExample": "Autorización: Portador hk_...",
+      "docsLinkLabel2": "Documentos de referencia de API",
+      "copiedLabel": "¡Copiado!",
+      "copyLabel": "Copiar",
+      "dismissLabel": "Descartar",
+      "revokeTitle": "Revocar la clave API",
+      "revokeDesc": "Esta clave quedará invalidada permanentemente y cualquier aplicación que la utilice dejará de funcionar inmediatamente. Esto no se puede deshacer.",
+      "revokeConfirm": "Revocar clave",
+      "neverUsed": "Nunca usado",
+      "lastUsed": "{time} usado por última vez",
+      "created": "Creado {date}",
+      "reqStats": "{today} requerido hoy · {week} esta semana",
+      "saveBtn": "Guardar",
+      "cancelBtn": "Cancelar"
+    },
+    "quickStats": {
+      "totalAgents": "Agentes totales",
+      "dailyMessages": "AI Credits",
+      "unlimited": "∞",
+      "accountWide": "saldo de cuenta",
+      "activeNow": "Activo ahora",
+      "noAgentsRunning": "No hay agentes en ejecución",
+      "agentsOnline": "Agente {count} en línea",
+      "agentsOnlinePlural": "Agentes {count} en línea",
+      "accountTier": "Nivel de cuenta",
+      "lifetimeAccess": "Acceso de por vida",
+      "prioritySupport": "Apoyo prioritario",
+      "upgradePlan": "Plan de actualización"
+    },
+    "agentDetail": {
+      "tabs": {
+        "dashboard": "Panel de control",
+        "chat": "Charla",
+        "mail": "correo",
+        "terminal": "terminales",
+        "dev": "desarrollador",
+        "config": "configuración",
+        "integrations": "Integraciones",
+        "plugins": "Complementos y habilidades",
+        "logs": "Registros",
+        "stats": "Estadísticas",
+        "memory": "Memoria",
+        "sessions": "Sesiones",
+        "knowledge": "conocimiento",
+        "addons": "Extras",
+        "wallet": "Cartera",
+        "kausalayer": "KausaLayer",
+        "files": "Archivos",
+        "workspace": "Espacio de trabajo",
+        "schedules": "Horarios",
+        "workflows": "Flujos de trabajo"
+      },
+      "sidebarGroups": {
+        "operate": "Operar",
+        "configure": "Configurar",
+        "monitor": "Monitorear",
+        "advanced": "Avanzado"
+      },
+      "nav": {
+        "allAgents": "Todos los agentes"
+      },
+      "header": {
+        "easy": "fácil",
+        "advanced": "Avanzado",
+        "restart": "Reiniciar",
+        "restarting": "Reiniciando...",
+        "stop": "Detener",
+        "stopping": "Parando...",
+        "start": "Empezar",
+        "starting": "Empezando...",
+        "share": "Compartir",
+        "room": "Habitación",
+        "clone": "clonar",
+        "delete": "Eliminar",
+        "deleting": "Eliminando...",
+        "confirm": "Confirmar",
+        "cancel": "Cancelar"
+      },
+      "notFound": {
+        "code": "404",
+        "title": "Agente no encontrado",
+        "description": "No se pudo encontrar el agente con ID \"{id}\".",
+        "backToAgents": "Volver a Agentes"
+      },
+      "statusPoll": {
+        "agentReady": "¡El agente está listo para charlar!"
+      },
+      "chat": {
+        "live": "en vivo",
+        "liveTitle": "Transmisión en tiempo real a través de WebSocket",
+        "voiceButton": "Voz",
+        "voiceCallTitle": "Iniciar llamada de voz",
+        "autoRead": "lectura automática",
+        "autoReadTitle": "Respuestas de lectura automática",
+        "emptyTitle": "Iniciar una conversación con {agentName}",
+        "emptySubtitle": "Las respuestas aparecen en tiempo real.",
+        "loadEarlier": "Cargar mensajes anteriores ({count} más antiguos)",
+        "listening": "Escuchando...",
+        "thinking": "Pensando...",
+        "speaking": "Hablando...",
+        "tapToSpeak": "Toca el micrófono para hablar",
+        "agentStartingUp": "El agente se está iniciando, espere...",
+        "uploading": "Subiendo…",
+        "poweredBy": "Desarrollado por {provider}",
+        "today": "hoy",
+        "unlimited": "ilimitado",
+        "enterToSend": "Ingrese para enviar, Mayús+Intro para una nueva línea",
+        "signInToChat": "Inicia sesión para chatear con este agente.",
+        "limitReached": "AI Credits agotado.",
+        "upgradeToPro": "Actualízate a Pro",
+        "limitReachedSuffix": "para obtener más, o trae tu propia clave para obtener acceso ilimitado.",
+        "agentNotRunning": "El agente no se está ejecutando.",
+        "startFromOverview": "Inícielo desde la pestaña Descripción general para chatear.",
+        "waitingForAgent": "Esperando que comience el agente...",
+        "messagePlaceholder": "Mensaje {agentName}...",
+        "sendMessage": "enviar mensaje",
+        "stopResponse": "Detener respuesta",
+        "attachFiles": "Adjuntar archivos: guardados según el conocimiento del agente",
+        "stopRecording": "dejar de grabar",
+        "startVoice": "Iniciar entrada de voz",
+        "errors": {
+          "rateLimit": "AI Credits agotado.",
+          "llmDown": "El servicio de IA no está disponible temporalmente. Esto suele resolverse en un minuto.",
+          "timeout": "El agente tardó demasiado en responder.",
+          "network": "Conexión perdida. Verifique su conexión a Internet.",
+          "generic": "Algo salió mal.",
+          "retry": "Reintentar"
+        },
+        "voiceCall": {
+          "listening": "Escuchando...",
+          "thinking": "Pensando...",
+          "speaking": "Hablando...",
+          "tapToSpeak": "Toca el micrófono para hablar"
+        }
+      },
+      "mail": {
+        "title": "Correo del agente",
+        "subtitle": "Administre el buzón del agente, el modo de respuesta automática, el historial de mensajes y el correo electrónico saliente manual.",
+        "mailbox": "dirección del buzón",
+        "copy": "Copiar",
+        "copied": "Dirección del buzón copiada",
+        "copyFailed": "Copia fallida",
+        "refresh": "Actualizar",
+        "refreshing": "Refrescante...",
+        "autoSend": "Respuestas de envío automático",
+        "autoSendOn": "El envío automático está activado",
+        "autoSendOff": "El envío automático está desactivado",
+        "runtimeActive": "La respuesta automática solo funciona mientras el agente ya está activo.",
+        "runtimeInactive": "La respuesta automática solo funciona mientras el agente ya está activo. Inicie el agente antes de confiar en las respuestas.",
+        "messageList": "Mensajes",
+        "messageCount": "Mensajes {count} cargados",
+        "details": "Detalle del mensaje",
+        "noSelection": "Seleccione un mensaje para inspeccionarlo.",
+        "emptyTitle": "Aún no hay correo",
+        "emptySubtitle": "Los mensajes entrantes y salientes aparecerán aquí después de utilizar este buzón.",
+        "untitled": "Sin tema",
+        "from": "De",
+        "to": "a",
+        "subject": "Asunto",
+        "created": "Fecha",
+        "body": "cuerpo",
+        "noBody": "Sin contenido corporal",
+        "filters": {
+          "all": "Todos",
+          "inbound": "entrante",
+          "outbound": "saliente"
+        },
+        "directions": {
+          "inbound": "entrante",
+          "outbound": "saliente"
+        },
+        "statusLabels": {
+          "queued": "En cola",
+          "sent": "Enviado",
+          "delivered": "Entregado",
+          "failed": "Fallido",
+          "received": "Recibido",
+          "unknown": "Desconocido"
+        },
+        "errors": {
+          "mailbox": "No se pudo cargar el buzón.",
+          "messages": "No se pudieron cargar mensajes de correo.",
+          "settings": "No se pudo actualizar la configuración de correo."
+        },
+        "composer": {
+          "title": "Envío manual",
+          "subtitle": "Envíe un correo electrónico saliente desde el buzón del agente.",
+          "toPlaceholder": "destinatario@ejemplo.com",
+          "subjectPlaceholder": "Asunto",
+          "bodyPlaceholder": "Escribe el cuerpo del correo electrónico...",
+          "validation": "Se requieren destinatario, asunto y cuerpo.",
+          "failed": "No se pudo enviar el correo electrónico.",
+          "sent": "Correo electrónico en cola",
+          "send": "Enviar correo electrónico",
+          "sending": "Enviando..."
+        }
+      },
+      "logs": {
+        "searchPlaceholder": "Buscar registros...",
+        "all": "Todos",
+        "connected": "Conectado",
+        "reconnecting": "Reconectando",
+        "pinned": "Fijado",
+        "scroll": "Desplazarse",
+        "refresh": "Actualizar",
+        "loading": "Cargando...",
+        "download": "Descargar",
+        "pinnedToBottom": "clavado al fondo",
+        "noLogs": "Aún no hay registros disponibles.",
+        "noLogsMatching": "No hay registros que coincidan con \"{query}\".",
+        "noLevelLogs": "No se encontraron registros de {level}.",
+        "entries": "Entradas de {count}",
+        "autoScrollEnabled": "Desplazamiento automático habilitado: fijado en la parte inferior",
+        "autoScrollDisabled": "Desplazamiento automático desactivado",
+        "fullLogsGate": {
+          "title": "Mostrando las últimas líneas de registro de {count}",
+          "description": "Se incluyen registros completos en cada nivel. Actualice el agente si el historial completo aún no está disponible.",
+          "descriptionEmpty": "Se incluyen registros completos en cada nivel. Actualice el agente si el historial completo aún no está disponible.",
+          "unlock": "Actualizar"
+        }
+      },
+      "integrations": {
+        "showingFor": "Mostrando integraciones compatibles con {framework}",
+        "connected": "{configured}/{total} conectado",
+        "encryptedNote": "Las claves y tokens API se cifran con AES-256-GCM antes del almacenamiento. Una vez guardados, los valores secretos nunca se vuelven a mostrar; solo aparecerán marcadores de posición enmascarados.",
+        "mainIntegrations": "Principales integraciones",
+        "mainIntegrationsFree": "Gratis en todos los niveles",
+        "otherPlatforms": "Otras plataformas",
+        "communityExtensions": "Extensiones comunitarias",
+        "allPlatformsFree": "Todas las plataformas incluidas gratis: configure las credenciales a continuación",
+        "allFreeNote": "Todas las integraciones son gratuitas en todos los niveles. Simplemente agregue sus credenciales y listo.",
+        "howToGetKey": "Cómo obtener su clave API →",
+        "howToSetup": "Cómo configurar {name} →",
+        "saving": "Guardando...",
+        "saveCredentials": "Guardar credenciales",
+        "badges": {
+          "recommended": "Recomendado",
+          "native": "Nativo",
+          "community": "Comunidad",
+          "planned": "planeado",
+          "quickSetup": "Configuración rápida",
+          "qrPairing": "Emparejamiento QR",
+          "free": "Gratis",
+          "connected": "Conectado",
+          "alwaysActive": "Siempre activo"
+        },
+        "legend": {
+          "native": "Nativo: soporte integrado",
+          "community": "Comunidad: extensiones npm",
+          "planned": "Planificado: próximamente"
+        },
+        "pairing": {
+          "whoCanMessage": "¿Quién puede enviar un mensaje a su agente?",
+          "everyone": "todos",
+          "specificNumbers": "Números específicos",
+          "save": "Guardar",
+          "anyoneCanMessage": "Cualquiera puede enviar un mensaje a su agente.",
+          "onlyListedNumbers": "Sólo los números que figuran en la lista pueden enviar mensajes a su agente.",
+          "restartAfterChange": "Reinicie el agente después del cambio.",
+          "setBeforePairing": "Configurar antes del emparejamiento. Números de teléfono en formato E.164 (+1234567890).",
+          "savedRestart": "¡Salvado! Reinicie el agente para aplicar.",
+          "connected": "{name} Conectado",
+          "disconnected": "{name} desconectado",
+          "messagesForwarded": "Los mensajes serán reenviados a su agente.",
+          "sessionExpired": "La sesión expiró. Vuelva a emparejar o desconectar para limpiar.",
+          "rePair": "Reemparejar",
+          "disconnect": "Desconectar",
+          "disconnectConfirm": "¿Desconectar {name}? Deberá volver a emparejarlo para usarlo nuevamente.",
+          "agentMustRun": "Su agente debe estar ejecutándose para emparejar {name}. Inicie el agente primero.",
+          "generatingQr": "Generar código QR: esto lleva ~30 segundos...",
+          "pairButton": "Par {name}",
+          "refreshQr": "Actualizar código QR",
+          "tapOutsideToClose": "Toca afuera para cerrar"
+        },
+        "webhook": {
+          "label": "gancho web",
+          "inboundHttp": "HTTP entrante",
+          "triggerFrom": "Active su agente desde servicios externos (Zapier, GitHub, etc.)",
+          "webhookUrl": "URL de webhook",
+          "alwaysActive": "Siempre activo",
+          "bearerToken": "Ficha al portador",
+          "exampleRequest": "Solicitud de ejemplo",
+          "revealToken": "Revelar ficha",
+          "hideToken": "Ocultar ficha",
+          "copyUrl": "Copiar URL",
+          "copyToken": "Copiar token",
+          "note": "Utilice esta URL para activar su agente desde servicios externos (Zapier, GitHub, n8n, etc.). Envíe una solicitud POST con un cuerpo JSON que contenga un campo de mensaje. El agente se despertará automáticamente del modo de suspensión si es necesario.",
+          "alreadyConfigured": "ya configurado"
+        },
+        "domains": {
+          "channelBehavior": "Comportamiento del canal",
+          "allowedUserIds": "ID de usuario permitidos (separados por comas)",
+          "allowedGroupIds": "ID de grupo permitidos (separados por comas)"
+        }
+      },
+      "memory": {
+        "refresh": "Actualizar",
+        "noMemory": "No se encontraron archivos de memoria.",
+        "noMemoryDescription": "Su agente aún no ha creado ningún archivo de memoria.",
+        "dailyLogs": "Registros diarios",
+        "noDailyLogs": "Aún no hay registros diarios.",
+        "loading": "Cargando memoria...",
+        "error": "No se pudieron cargar los recuerdos"
+      },
+      "knowledge": {
+        "uploadTitle": "Cargar archivo de conocimientos",
+        "filename": "Nombre de archivo",
+        "filenamePlaceholder": "por ej. información-empresa.txt",
+        "content": "Contenido",
+        "contentPlaceholder": "Pega tu contenido de conocimientos aquí...",
+        "upload": "Subir",
+        "uploading": "Subiendo...",
+        "cancel": "Cancelar",
+        "addFile": "Agregar archivo",
+        "noFiles": "Aún no hay archivos de conocimiento.",
+        "noFilesDescription": "Cargue documentos que su agente pueda consultar.",
+        "preview": "Vista previa",
+        "delete": "Eliminar",
+        "loading": "Cargando...",
+        "error": "No se pudieron cargar los archivos de conocimiento",
+        "refresh": "Actualizar"
+      },
+      "stats": {
+        "range7d": "7 dias",
+        "range30d": "30 dias",
+        "totalMessages": "Mensajes totales",
+        "avgPerDay": "Promedio / Día",
+        "peakDay": "Día pico",
+        "framework": "Marco",
+        "noData": "Aún no hay datos analíticos.",
+        "noDataDescription": "Envía algunos mensajes para empezar a ver estadísticas.",
+        "errorRate": "Tasa de errores",
+        "responseTimes": "Tiempos de respuesta",
+        "avgResponse": "Respuesta promedio",
+        "p50": "P50",
+        "p95": "P95",
+        "topTopics": "Temas principales",
+        "hourlyActivity": "Actividad por hora",
+        "byokActive": "BYOK Activo",
+        "totalTokens": "Fichas totales",
+        "estimatedCost": "Est. Costo",
+        "refresh": "Actualizar"
+      },
+      "terminal": {
+        "connecting": "Conectando...",
+        "connected": "Conectado",
+        "disconnected": "desconectado",
+        "error": "Error de conexión",
+        "reconnect": "Reconectar",
+        "agentNotActive": "El agente debe estar activo para utilizar la terminal.",
+        "startAgent": "Iniciar agente",
+        "sendMessage": "Enviar mensaje...",
+        "send": "enviar",
+        "sending": "Enviando..."
+      },
+      "plugins": {
+        "skillsTab": "Habilidades",
+        "pluginsTab": "Complementos",
+        "searchPlaceholder": "Habilidades de búsqueda y complementos...",
+        "install": "Instalar",
+        "installing": "Instalando...",
+        "installed": "Instalado",
+        "uninstall": "Desinstalar",
+        "uninstalling": "Desinstalando...",
+        "noInstalled": "No hay habilidades ni complementos instalados.",
+        "noInstalledDescription": "Explore e instale desde el mercado a continuación.",
+        "recommended": "Recomendado",
+        "available": "Disponible",
+        "source": "Fuente",
+        "requiresRestart": "Requiere reinicio",
+        "refresh": "Actualizar",
+        "limitReached": "Se incluyen complementos y habilidades en cada nivel."
+      },
+      "workflows": {
+        "new": "Nuevo flujo de trabajo",
+        "noWorkflows": "Aún no hay flujos de trabajo.",
+        "noWorkflowsDescription": "Cree su primer flujo de trabajo para automatizar su agente.",
+        "enable": "Habilitar",
+        "disable": "Desactivar",
+        "delete": "Eliminar",
+        "save": "Guardar",
+        "run": "correr",
+        "running": "Corriendo...",
+        "name": "Nombre del flujo de trabajo",
+        "trigger": "gatillo",
+        "lastRun": "Última ejecución",
+        "status": "Estado",
+        "active": "Activo",
+        "inactive": "Inactivo"
+      },
+      "files": {
+        "noFiles": "No se encontraron archivos.",
+        "noFilesDescription": "El administrador de archivos está vacío.",
+        "upload": "Subir",
+        "delete": "Eliminar",
+        "download": "Descargar",
+        "refresh": "Actualizar",
+        "locked": "El Administrador de archivos está incluido en todos los niveles. Actualice el agente si el acceso aún está bloqueado.",
+        "unlock": "Desbloquear"
+      },
+      "workspace": {
+        "noFiles": "No se encontraron archivos del espacio de trabajo.",
+        "refresh": "Actualizar",
+        "loading": "Cargando espacio de trabajo..."
+      },
+      "addons": {
+        "title": "Extras",
+        "description": "Amplíe su agente con capacidades adicionales.",
+        "noAddons": "Aún no se han comprado extras.",
+        "purchase": "Compra",
+        "active": "Activo",
+        "expires": "Vence {date}",
+        "lifetime": "Toda la vida"
+      },
+      "schedules": {
+        "new": "Nuevo horario",
+        "noSchedules": "Aún no hay horarios.",
+        "noSchedulesDescription": "Cree una programación para ejecutar su agente automáticamente.",
+        "enable": "Habilitar",
+        "disable": "Desactivar",
+        "delete": "Eliminar",
+        "save": "Guardar",
+        "name": "Nombre del horario",
+        "cron": "Expresión cron",
+        "nextRun": "Siguiente ejecución",
+        "lastRun": "Última ejecución",
+        "status": "Estado",
+        "active": "Activo",
+        "inactive": "Inactivo"
+      },
+      "sidebar": {
+        "switchAgent": "Cambiar de agente",
+        "enter3DRoom": "Ingrese a la sala 3D",
+        "enter3DRoomSubtitle": "Espacio de trabajo espacial abierto",
+        "enter3DRoomTooltip": "Abrir el espacio de trabajo espacial del agente"
+      }
+    }
+  },
+  "settings": {
+    "redirect": "Redirigiendo a configuración..."
+  },
+  "explorePage": {
+    "eyebrow": "Agentes públicos",
+    "title": "Chatea con agentes públicos de IA",
+    "body": "Busque agentes cuyos propietarios habilitaron el chat público. Cada sesión se ejecuta en su navegador y se dirige a través de la configuración Hatcher en vivo del agente.",
+    "cityCta": "Abrir Hatcher City",
+    "emptyTitle": "Aún no hay agentes de chat públicos",
+    "emptyBody": "Los perfiles públicos todavía aparecen en Hatcher City. Los agentes se muestran aquí una vez que su propietario habilita el chat público.",
+    "fallbackDescription": "Un agente público Hatcher listo para sesiones de chat del navegador.",
+    "interactions": "interacciones",
+    "publicChat": "charla publica",
+    "chatCta": "Charla",
+    "statsAgents": "{count} agentes públicos",
+    "statsLive": "{count} en vivo ahora",
+    "statsInteractions": "Interacciones {count}",
+    "searchPlaceholder": "Buscar agentes públicos",
+    "filterAll": "Todos",
+    "filterOpenClaw": "OpenClaw",
+    "filterHermes": "Hermes",
+    "filterLive": "vivir solo",
+    "showingCount": "Se muestra {count}",
+    "noResultsTitle": "No hay agentes coincidentes",
+    "noResultsBody": "Pruebe con otra búsqueda, marco o filtro en vivo.",
+    "frameworkLabel": "Marco",
+    "featured": "Destacado",
+    "ownerFallback": "agente comunitario",
+    "avatarLabel": "Avatar de agente público 3D",
+    "statusRunning": "en vivo",
+    "statusSleeping": "durmiendo",
+    "statusPaused": "En pausa",
+    "statusCrashed": "necesita atencion"
+  },
+  "agentPublic": {
+    "back": {
+      "toCity": "Volver a la ciudad",
+      "toMyAgents": "Volver a Mis Agentes",
+      "toDashboard": "Volver al panel"
+    },
+    "status": {
+      "active": "Activo",
+      "sleeping": "durmiendo",
+      "paused": "En pausa",
+      "archived": "Archivado",
+      "error": "error",
+      "killed": "asesinado",
+      "restarting": "Reiniciando"
+    },
+    "profile": {
+      "featuresCount": "Función {count}",
+      "featuresCountPlural": "Características de {count}",
+      "frameworkFeatures": "Características del marco",
+      "by": "por"
+    },
+    "share": {
+      "button": "Compartir",
+      "copied": "¡Copiado!"
+    },
+    "errors": {
+      "connectionError": "Error de conexión",
+      "notFound": "Agente no encontrado",
+      "somethingWrong": "Algo salió mal",
+      "defaultMessage": "Este agente no existe o ha sido eliminado.",
+      "goBack": "Volver",
+      "myAgents": "Mis agentes"
+    },
+    "owner": {
+      "heading": "Administrar {name}",
+      "body": "Eres dueño de este agente. Dirígete a tu panel para chatear o configurarlo.",
+      "manageAgent": "Administrar agente",
+      "openChat": "Abrir chat"
+    },
+    "analytics": {
+      "heading": "Análisis de agentes",
+      "messages": "Interacciones",
+      "daysActive": "Días activos",
+      "uptime": "tiempo de actividad",
+      "status": "Estado",
+      "framework": "Marco",
+      "created": "Creado"
+    },
+    "deploy": {
+      "heading": "Implementar un agente similar",
+      "body": "Cree su propio agente {framework} en Hatcher. Gratis para comenzar, implementación en 60 segundos.",
+      "cta": "Implementar agente similar",
+      "myAgents": "Mis agentes"
+    },
+    "publicChat": {
+      "eyebrow": "Chat de agente público",
+      "heading": "Chatear con {name}",
+      "usernamePlaceholder": "Elige un nombre de usuario",
+      "start": "Iniciar chat",
+      "starting": "Empezando...",
+      "newSession": "Nueva sesión",
+      "empty": "Inicie una nueva sesión pública con este agente.",
+      "messagePlaceholder": "Mensaje como {username}",
+      "thinking": "Investigando...",
+      "send": "enviar mensaje",
+      "errors": {
+        "session": "No se pudo iniciar una sesión de chat público.",
+        "message": "No se pudo enviar este mensaje."
+      }
+    },
+    "errorPage": {
+      "heading": "No se pudo cargar el agente",
+      "body": "No pudimos cargar los detalles de este agente. Es posible que se haya eliminado o que haya un problema de conexión.",
+      "errorId": "ID de error: {id}",
+      "tryAgain": "Inténtalo de nuevo",
+      "browseAgents": "Explorar agentes"
+    },
+    "statusPage": {
+      "poweredBy": "Desarrollado por",
+      "uptimeLabel": "tiempo de actividad 24 horas",
+      "messages": "Interacciones",
+      "days": "dias",
+      "since": "desde",
+      "framework": "marco",
+      "lastActive": "Último activo: {date} en {time}",
+      "viewProfile": "Ver perfil",
+      "notFound": {
+        "heading": "Agente no encontrado",
+        "body": "Este agente no existe o no es visible públicamente.",
+        "browseAgents": "Explorar agentes"
+      }
+    }
+  },
+  "city": {
+    "category": {
+      "district": "Distrito",
+      "breadcrumbCity": "Hatcher City",
+      "statAgents": "agentes",
+      "statRunning": "corriendo",
+      "statShareOfCity": "participación de la ciudad",
+      "seeIn3d": "Véalo en 3D →",
+      "emptyState": "Aún no hay agentes en este distrito.",
+      "emptyStateCta": "Sé el primero en construir uno.",
+      "otherDistricts": "Otros distritos",
+      "msgs": "mensajes"
+    }
+  },
+  "frameworks": {
+    "eyebrow": "Marcos",
+    "heading": "Elija el marco adecuado",
+    "subheading": "Hatcher se centra en dos marcos de agentes de producción: OpenClaw para automatización con muchas habilidades y Hermes para agentes adaptables de larga duración.",
+    "deployCta": "Implementar un agente",
+    "docsLink": "Documentos completos",
+    "atAGlance": "De un vistazo",
+    "featureMatrix": "Matriz de características",
+    "featureCol": "Característica",
+    "bestFor": "Lo mejor para...",
+    "bestForSubheading": "¿No estás seguro de qué marco elegir? Haga coincidir su caso de uso.",
+    "benchmarks": "Puntos de referencia de rendimiento",
+    "benchmarksSubheading": "Tiempo de inicio en frío y uso de memoria de referencia en la infraestructura compartida Hatcher. Los valores reales varían según la configuración.",
+    "coldStart": "Hora de inicio en frío",
+    "memoryUsage": "Uso de memoria de referencia",
+    "lowerFaster": "Más bajo es más rápido",
+    "lowerLeaner": "Lo más bajo es más delgado",
+    "benchmarkCallout": "OpenClaw es mejor cuando necesita la más amplia superficie de habilidades y automatizaciones. Hermes es más sencillo para agentes adaptativos con flujos de trabajo de investigación con mucha memoria.",
+    "configExamples": "Ejemplos de configuración",
+    "configSubheading": "Cada marco tiene su propio formato de configuración. Así es como se ve una configuración típica.",
+    "configRef": "Referencia de configuración completa →",
+    "docsSuffix": "documentos",
+    "llmSupport": "Soporte de Maestría en Derecho",
+    "llmSubheading": "Ambos marcos admiten BYOK (Traiga su propia clave) para el uso pagado por el proveedor. Los LLM alojados se dirigen a través de proveedores compatibles con Hatcher y el uso de medidores con AI Credits.",
+    "byokNote": "* BYOK siempre gratis: uso pagado por el proveedor sin Hatcher AI Credits.",
+    "byokSetupLink": "Ver la guía de configuración de BYOK →",
+    "decisionGuide": "guía de decisión rápida",
+    "readyCta": "¿Listo para implementar?",
+    "readySubheading": "Elija un marco, configure su agente y comience a funcionar en menos de 60 segundos. Nivel gratuito incluido.",
+    "deployFirstAgent": "Implemente su primer agente",
+    "viewPricing": "Ver precios",
+    "decisions": [
+      {
+        "condition": "Quiero máximas herramientas y automatización.",
+        "pick": "OpenClaw"
+      },
+      {
+        "condition": "Quiero un agente que aprenda con el tiempo.",
+        "pick": "Hermes"
+      },
+      {
+        "condition": "Necesito mensajes y activadores multicanal",
+        "pick": "OpenClaw"
+      },
+      {
+        "condition": "Necesito un asistente de investigación con mucha memoria",
+        "pick": "Hermes"
+      },
+      {
+        "condition": "Necesito mensajería multicanal (Telegram + Discord + WhatsApp)",
+        "pick": "OpenClaw o Hermes"
+      },
+      {
+        "condition": "Quiero un agente del espacio de trabajo con archivos, registros y habilidades.",
+        "pick": "OpenClaw"
+      }
+    ]
+  },
+  "token": {
+    "liveLabel": "Token de utilidad en Solana",
+    "heading": "$HATCHER",
+    "subheading": "$HATCHER es una opción de pago de servicios públicos para suscripciones, extras, descuentos y mecánicas de grabación en cadena elegibles de Hatcher.",
+    "caLabel": "CA:",
+    "viewDexscreener": "Ver en Dexscreener",
+    "viewSolscan": "Ver en Solscan",
+    "burnBadge": "El 10% de cada pago de $HATCHER se quema en la cadena, en la misma transacción.",
+    "burnsEyebrow": "Quemaduras en cadena",
+    "burnsHeading": "Rastreador de quemaduras",
+    "burnsBody": "Los datos de grabación en vivo se calculan a partir de las instrucciones de grabación de Solana Token-2022 para $HATCHER mint. El rastreador se actualiza en cadena cada 6 horas o cuando solicita una actualización manual.",
+    "burnsRefresh": "Actualizar en cadena",
+    "burnsRefreshing": "refrescante",
+    "burnsError": "Los datos de grabación no están disponibles temporalmente. La última instantánea almacenada en caché se mostrará cuando esté disponible.",
+    "burnsTotalLabel": "Total quemado",
+    "burnsTxLabel": "Quemar TX",
+    "burnsTxHelper": "{count} tx escaneado",
+    "burnsSupplyLabel": "Suministro quemado",
+    "burnsSupplyHelper": "Proporción del suministro actual más quemaduras",
+    "burnsLatestLabel": "Última grabación",
+    "burnsNoBurnsShort": "Aún no hay quemaduras",
+    "burnsUpdated": "Actualizado {time}",
+    "burnsUpdating": "Actualizando",
+    "burnsPeriodHeading": "Velocidad de combustión",
+    "burns24h": "24 horas",
+    "burns7d": "7 dias",
+    "burns30d": "30 dias",
+    "burnsSourceNote": "Solo se cuentan las instrucciones explícitas de quema y quema de SPL verificadas para la casa de moneda oficial. Se ignoran las transacciones fallidas y las transferencias normales.",
+    "burnsFeedHeading": "Quemaduras recientes",
+    "burnsUnknownTime": "Hora desconocida",
+    "burnsNoBurns": "Aún no se han encontrado transacciones grabadas.",
+    "burnsNoBurnsBody": "Una vez que los pagos de $HATCHER creen instrucciones de grabación en cadena, aparecerán aquí con los enlaces de Solscan.",
+    "createAgentCta": "Crear agente libre",
+    "viewPricing": "Ver precios",
+    "plannedUtilityLabel": "Utilidad",
+    "whatPowers": "Dónde encaja $HATCHER",
+    "ecosystemDesc": "Primero, una superficie de facturación seria: totales claros, vías de pago compatibles y manejo de tokens centrado en los servicios públicos.",
+    "keyDetails": "Detalles clave",
+    "networkLabel": "Red",
+    "networkValue": "Solana",
+    "splToken": "Ficha SPL",
+    "statusLabel": "Estado",
+    "statusValue": "Disponible como utilidad de plataforma",
+    "trading": "Utilidad",
+    "contractLabel": "Contrato",
+    "platformLabel": "Plataforma",
+    "platformValue": "Nivel gratuito disponible ahora: el pago con token admite niveles pagos y extras elegibles",
+    "stayInLoop": "Utilice Hatcher como plano de control",
+    "stayInLoopBody": "Implemente agentes, administre la facturación y elija la vía de pago que se adapte a su flujo de trabajo.",
+    "followOnX": "Sigue en X"
+  },
+  "roadmap": {
+    "liveLabel": "en vivo",
+    "heading": "Hoja de ruta",
+    "subheading": "Qué hemos construido, qué se envía ahora y hacia dónde nos dirigimos. Construimos en público: síguenos",
+    "followHandle": "X /@hatcherlabs",
+    "checkChangelog": "registro de cambios en vivo",
+    "featureRequest": "¿Tiene una solicitud de función? Leemos todo.",
+    "submitRequest": "Enviar una solicitud",
+    "followOnX": "Sigue en X"
+  },
+  "blog": {
+    "eyebrow": "Blog",
+    "heading": "El blog Hatcher",
+    "subheading": "Guías, tutoriales e información sobre los agentes de IA y la plataforma Hatcher.",
+    "searchPlaceholder": "Buscar artículos...",
+    "allCategory": "Todos",
+    "latestLabel": "Lo último",
+    "readLabel": "leer",
+    "resultsCount": "Resultado de {count} para \"{query}\"",
+    "resultsCountPlural": "{count} resultados para \"{query}\"",
+    "noArticles": "No se encontraron artículos",
+    "noArticlesCategory": "No se encontraron artículos en esta categoría.",
+    "noArticlesSearch": "No se encontraron artículos para \"{query}\".",
+    "clearFilters": "Limpiar filtros",
+    "backToBlog": "Volver al blog",
+    "relatedArticles": "Artículos relacionados"
+  },
+  "changelog": {
+    "betaLabel": "Beta",
+    "heading": "Registro de cambios",
+    "subheading": "Enviamos mejoras todos los días. Esto es lo que ha cambiado.",
+    "noCommits": "No se encontraron confirmaciones.",
+    "errorMessage": "Algo salió mal.",
+    "tryAgain": "Inténtalo de nuevo"
+  },
+  "help": {
+    "eyebrow": "Recursos",
+    "heading": "Centro de ayuda",
+    "subheading": "Encuentre respuestas, explore guías y póngase en contacto con el soporte.",
+    "searchPlaceholder": "Buscar todas las preguntas... p.e. \"BYOK\", \"límite de velocidad\", \"Telegram\"",
+    "resultCount": "Resultado de {count}",
+    "resultCountPlural": "Resultados de {count}",
+    "matchCount": "coincidencia {count}",
+    "matchCountPlural": "Coincidencias de {count}",
+    "noMatchHeading": "No se encontraron preguntas que coincidan",
+    "noMatchBody": "Pruebe diferentes palabras clave o explore la documentación.",
+    "documentationLink": "documentacion",
+    "contactHeading": "Contáctenos",
+    "contactBody": "¿No encuentras lo que estás buscando?",
+    "openTicket": "Abrir un ticket de soporte",
+    "contactOr": "o comuníquese directamente:",
+    "technicalHelp": "ayuda tecnica",
+    "generalInquiries": "Consultas generales",
+    "communitySupport": "Apoyo comunitario",
+    "communityChat": "charla comunitaria",
+    "stillNeedHelp": "¿Aún necesitas ayuda?",
+    "ticketResponse": "Envíe un ticket de soporte y nuestro equipo se comunicará con usted dentro de las 24 horas.",
+    "quickLinks": {
+      "documentation": "Documentación",
+      "discord": "Comunidad Discord",
+      "telegram": "Grupo Telegram",
+      "submitTicket": "Enviar ticket",
+      "emailSupport": "Soporte por correo electrónico"
+    }
+  },
+  "status": {
+    "eyebrow": "Estado",
+    "heading": "Estado de la plataforma",
+    "subheading": "Estado en tiempo real de la infraestructura Hatcher.",
+    "navLabel": "Estado de Hatcher",
+    "autoRefresh": "Actualización automática 30 segundos",
+    "operational": "Todos los sistemas operativos.",
+    "degraded": "Algunos sistemas degradados",
+    "down": "Interrupción del servicio detectada",
+    "statusOperational": "Operacional",
+    "statusDegraded": "degradado",
+    "statusDown": "abajo",
+    "lastChecked": "Última comprobación:",
+    "refresh": "Actualizar",
+    "checking": "Comprobando sistemas...",
+    "errorMessage": "No se puede acceder al API. Estado no disponible.",
+    "activeAgents": "Agentes activos",
+    "totalAgents": "Agentes totales",
+    "components": "Componentes",
+    "updatedAt": "Actualizado {time}",
+    "loading": "Cargando...",
+    "backToHatcher": "← Volver a Hatcher"
+  },
+  "shortcuts": {
+    "backToDashboard": "Volver al panel",
+    "heading": "Atajos de teclado",
+    "subheading": "Navegue por Hatcher más rápido con atajos de teclado",
+    "quickTipLabel": "Consejo rápido",
+    "quickTipBody": "Presione en cualquier lugar para abrir la paleta de comandos. Busque páginas, agentes o acciones al instante.",
+    "footerNote": "Los atajos están deshabilitados al escribir en campos de texto. En macOS, use Cmd en lugar de Ctrl."
+  },
+  "create": {
+    "errorHeading": "Error de creación",
+    "errorBody": "Algo salió mal al configurar su agente. Tu progreso no se ha perdido.",
+    "errorIdLabel": "ID de error:",
+    "tryAgain": "Inténtalo de nuevo",
+    "dashboard": "Panel de control"
+  },
+  "support": {
+    "eyebrow": "Ayuda",
+    "heading": "Soporte",
+    "subheading": "Obtenga ayuda con sus agentes, facturación o cualquier otra cosa.",
+    "quickLinks": {
+      "documentation": "Documentación",
+      "documentationDesc": "Explorar guías y referencia de API",
+      "faq": "Preguntas frecuentes",
+      "faqDesc": "Preguntas comunes respondidas",
+      "followUs": "Síguenos",
+      "followUsDesc": "Actualizaciones y anuncios"
+    },
+    "directContact": "O envíenos un correo electrónico directamente a",
+    "joinDiscord": "Únase a nuestro Discord",
+    "telegramLabel": "Telegram",
+    "communitySupport": "para el apoyo de la comunidad",
+    "submitTicketHeading": "Enviar un boleto",
+    "signInPrompt": "Inicie sesión para enviar un ticket de soporte.",
+    "signIn": "Iniciar sesión",
+    "ticketSubmitted": "Boleto enviado",
+    "ticketSubmittedBody": "Hemos recibido su solicitud y nos comunicaremos con usted en breve. Se le notificará cuando haya una actualización.",
+    "submitAnother": "Enviar otro ticket",
+    "subjectLabel": "Asunto",
+    "subjectPlaceholder": "Breve descripción de su problema",
+    "categoryLabel": "categoría",
+    "priorityLabel": "Prioridad",
+    "relatedAgentLabel": "Agente relacionado",
+    "relatedAgentOptional": "(opcional)",
+    "selectAgent": "Seleccione un agente...",
+    "messageLabel": "Mensaje",
+    "messagePlaceholder": "Describe tu problema en detalle...",
+    "submitTicket": "Enviar ticket",
+    "submitting": "Enviando...",
+    "signInError": "Por favor inicia sesión para enviar un ticket.",
+    "subjectRequired": "Se requiere sujeto.",
+    "messageRequired": "Se requiere mensaje.",
+    "failedSubmit": "No se pudo enviar el ticket. Por favor inténtalo de nuevo.",
+    "recentTickets": "Entradas recientes",
+    "noTickets": "Aún no hay entradas",
+    "noTicketsDesc": "Los tickets de soporte enviados aparecerán aquí. Crea tu primer ticket arriba para comenzar.",
+    "backToTop": "Volver al principio",
+    "ticketCount": "Boleto {count}",
+    "ticketCountPlural": "Entradas {count}"
+  },
+  "affiliate": {
+    "eyebrow": "Programa de afiliados",
+    "heading": "Gane con cada usuario que traiga a Hatcher.",
+    "subheading": "Gane un 20% de comisiones en efectivo recurrentes por cada usuario pago que recomiende. La atribución se basa en enlaces y se mantiene durante toda la vida de la cuenta referida. Ambas cuentas también reciben 500 AI Credits después de que el usuario recomendado crea su primer agente.",
+    "applyNowCta": "Aplicar ahora",
+    "howItWorksLink": "como funciona",
+    "pickYourPayout": "Estructura de la comisión",
+    "threeWays": "Comisiones en efectivo, libro mayor simple.",
+    "threeWaysSubheading": "Las ganancias de los afiliados son solo en efectivo: 20 % recurrente sobre los ingresos pagados elegibles, con una retención de 30 días antes de que las comisiones sean pagaderas. La recompensa por recomendación de 500 AI Credits se otorga por separado a ambas cuentas.",
+    "popularLabel": "populares",
+    "foundingBonusLabel": "Bono de miembro fundador",
+    "foundingBonusHeading": "Recomiende a un miembro fundador → bono en efectivo fijo $20.",
+    "foundingBonusBody": "El nivel de por vida de $99 paga una cantidad fija única de $20 al afiliado remitente, además de todo lo que gane de las compras posteriores de complementos o agentes de ese usuario. Pagado en efectivo independientemente de su modo de pago predeterminado.",
+    "applyLabel": "Aplicar",
+    "howItWorksLabel": "como funciona",
+    "fourSteps": "Cuatro pasos, cero sorpresas.",
+    "faqLabel": "Preguntas frecuentes",
+    "everythingYoudAsk": "Todo lo que pedirías antes de aplicar.",
+    "readyHeading": "¿Listo para asociarse con Hatcher?",
+    "readyBody": "Las solicitudes tardan unos minutos. Aprobaciones en 3 a 5 días. Comisiones recurrentes durante toda la vida de cada usuario que incorpores.",
+    "seePricing": "Ver precios",
+    "apply": {
+      "backLink": "Volver al programa de afiliados",
+      "loading": "Cargando…",
+      "eyebrow": "Aplicar a afiliados de Hatcher",
+      "heading": "Cuéntanos sobre ti.",
+      "subheading": "Algunos detalles sobre sus plataformas y audiencia. Revisamos cada solicitud manualmente: sea honesto, sea específico.",
+      "underReview": "En revisión: estaremos en contacto.",
+      "reviewTime": "Tiempo previsto de revisión:",
+      "reviewDays": "3 a 5 días",
+      "reviewEmailNote": "Recibirás un correo electrónico en el momento en que llegue una decisión.",
+      "submitted": "Solicitud enviada",
+      "submittedDate": "Enviado",
+      "platformsLabel": "Plataformas",
+      "followers": "seguidores",
+      "slugLabel": "babosa solicitada",
+      "slugPreview": "vista previa: hatcher.host/r/{slug}",
+      "payoutModeLabel": "Modo de pago",
+      "payoutAddressLabel": "Dirección de pago",
+      "pitchLabel": "Tono",
+      "successHeading": "Solicitud enviada.",
+      "successBody": "Lo revisaremos dentro de 3 a 5 días y le enviaremos el resultado por correo electrónico. Mientras tanto, siéntete libre de especificar qué compartirás una vez que seas aprobado.",
+      "backToAffiliate": "Volver al programa de afiliados",
+      "yourPlatforms": "Tus plataformas",
+      "platformCount": "{count} / {max}",
+      "platformLabel": "Plataforma {n}",
+      "removeLabel": "Quitar",
+      "addPlatform": "Agregar otra plataforma",
+      "platformTypeField": "Tipo de plataforma",
+      "handleField": "Manejar",
+      "handleHint": "por ej. @hatcher, @solana, /canal/xyz",
+      "audienceField": "Tamaño de audiencia (opcional)",
+      "urlField": "URL (opcional)",
+      "slugField": "Enlace de referencia personalizado (opcional)",
+      "slugPrefix": "hatcher.host/r/",
+      "slugPlaceholder": "tu nombre",
+      "slugBlankHint": "Déjelo en blanco para obtener un código generado automáticamente",
+      "slugPreviewGood": "Su enlace será hatcher.host/r/{slug}",
+      "pitchField": "Tono",
+      "pitchPlaceholder": "¿Por qué quiere asociarse con Hatcher? ¿A qué tipo de contenido o audiencia llegarás?",
+      "pitchCharHint": "50-2000 caracteres",
+      "payoutModeField": "Modo de pago",
+      "solAddressField": "Dirección de billetera SOL (base58, 32 a 44 caracteres)",
+      "solAddressPlaceholder": "por ej. 21L6VVRAuxk87sXggz8exhPCm1w4qWyKEs6SDauyyRAW",
+      "submitBtn": "Enviar solicitud",
+      "submitting": "Enviando…",
+      "rejectedLabel": "Solicitud anterior rechazada",
+      "validatePlatformMin": "Añade al menos una plataforma",
+      "validatePlatformMax": "Plataformas máximas {max}",
+      "validateHandleRequired": "Requerido",
+      "validateHandleMax": "Máximo 100 caracteres",
+      "validateAudienceNumber": "debe ser un numero entero",
+      "validateUrlInvalid": "Debe ser una URL válida",
+      "validatePitchMin": "El tono debe tener al menos 50 caracteres.",
+      "validatePitchMax": "El tono debe tener como máximo 2000 caracteres.",
+      "validateAddressRequired": "Requerido para pagos de afiliados en efectivo",
+      "validateAddressFormat": "Debe ser una dirección base58 Solana válida (32 a 44 caracteres)",
+      "slugTooShort": "Demasiado corto: mínimo 3 caracteres",
+      "slugTooLong": "Demasiado largo: máximo 30 caracteres",
+      "slugInvalidChars": "Solo a–z, 0–9 y guiones (no pueden comenzar ni terminar con -)",
+      "slugReserved": "Esa babosa está reservada: elige otra"
+    }
+  },
+  "docs": {
+    "eyebrow": "Documentación",
+    "heading": "Documentación",
+    "subheading": "Todo lo que necesita para crear, implementar y administrar agentes de IA con Hatcher.",
+    "searchPlaceholder": "Buscar documentación...",
+    "searchComingSoon": "Búsqueda próximamente",
+    "apiReferenceHeading": "API Referencia",
+    "apiReferenceBody": "Documentación completa de endpoints con ejemplos en cURL, JavaScript y Python. Autenticación, límites de tarifas y códigos de error.",
+    "apiReferenceLink": "Explorar puntos finales",
+    "integrationsHeading": "Guías de integración",
+    "integrationsBody": "Configuración paso a paso para Telegram, Discord, WhatsApp, Slack, Twitter/X y Signal. De las credenciales al primer mensaje.",
+    "integrationsLink": "Explorar plataformas",
+    "popularTopics": "Temas populares",
+    "readMore": "Leer más",
+    "cantFind": "¿No encuentras lo que estás buscando?",
+    "cantFindBody": "Nuestro equipo de soporte y nuestra comunidad están aquí para ayudarlo a aprovechar al máximo Hatcher.",
+    "contactSupport": "Contactar con soporte",
+    "helpCenter": "Centro de ayuda",
+    "quickLinks": [
+      {
+        "title": "Empezando",
+        "description": "Configure su primer agente de IA en menos de 60 segundos. Guía de inicio rápido, requisitos previos y primera implementación."
+      },
+      {
+        "title": "Configuración del agente",
+        "description": "Utilice Chat-to-Hatch, elija OpenClaw o Hermes y ajuste el tiempo de ejecución, los archivos, las integraciones y el enrutamiento de modelos."
+      },
+      {
+        "title": "AI Credits",
+        "description": "Vea cómo AI Credits mensual y las recargas únicas potencian las herramientas de LLM alojadas, búsqueda web, investigación, extracción y rastreo."
+      },
+      {
+        "title": "Configuración de BYOK",
+        "description": "Traiga sus propias claves de proveedor para OpenAI, Anthropic, Google, xAI, OpenRouter y más. BYOK nunca gasta Hatcher AI Credits."
+      },
+      {
+        "title": "Marcos",
+        "description": "Compare OpenClaw y Hermes, incluido el ajuste del marco, el enrutamiento de modelos, BYOK y el comportamiento del tiempo de ejecución alojado."
+      },
+      {
+        "title": "Integraciones de plataformas",
+        "description": "Conecte Telegram, Discord, Slack, Twitter/X, Signal, webhooks y otros canales incluidos en cada nivel."
+      },
+      {
+        "title": "Hatcher CLI",
+        "description": "Instale @hatcherlabs/cli, ejecute Hatcher, cree agentes, chatee, conecte terminal, configure GitHub y llame a A2A desde su shell."
+      },
+      {
+        "title": "Flujos de trabajo del desarrollador",
+        "description": "Conecte GitHub, administre sesiones de terminal, habilite la comunicación entre agentes y organice agentes propios."
+      },
+      {
+        "title": "Aplicación de Android",
+        "description": "Instale la aplicación de Android, inicie sesión, administre agentes y reciba notificaciones automáticas desde su dispositivo móvil."
+      },
+      {
+        "title": "API Referencia",
+        "description": "Puntos finales REST API para agentes, facturación, AI Credits, pagos, chat público y operaciones de administración."
+      }
+    ],
+    "topics": [
+      {
+        "label": "Describir un agente con Chat-to-Hatch"
+      },
+      {
+        "label": "Cómo se gastan AI Credits"
+      },
+      {
+        "label": "Modelos alojados y BYOK"
+      },
+      {
+        "label": "Notificaciones push de Android"
+      },
+      {
+        "label": "Configuración de la integración Telegram"
+      },
+      {
+        "label": "Métodos de pago admitidos"
+      }
+    ]
+  },
+  "shared": {
+    "tiers": {
+      "free": {
+        "name": "Gratis",
+        "description": "1 agente, 500 AI Credits/mes, 2 GB de espacio de trabajo"
+      },
+      "starter": {
+        "name": "entrante",
+        "description": "1 agente, 3000 AI Credits/mes, 10 GB de espacio de trabajo"
+      },
+      "pro": {
+        "name": "profesional",
+        "description": "3 agentes, 15 000 AI Credits/mes, 25 GB de espacio de trabajo"
+      },
+      "business": {
+        "name": "Negocios",
+        "description": "5 agentes, 40 000 AI Credits/mes, 50 GB de espacio de trabajo, siempre activo"
+      },
+      "founding_member": {
+        "name": "Miembro fundador",
+        "description": "10 agentes, 25 000 AI Credits/mes, 40 GB de espacio de trabajo, acceso de por vida"
+      }
+    },
+    "addons": {
+      "agents_plus1": {
+        "name": "+1 Agente",
+        "description": "1 espacio de agente adicional"
+      },
+      "agents_plus3": {
+        "name": "+3 Agentes",
+        "description": "3 espacios de agente adicionales"
+      },
+      "agents_plus5": {
+        "name": "+5 Agentes",
+        "description": "5 espacios de agente adicionales"
+      },
+      "agents_plus10": {
+        "name": "+10 Agentes",
+        "description": "10 espacios de agente adicionales"
+      },
+      "ai_credits_5000": {
+        "name": "5,000 AI Credits",
+        "description": "Recarga única para modelos alojados y búsqueda web"
+      },
+      "ai_credits_10000": {
+        "name": "10,000 AI Credits",
+        "description": "Recarga única para investigaciones y ejecuciones de modelos más pesados"
+      },
+      "ai_credits_25000": {
+        "name": "25,000 AI Credits",
+        "description": "Recarga única para cargas de trabajo de agentes más grandes"
+      },
+      "ai_credits_50000": {
+        "name": "50,000 AI Credits",
+        "description": "Recarga única para uso alojado de gran volumen"
+      }
+    },
+    "frameworks": {
+      "openclaw": {
+        "name": "OpenClaw",
+        "description": "Asistente de IA autónomo con más de 3200 habilidades comunitarias, puerta de enlace de mensajería multicanal y ejecución autónoma de tareas."
+      },
+      "hermes": {
+        "name": "Agente Hermes",
+        "description": "Agente de IA autónomo de Nous Research con memoria persistente, más de 40 herramientas, sistema de habilidades y puerta de enlace de mensajería multiplataforma."
+      }
+    },
+    "agentStatus": {
+      "active": "Activo",
+      "sleeping": "durmiendo",
+      "paused": "En pausa",
+      "archived": "Archivado",
+      "error": "error",
+      "killed": "asesinado",
+      "restarting": "Reiniciando",
+      "stopping": "Parando"
+    }
+  },
+  "localeSwitcher": {
+    "label": "Cambiar idioma"
+  },
+  "agentRoom": {
+    "back": {
+      "toCity": "Volver a la ciudad",
+      "toDashboard": "Volver al panel",
+      "toAgents": "Volver a Agentes",
+      "toBuilding": "Volver al edificio",
+      "toHouse": "Volver a casa"
+    }
+  },
+  "chatToHatch": {
+    "backLink": "← Panel de control",
+    "eyebrow": "Constructor de agentes de lenguaje natural",
+    "h1Prefix": "Descríbelo.",
+    "h1Accent": "Incubarlo.",
+    "authChecking": "Comprobando sesión…",
+    "assistantTitle": "Asistente Hatcher",
+    "assistantSub": "Desarrollado por Hatcher AI · analiza la intención en una configuración de agente completa",
+    "live": "en vivo",
+    "assistantWho": "Hatcher",
+    "intro": "Describa el agente que necesita: qué hace, dónde se ejecuta y qué se le debería permitir usar. Hatcher prepara un borrador de marco, modelo, herramientas, identidad y tiempo de ejecución para su revisión antes de la implementación.",
+    "thinking": "Pensando…",
+    "placeholder": "Un agente que observa mis webhooks Stripe y publica un resumen amigable en #revenue en Discord todas las mañanas.",
+    "send": "enviar",
+    "sendRefine": "Refinar",
+    "previewTitle": "Vista previa del agente",
+    "previewEmpty": "vacio",
+    "previewReady": "Listo para nacer",
+    "previewNeedsFix": "necesita arreglo",
+    "emptyHint": "Describe un agente a la izquierda para comenzar.",
+    "reset": "Restablecer a sugerido",
+    "resetTooltip": "Revertir todos los campos a los valores sugeridos por el asistente.",
+    "labelName": "Nombre",
+    "labelDescription": "Descripción",
+    "labelPersonality": "Personalidad",
+    "labelSystemPrompt": "SOUL.md/indicador del sistema",
+    "labelFramework": "Marco",
+    "labelFrameworkReason": "¿Por qué este marco?",
+    "labelSkills": "Habilidades para instalar",
+    "labelPlugins": "Complementos para instalar",
+    "labelInstallPlan": "Instalar plan",
+    "labelGreeting": "saludo de muestra",
+    "labelModel": "Modelo alojado",
+    "labelModelProvider": "ruta de la IA",
+    "labelAvatar": "idea de avatar",
+    "labelAvatarVariant": "avatar 3D",
+    "labelAvatarPalette": "paleta",
+    "labelAvatarEmblem": "Emblema",
+    "labelAvatarAccessory": "Accesorio",
+    "labelAvatarMood": "estado de ánimo",
+    "frameworkOpenClaw": "Navegador, archivos, código, investigación y uso de herramientas agentes.",
+    "frameworkHermes": "Automatizaciones, webhooks, mensajería y programadores rápidos nativos de API.",
+    "placeholderName": "Nombre del agente",
+    "placeholderDescription": "Una frase breve que describa lo que hace este agente.",
+    "placeholderPersonality": "Dirección tonal corta, p. conciso, técnico, sin disculpas.",
+    "placeholderSystemPrompt": "Mensaje del sistema de varios párrafos: rol, comportamiento, voz, herramientas.",
+    "addSkill": "agregar habilidad",
+    "addPlugin": "agregar complemento",
+    "removeChip": "Quitar {name}",
+    "slugUrl": "URL",
+    "hatchBtn": "Implementar agente",
+    "hatchBtnLoading": "Implementando…",
+    "footHint": "Cada campo es editable. Después de la implementación, puede refinar la configuración, instalar habilidades, inspeccionar registros y actualizar SOUL.md desde la sala de control del agente.",
+    "errName_min": "El nombre necesita al menos 3 caracteres.",
+    "errName_max": "El nombre es demasiado largo (50 máx.).",
+    "errName_regex": "El nombre puede utilizar letras, números, espacios y - : ' . ( ) & solo.",
+    "errDesc_max": "La descripción es demasiado larga (140 máx.).",
+    "errAssistant": "El asistente de incubación no respondió. Intente reformular.",
+    "errNetwork": "Error de red: ¿se puede acceder al API?",
+    "errCreate": "No se pudo crear el agente. Refina la descripción e inténtalo de nuevo.",
+    "errCreateNetwork": "Error de red al crear el agente."
+  },
+  "landingV3": {
+    "hero": {
+      "boxLabel": "Implementar",
+      "headline1": "Lanzar producción",
+      "headline2": "Agentes de IA en minutos.",
+      "sub": "Describe lo que necesitas. Hatcher lo convierte en un agente alojado con modelos, herramientas, billeteras, cronogramas y controles en vivo listos para ejecutar.",
+      "ctaPrimary": "Crea tu primer agente",
+      "ctaGhost": "Explora agentes en vivo",
+      "ctaSignup": "Crea una cuenta gratis",
+      "ctaAppStoreKicker": "Descargar en el",
+      "ctaAppStore": "Tienda de aplicaciones",
+      "ctaPlayStoreKicker": "Consíguelo",
+      "ctaPlayStore": "GooglePlay",
+      "ctaSolanaMobileKicker": "Disponible en",
+      "ctaSolanaMobile": "Solana Móvil",
+      "ctaFeatures": "Ver todas las características"
+    },
+    "flow": {
+      "boxLabel": "como funciona",
+      "title": "Tres pasos de la idea al agente real",
+      "tile1Title": "Escribe lo que quieras",
+      "tile1Body": "Describe el flujo de trabajo en inglés sencillo. Hatcher lo convierte en una especificación de agente estructurada.",
+      "tile1Example": "resumir las noticias criptográficas diariamente",
+      "tile2Title": "Revisa la configuración",
+      "tile2Body": "Revise el marco, el modelo, las herramientas, las integraciones, la configuración del tiempo de ejecución y AI Credits antes del lanzamiento.",
+      "tile3Title": "Iniciar el tiempo de ejecución",
+      "tile3Body": "Implemente en un tiempo de ejecución alojado con chat, registros, archivos, integraciones, acceso a terminales y controles en vivo.",
+      "cta": "Crea el tuyo",
+      "ctaFeatures": "Ver todas las características",
+      "liveLabel": "agente en vivo"
+    },
+    "useCases": {
+      "boxLabel": "¿Qué pueden hacer los agentes?",
+      "title": "La gente de agentes fáciles realmente entiende",
+      "body": "Comience con una solicitud en lenguaje sencillo. Hatcher lo convierte en un agente alojado con el marco, las herramientas, las integraciones, el espacio y el edificio adecuados.",
+      "items": {
+        "crypto": {
+          "eyebrow": "Mercados",
+          "title": "Explorador de noticias criptográficas",
+          "body": "Realice un seguimiento de las noticias sobre tokens, la actividad de la billetera, los precios y los resúmenes diarios a través del chat, el correo electrónico o Telegram."
+        },
+        "polymarket": {
+          "eyebrow": "Mercados de predicción",
+          "title": "Vigilante del polimercado",
+          "body": "Siga los mercados, los cambios de probabilidades, los picos de volumen y envíe alertas cuando una tesis necesite atención."
+        },
+        "trader": {
+          "eyebrow": "Comercio",
+          "title": "Copiloto comerciante",
+          "body": "Mantenga listas de vigilancia, notas de riesgo, enlaces de investigación y alertas mientras mantiene el control de cada decisión."
+        },
+        "community": {
+          "eyebrow": "Comunidades",
+          "title": "Operador Telegram o Discord",
+          "body": "Responda preguntas frecuentes, modere canales, resuma hilos y envíele mensajes importantes."
+        },
+        "research": {
+          "eyebrow": "Investigación",
+          "title": "Bucle de investigación diario",
+          "body": "Busque en la web, lea fuentes, recopile resúmenes y mantenga un recuerdo vivo de lo que importa."
+        },
+        "email": {
+          "eyebrow": "Operaciones",
+          "title": "Asistente de correo electrónico y tareas.",
+          "body": "Lea actualizaciones de la bandeja de entrada, redacte respuestas, prepare recordatorios y mantenga el trabajo rutinario en marcha."
+        }
+      },
+      "footer": "Cada uno tiene un lugar en su edificio, una habitación a la que puede ingresar y troncos que puede inspeccionar.",
+      "cta": "Crear con Chat-to-Hatch"
+    },
+    "rooms": {
+      "boxLabel": "Salas de control",
+      "title": "Cada agente obtiene un espacio de trabajo en vivo",
+      "body": "Hatcher City permanece como una capa espacial, pero la experiencia principal del producto es una sala de control precisa: chat, registros, archivos, configuración, integraciones, terminal y estado en un solo lugar.",
+      "stationAvatar": "avatar",
+      "stationSkills": "Banco de trabajo de habilidades",
+      "stationIntegrations": "Bastidor de integraciones",
+      "stationStatus": "Consola de estado",
+      "stationLogs": "Muro de troncos",
+      "stationStats": "Holograma de estadísticas",
+      "stationMemory": "Estantes de memoria",
+      "stationConfig": "Terminal de configuración"
+    },
+    "city": {
+      "boxLabel": "Hatcher City",
+      "title": "La red de agentes, transitable",
+      "body": "Reclama tu propio edificio de agentes. Camina por la ciudad, encuentra agentes activos que se mueven por ella y luego ingresa a tu edificio para administrar cada habitación.",
+      "cta": "Introduzca Hatcher City",
+      "districts": "25 distritos · cuadrícula 5×5"
+    },
+    "frameworks": {
+      "boxLabel": "Marcos",
+      "seeAll": "Ver todos →",
+      "tagOpenclaw": "Asistente multihabilidad",
+      "tagHermes": "agente autónomo"
+    },
+    "pricing": {
+      "boxLabel": "Precios",
+      "seeFull": "Ver precios completos →",
+      "lifetime": "Vida útil de $99",
+      "free": "$0",
+      "perMonth": "/mes",
+      "agentSingular": "agente",
+      "agentPlural": "agentes",
+      "msgsPerDay": "AI Credits/mes"
+    },
+    "ecosystem": {
+      "boxLabel": "Ecosistema",
+      "title": "Creado para la infraestructura de agentes",
+      "sub": "Tiempos de ejecución OpenClaw y Hermes, modelos alojados o BYOK y rieles cripto-nativo opcionales para pagos, identidades y flujos de trabajo de proveedores.",
+      "frameworksLabel": "Marcos",
+      "chainsLabel": "Cadenas"
+    },
+    "team": {
+      "boxLabel": "equipo",
+      "title": "Las personas que construyen Hatcher",
+      "cristianName": "cristian",
+      "cristianRole": "Desarrollador/CEO",
+      "ioanaName": "Ioana",
+      "ioanaRole": "Director de Marketing / Marketing",
+      "johnName": "Juan",
+      "johnRole": "Desarrollador",
+      "moiseName": "Moisés",
+      "moiseRole": "Representante de EE. UU./Comunidad",
+      "anonymousOneName": "Desarrollador anónimo",
+      "anonymousOneRole": "Desarrollador",
+      "anonymousTwoName": "Desarrollador anónimo",
+      "anonymousTwoRole": "Desarrollador",
+      "founderTag": "fundador",
+      "growthTag": "crecimiento",
+      "builderTag": "constructor",
+      "communityTag": "comunidad",
+      "anonymousTag": "privado"
+    },
+    "finalCta": {
+      "boxLabel": "Listo",
+      "headline": "Implemente su primer agente.",
+      "ctaPrimary": "agente de eclosión",
+      "ctaGhost": "Ver agentes",
+      "metaFrameworks": "OpenClaw + Hermes",
+      "metaNoCard": "sin tarjeta de crédito"
+    },
+    "cli": {
+      "boxLabel": "CLI",
+      "title": "Ejecute Hatcher desde su terminal",
+      "sub": "Instale Hatcher CLI, cree una clave API y luego ejecute `hatcher`. Cree agentes en inglés sencillo, charle con ellos, conéctese a su tiempo de ejecución en vivo y administre los flujos de trabajo de los desarrolladores sin salir de su caparazón.",
+      "apiKeyHint": "Genere una clave API en Cuenta → Claves API → Crear clave.",
+      "ctaKey": "Crear clave API",
+      "ctaDocs": "Documentos de CLI",
+      "terminalLabel": "Hatcher CLI",
+      "features": {
+        "hatch": {
+          "title": "Chat-to-Hatch",
+          "body": "Convierta un mensaje en un agente OpenClaw o Hermes configurado."
+        },
+        "terminal": {
+          "title": "terminal en vivo",
+          "body": "Adjunte a la sesión del marco en ejecución con `hatcher terminal`."
+        },
+        "dev": {
+          "title": "Flujos de trabajo de desarrollo",
+          "body": "Utilice el acceso a GitHub, llamadas, sesiones, registros y orquestación de A2A desde un CLI."
+        }
+      }
+    }
+  }
+}

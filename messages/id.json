@@ -1,0 +1,2594 @@
+{
+  "common": {
+    "appName": "Hatcher",
+    "tagline": "Hosting agen AI terkelola · Crypto-native"
+  },
+  "nav": {
+    "pricing": "Harga",
+    "docs": "dokumen",
+    "roadmap": "Peta jalan",
+    "login": "Masuk",
+    "signup": "Daftar",
+    "frameworks": "Kerangka kerja",
+    "token": "Tanda",
+    "blog": "blog",
+    "changelog": "log perubahan",
+    "help": "Bantuan",
+    "dashboard": "Dasbor",
+    "myAgents": "Agen Saya",
+    "create": "Buat",
+    "city": "Kota",
+    "analytics": "Analisis",
+    "skale": "Dompet SKALE",
+    "team": "Tim",
+    "billing": "Penagihan",
+    "settings": "Pengaturan",
+    "support": "Dukungan",
+    "logout": "Keluar",
+    "signIn": "Masuk",
+    "signUp": "Daftar",
+    "credits": "kredit",
+    "affiliate": "Afiliasi",
+    "admin": "Admin",
+    "adminPanel": "Panel Admin",
+    "openNav": "Buka menu navigasi",
+    "closeNav": "Tutup menu navigasi",
+    "affiliateDashboard": "Dasbor Afiliasi",
+    "affiliatePending": "Permohonan sedang ditinjau",
+    "affiliateRejected": "Ajukan permohonan kembali sebagai afiliasi",
+    "affiliateBecome": "Menjadi afiliasi",
+    "userMenu": {
+      "sub_myAgents": "Telusuri, edit, sebarkan.",
+      "sub_create": "Jelaskan agen yang akan ditetaskan.",
+      "sub_analytics": "AI Credits, token, tren.",
+      "sub_billing": "Tingkat, tambahan, kredit.",
+      "sub_wallets": "Dompet pembayaran Solana.",
+      "sub_team": "Anggota dan kolaborasi.",
+      "sub_settings": "Profil, kunci API, preferensi.",
+      "sub_support": "Bantuan, dokumen, hubungi.",
+      "sub_affiliate": "Rujukan dan pelaporan mitra.",
+      "sub_admin": "Kontrol platform.",
+      "sub_signOut": "Akhiri sesi di perangkat ini.",
+      "tierSuffix": "tingkat"
+    },
+    "groups": {
+      "build": "Membangun",
+      "explore": "Jelajahi",
+      "resources": "Sumber daya",
+      "hatchAgentLabel": "Agen penetasan (obrolan)",
+      "hatchAgentSub": "Jelaskan runtime, alat, dan alur kerja.",
+      "myAgentsLabel": "Agen saya",
+      "myAgentsSub": "Dasbor untuk agen Anda yang sedang berjalan.",
+      "publicAgentsLabel": "Agen publik",
+      "publicAgentsSub": "Ngobrol dengan agen komunitas.",
+      "featuresLabel": "Fitur",
+      "featuresSub": "Waktu proses, ruang kerja, peralatan, ruangan, dan CLI.",
+      "cityLabel": "Hatcher City",
+      "citySub": "Berjalanlah di dunia 3D agen langsung.",
+      "frameworksLabel": "Kerangka kerja",
+      "frameworksSub": "OpenClaw · Hermes.",
+      "pricingLabel": "Harga",
+      "pricingSub": "Gratis · Pemula · Pro · Bisnis · Pendiri.",
+      "tokenLabel": "$HATCHER",
+      "tokenSub": "Pembayaran utilitas, diskon, dan mekanisme pembakaran.",
+      "stakingLabel": "Mempertaruhkan",
+      "stakingSub": "Hadiah $HATCHER ditambah AI Credits.",
+      "whitepaperLabel": "kertas putih",
+      "whitepaperSub": "Platform, token, kredit, peta jalan.",
+      "blogLabel": "blog",
+      "blogSub": "Catatan, rilis, penyelaman mendalam.",
+      "roadmapLabel": "Peta jalan",
+      "roadmapSub": "Apa yang kami kirimkan selanjutnya.",
+      "changelogLabel": "log perubahan",
+      "changelogSub": "Apa yang berubah dan kapan."
+    },
+    "hatchAgent": "Agen penetasan"
+  },
+  "notifications": {
+    "heading": "Pemberitahuan",
+    "empty": "Tidak ada pemberitahuan",
+    "markRead": "Tandai sudah dibaca",
+    "markReadAriaLabel": "Tandai semua notifikasi sebagai telah dibaca",
+    "clear": "Jelas",
+    "clearAriaLabel": "Hapus semua notifikasi",
+    "unreadAriaLabel": "Pemberitahuan, {count} belum dibaca",
+    "allReadAriaLabel": "Pemberitahuan"
+  },
+  "footer": {
+    "columns": {
+      "product": "Produk",
+      "resources": "Sumber daya",
+      "community": "Komunitas"
+    },
+    "links": {
+      "createAgent": "Buat Agen",
+      "dashboard": "Dasbor",
+      "pricing": "Harga",
+      "affiliate": "Afiliasi",
+      "status": "Status",
+      "documentation": "Dokumentasi",
+      "support": "Dukungan",
+      "blog": "blog",
+      "changelog": "log perubahan",
+      "security": "Keamanan",
+      "roadmap": "Peta jalan",
+      "terms": "Ketentuan",
+      "privacy": "Privasi",
+      "cookies": "kue",
+      "impressum": "kesan",
+      "docs": "dokumen"
+    },
+    "copyright": "© {year} HatcherLabs. Semua hak dilindungi undang-undang.",
+    "companyInfo": "HHX TECHNOLOGY SRL · CUI 45318471 · Timișoara, România",
+    "legalNotice": "Halaman legal (Privasi, Ketentuan, Impressum, Cookies) hanya tersedia dalam bahasa Inggris.",
+    "tag": "Hosting agen AI terkelola · Rumania",
+    "colBuild": "Membangun",
+    "colExplore": "Jelajahi",
+    "colResources": "Sumber daya",
+    "colLegal": "Hukum",
+    "itemHatchAgent": "Agen penetasan",
+    "itemMyAgents": "Agen saya",
+    "itemPublicAgents": "Agen publik",
+    "itemFeatures": "Fitur",
+    "itemCity": "Hatcher City",
+    "itemFrameworks": "Kerangka kerja",
+    "itemPricing": "Harga",
+    "itemToken": "$HATCHER",
+    "itemStaking": "Mempertaruhkan",
+    "itemWhitepaper": "kertas putih",
+    "itemBlog": "blog",
+    "itemRoadmap": "Peta jalan",
+    "itemChangelog": "log perubahan",
+    "itemSecurity": "Keamanan",
+    "itemPrivacy": "Privasi",
+    "itemTerms": "Ketentuan",
+    "itemCookies": "kue",
+    "itemImpressum": "kesan",
+    "poweredBy": "Didukung oleh"
+  },
+  "landing": {
+    "affiliateBanner": {
+      "live": "Program Afiliasi sudah aktif",
+      "earn": "— dapatkan penghasilan hingga",
+      "pct": "40%",
+      "perReferral": "pada setiap referensi",
+      "dismissAriaLabel": "Tutup spanduk afiliasi"
+    },
+    "tokenBanner": {
+      "learnMore": "Pelajari lebih lanjut →"
+    },
+    "hero": {
+      "eyebrow": "Hosting agen AI terkelola · Crypto-native",
+      "headlinePrefix": "Tetaskan milikmu",
+      "typewriterWords": [
+        "Agen AI",
+        "Pelatih Kebugaran",
+        "Pelacak Kripto",
+        "Teman Belajar",
+        "Perencana Perjalanan",
+        "Asisten Pribadi"
+      ],
+      "body": "Pilih OpenClaw atau Hermes. Konfigurasikan. Luncurkan dalam 60 detik. Tidak diperlukan kode, tidak perlu mengelola infrastruktur. 20+ platform, model UsePod/OpenRouter yang dihosting, dan BYOK.",
+      "ctaPrimary": "Memulai secara gratis",
+      "ctaSecondary": "Baca dokumen",
+      "agentPreviewOnline": "CryptoHelper — Daring"
+    },
+    "stats": {
+      "users": "Pengguna",
+      "agents": "Agen",
+      "activeNow": "Aktif sekarang"
+    },
+    "agentDiscovery": {
+      "eyebrow": "Untuk Agen AI",
+      "heading": "Perintahkan pasukan subagen",
+      "body": "Agen pengkodean lokal Anda menjadi komandan armada. Tempel perintah ini — perintah ini terdaftar di Hatcher atas nama Anda, menjalankan subagen yang selalu aktif (bot Telegram, loop penelitian, mod Discord, monitor), dan terus mengontrolnya lama setelah sesi Anda berakhir.",
+      "promptLabel": "Cepat",
+      "copyLabel": "Salin",
+      "copiedLabel": "Disalin",
+      "copyAriaLabel": "Salin perintah",
+      "copiedAriaLabel": "Disalin",
+      "step01": "Kirimkan perintah ini ke agen pengkodean AI Anda — Claude Code, Cursor, OpenClaw, Hermes, atau agen mana pun yang dapat mengambil URL dan menjalankan perintah shell.",
+      "step02": "Agen mendaftarkan akun dengan email Anda dan mengirimi Anda tautan verifikasi.",
+      "step03": "Klik verifikasi. Hatcher menyusun konfigurasi, menerapkan, dan memberi Anda AI yang sedang berjalan.",
+      "viewSkillMd": "Lihat skill.md",
+      "githubSource": "Sumber GitHub"
+    },
+    "howItWorks": {
+      "eyebrow": "Bagaimana cara kerjanya",
+      "heading": "3 langkah. 60 detik.",
+      "subheading": "Tanpa pengkodean, tanpa panduan pengaturan, tanpa file konfigurasi.",
+      "steps": [
+        {
+          "num": "01",
+          "title": "Pilih kerangka kerja",
+          "desc": "Pilih OpenClaw untuk otomatisasi tingkat keterampilan atau Hermes untuk agen adaptif yang berjalan lama dan memiliki memori."
+        },
+        {
+          "num": "02",
+          "title": "Konfigurasikan",
+          "desc": "Nama, kepribadian, integrasi. Isi formulir sederhana — tanpa file konfigurasi, tanpa YAML."
+        },
+        {
+          "num": "03",
+          "title": "Menyebarkan",
+          "desc": "Satu klik. Agen Anda aktif di setiap platform yang terhubung dalam waktu kurang dari 60 detik."
+        }
+      ],
+      "cta": "Cobalah sekarang"
+    },
+    "useCases": {
+      "eyebrow": "Kasus penggunaan",
+      "heading": "Apa yang akan kamu tetaskan?",
+      "subheading": "Dari produktivitas pribadi hingga otomatisasi bisnis — agen Anda, aturan Anda.",
+      "items": [
+        {
+          "title": "Asisten pribadi",
+          "desc": "Kalender, email, pengingat — dari Telegram."
+        },
+        {
+          "title": "Pelatih kebugaran",
+          "desc": "Latihan, rutinitas, akuntabilitas harian."
+        },
+        {
+          "title": "Makanan & nutrisi",
+          "desc": "Catat makanan, hitung kalori, saran resep."
+        },
+        {
+          "title": "Pelacak kripto",
+          "desc": "Harga token, peringatan portofolio, data on-chain."
+        },
+        {
+          "title": "Teman belajar",
+          "desc": "Kuis Anda, rangkum buku pelajaran, bantu mengerjakan pekerjaan rumah."
+        },
+        {
+          "title": "Perencana perjalanan",
+          "desc": "Temukan penerbangan, rencanakan rencana perjalanan, pilihan lokal."
+        },
+        {
+          "title": "Manajer anggaran",
+          "desc": "Lacak pengeluaran, sasaran tabungan, laporan mingguan."
+        },
+        {
+          "title": "Asisten peneliti",
+          "desc": "Pencarian web, merangkum artikel, menyusun laporan."
+        },
+        {
+          "title": "Dukungan pelanggan",
+          "desc": "Jawab FAQ di Discord atau WhatsApp, 24/7."
+        }
+      ],
+      "footer": "Dan hal lain yang dapat Anda jelaskan dalam bahasa Inggris yang sederhana."
+    },
+    "frameworks": {
+      "eyebrow": "Kerangka kerja",
+      "heading": "Dua kerangka kerja. Satu platform.",
+      "subheading": "Pilih salah satu yang sesuai dengan agen Anda. Beralih kapan pun Anda mau.",
+      "items": [
+        {
+          "name": "OpenClaw",
+          "tag": "serba bisa",
+          "desc": "Alat, plugin, dan kontrol browser yang canggih.",
+          "features": "2500+ keterampilan · Otomatisasi browser · Manajemen file"
+        },
+        {
+          "name": "Hermes",
+          "tag": "penalaran",
+          "desc": "Desain cerdas pertama untuk memori dan penalaran yang kaya.",
+          "features": "77 keterampilan yang dibundel · Memori yang dalam · Multi-model"
+        }
+      ]
+    },
+    "city": {
+      "eyebrow": "★ BARU",
+      "heading": "Temui setiap agen di Hatcher City.",
+      "body": "Kota 3D yang hidup di mana setiap agen publik adalah sebuah bangunan. Distrik berdasarkan kategori, warna berdasarkan kerangka, balok emas menandai distrik Anda. Seret, perbesar, klik bangunan mana saja untuk membukanya.",
+      "videoAriaLabel": "Buka Hatcher City",
+      "label": "KOTA PENETAS",
+      "exploreCta": "Jelajahi armada lengkap →",
+      "enterCta": "Masuk kota"
+    },
+    "features": {
+      "eyebrow": "Peron",
+      "heading": "Semua yang dibutuhkan agen Anda",
+      "items": [
+        {
+          "title": "Penerapan instan",
+          "desc": "Dari nol hingga agen berjalan dalam waktu kurang dari 60 detik."
+        },
+        {
+          "title": "Semua platform",
+          "desc": "Telegram, Discord, Twitter, WhatsApp, Slack."
+        },
+        {
+          "title": "Bawalah kunci Anda sendiri",
+          "desc": "Gunakan kunci LLM API Anda sendiri tanpa menghabiskan AI Credits."
+        },
+        {
+          "title": "Aman secara default",
+          "desc": "Kontainer terisolasi, rahasia terenkripsi, tidak ada data yang dibagikan."
+        },
+        {
+          "title": "Analisis langsung",
+          "desc": "Statistik waktu nyata, pelacakan penggunaan, metrik kinerja."
+        },
+        {
+          "title": "Obrolan & suara",
+          "desc": "Obrolan teks, panggilan suara, streaming real-time — siap digunakan."
+        }
+      ]
+    },
+    "pricing": {
+      "eyebrow": "Harga",
+      "heading": "Mulailah dengan bebas, kembangkan jika sudah siap",
+      "subheading": "Semua platform disertakan dalam setiap paket. AI yang dihosting dan penelusuran web menggunakan AI Credits; BYOK tetap berbayar penyedia.",
+      "popularLabel": "Populer",
+      "tiers": [
+        {
+          "name": "Gratis",
+          "price": "$0",
+          "sub": "/bulan",
+          "features": [
+            "1 agen AI",
+            "500 AI Credits/bulan",
+            "Ruang kerja 2 GB",
+            "Semua platform",
+            "Manajer File + Log Lengkap"
+          ],
+          "cta": "Mulailah"
+        },
+        {
+          "name": "Pemula",
+          "price": "$6.99",
+          "sub": "/bulan",
+          "features": [
+            "1 agen AI",
+            "3.000 AI Credits/bulan",
+            "Ruang kerja 10 GB",
+            "BYOK penagihan langsung",
+            "Selalu aktif"
+          ],
+          "cta": "Pilih Pemula"
+        },
+        {
+          "name": "Pro",
+          "price": "$19.99",
+          "sub": "/bulan",
+          "features": [
+            "3 agen AI",
+            "15.000 AI Credits/bulan",
+            "Ruang kerja 25 GB",
+            "BYOK penagihan langsung",
+            "Sumber daya khusus"
+          ],
+          "cta": "Pilih Pro"
+        },
+        {
+          "name": "Bisnis",
+          "price": "$49.99",
+          "sub": "/bulan",
+          "features": [
+            "5 agen AI",
+            "40.000 AI Credits/bulan",
+            "Ruang kerja 50 GB",
+            "Kontainer yang selalu aktif",
+            "Kolaborasi tim"
+          ],
+          "cta": "Pilih Bisnis"
+        }
+      ],
+      "addonsNote": "Butuh lebih banyak agen, AI Credits, atau penyimpanan? Tambahkan kapasitas ekstra saat Anda membutuhkannya.",
+      "addonsCta": "Lihat harga lengkap →"
+    },
+    "founding": {
+      "eyebrow": "Penawaran terbatas · Anggota pendiri",
+      "heading": "Bayar sekali, simpan selamanya.",
+      "oneTime": "satu kali",
+      "subheading": "Harga terkunci, tanpa biaya bulanan, semua fitur Tingkat Bisnis selamanya. Hanya 20 tempat.",
+      "availableSpotsLabel": "Tempat yang tersedia",
+      "checking": "Memeriksa…",
+      "soldOut": "Terjual habis",
+      "spotsLeft": "{remaining} dari {max} tersisa",
+      "loadingAvailability": "Memuat ketersediaan…",
+      "allTaken": "Semua tempat pendirian {max} telah diambil. Tingkatan standar masih tersedia.",
+      "claimed": "{claimed} dari {max} diklaim · setelah hilang, tawaran ini hilang.",
+      "includedHeading": "Semuanya termasuk, selamanya",
+      "includedItems": [
+        "10 agen disertakan",
+        "Selalu aktif (tidak tidur)",
+        "25.000 AI Credits/bulan",
+        "Pencarian web menggunakan AI Credits",
+        "2 CPU · 4 GB RAM per agen",
+        "Ruang kerja 40 GB",
+        "Manajer File + Log Lengkap",
+        "Dukungan prioritas",
+        "Pendiri peran Discord + tag Telegram",
+        "Harga terkunci selamanya"
+      ],
+      "ctaSoldOut": "Terjual habis",
+      "ctaClaim": "Klaim tempat Anda"
+    },
+    "faq": {
+      "eyebrow": "Pertanyaan Umum",
+      "heading": "Pertanyaan umum",
+      "items": [
+        {
+          "q": "Apakah ini benar-benar gratis?",
+          "a": "Ya. Paket gratis memberi Anda 1 agen, 500 AI Credits/bulan, ruang kerja 2 GB, Manajer File, Log Lengkap, dan akses ke semua platform. Tidak diperlukan kartu kredit. BYOK (bawa kunci LLM Anda sendiri) tetap dibayar penyedia pada tingkat mana pun."
+        },
+        {
+          "q": "Apakah saya perlu tahu cara membuat kode?",
+          "a": "Tidak sama sekali! Membuat agen seperti mengisi formulir — pilih nama, jelaskan apa yang Anda ingin lakukan, pilih platform, dan luncurkan."
+        },
+        {
+          "q": "Apa itu \"Bawa Kunci Anda Sendiri\"?",
+          "a": "Hubungkan OpenAI, Anthropic, Google, OpenRouter, atau kunci LLM lain yang didukung. Penggunaan BYOK dibayarkan langsung ke penyedia Anda dan tidak menghabiskan Hatcher AI Credits."
+        },
+        {
+          "q": "Di mana agen saya beroperasi?",
+          "a": "Di server cloud kami 24/7. Tidak perlu menyalakan komputer atau menginstal apa pun."
+        }
+      ]
+    },
+    "finalCta": {
+      "heading": "Siap untuk menyebarkan agen pertama Anda?",
+      "body": "Tingkat gratis mencakup 1 agen, 500 AI Credits/bulan, Manajer File, Log Lengkap, dan ruang kerja 2 GB. BYOK penagihan langsung. Tidak diperlukan kartu kredit.",
+      "ctaPrimary": "Buat agen Anda",
+      "ctaSecondary": "Lihat harga",
+      "trustNoCreditCard": "Tidak ada kartu kredit",
+      "trustFreeAi": "Termasuk AI gratis",
+      "trustDeploy60s": "Terapkan pada tahun 60an",
+      "trustAllPlatforms": "Semua platform"
+    }
+  },
+  "auth": {
+    "login": {
+      "heading": "Selamat datang kembali",
+      "subheading": "Masuk ke akun Hatcher Anda",
+      "panelTagline": "Hatcher",
+      "panelHeadlinePrefix": "Tetaskan milikmu",
+      "panelHeadlineAccent": "Agen AI.",
+      "panelBody": "Pilih kerangka kerja. Konfigurasikan. Luncurkan dalam 60 detik. Tanpa kode, tanpa infrastruktur.",
+      "statsUsers": "Pengguna",
+      "statsAgents": "Agen",
+      "statsOnline": "Daring sekarang",
+      "emailLabel": "Surel",
+      "emailPlaceholder": "kamu@example.com",
+      "passwordLabel": "Kata sandi",
+      "passwordPlaceholder": "Masukkan kata sandi Anda",
+      "forgotLink": "Lupa kata sandi?",
+      "submit": "Masuk",
+      "submitLoading": "Masuk...",
+      "registerPrompt": "Belum punya akun?",
+      "registerLink": "Daftar"
+    },
+    "register": {
+      "heading": "Buat akun",
+      "subheading": "Mulailah dengan Hatcher",
+      "panelTagline": "Hatcher",
+      "panelHeadlinePrefix": "Tetaskan milikmu",
+      "panelHeadlineAccent": "Agen AI.",
+      "panelBody": "Tingkat gratis termasuk AI Credits. Penggunaan BYOK dibayarkan langsung ke penyedia Anda. Tidak diperlukan kartu kredit.",
+      "statsUsers": "Pengguna",
+      "statsAgents": "Agen",
+      "statsOnline": "Daring sekarang",
+      "referralBadge": "Dirujuk oleh {referrer} — Anda berdua mendapatkan {credit}!",
+      "emailLabel": "Surel",
+      "emailPlaceholder": "kamu@example.com",
+      "emailTaken": "Sudah terdaftar.",
+      "emailTakenLink": "Masuk saja",
+      "emailInvalid": "Masukkan alamat email yang valid.",
+      "usernameLabel": "Nama pengguna",
+      "usernamePlaceholder": "pengguna keren123",
+      "usernameTaken": "Nama pengguna ini sudah dipakai. Pilih yang lain.",
+      "usernameInvalid": "3–30 huruf, angka, tanda hubung, atau garis bawah.",
+      "usernameHint": "Hanya huruf, angka, tanda hubung, dan garis bawah",
+      "passwordLabel": "Kata sandi",
+      "passwordPlaceholder": "Masukkan kata sandi yang kuat",
+      "passwordHint": "Harus menyertakan: 8+ karakter, huruf besar, huruf kecil, angka, dan karakter khusus",
+      "confirmPasswordLabel": "Konfirmasi Kata Sandi",
+      "confirmPasswordPlaceholder": "Ulangi kata sandi Anda",
+      "strengthLabels": {
+        "veryWeak": "Sangat lemah",
+        "weak": "Lemah",
+        "fair": "Adil",
+        "strong": "Kuat",
+        "veryStrong": "Sangat kuat"
+      },
+      "strengthChecks": {
+        "length": "8+ karakter",
+        "lowercase": "Huruf kecil",
+        "uppercase": "Huruf besar",
+        "number": "Nomor",
+        "special": "Karakter khusus"
+      },
+      "submit": "Buat Akun",
+      "submitLoading": "Membuat akun...",
+      "loginPrompt": "Sudah punya akun?",
+      "loginLink": "Masuk",
+      "errors": {
+        "emailTaken": "Email ini sudah terdaftar. Coba masuk saja.",
+        "usernameTaken": "Nama pengguna ini sudah dipakai. Pilih yang lain.",
+        "passwordMismatch": "Kata sandi tidak cocok",
+        "passwordTooShort": "Kata sandi minimal harus 8 karakter",
+        "passwordComplexity": "Kata sandi harus mengandung huruf besar, huruf kecil, angka, dan karakter khusus"
+      }
+    },
+    "forgotPassword": {
+      "heading": "Lupa kata sandi?",
+      "subheading": "Masukkan email Anda dan kami akan mengirimkan Anda tautan reset",
+      "emailLabel": "Surel",
+      "emailPlaceholder": "kamu@example.com",
+      "submit": "Kirim Tautan Reset",
+      "submitLoading": "Mengirim...",
+      "backToLogin": "Kembali untuk masuk",
+      "successHeading": "Periksa email Anda",
+      "successBody": "Jika ada akun untuk <bold>{email}</bold>, kami mengirimkan tautan pengaturan ulang kata sandi. Periksa kotak masuk dan folder spam Anda.",
+      "successBackLink": "Kembali untuk masuk",
+      "genericError": "Ada yang tidak beres. Silakan coba lagi."
+    },
+    "resetPassword": {
+      "heading": "Tetapkan kata sandi baru",
+      "subheading": "Masukkan kata sandi baru Anda di bawah",
+      "newPasswordLabel": "Kata Sandi Baru",
+      "newPasswordPlaceholder": "8+ karakter, atas, bawah, angka, spesial",
+      "passwordRequirements": "Gunakan 8+ karakter dengan huruf besar, huruf kecil, angka, dan karakter khusus.",
+      "confirmPasswordLabel": "Konfirmasi Kata Sandi",
+      "confirmPasswordPlaceholder": "Ulangi kata sandi Anda",
+      "passwordMismatch": "Kata sandi tidak cocok",
+      "submit": "Atur Ulang Kata Sandi",
+      "submitLoading": "Menyetel ulang...",
+      "backToLogin": "Kembali untuk masuk",
+      "successHeading": "Reset Kata Sandi",
+      "successBody": "Kata sandi Anda telah diperbarui. Anda sekarang dapat masuk dengan kata sandi baru Anda.",
+      "successCta": "Masuk",
+      "invalidHeading": "Tautan Reset Tidak Valid",
+      "invalidBody": "Tautan setel ulang ini tidak ada atau tidak valid. Silakan minta yang baru.",
+      "invalidCta": "Minta tautan setel ulang baru",
+      "genericError": "Penyetelan ulang gagal. Tautan tersebut mungkin telah kedaluwarsa."
+    },
+    "verifyEmail": {
+      "loadingHeading": "Memverifikasi email Anda...",
+      "successHeading": "Email Terverifikasi!",
+      "successBody": "Akun Anda sekarang aktif. Anda dapat mulai membuat agen.",
+      "successCta": "Buka Dasbor",
+      "errorHeading": "Verifikasi Gagal",
+      "errorBody": "Tautan verifikasi tidak valid atau telah kedaluwarsa.",
+      "errorCta": "Pergi ke Masuk",
+      "noTokenHeading": "Periksa Email Anda",
+      "noTokenBody": "Kami mengirimkan tautan verifikasi ke email Anda. Klik tautan untuk mengaktifkan akun Anda.",
+      "noTokenHint": "Tidak menerimanya? Periksa folder spam Anda atau coba masuk untuk mengirim ulang."
+    }
+  },
+  "pricing": {
+    "eyebrow": "Harga",
+    "heading": "Pilih paket Anda",
+    "subheading": "Mulai gratis dengan kerangka apa pun. Skalakan saat siap. Semua integrasi disertakan di setiap tingkatan. BYOK tetap dibayar penyedia di setiap tingkatan.",
+    "hatcherDiscountBanner": "Bayar dengan $HATCHER untuk paket diskon 10% dan ekstra.",
+    "hatcherDiscountLine": "$HATCHER harga: ${price}",
+    "hatcherDiscountAnnual": "$HATCHER harga tahunan: ${price}",
+    "billingToggle": {
+      "monthly": "Bulanan",
+      "annual": "Tahunan",
+      "annualDiscount": "−15%"
+    },
+    "tierBadges": {
+      "popular": "Populer",
+      "limited": "Terbatas"
+    },
+    "priceUnit": {
+      "perMonth": "/bln",
+      "once": "sekali"
+    },
+    "annualSavings": "${annualTotal}/tahun · hemat ${saved}",
+    "switchToAnnual": "Beralih ke tahunan, hemat 15%",
+    "payOnce": "Bayar sekali, simpan selamanya",
+    "availability": "Ketersediaan",
+    "availabilityLoading": "Memuat",
+    "soldOut": "Terjual habis",
+    "slotsLeft": "{remaining} dari {max} tersisa",
+    "tierCta": {
+      "free": "Mulailah",
+      "paid": "Pilih {tierName}"
+    },
+    "tiers": {
+      "free": {
+        "agents": "1 agen disertakan",
+        "messages": "500 AI Credits/bulan",
+        "cpu": "1 CPU",
+        "ram": "RAM 1 GB",
+        "storage": "Ruang kerja 2 GB",
+        "sleep": "Tidur otomatis setelah 12 jam idle",
+        "features": [
+          "Model yang dihosting melalui UsePod/OpenRouter",
+          "Pencarian web menggunakan AI Credits",
+          "Manajer File + Log Lengkap disertakan",
+          "Semua integrasi (Telegram, Discord, Twitter, dll)"
+        ],
+        "missing": []
+      },
+      "starter": {
+        "agents": "1 agen disertakan",
+        "messages": "3.000 AI Credits/bulan",
+        "cpu": "1 CPU",
+        "ram": "RAM 1,5GB",
+        "storage": "Ruang kerja 10 GB",
+        "sleep": "Selalu aktif",
+        "features": [
+          "Model yang dihosting melalui UsePod/OpenRouter",
+          "Pencarian web menggunakan AI Credits",
+          "Manajer File + Log Lengkap disertakan",
+          "Semua integrasi"
+        ],
+        "missing": []
+      },
+      "pro": {
+        "agents": "3 agen disertakan",
+        "messages": "15.000 AI Credits/bulan",
+        "cpu": "1,5 CPU",
+        "ram": "RAM 2 GB",
+        "storage": "Ruang kerja 25 GB",
+        "sleep": "Selalu aktif",
+        "features": [
+          "Model yang dihosting melalui UsePod/OpenRouter",
+          "Pencarian web menggunakan AI Credits",
+          "Manajer File + Log Lengkap disertakan",
+          "Semua integrasi"
+        ],
+        "missing": []
+      },
+      "business": {
+        "agents": "5 agen disertakan",
+        "messages": "40.000 AI Credits/bulan",
+        "cpu": "2 CPU",
+        "ram": "RAM 3 GB",
+        "storage": "Ruang kerja 50 GB",
+        "sleep": "Selalu aktif",
+        "features": [
+          "Model yang dihosting melalui UsePod/OpenRouter",
+          "Pencarian web menggunakan AI Credits",
+          "Manajer File disertakan",
+          "Log lengkap disertakan",
+          "Dukungan prioritas",
+          "Kolaborasi tim",
+          "Semua integrasi"
+        ],
+        "missing": []
+      },
+      "founding_member": {
+        "agents": "10 agen disertakan",
+        "messages": "25.000 AI Credits/bulan",
+        "cpu": "2 CPU",
+        "ram": "RAM 4 GB",
+        "storage": "Ruang kerja 40 GB",
+        "sleep": "Selalu aktif",
+        "features": [
+          "$99 satu kali — akses seumur hidup",
+          "Model yang dihosting melalui UsePod/OpenRouter",
+          "Pencarian web menggunakan AI Credits",
+          "Manajer File + Log Lengkap disertakan",
+          "Dukungan prioritas",
+          "Semua integrasi",
+          "Pendiri peran Discord + tag Telegram"
+        ],
+        "missing": []
+      }
+    },
+    "addons": {
+      "heading": "Ekstra",
+      "subheading": "Tambahkan paket Kredit AI atau slot agen tambahan bila Anda membutuhkan kapasitas lebih.",
+      "annualDiscount": "Diskon 15% setiap tahunnya",
+      "hatcherDiscount": "$HATCHER: ${price}",
+      "groups": {
+        "extraAgents": {
+          "label": "Agen Ekstra",
+          "items": [
+            {
+              "name": "+1 Agen",
+              "period": "/bln",
+              "description": "1 slot tambahan"
+            },
+            {
+              "name": "+3 Agen",
+              "period": "/bln",
+              "description": "3 slot tambahan"
+            },
+            {
+              "name": "+5 Agen",
+              "period": "/bln",
+              "description": "5 slot tambahan"
+            },
+            {
+              "name": "+10 Agen",
+              "period": "/bln",
+              "description": "10 slot tambahan"
+            }
+          ]
+        },
+        "aiCredits": {
+          "label": "AI Credits",
+          "items": [
+            {
+              "name": "5.000 AI Credits",
+              "period": "satu kali",
+              "description": "Model yang dihosting dan pencarian web"
+            },
+            {
+              "name": "10.000 AI Credits",
+              "period": "satu kali",
+              "description": "Model yang lebih berat dijalankan dan diteliti"
+            },
+            {
+              "name": "25.000 AI Credits",
+              "period": "satu kali",
+              "description": "Beban kerja agen yang lebih besar"
+            },
+            {
+              "name": "50.000 AI Credits",
+              "period": "satu kali",
+              "description": "Penggunaan yang dihosting dalam volume tinggi"
+            }
+          ]
+        },
+        "perAgent": {
+          "label": "Plugin + Keterampilan",
+          "items": [
+            {
+              "name": "Termasuk plugin",
+              "period": "termasuk",
+              "description": "Termasuk di setiap tingkatan"
+            }
+          ]
+        }
+      }
+    },
+    "integrations": {
+      "heading": "Semua Integrasi Gratis",
+      "badge": "setiap tingkatan",
+      "body": "Telegram, Discord, WhatsApp, Slack, Signal, iMessage, dan 14+ platform lainnya disertakan gratis di semua tingkatan. Tanpa biaya tambahan.",
+      "note": "Semua harga tercantum dalam USD. Bayar dengan kartu, SOL, USDC di Solana, $HATCHER, atau $KAUSA. Pembayaran $HATCHER mendapat diskon 10%; model yang dihosting dan penggunaan pencarian web diukur dengan AI Credits, sedangkan BYOK dibayar langsung dengan kunci penyedia Anda sendiri."
+    },
+    "compareTable": {
+      "heading": "Bandingkan Paket",
+      "subheading": "Lihat sekilas apa yang tercakup dalam setiap tingkatan",
+      "featureColumn": "Fitur",
+      "onceSuffix": "sekali",
+      "rows": {
+        "agents": "Termasuk agen",
+        "messages": "AI Credits/bulan",
+        "searches": "Pencarian web",
+        "byok": "Penggunaan penyedia BYOK",
+        "cpuRam": "CPU/RAM",
+        "storage": "Penyimpanan",
+        "autoSleep": "Tidur otomatis",
+        "fileManager": "Manajer File",
+        "fullLogs": "Log Lengkap",
+        "teamCollab": "Kolaborasi tim",
+        "prioritySupport": "Dukungan prioritas",
+        "plugins": "Plugin + Keterampilan",
+        "integrations": "Semua integrasi",
+        "byokKey": "BYOK (kunci LLM sendiri)",
+        "defaultLlm": "Pemilihan model"
+      },
+      "values": {
+        "unlimited": "Tidak terbatas",
+        "alwaysOn": "Selalu aktif",
+        "addon": "Tambahan",
+        "llama4Scout": "Pemilih penyedia/model"
+      }
+    },
+    "faq": {
+      "heading": "Pertanyaan yang Sering Diajukan",
+      "items": [
+        {
+          "q": "Apa itu BYOK (Bawa Kunci Anda Sendiri)?",
+          "a": "BYOK memungkinkan Anda menggunakan kunci API Anda sendiri untuk penyedia LLM mana pun yang didukung (OpenAI, Anthropic, Google, xAI, OpenRouter, dan banyak lagi). Ini selalu gratis di semua tingkatan -- Anda membayar penyedia secara langsung, tanpa markup Hatcher. Hatcher tidak mengukur penggunaan BYOK dengan AI Credits."
+        },
+        {
+          "q": "Bagaimana cara kerja ekstra?",
+          "a": "Paket Kredit AI adalah isi ulang satu kali untuk model yang dihosting dan pencarian web. Slot agen tambahan meningkatkan kapasitas secara terpisah."
+        },
+        {
+          "q": "Apa perbedaan antara sumber daya bersama dan sumber daya khusus?",
+          "a": "Sumber daya bersama berarti agen Anda berbagi CPU dan RAM dengan orang lain di server yang sama -- tetap berperforma tetapi mungkin berbeda dalam beban. Sumber daya khusus (Pro dan Bisnis) memberi agen Anda jaminan CPU dan RAM yang tidak dapat digunakan orang lain."
+        },
+        {
+          "q": "Metode pembayaran apa yang diterima?",
+          "a": "Anda dapat membayar dengan kartu, SOL, USDC di Solana, $HATCHER, atau $KAUSA. Harga Crypto tercantum dalam USD dan dikonversi dengan kurs langsung melalui Jupiter."
+        },
+        {
+          "q": "Bisakah saya menurunkan tingkatan saya?",
+          "a": "Ya. Anda dapat membatalkan langganan kapan saja dan tingkatan Anda akan kembali ke Gratis di akhir periode penagihan. Agen yang melampaui batas gratis Anda akan dijeda."
+        },
+        {
+          "q": "Apa itu tidur otomatis?",
+          "a": "Agen bebas tidur setelah 12 jam tidak aktif. Agen Starter, Pro, Business, dan Founding Member selalu aktif tanpa auto-sleep."
+        },
+        {
+          "q": "LLM apa yang saya dapatkan dengan tingkat gratis?",
+          "a": "Penggunaan yang dihosting dibebankan dari saldo Kredit AI Anda dan dirutekan melalui penyedia terpilih yang didukung Hatcher, dengan fallback jika tersedia. Anda dapat memilih dari model yang dihosting yang didukung; BYOK melewati pengukuran Kredit AI Hatcher karena Anda membayar penyedia Anda secara langsung."
+        },
+        {
+          "q": "Apa yang dimaksud dengan tingkatan Anggota Pendiri?",
+          "a": "Anggota Pendiri adalah pembayaran satu kali $99 yang memberi Anda akses seumur hidup ke Hatcher: 10 agen, 25.000 AI Credits/bulan, 2 CPU / 4 GB RAM, ruang kerja 40 GB, agen selalu aktif, Manajer File, Log Lengkap, dukungan prioritas, dan peran Pendiri Discord + tag Telegram. Tidak ada biaya bulanan, selamanya. Terbatas pada 20 tempat — setelah hilang, tingkatan ini hilang."
+        }
+      ]
+    },
+    "help": {
+      "text": "Butuh bantuan memilih paket?",
+      "emailLabel": "Kirim email kepada kami",
+      "discordLabel": "Discord",
+      "telegramLabel": "Telegram"
+    },
+    "cta": {
+      "heading": "Siap untuk menyebarkan agen Anda?",
+      "body": "Jelaskan agen yang Anda inginkan dan terapkan dalam hitungan detik. Mulai gratis dengan host AI Credits. Tingkatkan versi saat Anda membutuhkan lebih banyak daya.",
+      "createAgent": "Buat Agen",
+      "seeFrameworks": "Lihat Kerangka"
+    },
+    "footerNote": "Semua harga dalam USD, dibayar dengan kartu, SOL, USDC di Solana, $HATCHER, atau $KAUSA. Model yang dihosting dan penggunaan penelusuran web diukur dengan AI Credits; BYOK dibayar langsung dengan kunci penyedia Anda sendiri."
+  },
+  "dashboard": {
+    "common": {
+      "loading": "Memuat...",
+      "authenticating": "Mengautentikasi...",
+      "signInRequired": "Diperlukan Masuk",
+      "signIn": "Masuk",
+      "refresh": "Segarkan",
+      "save": "Simpan",
+      "cancel": "Batalkan",
+      "delete": "Hapus",
+      "create": "Buat",
+      "invite": "Undang",
+      "share": "Bagikan",
+      "unshare": "Batalkan pembagian",
+      "copy": "Salin",
+      "copied": "Disalin!",
+      "close": "Tutup",
+      "confirm": "Konfirmasikan",
+      "back": "Kembali",
+      "noDescription": "Tidak ada deskripsi",
+      "clear": "Jelas"
+    },
+    "agents": {
+      "eyebrow": "Dasbor",
+      "heading": "Agen saya",
+      "subtitleEmpty": "Buat agen pertama Anda untuk memulai.",
+      "createCta": "Buat agen",
+      "searchPlaceholder": "Agen pencarian... ( / )",
+      "filterAll": "Semua",
+      "frameworkAll": "Semua Kerangka",
+      "sortNewest": "Terbaru",
+      "sortAZ": "A-Z",
+      "sortMessages": "Paling Aktif",
+      "sortActive": "Terakhir Aktif",
+      "emptyTitle": "Belum ada agen",
+      "emptyDescription": "Buat agen AI pertama Anda dan terapkan dalam 60 detik.",
+      "emptyActionLabel": "Buat Agen",
+      "emptySecondaryLabel": "Lihat Kerangka",
+      "noMatchTitle": "Tidak ada agen yang cocok",
+      "noMatchDescription": "Coba sesuaikan kriteria pencarian atau filter Anda.",
+      "signInDescription": "Masuk ke akun Anda untuk mengakses agen Anda.",
+      "featuresCount": "Fitur {count}",
+      "featuresCountPlural": "Fitur {count}",
+      "agentsCount": "Total agen {count} · {active} aktif",
+      "agentsCountPlural": "Total agen {count} · {active} aktif",
+      "details": "Detail",
+      "tourCreateTitle": "Buat Agen Pertama Anda",
+      "tourCreateDescription": "Klik di sini untuk menetaskan agen AI pertama Anda dengan OpenClaw atau Hermes.",
+      "tourFilterTitle": "Filter berdasarkan Kerangka",
+      "tourFilterDescription": "OpenClaw adalah yang terbaik untuk otomatisasi; Hermes adalah yang terbaik untuk alur kerja memori adaptif.",
+      "tourSearchTitle": "Cari & Jelajahi",
+      "tourSearchDescription": "Cari agen atau luncurkan Chat-to-Hatch untuk memulai dengan cepat.",
+      "tourPlanTitle": "Rencana Anda",
+      "tourPlanDescription": "Mulai gratis dengan 1 agen, 500 AI Credits/bulan, dan alat yang disertakan. Tingkatkan versi kapan saja.",
+      "statTotal": "Jumlah",
+      "statActive": "Aktif",
+      "statSleeping": "Sedang tidur",
+      "statMeshReady": "Jaring sudah siap",
+      "viewAgents": "Agen",
+      "viewOrchestration": "Orkestrasi",
+      "meshTitle": "Jaring orkestrasi agen",
+      "meshSubtitle": "Hubungkan agen dengan pemilik yang sama, kirimkan tugas yang terikat, dan periksa aktivitas agen-ke-agen terkini dari satu tempat.",
+      "meshSource": "Agen sumber",
+      "meshTarget": "Agen sasaran",
+      "meshSelectTarget": "Pilih sasaran",
+      "meshNoAgents": "Tidak ada agen yang dapat dihubungi",
+      "meshModeSync": "Sinkronisasi",
+      "meshModeAsync": "asinkron",
+      "meshTaskLabel": "Tugas",
+      "meshTaskPlaceholder": "Minta satu agen untuk meneliti, meninjau, meringkas, atau melaksanakan tugas terbatas untuk agen lain...",
+      "meshSend": "Tugas pengiriman",
+      "meshRefresh": "Segarkan",
+      "meshEnableAll": "Aktifkan jaring",
+      "meshEnableAgent": "Aktifkan",
+      "meshOpenDev": "tab pengembang",
+      "meshAvailable": "Tersedia",
+      "meshDisabled": "Dengan disabilitas",
+      "meshRecent": "Aktivitas mesh baru-baru ini",
+      "meshNoLogs": "Belum ada panggilan agen-ke-agen.",
+      "msgsShort": "interaksi",
+      "cardOpen": "Ruang 3D",
+      "cardOpenTooltip": "Masuk ke Ruang 3D",
+      "actionStop": "Berhenti",
+      "actionStart": "Mulai",
+      "actionRestart": "Mulai ulang",
+      "noResultsAction": "Hapus filter"
+    },
+    "billing": {
+      "eyebrow": "Akun",
+      "heading": "Penagihan & rencana",
+      "breadcrumbDashboard": "Dasbor",
+      "breadcrumbBilling": "Penagihan",
+      "connectWallet": "Hubungkan Dompet",
+      "connectedWallet": "Dompet yang terhubung",
+      "switchWallet": "Ganti dompet",
+      "disconnect": "Putuskan sambungan",
+      "loadingBilling": "Memuat penagihan...",
+      "signInDescription": "Masuk untuk mengelola paket dan penagihan Anda.",
+      "creditsBalance": "Saldo AI Credits",
+      "creditsUsd": "AI Credits",
+      "creditsDesc": "AI Credits digunakan untuk LLM yang dihosting, pencarian web, penelitian, ekstrak, dan alat perayapan.",
+      "recentTransactions": "Transaksi Terkini",
+      "currentTier": "Rencana Saat Ini",
+      "freeTier": "Tingkat Gratis",
+      "active": "Aktif",
+      "agentUsage": "Penggunaan Agen",
+      "agentsOf": "{count} dari agen {limit} yang digunakan",
+      "agentsOver": "{over} melebihi batas",
+      "slotsRemaining": "Slot {slots} tersisa",
+      "slotsRemainingPlural": "Slot {slots} tersisa",
+      "activeAddons": "Ekstra Aktif",
+      "expires": "Kedaluwarsa {date}",
+      "extend": "Perpanjang",
+      "extend30Days": "Perpanjang +30 hari (${price})",
+      "upgradeAnnual": "Tingkatkan ke tahunan (${price})",
+      "annualDiscount": "-15%",
+      "renew": "Memperbarui",
+      "renewFor": "Perpanjang untuk ${price}",
+      "planExpired": "Paket sudah habis masa berlakunya — perbarui untuk mempertahankan tingkatan Anda",
+      "planExpiring": "Berakhir dalam {days} hari — perbarui sekarang",
+      "planExpiringPlural": "Masa berlakunya akan habis dalam {days} hari — perbarui sekarang",
+      "planActiveUntil": "Aktif hingga {date}",
+      "noCharge": "Tanpa biaya",
+      "lifetimePrice": "seumur hidup",
+      "lifetimePriceFull": "${price} seumur hidup",
+      "monthlyPrice": "${price} / 30 hari",
+      "unlimitedMessages": "AI Credits",
+      "messagesPerDay": "{count} AI Credits",
+      "byokUnlimited": "",
+      "upgradeSection": "Tingkatkan Paket Anda",
+      "upgradeDesc": "Dapatkan lebih banyak agen, AI Credits, dan kekuatan komputasi.",
+      "addonsSection": "Ekstra",
+      "addonsDesc": "Tumpuk kapasitas ekstra pada paket Anda saat ini.",
+      "accountAddons": "Ekstra Tingkat Akun",
+      "perAgentAddons": "Ekstra per agen",
+      "annualBilling": "Penagihan tahunan",
+      "annualBillingDesc": "Diskon 15% — ekstra berulang",
+      "hatcherDiscountTitle": "Diskon 10% dengan $HATCHER",
+      "hatcherDiscountBody": "Gunakan $HATCHER di Solana untuk paket, paket Kredit AI, dan slot agen tambahan. Diskon diterapkan sebelum konfirmasi dompet.",
+      "monthly": "Bulanan",
+      "annual": "Tahunan",
+      "monthSuffix": "/ 30 hari",
+      "annualSuffix": "/ tahun",
+      "yearSuffix": "/ tahun",
+      "paymentHistory": "Riwayat Pembayaran",
+      "noPaymentsYet": "Belum ada pembayaran",
+      "noPaymentsDesc": "Riwayat pembayaran Anda akan muncul di sini.",
+      "status": {
+        "confirmed": "Dikonfirmasi",
+        "pending": "Tertunda",
+        "failed": "Gagal",
+        "refunded": "Dikembalikan"
+      },
+      "selectAgent": "Pilih Agen",
+      "choosePayment": "Pilih Metode Pembayaran",
+      "applyToAgent": "Lamar ke agen:",
+      "noAgentsFound": "Tidak ada agen yang ditemukan. Buat agen terlebih dahulu.",
+      "payWithSol": "Bayar dengan SOL",
+      "solDesc": "Pembayaran dompet Solana",
+      "payWithHatcher": "Bayar dengan $HATCHER",
+      "hatcherDesc": "Token HATCHER di Solana",
+      "hatcherDiscountDesc": "Diskon 10% dengan $HATCHER: {price}",
+      "payWithKausa": "Bayar dengan $KAUSA",
+      "kausaDesc": "Token mitra KausaLayer di Solana",
+      "payWithUsdcSolana": "Bayar dengan USDC di Solana",
+      "usdcSolanaDesc": "SPL USDC melalui dompet Solana",
+      "payWithCryptoNow": "Bayar melalui CryptoNow",
+      "cryptnowDesc": "Pembayaran SOL / USDC yang dihosting",
+      "payWithUsdc": "Bayar dengan USDC",
+      "usdcDesc": "Stablecoin — 1 USDC = $1",
+      "payWithCard": "Bayar dengan Kartu",
+      "cardDesc": "Kartu kredit/debit melalui Stripe",
+      "foundingSlots": "{remaining} dari {max} slot tersisa",
+      "foundingSoldOut": "Terjual habis",
+      "oneTimeSuffix": "satu kali",
+      "oneTimeAgent": "satu kali / agen",
+      "annualAgent": "/ tahun / agen",
+      "monthAgent": "/ 30 hari / agen",
+      "manageBilling": "Kelola Penagihan",
+      "successPayment": "Pembayaran berhasil! Akun Anda sedang ditingkatkan. Mungkin perlu beberapa saat untuk merenung.",
+      "canceledPayment": "Pembayaran dibatalkan. Tidak ada biaya yang dikenakan."
+    },
+    "analytics": {
+      "eyebrow": "Dasbor",
+      "heading": "Analisis Penggunaan",
+      "subheading": "Interaksi seluruh akun, penggunaan yang dihosting, dan AI Credits.",
+      "signInDescription": "Masuk untuk melihat analitik.",
+      "interactionVolume": "Volume Interaksi",
+      "messageVolume": "Volume Interaksi",
+      "last14Days": "14 hari terakhir",
+      "last30Days": "30 hari terakhir",
+      "frameworks": "Kerangka kerja",
+      "agentStatus": "Status Agen",
+      "totalMessages": "Interaksi Agen",
+      "noMessageData": "Belum ada data interaksi — mulailah mengobrol dengan agen Anda!",
+      "noAgentsYet": "Belum ada agen",
+      "noAgentsEmpty": "Belum ada agen. Buat agen pertama Anda yang mulai melihat analitik.",
+      "createAgent": "Buat Agen",
+      "totalAgents": "Jumlah Agen",
+      "totalAgentsSub": "{active} aktif",
+      "messages": "Interaksi",
+      "messagesAllTime": "Sepanjang waktu",
+      "llmCalls": "Panggilan LLM",
+      "llmCallsAllTime": "Sepanjang waktu",
+      "aiCreditsBalance": "AI Credits",
+      "monthlyGrant": "Hibah bulanan {count}",
+      "aiCreditsUsed": "AI Credits Digunakan",
+      "hostedUsage": "Penggunaan yang Dihosting",
+      "hostedUsageSubheading": "LLM yang dihosting, pencarian web, penelitian, ekstrak, dan perayapan menggunakan akun AI Credits. Penggunaan BYOK melewati meteran ini.",
+      "remainingBalance": "Saldo yang tersisa",
+      "usedLast30": "Digunakan 30 hari terakhir",
+      "usageByKind": "Penggunaan berdasarkan jenisnya",
+      "tokensProcessed": "Token diproses",
+      "inputTokens": "Masukan",
+      "outputTokens": "Keluaran",
+      "noHostedUsageYet": "Belum ada penggunaan yang dihosting. Pemakaian BYOK tidak menghabiskan AI Credits.",
+      "last14DaysLabel": "14 Hari Terakhir",
+      "last14DaysSub": "Interaksi pengguna",
+      "today": "Hari ini",
+      "noDataYet": "Belum ada data interaksi"
+    },
+    "team": {
+      "eyebrow": "Kolaborasi",
+      "heading": "Tim",
+      "subheading": "Buat tim untuk berbagi agen dan berkolaborasi dengan orang lain.",
+      "signInTitle": "Masuk untuk mengakses Teams",
+      "signInDesc": "Tim memungkinkan Anda berkolaborasi dengan orang lain di agen AI Anda.",
+      "createTeamTitle": "Buat Tim Anda",
+      "createTeamDesc": "Mulailah berkolaborasi dengan membuat tim. Anda kemudian dapat mengundang anggota dan membagikan agen Anda.",
+      "teamNamePlaceholder": "Nama tim...",
+      "createBtn": "Buat",
+      "creating": "Membuat...",
+      "membersHeading": "Anggota",
+      "inviteMemberHeading": "Undang Anggota",
+      "emailPlaceholder": "Alamat email...",
+      "invite": "Undang",
+      "roleAdmin": "Admin",
+      "roleMember": "Anggota",
+      "roleViewer": "Penampil",
+      "roleOwner": "Pemilik",
+      "you": "(kamu)",
+      "sharedAgentsHeading": "Agen Bersama",
+      "noSharedAgents": "Belum ada agen yang dibagikan dengan tim ini.",
+      "yourAgentsHeading": "Agen Anda",
+      "byLabel": "oleh {username}",
+      "memberCount": "Anggota {count}",
+      "memberCountPlural": "Anggota {count}",
+      "agentSharedCount": "Agen {count} dibagikan",
+      "agentSharedCountPlural": "Agen {count} berbagi",
+      "leaveTeam": "Pergi",
+      "leaveTeamTitle": "Keluar dari Tim",
+      "leaveTeamDesc": "Apakah Anda yakin ingin keluar dari tim ini? Anda akan kehilangan akses ke semua agen bersama.",
+      "leaveTeamConfirm": "Keluar dari Tim",
+      "deleteTeam": "Hapus Tim",
+      "deleteTeamTitle": "Hapus Tim",
+      "deleteTeamDesc": "Apakah Anda yakin ingin menghapus tim ini secara permanen? Semua agen yang dibagikan tidak akan dibagikan lagi.",
+      "deleteTeamConfirm": "Hapus Tim",
+      "errors": {
+        "loadFailed": "Gagal memuat data tim",
+        "createFailed": "Gagal membuat tim",
+        "inviteFailed": "Gagal mengundang anggota",
+        "removeFailed": "Gagal menghapus anggota",
+        "leaveFailed": "Gagal meninggalkan tim",
+        "deleteFailed": "Gagal menghapus tim",
+        "shareFailed": "Gagal membagikan agen",
+        "unshareFailed": "Gagal membatalkan pembagian agen",
+        "roleFailed": "Gagal memperbarui peran"
+      }
+    },
+    "affiliate": {
+      "eyebrow": "Dasbor",
+      "heading": "Dasbor Afiliasi",
+      "signInTitle": "Diperlukan Masuk",
+      "signInDesc": "Masuk untuk melihat dasbor afiliasi Anda.",
+      "yourReferralLink": "Tautan Referensi Anda",
+      "referralLinkDesc": "Pendaftaran baru melalui tautan ini diberikan kepada Anda seumur hidup. Anda berdua mendapatkan 500 AI Credits setelah mereka membuat agen pertama mereka.",
+      "aiCreditRewardTitle": "Rujukan AI Credits",
+      "aiCreditRewardDesc": "Referensi afiliasi juga memberikan {credit} ke kedua akun setelah pengguna yang dirujuk membuat agen pertama mereka.",
+      "claimAiCredits": "Klaim AI Credits",
+      "claimingAiCredits": "Mengklaim...",
+      "aiCreditsCol": "AI Credits",
+      "aiCreditsClaimed": "Diklaim",
+      "aiCreditsPending": "Tertunda",
+      "shareOnX": "Bagikan di X",
+      "telegram": "Telegram",
+      "copyLink": "Salin",
+      "copiedLink": "Disalin",
+      "refresh": "Segarkan",
+      "frozenTitle": "Akun dibekukan",
+      "codeLabel": "Kode",
+      "totalReferrals": "Total Referensi",
+      "paidLabel": "{count} berbayar",
+      "pending30d": "Tertunda (tahan 30 hari)",
+      "payableNow": "Dibayar Sekarang",
+      "lifetimeEarned": "Pendapatan Seumur Hidup",
+      "paidOut": "{amount} telah dibayarkan",
+      "referralsTable": "Referensi",
+      "noReferrals": "Belum ada referensi. Bagikan tautan Anda!",
+      "commissionsTable": "Komisi",
+      "noCommissions": "Belum ada komisi.",
+      "payoutsTable": "Pembayaran",
+      "noPayouts": "Belum ada pembayaran.",
+      "loadMore": "Muat lebih banyak",
+      "signupCol": "Daftar",
+      "emailCol": "Surel",
+      "statusCol": "Status",
+      "tierCol": "Tingkat",
+      "dateCol": "Tanggal",
+      "sourceCol": "Sumber",
+      "amountCol": "Jumlah",
+      "cashCol": "Uang tunai",
+      "creditsCol": "Kredit",
+      "noteCol": "Catatan",
+      "statusPaid": "Dibayar",
+      "statusFree": "Gratis",
+      "statusPending": "Tertunda",
+      "statusPayable": "Hutang",
+      "statusPaidOut": "Dibayar",
+      "statusVoided": "Tidak berlaku",
+      "flagged": "Ditandai",
+      "untilDate": "sampai {date}",
+      "sourceSubscription": "Berlangganan",
+      "sourceFoundingMember": "Anggota Pendiri",
+      "payoutSettings": "Pengaturan Pembayaran",
+      "payoutMode": "Modus",
+      "payoutAddress": "Alamat Pembayaran",
+      "creditsOnly": "Alamat pembayaran tunai diperlukan",
+      "changePrefs": "Perlu mengubah preferensi pembayaran?",
+      "contactSupport": "Hubungi dukungan",
+      "modeCashOnly": "Hanya uang tunai (20%)",
+      "modeCreditsOnly": "Pensiunan",
+      "modeHybrid": "Pensiunan"
+    },
+    "settings": {
+      "eyebrow": "Akun",
+      "heading": "Pengaturan",
+      "subheading": "Kelola akun, keamanan, dan preferensi Anda.",
+      "tabs": {
+        "profile": "Profil",
+        "security": "Keamanan",
+        "notifications": "Pemberitahuan",
+        "billing": "Penagihan",
+        "danger": "Zona Bahaya"
+      },
+      "profile": {
+        "sectionTitle": "Profil",
+        "changePhoto": "Ganti foto",
+        "uploadPhoto": "Unggah foto",
+        "remove": "Hapus",
+        "joinedLabel": "Bergabung dengan {date}",
+        "usernameLabel": "Nama pengguna",
+        "usernamePlaceholder": "nama pengguna_Anda",
+        "usernameHint": "3–30 karakter, huruf, angka, _ atau -",
+        "emailLabel": "Alamat email",
+        "emailPlaceholder": "kamu@example.com",
+        "saveChanges": "Simpan Perubahan",
+        "saving": "Menyimpan...",
+        "walletTitle": "Dompet Terhubung",
+        "walletLinkedDesc": "Tertaut secara otomatis dari pembayaran on-chain pertama Anda. Digunakan saat membayar dengan SOL, USDC, atau $HATCHER.",
+        "walletViewSolscan": "Solscan",
+        "walletDisconnect": "Putuskan sambungan dompet",
+        "walletNone": "Belum ada dompet yang ditautkan. Dompet Solana Anda terhubung secara otomatis saat pertama kali Anda melakukan pembayaran on-chain dari halaman penagihan.",
+        "referralTitle": "Program Rujukan",
+        "referralDesc": "Undang teman ke Hatcher. Anda berdua mendapatkan {credit} saat mereka membuat agen pertamanya.",
+        "referralCode": "Kode Referensi",
+        "shareLink": "Bagikan Tautan",
+        "referred": "Dirujuk",
+        "earned": "Diperoleh",
+        "claimRewards": "Klaim Hadiah yang Tertunda",
+        "claiming": "Mengklaim..."
+      },
+      "security": {
+        "changePasswordTitle": "Ubah Kata Sandi",
+        "currentPassword": "Kata Sandi Saat Ini",
+        "currentPasswordPlaceholder": "Masukkan kata sandi saat ini",
+        "newPassword": "Kata Sandi Baru",
+        "newPasswordPlaceholder": "Min 8 karakter, atas, bawah, angka, spesial",
+        "confirmPassword": "Konfirmasi Kata Sandi Baru",
+        "confirmPasswordPlaceholder": "Ulangi kata sandi baru",
+        "changePasswordBtn": "Ubah Kata Sandi",
+        "changing": "Mengubah...",
+        "apiKeysTitle": "Kunci API",
+        "apiKeysDesc": "Buat beberapa kunci API untuk akses terprogram. Setiap kunci menggunakan awalan {prefix}. Kunci lengkapnya ditampilkan {emphasis} saat pembuatan.",
+        "apiKeysEmphasis": "hanya sekali",
+        "manageKeys": "Kelola kunci",
+        "newKeyCreated": "Kunci baru telah dibuat — salin sekarang!",
+        "noKeysYet": "Belum ada kunci API. Buat satu di bawah.",
+        "keyLabelPlaceholder": "Label (misalnya, \"Produksi\")",
+        "createKey": "Buat Kunci",
+        "creating": "Membuat...",
+        "keysLimit": "Hingga 10 kunci aktif. Setiap kunci memiliki akses penuh API.",
+        "reqToday": "Permintaan {count} hari ini · {week} minggu ini",
+        "lastUsed": "Terakhir digunakan {date}",
+        "save": "Simpan"
+      },
+      "notifications": {
+        "sectionTitle": "Pemberitahuan",
+        "pushLabel": "Pemberitahuan Dorong",
+        "pushDesc": "Pemberitahuan push browser untuk pembaruan waktu nyata",
+        "agentsLabel": "Peringatan Agen",
+        "agentsDesc": "Dapatkan pemberitahuan ketika agen mengubah status, mogok, atau memerlukan perhatian",
+        "billingLabel": "Peringatan Penagihan",
+        "billingDesc": "Konfirmasi pembayaran, perpanjangan langganan, dan kredit"
+      },
+      "billing": {
+        "sectionTitle": "Penagihan",
+        "currentPlan": "Rencana Saat Ini",
+        "hatcherCredits": "Kredit PENETAS",
+        "creditsAutoApplied": "Secara otomatis diterapkan saat checkout",
+        "manageBilling": "Kelola Penagihan"
+      },
+      "danger": {
+        "sectionTitle": "Zona Bahaya",
+        "exportTitle": "Ekspor Data Saya",
+        "exportDesc": "Unduh file JSON yang berisi semua data akun Anda: profil, agen, riwayat obrolan, pembayaran, rujukan, tiket dukungan, dan banyak lagi.",
+        "exportBtn": "Ekspor Data Saya",
+        "exporting": "Mengekspor...",
+        "deleteTitle": "Hapus Akun",
+        "deleteDesc": "Hapus akun Anda secara permanen, semua agen, riwayat pembayaran, dan konfigurasi. Tindakan ini tidak dapat diubah.",
+        "deleteBtn": "Hapus Akun",
+        "deleting": "Menghapus...",
+        "dialogTitle": "Hapus Akun Anda?",
+        "dialogDesc": "Tindakan ini akan menghapus secara permanen semua agen, data, dan riwayat pembayaran Anda. Tindakan ini {emphasis} dibatalkan.",
+        "dialogEmphasis": "tidak bisa",
+        "confirmPassword": "Konfirmasikan kata sandi Anda",
+        "passwordPlaceholder": "Kata sandi Anda saat ini",
+        "cancelBtn": "Batalkan"
+      }
+    },
+    "apiKeys": {
+      "eyebrow": "Pengaturan",
+      "heading": "Kunci API",
+      "subheading": "Kelola kunci akses terprogram untuk {docsLink}. Setiap kunci dimulai dengan {prefix}.",
+      "docsLinkLabel": "Hatcher API",
+      "backToSettings": "Kembali ke Pengaturan",
+      "newKeyAlert": "Kunci telah dibuat — salin sekarang!",
+      "newKeyAlertSub": "Ini adalah satu-satunya saat kunci lengkap akan ditampilkan. Simpan di tempat yang aman.",
+      "noKeysTitle": "Belum ada kunci API",
+      "noKeysDesc": "Buat kunci pertama Anda untuk memulai",
+      "loading": "Memuat kunci...",
+      "createSectionTitle": "Buat kunci baru",
+      "createSectionDesc": "Berikan nama deskriptif pada kunci Anda (misalnya, \"Pengembangan Lokal\", \"Pipa CI/CD\").",
+      "keyLabelPlaceholder": "Label kunci...",
+      "createKey": "Buat Kunci",
+      "creating": "Membuat...",
+      "usageNote": "Gunakan kunci API Anda di header {header}. Lihat {docsLink} untuk semua titik akhir yang tersedia.",
+      "headerExample": "Otorisasi: Pembawa hk_...",
+      "docsLinkLabel2": "Dokumen referensi API",
+      "copiedLabel": "Disalin!",
+      "copyLabel": "Salin",
+      "dismissLabel": "Singkirkan",
+      "revokeTitle": "Cabut Kunci API",
+      "revokeDesc": "Kunci ini akan dibatalkan secara permanen dan aplikasi apa pun yang menggunakannya akan segera berhenti bekerja. Hal ini tidak dapat dibatalkan.",
+      "revokeConfirm": "Cabut Kunci",
+      "neverUsed": "Tidak pernah digunakan",
+      "lastUsed": "Terakhir digunakan {time}",
+      "created": "Dibuat {date}",
+      "reqStats": "Permintaan {today} hari ini · {week} minggu ini",
+      "saveBtn": "Simpan",
+      "cancelBtn": "Batalkan"
+    },
+    "quickStats": {
+      "totalAgents": "Jumlah Agen",
+      "dailyMessages": "AI Credits",
+      "unlimited": "∞",
+      "accountWide": "saldo akun",
+      "activeNow": "Aktif Sekarang",
+      "noAgentsRunning": "Tidak ada agen yang berjalan",
+      "agentsOnline": "Agen {count} online",
+      "agentsOnlinePlural": "Agen {count} online",
+      "accountTier": "Tingkat Akun",
+      "lifetimeAccess": "Akses seumur hidup",
+      "prioritySupport": "Dukungan prioritas",
+      "upgradePlan": "Paket peningkatan"
+    },
+    "agentDetail": {
+      "tabs": {
+        "dashboard": "Dasbor",
+        "chat": "Obrolan",
+        "mail": "Surat",
+        "terminal": "Terminal",
+        "dev": "Dev",
+        "config": "Konfigurasi",
+        "integrations": "Integrasi",
+        "plugins": "Plugin & Keterampilan",
+        "logs": "Log",
+        "stats": "Statistik",
+        "memory": "Memori",
+        "sessions": "Sesi",
+        "knowledge": "Pengetahuan",
+        "addons": "Ekstra",
+        "wallet": "Dompet",
+        "kausalayer": "KausaLayer",
+        "files": "File",
+        "workspace": "Ruang kerja",
+        "schedules": "Jadwal",
+        "workflows": "Alur kerja"
+      },
+      "sidebarGroups": {
+        "operate": "Operasikan",
+        "configure": "Konfigurasikan",
+        "monitor": "Memantau",
+        "advanced": "Lanjutan"
+      },
+      "nav": {
+        "allAgents": "Semua Agen"
+      },
+      "header": {
+        "easy": "Mudah",
+        "advanced": "Lanjutan",
+        "restart": "Mulai ulang",
+        "restarting": "Memulai ulang...",
+        "stop": "Berhenti",
+        "stopping": "Berhenti...",
+        "start": "Mulai",
+        "starting": "Mulai...",
+        "share": "Bagikan",
+        "room": "Kamar",
+        "clone": "Klon",
+        "delete": "Hapus",
+        "deleting": "Menghapus...",
+        "confirm": "Konfirmasikan",
+        "cancel": "Batalkan"
+      },
+      "notFound": {
+        "code": "404",
+        "title": "Agen Tidak Ditemukan",
+        "description": "Agen dengan ID \"{id}\" tidak dapat ditemukan.",
+        "backToAgents": "Kembali ke Agen"
+      },
+      "statusPoll": {
+        "agentReady": "Agen siap mengobrol!"
+      },
+      "chat": {
+        "live": "Hidup",
+        "liveTitle": "Streaming waktu nyata melalui WebSocket",
+        "voiceButton": "Suara",
+        "voiceCallTitle": "Mulai panggilan suara",
+        "autoRead": "Baca otomatis",
+        "autoReadTitle": "Respons baca otomatis",
+        "emptyTitle": "Mulailah percakapan dengan {agentName}",
+        "emptySubtitle": "Tanggapan muncul secara real time",
+        "loadEarlier": "Muat pesan sebelumnya ({count} lebih lama)",
+        "listening": "Mendengarkan...",
+        "thinking": "Berpikir...",
+        "speaking": "Berbicara...",
+        "tapToSpeak": "Ketuk mikrofon untuk berbicara",
+        "agentStartingUp": "Agen mulai aktif, harap tunggu...",
+        "uploading": "Mengunggah…",
+        "poweredBy": "Didukung oleh {provider}",
+        "today": "hari ini",
+        "unlimited": "tidak terbatas",
+        "enterToSend": "Enter untuk mengirim, Shift+Enter untuk baris baru",
+        "signInToChat": "Masuk untuk mengobrol dengan agen ini.",
+        "limitReached": "AI Credits habis.",
+        "upgradeToPro": "Tingkatkan ke Pro",
+        "limitReachedSuffix": "untuk lebih banyak, atau bawa kunci Anda sendiri tanpa batas.",
+        "agentNotRunning": "Agen tidak berjalan.",
+        "startFromOverview": "Mulai dari tab Ikhtisar untuk mengobrol.",
+        "waitingForAgent": "Menunggu agen untuk memulai...",
+        "messagePlaceholder": "Pesan {agentName}...",
+        "sendMessage": "Kirim pesan",
+        "stopResponse": "Hentikan respons",
+        "attachFiles": "Lampirkan file — disimpan sepengetahuan agen",
+        "stopRecording": "Berhenti merekam",
+        "startVoice": "Mulai masukan suara",
+        "errors": {
+          "rateLimit": "AI Credits habis.",
+          "llmDown": "Layanan AI untuk sementara tidak tersedia. Ini biasanya teratasi dalam satu menit.",
+          "timeout": "Agen membutuhkan waktu terlalu lama untuk merespons.",
+          "network": "Koneksi terputus. Periksa koneksi internet Anda.",
+          "generic": "Ada yang tidak beres.",
+          "retry": "Coba lagi"
+        },
+        "voiceCall": {
+          "listening": "Mendengarkan...",
+          "thinking": "Berpikir...",
+          "speaking": "Berbicara...",
+          "tapToSpeak": "Ketuk mikrofon untuk berbicara"
+        }
+      },
+      "mail": {
+        "title": "Agen Surat",
+        "subtitle": "Kelola kotak surat agen, mode balasan otomatis, riwayat pesan, dan email keluar manual.",
+        "mailbox": "Alamat kotak surat",
+        "copy": "Salin",
+        "copied": "Alamat kotak surat disalin",
+        "copyFailed": "Penyalinan gagal",
+        "refresh": "Segarkan",
+        "refreshing": "Menyegarkan...",
+        "autoSend": "Kirim balasan secara otomatis",
+        "autoSendOn": "Kirim otomatis aktif",
+        "autoSendOff": "Kirim otomatis tidak aktif",
+        "runtimeActive": "Balasan otomatis hanya berfungsi saat agen sudah aktif.",
+        "runtimeInactive": "Balasan otomatis hanya berfungsi saat agen sudah aktif. Mulai agen sebelum mengandalkan balasan.",
+        "messageList": "Pesan",
+        "messageCount": "Pesan {count} dimuat",
+        "details": "Detil pesan",
+        "noSelection": "Pilih pesan untuk memeriksanya.",
+        "emptyTitle": "Belum ada surat",
+        "emptySubtitle": "Pesan masuk dan keluar akan muncul di sini setelah kotak surat ini digunakan.",
+        "untitled": "Tidak ada subjek",
+        "from": "Dari",
+        "to": "Untuk",
+        "subject": "Subyek",
+        "created": "Tanggal",
+        "body": "Tubuh",
+        "noBody": "Tidak ada isi tubuh",
+        "filters": {
+          "all": "Semua",
+          "inbound": "Masuk",
+          "outbound": "Keluar"
+        },
+        "directions": {
+          "inbound": "Masuk",
+          "outbound": "Keluar"
+        },
+        "statusLabels": {
+          "queued": "Mengantri",
+          "sent": "Terkirim",
+          "delivered": "Terkirim",
+          "failed": "Gagal",
+          "received": "Diterima",
+          "unknown": "Tidak diketahui"
+        },
+        "errors": {
+          "mailbox": "Tidak dapat memuat kotak surat.",
+          "messages": "Tidak dapat memuat pesan email.",
+          "settings": "Tidak dapat memperbarui setelan email."
+        },
+        "composer": {
+          "title": "Pengiriman manual",
+          "subtitle": "Kirim satu email keluar dari kotak surat agen.",
+          "toPlaceholder": "penerima@example.com",
+          "subjectPlaceholder": "Subyek",
+          "bodyPlaceholder": "Tulis badan email...",
+          "validation": "Penerima, subjek, dan isi wajib diisi.",
+          "failed": "Tidak dapat mengirim email.",
+          "sent": "Email dalam antrian",
+          "send": "Kirim email",
+          "sending": "Mengirim..."
+        }
+      },
+      "logs": {
+        "searchPlaceholder": "Log penelusuran...",
+        "all": "Semua",
+        "connected": "Terhubung",
+        "reconnecting": "Menghubungkan kembali",
+        "pinned": "Disematkan",
+        "scroll": "Gulir",
+        "refresh": "Segarkan",
+        "loading": "Memuat...",
+        "download": "Unduh",
+        "pinnedToBottom": "disematkan ke bawah",
+        "noLogs": "Belum ada log yang tersedia.",
+        "noLogsMatching": "Tidak ada log yang cocok dengan \"{query}\".",
+        "noLevelLogs": "Tidak ditemukan log {level}.",
+        "entries": "Entri {count}",
+        "autoScrollEnabled": "Gulir otomatis diaktifkan — disematkan ke bawah",
+        "autoScrollDisabled": "Gulir otomatis dinonaktifkan",
+        "fullLogsGate": {
+          "title": "Menampilkan baris log {count} terakhir",
+          "description": "Log Lengkap disertakan di setiap tingkatan. Refresh agen jika riwayat lengkap masih belum tersedia.",
+          "descriptionEmpty": "Log Lengkap disertakan di setiap tingkatan. Refresh agen jika riwayat lengkap masih belum tersedia.",
+          "unlock": "Segarkan"
+        }
+      },
+      "integrations": {
+        "showingFor": "Menampilkan integrasi yang kompatibel dengan {framework}",
+        "connected": "{configured}/{total} terhubung",
+        "encryptedNote": "Kunci dan token API dienkripsi dengan AES-256-GCM sebelum disimpan. Setelah disimpan, nilai rahasia tidak akan pernah ditampilkan lagi — hanya placeholder bertopeng yang akan muncul.",
+        "mainIntegrations": "Integrasi Utama",
+        "mainIntegrationsFree": "Gratis di semua tingkatan",
+        "otherPlatforms": "Platform Lainnya",
+        "communityExtensions": "Ekstensi komunitas",
+        "allPlatformsFree": "Semua platform disertakan gratis — konfigurasikan kredensial di bawah",
+        "allFreeNote": "Semua integrasi gratis di setiap tingkatan. Cukup tambahkan kredensial Anda dan pergi.",
+        "howToGetKey": "Cara mendapatkan kunci API Anda →",
+        "howToSetup": "Cara mengatur {name} →",
+        "saving": "Menyimpan...",
+        "saveCredentials": "Simpan Kredensial",
+        "badges": {
+          "recommended": "Direkomendasikan",
+          "native": "Asli",
+          "community": "Komunitas",
+          "planned": "Direncanakan",
+          "quickSetup": "Pengaturan Cepat",
+          "qrPairing": "Pemasangan QR",
+          "free": "Gratis",
+          "connected": "Terhubung",
+          "alwaysActive": "Selalu Aktif"
+        },
+        "legend": {
+          "native": "Asli — dukungan bawaan",
+          "community": "Komunitas — ekstensi npm",
+          "planned": "Direncanakan — segera hadir"
+        },
+        "pairing": {
+          "whoCanMessage": "Siapa yang dapat mengirim pesan kepada agen Anda?",
+          "everyone": "Semuanya",
+          "specificNumbers": "Angka tertentu",
+          "save": "Simpan",
+          "anyoneCanMessage": "Siapa pun dapat mengirim pesan kepada agen Anda.",
+          "onlyListedNumbers": "Hanya nomor terdaftar yang dapat mengirim pesan ke agen Anda.",
+          "restartAfterChange": "Mulai ulang agen setelah perubahan.",
+          "setBeforePairing": "Atur sebelum memasangkan. Nomor telepon dalam format E.164 (+1234567890).",
+          "savedRestart": "Disimpan! Mulai ulang agen untuk mengajukan permohonan.",
+          "connected": "{name} Terhubung",
+          "disconnected": "{name} Terputus",
+          "messagesForwarded": "Pesan akan diteruskan ke agen Anda",
+          "sessionExpired": "Sesi berakhir. Pasangkan kembali atau putuskan sambungan untuk membersihkan.",
+          "rePair": "Pasangkan kembali",
+          "disconnect": "Putuskan sambungan",
+          "disconnectConfirm": "Putuskan sambungan {name}? Anda perlu memasangkan ulang untuk menggunakannya lagi.",
+          "agentMustRun": "Agen Anda harus berjalan untuk memasangkan {name}. Mulai agen terlebih dahulu.",
+          "generatingQr": "Menghasilkan kode QR — ini memerlukan waktu ~30 detik...",
+          "pairButton": "Pasangkan {name}",
+          "refreshQr": "Segarkan Kode QR",
+          "tapOutsideToClose": "Ketuk di luar untuk menutup"
+        },
+        "webhook": {
+          "label": "kait web",
+          "inboundHttp": "HTTP masuk",
+          "triggerFrom": "Memicu agen Anda dari layanan eksternal (Zapier, GitHub, dll.)",
+          "webhookUrl": "URL kait web",
+          "alwaysActive": "Selalu Aktif",
+          "bearerToken": "Token Pembawa",
+          "exampleRequest": "Contoh Permintaan",
+          "revealToken": "Ungkapkan token",
+          "hideToken": "Sembunyikan token",
+          "copyUrl": "Salin URL",
+          "copyToken": "Salin token",
+          "note": "Gunakan URL ini untuk memicu agen Anda dari layanan eksternal (Zapier, GitHub, n8n, dll.). Kirim permintaan POST dengan isi JSON yang berisi bidang pesan. Agen akan bangun otomatis dari tidur jika diperlukan.",
+          "alreadyConfigured": "sudah dikonfigurasi"
+        },
+        "domains": {
+          "channelBehavior": "Perilaku Saluran",
+          "allowedUserIds": "ID Pengguna yang Diizinkan (dipisahkan koma)",
+          "allowedGroupIds": "ID Grup yang diizinkan (dipisahkan koma)"
+        }
+      },
+      "memory": {
+        "refresh": "Segarkan",
+        "noMemory": "Tidak ada file memori yang ditemukan.",
+        "noMemoryDescription": "Agen Anda belum membuat file memori apa pun.",
+        "dailyLogs": "Log Harian",
+        "noDailyLogs": "Belum ada catatan harian.",
+        "loading": "Memuat memori...",
+        "error": "Gagal memuat kenangan"
+      },
+      "knowledge": {
+        "uploadTitle": "Unggah File Pengetahuan",
+        "filename": "Nama file",
+        "filenamePlaceholder": "misalnya info-perusahaan.txt",
+        "content": "Konten",
+        "contentPlaceholder": "Tempelkan konten pengetahuan Anda di sini...",
+        "upload": "Unggah",
+        "uploading": "Mengunggah...",
+        "cancel": "Batalkan",
+        "addFile": "Tambahkan Berkas",
+        "noFiles": "Belum ada file pengetahuan.",
+        "noFilesDescription": "Unggah dokumen yang dapat direferensikan oleh agen Anda.",
+        "preview": "Pratinjau",
+        "delete": "Hapus",
+        "loading": "Memuat...",
+        "error": "Gagal memuat file pengetahuan",
+        "refresh": "Segarkan"
+      },
+      "stats": {
+        "range7d": "7 hari",
+        "range30d": "30 hari",
+        "totalMessages": "Jumlah Pesan",
+        "avgPerDay": "Rata-rata / Hari",
+        "peakDay": "Hari Puncak",
+        "framework": "Kerangka",
+        "noData": "Belum ada data analitik.",
+        "noDataDescription": "Kirim beberapa pesan untuk mulai melihat statistik.",
+        "errorRate": "Tingkat Kesalahan",
+        "responseTimes": "Waktu Respons",
+        "avgResponse": "Respon Rata-Rata",
+        "p50": "hal50",
+        "p95": "Hlm95",
+        "topTopics": "Topik Teratas",
+        "hourlyActivity": "Aktivitas Setiap Jam",
+        "byokActive": "BYOK Aktif",
+        "totalTokens": "Jumlah Token",
+        "estimatedCost": "Perkiraan. Biaya",
+        "refresh": "Segarkan"
+      },
+      "terminal": {
+        "connecting": "Menghubungkan...",
+        "connected": "Terhubung",
+        "disconnected": "Terputus",
+        "error": "Kesalahan koneksi",
+        "reconnect": "Hubungkan kembali",
+        "agentNotActive": "Agen harus aktif untuk menggunakan terminal.",
+        "startAgent": "Mulai Agen",
+        "sendMessage": "Kirim pesan...",
+        "send": "Kirim",
+        "sending": "Mengirim..."
+      },
+      "plugins": {
+        "skillsTab": "Keterampilan",
+        "pluginsTab": "Plugin",
+        "searchPlaceholder": "Keterampilan pencarian & plugin...",
+        "install": "Instal",
+        "installing": "Memasang...",
+        "installed": "Dipasang",
+        "uninstall": "Copot pemasangan",
+        "uninstalling": "Mencopot pemasangan...",
+        "noInstalled": "Tidak ada keterampilan atau plugin yang dipasang.",
+        "noInstalledDescription": "Jelajahi dan instal dari pasar di bawah ini.",
+        "recommended": "Direkomendasikan",
+        "available": "Tersedia",
+        "source": "Sumber",
+        "requiresRestart": "Perlu dimulai ulang",
+        "refresh": "Segarkan",
+        "limitReached": "Plugin dan keterampilan disertakan di setiap tingkatan."
+      },
+      "workflows": {
+        "new": "Alur Kerja Baru",
+        "noWorkflows": "Belum ada alur kerja.",
+        "noWorkflowsDescription": "Buat alur kerja pertama Anda untuk mengotomatiskan agen Anda.",
+        "enable": "Aktifkan",
+        "disable": "Nonaktifkan",
+        "delete": "Hapus",
+        "save": "Simpan",
+        "run": "Jalankan",
+        "running": "Berlari...",
+        "name": "Nama Alur Kerja",
+        "trigger": "Pemicu",
+        "lastRun": "Jalankan Terakhir",
+        "status": "Status",
+        "active": "Aktif",
+        "inactive": "Tidak aktif"
+      },
+      "files": {
+        "noFiles": "Tidak ada file yang ditemukan.",
+        "noFilesDescription": "Manajer file kosong.",
+        "upload": "Unggah",
+        "delete": "Hapus",
+        "download": "Unduh",
+        "refresh": "Segarkan",
+        "locked": "Manajer File disertakan di setiap tingkatan. Refresh agen jika akses masih diblokir.",
+        "unlock": "Buka kunci"
+      },
+      "workspace": {
+        "noFiles": "Tidak ada file ruang kerja yang ditemukan.",
+        "refresh": "Segarkan",
+        "loading": "Memuat ruang kerja..."
+      },
+      "addons": {
+        "title": "Ekstra",
+        "description": "Perluas agen Anda dengan kemampuan ekstra.",
+        "noAddons": "Belum ada tambahan yang dibeli.",
+        "purchase": "Beli",
+        "active": "Aktif",
+        "expires": "Kedaluwarsa {date}",
+        "lifetime": "Seumur hidup"
+      },
+      "schedules": {
+        "new": "Jadwal Baru",
+        "noSchedules": "Belum ada jadwal.",
+        "noSchedulesDescription": "Buat jadwal untuk menjalankan agen Anda secara otomatis.",
+        "enable": "Aktifkan",
+        "disable": "Nonaktifkan",
+        "delete": "Hapus",
+        "save": "Simpan",
+        "name": "Nama Jadwal",
+        "cron": "Ekspresi Cron",
+        "nextRun": "Jalankan Selanjutnya",
+        "lastRun": "Jalankan Terakhir",
+        "status": "Status",
+        "active": "Aktif",
+        "inactive": "Tidak aktif"
+      },
+      "sidebar": {
+        "switchAgent": "Ganti agen",
+        "enter3DRoom": "Masuk ke Ruang 3D",
+        "enter3DRoomSubtitle": "Ruang kerja spasial terbuka",
+        "enter3DRoomTooltip": "Buka ruang kerja spasial agen"
+      }
+    }
+  },
+  "settings": {
+    "redirect": "Mengalihkan ke pengaturan..."
+  },
+  "explorePage": {
+    "eyebrow": "Agen publik",
+    "title": "Ngobrol dengan agen AI publik",
+    "body": "Telusuri agen yang pemiliknya mengaktifkan obrolan publik. Setiap sesi berjalan di browser Anda dan merutekan melalui konfigurasi Hatcher langsung agen.",
+    "cityCta": "Buka Hatcher City",
+    "emptyTitle": "Belum ada agen obrolan publik",
+    "emptyBody": "Profil publik masih muncul di Hatcher City. Agen muncul di sini setelah pemiliknya mengaktifkan obrolan publik.",
+    "fallbackDescription": "Agen Hatcher publik yang siap untuk sesi obrolan browser.",
+    "interactions": "interaksi",
+    "publicChat": "Obrolan publik",
+    "chatCta": "Obrolan",
+    "statsAgents": "Agen publik {count}",
+    "statsLive": "{count} tayang sekarang",
+    "statsInteractions": "Interaksi {count}",
+    "searchPlaceholder": "Cari agen publik",
+    "filterAll": "Semua",
+    "filterOpenClaw": "OpenClaw",
+    "filterHermes": "Hermes",
+    "filterLive": "Hidup saja",
+    "showingCount": "{count} ditampilkan",
+    "noResultsTitle": "Tidak ada agen yang cocok",
+    "noResultsBody": "Coba penelusuran, kerangka kerja, atau filter langsung lainnya.",
+    "frameworkLabel": "Kerangka",
+    "featured": "Unggulan",
+    "ownerFallback": "agen komunitas",
+    "avatarLabel": "Avatar agen publik 3D",
+    "statusRunning": "Hidup",
+    "statusSleeping": "Sedang tidur",
+    "statusPaused": "Dijeda",
+    "statusCrashed": "Perlu perhatian"
+  },
+  "agentPublic": {
+    "back": {
+      "toCity": "Kembali ke Kota",
+      "toMyAgents": "Kembali ke Agen Saya",
+      "toDashboard": "Kembali ke Dasbor"
+    },
+    "status": {
+      "active": "Aktif",
+      "sleeping": "Sedang tidur",
+      "paused": "Dijeda",
+      "archived": "Diarsipkan",
+      "error": "Kesalahan",
+      "killed": "Terbunuh",
+      "restarting": "Memulai ulang"
+    },
+    "profile": {
+      "featuresCount": "Fitur {count}",
+      "featuresCountPlural": "Fitur {count}",
+      "frameworkFeatures": "Fitur Kerangka",
+      "by": "oleh"
+    },
+    "share": {
+      "button": "Bagikan",
+      "copied": "Disalin!"
+    },
+    "errors": {
+      "connectionError": "Kesalahan Koneksi",
+      "notFound": "Agen Tidak Ditemukan",
+      "somethingWrong": "Ada yang Salah",
+      "defaultMessage": "Agen ini tidak ada atau telah dihapus.",
+      "goBack": "Kembali",
+      "myAgents": "Agen Saya"
+    },
+    "owner": {
+      "heading": "Kelola {name}",
+      "body": "Anda pemilik agen ini. Buka dasbor Anda untuk mengobrol atau mengonfigurasinya.",
+      "manageAgent": "Kelola Agen",
+      "openChat": "Buka Obrolan"
+    },
+    "analytics": {
+      "heading": "Analisis Agen",
+      "messages": "Interaksi",
+      "daysActive": "Hari Aktif",
+      "uptime": "Waktu aktif",
+      "status": "Status",
+      "framework": "Kerangka",
+      "created": "Dibuat"
+    },
+    "deploy": {
+      "heading": "Sebarkan agen serupa",
+      "body": "Buat agen {framework} Anda sendiri di Hatcher. Gratis untuk memulai, terapkan dalam 60 detik.",
+      "cta": "Sebarkan Agen Serupa",
+      "myAgents": "Agen Saya"
+    },
+    "publicChat": {
+      "eyebrow": "Obrolan agen publik",
+      "heading": "Ngobrol dengan {name}",
+      "usernamePlaceholder": "Pilih nama pengguna",
+      "start": "Mulai obrolan",
+      "starting": "Mulai...",
+      "newSession": "Sesi baru",
+      "empty": "Mulai sesi publik baru dengan agen ini.",
+      "messagePlaceholder": "Pesan sebagai {username}",
+      "thinking": "Meneliti...",
+      "send": "Kirim pesan",
+      "errors": {
+        "session": "Tidak dapat memulai sesi obrolan publik.",
+        "message": "Tidak dapat mengirimkan pesan ini."
+      }
+    },
+    "errorPage": {
+      "heading": "Gagal Memuat Agen",
+      "body": "Kami tidak dapat memuat detail agen ini. Mungkin telah dihapus atau ada masalah koneksi.",
+      "errorId": "ID Kesalahan: {id}",
+      "tryAgain": "Coba Lagi",
+      "browseAgents": "Telusuri Agen"
+    },
+    "statusPage": {
+      "poweredBy": "Didukung oleh",
+      "uptimeLabel": "Waktu aktif 24 jam",
+      "messages": "Interaksi",
+      "days": "hari",
+      "since": "Sejak",
+      "framework": "kerangka kerja",
+      "lastActive": "Terakhir aktif: {date} di {time}",
+      "viewProfile": "Lihat Profil",
+      "notFound": {
+        "heading": "Agen Tidak Ditemukan",
+        "body": "Agen ini tidak ada atau tidak terlihat oleh publik.",
+        "browseAgents": "Telusuri Agen"
+      }
+    }
+  },
+  "city": {
+    "category": {
+      "district": "Distrik",
+      "breadcrumbCity": "Hatcher City",
+      "statAgents": "agen",
+      "statRunning": "berlari",
+      "statShareOfCity": "bagian kota",
+      "seeIn3d": "Lihat dalam 3D →",
+      "emptyState": "Belum ada agen di distrik ini.",
+      "emptyStateCta": "Jadilah orang pertama yang membangunnya.",
+      "otherDistricts": "Distrik lain",
+      "msgs": "pesan"
+    }
+  },
+  "frameworks": {
+    "eyebrow": "Kerangka kerja",
+    "heading": "Pilih kerangka kerja yang tepat",
+    "subheading": "Hatcher berfokus pada dua kerangka kerja agen produksi: OpenClaw untuk otomatisasi yang memerlukan keterampilan tinggi dan Hermes untuk agen adaptif yang sudah berjalan lama.",
+    "deployCta": "Menyebarkan agen",
+    "docsLink": "Dokumen lengkap",
+    "atAGlance": "Sekilas",
+    "featureMatrix": "Matriks fitur",
+    "featureCol": "Fitur",
+    "bestFor": "Terbaik untuk...",
+    "bestForSubheading": "Tidak yakin kerangka kerja mana yang harus dipilih? Cocokkan kasus penggunaan Anda.",
+    "benchmarks": "Tolok ukur kinerja",
+    "benchmarksSubheading": "Waktu mulai dingin dan penggunaan memori dasar pada infrastruktur bersama Hatcher. Nilai sebenarnya bervariasi menurut konfigurasi.",
+    "coldStart": "Waktu mulai dingin",
+    "memoryUsage": "Penggunaan memori dasar",
+    "lowerFaster": "Lebih rendah lebih cepat",
+    "lowerLeaner": "Lebih rendah lebih ramping",
+    "benchmarkCallout": "OpenClaw adalah yang terbaik saat Anda membutuhkan permukaan keterampilan dan otomatisasi terluas. Hermes lebih ramping untuk agen adaptif dengan alur kerja penelitian yang banyak memori.",
+    "configExamples": "Contoh konfigurasi",
+    "configSubheading": "Setiap kerangka kerja memiliki format konfigurasinya sendiri. Berikut tampilan pengaturan umumnya.",
+    "configRef": "Referensi konfigurasi lengkap →",
+    "docsSuffix": "dokumen",
+    "llmSupport": "dukungan LLM",
+    "llmSubheading": "Kedua kerangka kerja tersebut mendukung BYOK (Bawa Kunci Anda Sendiri) untuk penggunaan berbayar penyedia. Rute LLM yang dihosting melalui penyedia yang didukung Hatcher dan penggunaan meteran dengan AI Credits.",
+    "byokNote": "* BYOK selalu gratis — penggunaan berbayar penyedia tanpa Hatcher AI Credits.",
+    "byokSetupLink": "Lihat panduan pengaturan BYOK →",
+    "decisionGuide": "Panduan keputusan cepat",
+    "readyCta": "Siap untuk diterapkan?",
+    "readySubheading": "Pilih kerangka kerja, konfigurasikan agen Anda, dan tayangkan dalam waktu kurang dari 60 detik. Termasuk tingkat gratis.",
+    "deployFirstAgent": "Sebarkan agen pertama Anda",
+    "viewPricing": "Lihat harga",
+    "decisions": [
+      {
+        "condition": "Saya ingin alat dan otomatisasi yang maksimal",
+        "pick": "OpenClaw"
+      },
+      {
+        "condition": "Saya ingin agen yang belajar seiring waktu",
+        "pick": "Hermes"
+      },
+      {
+        "condition": "Saya memerlukan pesan dan pemicu multi-saluran",
+        "pick": "OpenClaw"
+      },
+      {
+        "condition": "Saya membutuhkan asisten peneliti yang memiliki banyak memori",
+        "pick": "Hermes"
+      },
+      {
+        "condition": "Saya memerlukan perpesanan multisaluran (Telegram + Discord + WhatsApp)",
+        "pick": "OpenClaw atau Hermes"
+      },
+      {
+        "condition": "Saya ingin agen ruang kerja dengan file, log, dan keterampilan",
+        "pick": "OpenClaw"
+      }
+    ]
+  },
+  "token": {
+    "liveLabel": "Token utilitas di Solana",
+    "heading": "$HATCHER",
+    "subheading": "$HATCHER adalah opsi pembayaran utilitas untuk langganan Hatcher yang memenuhi syarat, ekstra, diskon, dan mekanisme pembakaran on-chain.",
+    "caLabel": "CA:",
+    "viewDexscreener": "Lihat di Dexscreener",
+    "viewSolscan": "Lihat di Solscan",
+    "burnBadge": "10% dari setiap pembayaran $HATCHER dibakar secara on-chain, dalam transaksi yang sama.",
+    "burnsEyebrow": "Luka bakar pada rantai",
+    "burnsHeading": "Pelacak Pembakaran",
+    "burnsBody": "Data pembakaran langsung dihitung dari instruksi pembakaran Solana Token-2022 untuk mint $HATCHER. Pelacak menyegarkan secara on-chain setiap 6 jam, atau saat Anda meminta penyegaran manual.",
+    "burnsRefresh": "Segarkan secara on-chain",
+    "burnsRefreshing": "Menyegarkan",
+    "burnsError": "Data pembakaran untuk sementara tidak tersedia. Snapshot cache terakhir akan ditampilkan bila tersedia.",
+    "burnsTotalLabel": "Total Terbakar",
+    "burnsTxLabel": "Bakar TX",
+    "burnsTxHelper": "{count} tx dipindai",
+    "burnsSupplyLabel": "Pasokan Terbakar",
+    "burnsSupplyHelper": "Bagian dari pasokan saat ini ditambah luka bakar",
+    "burnsLatestLabel": "Pembakaran Terbaru",
+    "burnsNoBurnsShort": "Belum ada luka bakar",
+    "burnsUpdated": "Diperbarui {time}",
+    "burnsUpdating": "Memperbarui",
+    "burnsPeriodHeading": "Kecepatan Pembakaran",
+    "burns24h": "24 jam",
+    "burns7d": "7 hari",
+    "burns30d": "30 hari",
+    "burnsSourceNote": "Hanya instruksi pembakaran dan pembakaran SPL yang eksplisit untuk mint resmi yang dihitung. Transaksi gagal dan transfer normal diabaikan.",
+    "burnsFeedHeading": "Luka Bakar Baru-baru ini",
+    "burnsUnknownTime": "Waktu tidak diketahui",
+    "burnsNoBurns": "Belum ada transaksi pembakaran yang ditemukan.",
+    "burnsNoBurnsBody": "Setelah pembayaran $HATCHER membuat instruksi pembakaran on-chain, instruksi tersebut akan muncul di sini dengan tautan Solscan.",
+    "createAgentCta": "Buat Agen Gratis",
+    "viewPricing": "Lihat Harga",
+    "plannedUtilityLabel": "Utilitas",
+    "whatPowers": "Dimana $HATCHER cocok",
+    "ecosystemDesc": "Permukaan penagihan yang serius terlebih dahulu: total yang jelas, jalur pembayaran yang didukung, dan penanganan token yang berfokus pada utilitas.",
+    "keyDetails": "Detail Utama",
+    "networkLabel": "Jaringan",
+    "networkValue": "Solana",
+    "splToken": "Token SPL",
+    "statusLabel": "Status",
+    "statusValue": "Tersedia sebagai utilitas platform",
+    "trading": "Utilitas",
+    "contractLabel": "Kontrak",
+    "platformLabel": "Peron",
+    "platformValue": "Tingkat gratis tersedia sekarang — pembayaran token mendukung tingkatan berbayar dan tambahan yang memenuhi syarat",
+    "stayInLoop": "Gunakan Hatcher sebagai bidang kendali",
+    "stayInLoopBody": "Terapkan agen, kelola penagihan, dan pilih jalur pembayaran yang sesuai dengan alur kerja Anda.",
+    "followOnX": "Ikuti di X"
+  },
+  "roadmap": {
+    "liveLabel": "Hidup",
+    "heading": "Peta jalan",
+    "subheading": "Apa yang telah kami buat, apa yang dikirimkan sekarang, dan ke mana tujuan kami. Kami membangun di depan umum — ikuti terus",
+    "followHandle": "X /@hatcherlabs",
+    "checkChangelog": "log perubahan langsung",
+    "featureRequest": "Punya permintaan fitur? Kami membaca semuanya.",
+    "submitRequest": "Kirimkan permintaan",
+    "followOnX": "Ikuti di X"
+  },
+  "blog": {
+    "eyebrow": "blog",
+    "heading": "Blog Hatcher",
+    "subheading": "Panduan, tutorial, dan wawasan tentang agen AI dan platform Hatcher.",
+    "searchPlaceholder": "Cari artikel...",
+    "allCategory": "Semua",
+    "latestLabel": "Terbaru",
+    "readLabel": "membaca",
+    "resultsCount": "Hasil {count} untuk \"{query}\"",
+    "resultsCountPlural": "Hasil {count} untuk \"{query}\"",
+    "noArticles": "Tidak ada artikel yang ditemukan",
+    "noArticlesCategory": "Tidak ada artikel ditemukan dalam kategori ini.",
+    "noArticlesSearch": "Tidak ada artikel ditemukan untuk \"{query}\".",
+    "clearFilters": "Hapus filter",
+    "backToBlog": "Kembali ke Blog",
+    "relatedArticles": "Artikel Terkait"
+  },
+  "changelog": {
+    "betaLabel": "Beta",
+    "heading": "log perubahan",
+    "subheading": "Kami mengirimkan perbaikan setiap hari. Inilah yang berubah.",
+    "noCommits": "Tidak ada komitmen yang ditemukan.",
+    "errorMessage": "Ada yang tidak beres.",
+    "tryAgain": "Coba lagi"
+  },
+  "help": {
+    "eyebrow": "Sumber daya",
+    "heading": "Pusat bantuan",
+    "subheading": "Temukan jawaban, telusuri panduan, dan hubungi dukungan.",
+    "searchPlaceholder": "Cari semua pertanyaan... mis. \"BYOK\", \"batas tarif\", \"Telegram\"",
+    "resultCount": "Hasil {count}",
+    "resultCountPlural": "Hasil {count}",
+    "matchCount": "Pertandingan {count}",
+    "matchCountPlural": "{count} cocok",
+    "noMatchHeading": "Tidak ditemukan pertanyaan yang cocok",
+    "noMatchBody": "Coba kata kunci lain atau telusuri dokumentasinya.",
+    "documentationLink": "dokumentasi",
+    "contactHeading": "Hubungi Kami",
+    "contactBody": "Tidak dapat menemukan apa yang Anda cari?",
+    "openTicket": "Buka tiket dukungan",
+    "contactOr": "atau hubungi langsung:",
+    "technicalHelp": "Bantuan teknis",
+    "generalInquiries": "Pertanyaan umum",
+    "communitySupport": "Dukungan komunitas",
+    "communityChat": "Obrolan komunitas",
+    "stillNeedHelp": "Masih butuh bantuan?",
+    "ticketResponse": "Kirimkan tiket dukungan dan tim kami akan menghubungi Anda kembali dalam waktu 24 jam.",
+    "quickLinks": {
+      "documentation": "Dokumentasi",
+      "discord": "Komunitas Discord",
+      "telegram": "Grup Telegram",
+      "submitTicket": "Kirim Tiket",
+      "emailSupport": "Dukungan Email"
+    }
+  },
+  "status": {
+    "eyebrow": "Status",
+    "heading": "Status platform",
+    "subheading": "Kesehatan infrastruktur Hatcher secara real-time.",
+    "navLabel": "Status Hatcher",
+    "autoRefresh": "Segarkan otomatis 30 detik",
+    "operational": "Semua sistem beroperasi",
+    "degraded": "Beberapa sistem terdegradasi",
+    "down": "Gangguan layanan terdeteksi",
+    "statusOperational": "Operasional",
+    "statusDegraded": "Terdegradasi",
+    "statusDown": "Turun",
+    "lastChecked": "Terakhir diperiksa:",
+    "refresh": "Segarkan",
+    "checking": "Memeriksa sistem...",
+    "errorMessage": "Tidak dapat mencapai API. Status tidak tersedia.",
+    "activeAgents": "Agen Aktif",
+    "totalAgents": "Jumlah Agen",
+    "components": "Komponen",
+    "updatedAt": "Diperbarui {time}",
+    "loading": "Memuat...",
+    "backToHatcher": "← Kembali ke Hatcher"
+  },
+  "shortcuts": {
+    "backToDashboard": "Kembali ke Dasbor",
+    "heading": "Pintasan Papan Ketik",
+    "subheading": "Navigasi Hatcher lebih cepat dengan pintasan keyboard",
+    "quickTipLabel": "Tip cepat",
+    "quickTipBody": "Tekan di mana saja untuk membuka palet perintah. Telusuri halaman, agen, atau tindakan secara instan.",
+    "footerNote": "Pintasan dinonaktifkan saat mengetik di kolom teks. Di macOS, gunakan Cmd, bukan Ctrl."
+  },
+  "create": {
+    "errorHeading": "Kesalahan Pembuatan",
+    "errorBody": "Terjadi error saat menyiapkan agen Anda. Kemajuan Anda belum hilang.",
+    "errorIdLabel": "ID Kesalahan:",
+    "tryAgain": "Coba Lagi",
+    "dashboard": "Dasbor"
+  },
+  "support": {
+    "eyebrow": "Bantuan",
+    "heading": "Dukungan",
+    "subheading": "Dapatkan bantuan terkait agen, penagihan, atau hal lainnya.",
+    "quickLinks": {
+      "documentation": "Dokumentasi",
+      "documentationDesc": "Jelajahi panduan dan referensi API",
+      "faq": "Pertanyaan Umum",
+      "faqDesc": "Pertanyaan umum terjawab",
+      "followUs": "Ikuti Kami",
+      "followUsDesc": "Pembaruan dan pengumuman"
+    },
+    "directContact": "Atau email kami langsung di",
+    "joinDiscord": "Bergabunglah dengan Discord kami",
+    "telegramLabel": "Telegram",
+    "communitySupport": "untuk dukungan masyarakat",
+    "submitTicketHeading": "Kirimkan Tiket",
+    "signInPrompt": "Masuk untuk mengirimkan tiket dukungan.",
+    "signIn": "Masuk",
+    "ticketSubmitted": "Tiket Dikirim",
+    "ticketSubmittedBody": "Kami telah menerima permintaan Anda dan akan segera menghubungi Anda kembali. Anda akan diberitahu bila ada pembaruan.",
+    "submitAnother": "Kirim Tiket Lain",
+    "subjectLabel": "Subyek",
+    "subjectPlaceholder": "Deskripsi singkat tentang masalah Anda",
+    "categoryLabel": "Kategori",
+    "priorityLabel": "Prioritas",
+    "relatedAgentLabel": "Agen Terkait",
+    "relatedAgentOptional": "(opsional)",
+    "selectAgent": "Pilih agen...",
+    "messageLabel": "Pesan",
+    "messagePlaceholder": "Jelaskan masalah Anda secara detail...",
+    "submitTicket": "Kirim Tiket",
+    "submitting": "Mengirimkan...",
+    "signInError": "Silakan masuk untuk mengirimkan tiket.",
+    "subjectRequired": "Subjek diperlukan.",
+    "messageRequired": "Pesan diperlukan.",
+    "failedSubmit": "Gagal mengirimkan tiket. Silakan coba lagi.",
+    "recentTickets": "Tiket Terbaru",
+    "noTickets": "Belum ada tiket",
+    "noTicketsDesc": "Tiket dukungan yang Anda kirimkan akan muncul di sini. Buat tiket pertama Anda di atas untuk memulai.",
+    "backToTop": "Kembali ke Atas",
+    "ticketCount": "Tiket {count}",
+    "ticketCountPlural": "Tiket {count}"
+  },
+  "affiliate": {
+    "eyebrow": "Program Afiliasi",
+    "heading": "Hasilkan dari setiap pengguna yang Anda bawa ke Hatcher.",
+    "subheading": "Dapatkan 20% komisi tunai berulang untuk setiap pengguna berbayar yang Anda referensikan. Atribusi berbasis tautan dan berlaku seumur hidup pada akun yang dirujuk. Kedua akun juga menerima 500 AI Credits setelah pengguna yang dirujuk membuat agen pertama mereka.",
+    "applyNowCta": "Lamar sekarang",
+    "howItWorksLink": "Bagaimana cara kerjanya",
+    "pickYourPayout": "Struktur komisi",
+    "threeWays": "Komisi tunai, buku besar sederhana.",
+    "threeWaysSubheading": "Penghasilan afiliasi hanya berupa uang tunai: 20% berulang dari pendapatan berbayar yang memenuhi syarat, dengan penangguhan 30 hari sebelum komisi dibayarkan. Hadiah rujukan 500 AI Credits diberikan secara terpisah ke kedua akun.",
+    "popularLabel": "Populer",
+    "foundingBonusLabel": "Bonus Anggota Pendiri",
+    "foundingBonusHeading": "Referensikan Anggota Pendiri → bonus tunai $20 tetap.",
+    "foundingBonusBody": "Tingkat seumur hidup $99 membayar $20 tetap satu kali kepada afiliasi perujuk — selain apa pun yang mereka peroleh dari pembelian add-on atau agen berikutnya oleh pengguna tersebut. Dibayar tunai terlepas dari mode pembayaran default Anda.",
+    "applyLabel": "Terapkan",
+    "howItWorksLabel": "Bagaimana cara kerjanya",
+    "fourSteps": "Empat langkah, tidak ada kejutan.",
+    "faqLabel": "Sering ditanyakan",
+    "everythingYoudAsk": "Segala sesuatu yang Anda tanyakan sebelum melamar.",
+    "readyHeading": "Siap bermitra dengan Hatcher?",
+    "readyBody": "Aplikasi membutuhkan waktu beberapa menit. Persetujuan dalam 3–5 hari. Komisi berulang seumur hidup untuk setiap pengguna yang Anda bawa.",
+    "seePricing": "Lihat harga",
+    "apply": {
+      "backLink": "Kembali ke Program Afiliasi",
+      "loading": "Memuat…",
+      "eyebrow": "Berlaku untuk Afiliasi Hatcher",
+      "heading": "Beritahu kami tentang Anda.",
+      "subheading": "Beberapa detail tentang platform dan audiens Anda. Kami meninjau setiap permohonan secara manual — jujur, spesifik.",
+      "underReview": "Sedang ditinjau — kami akan menghubungi Anda.",
+      "reviewTime": "Waktu peninjauan yang diharapkan:",
+      "reviewDays": "3–5 hari",
+      "reviewEmailNote": "Anda akan mendapatkan email saat keputusan diambil.",
+      "submitted": "Permohonan diajukan",
+      "submittedDate": "Dikirim",
+      "platformsLabel": "Platform",
+      "followers": "pengikut",
+      "slugLabel": "Siput yang diminta",
+      "slugPreview": "pratinjau: hatcher.host/r/{slug}",
+      "payoutModeLabel": "Mode pembayaran",
+      "payoutAddressLabel": "Alamat pembayaran",
+      "pitchLabel": "Pitch",
+      "successHeading": "Permohonan diajukan.",
+      "successBody": "Kami akan meninjaunya dalam waktu 3–5 hari dan mengirimkan hasilnya melalui email. Sementara itu, silakan tentukan apa yang akan Anda bagikan setelah Anda disetujui.",
+      "backToAffiliate": "Kembali ke Program Afiliasi",
+      "yourPlatforms": "Platform Anda",
+      "platformCount": "{count} / {max}",
+      "platformLabel": "Platform {n}",
+      "removeLabel": "Hapus",
+      "addPlatform": "Tambahkan platform lain",
+      "platformTypeField": "Jenis platform",
+      "handleField": "Tangani",
+      "handleHint": "misalnya @hatcher, @solana, /channel/xyz",
+      "audienceField": "Ukuran audiens (opsional)",
+      "urlField": "URL (opsional)",
+      "slugField": "Tautan rujukan khusus (opsional)",
+      "slugPrefix": "hatcher.host/r/",
+      "slugPlaceholder": "namamu",
+      "slugBlankHint": "Biarkan kosong untuk kode yang dibuat secara otomatis",
+      "slugPreviewGood": "Tautan Anda adalah hatcher.host/r/{slug}",
+      "pitchField": "Pitch",
+      "pitchPlaceholder": "Mengapa Anda ingin bermitra dengan Hatcher? Konten atau audiens seperti apa yang akan Anda jangkau?",
+      "pitchCharHint": "50–2000 karakter",
+      "payoutModeField": "Mode pembayaran",
+      "solAddressField": "Alamat dompet SOL (base58, 32–44 karakter)",
+      "solAddressPlaceholder": "misalnya 21L6VVRAuxk87sXggz8exhPCm1w4qWyKEs6SDauyyRAW",
+      "submitBtn": "Kirim lamaran",
+      "submitting": "Mengirimkan…",
+      "rejectedLabel": "Lamaran sebelumnya ditolak",
+      "validatePlatformMin": "Tambahkan setidaknya satu platform",
+      "validatePlatformMax": "Platform {max} maksimal",
+      "validateHandleRequired": "Diperlukan",
+      "validateHandleMax": "Maks 100 karakter",
+      "validateAudienceNumber": "Harus bilangan bulat",
+      "validateUrlInvalid": "Harus berupa URL yang valid",
+      "validatePitchMin": "Pitch minimal harus 50 karakter",
+      "validatePitchMax": "Pitch harus maksimal 2000 karakter",
+      "validateAddressRequired": "Diperlukan untuk pembayaran afiliasi tunai",
+      "validateAddressFormat": "Harus berupa alamat Solana base58 yang valid (32–44 karakter)",
+      "slugTooShort": "Terlalu pendek — minimal 3 karakter",
+      "slugTooLong": "Terlalu panjang — maksimal 30 karakter",
+      "slugInvalidChars": "Hanya a–z, 0–9, dan tanda hubung (tidak boleh diawali/diakhiri dengan -)",
+      "slugReserved": "Siput itu sudah dipesan — pilih yang lain"
+    }
+  },
+  "docs": {
+    "eyebrow": "Dokumentasi",
+    "heading": "Dokumentasi",
+    "subheading": "Semua yang Anda perlukan untuk membangun, menerapkan, dan mengelola agen AI dengan Hatcher.",
+    "searchPlaceholder": "Telusuri dokumentasi...",
+    "searchComingSoon": "Pencarian segera hadir",
+    "apiReferenceHeading": "Referensi API",
+    "apiReferenceBody": "Dokumentasi titik akhir lengkap dengan contoh dalam cURL, JavaScript, dan Python. Otentikasi, batas kecepatan, dan kode kesalahan.",
+    "apiReferenceLink": "Jelajahi titik akhir",
+    "integrationsHeading": "Panduan Integrasi",
+    "integrationsBody": "Penyiapan langkah demi langkah untuk Telegram, Discord, WhatsApp, Slack, Twitter/X, dan Signal. Dari kredensial hingga pesan pertama.",
+    "integrationsLink": "Jelajahi platform",
+    "popularTopics": "Topik populer",
+    "readMore": "Baca lebih lanjut",
+    "cantFind": "Tidak dapat menemukan apa yang Anda cari?",
+    "cantFindBody": "Tim dukungan dan komunitas kami siap membantu Anda mendapatkan hasil maksimal dari Hatcher.",
+    "contactSupport": "Hubungi Dukungan",
+    "helpCenter": "Pusat Bantuan",
+    "quickLinks": [
+      {
+        "title": "Memulai",
+        "description": "Siapkan agen AI pertama Anda dalam waktu kurang dari 60 detik. Panduan memulai cepat, prasyarat, dan penerapan pertama."
+      },
+      {
+        "title": "Konfigurasi Agen",
+        "description": "Gunakan Chat-to-Hatch, pilih OpenClaw atau Hermes, dan sesuaikan runtime, file, integrasi, dan perutean model."
+      },
+      {
+        "title": "AI Credits",
+        "description": "Lihat bagaimana AI Credits bulanan dan pengisian ulang satu kali memberdayakan LLM yang dihosting, penelusuran web, penelitian, ekstrak, dan alat perayapan."
+      },
+      {
+        "title": "Pengaturan BYOK",
+        "description": "Bawalah kunci penyedia Anda sendiri untuk OpenAI, Anthropic, Google, xAI, OpenRouter, dan banyak lagi. BYOK tidak pernah menghabiskan Hatcher AI Credits."
+      },
+      {
+        "title": "Kerangka kerja",
+        "description": "Bandingkan OpenClaw dan Hermes, termasuk kesesuaian kerangka kerja, perutean model, BYOK, dan perilaku runtime yang dihosting."
+      },
+      {
+        "title": "Integrasi Platform",
+        "description": "Hubungkan Telegram, Discord, Slack, Twitter/X, Signal, webhook, dan saluran lain yang disertakan di setiap tingkat."
+      },
+      {
+        "title": "Hatcher CLI",
+        "description": "Instal @hatcherlabs/cli, jalankan hatcher, buat agen, chat, lampirkan terminal, konfigurasi GitHub, dan panggilan A2A dari shell Anda."
+      },
+      {
+        "title": "Alur Kerja Pengembang",
+        "description": "Hubungkan GitHub, kelola sesi terminal, aktifkan komunikasi agen-ke-agen, dan atur agen yang dimiliki."
+      },
+      {
+        "title": "Aplikasi Android",
+        "description": "Instal aplikasi Android, masuk, kelola agen, dan terima pemberitahuan push dari perangkat seluler Anda."
+      },
+      {
+        "title": "Referensi API",
+        "description": "Titik akhir REST API untuk agen, penagihan, AI Credits, pembayaran, obrolan publik, dan operasi admin."
+      }
+    ],
+    "topics": [
+      {
+        "label": "Jelaskan agen dengan Chat-to-Hatch"
+      },
+      {
+        "label": "Bagaimana AI Credits dibelanjakan"
+      },
+      {
+        "label": "Model yang dihosting dan BYOK"
+      },
+      {
+        "label": "Pemberitahuan push Android"
+      },
+      {
+        "label": "Menyiapkan integrasi Telegram"
+      },
+      {
+        "label": "Metode pembayaran yang didukung"
+      }
+    ]
+  },
+  "shared": {
+    "tiers": {
+      "free": {
+        "name": "Gratis",
+        "description": "1 agen, 500 AI Credits/bulan, ruang kerja 2 GB"
+      },
+      "starter": {
+        "name": "Pemula",
+        "description": "1 agen, 3.000 AI Credits/bulan, ruang kerja 10 GB"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "3 agen, 15.000 AI Credits/bulan, ruang kerja 25 GB"
+      },
+      "business": {
+        "name": "Bisnis",
+        "description": "5 agen, 40.000 AI Credits/bulan, ruang kerja 50 GB, selalu aktif"
+      },
+      "founding_member": {
+        "name": "Anggota Pendiri",
+        "description": "10 agen, 25.000 AI Credits/bulan, ruang kerja 40 GB, akses seumur hidup"
+      }
+    },
+    "addons": {
+      "agents_plus1": {
+        "name": "+1 Agen",
+        "description": "1 slot agen tambahan"
+      },
+      "agents_plus3": {
+        "name": "+3 Agen",
+        "description": "3 slot agen tambahan"
+      },
+      "agents_plus5": {
+        "name": "+5 Agen",
+        "description": "5 slot agen tambahan"
+      },
+      "agents_plus10": {
+        "name": "+10 Agen",
+        "description": "10 slot agen tambahan"
+      },
+      "ai_credits_5000": {
+        "name": "5.000 AI Credits",
+        "description": "Isi ulang satu kali untuk model yang dihosting dan pencarian web"
+      },
+      "ai_credits_10000": {
+        "name": "10.000 AI Credits",
+        "description": "Isi ulang satu kali untuk menjalankan model dan penelitian yang lebih berat"
+      },
+      "ai_credits_25000": {
+        "name": "25.000 AI Credits",
+        "description": "Isi ulang satu kali untuk beban kerja agen yang lebih besar"
+      },
+      "ai_credits_50000": {
+        "name": "50.000 AI Credits",
+        "description": "Isi ulang satu kali untuk penggunaan host bervolume tinggi"
+      }
+    },
+    "frameworks": {
+      "openclaw": {
+        "name": "OpenClaw",
+        "description": "Asisten AI yang dihosting sendiri dengan 3.200+ keterampilan komunitas, gateway perpesanan multi-saluran, dan pelaksanaan tugas otonom."
+      },
+      "hermes": {
+        "name": "Agen Hermes",
+        "description": "Agen AI otonom oleh Nous Research dengan memori persisten, 40+ alat, sistem keterampilan, dan gateway perpesanan multi-platform."
+      }
+    },
+    "agentStatus": {
+      "active": "Aktif",
+      "sleeping": "Sedang tidur",
+      "paused": "Dijeda",
+      "archived": "Diarsipkan",
+      "error": "Kesalahan",
+      "killed": "Terbunuh",
+      "restarting": "Memulai ulang",
+      "stopping": "Berhenti"
+    }
+  },
+  "localeSwitcher": {
+    "label": "Ubah bahasa"
+  },
+  "agentRoom": {
+    "back": {
+      "toCity": "Kembali ke Kota",
+      "toDashboard": "Kembali ke Dasbor",
+      "toAgents": "Kembali ke Agen",
+      "toBuilding": "Kembali ke Gedung",
+      "toHouse": "Kembali ke Rumah"
+    }
+  },
+  "chatToHatch": {
+    "backLink": "← Dasbor",
+    "eyebrow": "Pembuat agen bahasa alami",
+    "h1Prefix": "Jelaskan itu.",
+    "h1Accent": "Tetaskan.",
+    "authChecking": "Sesi pengecekan…",
+    "assistantTitle": "Asisten Hatcher",
+    "assistantSub": "Didukung oleh Hatcher AI · mem-parsing maksud menjadi konfigurasi agen lengkap",
+    "live": "Hidup",
+    "assistantWho": "Hatcher",
+    "intro": "Jelaskan agen yang Anda perlukan: apa fungsinya, di mana ia dijalankan, dan apa yang boleh digunakan. Hatcher menyiapkan kerangka kerja, model, alat, identitas, dan draf runtime untuk ditinjau sebelum penerapan.",
+    "thinking": "Berpikir…",
+    "placeholder": "Agen yang mengawasi webhook Stripe saya dan memposting ringkasan ramah di #pendapatan di Discord setiap pagi.",
+    "send": "Kirim",
+    "sendRefine": "Sempurnakan",
+    "previewTitle": "Pratinjau agen",
+    "previewEmpty": "Kosong",
+    "previewReady": "Siap menetas",
+    "previewNeedsFix": "Perlu diperbaiki",
+    "emptyHint": "Jelaskan agen di sebelah kiri untuk memulai.",
+    "reset": "Setel ulang ke yang disarankan",
+    "resetTooltip": "Kembalikan semua bidang ke nilai yang disarankan asisten",
+    "labelName": "Nama",
+    "labelDescription": "Deskripsi",
+    "labelPersonality": "Kepribadian",
+    "labelSystemPrompt": "SOUL.md / perintah sistem",
+    "labelFramework": "Kerangka",
+    "labelFrameworkReason": "Mengapa kerangka ini",
+    "labelSkills": "Keterampilan untuk menginstal",
+    "labelPlugins": "Plugin untuk dipasang",
+    "labelInstallPlan": "Instal rencana",
+    "labelGreeting": "Contoh salam",
+    "labelModel": "Model yang dihosting",
+    "labelModelProvider": "Rute AI",
+    "labelAvatar": "Ide avatar",
+    "labelAvatarVariant": "avatar 3D",
+    "labelAvatarPalette": "Palet",
+    "labelAvatarEmblem": "Lambang",
+    "labelAvatarAccessory": "Aksesori",
+    "labelAvatarMood": "suasana hati",
+    "frameworkOpenClaw": "Browser, file, kode, penelitian, dan penggunaan alat agen.",
+    "frameworkHermes": "Otomatisasi, webhook, perpesanan, dan penjadwal asli API yang cepat.",
+    "placeholderName": "Nama agen",
+    "placeholderDescription": "Satu kalimat singkat yang menggambarkan apa yang dilakukan agen ini.",
+    "placeholderPersonality": "Arah nada pendek — mis. ringkas, teknis, tidak ada permintaan maaf.",
+    "placeholderSystemPrompt": "Perintah sistem multi-paragraf — peran, perilaku, suara, alat.",
+    "addSkill": "menambahkan keterampilan",
+    "addPlugin": "tambahkan plugin",
+    "removeChip": "Hapus {name}",
+    "slugUrl": "URL",
+    "hatchBtn": "Sebarkan agen",
+    "hatchBtnLoading": "Menyebarkan…",
+    "footHint": "Setiap bidang dapat diedit. Setelah penerapan, Anda dapat menyempurnakan konfigurasi, menginstal keterampilan, memeriksa log, dan memperbarui SOUL.md dari ruang kontrol agen.",
+    "errName_min": "Nama memerlukan minimal 3 karakter.",
+    "errName_max": "Nama terlalu panjang (maks 50).",
+    "errName_regex": "Nama boleh menggunakan huruf, angka, spasi, dan - : ' . ( ) & hanya.",
+    "errDesc_max": "Deskripsi terlalu panjang (maks 140).",
+    "errAssistant": "Asisten penetasan tidak menanggapi. Coba ulangi.",
+    "errNetwork": "Kesalahan jaringan — apakah API dapat dijangkau?",
+    "errCreate": "Tidak dapat membuat agen. Perbaiki deskripsinya dan coba lagi.",
+    "errCreateNetwork": "Kesalahan jaringan saat membuat agen."
+  },
+  "landingV3": {
+    "hero": {
+      "boxLabel": "Menyebarkan",
+      "headline1": "Luncurkan produksi",
+      "headline2": "Agen AI dalam hitungan menit.",
+      "sub": "Jelaskan apa yang Anda butuhkan. Hatcher mengubahnya menjadi agen yang dihosting dengan model, alat, dompet, jadwal, dan kontrol langsung yang siap dijalankan.",
+      "ctaPrimary": "Buat agen pertama Anda",
+      "ctaGhost": "Jelajahi agen langsung",
+      "ctaSignup": "Buat akun gratis",
+      "ctaAppStoreKicker": "Unduh di",
+      "ctaAppStore": "Toko Aplikasi",
+      "ctaPlayStoreKicker": "Pakailah",
+      "ctaPlayStore": "Google Bermain",
+      "ctaSolanaMobileKicker": "Tersedia di",
+      "ctaSolanaMobile": "Solana Ponsel",
+      "ctaFeatures": "Lihat semua fitur"
+    },
+    "flow": {
+      "boxLabel": "Bagaimana cara kerjanya",
+      "title": "Tiga langkah dari ide menjadi agen hidup",
+      "tile1Title": "Ketik apa yang Anda inginkan",
+      "tile1Body": "Jelaskan alur kerja dalam bahasa Inggris sederhana. Hatcher mengubahnya menjadi spesifikasi agen terstruktur.",
+      "tile1Example": "merangkum berita kripto setiap hari",
+      "tile2Title": "Tinjau konfigurasinya",
+      "tile2Body": "Tinjau kerangka kerja, model, alat, integrasi, pengaturan runtime, dan AI Credits sebelum peluncuran.",
+      "tile3Title": "Luncurkan waktu proses",
+      "tile3Body": "Terapkan ke runtime yang dihosting dengan obrolan, log, file, integrasi, akses terminal, dan kontrol langsung.",
+      "cta": "Buat milikmu",
+      "ctaFeatures": "Lihat semua fitur",
+      "liveLabel": "agen hidup"
+    },
+    "useCases": {
+      "boxLabel": "Apa yang bisa dilakukan agen",
+      "title": "Agen yang mudah sebenarnya dipahami orang",
+      "body": "Mulailah dengan permintaan bahasa sederhana. Hatcher mengubahnya menjadi agen yang dihosting dengan kerangka kerja, alat, integrasi, ruangan, dan bangunan yang tepat.",
+      "items": {
+        "crypto": {
+          "eyebrow": "Pasar",
+          "title": "Pencari berita kripto",
+          "body": "Lacak berita token, aktivitas dompet, harga, dan ringkasan harian melalui obrolan, email, atau Telegram."
+        },
+        "polymarket": {
+          "eyebrow": "Pasar prediksi",
+          "title": "Pengamat polimarket",
+          "body": "Ikuti pasar, perubahan peluang, lonjakan volume, dan kirim peringatan ketika tesis memerlukan perhatian."
+        },
+        "trader": {
+          "eyebrow": "Perdagangan",
+          "title": "Kopilot pedagang",
+          "body": "Pertahankan daftar pantauan, catatan risiko, tautan penelitian, dan peringatan selagi Anda tetap mengendalikan setiap keputusan."
+        },
+        "community": {
+          "eyebrow": "Komunitas",
+          "title": "Operator Telegram atau Discord",
+          "body": "Jawab FAQ, moderasi saluran, rangkum rangkaian pesan, dan sampaikan pesan penting kepada Anda."
+        },
+        "research": {
+          "eyebrow": "Penelitian",
+          "title": "Lingkaran penelitian harian",
+          "body": "Telusuri web, baca sumber, susun ringkasan, dan simpan kenangan nyata tentang hal-hal penting."
+        },
+        "email": {
+          "eyebrow": "Operasi",
+          "title": "Email dan asisten tugas",
+          "body": "Baca pembaruan kotak masuk, buat draf balasan, siapkan pengingat, dan terus lakukan pekerjaan rutin."
+        }
+      },
+      "footer": "Setiap orang mendapat tempat di gedung Anda, ruangan yang bisa Anda masuki, dan kayu gelondongan yang bisa Anda periksa.",
+      "cta": "Buat dengan Chat-to-Hatch"
+    },
+    "rooms": {
+      "boxLabel": "Ruang kontrol",
+      "title": "Setiap agen mendapatkan ruang kerja langsung",
+      "body": "Hatcher City tetap sebagai lapisan spasial, namun pengalaman produk inti adalah ruang kontrol yang tepat: obrolan, log, file, konfigurasi, integrasi, terminal, dan status di satu tempat.",
+      "stationAvatar": "Avatar",
+      "stationSkills": "Meja Kerja Keterampilan",
+      "stationIntegrations": "Rak Integrasi",
+      "stationStatus": "Konsol Status",
+      "stationLogs": "Dinding Log",
+      "stationStats": "Statistik Hologram",
+      "stationMemory": "Rak Memori",
+      "stationConfig": "Terminal Konfigurasi"
+    },
+    "city": {
+      "boxLabel": "Hatcher City",
+      "title": "Jaringan agen, dapat dilalui dengan berjalan kaki",
+      "body": "Klaim gedung agen Anda sendiri. Berjalanlah di kota, temukan agen aktif yang melewatinya, lalu masuki gedung Anda untuk mengelola setiap ruangan.",
+      "cta": "Masukkan Hatcher City",
+      "districts": "25 distrik · jaringan 5×5"
+    },
+    "frameworks": {
+      "boxLabel": "Kerangka kerja",
+      "seeAll": "Lihat semua →",
+      "tagOpenclaw": "Asisten multi-keterampilan",
+      "tagHermes": "Agen otonom"
+    },
+    "pricing": {
+      "boxLabel": "Harga",
+      "seeFull": "Lihat harga lengkap →",
+      "lifetime": "$99 seumur hidup",
+      "free": "$0",
+      "perMonth": "/bln",
+      "agentSingular": "agen",
+      "agentPlural": "agen",
+      "msgsPerDay": "AI Credits/bln"
+    },
+    "ecosystem": {
+      "boxLabel": "Ekosistem",
+      "title": "Dibangun untuk infrastruktur agen",
+      "sub": "Runtime OpenClaw dan Hermes, model yang dihosting atau BYOK, dan jalur asli kripto opsional untuk pembayaran, identitas, dan alur kerja penyedia.",
+      "frameworksLabel": "Kerangka kerja",
+      "chainsLabel": "Rantai"
+    },
+    "team": {
+      "boxLabel": "Tim",
+      "title": "Orang-orang yang membangun Hatcher",
+      "cristianName": "Kristen",
+      "cristianRole": "Pengembang / CEO",
+      "ioanaName": "Ioana",
+      "ioanaRole": "CMO / Pemasaran",
+      "johnName": "Yohanes",
+      "johnRole": "Pengembang",
+      "moiseName": "Moise",
+      "moiseRole": "Perwakilan / Komunitas AS",
+      "anonymousOneName": "Pengembang Anonim",
+      "anonymousOneRole": "Pengembang",
+      "anonymousTwoName": "Pengembang Anonim",
+      "anonymousTwoRole": "Pengembang",
+      "founderTag": "pendiri",
+      "growthTag": "pertumbuhan",
+      "builderTag": "pembangun",
+      "communityTag": "komunitas",
+      "anonymousTag": "pribadi"
+    },
+    "finalCta": {
+      "boxLabel": "Siap",
+      "headline": "Sebarkan agen pertama Anda.",
+      "ctaPrimary": "Agen penetasan",
+      "ctaGhost": "Lihat agen",
+      "metaFrameworks": "OpenClaw + Hermes",
+      "metaNoCard": "tidak ada kartu kredit"
+    },
+    "cli": {
+      "boxLabel": "CLI",
+      "title": "Jalankan Hatcher dari terminal Anda",
+      "sub": "Instal Hatcher CLI, buat kunci API, lalu jalankan `hatcher`. Bangun agen dari bahasa Inggris sederhana, ngobrol dengan mereka, lampirkan ke runtime langsung mereka, dan kelola alur kerja pengembang tanpa meninggalkan cangkang Anda.",
+      "apiKeyHint": "Hasilkan kunci API di Akun → Kunci API → Buat kunci.",
+      "ctaKey": "Buat kunci API",
+      "ctaDocs": "dokumen CLI",
+      "terminalLabel": "Hatcher CLI",
+      "features": {
+        "hatch": {
+          "title": "Chat-to-Hatch",
+          "body": "Ubah satu perintah menjadi agen OpenClaw atau Hermes yang dikonfigurasi."
+        },
+        "terminal": {
+          "title": "Terminal langsung",
+          "body": "Lampirkan ke sesi kerangka kerja yang sedang berjalan dengan `hatcher terminal`."
+        },
+        "dev": {
+          "title": "Alur kerja pengembangan",
+          "body": "Gunakan akses GitHub, panggilan, sesi, log, dan orkestrasi A2A dari satu CLI."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,2594 @@
+{
+  "common": {
+    "appName": "Hatcher",
+    "tagline": "Yönetilen Yapay Zeka Ajanı Barındırma · Kripto-native"
+  },
+  "nav": {
+    "pricing": "Fiyatlandırma",
+    "docs": "Belgeler",
+    "roadmap": "Yol haritası",
+    "login": "Giriş",
+    "signup": "Kayıt olun",
+    "frameworks": "Çerçeveler",
+    "token": "Token",
+    "blog": "Blog",
+    "changelog": "Değişiklik Günlüğü",
+    "help": "Yardım edin",
+    "dashboard": "Dashboard",
+    "myAgents": "Ajanlarım",
+    "create": "Yarat",
+    "city": "Şehir",
+    "analytics": "Analitikler",
+    "skale": "SKALE Cüzdanlar",
+    "team": "Takım",
+    "billing": "Faturalandırma",
+    "settings": "Ortamlar",
+    "support": "Destek",
+    "logout": "Çıkış",
+    "signIn": "Giriş Yapın",
+    "signUp": "Kayıt Olun",
+    "credits": "Krediler",
+    "affiliate": "Bağlı Kuruluş",
+    "admin": "Yönetici",
+    "adminPanel": "Yönetim Paneli",
+    "openNav": "Navigasyon menüsünü aç",
+    "closeNav": "Navigasyon menüsünü kapat",
+    "affiliateDashboard": "Affiliate Dashboard",
+    "affiliatePending": "Başvuru inceleniyor",
+    "affiliateRejected": "Bağlı kuruluş olarak yeniden başvurun",
+    "affiliateBecome": "Bağlı kuruluş olun",
+    "userMenu": {
+      "sub_myAgents": "Bak, düzenle, dağıt.",
+      "sub_create": "Bir ajanı yumurtadan çıkarmayı tarif edin.",
+      "sub_analytics": "AI Credits, jetonlar, trendler.",
+      "sub_billing": "Katman, eklentiler, krediler.",
+      "sub_wallets": "Solana ödeme cüzdanları.",
+      "sub_team": "Üyeler ve iş birliği.",
+      "sub_settings": "Profil, API tuşlar, prefler.",
+      "sub_support": "Yardım, doktorlar, iletişim.",
+      "sub_affiliate": "Ortak yönlendirmeleri ve raporlama.",
+      "sub_admin": "Platform kontrolleri.",
+      "sub_signOut": "Bu cihazda oturumu sonlandırın.",
+      "tierSuffix": "Seviye"
+    },
+    "groups": {
+      "build": "Yapı",
+      "explore": "Keşfet",
+      "resources": "Kaynaklar",
+      "hatchAgentLabel": "Hatch agent (sohbet)",
+      "hatchAgentSub": "Çalışma zamanını, araçları ve iş akışını tanımlayın.",
+      "myAgentsLabel": "Ajanlarım",
+      "myAgentsSub": "Koşan ajanlarınız için bir gösterge paneli.",
+      "publicAgentsLabel": "Kamu temsilcileri",
+      "publicAgentsSub": "Topluluk temsilcileriyle sohbet edin.",
+      "featuresLabel": "Özellikler",
+      "featuresSub": "Çalışma zamanı, çalışma alanı, araçlar, odalar ve CLI.",
+      "cityLabel": "Hatcher City",
+      "citySub": "Canlı ajanların 3D dünyasında yürüyün.",
+      "frameworksLabel": "Çerçeveler",
+      "frameworksSub": "OpenClaw · Hermes.",
+      "pricingLabel": "Fiyatlandırma",
+      "pricingSub": "Ücretsiz · Başlangıç · Avantajları · İş Dünyası · Kuruluş.",
+      "tokenLabel": "$HATCHER",
+      "tokenSub": "Fatura ödemeleri, indirimler ve yanma mekanikleri.",
+      "stakingLabel": "Staking",
+      "stakingSub": "$HATCHER ödüller artı AI Credits.",
+      "whitepaperLabel": "Beyaz Kitap",
+      "whitepaperSub": "Platform, token, krediler, yol haritası.",
+      "blogLabel": "Blog",
+      "blogSub": "Notlar, çıkışlar, derinlemesine dalışlar.",
+      "roadmapLabel": "Yol haritası",
+      "roadmapSub": "Sırada ne göndereceğimiz.",
+      "changelogLabel": "Değişiklik Günlüğü",
+      "changelogSub": "Ne değişti ve ne zaman."
+    },
+    "hatchAgent": "Hatch ajanı"
+  },
+  "notifications": {
+    "heading": "Bildirimler",
+    "empty": "Bildirim yok",
+    "markRead": "Mark okudu",
+    "markReadAriaLabel": "Tüm bildirimleri okunmuş olarak işaretle",
+    "clear": "Temiz",
+    "clearAriaLabel": "Tüm bildirimleri temizle",
+    "unreadAriaLabel": "Bildirimler, {count} okunmamış",
+    "allReadAriaLabel": "Bildirimler"
+  },
+  "footer": {
+    "columns": {
+      "product": "Ürün",
+      "resources": "Kaynaklar",
+      "community": "Topluluk"
+    },
+    "links": {
+      "createAgent": "Ajan Oluştur",
+      "dashboard": "Dashboard",
+      "pricing": "Fiyatlandırma",
+      "affiliate": "Bağlı Kuruluş",
+      "status": "Durum",
+      "documentation": "Dokümantasyon",
+      "support": "Destek",
+      "blog": "Blog",
+      "changelog": "Değişiklik Günlüğü",
+      "security": "Güvenlik",
+      "roadmap": "Yol haritası",
+      "terms": "Terimler",
+      "privacy": "Gizlilik",
+      "cookies": "Kurabiyeler",
+      "impressum": "Impressum",
+      "docs": "Belgeler"
+    },
+    "copyright": "© {year} HatcherLabs. Tüm haklar saklıdır.",
+    "companyInfo": "HHX TEKNOLOJÎ SRL · CUI 45318471 · Timișoara, România",
+    "legalNotice": "Hukuki sayfalar (Gizlilik, Şartlar, Impressum, Çerezler) yalnızca İngilizce olarak mevcuttur.",
+    "tag": "Yönetilen Yapay Zeka Ajanı Barındırma · Romanya",
+    "colBuild": "Yapı",
+    "colExplore": "Keşfet",
+    "colResources": "Kaynaklar",
+    "colLegal": "Hukuki",
+    "itemHatchAgent": "Hatch ajanı",
+    "itemMyAgents": "Ajanlarım",
+    "itemPublicAgents": "Kamu temsilcileri",
+    "itemFeatures": "Özellikler",
+    "itemCity": "Hatcher City",
+    "itemFrameworks": "Çerçeveler",
+    "itemPricing": "Fiyatlandırma",
+    "itemToken": "$HATCHER",
+    "itemStaking": "Staking",
+    "itemWhitepaper": "Beyaz Kitap",
+    "itemBlog": "Blog",
+    "itemRoadmap": "Yol haritası",
+    "itemChangelog": "Değişiklik Günlüğü",
+    "itemSecurity": "Güvenlik",
+    "itemPrivacy": "Gizlilik",
+    "itemTerms": "Terimler",
+    "itemCookies": "Kurabiyeler",
+    "itemImpressum": "Impressum",
+    "poweredBy": "Destekleyici"
+  },
+  "landing": {
+    "affiliateBanner": {
+      "live": "Ortaklık Programı yayında",
+      "earn": "— kazanç",
+      "pct": "40%",
+      "perReferral": "Her yönlendirmede",
+      "dismissAriaLabel": "Bağlı kuruluşun bağlanması"
+    },
+    "tokenBanner": {
+      "learnMore": "Daha fazla bilgi →"
+    },
+    "hero": {
+      "eyebrow": "Yönetilen Yapay Zeka Ajanı Barındırma · Kripto-native",
+      "headlinePrefix": "Hatch Your",
+      "typewriterWords": [
+        "AI Ajanı",
+        "Fitness Koçu",
+        "Kripto İzleyici",
+        "Çalışma Arkadaşı",
+        "Seyahat Planlayıcısı",
+        "Kişisel Asistan"
+      ],
+      "body": "Seç OpenClaw ya da Hermes. Yapılandır. 60 saniye içinde fırlatma. Kod gerekmiyor, yönetilecek altyapı yok. 20+ platform, barındırılan UsePod/OpenRouter modelleri ve BYOK.",
+      "ctaPrimary": "Ücretsiz başlayın",
+      "ctaSecondary": "Belgeleri okuyun",
+      "agentPreviewOnline": "CryptoHelper — Çevrimiçi"
+    },
+    "stats": {
+      "users": "Kullanıcılar",
+      "agents": "Ajanlar",
+      "activeNow": "Şu anda aktif"
+    },
+    "agentDiscovery": {
+      "eyebrow": "Yapay Zeka Ajanları İçin",
+      "heading": "Bir alt ajanlardan oluşan bir orduya komuta etmek",
+      "body": "Yerel kodlama ajanınız filo komutanı olur. Bu istri yapıştırın — adınıza Hatcher kayıt yapar, sürekli açık alt ajanları (Telegram botlar, araştırma döngüleri, Discord modlar, monitörler) açar ve oturumunuz bittikten sonra bile onları kontrol etmeye devam eder.",
+      "promptLabel": "Prompt",
+      "copyLabel": "Anlaşıldı",
+      "copiedLabel": "Kopyalandı",
+      "copyAriaLabel": "Kopyalama isteği",
+      "copiedAriaLabel": "Kopyalandı",
+      "step01": "Bu istemi yapay zeka kodlama ajanınıza — Claude Code, Cursor, OpenClaw, Hermes veya URL getirebilen ve shell komutlarını çalıştırabilen herhangi bir ajana gönderin.",
+      "step02": "Temsilci, e-postanızla bir hesap kaydeder ve size bir doğrulama bağlantısı gönderir.",
+      "step03": "Doğrulama tuşuna tıklayın. Hatcher yapılandırmayı taslaklar, dağıtır ve size çalışan bir yapay zekayı verir.",
+      "viewSkillMd": "Görüntü skill.md",
+      "githubSource": "GitHub Kaynak"
+    },
+    "howItWorks": {
+      "eyebrow": "Nasıl çalışır",
+      "heading": "3 adım. 60 saniye.",
+      "subheading": "Kodlama yok, kurulum rehberi yok, yapılandırma dosyası yok.",
+      "steps": [
+        {
+          "num": "01",
+          "title": "Bir çerçeve seçin",
+          "desc": "Beceri ağırlıklı otomasyon için OpenClaw ya da hafızalı adaptif uzun süreli ajanlar için Hermes seçin."
+        },
+        {
+          "num": "02",
+          "title": "Yapılandır",
+          "desc": "İsim, kişilik, entegrasyonlar. Basit bir form doldurun — yapılandırma dosyası yok, YAML yok."
+        },
+        {
+          "num": "03",
+          "title": "Konuşlandırma",
+          "desc": "Bir tık. Temsilciniz 60 saniyeden kısa sürede her bağlı platformda canlı oluyor."
+        }
+      ],
+      "cta": "Şimdi dene"
+    },
+    "useCases": {
+      "eyebrow": "Kullanım Durumları",
+      "heading": "Ne çıkaracaksın?",
+      "subheading": "Kişisel verimlilikten iş otomasyonuna kadar — ajanınız, kurallarınız.",
+      "items": [
+        {
+          "title": "Kişisel asistan",
+          "desc": "Takvim, e-postalar, hatırlatmalar — Telegram'den."
+        },
+        {
+          "title": "Fitness koçu",
+          "desc": "Antrenmanlar, rutinler, günlük hesap verebilirlik."
+        },
+        {
+          "title": "Gıda ve beslenme",
+          "desc": "Yemekleri kaydet, kalori say, tarif önerilerini yaz."
+        },
+        {
+          "title": "Kripto takipçisi",
+          "desc": "Token fiyatları, portföy uyarıları, zincir içi veriler."
+        },
+        {
+          "title": "Çalışma arkadaşı",
+          "desc": "Size sınav veriyor, ders kitaplarını özetliyor, ödevlerde yardımcı oluyor."
+        },
+        {
+          "title": "Seyahat planlayıcısı",
+          "desc": "Uçuşları bul, rota planla, yerel seçimleri bul."
+        },
+        {
+          "title": "Bütçe yöneticisi",
+          "desc": "Giderleri, tasarruf hedeflerini, haftalık raporları takip edin."
+        },
+        {
+          "title": "Araştırma asistanı",
+          "desc": "Web araması, makaleleri özetle, raporlar derle."
+        },
+        {
+          "title": "Müşteri desteği",
+          "desc": "SSS'leri 7/24 Discord veya WhatsApp'ta yanıtlayın."
+        }
+      ],
+      "footer": "Ve sade İngilizceyle tarif edebileceğiniz diğer her şey."
+    },
+    "frameworks": {
+      "eyebrow": "Çerçeveler",
+      "heading": "İki çerçeve. Tek platform.",
+      "subheading": "Temsilcinize uygun olanı seçin. İstediğin zaman değiştir.",
+      "items": [
+        {
+          "name": "OpenClaw",
+          "tag": "Çok yönlü oyuncu",
+          "desc": "Güçlü araçlar, eklentiler ve tarayıcı kontrolü.",
+          "features": "2500+ beceri · Tarayıcı otomasyonu · Dosya yönetimi"
+        },
+        {
+          "name": "Hermes",
+          "tag": "Gerekçe",
+          "desc": "Zengin hafıza ve akıl yürütme için akıllı tasarım.",
+          "features": "77 paketlenmiş beceri · Derin hafıza · Çok modelli"
+        }
+      ]
+    },
+    "city": {
+      "eyebrow": "★ YENİ",
+      "heading": "Hatcher City'daki tüm ajanları görün.",
+      "body": "Her kamu görevlisinin bir bina olduğu canlı bir 3D şehir. Bölgeler kategoriye göre, renkler çerçeveye göre, altın kirişler sizin bölgelerinizi işaretliyor. Sürükle, büyüt, herhangi bir binaya tıklayarak aç.",
+      "videoAriaLabel": "Açık Hatcher City",
+      "label": "HATCHER ŞEHRI",
+      "exploreCta": "Tüm filoyu keşfedin →",
+      "enterCta": "Şehre Giriş"
+    },
+    "features": {
+      "eyebrow": "Platform",
+      "heading": "Temsilcinizin ihtiyacı olan her şey",
+      "items": [
+        {
+          "title": "Anında dağıtım",
+          "desc": "Sıfırdan 60 saniyeden kısa sürede çalıştıran ajana geçmek."
+        },
+        {
+          "title": "Tüm platformlar",
+          "desc": "Telegram, Discord, Twitter, WhatsApp, Slack."
+        },
+        {
+          "title": "Kendi anahtarını getir",
+          "desc": "Kendi LLM API anahtarınızı kullanın, AI Credits harcamadan."
+        },
+        {
+          "title": "Varsayılan olarak güvenli",
+          "desc": "İzole konteynerler, şifrelenmiş sırlar, paylaşılan veri yok."
+        },
+        {
+          "title": "Canlı analiz",
+          "desc": "Gerçek zamanlı istatistikler, kullanım takibi, performans metrikleri."
+        },
+        {
+          "title": "Sohbet ve ses",
+          "desc": "Mesajlı sohbet, sesli aramalar, gerçek zamanlı yayın — kutudan çıktığı gibi."
+        }
+      ]
+    },
+    "pricing": {
+      "eyebrow": "Fiyatlandırma",
+      "heading": "Ücretsiz başlayın, hazır olunca büyütünüz",
+      "subheading": "Her planda tüm platformlar yer alıyor. Barındırılan yapay zeka ve web arama kullanımı AI Credits; BYOK sağlayıcı tarafından ödeniyor.",
+      "popularLabel": "Popüler",
+      "tiers": [
+        {
+          "name": "Ücretsiz",
+          "price": "$0",
+          "sub": "/ay",
+          "features": [
+            "1 Yapay Zeka ajanı",
+            "500 AI Credits/ay",
+            "2 GB çalışma alanı",
+            "Tüm platformlar",
+            "Dosya Yöneticisi + Tam Loglar"
+          ],
+          "cta": "Başla"
+        },
+        {
+          "name": "Başlangıç",
+          "price": "$6.99",
+          "sub": "/ay",
+          "features": [
+            "1 Yapay Zeka ajanı",
+            "3.000 AI Credits/ay",
+            "10 GB çalışma alanı",
+            "BYOK doğrudan faturalandırma",
+            "Her zaman aktif"
+          ],
+          "cta": "Başlangıç Seç"
+        },
+        {
+          "name": "Profesyonel",
+          "price": "$19.99",
+          "sub": "/ay",
+          "features": [
+            "3 Yapay Zeka ajanı",
+            "15.000 AI Credits/ay",
+            "25 GB çalışma alanı",
+            "BYOK doğrudan faturalandırma",
+            "Özel kaynaklar"
+          ],
+          "cta": "Pro Seç"
+        },
+        {
+          "name": "İş Dünyası",
+          "price": "$49.99",
+          "sub": "/ay",
+          "features": [
+            "5 Yapay Zeka Ajanı",
+            "40.000 AI Credits/ay",
+            "50 GB çalışma alanı",
+            "Her zaman açık olan konteynerler",
+            "Ekip iş birliği"
+          ],
+          "cta": "İşi Seç"
+        }
+      ],
+      "addonsNote": "Daha fazla ajan, AI Credits veya depolama alanına mı ihtiyacınız var? İhtiyacınız olduğunda ekstra kapasite ekleyin.",
+      "addonsCta": "Tam fiyatlandırma →"
+    },
+    "founding": {
+      "eyebrow": "Sınırlı teklif · Kurucu üye",
+      "heading": "Bir kez öde, sonsuza kadar sakla.",
+      "oneTime": "bir kez",
+      "subheading": "Sabit fiyat, aylık ücret yok, tüm İş seviyesi özellikler sonsuza dek. Sadece 20 yer.",
+      "availableSpotsLabel": "Mevcut yerler",
+      "checking": "Kontrol ediyorum...",
+      "soldOut": "Tükenmişti",
+      "spotsLeft": "{remaining} {max} kaldı",
+      "loadingAvailability": "Yükleme mevcudiyeti...",
+      "allTaken": "Tüm {max} kurucu yerler tutulmuştur. Standart seviyeler hâlâ mevcut.",
+      "claimed": "{max} {claimed} · Onlar gittikten sonra bu teklif de geçer.",
+      "includedHeading": "Her şey dahil, sonsuza dek",
+      "includedItems": [
+        "10 ajan dahil",
+        "Her zaman açık (uykusuz)",
+        "25.000 AI Credits/ay",
+        "Web arama AI Credits kullanır",
+        "2 CPU · Her ajan için 4 GB RAM",
+        "40 GB çalışma alanı",
+        "Dosya Yöneticisi + Tam Loglar",
+        "Öncelikli destek",
+        "Role Discord kurma + Telegram etiketi",
+        "Sonsuza dek sabit fiyat"
+      ],
+      "ctaSoldOut": "Tükenmişti",
+      "ctaClaim": "Yerinizi alın"
+    },
+    "faq": {
+      "eyebrow": "SSS",
+      "heading": "Sıkça sorulan sorular",
+      "items": [
+        {
+          "q": "Gerçekten ücretsiz mi?",
+          "a": "Evet. Ücretsiz plan size 1 ajan, ayda 500 AI Credits, 2 GB çalışma alanı, Dosya Yöneticisi, Tam Kayıtlar ve tüm platformlara erişim sağlıyor. Kredi kartı gerekmiyor. BYOK (kendi LLM anahtarınızı getirin) her seviyede sağlayıcı tarafından ödenmeye devam eder."
+        },
+        {
+          "q": "Kod yazmayı bilmem gerekiyor mu?",
+          "a": "Hiç de hayır! Bir ajan oluşturmak, bir form doldurmak gibidir — bir isim seçin, ne yapmasını istediğinizi açıklayın, platformları seçin ve başlatın."
+        },
+        {
+          "q": "\"Kendi Anahtarını Getir\" nedir?",
+          "a": "Kendi OpenAI, Anthropic, Google, OpenRouter veya desteklenen diğer LLM anahtarlarınızı bağlayın. BYOK kullanım doğrudan sağlayıcınıza ödenir ve Hatcher AI Credits harcamaz."
+        },
+        {
+          "q": "Ajanım nerede çalışıyor?",
+          "a": "Bulut sunucularımızda 7/24. Bilgisayarınızı açık tutmanıza veya bir şey kurmanıza gerek yok."
+        }
+      ]
+    },
+    "finalCta": {
+      "heading": "İlk ajanınızı görevlendirmeye hazır mısınız?",
+      "body": "Ücretsiz seviyede 1 ajan, ayda 500 AI Credits, Dosya Yöneticisi, Tam Günlükler ve 2 GB çalışma alanı yer alıyor. BYOK doğrudan faturalandırma. Kredi kartı gerekmiyor.",
+      "ctaPrimary": "Temsilcinizi oluşturun",
+      "ctaSecondary": "Fiyatlandırmaya bakınız",
+      "trustNoCreditCard": "Kredi kartı yok",
+      "trustFreeAi": "Ücretsiz yapay zeka dahil",
+      "trustDeploy60s": "60'larda göreve",
+      "trustAllPlatforms": "Tüm platformlar"
+    }
+  },
+  "auth": {
+    "login": {
+      "heading": "Tekrar hoş geldin",
+      "subheading": "Hatcher hesabınıza giriş yapın",
+      "panelTagline": "Hatcher",
+      "panelHeadlinePrefix": "Hatch your",
+      "panelHeadlineAccent": "Yapay zeka ajanı.",
+      "panelBody": "Bir çerçeve seçin. Yapılandır. 60 saniye içinde fırlatma. Kod yok, altyapı yok.",
+      "statsUsers": "Kullanıcılar",
+      "statsAgents": "Ajanlar",
+      "statsOnline": "Şimdi çevrimiçi",
+      "emailLabel": "E-posta",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Şifre",
+      "passwordPlaceholder": "Şifrenizi girin",
+      "forgotLink": "Şifreyi unuttun mu?",
+      "submit": "Giriş Yapın",
+      "submitLoading": "Giriş yapıyorum...",
+      "registerPrompt": "Hesabınız yok mu?",
+      "registerLink": "Kayıt Olun"
+    },
+    "register": {
+      "heading": "Hesap oluştur",
+      "subheading": "Başlayın Hatcher",
+      "panelTagline": "Hatcher",
+      "panelHeadlinePrefix": "Hatch your",
+      "panelHeadlineAccent": "Yapay zeka ajanı.",
+      "panelBody": "Ücretsiz seviye AI Credits içerir. BYOK kullanım doğrudan sağlayıcınıza ödenir. Kredi kartı gerekmiyor.",
+      "statsUsers": "Kullanıcılar",
+      "statsAgents": "Ajanlar",
+      "statsOnline": "Şimdi çevrimiçi",
+      "referralBadge": "{referrer} tarafından yönlendirildi — ikiniz de {credit} alıyorsunuz!",
+      "emailLabel": "E-posta",
+      "emailPlaceholder": "you@example.com",
+      "emailTaken": "Zaten kayıt oldum.",
+      "emailTakenLink": "Bunun yerine giriş yapın",
+      "emailInvalid": "Geçerli bir e-posta adresi girin.",
+      "usernameLabel": "Kullanıcı adı",
+      "usernamePlaceholder": "cooluser123",
+      "usernameTaken": "Bu kullanıcı adı zaten kullanılmış. Başka birini seç.",
+      "usernameInvalid": "3–30 harf, sayı, tire veya alt çizgi.",
+      "usernameHint": "Sadece harfler, sayılar, tire ve alt çizgiler",
+      "passwordLabel": "Şifre",
+      "passwordPlaceholder": "Güçlü bir şifre girin",
+      "passwordHint": "Şunları içermelidir: 8+ karakter, büyük harf, küçük harf, sayı ve özel karakter",
+      "confirmPasswordLabel": "Şifreyi Onayla",
+      "confirmPasswordPlaceholder": "Şifrenizi tekrar edin",
+      "strengthLabels": {
+        "veryWeak": "Çok zayıf",
+        "weak": "Zayıf",
+        "fair": "Adil",
+        "strong": "Güçlü",
+        "veryStrong": "Çok güçlü"
+      },
+      "strengthChecks": {
+        "length": "8+ karakter",
+        "lowercase": "Küçük harf",
+        "uppercase": "Büyük harf",
+        "number": "Sayı",
+        "special": "Özel karakter"
+      },
+      "submit": "Hesap Oluştur",
+      "submitLoading": "Hesap oluşturuyorum...",
+      "loginPrompt": "Zaten bir hesabınız var mı?",
+      "loginLink": "Giriş Yapın",
+      "errors": {
+        "emailTaken": "Bu e-posta zaten kayıtlıdır. Bunun yerine giriş yapmayı dene.",
+        "usernameTaken": "Bu kullanıcı adı zaten kullanılmış. Başka birini seç.",
+        "passwordMismatch": "Şifreler eşleşmiyor",
+        "passwordTooShort": "Şifre en az 8 karakter olmalı",
+        "passwordComplexity": "Şifre büyük harf, küçük harf, sayı ve özel bir karakter içermelidir"
+      }
+    },
+    "forgotPassword": {
+      "heading": "Şifreyi unuttun mu?",
+      "subheading": "E-posta adresinizi girin, size bir sıfırlama bağlantısı göndereceğiz",
+      "emailLabel": "E-posta",
+      "emailPlaceholder": "you@example.com",
+      "submit": "Reset Linki Gönder",
+      "submitLoading": "Gönderiyorum...",
+      "backToLogin": "Giriş için geri dön",
+      "successHeading": "E-postanızı kontrol edin",
+      "successBody": "<bold>{email}</bold> için bir hesap varsa, şifre sıfırlama bağlantısı gönderdik. Gelen kutunuzu ve spam klasörünüzü kontrol edin.",
+      "successBackLink": "Giriş için geri dön",
+      "genericError": "Bir şeyler ters gitti. Lütfen tekrar dene."
+    },
+    "resetPassword": {
+      "heading": "Yeni şifre belirleyin",
+      "subheading": "Yeni şifrenizi aşağıya girin",
+      "newPasswordLabel": "Yeni Şifre",
+      "newPasswordPlaceholder": "8+ karakter, üst, alt, sayı, özel",
+      "passwordRequirements": "8+ karakter kullanarak büyük harf, küçük harf, sayı ve özel karakter kullanın.",
+      "confirmPasswordLabel": "Şifreyi Onayla",
+      "confirmPasswordPlaceholder": "Şifrenizi tekrar edin",
+      "passwordMismatch": "Şifreler eşleşmiyor",
+      "submit": "Şifreyi Sıfırla",
+      "submitLoading": "Sıfırlama...",
+      "backToLogin": "Giriş için geri dön",
+      "successHeading": "Şifre Sıfırlama",
+      "successBody": "Şifreniz güncellendi. Artık yeni şifrenle giriş yapabilirsin.",
+      "successCta": "Giriş Yapın",
+      "invalidHeading": "Geçersiz Sıfırlama Bağlantısı",
+      "invalidBody": "Bu sıfırlama bağlantısı eksik ya da geçersiz. Lütfen yeni bir tane talep edin.",
+      "invalidCta": "Yeni sıfırlama bağlantısı talep et",
+      "genericError": "Sıfırlama başarısız oldu. Bağlantı süresi dolup taşmış olabilir."
+    },
+    "verifyEmail": {
+      "loadingHeading": "E-postanızı doğrulamak...",
+      "successHeading": "E-posta Doğrulandı!",
+      "successBody": "Hesabınız artık aktif. Ajanlar oluşturmaya başlayabilirsiniz.",
+      "successCta": "Dashboard'a git",
+      "errorHeading": "Doğrulama Başarısız Oldu",
+      "errorBody": "Doğrulama bağlantısı geçersiz veya süresi dolmuş.",
+      "errorCta": "Giriş Sayfasına Geç",
+      "noTokenHeading": "E-postanızı Kontrol Edin",
+      "noTokenBody": "E-postanıza doğrulama bağlantısı gönderdik. Hesabınızı etkinleştirmek için bağlantıya tıklayın.",
+      "noTokenHint": "Almadım mı? Spam klasörünüzü kontrol edin veya yeniden göndermek için giriş yapmayı deneyin."
+    }
+  },
+  "pricing": {
+    "eyebrow": "Fiyatlandırma",
+    "heading": "Planınızı seçin",
+    "subheading": "Herhangi bir çerçeveyle ücretsiz başlayın. Hazır olduğunda ölçeklen. Tüm entegrasyonlar her seviyede dahil. BYOK her seviyede sağlayıcı tarafından ödeniyor.",
+    "hatcherDiscountBanner": "$HATCHER ile %10 indirim planları ve ekstra indirimler için ödeme yapın.",
+    "hatcherDiscountLine": "$HATCHER fiyatı: ${price}",
+    "hatcherDiscountAnnual": "$HATCHER yıllık fiyatı: ${price}",
+    "billingToggle": {
+      "monthly": "Aylık",
+      "annual": "Yıllık",
+      "annualDiscount": "−%15"
+    },
+    "tierBadges": {
+      "popular": "Popüler",
+      "limited": "Sınırlı"
+    },
+    "priceUnit": {
+      "perMonth": "/mo",
+      "once": "bir kez"
+    },
+    "annualSavings": "${annualTotal}/yıl · Kurtar ${saved}",
+    "switchToAnnual": "Yıllık sisteme geç, %15 tasarruf et",
+    "payOnce": "Bir kez öde, sonsuza kadar sakla",
+    "availability": "Erişilebilirlik",
+    "availabilityLoading": "Yükleme",
+    "soldOut": "Tükenmişti",
+    "slotsLeft": "{remaining} {max} kaldı",
+    "tierCta": {
+      "free": "Başla",
+      "paid": "Seç {tierName}"
+    },
+    "tiers": {
+      "free": {
+        "agents": "1 ajan dahil",
+        "messages": "500 AI Credits/ay",
+        "cpu": "1 CPU",
+        "ram": "1 GB RAM",
+        "storage": "2 GB çalışma alanı",
+        "sleep": "12 saat boşta durduktan sonra otomatik uyku",
+        "features": [
+          "UsePod/OpenRouter üzerinden sunulan modeller",
+          "Web arama AI Credits kullanır",
+          "Dosya Yöneticisi + Tam Loglar dahil",
+          "Tüm entegrasyonlar (Telegram, Discord, Twitter vb.)"
+        ],
+        "missing": []
+      },
+      "starter": {
+        "agents": "1 ajan dahil",
+        "messages": "3.000 AI Credits/ay",
+        "cpu": "1 CPU",
+        "ram": "1.5 GB RAM",
+        "storage": "10 GB çalışma alanı",
+        "sleep": "Her zaman aktif",
+        "features": [
+          "UsePod/OpenRouter üzerinden sunulan modeller",
+          "Web arama AI Credits kullanır",
+          "Dosya Yöneticisi + Tam Loglar dahil",
+          "Tüm entegrasyonlar"
+        ],
+        "missing": []
+      },
+      "pro": {
+        "agents": "3 ajan dahil edildi",
+        "messages": "15.000 AI Credits/ay",
+        "cpu": "1.5 CPU",
+        "ram": "2 GB RAM",
+        "storage": "25 GB çalışma alanı",
+        "sleep": "Her zaman aktif",
+        "features": [
+          "UsePod/OpenRouter üzerinden sunulan modeller",
+          "Web arama AI Credits kullanır",
+          "Dosya Yöneticisi + Tam Loglar dahil",
+          "Tüm entegrasyonlar"
+        ],
+        "missing": []
+      },
+      "business": {
+        "agents": "5 ajan dahil",
+        "messages": "40.000 AI Credits/ay",
+        "cpu": "2 CPU",
+        "ram": "3 GB RAM",
+        "storage": "50 GB çalışma alanı",
+        "sleep": "Her zaman aktif",
+        "features": [
+          "UsePod/OpenRouter üzerinden sunulan modeller",
+          "Web arama AI Credits kullanır",
+          "Dosya Yöneticisi dahil",
+          "Tam kayıtlar dahil",
+          "Öncelikli destek",
+          "Ekip iş birliği",
+          "Tüm entegrasyonlar"
+        ],
+        "missing": []
+      },
+      "founding_member": {
+        "agents": "10 ajan dahil",
+        "messages": "25.000 AI Credits/ay",
+        "cpu": "2 CPU",
+        "ram": "4 GB RAM",
+        "storage": "40 GB çalışma alanı",
+        "sleep": "Her zaman aktif",
+        "features": [
+          "$99 tek seferlik — ömür boyu erişim",
+          "UsePod/OpenRouter üzerinden sunulan modeller",
+          "Web arama AI Credits kullanır",
+          "Dosya Yöneticisi + Tam Loglar dahil",
+          "Öncelikli destek",
+          "Tüm entegrasyonlar",
+          "Role Discord kurma + Telegram etiketi"
+        ],
+        "missing": []
+      }
+    },
+    "addons": {
+      "heading": "Ekstralar",
+      "subheading": "Daha fazla kapasiteye ihtiyacınız olduğunda yapay zeka kredi paketleri veya ekstra ajan slotları ekleyin.",
+      "annualDiscount": "Yıllık %15 indirim",
+      "hatcherDiscount": "$HATCHER: ${price}",
+      "groups": {
+        "extraAgents": {
+          "label": "Ekstra Ajanlar",
+          "items": [
+            {
+              "name": "+1 Ajan",
+              "period": "/mo",
+              "description": "1 ekstra slot"
+            },
+            {
+              "name": "+3 Ajanlar",
+              "period": "/mo",
+              "description": "3 ekstra slot"
+            },
+            {
+              "name": "+5 Ajanlar",
+              "period": "/mo",
+              "description": "5 ekstra slot"
+            },
+            {
+              "name": "+10 Ajan",
+              "period": "/mo",
+              "description": "10 ekstra slot"
+            }
+          ]
+        },
+        "aiCredits": {
+          "label": "AI Credits",
+          "items": [
+            {
+              "name": "5.000 AI Credits",
+              "period": "bir kez",
+              "description": "Barındırılan modeller ve web araması"
+            },
+            {
+              "name": "10.000 AI Credits",
+              "period": "bir kez",
+              "description": "Daha ağır model çalışmaları ve araştırmalar"
+            },
+            {
+              "name": "25.000 AI Credits",
+              "period": "bir kez",
+              "description": "Daha büyük ajan iş yükleri"
+            },
+            {
+              "name": "50.000 AI Credits",
+              "period": "bir kez",
+              "description": "Yüksek hacimli barındırma kullanımı"
+            }
+          ]
+        },
+        "perAgent": {
+          "label": "Eklentiler + Beceriler",
+          "items": [
+            {
+              "name": "Eklentiler dahil edilmiştir",
+              "period": "dahil",
+              "description": "Her seviyede yer alıyor"
+            }
+          ]
+        }
+      }
+    },
+    "integrations": {
+      "heading": "Tüm Entegrasyonlar Ücretsiz",
+      "badge": "her seviye",
+      "body": "Telegram, Discord, WhatsApp, Slack, Signal, iMessage ve 14+ daha platformlar tüm seviyelerde ücretsiz olarak dahil edilmiştir. Ekstra ücret yok, asla.",
+      "note": "Tüm fiyatlar USD cinsinden listelenmiştir. Kart, SOL, USDC Solana, $HATCHER veya $KAUSA ile ödeme yapın. $HATCHER ödemeler %10 indirim alıyor; Barındırılan model ve web arama kullanımı AI Credits ile ölçülürken, BYOK doğrudan kendi sağlayıcı anahtarınızla ödenir."
+    },
+    "compareTable": {
+      "heading": "Planları Karşılaştırın",
+      "subheading": "Her seviyenin neler içerdiğini bir bakışta görün",
+      "featureColumn": "Özellik",
+      "onceSuffix": "bir kez",
+      "rows": {
+        "agents": "Ajanlar arasında",
+        "messages": "AI Credits/ay",
+        "searches": "Web araması",
+        "byok": "BYOK sağlayıcı kullanımı",
+        "cpuRam": "CPU / RAM",
+        "storage": "Depolama",
+        "autoSleep": "Otomatik uyku",
+        "fileManager": "Dosya Yöneticisi",
+        "fullLogs": "Tam Kayıtlar",
+        "teamCollab": "Ekip iş birliği",
+        "prioritySupport": "Öncelikli destek",
+        "plugins": "Eklentiler + Beceriler",
+        "integrations": "Tüm entegrasyonlar",
+        "byokKey": "BYOK (kendi LLM tuşu)",
+        "defaultLlm": "Model seçimi"
+      },
+      "values": {
+        "unlimited": "Unlimited",
+        "alwaysOn": "Her zaman açık",
+        "addon": "Eklenti",
+        "llama4Scout": "Sağlayıcı/model seçici"
+      }
+    },
+    "faq": {
+      "heading": "Sıkça Sorulan Sorular",
+      "items": [
+        {
+          "q": "BYOK (Kendi Anahtarını Getir) nedir?",
+          "a": "BYOK, desteklenen herhangi bir LLM sağlayıcısı için kendi API anahtarınızı kullanmanıza izin verir (OpenAI, Anthropic, Google, xAI, OpenRouter ve daha fazlası). Bu her kademe için ücretsizdir -- doğrudan sağlayıcıya ödeme yaparsınız, Hatcher fark yok. Hatcher AI Credits BYOK kullanımını ölçmez."
+        },
+        {
+          "q": "Ekstralar nasıl çalışır?",
+          "a": "AI Kredi paketleri, barındırılan modeller ve web araması için tek seferlik takviyelerdir. Ekstra ajan slotları ayrıca kapasiteyi artırır."
+        },
+        {
+          "q": "Paylaşılan ve özel kaynaklar arasındaki fark nedir?",
+          "a": "Paylaşılan kaynaklar, ajanınızın CPU ve RAM'i aynı sunucudaki diğer kişilerle paylaşması anlamına gelir — hala performanslıdır ama yük altında değişebilir. Özel kaynaklar (Pro ve İş), ajanınıza kimsenin kullanamayacağı garantili CPU ve RAM sağlar."
+        },
+        {
+          "q": "Hangi ödeme yöntemleri kabul ediliyor?",
+          "a": "Kart, SOL, USDC Solana, $HATCHER veya $KAUSA ile ödeme yapabilirsiniz. Kripto fiyatları USD cinsinden listelenir ve Jupiter üzerinden canlı oranlara dönüştürülür."
+        },
+        {
+          "q": "Seviyemi düşürebilir miyim?",
+          "a": "Evet. Aboneliğinizi istediğiniz zaman iptal edebilirsiniz ve faturalama süresi sonunda seviyeniz Ücretsiz olarak geri dönecektir. Serbest sınırınızı aşan ajanlar durakta tutulacak."
+        },
+        {
+          "q": "Otomatik uyku nedir?",
+          "a": "Serbest oyuncular 12 saatlik hareketsizlikten sonra uyur. Başlangıç, Pro, İş ve Kurucu Üye temsilcileri otomatik uyku olmadan her zaman aktiftir."
+        },
+        {
+          "q": "Ücretsiz seviyeyle hangi LLM alabilirim?",
+          "a": "Barındırılan kullanım, AI Kredi bakiyenizden ücretlendirilir ve seçilen Hatcher destekli sağlayıcı üzerinden yönlendirilir; mevcut yerlerde yedek destekler de vardır. Desteklenen barındırılan modellerden seçim yapabilirsiniz; BYOK sağlayıcınıza doğrudan ödeme yaptığınız Hatcher AI Kredi Ölçümünü atlar."
+        },
+        {
+          "q": "Kurucu Üye seviyesi nedir?",
+          "a": "Kurucu Üye, ömür boyu erişim sağlayan tek seferlik $99 ödemedir ve size ömür boyu Hatcher erişim sağlar: 10 ajan, ayda 25.000 AI Credits, 2 CPU / 4 GB RAM, 40 GB çalışma alanı, her zaman aktif ajanlar, Dosya Yöneticisi, Tam Loglar, öncelikli destek ve Founding Discord rolü + Telegram etiketi. Aylık ücret yok, asla. 20 yerle sınırlı — onlar gittikten sonra bu seviye de yok oluyor."
+        }
+      ]
+    },
+    "help": {
+      "text": "Plan için yardıma mı ihtiyacınız var?",
+      "emailLabel": "Bize e-posta gönderin",
+      "discordLabel": "Discord",
+      "telegramLabel": "Telegram"
+    },
+    "cta": {
+      "heading": "Ajanınızı görevlendirmeye hazır mısınız?",
+      "body": "İstediğiniz ajanı tarif edin ve saniyeler içinde göreve verin. Barındırılan AI Credits ile ücretsiz başlayın. Daha fazla güce ihtiyacınız olduğunda yükseltin.",
+      "createAgent": "Ajan Oluştur",
+      "seeFrameworks": "Bkz. Çerçeveler"
+    },
+    "footerNote": "Tüm fiyatlar USD cinsinden, kartla ödenebilir, SOL, USDC Solana, $HATCHER veya $KAUSA ile ödenebilir. Barındırılan model ve web arama kullanımı AI Credits ile ölçülür; BYOK doğrudan kendi sağlayıcı anahtarınızla ödenir."
+  },
+  "dashboard": {
+    "common": {
+      "loading": "Yükleniyor...",
+      "authenticating": "Doğrulama...",
+      "signInRequired": "Giriş Zorunlu",
+      "signIn": "Giriş Yapın",
+      "refresh": "Yenileme",
+      "save": "Kayd et",
+      "cancel": "İptal et",
+      "delete": "Sil",
+      "create": "Yarat",
+      "invite": "Davet et",
+      "share": "Paylaş",
+      "unshare": "Paylaşmayı Kaldır",
+      "copy": "Anlaşıldı",
+      "copied": "Kopyalandı!",
+      "close": "Kapat",
+      "confirm": "Onay",
+      "back": "Geri",
+      "noDescription": "Açıklama yok",
+      "clear": "Temiz"
+    },
+    "agents": {
+      "eyebrow": "Dashboard",
+      "heading": "Ajanlarım",
+      "subtitleEmpty": "Başlamak için ilk temsilcinizi oluşturun.",
+      "createCta": "Ajan oluştur",
+      "searchPlaceholder": "Arama ajanları... ( / )",
+      "filterAll": "Hepsi",
+      "frameworkAll": "Tüm Çerçeveler",
+      "sortNewest": "En yenisi",
+      "sortAZ": "A-Z",
+      "sortMessages": "En Aktif",
+      "sortActive": "Son Aktif",
+      "emptyTitle": "Henüz ajan yok",
+      "emptyDescription": "İlk yapay zeka ajanınızı oluşturun ve 60 saniyede dağıtın.",
+      "emptyActionLabel": "Ajan Oluştur",
+      "emptySecondaryLabel": "Bkz. Çerçeveler",
+      "noMatchTitle": "Eşleştirme ajanları yok",
+      "noMatchDescription": "Arama veya filtreleme kriterlerinizi ayarlamayı deneyin.",
+      "signInDescription": "Temsilcilerinize erişmek için hesabınıza giriş yapın.",
+      "featuresCount": "{count} özelliği",
+      "featuresCountPlural": "{count} özellikleri",
+      "agentsCount": "{count} toplam ajanı · {active} aktif",
+      "agentsCountPlural": "{count} ajanların toplam · {active} aktif",
+      "details": "Detaylar",
+      "tourCreateTitle": "İlk Temsilcinizi Oluşturun",
+      "tourCreateDescription": "İlk yapay zeka ajanınızı OpenClaw veya Hermes ile açmak için buraya tıklayın.",
+      "tourFilterTitle": "Çerçeveye Göre Filtre",
+      "tourFilterDescription": "OpenClaw otomasyon için en iyisidir; Hermes uyarlanabilir bellek iş akışları için en iyisidir.",
+      "tourSearchTitle": "Arama ve Keşf",
+      "tourSearchDescription": "Hızlı başlamak için ajanları arayın veya Chat-to-Hatch fırlatın.",
+      "tourPlanTitle": "Planın",
+      "tourPlanDescription": "Ücretsiz başlayın, 1 ajan, ayda 500 AI Credits ve dahil edilen araçlar. İstediğin zaman yükseltebilirsin.",
+      "statTotal": "Toplam",
+      "statActive": "Aktif",
+      "statSleeping": "Uyumak",
+      "statMeshReady": "Mesh hazır",
+      "viewAgents": "Ajanlar",
+      "viewOrchestration": "Orkestrasyon",
+      "meshTitle": "Ajan orkestrasyon ağı",
+      "meshSubtitle": "Aynı sahip ajanları bağlayın, sınırlı görevleri gönderin ve güncel ajanlar arasında faaliyetleri tek bir yerden inceleyin.",
+      "meshSource": "Kaynak ajan",
+      "meshTarget": "Hedef ajan",
+      "meshSelectTarget": "Hedef seç",
+      "meshNoAgents": "Çağrılabilir ajan yok",
+      "meshModeSync": "Senkronizasyon",
+      "meshModeAsync": "Asenkron",
+      "meshTaskLabel": "Görev",
+      "meshTaskPlaceholder": "Bir ajandan başka bir ajan için sınırlı bir görevi araştırmasını, incelemesini, özetlemesini veya yerine getirmesini istemek...",
+      "meshSend": "Gönderme görevi",
+      "meshRefresh": "Yenileme",
+      "meshEnableAll": "Mesh etkinleştir",
+      "meshEnableAgent": "Etkinleştir",
+      "meshOpenDev": "Geliştirici sekmesi",
+      "meshAvailable": "Mevcut",
+      "meshDisabled": "Engelli",
+      "meshRecent": "Son mesh aktiviteleri",
+      "meshNoLogs": "Henüz ajandan ajana arama yok.",
+      "msgsShort": "Etkileşimler",
+      "cardOpen": "3D Oda",
+      "cardOpenTooltip": "3D Oda'ya Gir",
+      "actionStop": "Dur",
+      "actionStart": "Başlangıç",
+      "actionRestart": "Yeniden başlatma",
+      "noResultsAction": "Temiz filtreler"
+    },
+    "billing": {
+      "eyebrow": "Hesap",
+      "heading": "Faturalandırma ve planlar",
+      "breadcrumbDashboard": "Dashboard",
+      "breadcrumbBilling": "Faturalandırma",
+      "connectWallet": "Connect Wallet",
+      "connectedWallet": "Bağlı cüzdan",
+      "switchWallet": "Cüzdanı değiştir",
+      "disconnect": "Kopuk",
+      "loadingBilling": "Fatura yükleniyor...",
+      "signInDescription": "Planınızı ve faturalamanızı yönetmek için giriş yapın.",
+      "creditsBalance": "AI Credits Denge",
+      "creditsUsd": "AI Credits",
+      "creditsDesc": "AI Credits barındırılan LLM'ler, web araması, araştırma, çıkarma ve tarama araçları için kullanılır.",
+      "recentTransactions": "Son İşlemler",
+      "currentTier": "Mevcut Plan",
+      "freeTier": "Serbest Seviye",
+      "active": "Aktif",
+      "agentUsage": "Ajan Kullanımı",
+      "agentsOf": "{count} kullanılan {limit} ajanlar",
+      "agentsOver": "{over} aşırı limit",
+      "slotsRemaining": "{slots} kalan slot",
+      "slotsRemainingPlural": "{slots} kalan slotlar",
+      "activeAddons": "Aktif Ekstralar",
+      "expires": "Süresi {date}",
+      "extend": "Genişletme",
+      "extend30Days": "+30 gün uzatın (${price})",
+      "upgradeAnnual": "Yıllık (${price}) yükseltme",
+      "annualDiscount": "-15%",
+      "renew": "Yenileme",
+      "renewFor": "Yenileme ${price}",
+      "planExpired": "Planın süresi doldu — seviyenizi korumak için yenileyin",
+      "planExpiring": "{days} gün içinde süresi dolacak — şimdi yenileyin",
+      "planExpiringPlural": "{days} gün içinde sona erer — şimdi yenileyin",
+      "planActiveUntil": "Aktif {date}",
+      "noCharge": "Ücret yok",
+      "lifetimePrice": "Yaşam Boyu",
+      "lifetimePriceFull": "${price} ömrü",
+      "monthlyPrice": "${price} / 30 gün",
+      "unlimitedMessages": "AI Credits",
+      "messagesPerDay": "{count} AI Credits",
+      "byokUnlimited": "",
+      "upgradeSection": "Planınızı Yükseltin",
+      "upgradeDesc": "Daha fazla ajan, AI Credits ve hesaplama gücü alın.",
+      "addonsSection": "Ekstralar",
+      "addonsDesc": "Mevcut planınıza ekstra kapasite biriktirin.",
+      "accountAddons": "Hesap Düzeyinde Ekstralar",
+      "perAgentAddons": "Ajan başına Ekstralar",
+      "annualBilling": "Yıllık faturalandırma",
+      "annualBillingDesc": "%15 indirim — tekrarlayan ekstralar",
+      "hatcherDiscountTitle": "$HATCHER ile %10 indirim",
+      "hatcherDiscountBody": "Planlar, AI Kredi paketleri ve ekstra temsilci slotları için $HATCHER on Solana kullanın. İndirim, cüzdan onayından önce uygulanır.",
+      "monthly": "Aylık",
+      "annual": "Yıllık",
+      "monthSuffix": "/ 30 gün",
+      "annualSuffix": "/ yıl",
+      "yearSuffix": "/ yıl",
+      "paymentHistory": "Ödeme Geçmişi",
+      "noPaymentsYet": "Henüz ödeme yok",
+      "noPaymentsDesc": "Ödeme geçmişiniz burada görünecektir.",
+      "status": {
+        "confirmed": "Onaylandı",
+        "pending": "Bekleme",
+        "failed": "Başarısız",
+        "refunded": "İade edildi"
+      },
+      "selectAgent": "Select Agent",
+      "choosePayment": "Ödeme Yöntemini Seçin",
+      "applyToAgent": "Temsilciye başvurun:",
+      "noAgentsFound": "Ajan bulunamadı. Önce bir ajan oluşturun.",
+      "payWithSol": "Ödeme SOL",
+      "solDesc": "Solana cüzdan ödemesi",
+      "payWithHatcher": "Ödeme $HATCHER",
+      "hatcherDesc": "HATCHER tokeni Solana",
+      "hatcherDiscountDesc": "$HATCHER ile %10 indirim: {price}",
+      "payWithKausa": "Ödeme $KAUSA",
+      "kausaDesc": "KausaLayer ortak tokenı Solana",
+      "payWithUsdcSolana": "Ödeme USDC Solana",
+      "usdcSolanaDesc": "SPL USDC Solana cüzdan üzerinden",
+      "payWithCryptoNow": "CryptoNow üzerinden ödeme yapın",
+      "cryptnowDesc": "Sunuculu SOL / USDC çıkış",
+      "payWithUsdc": "Ödeme USDC",
+      "usdcDesc": "Stablecoin — 1 USDC = $1",
+      "payWithCard": "Kartla Ödeme",
+      "cardDesc": "Kredi kartı Stripe",
+      "foundingSlots": "{remaining} {max} slotu kaldı",
+      "foundingSoldOut": "Tükenmişti",
+      "oneTimeSuffix": "bir kez",
+      "oneTimeAgent": "Bir Kez / Ajan",
+      "annualAgent": "/ yıl / ajan",
+      "monthAgent": "/ 30 gün / ajan",
+      "manageBilling": "Faturalamayı Yönetin",
+      "successPayment": "Ödeme başarılı! Hesabınız yükseltiliyor. Düşünmek biraz zaman alabilir.",
+      "canceledPayment": "Ödeme iptal edildi. Herhangi bir suçlama yapılmadı."
+    },
+    "analytics": {
+      "eyebrow": "Dashboard",
+      "heading": "Kullanım Analitiği",
+      "subheading": "Hesap genelinde etkileşimler, barındırılan kullanım ve AI Credits.",
+      "signInDescription": "Analitikleri görmek için giriş yapın.",
+      "interactionVolume": "Etkileşim Hacmi",
+      "messageVolume": "Etkileşim Hacmi",
+      "last14Days": "Son 14 gün",
+      "last30Days": "Son 30 gün",
+      "frameworks": "Çerçeveler",
+      "agentStatus": "Ajan Durumu",
+      "totalMessages": "Ajan Etkileşimleri",
+      "noMessageData": "Henüz etkileşim veri yok — temsilcilerinizle sohbet etmeye başlayın!",
+      "noAgentsYet": "Henüz ajan yok",
+      "noAgentsEmpty": "Henüz ajan yok. İlk ajanınızı oluşturarak analitiklerle görüşmeye başlayın.",
+      "createAgent": "Ajan Oluştur",
+      "totalAgents": "Toplam Ajanlar",
+      "totalAgentsSub": "{active} aktif",
+      "messages": "Etkileşimler",
+      "messagesAllTime": "Tüm zamanlar",
+      "llmCalls": "LLM Çağrıları",
+      "llmCallsAllTime": "Tüm zamanlar",
+      "aiCreditsBalance": "AI Credits",
+      "monthlyGrant": "{count} aylık hibe",
+      "aiCreditsUsed": "AI Credits Kullanılanlar",
+      "hostedUsage": "Barındırılan Kullanım",
+      "hostedUsageSubheading": "Barındırılan LLM, web araması, araştırma, çıkarma ve tarama hesabı tüketim AI Credits. BYOK kullanımı bu sayacı atlar.",
+      "remainingBalance": "Kalan denge",
+      "usedLast30": "Son 30 gün kullanıldı",
+      "usageByKind": "Türe göre kullanım",
+      "tokensProcessed": "İşleme Yapılan Jetonlar",
+      "inputTokens": "Giriş",
+      "outputTokens": "Çıktı",
+      "noHostedUsageYet": "Henüz hosted kullanım yok. BYOK kullanım AI Credits harcamaz.",
+      "last14DaysLabel": "Son 14 Gün",
+      "last14DaysSub": "Kullanıcı etkileşimleri",
+      "today": "Bugün",
+      "noDataYet": "Henüz etkileşim veri yok"
+    },
+    "team": {
+      "eyebrow": "İşbirliği",
+      "heading": "Takım",
+      "subheading": "Ajanları paylaşmak ve başkalarıyla iş birliği yapmak için bir ekip oluşturun.",
+      "signInTitle": "Teams'e erişmek için giriş yapın",
+      "signInDesc": "Teams, yapay zeka ajanlarınızda başkalarıyla iş birliği yapmanızı sağlıyor.",
+      "createTeamTitle": "Ekibinizi Oluşturun",
+      "createTeamDesc": "İş birliğine bir ekip oluşturarak başlayın. Sonra üyeleri davet edebilir ve temsilcilerinizi paylaşabilirsiniz.",
+      "teamNamePlaceholder": "Takım adı...",
+      "createBtn": "Yarat",
+      "creating": "Yaratmak...",
+      "membersHeading": "Üyeler",
+      "inviteMemberHeading": "Davetli Üye",
+      "emailPlaceholder": "E-posta adresi...",
+      "invite": "Davet et",
+      "roleAdmin": "Yönetici",
+      "roleMember": "Üye",
+      "roleViewer": "İzleyici",
+      "roleOwner": "Sahibi",
+      "you": "(sen)",
+      "sharedAgentsHeading": "Paylaşılan Ajanlar",
+      "noSharedAgents": "Henüz bu ekiple paylaşan hiç ajan yok.",
+      "yourAgentsHeading": "Senin Ajanların",
+      "byLabel": "{username} tarafından",
+      "memberCount": "{count} üyesi",
+      "memberCountPlural": "{count} üyeleri",
+      "agentSharedCount": "{count} temsilcisi paylaştı",
+      "agentSharedCountPlural": "{count} ajanlar paylaşıldı",
+      "leaveTeam": "Bırak",
+      "leaveTeamTitle": "Takımdan Ayrıl",
+      "leaveTeamDesc": "Bu takımdan ayrılmak istediğinden emin misin? Tüm paylaşılan ajanlara erişimi kaybedeceksiniz.",
+      "leaveTeamConfirm": "Takımdan Ayrıl",
+      "deleteTeam": "Sil Takımı",
+      "deleteTeamTitle": "Sil Takımı",
+      "deleteTeamDesc": "Bu takımı kalıcı olarak silmek istediğinizden emin misiniz? Tüm paylaşılan ajanlar paylaşılmadan kaldırılacaktır.",
+      "deleteTeamConfirm": "Sil Takımı",
+      "errors": {
+        "loadFailed": "Takım verisi yüklenemedi",
+        "createFailed": "Takım kuramadı",
+        "inviteFailed": "Üye davet edilmedi",
+        "removeFailed": "Üye çıkarılamadı",
+        "leaveFailed": "Takımdan ayrılmayı başaramadı",
+        "deleteFailed": "Takımı silmek başarısız oldu",
+        "shareFailed": "Temsilci paylaşımı başarısız oldu",
+        "unshareFailed": "Temsilcinin paylaşımını kaldırma başarısız oldu",
+        "roleFailed": "Rol güncellenemedi"
+      }
+    },
+    "affiliate": {
+      "eyebrow": "Dashboard",
+      "heading": "Affiliate Dashboard",
+      "signInTitle": "Giriş Zorunlu",
+      "signInDesc": "Ortaklık panelinizi görmek için giriş yapın.",
+      "yourReferralLink": "Referans Bağlantınız",
+      "referralLinkDesc": "Bu bağlantı üzerinden yapılan yeni kayıtlar ömür boyu size atfedilir. İlk ajanlarını yarattıklarında ikiniz de 500 AI Credits alıyorsunuz.",
+      "aiCreditRewardTitle": "Yönlendirme AI Credits",
+      "aiCreditRewardDesc": "Affiliate referansları, yönlendirilen kullanıcı ilk temsilcisini oluşturduktan sonra her iki hesaba da {credit} verir.",
+      "claimAiCredits": "Talep AI Credits",
+      "claimingAiCredits": "İddia ediyor...",
+      "aiCreditsCol": "AI Credits",
+      "aiCreditsClaimed": "İddia Edilenler",
+      "aiCreditsPending": "Bekleme",
+      "shareOnX": "X'te paylaş",
+      "telegram": "Telegram",
+      "copyLink": "Anlaşıldı",
+      "copiedLink": "Kopyalandı",
+      "refresh": "Yenileme",
+      "frozenTitle": "Hesap donduruldu",
+      "codeLabel": "Kod",
+      "totalReferrals": "Toplam Yönlendirmeler",
+      "paidLabel": "{count} ödedi",
+      "pending30d": "Bekleme (30d bekletme)",
+      "payableNow": "Şimdi Ödenebilir",
+      "lifetimeEarned": "Ömür boyu kazanılan",
+      "paidOut": "{amount} ödedi.",
+      "referralsTable": "Yönlendirmeler",
+      "noReferrals": "Henüz yönlendirme yok. Bağlantınızı paylaşın!",
+      "commissionsTable": "Komisyonlar",
+      "noCommissions": "Henüz komisyon yok.",
+      "payoutsTable": "Ödemeler",
+      "noPayouts": "Henüz ödeme yok.",
+      "loadMore": "Daha fazla yükle",
+      "signupCol": "Kayıt",
+      "emailCol": "E-posta",
+      "statusCol": "Durum",
+      "tierCol": "Seviye",
+      "dateCol": "Tarih",
+      "sourceCol": "Kaynak",
+      "amountCol": "Miktar",
+      "cashCol": "Nakit",
+      "creditsCol": "Krediler",
+      "noteCol": "Not",
+      "statusPaid": "Ücretli",
+      "statusFree": "Ücretsiz",
+      "statusPending": "Bekleme",
+      "statusPayable": "Ödenebilir",
+      "statusPaidOut": "Ücretli",
+      "statusVoided": "Geçersiz Oldu",
+      "flagged": "Bayraklandı",
+      "untilDate": "ta ki {date}",
+      "sourceSubscription": "Abonelik",
+      "sourceFoundingMember": "Kurucu Üye",
+      "payoutSettings": "Ödeme Ayarları",
+      "payoutMode": "Mod",
+      "payoutAddress": "Ödeme Adresi",
+      "creditsOnly": "Nakit ödeme adresi gerekli",
+      "changePrefs": "Ödeme tercihlerini değiştirmeniz mi gerekiyor?",
+      "contactSupport": "Destek ile iletişime geçin",
+      "modeCashOnly": "Sadece nakit (%20)",
+      "modeCreditsOnly": "Emekli Oldu",
+      "modeHybrid": "Emekli Oldu"
+    },
+    "settings": {
+      "eyebrow": "Hesap",
+      "heading": "Ortamlar",
+      "subheading": "Hesabınızı, güvenliğinizi ve tercihlerinizi yönetin.",
+      "tabs": {
+        "profile": "Profil",
+        "security": "Güvenlik",
+        "notifications": "Bildirimler",
+        "billing": "Faturalandırma",
+        "danger": "Tehlike Bölgesi"
+      },
+      "profile": {
+        "sectionTitle": "Profil",
+        "changePhoto": "Fotoğrafı değiştir",
+        "uploadPhoto": "Fotoğrafı yükle",
+        "remove": "Kaldır",
+        "joinedLabel": "Katıldı {date}",
+        "usernameLabel": "Kullanıcı adı",
+        "usernamePlaceholder": "your_username",
+        "usernameHint": "3–30 karakter, harf, sayı, _ veya -",
+        "emailLabel": "E-posta adresi",
+        "emailPlaceholder": "you@example.com",
+        "saveChanges": "Kayıt Değişiklikleri",
+        "saving": "Kurtarmak...",
+        "walletTitle": "Bağlı Cüzdan",
+        "walletLinkedDesc": "İlk zincir üzerindeki ödemenizden itibaren otomatik olarak bağlanıyor. SOL, USDC veya $HATCHER ile ödeme yaparken kullanılır.",
+        "walletViewSolscan": "Solscan",
+        "walletDisconnect": "Cüzdanı kapatma",
+        "walletNone": "Henüz cüzdan bağlanmadı. Solana cüzdanınız, faturalama sayfasından ilk kez çevrimiçi ödeme yaptığınızda otomatik olarak bağlanır.",
+        "referralTitle": "Yönlendirme Programı",
+        "referralDesc": "Arkadaşlarınızı Hatcher davet edin. İkiniz de ilk ajanlarını yarattıklarında {credit} alıyorsunuz.",
+        "referralCode": "Referans Kodu",
+        "shareLink": "Paylaş Bağlantısı",
+        "referred": "Referans",
+        "earned": "Kazanıldı",
+        "claimRewards": "Bekleyen Ödülleri Talep Edin",
+        "claiming": "İddia ediyor..."
+      },
+      "security": {
+        "changePasswordTitle": "Şifreyi Değiştir",
+        "currentPassword": "Güncel Şifre",
+        "currentPasswordPlaceholder": "Güncel şifreyi girin",
+        "newPassword": "Yeni Şifre",
+        "newPasswordPlaceholder": "En az 8 karakter, üst, alt, sayı, özel",
+        "confirmPassword": "Yeni Şifreyi Onayla",
+        "confirmPasswordPlaceholder": "Yeni şifreyi tekrarla",
+        "changePasswordBtn": "Şifreyi Değiştir",
+        "changing": "Değişmek...",
+        "apiKeysTitle": "API Anahtarlar",
+        "apiKeysDesc": "Programatik erişim için birden fazla API anahtarı oluşturun. Her anahtar {prefix} önekini kullanır. Tam anahtar {emphasis} yaratılışta gösterilir.",
+        "apiKeysEmphasis": "sadece bir kez",
+        "manageKeys": "Anahtarları yönet",
+        "newKeyCreated": "Yeni anahtar oluşturuldu — şimdi kopyala!",
+        "noKeysYet": "Henüz API anahtar yok. Aşağıda bir tane oluşturun.",
+        "keyLabelPlaceholder": "Etiket (ör. \"Prodüksiyon\")",
+        "createKey": "Anahtar Oluştur",
+        "creating": "Yaratmak...",
+        "keysLimit": "10 aktif tuşa kadar. Her anahtarın tam API erişimi vardır.",
+        "reqToday": "{count} bugün soru · {week} bu hafta",
+        "lastUsed": "Son kullanılan {date}",
+        "save": "Kayd et"
+      },
+      "notifications": {
+        "sectionTitle": "Bildirimler",
+        "pushLabel": "Push Bildirimleri",
+        "pushDesc": "Gerçek zamanlı güncellemeler için tarayıcı push bildirimleri",
+        "agentsLabel": "Ajan Uyarıları",
+        "agentsDesc": "Ajanların durumu değiştiğinde, çöktüğde veya ilgi gerektirdiğinde bildirim alın",
+        "billingLabel": "Faturalandırma Uyarıları",
+        "billingDesc": "Ödeme onayları, abonelik yenilemeleri ve krediler"
+      },
+      "billing": {
+        "sectionTitle": "Faturalandırma",
+        "currentPlan": "Mevcut Plan",
+        "hatcherCredits": "HATCHER Kredileri",
+        "creditsAutoApplied": "Ödeme sırasında otomatik olarak uygulanır",
+        "manageBilling": "Faturalamayı Yönetin"
+      },
+      "danger": {
+        "sectionTitle": "Tehlike Bölgesi",
+        "exportTitle": "Verilerimi Dışa Aktar",
+        "exportDesc": "Tüm hesap verilerinizi içeren bir JSON dosyası indirin: profil, temsilciler, sohbet geçmişi, ödemeler, referanslar, destek biletleri ve daha fazlası.",
+        "exportBtn": "Verilerimi Dışa Aktar",
+        "exporting": "İhracat...",
+        "deleteTitle": "Hesabı Sil",
+        "deleteDesc": "Hesabınızı, tüm temsilcilerinizi, ödeme geçmişinizi ve yapılandırmanızı kalıcı olarak kaldırın. Bu eylem geri döndürülemezdir.",
+        "deleteBtn": "Hesabı Sil",
+        "deleting": "Siliyor...",
+        "dialogTitle": "Hesabınızı Silmek mi?",
+        "dialogDesc": "Bu, tüm temsilcilerinizi, verilerinizi ve ödeme geçmişinizi kalıcı olarak kaldıracaktır. Bu eylem geri alınabilir {emphasis}.",
+        "dialogEmphasis": "Olamam",
+        "confirmPassword": "Şifrenizi onaylayın",
+        "passwordPlaceholder": "Mevcut şifreniz",
+        "cancelBtn": "İptal et"
+      }
+    },
+    "apiKeys": {
+      "eyebrow": "Ortamlar",
+      "heading": "API anahtarları",
+      "subheading": "{docsLink} için programatik erişim anahtarlarını yönetin. Her anahtar {prefix} ile başlar.",
+      "docsLinkLabel": "Hatcher API",
+      "backToSettings": "Ayarlara Geri Dön",
+      "newKeyAlert": "Anahtar oluşturuldu — şimdi kopyala!",
+      "newKeyAlertSub": "Tam anahtarın gösterileceği tek sefer bu. Güvenli bir yerde sakla.",
+      "noKeysTitle": "Henüz API anahtar yok",
+      "noKeysDesc": "Başlamak için ilk anahtarınızı oluşturun",
+      "loading": "Anahtarları yüklüyor...",
+      "createSectionTitle": "Yeni anahtar oluştur",
+      "createSectionDesc": "Anahtarınıza tanımlayıcı bir isim verin (örneğin \"Yerel Geliştirici\", \"CI/CD Boru Hattı\").",
+      "keyLabelPlaceholder": "Anahtar etiketi...",
+      "createKey": "Anahtar Oluştur",
+      "creating": "Yaratmak...",
+      "usageNote": "{header} başlığında API anahtarınızı kullanın. Tüm mevcut uç noktaları için {docsLink} bakınız.",
+      "headerExample": "Yetki: Taşıyıcı hk_...",
+      "docsLinkLabel2": "API referans belgeleri",
+      "copiedLabel": "Kopyalandı!",
+      "copyLabel": "Anlaşıldı",
+      "dismissLabel": "Bırakın",
+      "revokeTitle": "Anahtarı API Geri Alma",
+      "revokeDesc": "Bu anahtar kalıcı olarak geçersiz kalacak ve onu kullanan uygulamalar hemen çalışmayı durduracaktır. Bu geri alınamaz.",
+      "revokeConfirm": "Anahtarı İptal Etme",
+      "neverUsed": "Hiç kullanılmadı",
+      "lastUsed": "Son kullanılan {time}",
+      "created": "Oluşturuldu {date}",
+      "reqStats": "{today} bugün soru · {week} bu hafta",
+      "saveBtn": "Kayd et",
+      "cancelBtn": "İptal et"
+    },
+    "quickStats": {
+      "totalAgents": "Toplam Ajanlar",
+      "dailyMessages": "AI Credits",
+      "unlimited": "∞",
+      "accountWide": "Hesap bakiyesi",
+      "activeNow": "Aktif Şimdi",
+      "noAgentsRunning": "Ajan koşmuyor",
+      "agentsOnline": "{count} acente online",
+      "agentsOnlinePlural": "{count} acenteler çevrimiçi",
+      "accountTier": "Hesap Katmanı",
+      "lifetimeAccess": "Ömür boyu erişim",
+      "prioritySupport": "Öncelikli destek",
+      "upgradePlan": "Yükseltme planı"
+    },
+    "agentDetail": {
+      "tabs": {
+        "dashboard": "Dashboard",
+        "chat": "Sohbet",
+        "mail": "Posta",
+        "terminal": "Terminal",
+        "dev": "Geliştirici",
+        "config": "Yapılandırma",
+        "integrations": "Entegrasyonlar",
+        "plugins": "Eklentiler ve Beceriler",
+        "logs": "Kütükler",
+        "stats": "İstatistikler",
+        "memory": "Hafıza",
+        "sessions": "Oturumlar",
+        "knowledge": "Bilgi",
+        "addons": "Ekstralar",
+        "wallet": "Cüzdan",
+        "kausalayer": "KausaLayer",
+        "files": "Dosyalar",
+        "workspace": "Çalışma alanı",
+        "schedules": "Takvim",
+        "workflows": "İş Akışları"
+      },
+      "sidebarGroups": {
+        "operate": "Çalışma",
+        "configure": "Yapılandır",
+        "monitor": "Monitör",
+        "advanced": "İleri"
+      },
+      "nav": {
+        "allAgents": "Tüm Ajanlar"
+      },
+      "header": {
+        "easy": "Sakin olun",
+        "advanced": "İleri",
+        "restart": "Yeniden başlatma",
+        "restarting": "Yeniden başlatılıyorum...",
+        "stop": "Dur",
+        "stopping": "Duruyor...",
+        "start": "Başlangıç",
+        "starting": "Başlıyorum...",
+        "share": "Paylaş",
+        "room": "Oda",
+        "clone": "Klon",
+        "delete": "Sil",
+        "deleting": "Siliyor...",
+        "confirm": "Onay",
+        "cancel": "İptal et"
+      },
+      "notFound": {
+        "code": "404",
+        "title": "Ajan Bulunamadı",
+        "description": "\"{id}\" kimliğine sahip ajan bulunamadı.",
+        "backToAgents": "Ajanlara Geri Dön"
+      },
+      "statusPoll": {
+        "agentReady": "Ajan sohbet etmeye hazır!"
+      },
+      "chat": {
+        "live": "Canlı",
+        "liveTitle": "WebSocket üzerinden gerçek zamanlı yayın",
+        "voiceButton": "Ses",
+        "voiceCallTitle": "Sesli görüşmeyi başlat",
+        "autoRead": "Otomatik okuma",
+        "autoReadTitle": "Otomatik okuma yanıtları",
+        "emptyTitle": "Bir sohbet başlat {agentName}",
+        "emptySubtitle": "Yanıtlar gerçek zamanlı olarak ortaya çıkıyor",
+        "loadEarlier": "Daha önceki mesajları yükle ({count} daha eski olanlar)",
+        "listening": "Dinlemek...",
+        "thinking": "Düşünüyorum...",
+        "speaking": "Konuşuyorum...",
+        "tapToSpeak": "Mikrofonla konuşun",
+        "agentStartingUp": "Ajan başlıyor, lütfen bekle...",
+        "uploading": "Yüklüyorum...",
+        "poweredBy": "Güç {provider}",
+        "today": "Bugün",
+        "unlimited": "sınırsız",
+        "enterToSend": "Göndermek için Enter ve yeni satır için Shift+Enter",
+        "signInToChat": "Bu temsilciyle sohbet etmek için giriş yapın.",
+        "limitReached": "AI Credits yorgun.",
+        "upgradeToPro": "Pro'ya Yükseltme",
+        "limitReachedSuffix": "Daha fazlası için ya da kendi anahtarınızı getirin, Unlimited için.",
+        "agentNotRunning": "Ajan kaçmıyor.",
+        "startFromOverview": "Sohbet etmek için Genel Bakış sekmesinden başlatın.",
+        "waitingForAgent": "Ajanın başlamasını bekliyorum...",
+        "messagePlaceholder": "Mesaj {agentName}...",
+        "sendMessage": "Mesaj gönder",
+        "stopResponse": "Stop tepki",
+        "attachFiles": "Dosyaları ekle — ajanın bilgisine kaydedilmiş",
+        "stopRecording": "Kaydı durdur",
+        "startVoice": "Sesli girişi başlat",
+        "errors": {
+          "rateLimit": "AI Credits yorgun.",
+          "llmDown": "Yapay zeka hizmeti geçici olarak kullanılamaz. Bu genellikle bir dakika içinde çözülür.",
+          "timeout": "Ajan cevap vermekte çok geç kaldı.",
+          "network": "Bağlantı koptu. İnternet bağlantınızı kontrol edin.",
+          "generic": "Bir şeyler ters gitti.",
+          "retry": "Yeniden deneme"
+        },
+        "voiceCall": {
+          "listening": "Dinlemek...",
+          "thinking": "Düşünüyorum...",
+          "speaking": "Konuşuyorum...",
+          "tapToSpeak": "Mikrofonla konuşun"
+        }
+      },
+      "mail": {
+        "title": "Ajan Posta",
+        "subtitle": "Temsilci posta kutusunu, otomatik yanıt modunu, mesaj geçmişini ve manuel giden e-postayı yönetin.",
+        "mailbox": "Posta kutusu adresi",
+        "copy": "Anlaşıldı",
+        "copied": "Posta kutusu adresi kopyalandı",
+        "copyFailed": "Kopya başarısız oldu",
+        "refresh": "Yenileme",
+        "refreshing": "Ferahlatıcı...",
+        "autoSend": "Otomatik gönderme yanıtları",
+        "autoSendOn": "Otomatik gönderme açık",
+        "autoSendOff": "Otomatik gönderim kapalı",
+        "runtimeActive": "Otomatik yanıt sadece ajan zaten aktifken çalışır.",
+        "runtimeInactive": "Otomatik yanıt sadece ajan zaten aktifken çalışır. Yanıtlara güvenmeden önce acenteyi başlatın.",
+        "messageList": "Mesajlar",
+        "messageCount": "{count} mesajları yüklendi",
+        "details": "Mesaj detayı",
+        "noSelection": "Kontrol etmek için bir mesaj seçin.",
+        "emptyTitle": "Henüz posta yok",
+        "emptySubtitle": "Bu posta kutusu kullanıldıktan sonra gelen ve giden mesajlar burada görünecektir.",
+        "untitled": "Konu yok",
+        "from": "From",
+        "to": "To",
+        "subject": "Konu",
+        "created": "Tarih",
+        "body": "Gövde",
+        "noBody": "Vücut içeriği yok",
+        "filters": {
+          "all": "Hepsi",
+          "inbound": "Gelen",
+          "outbound": "Çıkış"
+        },
+        "directions": {
+          "inbound": "Gelen",
+          "outbound": "Çıkış"
+        },
+        "statusLabels": {
+          "queued": "Kuyrağa Girdi",
+          "sent": "Gönderildi",
+          "delivered": "Teslim Edildi",
+          "failed": "Başarısız",
+          "received": "Alındı",
+          "unknown": "Bilinmiyor"
+        },
+        "errors": {
+          "mailbox": "Posta kutusu yüklenemedi.",
+          "messages": "Posta mesajları yüklenemedi.",
+          "settings": "Posta ayarlarını güncelleyemiyordu."
+        },
+        "composer": {
+          "title": "Manuel gönderme",
+          "subtitle": "Temsilci posta kutusundan bir giden e-posta gönderin.",
+          "toPlaceholder": "recipient@example.com",
+          "subjectPlaceholder": "Konu",
+          "bodyPlaceholder": "E-posta gövdesini yaz...",
+          "validation": "Alıcı, konu ve beden gereklidir.",
+          "failed": "E-posta gönderemedim.",
+          "sent": "E-posta sıraya alındı",
+          "send": "E-posta gönder",
+          "sending": "Gönderiyorum..."
+        }
+      },
+      "logs": {
+        "searchPlaceholder": "Arama kayıtları...",
+        "all": "Hepsi",
+        "connected": "Bağlantılı",
+        "reconnecting": "Yeniden bağlantı",
+        "pinned": "Pinned",
+        "scroll": "Parşömen",
+        "refresh": "Yenileme",
+        "loading": "Yükleniyor...",
+        "download": "İndir",
+        "pinnedToBottom": "aşağıya sabitlenmiş",
+        "noLogs": "Henüz kayıt yok.",
+        "noLogsMatching": "\"{query}\" ile eşleşen bir log yok.",
+        "noLevelLogs": "{level} kayıt bulunmadı.",
+        "entries": "{count} girişleri",
+        "autoScrollEnabled": "Otomatik kaydırma etkinleştirildi — aşağıya sabitlendi",
+        "autoScrollDisabled": "Otomatik kaydırma devre dışı bırakıldı",
+        "fullLogsGate": {
+          "title": "Son {count} log satırlarını gösteriyor",
+          "description": "Her seviyede tam Loglar dahildir. Tam geçmiş hala mevcut değilse temsilciyi yenileyin.",
+          "descriptionEmpty": "Her seviyede tam Loglar dahildir. Tam geçmiş hala mevcut değilse temsilciyi yenileyin.",
+          "unlock": "Yenileme"
+        }
+      },
+      "integrations": {
+        "showingFor": "Entegrasyonların gösterilmesi {framework}",
+        "connected": "{configured}/{total} bağlı",
+        "encryptedNote": "API anahtarlar ve tokenlar, depolamadan önce AES-256-GCM ile şifrelenir. Kaydedildikten sonra gizli değerler bir daha gösterilmez — sadece maskeli yer tutucular ortaya çıkar.",
+        "mainIntegrations": "Ana Entegrasyonlar",
+        "mainIntegrationsFree": "Tüm kademelerde ücretsiz",
+        "otherPlatforms": "Diğer Platformlar",
+        "communityExtensions": "Topluluk uzantıları",
+        "allPlatformsFree": "Tüm platformlar ücretsiz dahil — kimlik bilgilerini aşağıda yapılandırabilirsiniz",
+        "allFreeNote": "Tüm entegrasyonlar her seviyede ücretsizdir. Sadece kimlik bilgilerinizi ekleyin ve gidin.",
+        "howToGetKey": "API anahtarınızı nasıl alırsınız →",
+        "howToSetup": "Nasıl kurulur {name} →",
+        "saving": "Kurtarmak...",
+        "saveCredentials": "Kimlik bilgilerini kaydet",
+        "badges": {
+          "recommended": "Tavsiye edilir",
+          "native": "Yerli",
+          "community": "Topluluk",
+          "planned": "Planlanıyor",
+          "quickSetup": "Hızlı Kurulum",
+          "qrPairing": "QR Eşleşmesi",
+          "free": "Ücretsiz",
+          "connected": "Bağlantılı",
+          "alwaysActive": "Her Zaman Aktif"
+        },
+        "legend": {
+          "native": "Yerel — yerleşik destek",
+          "community": "Topluluk — npm uzantıları",
+          "planned": "Planlandı — yakında"
+        },
+        "pairing": {
+          "whoCanMessage": "Ajanınıza kim mesaj atabilir?",
+          "everyone": "Herkes",
+          "specificNumbers": "Özel sayılar",
+          "save": "Kayd et",
+          "anyoneCanMessage": "Herkes temsilcinize mesaj atabilir.",
+          "onlyListedNumbers": "Sadece listelenen numaralar temsilcinize mesaj atabilir.",
+          "restartAfterChange": "Değiştirdikten sonra ajanı yeniden başlat.",
+          "setBeforePairing": "Eşleşmeden önce ayarlanır. E.164 formatında telefon numaraları (+1234567890).",
+          "savedRestart": "Kurtarıldı! Başvuru için ajanı yeniden başlatın.",
+          "connected": "{name} Bağlantılı",
+          "disconnected": "{name} Bağlantısı Kesildi",
+          "messagesForwarded": "Mesajlar temsilcinize iletilir",
+          "sessionExpired": "Oturum süresi doldu. Temizlemek için yeniden eşleştir veya ayırın.",
+          "rePair": "Yeniden eşleşme",
+          "disconnect": "Kopuk",
+          "disconnectConfirm": "Bağlantıyı {name}? Tekrar kullanmak için yeniden eşleştirmeniz gerekecek.",
+          "agentMustRun": "Ajanınız {name} eşleştirmek için koşuyor olmalı. Önce ajanı başlat.",
+          "generatingQr": "QR kodu oluşturmak — bu ~30 saniye sürüyor...",
+          "pairButton": "Çift {name}",
+          "refreshQr": "QR Kodunu yenile",
+          "tapOutsideToClose": "Dışarıya tıkla kapatmak için"
+        },
+        "webhook": {
+          "label": "Webhook",
+          "inboundHttp": "Gelen HTTP",
+          "triggerFrom": "Ajanınızı dış hizmetlerden tetikleyin (Zapier, GitHub vb.)",
+          "webhookUrl": "Webhook URL'si",
+          "alwaysActive": "Her Zaman Aktif",
+          "bearerToken": "Taşıyıcı Jeton",
+          "exampleRequest": "Örnek İstek",
+          "revealToken": "Gösteriş jetonu",
+          "hideToken": "Token gizle",
+          "copyUrl": "URL'yi kopyala",
+          "copyToken": "Kopya tokenı",
+          "note": "Bu URL'yi kullanarak ajanınızı dış servislerden tetikleyin (Zapier, GitHub, n8n vb.). Mesaj alanı içeren bir JSON gövdesiyle POST talebi gönderin. Gerekirse ajan otomatik uykudan uyanır.",
+          "alreadyConfigured": "zaten yapılandırılmıştır"
+        },
+        "domains": {
+          "channelBehavior": "Kanal Davranışı",
+          "allowedUserIds": "İzin verilen Kullanıcı Kimlikleri (virgülle ayrılmış)",
+          "allowedGroupIds": "İzin verilen Grup Kimlikleri (virgülle ayrılmış)"
+        }
+      },
+      "memory": {
+        "refresh": "Yenileme",
+        "noMemory": "Hiçbir hafıza dosyası bulunmadı.",
+        "noMemoryDescription": "Ajanınız henüz hiçbir bellek dosyası oluşturmadı.",
+        "dailyLogs": "Günlük Kayıtlar",
+        "noDailyLogs": "Henüz günlük kayıtlar yok.",
+        "loading": "Bellek yükleniyor...",
+        "error": "Bellek yüklenemez"
+      },
+      "knowledge": {
+        "uploadTitle": "Bilgi Dosyası Yükle",
+        "filename": "Dosya adı",
+        "filenamePlaceholder": "örneğin company-info.txt",
+        "content": "İçerik",
+        "contentPlaceholder": "Bilgi içeriğinizi buraya yapıştırın...",
+        "upload": "Yükleme",
+        "uploading": "Yüklüyorum...",
+        "cancel": "İptal et",
+        "addFile": "Dosya Ekle",
+        "noFiles": "Henüz bilgi dosyası yok.",
+        "noFilesDescription": "Temsilcinizin referans alabileceği belgeleri yükleyin.",
+        "preview": "Önizleme",
+        "delete": "Sil",
+        "loading": "Yükleniyor...",
+        "error": "Bilgi dosyaları yüklenemez",
+        "refresh": "Yenileme"
+      },
+      "stats": {
+        "range7d": "7 gün",
+        "range30d": "30 gün",
+        "totalMessages": "Toplam Mesajlar",
+        "avgPerDay": "Ortalama / Gün",
+        "peakDay": "Zirve Günü",
+        "framework": "Çerçeve",
+        "noData": "Henüz analiz veri yok.",
+        "noDataDescription": "İstatistikleri görmeye başlamak için mesajlar gönderin.",
+        "errorRate": "Hata Oranı",
+        "responseTimes": "Yanıt Süreleri",
+        "avgResponse": "Ortalama Yanıt",
+        "p50": "P50",
+        "p95": "P95",
+        "topTopics": "Önemli Konular",
+        "hourlyActivity": "Saatlik Aktivite",
+        "byokActive": "BYOK Aktif",
+        "totalTokens": "Toplam Jetonlar",
+        "estimatedCost": "Maliyet",
+        "refresh": "Yenileme"
+      },
+      "terminal": {
+        "connecting": "Bağlantı kuruyor...",
+        "connected": "Bağlantılı",
+        "disconnected": "Bağlantısı Kopuk",
+        "error": "Bağlantı hatası",
+        "reconnect": "Yeniden Bağlantı",
+        "agentNotActive": "Terminali kullanmak için ajan aktif olmalıdır.",
+        "startAgent": "Start Agent",
+        "sendMessage": "Mesaj gönder...",
+        "send": "Gönder",
+        "sending": "Gönderiyorum..."
+      },
+      "plugins": {
+        "skillsTab": "Yetenekler",
+        "pluginsTab": "Eklentiler",
+        "searchPlaceholder": "Arama becerileri ve eklentiler...",
+        "install": "Kurulum",
+        "installing": "Kurulum...",
+        "installed": "Kuruldu",
+        "uninstall": "Kaldır",
+        "uninstalling": "Kaldırılıyorum...",
+        "noInstalled": "Hiçbir beceri veya eklenti yüklenmemiş.",
+        "noInstalledDescription": "Aşağıdaki pazar yerinden göz atın ve kurun.",
+        "recommended": "Tavsiye edilir",
+        "available": "Mevcut",
+        "source": "Kaynak",
+        "requiresRestart": "Yeniden başlatma gerekiyor",
+        "refresh": "Yenileme",
+        "limitReached": "Her seviyede eklentiler ve beceriler var."
+      },
+      "workflows": {
+        "new": "Yeni İş Akışı",
+        "noWorkflows": "Henüz iş akışı yok.",
+        "noWorkflowsDescription": "Ajanınızı otomatikleştirmek için ilk iş akışınızı oluşturun.",
+        "enable": "Etkinleştir",
+        "disable": "Devre dışı bırak",
+        "delete": "Sil",
+        "save": "Kayd et",
+        "run": "Koş",
+        "running": "Koşuyorum...",
+        "name": "İş Akışı Adı",
+        "trigger": "Tetikleyici",
+        "lastRun": "Son Koşu",
+        "status": "Durum",
+        "active": "Aktif",
+        "inactive": "Aktif olmayan"
+      },
+      "files": {
+        "noFiles": "Dosya bulunmadı.",
+        "noFilesDescription": "Dosya yöneticisi boş.",
+        "upload": "Yükleme",
+        "delete": "Sil",
+        "download": "İndir",
+        "refresh": "Yenileme",
+        "locked": "Dosya Yöneticisi her seviyede yer alıyor. Erişim hâlâ engelliyse ajanı yenileyin.",
+        "unlock": "Kilidini aç"
+      },
+      "workspace": {
+        "noFiles": "Çalışma alanı dosyası bulunmadı.",
+        "refresh": "Yenileme",
+        "loading": "Çalışma alanı yükleniyor..."
+      },
+      "addons": {
+        "title": "Ekstralar",
+        "description": "Temsilcinizi ek yeteneklerle genişletin.",
+        "noAddons": "Henüz ekstra ürün satın alınmadı.",
+        "purchase": "Satın alma",
+        "active": "Aktif",
+        "expires": "Süresi {date}",
+        "lifetime": "Yaşam Boyu"
+      },
+      "schedules": {
+        "new": "Yeni Takvim",
+        "noSchedules": "Henüz bir program yok.",
+        "noSchedulesDescription": "Temsilcinizi otomatik olarak çalıştırmak için bir program oluşturun.",
+        "enable": "Etkinleştir",
+        "disable": "Devre dışı bırak",
+        "delete": "Sil",
+        "save": "Kayd et",
+        "name": "Takvim Adı",
+        "cron": "Cron İfadesi",
+        "nextRun": "Sonraki Dönem",
+        "lastRun": "Son Koşu",
+        "status": "Durum",
+        "active": "Aktif",
+        "inactive": "Aktif olmayan"
+      },
+      "sidebar": {
+        "switchAgent": "Anahtar ajanı",
+        "enter3DRoom": "3D Oda'ya Gir",
+        "enter3DRoomSubtitle": "Açık uzaysal çalışma alanı",
+        "enter3DRoomTooltip": "Ajanın uzaysal çalışma alanını aç"
+      }
+    }
+  },
+  "settings": {
+    "redirect": "Ayarlara yönlendiriyorum..."
+  },
+  "explorePage": {
+    "eyebrow": "Kamu temsilcileri",
+    "title": "Kamuya açık yapay zeka ajanlarıyla sohbet",
+    "body": "Sahipleri açık sohbeti etkinleştiren temsilcileri inceleyin. Her oturum tarayıcınızda çalışır ve ajanın canlı Hatcher yapılandırması üzerinden yönlendirilir.",
+    "cityCta": "Açık Hatcher City",
+    "emptyTitle": "Henüz halka açık sohbet temsilcisi yok",
+    "emptyBody": "Kamuya açık profiller hâlâ Hatcher City'de görünüyor. Temsilciler, sahipleri açık sohbeti etkinleştirdiğinde burada gösterirler.",
+    "fallbackDescription": "Tarayıcı sohbet oturumlarına hazır bir kamuya açık Hatcher ajanı.",
+    "interactions": "Etkileşimler",
+    "publicChat": "Kamuya açık sohbet",
+    "chatCta": "Sohbet",
+    "statsAgents": "{count} kamu temsilcileri",
+    "statsLive": "{count} şimdi yaşıyor",
+    "statsInteractions": "{count} etkileşimleri",
+    "searchPlaceholder": "Kamu temsilcilerini arayın",
+    "filterAll": "Hepsi",
+    "filterOpenClaw": "OpenClaw",
+    "filterHermes": "Hermes",
+    "filterLive": "Sadece canlı",
+    "showingCount": "{count} gösteriliyor",
+    "noResultsTitle": "Eşleştirme ajanları yok",
+    "noResultsBody": "Başka bir arama, framework veya canlı filtre deneyin.",
+    "frameworkLabel": "Çerçeve",
+    "featured": "Öne Çıkanlar",
+    "ownerFallback": "Topluluk temsilcisi",
+    "avatarLabel": "3D kamu ajanı avatarı",
+    "statusRunning": "Canlı",
+    "statusSleeping": "Uyumak",
+    "statusPaused": "Duraklatıldı",
+    "statusCrashed": "Dikkat gerektiriyor"
+  },
+  "agentPublic": {
+    "back": {
+      "toCity": "Şehre Dönüş",
+      "toMyAgents": "Ajanlarıma Geri Dön",
+      "toDashboard": "Dashboard'a Geri Dön"
+    },
+    "status": {
+      "active": "Aktif",
+      "sleeping": "Uyumak",
+      "paused": "Duraklatıldı",
+      "archived": "Arşivlendi",
+      "error": "Hata",
+      "killed": "Öldürüldü",
+      "restarting": "Yeniden başlatma"
+    },
+    "profile": {
+      "featuresCount": "{count} özelliği",
+      "featuresCountPlural": "{count} özellikleri",
+      "frameworkFeatures": "Çerçeve Özellikleri",
+      "by": "tarafından"
+    },
+    "share": {
+      "button": "Paylaş",
+      "copied": "Kopyalandı!"
+    },
+    "errors": {
+      "connectionError": "Bağlantı Hatası",
+      "notFound": "Ajan Bulunamadı",
+      "somethingWrong": "Bir Şeyler Ters Gitti",
+      "defaultMessage": "Bu ajan yok ya da kaldırıldı.",
+      "goBack": "Geri Dön",
+      "myAgents": "Ajanlarım"
+    },
+    "owner": {
+      "heading": "Yönet {name}",
+      "body": "Bu ajanın sahibi sen. Panelinize gidip sohbet edin veya ayarları yapın.",
+      "manageAgent": "Yönetici Temsilci",
+      "openChat": "Açık Sohbet"
+    },
+    "analytics": {
+      "heading": "Ajan Analitiği",
+      "messages": "Etkileşimler",
+      "daysActive": "Aktif Günler",
+      "uptime": "Çalışma süresi",
+      "status": "Durum",
+      "framework": "Çerçeve",
+      "created": "Oluşturuldu"
+    },
+    "deploy": {
+      "heading": "Benzer bir ajanı yerleştirin",
+      "body": "Hatcher'de kendi {framework} ajanınızı oluşturun. Başlatmak ücretsiz, 60 saniye içinde açılın.",
+      "cta": "Benzer Ajanı Yerleştir",
+      "myAgents": "Ajanlarım"
+    },
+    "publicChat": {
+      "eyebrow": "Kamu temsilcisi sohbeti",
+      "heading": "{name} ile sohbet et",
+      "usernamePlaceholder": "Bir kullanıcı adı seçin",
+      "start": "Sohbet başlat",
+      "starting": "Başlıyorum...",
+      "newSession": "Yeni oturum",
+      "empty": "Bu ajanla yeni bir halka açık oturum başlatın.",
+      "messagePlaceholder": "Mesaj {username}",
+      "thinking": "Araştırma...",
+      "send": "Mesaj gönder",
+      "errors": {
+        "session": "Açık bir sohbet oturumu başlatamadım.",
+        "message": "Bu mesajı gönderemedim."
+      }
+    },
+    "errorPage": {
+      "heading": "Ajanı Yüklemek Başarısız Oldu",
+      "body": "Bu ajanın bilgilerini yükleyemedik. Belki kaldırıldı ya da bağlantı sorunu var.",
+      "errorId": "Hata Kimliği: {id}",
+      "tryAgain": "Tekrar Deneyin",
+      "browseAgents": "Temsilcilere Göz Atma"
+    },
+    "statusPage": {
+      "poweredBy": "Destekleyici",
+      "uptimeLabel": "24 saat çalışma süresi",
+      "messages": "Etkileşimler",
+      "days": "Günler",
+      "since": "Çünkü",
+      "framework": "Çerçeve",
+      "lastActive": "Son aktif: {date} {time}",
+      "viewProfile": "Profili Görüntüle",
+      "notFound": {
+        "heading": "Ajan Bulunamadı",
+        "body": "Bu ajan var değildir veya kamuya açık değildir.",
+        "browseAgents": "Temsilcilere Göz Atma"
+      }
+    }
+  },
+  "city": {
+    "category": {
+      "district": "İlçe",
+      "breadcrumbCity": "Hatcher City",
+      "statAgents": "Ajanlar",
+      "statRunning": "Koşu",
+      "statShareOfCity": "Şehir payı",
+      "seeIn3d": "3D olarak →",
+      "emptyState": "Bu bölgede henüz ajan yok.",
+      "emptyStateCta": "İlk yapan kişi ol.",
+      "otherDistricts": "Diğer bölgeler",
+      "msgs": "mesajlar"
+    }
+  },
+  "frameworks": {
+    "eyebrow": "Çerçeveler",
+    "heading": "Doğru çerçeveyi seçin",
+    "subheading": "Hatcher, iki üretim ajanı çerçevesine odaklanıyor: OpenClaw beceri ağırlıklı otomasyon için ve Hermes uzun süreli adaptif ajanlar için.",
+    "deployCta": "Bir ajan gönderin",
+    "docsLink": "Tam belgeler",
+    "atAGlance": "Bir bakışta",
+    "featureMatrix": "Özellik matrisi",
+    "featureCol": "Özellik",
+    "bestFor": "En iyisi...",
+    "bestForSubheading": "Hangi framework'ü seçeceğimden emin değil misiniz? Kullanım alanınıza uyun.",
+    "benchmarks": "Performans ölçütleri",
+    "benchmarksSubheading": "Soğuk başlatma zamanı ve Hatcher ortak altyapıda temel bellek kullanımı. Gerçek değerler yapılandırmaya göre değişir.",
+    "coldStart": "Soğuk başlatma zamanı",
+    "memoryUsage": "Temel bellek kullanımı",
+    "lowerFaster": "Düşük daha hızlıdır",
+    "lowerLeaner": "Alt olan daha zayıf",
+    "benchmarkCallout": "OpenClaw en geniş yetenek yüzeyi ve otomasyonlara ihtiyacınız olduğunda en iyisidir. Hermes, bellek ağırlıklı araştırma iş akışlarına sahip adaptif ajanlar için daha sade bir yaklaşım.",
+    "configExamples": "Konfigürasyon örnekleri",
+    "configSubheading": "Her çerçevenin kendi yapılandırma formatı vardır. İşte tipik bir kurulum nasıl görünüyor.",
+    "configRef": "Tam yapılandırma referansı →",
+    "docsSuffix": "Belgeler",
+    "llmSupport": "LLM desteği",
+    "llmSubheading": "Her iki çerçeve de sağlayıcı tarafından ücretli kullanım için BYOK (Kendi Anahtarını Getir) destekliyor. Barındırılan LLM'ler Hatcher destekli sağlayıcılar ve AI Credits sayaç kullanımı üzerinden yönlendirilir.",
+    "byokNote": "* BYOK her zaman ücretsiz — Hatcher AI Credits olmadan sağlayıcı tarafından ücretli kullanım.",
+    "byokSetupLink": "Kurulum rehberini BYOK →",
+    "decisionGuide": "Hızlı karar rehberi",
+    "readyCta": "Göreve hazır mısınız?",
+    "readySubheading": "Bir çerçeve seçin, ajanınızı yapılandırın ve 60 saniyeden kısa sürede yayına başlayın. Ücretsiz seviye dahil.",
+    "deployFirstAgent": "İlk ajanınızı gönderin",
+    "viewPricing": "Fiyatlandırmayı görüntüleyin",
+    "decisions": [
+      {
+        "condition": "Maksimum araç ve otomasyon istiyorum",
+        "pick": "OpenClaw"
+      },
+      {
+        "condition": "Zamanla öğrenen bir ajan istiyorum",
+        "pick": "Hermes"
+      },
+      {
+        "condition": "Çok kanallı mesajlaşma ve tetikleyicilere ihtiyacım var",
+        "pick": "OpenClaw"
+      },
+      {
+        "condition": "Hafıza ağırlıklı bir araştırma asistanına ihtiyacım var",
+        "pick": "Hermes"
+      },
+      {
+        "condition": "Çok kanallı mesajlaşmaya ihtiyacım var (Telegram + Discord + WhatsApp)",
+        "pick": "OpenClaw ya da Hermes"
+      },
+      {
+        "condition": "Dosyalar, loglar ve becerilere sahip bir çalışma alanı ajanı istiyorum",
+        "pick": "OpenClaw"
+      }
+    ]
+  },
+  "token": {
+    "liveLabel": "Utility token on Solana",
+    "heading": "$HATCHER",
+    "subheading": "$HATCHER, uygun Hatcher abonelikleri, ekstralar, indirimler ve zincir üzerinde yakma mekanikleri için bir hizmet ödeme seçeneğidir.",
+    "caLabel": "CA:",
+    "viewDexscreener": "Dexscreener'da görüntü",
+    "viewSolscan": "Bakış Solscan",
+    "burnBadge": "Her $HATCHER ödemenin %10'u aynı işlemde zincir üzerinde yakılır.",
+    "burnsEyebrow": "Zincir üzerinde yanıklar",
+    "burnsHeading": "Yanık İzleyici",
+    "burnsBody": "Canlı yanma verisi, $HATCHER darphanesi için Solana Token-2022 yanma talimatlarından hesaplanır. İzleyici, zincir üzerinde her 6 saatte bir yeniliyor ya da manuel yenileme talep ettiğinizde.",
+    "burnsRefresh": "Zincirde yenileme",
+    "burnsRefreshing": "Ferahlatıcı",
+    "burnsError": "Yanma verileri geçici olarak erişilebilir değildir. Son önbelleklenmiş anlık fotoğraf mevcut olduğunda gösterilecektir.",
+    "burnsTotalLabel": "Total Burned",
+    "burnsTxLabel": "Burn TX",
+    "burnsTxHelper": "{count} tarandı",
+    "burnsSupplyLabel": "Tedarik Yandı",
+    "burnsSupplyHelper": "Mevcut arz artı yanma payı",
+    "burnsLatestLabel": "Son Yanma",
+    "burnsNoBurnsShort": "Henüz yanık yok",
+    "burnsUpdated": "Güncellenmiş {time}",
+    "burnsUpdating": "Güncelleme",
+    "burnsPeriodHeading": "Yanma Hızı",
+    "burns24h": "24 saat",
+    "burns7d": "7 gün",
+    "burns30d": "30 gün",
+    "burnsSourceNote": "Sadece açık SPL yanması ve resmi naphne için kontrol edilmiş talimatlar sayılır. Başarısız işlemler ve normal transferler göz ardı edilir.",
+    "burnsFeedHeading": "Son Yanıklar",
+    "burnsUnknownTime": "Bilinmeyen zaman",
+    "burnsNoBurns": "Henüz yanma işlemi bulunmadı.",
+    "burnsNoBurnsBody": "$HATCHER ödemeler zincir üzerinde yakma talimatları oluşturduğunda, burada Solscan bağlantılarla birlikte görünecekler.",
+    "createAgentCta": "Serbest Ajan Yarat",
+    "viewPricing": "Fiyatlandırmayı Görüntüleyin",
+    "plannedUtilityLabel": "Kullanım Alanı",
+    "whatPowers": "$HATCHER nerede uyuyor",
+    "ecosystemDesc": "Ciddi bir faturalandırma yüzeyi: temiz toplamlar, desteklenen ödeme rayları ve utility odaklı token yönetimi.",
+    "keyDetails": "Önemli Detaylar",
+    "networkLabel": "Ağ",
+    "networkValue": "Solana",
+    "splToken": "SPL Token",
+    "statusLabel": "Durum",
+    "statusValue": "Platform aracı olarak mevcut",
+    "trading": "Kullanım Alanı",
+    "contractLabel": "Sözleşme",
+    "platformLabel": "Platform",
+    "platformValue": "Ücretsiz seviye şimdi mevcut — token checkout, uygun ücretli seviyeleri ve ekstraları destekler",
+    "stayInLoop": "Hatcher kontrol düzlemi olarak kullanın",
+    "stayInLoopBody": "Temsilcileri görevlendirin, faturalamayı yönetin ve iş akışınıza uygun ödeme hattını seçin.",
+    "followOnX": "X'te takip edin"
+  },
+  "roadmap": {
+    "liveLabel": "Canlı",
+    "heading": "Yol haritası",
+    "subheading": "Ne inşa ettik, şu anda ne gönderiliyor ve nereye gidiyoruz. Kamuya açık şekilde inşa ediyoruz — devam ediyoruz",
+    "followHandle": "X /@hatcherlabs",
+    "checkChangelog": "Canlı değişiklik günlüğü",
+    "featureRequest": "Özellik talebin mi var? Her şeyi okuduk.",
+    "submitRequest": "Bir talep gönderin",
+    "followOnX": "X'te takip edin"
+  },
+  "blog": {
+    "eyebrow": "Blog",
+    "heading": "Hatcher blogu",
+    "subheading": "Yapay zeka ajanları ve Hatcher platformu hakkında rehberler, eğitimler ve içgörüler.",
+    "searchPlaceholder": "Makaleleri ara...",
+    "allCategory": "Hepsi",
+    "latestLabel": "Son Bilgiler",
+    "readLabel": "Oku",
+    "resultsCount": "\"{query}\" için {count} sonuç",
+    "resultsCountPlural": "\"{query}\" için {count} sonuçlar",
+    "noArticles": "Makale bulunmadı",
+    "noArticlesCategory": "Bu kategoride makale bulunmamıştır.",
+    "noArticlesSearch": "\"{query}\" için makale bulunamadı.",
+    "clearFilters": "Temiz filtreler",
+    "backToBlog": "Bloga Geri Dön",
+    "relatedArticles": "İlgili Makaleler"
+  },
+  "changelog": {
+    "betaLabel": "Beta",
+    "heading": "Değişiklik Günlüğü",
+    "subheading": "Her gün iyileştirmeler gönderiyoruz. İşte değişenler şunlar.",
+    "noCommits": "Hiçbir commit bulunamadı.",
+    "errorMessage": "Bir şeyler ters gitti.",
+    "tryAgain": "Tekrar dene"
+  },
+  "help": {
+    "eyebrow": "Kaynaklar",
+    "heading": "Yardım merkezi",
+    "subheading": "Cevapları bulun, rehberlere göz atın ve destek ekibiyle iletişime geçin.",
+    "searchPlaceholder": "Tüm soruları ara... Örneğin: \"BYOK\", \"hız limiti\", \"Telegram\"",
+    "resultCount": "{count} sonuç",
+    "resultCountPlural": "{count} sonuçları",
+    "matchCount": "{count} maçı",
+    "matchCountPlural": "{count} maçları",
+    "noMatchHeading": "Eşleşen soru bulunmadı",
+    "noMatchBody": "Farklı anahtar kelimeleri deneyin veya dokümantasyonları inceleyin.",
+    "documentationLink": "Dokümantasyon",
+    "contactHeading": "Bizimle İletişime Geçin",
+    "contactBody": "Aradığını bulamıyor musun?",
+    "openTicket": "Destek bileti açın",
+    "contactOr": "Ya da doğrudan ulaşın:",
+    "technicalHelp": "Teknik yardım",
+    "generalInquiries": "Genel Soruşturmalar",
+    "communitySupport": "Topluluk desteği",
+    "communityChat": "Topluluk sohbeti",
+    "stillNeedHelp": "Hâlâ yardıma ihtiyacınız var mı?",
+    "ticketResponse": "Destek talebi gönderin, ekibimiz 24 saat içinde size geri dönecektir.",
+    "quickLinks": {
+      "documentation": "Dokümantasyon",
+      "discord": "Discord Topluluk",
+      "telegram": "Telegram Grubu",
+      "submitTicket": "Bilet Gönder",
+      "emailSupport": "E-posta Destek"
+    }
+  },
+  "status": {
+    "eyebrow": "Durum",
+    "heading": "Platform durumu",
+    "subheading": "Hatcher altyapısının gerçek zamanlı sağlığı.",
+    "navLabel": "Hatcher Durumu",
+    "autoRefresh": "Otomatik yenileme 30'lar",
+    "operational": "Tüm sistemler çalışır",
+    "degraded": "Bazı sistemler bozuldu",
+    "down": "Hizmet kesintisi tespit edildi",
+    "statusOperational": "Operasyonel",
+    "statusDegraded": "Bozulmuş",
+    "statusDown": "Aşağıya",
+    "lastChecked": "Son kontrol edilen:",
+    "refresh": "Yenileme",
+    "checking": "Kontrol sistemleri...",
+    "errorMessage": "Ulaşamıyor API. Durum mevcut değil.",
+    "activeAgents": "Aktif Ajanlar",
+    "totalAgents": "Toplam Ajanlar",
+    "components": "Bileşenler",
+    "updatedAt": "Güncellenmiş {time}",
+    "loading": "Yükleniyor...",
+    "backToHatcher": "← Geri Hatcher"
+  },
+  "shortcuts": {
+    "backToDashboard": "Dashboard'a Geri Dön",
+    "heading": "Klavye Kısayolları",
+    "subheading": "Klavye kısayolları ile Hatcher daha hızlı gezinmek",
+    "quickTipLabel": "Hızlı bir ipucu",
+    "quickTipBody": "Komut paletini açmak için herhangi bir yere basın. Sayfalar, ajanlar veya eylemler için anında arama yapın.",
+    "footerNote": "Metin alanlarında yazılırken kısayollar devre dışı bırakılır. macOS'ta Ctrl yerine Cmd kullanın."
+  },
+  "create": {
+    "errorHeading": "Oluşturma Hatası",
+    "errorBody": "Ajanınızı kurarken bir şeyler ters gitti. İlerlemeniz kaybolmadı.",
+    "errorIdLabel": "Hata Kimliği:",
+    "tryAgain": "Tekrar Deneyin",
+    "dashboard": "Dashboard"
+  },
+  "support": {
+    "eyebrow": "Yardım edin",
+    "heading": "Destek",
+    "subheading": "Temsilcileriniz, faturalandırma veya başka herhangi bir konuda yardım alın.",
+    "quickLinks": {
+      "documentation": "Dokümantasyon",
+      "documentationDesc": "Rehberlere göz atın ve API referans",
+      "faq": "SSS",
+      "faqDesc": "Yanıtlanan sıkça sorular",
+      "followUs": "Bizi Takip Edin",
+      "followUsDesc": "Güncellemeler ve duyurular"
+    },
+    "directContact": "Ya da doğrudan bize e-posta gönderin.",
+    "joinDiscord": "Ekibimize katılın Discord",
+    "telegramLabel": "Telegram",
+    "communitySupport": "Topluluk desteği için",
+    "submitTicketHeading": "Bir Bilet Gönderin",
+    "signInPrompt": "Destek başvurusu göndermek için giriş yapın.",
+    "signIn": "Giriş Yapın",
+    "ticketSubmitted": "Bilet Gönderildi",
+    "ticketSubmittedBody": "İsteğinizi aldık ve kısa süre içinde size geri döneceğiz. Güncelleme olduğunda bilgilendirileceksiniz.",
+    "submitAnother": "Başka bir bilet gönderin",
+    "subjectLabel": "Konu",
+    "subjectPlaceholder": "Sorununuzun kısa açıklaması",
+    "categoryLabel": "Kategori",
+    "priorityLabel": "Öncelik",
+    "relatedAgentLabel": "İlgili Ajan",
+    "relatedAgentOptional": "(isteğe bağlı)",
+    "selectAgent": "Bir ajan seç...",
+    "messageLabel": "Mesaj",
+    "messagePlaceholder": "Sorununuzu ayrıntılı olarak anlatın...",
+    "submitTicket": "Bilet Gönder",
+    "submitting": "Teslim oluyorum...",
+    "signInError": "Lütfen giriş yaparak bir bilet gönderin.",
+    "subjectRequired": "Konu zorunludur.",
+    "messageRequired": "Mesaj gerekli.",
+    "failedSubmit": "Bilet gönderemedim. Lütfen tekrar dene.",
+    "recentTickets": "Son Biletler",
+    "noTickets": "Henüz bilet yok",
+    "noTicketsDesc": "Gönderdiğiniz destek biletleri burada görünecektir. Başlamak için yukarıda ilk biletinizi oluşturun.",
+    "backToTop": "Başa Dön",
+    "ticketCount": "{count} bileti",
+    "ticketCountPlural": "{count} biletleri"
+  },
+  "affiliate": {
+    "eyebrow": "Ortaklık Programı",
+    "heading": "Hatcher'ye getirdiğiniz her kullanıcıdan kazanın.",
+    "subheading": "Her ücretli kullanıcıdan %20 tekrarlayan nakit komisyon kazanın. Atıflama bağlantı bazlıdır ve referans verilen hesabın ömrü boyunca geçerlidir. Her iki hesap da, referans edilen kullanıcı ilk temsilcisini oluşturduktan sonra 500 AI Credits alır.",
+    "applyNowCta": "Şimdi başvur",
+    "howItWorksLink": "Nasıl çalışır",
+    "pickYourPayout": "Komisyon yapısı",
+    "threeWays": "Nakit komisyonlar, basit defter.",
+    "threeWaysSubheading": "Bağlı kuruluş gelirleri yalnızca nakittir: uygun ödenen gelirin %20'si tekrarlanır ve komisyonlar ödenmeye başlamadan önce 30 günlük bekletme süresi vardır. 500 AI Credits referans ödülü her iki hesaba ayrı ayrı verilir.",
+    "popularLabel": "Popüler",
+    "foundingBonusLabel": "Kurucu Üye bonusu",
+    "foundingBonusHeading": "Kurucu Üyeye sabit $20 nakit bonusu → önerin.",
+    "foundingBonusBody": "$99 ömür boyu seviye, referans alan bağlı kuruluşa tek seferlik sabit $20 ödeme yapar — bu da kullanıcının sonraki eklenti veya acente satın alımlarından elde ettikleri her şeyin yanı sıra. Varsayılan ödeme şekliniz ne olursa olsun, nakit olarak ödenir.",
+    "applyLabel": "Başvuru",
+    "howItWorksLabel": "Nasıl çalışır",
+    "fourSteps": "Dört adım, sıfır sürpriz.",
+    "faqLabel": "Sıkça Sorulan",
+    "everythingYoudAsk": "Başvurmadan önce soracağınız her şey.",
+    "readyHeading": "Hatcher ile ortaklık kurmaya hazır mısınız?",
+    "readyBody": "Başvurular birkaç dakika sürüyor. Onaylar 3–5 gün içinde alınır. Getirdiğiniz her kullanıcının ömrü boyunca tekrarlayan komisyonlar.",
+    "seePricing": "Fiyatlandırmaya bakınız",
+    "apply": {
+      "backLink": "Ortaklık Programına Dönüş",
+      "loading": "Yükleniyor...",
+      "eyebrow": "Hatcher Bağlı Kuruluşlarına Başvurun",
+      "heading": "Bize kendinden bahset.",
+      "subheading": "Platformlarınız ve kitleniz hakkında birkaç detay. Her başvuruyu manuel olarak inceliyoruz — dürüst olun, spesifik olun.",
+      "underReview": "İnceleme aşamasında — iletişimde olacağız.",
+      "reviewTime": "Beklenen inceleme süresi:",
+      "reviewDays": "3–5 gün",
+      "reviewEmailNote": "Karar verdiğiniz anda size e-posta gönderilecek.",
+      "submitted": "Başvuru gönderildi",
+      "submittedDate": "Gönderildi",
+      "platformsLabel": "Platformlar",
+      "followers": "Takipçiler",
+      "slugLabel": "İstenen mermi",
+      "slugPreview": "Önizleme: hatcher.host/r/{slug}",
+      "payoutModeLabel": "Ödeme modu",
+      "payoutAddressLabel": "Ödeme adresi",
+      "pitchLabel": "Atış",
+      "successHeading": "Başvuru gönderildi.",
+      "successBody": "3–5 gün içinde inceleyip sonucu size e-posta ile göndereceğiz. Bu arada, onaylandıktan sonra paylaşacağınız şeyleri belirtmekten çekinmeyin.",
+      "backToAffiliate": "Ortaklık Programına Dönüş",
+      "yourPlatforms": "Platformlarınız",
+      "platformCount": "{count} / {max}",
+      "platformLabel": "Platform {n}",
+      "removeLabel": "Kaldır",
+      "addPlatform": "Başka bir platform ekleyin",
+      "platformTypeField": "Platform tipi",
+      "handleField": "Kullanıcı adı",
+      "handleHint": "örneğin @hatcher, @solana, /channel/xyz",
+      "audienceField": "İzleyici büyüklüğü (isteğe bağlı)",
+      "urlField": "URL (isteğe bağlı)",
+      "slugField": "Özel yönlendirme bağlantısı (isteğe bağlı)",
+      "slugPrefix": "hatcher.host/r/",
+      "slugPlaceholder": "adın",
+      "slugBlankHint": "Otomatik oluşturulan kod için boşluk bırakın",
+      "slugPreviewGood": "Bağlantınız hatcher.host/r/{slug} olacaktır",
+      "pitchField": "Atış",
+      "pitchPlaceholder": "Neden Hatcher ile ortaklık kurmak istiyorsunuz? Hangi tür içerik veya kitleye ulaşacaksınız?",
+      "pitchCharHint": "50–2000 karakterler",
+      "payoutModeField": "Ödeme modu",
+      "solAddressField": "SOL cüzdan adresi (base58, 32–44 karakterleri)",
+      "solAddressPlaceholder": "örneğin 21L6VVRAuxk87sXggz8exhPCm1w4qWyKEs6SDauyyRAW",
+      "submitBtn": "Başvuru gönder",
+      "submitting": "Teslim oluyorum...",
+      "rejectedLabel": "Önceki başvuru reddedildi",
+      "validatePlatformMin": "En az bir platform ekleyin",
+      "validatePlatformMax": "Max {max} platformları",
+      "validateHandleRequired": "Gerekli",
+      "validateHandleMax": "Maksimum 100 karakter",
+      "validateAudienceNumber": "Tam sayı olmalı",
+      "validateUrlInvalid": "Geçerli bir URL olmalı",
+      "validatePitchMin": "Pitch en az 50 karakter olmalı",
+      "validatePitchMax": "Pitch en fazla 2000 karakter olmalı",
+      "validateAddressRequired": "Nakit bağlı kuruluş ödemeleri için gereklidir",
+      "validateAddressFormat": "Geçerli bir Solana base58 adresi (32–44 karakter) olmalıdır",
+      "slugTooShort": "Çok kısa — minimum 3 karakter",
+      "slugTooLong": "Çok uzun — maksimum 30 karakter",
+      "slugInvalidChars": "Sadece a–z, 0–9 ve tire (-ile başlayıp bitemez)",
+      "slugReserved": "O salyangoz saklandı — başka birini seç"
+    }
+  },
+  "docs": {
+    "eyebrow": "Dokümantasyon",
+    "heading": "Dokümantasyon",
+    "subheading": "Hatcher ile yapay zeka ajanları oluşturmak, dağıtmak ve yönetmek için ihtiyacınız olan her şey.",
+    "searchPlaceholder": "Arama belgeleri...",
+    "searchComingSoon": "Arama yakında",
+    "apiReferenceHeading": "API Referans",
+    "apiReferenceBody": "cURL, JavaScript ve Python örnekleriyle tam uç nokta dokümantasyonu. Doğrulama, hız sınırları ve hata kodları.",
+    "apiReferenceLink": "Uç noktaları keşfedin",
+    "integrationsHeading": "Entegrasyon Rehberleri",
+    "integrationsBody": "Telegram, Discord, WhatsApp, Slack, Twitter/X ve Signal için adım adım kurulum. Kimlik bilgilerinden ilk mesaja kadar.",
+    "integrationsLink": "Platformlara göz atın",
+    "popularTopics": "Popüler konular",
+    "readMore": "Daha fazlasını okuyun",
+    "cantFind": "Aradığını bulamıyor musun?",
+    "cantFindBody": "Destek ekibimiz ve topluluğumuz Hatcher en iyi şekilde yararlanmanıza yardımcı olmak için burada.",
+    "contactSupport": "İletişim Destek",
+    "helpCenter": "Yardım Merkezi",
+    "quickLinks": [
+      {
+        "title": "Başlamak",
+        "description": "İlk yapay zeka ajanınızı 60 saniyeden kısa sürede kurun. Hızlı başlangıç rehberi, ön koşullar ve ilk görevlendirme."
+      },
+      {
+        "title": "Ajan Konfigürasyonu",
+        "description": "Chat-to-Hatch kullanın, OpenClaw veya Hermes seçin ve çalışma zamanını, dosyaları, entegrasyonları ve model yönlendirmeyi ayarlayın."
+      },
+      {
+        "title": "AI Credits",
+        "description": "Aylık AI Credits ve tek seferlik takviyelerin barındırılan LLM'leri, web araması, araştırma, çıkarma ve tarama araçlarını nasıl güçlendirdiğine bakın."
+      },
+      {
+        "title": "BYOK Kurulum",
+        "description": "OpenAI, Anthropic, Google, xAI, OpenRouter ve daha fazlası için kendi sağlayıcı anahtarlarınızı getirin. BYOK asla Hatcher AI Credits harcamaz."
+      },
+      {
+        "title": "Çerçeveler",
+        "description": "OpenClaw ve Hermes karşılaştırın; çerçeve uyumu, model yönlendirme, BYOK ve barındırılan çalışma zamanı davranışı dahil."
+      },
+      {
+        "title": "Platform Entegrasyonları",
+        "description": "Her seviyede bulunan Telegram, Discord, Slack, Twitter/X, Signal, webhooks ve diğer kanalları bağlayın."
+      },
+      {
+        "title": "Hatcher CLI",
+        "description": "@hatcherlabs/cli'yi kur, hatcher'ı çalıştır, ajanlar oluştur, sohbet et, terminal ekini GitHub kurulum ve shell'den A2A çağrıları yap."
+      },
+      {
+        "title": "Geliştirici İş Akışları",
+        "description": "GitHub bağlayın, terminal oturumlarını yönetin, ajanlar arasında iletişimi mümkün kılar ve sahip olduğunuz ajanları organize edin."
+      },
+      {
+        "title": "Android Uygulaması",
+        "description": "Android uygulamasını yükleyin, giriş yapın, ajanları yönetin ve mobil cihazınızdan push bildirimleri alın."
+      },
+      {
+        "title": "API Referans",
+        "description": "REST, ajanlar, faturalandırma, AI Credits, ödemeler, kamuya açık sohbet ve yönetici işlemler için uç noktaları API."
+      }
+    ],
+    "topics": [
+      {
+        "label": "Bir ajanı tanımlayın Chat-to-Hatch"
+      },
+      {
+        "label": "AI Credits nasıl harcanıyor"
+      },
+      {
+        "label": "Ev sahipliği modelleri ve BYOK"
+      },
+      {
+        "label": "Android push bildirimleri"
+      },
+      {
+        "label": "Entegrasyon Telegram Kurulum"
+      },
+      {
+        "label": "Desteklenen ödeme yöntemleri"
+      }
+    ]
+  },
+  "shared": {
+    "tiers": {
+      "free": {
+        "name": "Ücretsiz",
+        "description": "1 ajan, ayda 500 AI Credits, 2 GB çalışma alanı"
+      },
+      "starter": {
+        "name": "Başlangıç",
+        "description": "1 ajan, ayda 3.000 AI Credits, 10 GB çalışma alanı"
+      },
+      "pro": {
+        "name": "Profesyonel",
+        "description": "3 ajan, ayda 15.000 AI Credits, 25 GB çalışma alanı"
+      },
+      "business": {
+        "name": "İş Dünyası",
+        "description": "5 ajan, ayda 40.000 AI Credits, 50 GB çalışma alanı, her zaman aktif"
+      },
+      "founding_member": {
+        "name": "Kurucu Üye",
+        "description": "10 ajan, ayda 25.000 AI Credits, 40 GB çalışma alanı, ömür boyu erişim"
+      }
+    },
+    "addons": {
+      "agents_plus1": {
+        "name": "+1 Ajan",
+        "description": "1 ek ajan yuvası"
+      },
+      "agents_plus3": {
+        "name": "+3 Ajanlar",
+        "description": "3 ek temsilci slotu"
+      },
+      "agents_plus5": {
+        "name": "+5 Ajanlar",
+        "description": "5 ek ajan slotu"
+      },
+      "agents_plus10": {
+        "name": "+10 Ajan",
+        "description": "10 ek ajan slotu"
+      },
+      "ai_credits_5000": {
+        "name": "5.000 AI Credits",
+        "description": "Barındırılan modeller ve web araması için tek seferlik doldurma"
+      },
+      "ai_credits_10000": {
+        "name": "10.000 AI Credits",
+        "description": "Daha ağır model çalışmaları ve araştırmalar için tek seferlik takviye"
+      },
+      "ai_credits_25000": {
+        "name": "25.000 AI Credits",
+        "description": "Daha büyük ajan iş yükleri için tek seferlik ekleme"
+      },
+      "ai_credits_50000": {
+        "name": "50.000 AI Credits",
+        "description": "Yüksek hacimli barındırma kullanımı için tek seferlik doldurma"
+      }
+    },
+    "frameworks": {
+      "openclaw": {
+        "name": "OpenClaw",
+        "description": "3.200+ topluluk becerisine sahip, çok kanallı mesajlaşma geçidi ve otonom görev yürütme yeteneğine sahip kendi kendine çalışan yapay zeka asistanı."
+      },
+      "hermes": {
+        "name": "Hermes Ajan",
+        "description": "Nous Research tarafından hazırlanmış otonom yapay zeka ajanı, kalıcı bellek, 40+ araç, beceri sistemi ve çok platformlu mesajlaşma geçidi ile sunuluyor."
+      }
+    },
+    "agentStatus": {
+      "active": "Aktif",
+      "sleeping": "Uyumak",
+      "paused": "Duraklatıldı",
+      "archived": "Arşivlendi",
+      "error": "Hata",
+      "killed": "Öldürüldü",
+      "restarting": "Yeniden başlatma",
+      "stopping": "Durma"
+    }
+  },
+  "localeSwitcher": {
+    "label": "Dil değiştir"
+  },
+  "agentRoom": {
+    "back": {
+      "toCity": "Şehre Dönüş",
+      "toDashboard": "Dashboard'a Geri Dön",
+      "toAgents": "Ajanlara Geri Dön",
+      "toBuilding": "Binaya Dönüş",
+      "toHouse": "Evine Geri"
+    }
+  },
+  "chatToHatch": {
+    "backLink": "← Dashboard",
+    "eyebrow": "Doğal dil ajanı oluşturucu",
+    "h1Prefix": "Anlat.",
+    "h1Accent": "Aç.",
+    "authChecking": "Kontrol seansı...",
+    "assistantTitle": "Hatcher Asistan",
+    "assistantSub": "Hatcher AI tarafından desteklenir · Niyeti tam bir ajan yapılandırmasına ayrıştırır",
+    "live": "Canlı",
+    "assistantWho": "Hatcher",
+    "intro": "İhtiyacınız olan ajanı tanımlayın: ne yapar, nerede çalışır ve neleri kullanmasına izin verilir. Hatcher, dağıtımdan önce inceleme için bir çerçeve, model, araçlar, kimlik ve çalışma zamanı taslağı hazırlar.",
+    "thinking": "Düşünüyorum...",
+    "placeholder": "Stripe webhook'larımı izleyen ve her sabah #revenue on Discord'de dostça bir özet paylaşan bir ajan.",
+    "send": "Gönder",
+    "sendRefine": "Geliştirme",
+    "previewTitle": "Ajan önizlemesi",
+    "previewEmpty": "Boş",
+    "previewReady": "Yumurtadan çıkmaya hazır",
+    "previewNeedsFix": "Düzeltilmesi gerekiyor",
+    "emptyHint": "Başlamak için soldaki bir ajanı tarif edin.",
+    "reset": "Önerilen Duruma Sıfırla",
+    "resetTooltip": "Tüm alanları asistanın önerilen değerlerine geri döndür",
+    "labelName": "İsim",
+    "labelDescription": "Tanım",
+    "labelPersonality": "Kişilik",
+    "labelSystemPrompt": "SOUL.md / sistem isteği",
+    "labelFramework": "Çerçeve",
+    "labelFrameworkReason": "Neden bu çerçeve",
+    "labelSkills": "Kurulum becerileri",
+    "labelPlugins": "Kurulum için eklentiler",
+    "labelInstallPlan": "Kurulum planı",
+    "labelGreeting": "Örnek selamlaşma",
+    "labelModel": "Hosted model",
+    "labelModelProvider": "Yapay zeka rotası",
+    "labelAvatar": "Avatar fikri",
+    "labelAvatarVariant": "3D avatar",
+    "labelAvatarPalette": "Palet",
+    "labelAvatarEmblem": "Amblem",
+    "labelAvatarAccessory": "Aksesuar",
+    "labelAvatarMood": "Ruh hali",
+    "frameworkOpenClaw": "Tarayıcı, dosyalar, kod, araştırma ve ajan aracı kullanımı.",
+    "frameworkHermes": "Hızlı API yerli otomasyonlar, webhooklar, mesajlaşma ve zamanlayıcılar.",
+    "placeholderName": "Temsilci adı",
+    "placeholderDescription": "Bu ajanın ne yaptığını anlatan kısa bir cümle.",
+    "placeholderPersonality": "Kısa ton yönü — örneğin kısa, teknik, özür dilemeden.",
+    "placeholderSystemPrompt": "Çok paragraflı sistem sorusu — rol, davranış, ses, araçlar.",
+    "addSkill": "Beceri Ekle",
+    "addPlugin": "Eklenti ekle",
+    "removeChip": "Kaldır {name}",
+    "slugUrl": "URL",
+    "hatchBtn": "Ajanı dağıt",
+    "hatchBtnLoading": "Konuşlandırılıyor...",
+    "footHint": "Her alan düzenlenebilir. Dağıtımdan sonra yapılandırmayı geliştirebilir, becerileri kurabilir, logları inceleyebilir ve ajan kontrol odasından SOUL.md güncelleyebilirsiniz.",
+    "errName_min": "İsim en az 3 karakter gerektirir.",
+    "errName_max": "İsim çok uzun (en fazla 50).",
+    "errName_regex": "İsim harfler, sayılar, boşluklar ve - : ' . ( ) & sadece.",
+    "errDesc_max": "Açıklama çok uzun (maksimum 140).",
+    "errAssistant": "Yumurtadan çıkarma asistanı cevap vermedi. Yeniden ifade etmeyi dene.",
+    "errNetwork": "Ağ hatası — API ulaşılabilir mi?",
+    "errCreate": "Ajanı oluşturamadım. Açıklamayı geliştirin ve tekrar deneyin.",
+    "errCreateNetwork": "Ajan oluştururken ağ hatası."
+  },
+  "landingV3": {
+    "hero": {
+      "boxLabel": "Konuşlandırma",
+      "headline1": "Fırlatma üretimi",
+      "headline2": "Dakikalar içinde yapay zeka ajanları.",
+      "sub": "Neye ihtiyacınız olduğunu anlatın. Hatcher, modeller, araçlar, cüzdanlar, takvimler ve canlı kontrollerle hazır bir barındırılan bir ajana dönüştürüyor.",
+      "ctaPrimary": "İlk ajanınızı oluşturun",
+      "ctaGhost": "Canlı ajanları keşfedin",
+      "ctaSignup": "Ücretsiz bir hesap oluşturun",
+      "ctaAppStoreKicker": "İndirin",
+      "ctaAppStore": "App Store",
+      "ctaPlayStoreKicker": "Başla",
+      "ctaPlayStore": "Google Play",
+      "ctaSolanaMobileKicker": "Mevcut",
+      "ctaSolanaMobile": "Solana Mobile",
+      "ctaFeatures": "Tüm özellikleri gör"
+    },
+    "flow": {
+      "boxLabel": "Nasıl çalışır",
+      "title": "Fikirden canlı ajana üç adım",
+      "tile1Title": "İstediğini yaz",
+      "tile1Body": "İş akışını sade İngilizceyle anlatın. Hatcher onu yapılandırılmış bir ajan spesifikasyonuna dönüştürüyor.",
+      "tile1Example": "Kripto haberlerini günlük özetle",
+      "tile2Title": "Yapılandırmayı gözden geçir",
+      "tile2Body": "Başlatmadan önce framework, model, araçlar, entegrasyonlar, çalışma zamanı ayarları ve AI Credits gözden geçirin.",
+      "tile3Title": "Çalışma süresini başlat",
+      "tile3Body": "Sohbet, loglar, dosyalar, entegrasyonlar, terminal erişimi ve canlı kontrollerle barındırılan bir çalışma zamanına entegre edin.",
+      "cta": "Kendi hikayenizi oluşturun",
+      "ctaFeatures": "Tüm özellikleri gör",
+      "liveLabel": "Ajan Live"
+    },
+    "useCases": {
+      "boxLabel": "Ajanların yapabilecekleri",
+      "title": "Kolay ajanlar gerçekten anlıyor",
+      "body": "Basit bir dilde bir istekle başlayın. Hatcher, doğru framework, araçlar, entegrasyonlar, oda ve binaya sahip bir barındırılan ajana dönüştürüyor.",
+      "items": {
+        "crypto": {
+          "eyebrow": "Pazarlar",
+          "title": "Kripto haber keşfi",
+          "body": "Token haberlerini, cüzdan aktivitelerini, fiyatları ve günlük özetleri sohbet, e-posta veya Telegram üzerinden takip edin."
+        },
+        "polymarket": {
+          "eyebrow": "Tahmin piyasaları",
+          "title": "Polymarket gözlemcisi",
+          "body": "Piyasaları, oran değişimlerini, hacim artışlarını takip edin ve bir tezin dikkat gerektirdiğinde uyarılar gönderin."
+        },
+        "trader": {
+          "eyebrow": "Ticaret",
+          "title": "Trader yardımcı pilotu",
+          "body": "İzleme listeleri, risk notları, araştırma bağlantıları ve uyarılar tutun ve her kararı kontrol altında kalın."
+        },
+        "community": {
+          "eyebrow": "Topluluklar",
+          "title": "Telegram veya Discord operatörü",
+          "body": "SSS'leri yanıtlayacak, kanalları yönetecek, başlıkları özetleyecek ve önemli mesajları size yönlendirecek."
+        },
+        "research": {
+          "eyebrow": "Araştırma",
+          "title": "Günlük araştırma döngüsü",
+          "body": "Web'de arama yapın, kaynakları okuyun, özetler derleyin ve önemli olanı canlı bir şekilde hafıza edin."
+        },
+        "email": {
+          "eyebrow": "İşletmeler",
+          "title": "E-posta ve görev asistanı",
+          "body": "Gelen kutusu güncellemelerini okuyun, yanıtları taslak okuyun, hatırlatıcılar hazırlayın ve rutin işleri ilerletmeye devam edin."
+        }
+      },
+      "footer": "Herkesin binanızda bir yeri, girebileceğiniz bir oda ve inceleyebileceğiniz kütükler olur.",
+      "cta": "Yarat Chat-to-Hatch"
+    },
+    "rooms": {
+      "boxLabel": "Kontrol odaları",
+      "title": "Her ajanın canlı bir çalışma alanı elde ediyor",
+      "body": "Hatcher City mekansal bir katman olarak kalır, ancak temel ürün deneyimi hassas bir kontrol odasıdır: sohbet, günlükler, dosyalar, yapılandırma, entegrasyonlar, terminal ve durum tek bir yerde.",
+      "stationAvatar": "Avatar",
+      "stationSkills": "Beceri Çalışma Tezgahı",
+      "stationIntegrations": "Entegrasyon Rafı",
+      "stationStatus": "Durum Konsolu",
+      "stationLogs": "Kütük Duvar",
+      "stationStats": "İstatistik Hologramı",
+      "stationMemory": "Hafıza Rafları",
+      "stationConfig": "Yapılandırma Terminali"
+    },
+    "city": {
+      "boxLabel": "Hatcher City",
+      "title": "Ajanların ağı, yürüme mesafesi",
+      "body": "Kendi ajans binanızı talep edin. Şehirde dolaşın, aktif ajanların içinde hareket ettiğini görün, sonra binanıza girip her odayı yönetin.",
+      "cta": "Sahneye Hatcher City",
+      "districts": "25 ilçe · Grid 5×5"
+    },
+    "frameworks": {
+      "boxLabel": "Çerçeveler",
+      "seeAll": "Tüm →",
+      "tagOpenclaw": "Çok Becerili Asistan",
+      "tagHermes": "Otonom ajan"
+    },
+    "pricing": {
+      "boxLabel": "Fiyatlandırma",
+      "seeFull": "Tam fiyatlandırma →",
+      "lifetime": "$99 ömrü",
+      "free": "$0",
+      "perMonth": "/mo",
+      "agentSingular": "ajan",
+      "agentPlural": "Ajanlar",
+      "msgsPerDay": "AI Credits/ay"
+    },
+    "ecosystem": {
+      "boxLabel": "Ekosistem",
+      "title": "Ajan altyapısı için inşa edilmiştir",
+      "sub": "OpenClaw ve Hermes çalışma zamanları, barındırılan modeller veya BYOK ve ödeme, kimlik ve sağlayıcı iş akışları için isteğe bağlı kripto-native raylar.",
+      "frameworksLabel": "Çerçeveler",
+      "chainsLabel": "Zincirler"
+    },
+    "team": {
+      "boxLabel": "Takım",
+      "title": "İnsanlar Hatcher",
+      "cristianName": "Cristian",
+      "cristianRole": "Geliştirici / CEO",
+      "ioanaName": "Ioana",
+      "ioanaRole": "CMO / Pazarlama",
+      "johnName": "John",
+      "johnRole": "Geliştirici",
+      "moiseName": "Moise",
+      "moiseRole": "ABD Temsilcisi / Topluluk",
+      "anonymousOneName": "Anonim Geliştirici",
+      "anonymousOneRole": "Geliştirici",
+      "anonymousTwoName": "Anonim Geliştirici",
+      "anonymousTwoRole": "Geliştirici",
+      "founderTag": "Kurucu",
+      "growthTag": "Büyüme",
+      "builderTag": "Yapımcı",
+      "communityTag": "Topluluk",
+      "anonymousTag": "özel"
+    },
+    "finalCta": {
+      "boxLabel": "Hazır",
+      "headline": "İlk ajanınızı gönderin.",
+      "ctaPrimary": "Hatch ajanı",
+      "ctaGhost": "Ajanları görüntüleyin",
+      "metaFrameworks": "OpenClaw + Hermes",
+      "metaNoCard": "Kredi kartı yok"
+    },
+    "cli": {
+      "boxLabel": "CLI",
+      "title": "Terminalinizden Hatcher çalıştırın",
+      "sub": "Hatcher CLI kur, bir API anahtarı oluştur, sonra `hatcher` çalıştır. Basit İngilizceden ajanlar oluşturun, onlarla sohbet edin, canlı çalışma zamanlarına bağlanın ve geliştirici iş akışlarını shell'inizden çıkmadan yönetin.",
+      "apiKeyHint": "Account → API Anahtarlar → Oluştur anahtarında bir API anahtarı oluşturun.",
+      "ctaKey": "API anahtar oluşturun",
+      "ctaDocs": "CLI belgeleri",
+      "terminalLabel": "Hatcher CLI",
+      "features": {
+        "hatch": {
+          "title": "Chat-to-Hatch",
+          "body": "Bir promptu yapılandırılmış bir OpenClaw veya Hermes ajanına dönüştürün."
+        },
+        "terminal": {
+          "title": "Canlı terminal",
+          "body": "Çalışan framework oturumuna `hatcher terminal` ile ekle."
+        },
+        "dev": {
+          "title": "Geliştirici iş akışları",
+          "body": "Tek bir CLI'ten GitHub erişim, çağrılar, oturumlar, kayıtlar ve orkestrasyon A2A kullanın."
+        }
+      }
+    }
+  }
+}

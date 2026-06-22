@@ -1,14 +1,12 @@
 /**
  * SEO helpers for hreflang / alternate language link generation.
  *
- * Locales are fixed: en (default, no prefix), zh, de, fr, ro.
  * Use buildLanguagesMap(path) wherever a layout/page sets `alternates`.
  */
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://hatcher.host';
+import { defaultLocale, locales } from '@/i18n/config';
 
-const LOCALES = ['en', 'zh', 'de', 'fr', 'ro'] as const;
-const DEFAULT_LOCALE = 'en';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://hatcher.host';
 
 /**
  * Returns a `languages` map suitable for Next.js `alternates.languages`.
@@ -20,8 +18,8 @@ export function buildLanguagesMap(path: string): Record<string, string> {
   const suffix = path === '/' ? '' : path;
   const languages: Record<string, string> = {};
 
-  for (const locale of LOCALES) {
-    const prefix = locale === DEFAULT_LOCALE ? '' : `/${locale}`;
+  for (const locale of locales) {
+    const prefix = locale === defaultLocale ? '' : `/${locale}`;
     languages[locale] = `${SITE_URL}${prefix}${suffix}`;
   }
 

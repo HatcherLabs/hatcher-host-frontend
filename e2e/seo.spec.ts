@@ -14,7 +14,21 @@ test.describe('SEO routing hygiene', () => {
     );
 
     expect(hreflangs.map((entry) => entry.lang)).toEqual(
-      expect.arrayContaining(['en', 'zh', 'de', 'fr', 'ro', 'x-default']),
+      expect.arrayContaining([
+        'en',
+        'zh',
+        'de',
+        'fr',
+        'ro',
+        'es',
+        'pt-BR',
+        'id',
+        'vi',
+        'ja',
+        'hi',
+        'tr',
+        'x-default',
+      ]),
     );
     expect(hreflangs.find((entry) => entry.lang === 'x-default')?.href).toMatch(/https:\/\/hatcher\.host\/?$/);
   });

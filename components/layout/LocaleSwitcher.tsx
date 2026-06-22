@@ -69,6 +69,62 @@ function LocaleFlag({ locale }: { locale: Locale }) {
           <rect x="40" width="20" height="40" fill="#ce1126" />
         </svg>
       );
+    case 'es':
+      return (
+        <svg aria-hidden="true" viewBox="0 0 60 40" className={className}>
+          <rect width="60" height="40" fill="#c60b1e" />
+          <rect y="10" width="60" height="20" fill="#ffc400" />
+        </svg>
+      );
+    case 'pt-BR':
+      return (
+        <svg aria-hidden="true" viewBox="0 0 60 40" className={className}>
+          <rect width="60" height="40" fill="#009b3a" />
+          <polygon points="30,5 55,20 30,35 5,20" fill="#ffdf00" />
+          <circle cx="30" cy="20" r="8" fill="#002776" />
+          <path d="M22 18c5 2 11 2 16 0" stroke="#fff" strokeWidth="1.4" fill="none" />
+        </svg>
+      );
+    case 'id':
+      return (
+        <svg aria-hidden="true" viewBox="0 0 60 40" className={className}>
+          <rect width="60" height="20" fill="#ce1126" />
+          <rect y="20" width="60" height="20" fill="#fff" />
+        </svg>
+      );
+    case 'vi':
+      return (
+        <svg aria-hidden="true" viewBox="0 0 60 40" className={className}>
+          <rect width="60" height="40" fill="#da251d" />
+          <polygon points="30,7 33.1,16.6 43.2,16.6 35,22.4 38.2,32 30,26.1 21.8,32 25,22.4 16.8,16.6 26.9,16.6" fill="#ff0" />
+        </svg>
+      );
+    case 'ja':
+      return (
+        <svg aria-hidden="true" viewBox="0 0 60 40" className={className}>
+          <rect width="60" height="40" fill="#fff" />
+          <circle cx="30" cy="20" r="10" fill="#bc002d" />
+        </svg>
+      );
+    case 'hi':
+      return (
+        <svg aria-hidden="true" viewBox="0 0 60 40" className={className}>
+          <rect width="60" height="13.34" fill="#ff9933" />
+          <rect y="13.33" width="60" height="13.34" fill="#fff" />
+          <rect y="26.66" width="60" height="13.34" fill="#138808" />
+          <circle cx="30" cy="20" r="4.4" fill="none" stroke="#000080" strokeWidth="1.2" />
+          <circle cx="30" cy="20" r="1" fill="#000080" />
+        </svg>
+      );
+    case 'tr':
+      return (
+        <svg aria-hidden="true" viewBox="0 0 60 40" className={className}>
+          <rect width="60" height="40" fill="#e30a17" />
+          <circle cx="25" cy="20" r="10" fill="#fff" />
+          <circle cx="29" cy="20" r="8" fill="#e30a17" />
+          <polygon points="42,13 44,18 49,18 45,21 47,26 42,23 37,26 39,21 35,18 40,18" fill="#fff" />
+        </svg>
+      );
   }
 }
 
