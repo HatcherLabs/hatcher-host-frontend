@@ -19,6 +19,7 @@ import {
   AUTR_LIVE_POLL_INTERVAL_MS,
   actionStatusLabel,
   actionTone,
+  dexscreenerSolanaTokenUrl,
   emptyAutrLiveTraderSnapshot,
   formatSignedSol,
   latestActivityLabel,
@@ -120,7 +121,7 @@ export function AutrLiveTraderDashboard({ initialSnapshot, apiUrl, deployUrl }: 
                 </span>
               </div>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--text-secondary)]">
-                Real AUTR webhook signals tracked through the Hatcher execution wallet. First live session guardrails: 1 SOL wallet funding and 0.15 SOL max BUY.
+                Real AUTR webhook signals tracked through the Hatcher execution wallet. First live session guardrails: 1 SOL wallet funding and 0.1 SOL max BUY.
               </p>
             </div>
           </div>
@@ -336,9 +337,20 @@ function PositionRow({ position }: { position: AutrLiveTraderPosition }) {
     : position.realized_pnl_sol;
   const displayPnl = formatSignedSol(pnlValue).replace(' SOL', '');
   const pnlTone = pnlValue.startsWith('-') ? 'text-[var(--color-destructive)]' : 'text-[var(--color-success)]';
+  const tokenUrl = dexscreenerSolanaTokenUrl(position.mint);
   return (
     <div className="grid grid-cols-[1.25fr_0.95fr_0.75fr_0.75fr_0.75fr] border-t border-[var(--border-default)] px-3 py-3 text-sm">
-      <span className="min-w-0 truncate font-mono text-[var(--text-primary)]">{shortAddress(position.mint, 7, 7)}</span>
+      <a
+        href={tokenUrl}
+        target="_blank"
+        rel="noreferrer"
+        title={`Open ${position.mint} on Dexscreener`}
+        aria-label={`Open ${position.mint} on Dexscreener`}
+        className="inline-flex min-w-0 items-center gap-1.5 font-mono text-[var(--text-primary)] transition-colors hover:text-[var(--color-accent)]"
+      >
+        <span className="min-w-0 truncate">{shortAddress(position.mint, 7, 7)}</span>
+        <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+      </a>
       <span className="min-w-0 truncate font-mono text-[var(--text-secondary)]">{position.raw_amount}</span>
       <span className="min-w-0 truncate font-mono text-[var(--text-secondary)]">{position.cost_sol}</span>
       <span className="min-w-0 truncate font-mono text-[var(--text-secondary)]">{position.mark_value_sol}</span>

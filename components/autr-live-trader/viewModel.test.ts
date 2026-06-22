@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   actionStatusLabel,
   actionTone,
+  dexscreenerSolanaTokenUrl,
   formatSignedSol,
   latestActivityLabel,
   snapshotActivityKey,
@@ -53,6 +54,12 @@ describe('AUTR live trader view model', () => {
     expect(shortAddress('BtGuT8JGrhr7Cf9P7r2K4WDSs5t7FNFRiq3qdcRexcmT')).toBe('BtGuT8...RexcmT');
   });
 
+  it('builds Dexscreener Solana token links from mint addresses', () => {
+    expect(dexscreenerSolanaTokenUrl('7iuTToHkV5cdFMXYu4ftMT9obcMgbiRttxF5cXDypump')).toBe(
+      'https://dexscreener.com/solana/7iuTToHkV5cdFMXYu4ftMT9obcMgbiRttxF5cXDypump',
+    );
+  });
+
   it('formats signed SOL deltas consistently', () => {
     expect(formatSignedSol('0.020000000')).toBe('+0.020000000 SOL');
     expect(formatSignedSol('-0.100000000')).toBe('-0.100000000 SOL');
@@ -64,9 +71,11 @@ describe('AUTR live trader view model', () => {
     expect(actionTone('paper_sell_filled')).toBe('accent');
     expect(actionTone('paper_sell_skipped_unpriced')).toBe('warning');
     expect(actionTone('paper_buy_skipped_missing_output_amount')).toBe('danger');
+    expect(actionTone('paper_sell_skipped_onchain_delta')).toBe('danger');
     expect(actionStatusLabel('paper_buy_filled')).toBe('BUY tracked');
     expect(actionStatusLabel('paper_sell_filled')).toBe('SELL tracked');
     expect(actionStatusLabel('paper_buy_skipped_missing_output_amount')).toBe('BUY skipped');
+    expect(actionStatusLabel('paper_buy_skipped_onchain_delta')).toBe('BUY unfilled');
   });
 
   it('summarizes latest activity for empty and active streams', () => {
