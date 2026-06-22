@@ -690,7 +690,7 @@ export function StakingClient() {
       });
 
       if (result.preparedOnly) {
-        setNotice('Streamflow staking account prepared. Tap Stake HATCHER again to submit the staking transaction.');
+        setNotice('Streamflow receipt setup submitted. No HATCHER was staked in that transaction; tap Stake HATCHER again after it confirms.');
         await loadWalletBalance();
         return;
       }
@@ -704,7 +704,13 @@ export function StakingClient() {
         return;
       }
       const message = err instanceof Error ? err.message : 'Could not stake HATCHER';
-      if (message !== 'Cancelled') setError(message);
+      if (message !== 'Cancelled') {
+        if (/block height exceeded|signature .*expired/i.test(message)) {
+          setError('Solana confirmation expired before the site could verify the transaction. If this was the receipt setup step, no HATCHER was staked; wait a few seconds, refresh the wallet balance, and try Stake HATCHER again.');
+        } else {
+          setError(message);
+        }
+      }
     } finally {
       setStaking(false);
     }
@@ -980,7 +986,7 @@ export function StakingClient() {
                 <p className="mt-2 text-xs font-medium text-amber-400">Balance unavailable: {balanceError}</p>
               )}
               <p className="mt-2 text-xs leading-5 text-[var(--text-muted)]">
-                Minimum stake is 1 HATCHER. Keep a small SOL balance available for Solana rent and network fees. First-time staking may require one Streamflow receipt account setup.
+                Minimum stake is 1 HATCHER. A new pool may require a separate Streamflow receipt setup transaction first; that uses a small SOL rent/network fee and does not move HATCHER.
               </p>
             </div>
 

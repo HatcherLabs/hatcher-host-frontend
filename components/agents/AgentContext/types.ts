@@ -189,6 +189,7 @@ export interface AgentContextValue {
   toggleFieldVisibility: (fieldKey: string) => void;
   setIntegrationField: (featureKey: string, fieldKey: string, value: string) => void;
   saveIntegrationSecrets: (integration: IntegrationDef) => Promise<void>;
+  disconnectIntegration: (integration: IntegrationDef) => Promise<void>;
   hasExistingSecret: (secretKey: string) => boolean;
 
   // Actions

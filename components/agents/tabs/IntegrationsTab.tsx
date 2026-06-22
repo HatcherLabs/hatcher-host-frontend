@@ -47,6 +47,7 @@ import { DomainsSection } from './DomainsSection';
 
 type CompatLevel = 'native' | 'community' | 'planned';
 type PairingTerminalState = 'idle' | 'connecting' | 'connected' | 'restarting' | 'paired' | 'error' | 'closed';
+const DISCONNECTABLE_INTEGRATION_PREFIXES = new Set(['TELEGRAM', 'DISCORD', 'SLACK', 'XURL', 'MATRIX']);
 
 function WhatsAppQrPreview({ qrCode }: { qrCode: string }) {
   const sourceRows = qrCode.split(/\r?\n/).filter((row) => row.length > 0);
@@ -207,7 +208,7 @@ function IntegrationFieldsForm({
     integrationSecrets, visibleFields,
     setIntegrationField, toggleFieldVisibility,
     hasExistingSecret, savingIntegration,
-    integrationSaveMsg, saveIntegrationSecrets,
+    integrationSaveMsg, saveIntegrationSecrets, disconnectIntegration,
   } = ctx;
 
   // Channel settings (DM/group policy, allowlists, streaming, require-mention)
@@ -227,6 +228,10 @@ function IntegrationFieldsForm({
   const isSaving = savingIntegration === sk;
   const msg = integrationSaveMsg[sk] ?? '';
   const currentValues = integrationSecrets[sk] ?? {};
+  const canDisconnect =
+    DISCONNECTABLE_INTEGRATION_PREFIXES.has(integration.secretPrefix) ||
+    Boolean(integration.pairingChannel);
+  const hasSavedCredentials = integration.fields.some((field) => !field.key.startsWith('_CS_') && hasExistingSecret(field.key));
 
   return (
     <div className="border-t border-[var(--border-default)] p-5 space-y-4 bg-[var(--bg-card)]">
@@ -345,6 +350,20 @@ function IntegrationFieldsForm({
         >
           {isSaving ? t('saving') : t('saveCredentials')}
         </button>
+        {canDisconnect && hasSavedCredentials && (
+          <button
+            type="button"
+            onClick={() => {
+              if (!confirm(t('pairing.disconnectConfirm', { name: integration.name }))) return;
+              void disconnectIntegration(integration);
+            }}
+            disabled={isSaving}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-[var(--color-destructive-border)] text-[var(--color-destructive)] hover:bg-[var(--color-destructive-bg)] transition-colors disabled:opacity-40"
+          >
+            <Trash2 size={13} />
+            {t('pairing.disconnect')}
+          </button>
+        )}
         {msg && (
           <span className={`text-xs ${msg.startsWith('Error') || msg.startsWith('Missing') ? 'text-[var(--color-destructive)]' : 'text-[var(--color-success)]'}`}>
             {msg}
@@ -588,7 +607,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
 
   const isRunning = agent.status === 'active';
   const ctx = useAgentContext();
-  const { integrationSecrets, setIntegrationField, saveIntegrationSecrets, savingIntegration, integrationSaveMsg, hasExistingSecret } = ctx;
+  const { integrationSecrets, setIntegrationField, saveIntegrationSecrets, disconnectIntegration, savingIntegration, integrationSaveMsg, hasExistingSecret } = ctx;
   const isPaired = hasExistingSecret('WHATSAPP_PAIRING');
 
   // AllowFrom — pre-populate from agent.config so a saved value (e.g. a phone
@@ -709,9 +728,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
             <button
               onClick={async () => {
                 if (!confirm(t('pairing.disconnectConfirm', { name: integration.name }))) return;
-                const ch = integration.pairingChannel;
-                if (!ch) return;
-                await api.disconnectChannel(agent.id, ch);
+                await disconnectIntegration(integration);
                 setConnected(false);
                 setQrCode(null);
                 qrCodeRef.current = null;

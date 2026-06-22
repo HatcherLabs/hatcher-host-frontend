@@ -56,7 +56,7 @@ export const HOSTED_MODEL_PROVIDERS: HostedModelProvider[] = [
   { key: 'anthropic', name: 'Anthropic', description: 'Claude models for reasoning and writing.' },
   { key: 'idle', name: 'IDLE', description: 'Partner-hosted Claude models with fixed request pricing.' },
   { key: 'openserv', name: 'OpenServ', description: 'Private-beta SERV reasoning models for agent workflows.' },
-  { key: 'xiaomi', name: 'Xiaomi MiMo', description: 'Partner-hosted MiMo models with long context and launch-promo usage.' },
+  { key: 'xiaomi', name: 'Xiaomi MiMo', description: 'MiMo models routed through UsePod with OpenRouter fallback.' },
   { key: 'acedata', name: 'AceData', description: 'Partner-hosted frontier models plus data and media intelligence APIs.' },
   { key: 'minimax', name: 'MiniMax', description: 'MiniMax M-series models routed through UsePod and OpenRouter.' },
   { key: 'google', name: 'Google', description: 'Gemini models with large context windows.' },
@@ -313,8 +313,7 @@ export const HOSTED_MODELS: HostedModelOption[] = [
     category: 'Partner',
     cost: 'Low',
     context: '1M',
-    description: 'Partner-hosted Xiaomi MiMo model for long-context reasoning, coding, and agent workflows.',
-    fixedPrice: 'Free launch promo',
+    description: 'Xiaomi MiMo model routed through UsePod/OpenRouter for long-context reasoning, coding, and agent workflows.',
   },
   {
     id: 'xiaomi/mimo-v2.5',
@@ -324,8 +323,7 @@ export const HOSTED_MODELS: HostedModelOption[] = [
     category: 'Balanced',
     cost: 'Low',
     context: '1M',
-    description: 'Balanced Xiaomi MiMo model for multi-step reasoning, writing, and longer conversations.',
-    fixedPrice: 'Free launch promo',
+    description: 'Balanced Xiaomi MiMo model routed through UsePod/OpenRouter for multi-step reasoning, writing, and longer conversations.',
   },
   {
     id: 'xiaomi/mimo-v2-pro',
@@ -335,8 +333,7 @@ export const HOSTED_MODELS: HostedModelOption[] = [
     category: 'Partner',
     cost: 'Low',
     context: '1M',
-    description: 'Previous-generation MiMo Pro model for long-context coding and agent tasks.',
-    fixedPrice: 'Free launch promo',
+    description: 'Previous-generation MiMo Pro model routed through UsePod/OpenRouter for long-context coding and agent tasks.',
   },
   {
     id: 'xiaomi/mimo-v2-omni',
@@ -346,8 +343,7 @@ export const HOSTED_MODELS: HostedModelOption[] = [
     category: 'Multimodal',
     cost: 'Low',
     context: '256K',
-    description: 'Multimodal MiMo model for image-aware analysis, OCR, charts, and visual context.',
-    fixedPrice: 'Free launch promo',
+    description: 'Multimodal MiMo model routed through UsePod/OpenRouter for image-aware analysis, OCR, charts, and visual context.',
   },
   {
     id: 'acedata/claude-opus-4-8',
@@ -889,7 +885,7 @@ export function getHostedModelOption(model: string | undefined): HostedModelOpti
 export function hostedModelRoute(model: HostedModelOption): string {
   if (model.providerKey === 'idle') return 'IDLE partner';
   if (model.providerKey === 'openserv') return 'OpenServ direct / OpenRouter fallback';
-  if (model.providerKey === 'xiaomi') return 'Xiaomi MiMo direct';
+  if (model.providerKey === 'xiaomi') return 'UsePod primary / OpenRouter fallback';
   if (model.providerKey === 'acedata') return 'AceData primary / OpenRouter fallback';
   return 'UsePod primary / OpenRouter fallback';
 }
@@ -903,7 +899,7 @@ export function hostedModelPrivacy(model: HostedModelOption): HostedModelPrivacy
 export function hostedPrivacyLabel(model: HostedModelOption): string {
   if (model.providerKey === 'idle') return 'Partner-hosted';
   if (model.providerKey === 'openserv') return 'OpenServ-hosted';
-  if (model.providerKey === 'xiaomi') return 'Xiaomi-hosted';
+  if (model.providerKey === 'xiaomi') return 'UsePod/OpenRouter';
   if (model.providerKey === 'acedata') return 'AceData-hosted';
   return 'Hatcher-hosted';
 }

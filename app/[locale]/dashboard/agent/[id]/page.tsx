@@ -1214,6 +1214,7 @@ export default function AgentManagePage() {
       toggleFieldVisibility: integrations.toggleFieldVisibility,
       setIntegrationField: integrations.setIntegrationField,
       saveIntegrationSecrets: integrations.saveIntegrationSecrets,
+      disconnectIntegration: integrations.disconnectIntegration,
       hasExistingSecret: integrations.hasExistingSecret,
       actionLoading: actions.actionLoading, actionError: actions.actionError,
       actionSuccess: actions.actionSuccess, setActionError: actions.setActionError,

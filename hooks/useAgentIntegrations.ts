@@ -18,6 +18,22 @@ const CHANNEL_TO_FEATURE: Record<string, string> = {
   matrix: 'openclaw.platform.matrix',
 };
 
+const SUPPORTED_DISCONNECT_CHANNELS = new Set([
+  'telegram',
+  'discord',
+  'slack',
+  'whatsapp',
+  'twitter',
+  'instagram',
+  'matrix',
+]);
+
+function integrationDisconnectChannel(integration: IntegrationDef): string {
+  if (integration.pairingChannel) return integration.pairingChannel;
+  const prefix = integration.secretPrefix.toLowerCase();
+  return prefix === 'xurl' ? 'twitter' : prefix;
+}
+
 function csv(value: string): string[] {
   return value.split(',').map((s) => s.trim()).filter(Boolean);
 }
@@ -248,6 +264,42 @@ export function useAgentIntegrations(
     }
   }, [agent, id, integrationSecrets, hasExistingSecret, setAgent]);
 
+  const disconnectIntegration = useCallback(async (integration: IntegrationDef) => {
+    if (!agent) return;
+    const sk = integrationStateKey(integration);
+    const channel = integrationDisconnectChannel(integration);
+    if (!SUPPORTED_DISCONNECT_CHANNELS.has(channel)) {
+      setIntegrationSaveMsg((prev) => ({ ...prev, [sk]: 'Disconnect is not available for this integration yet' }));
+      setTimeout(() => setIntegrationSaveMsg((prev) => ({ ...prev, [sk]: '' })), 5000);
+      return;
+    }
+
+    setSavingIntegration(sk);
+    setIntegrationSaveMsg((prev) => ({ ...prev, [sk]: '' }));
+
+    try {
+      const res = await api.disconnectChannel(id, channel);
+      if (!res.success) {
+        setSavingIntegration(null);
+        setIntegrationSaveMsg((prev) => ({ ...prev, [sk]: 'Error: ' + res.error }));
+        return;
+      }
+
+      const fresh = await api.getAgent(id);
+      if (fresh.success) {
+        setAgent(fresh.data);
+      }
+      setIntegrationSecrets((prev) => ({ ...prev, [sk]: {} }));
+      setSavingIntegration(null);
+      setIntegrationSaveMsg((prev) => ({ ...prev, [sk]: 'Disconnected - container restarting with new config' }));
+      setTimeout(() => setIntegrationSaveMsg((prev) => ({ ...prev, [sk]: '' })), 5000);
+    } catch {
+      setSavingIntegration(null);
+      setIntegrationSaveMsg((prev) => ({ ...prev, [sk]: 'Failed to disconnect. Check your connection.' }));
+      setTimeout(() => setIntegrationSaveMsg((prev) => ({ ...prev, [sk]: '' })), 5000);
+    }
+  }, [agent, id, setAgent]);
+
   return {
     integrationSecrets,
     expandedIntegrations,
@@ -258,6 +310,7 @@ export function useAgentIntegrations(
     toggleFieldVisibility,
     setIntegrationField,
     saveIntegrationSecrets,
+    disconnectIntegration,
     hasExistingSecret,
   };
 }
