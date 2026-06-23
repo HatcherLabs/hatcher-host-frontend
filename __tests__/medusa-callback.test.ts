@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import {
   buildMedusaAgentReturnPath,
@@ -8,6 +8,12 @@ import {
 } from '@/lib/medusa-callback';
 
 describe('medusa callback helpers', () => {
+  const originalBuffer = globalThis.Buffer;
+
+  afterEach(() => {
+    globalThis.Buffer = originalBuffer;
+  });
+
   it('round-trips opaque state for a Hatcher agent', () => {
     const state = encodeMedusaCallbackState({
       agentId: 'agent-1',
@@ -36,5 +42,26 @@ describe('medusa callback helpers', () => {
     expect(buildMedusaCallbackUrl('https://hatcher.host/', '/dashboard/agent/agent-1')).toBe(
       'https://hatcher.host/medusa/callback',
     );
+  });
+
+  it('does not rely on browser Buffer polyfills supporting base64url', () => {
+    const BrowserBufferPolyfill = function BufferPolyfill() {} as unknown as typeof Buffer;
+    BrowserBufferPolyfill.from = (() => ({
+      toString: (encoding?: string) => {
+        if (encoding === 'base64url') throw new TypeError('Unknown encoding: base64url');
+        return 'ignored';
+      },
+    })) as unknown as typeof Buffer.from;
+    globalThis.Buffer = BrowserBufferPolyfill;
+
+    const state = encodeMedusaCallbackState({
+      agentId: 'agent-1',
+      campaignId: 'hatcher-agent-presale',
+    });
+
+    expect(decodeMedusaCallbackState(state)).toMatchObject({
+      agentId: 'agent-1',
+      campaignId: 'hatcher-agent-presale',
+    });
   });
 });

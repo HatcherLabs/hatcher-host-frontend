@@ -7,19 +7,47 @@ export interface MedusaCallbackState {
   createdAt?: number;
 }
 
-function toBase64Url(value: string): string {
-  if (typeof Buffer !== 'undefined') {
-    return Buffer.from(value, 'utf8').toString('base64url');
+function base64ToBase64Url(value: string): string {
+  return value.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function base64UrlToBase64(value: string): string {
+  return value.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(value.length / 4) * 4, '=');
+}
+
+function utf8ToBase64(value: string): string {
+  if (typeof btoa === 'function' && typeof TextEncoder !== 'undefined') {
+    const bytes = new TextEncoder().encode(value);
+    let binary = '';
+    for (const byte of bytes) {
+      binary += String.fromCharCode(byte);
+    }
+    return btoa(binary);
   }
-  return btoa(value).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  if (typeof Buffer !== 'undefined') {
+    return Buffer.from(value, 'utf8').toString('base64');
+  }
+  throw new Error('Base64 encoding is not available in this runtime.');
+}
+
+function base64ToUtf8(value: string): string {
+  if (typeof atob === 'function' && typeof TextDecoder !== 'undefined') {
+    const binary = atob(value);
+    const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
+  }
+  if (typeof Buffer !== 'undefined') {
+    return Buffer.from(value, 'base64').toString('utf8');
+  }
+  throw new Error('Base64 decoding is not available in this runtime.');
+}
+
+function toBase64Url(value: string): string {
+  return base64ToBase64Url(utf8ToBase64(value));
 }
 
 function fromBase64Url(value: string): string {
-  if (typeof Buffer !== 'undefined') {
-    return Buffer.from(value, 'base64url').toString('utf8');
-  }
-  const padded = value.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(value.length / 4) * 4, '=');
-  return atob(padded);
+  return base64ToUtf8(base64UrlToBase64(value));
 }
 
 export function encodeMedusaCallbackState(input: Omit<MedusaCallbackState, 'createdAt'> & { createdAt?: number }): string {
