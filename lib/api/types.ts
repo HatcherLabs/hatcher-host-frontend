@@ -727,6 +727,116 @@ export interface MirariGrantResponse {
   scopes: string[];
 }
 
+export type MedusaTier = 1 | 2 | 3;
+
+export interface MedusaPassportSummary {
+  valid: boolean;
+  tier?: MedusaTier;
+  tierLabel?: string;
+  nullifier?: string;
+  expiresAt?: string;
+  errors: string[];
+}
+
+export interface MedusaPassportBadge {
+  assetId: string;
+  collection: string | null;
+  frozen: boolean;
+  solscanUrl: string;
+}
+
+export interface MedusaSavedConfig {
+  campaignId?: string;
+  claimWallet?: string;
+  minTier?: MedusaTier;
+  requireBadge?: boolean;
+  badgeVerified?: boolean;
+  registered?: boolean;
+  registeredAt?: string;
+  verifiedAt?: string;
+  passport?: {
+    tier?: MedusaTier;
+    tierLabel?: string;
+    nullifier?: string;
+    expiresAt?: string;
+  };
+  badge?: MedusaPassportBadge | null;
+}
+
+export interface MedusaConfigStatus {
+  campaignId: string;
+  minTier: MedusaTier;
+  requireBadge: boolean;
+  badgeCollection: string;
+  dasRpcConfigured: boolean;
+  saved: MedusaSavedConfig | null;
+}
+
+export interface MedusaVerifyBody {
+  passport: unknown;
+  minTier?: MedusaTier;
+}
+
+export interface MedusaRegisterBody extends MedusaVerifyBody {
+  claimWallet: string;
+  campaignId?: string;
+  requireBadge?: boolean;
+}
+
+export interface MedusaRegisterResponse {
+  registered: boolean;
+  campaignId: string;
+  claimWallet: string;
+  tier?: MedusaTier;
+  tierLabel?: string;
+  nullifier?: string;
+  registeredAt?: string;
+  badgeVerified: boolean;
+  badge: MedusaPassportBadge | null;
+  verification: MedusaPassportSummary;
+}
+
+export interface MedusaHandoffBody {
+  passportUrl?: string;
+  code?: string;
+  campaignId?: string;
+  claimWallet?: string;
+  status?: string;
+}
+
+export interface MedusaHandoffResponse {
+  completed: boolean;
+  campaignId: string;
+  claimWallet: string;
+  verification: MedusaPassportSummary;
+  badgeVerified: boolean;
+  badge: MedusaPassportBadge | null;
+}
+
+export interface MedusaRotateResponse {
+  rotated: boolean;
+  previousClaimWallet: string;
+  campaignId: string;
+  claimWallet: string;
+  tier?: MedusaTier;
+  tierLabel?: string;
+  nullifier?: string;
+  registeredAt?: string;
+  verification: MedusaPassportSummary;
+}
+
+export interface MedusaMintBadgeBody {
+  passport: unknown;
+  claimWallet?: string;
+  campaignId?: string;
+}
+
+export interface MedusaMintBadgeResponse {
+  minted: boolean;
+  alreadyMinted: boolean;
+  badge: MedusaPassportBadge;
+}
+
 export type ConduitPayoutMode = "ai_credits" | "usdc_wallet";
 
 export interface ConduitConfigBody {
