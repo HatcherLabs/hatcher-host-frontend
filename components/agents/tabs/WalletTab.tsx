@@ -41,6 +41,7 @@ import { OrbisWalletPanel } from './OrbisWalletPanel';
 import { MirariWalletPanel } from './MirariWalletPanel';
 import { XonaPartnerResourcesPanel } from './XonaPartnerResourcesPanel';
 import { Mpp32WalletPanel } from './Mpp32WalletPanel';
+import { MedusaWalletPanel } from './MedusaWalletPanel';
 
 interface ReputationState {
   upCount: number;
@@ -60,7 +61,7 @@ interface ReputationState {
 
 type WalletPanel = 'passport' | AgentPassportNetworkId;
 type WalletSection = 'overview' | 'networks' | 'providers' | 'security';
-type ProviderPanelId = 'xona' | 'conduit' | 'earnfi' | 'oobe' | 'clawville' | 'kausalayer' | 'mirari' | 'mpp32' | 'orbis';
+type ProviderPanelId = 'xona' | 'conduit' | 'earnfi' | 'oobe' | 'clawville' | 'kausalayer' | 'mirari' | 'mpp32' | 'medusa' | 'orbis';
 
 const TAB_ORDER: WalletPanel[] = ['passport', 'skale', 'solana', 'base'];
 const NETWORK_ORDER: AgentPassportNetworkId[] = ['skale', 'solana', 'base'];
@@ -85,6 +86,7 @@ const SOLANA_PROVIDERS: ReadonlyArray<{ id: ProviderPanelId; label: string; desc
   { id: 'kausalayer', label: 'KausaLayer', description: 'Private pockets and saved wallets.', network: 'Solana' },
   { id: 'mirari', label: 'Mirari', description: 'Signal ingest and live mirror.', network: 'Solana' },
   { id: 'mpp32', label: 'MPP32', description: 'Signed AGTP intelligence and x402 settlement.', network: 'Solana' },
+  { id: 'medusa', label: 'Medusa', description: 'Privacy passport and presale enrollment.', network: 'Solana' },
 ];
 
 const BASE_PROVIDERS: ReadonlyArray<{ id: ProviderPanelId; label: string; description: string; network: 'Base' }> = [
@@ -113,6 +115,20 @@ export function getProviderPanelIdsForWallet(networkId: AgentPassportNetworkId):
   if (networkId === 'solana') return SOLANA_PROVIDERS.map((provider) => provider.id);
   if (networkId === 'base') return BASE_PROVIDERS.map((provider) => provider.id);
   return [];
+}
+
+function providerIds(): ProviderPanelId[] {
+  return [...SOLANA_PROVIDERS, ...BASE_PROVIDERS].map((provider) => provider.id);
+}
+
+export function getInitialWalletSectionFromSearch(search: string): WalletSection {
+  const requested = new URLSearchParams(search).get('walletSection');
+  return WALLET_SECTIONS.some((section) => section.id === requested) ? requested as WalletSection : 'overview';
+}
+
+export function getInitialWalletProviderFromSearch(search: string): ProviderPanelId {
+  const requested = new URLSearchParams(search).get('walletProvider');
+  return providerIds().includes(requested as ProviderPanelId) ? requested as ProviderPanelId : 'xona';
 }
 
 function readInitialWalletPanel(): WalletPanel {
@@ -183,9 +199,13 @@ export function WalletTab() {
   const [passport, setPassport] = useState<AgentPassport | null>(null);
   const [wallets, setWallets] = useState<AgentWalletsResponse | null>(null);
   const [reputation, setReputation] = useState<ReputationState | null>(null);
-  const [activeSection, setActiveSection] = useState<WalletSection>('overview');
+  const [activeSection, setActiveSection] = useState<WalletSection>(() => (
+    typeof window === 'undefined' ? 'overview' : getInitialWalletSectionFromSearch(window.location.search)
+  ));
   const [activePanel, setActivePanelRaw] = useState<WalletPanel>(() => readInitialWalletPanel());
-  const [activeProvider, setActiveProvider] = useState<ProviderPanelId>('xona');
+  const [activeProvider, setActiveProvider] = useState<ProviderPanelId>(() => (
+    typeof window === 'undefined' ? 'xona' : getInitialWalletProviderFromSearch(window.location.search)
+  ));
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copyMsg, setCopyMsg] = useState<string | null>(null);
@@ -504,6 +524,7 @@ export function WalletTab() {
       ) : activeSection === 'providers' ? (
         <ProviderIntegrationsPanel
           agentId={agent.id}
+          solanaWallet={networkById.get('solana')?.address}
           activeProvider={activeProvider}
           onProviderChange={setActiveProvider}
         />
@@ -742,10 +763,12 @@ function NetworkSelector({
 
 function ProviderIntegrationsPanel({
   agentId,
+  solanaWallet,
   activeProvider,
   onProviderChange,
 }: {
   agentId: string;
+  solanaWallet?: string | null;
   activeProvider: ProviderPanelId;
   onProviderChange: (provider: ProviderPanelId) => void;
 }) {
@@ -803,13 +826,13 @@ function ProviderIntegrationsPanel({
             </span>
           </div>
         </WalletSurface>
-        <ProviderPanel provider={activeProvider} agentId={agentId} />
+        <ProviderPanel provider={activeProvider} agentId={agentId} solanaWallet={solanaWallet} />
       </div>
     </div>
   );
 }
 
-function ProviderPanel({ provider, agentId }: { provider: ProviderPanelId; agentId: string }) {
+function ProviderPanel({ provider, agentId, solanaWallet }: { provider: ProviderPanelId; agentId: string; solanaWallet?: string | null }) {
   switch (provider) {
     case 'xona':
       return <XonaPartnerResourcesPanel agentId={agentId} />;
@@ -827,6 +850,8 @@ function ProviderPanel({ provider, agentId }: { provider: ProviderPanelId; agent
       return <MirariWalletPanel agentId={agentId} />;
     case 'mpp32':
       return <Mpp32WalletPanel agentId={agentId} />;
+    case 'medusa':
+      return <MedusaWalletPanel agentId={agentId} solanaWallet={solanaWallet} />;
     case 'orbis':
       return <OrbisWalletPanel agentId={agentId} />;
     default:

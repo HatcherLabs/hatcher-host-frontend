@@ -79,6 +79,16 @@ import type {
   MirariGrantResponse,
   MirariSignalResult,
   MirariTestSignalBody,
+  MedusaConfigStatus,
+  MedusaHandoffBody,
+  MedusaHandoffResponse,
+  MedusaMintBadgeBody,
+  MedusaMintBadgeResponse,
+  MedusaRegisterBody,
+  MedusaRegisterResponse,
+  MedusaRotateResponse,
+  MedusaVerifyBody,
+  MedusaPassportSummary,
   ConduitConfigBody,
   ConduitConfigStatus,
   ConduitManifestResponse,
@@ -662,6 +672,40 @@ export const api = {
     req<MirariGrantResponse>(`/agents/${id}/mirari/grant`, {
       method: "POST",
       body: JSON.stringify(scopes?.length ? { scopes } : {}),
+    }),
+
+  /** zkMedusa privacy passport verification and presale enrollment. */
+  getAgentMedusaConfig: (id: string) =>
+    req<MedusaConfigStatus>(`/agents/${id}/medusa/config`),
+
+  verifyAgentMedusaPassport: (id: string, body: MedusaVerifyBody) =>
+    req<MedusaPassportSummary>(`/agents/${id}/medusa/passport/verify`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  registerAgentMedusaPresale: (id: string, body: MedusaRegisterBody) =>
+    req<MedusaRegisterResponse>(`/agents/${id}/medusa/presale/register`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  completeAgentMedusaHandoff: (id: string, body: MedusaHandoffBody) =>
+    req<MedusaHandoffResponse>(`/agents/${id}/medusa/handoff/complete`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  rotateAgentMedusaClaimWallet: (id: string, body: MedusaRegisterBody) =>
+    req<MedusaRotateResponse>(`/agents/${id}/medusa/claim/rotate`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  mintAgentMedusaBadge: (id: string, body: MedusaMintBadgeBody) =>
+    req<MedusaMintBadgeResponse>(`/agents/${id}/medusa/badge/mint`, {
+      method: "POST",
+      body: JSON.stringify(body),
     }),
 
   /** Conduit Protocol provider settlement controls. */
