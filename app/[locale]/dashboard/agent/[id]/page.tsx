@@ -37,6 +37,7 @@ import {
   Skeleton,
   STATUS_STYLES,
   pageEntranceVariants,
+  shouldRunChatWorkloads,
 } from '@/components/agents/AgentContext';
 import { AgentSidebar } from '@/components/agents/AgentSidebar';
 import { PortAgentModal } from '@/components/agents/PortAgentModal';
@@ -711,10 +712,11 @@ export default function AgentManagePage() {
   }, [historySignature, id, normalizeHistoryMessages]);
 
   useEffect(() => {
+    if (!shouldRunChatWorkloads(tab)) return;
     lastHistorySignatureRef.current = '';
     void loadChatSessions();
     void loadChatHistory('initial');
-  }, [loadChatHistory, loadChatSessions, activeChatSessionId]);
+  }, [loadChatHistory, loadChatSessions, activeChatSessionId, tab]);
 
   useEffect(() => {
     if (tab !== 'chat' || !id) return;
@@ -821,7 +823,7 @@ export default function AgentManagePage() {
 
   const wsChat = useWebSocketChat({
     agentId: id,
-    enabled: isAuthenticated && !!id,
+    enabled: isAuthenticated && !!id && shouldRunChatWorkloads(tab),
     onToken: (token) => {
       setChatError(null);
       setChatErrorType(null);
