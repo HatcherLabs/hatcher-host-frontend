@@ -43,7 +43,7 @@ export function shortMedusaValue(value: string | null | undefined): string {
 }
 
 export function formatMedusaRequirement(tier: MedusaTier): string {
-  return `Campaign requirement: ${TIER_LABELS[tier]}`;
+  return `Required passport tier: ${TIER_LABELS[tier]}`;
 }
 
 export function buildMedusaBadgeUrl(assetId: string): string {
@@ -51,7 +51,7 @@ export function buildMedusaBadgeUrl(assetId: string): string {
 }
 
 export function getMedusaPrimaryActionLabel(hasSavedRegistration: boolean): string {
-  return hasSavedRegistration ? 'Rotate claim wallet' : 'Register for presale';
+  return hasSavedRegistration ? 'Update agent wallet' : 'Link agent wallet';
 }
 
 function buildMedusaPartnerUrl(input: {
@@ -111,10 +111,10 @@ export function parseMedusaPassportJson(raw: string): unknown {
 
 export function humanizeMedusaError(message: string): string {
   if (/already|duplicate|409|nullifier|used/i.test(message)) {
-    return 'This passport looks already used for this presale. Use a fresh Medusa passport for another claim wallet.';
+    return 'This passport looks already linked for this integration. Use a fresh Medusa passport for another agent wallet.';
   }
   if (/badge|cnft|collection/i.test(message)) {
-    return 'The selected claim wallet does not show the required Medusa badge yet.';
+    return 'The selected agent wallet does not show the required Medusa badge yet.';
   }
   if (/DAS|rpc|helius/i.test(message)) {
     return 'Badge lookup is not configured. Keep badge check optional or add a DAS RPC URL.';
@@ -283,7 +283,7 @@ export function MedusaWalletPanel({
     setError(null);
     try {
       const passport = parseMedusaPassportJson(passportText);
-      if (!claimWallet) throw new Error('Choose a claim wallet first.');
+      if (!claimWallet) throw new Error('Choose an agent wallet first.');
       if (badgeRequired && !config?.dasRpcConfigured) {
         throw new Error('DAS RPC is required for badge checks.');
       }
@@ -306,7 +306,7 @@ export function MedusaWalletPanel({
       }
       setRegistration(res.data);
       setVerification(res.data.verification);
-      toast.success(savedStatus.registered ? 'Medusa claim wallet rotated' : 'Agent registered for the Medusa presale');
+      toast.success(savedStatus.registered ? 'Medusa agent wallet updated' : 'Medusa passport linked to this agent');
       void loadConfig();
     } catch (e) {
       const message = humanizeMedusaError((e as Error).message);
@@ -352,9 +352,9 @@ export function MedusaWalletPanel({
           <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">
             <ShieldCheck size={13} /> Medusa Passport
           </div>
-          <h3 className="text-base font-semibold text-[var(--text-primary)]">Enroll this agent in private presales</h3>
+          <h3 className="text-base font-semibold text-[var(--text-primary)]">Add a private Medusa Passport</h3>
           <p className="mt-1 max-w-2xl text-xs leading-relaxed text-[var(--text-muted)]">
-            Verify a Medusa privacy passport, then register this agent wallet without exposing the proving wallet.
+            Verify privately on Medusa, then link an agent wallet. Hatcher stores the tier and expiry, not your proving wallet address.
           </p>
         </div>
         <button
@@ -378,21 +378,21 @@ export function MedusaWalletPanel({
         <StatusTile
           label="Passport"
           value={currentTierLabel}
-          description={currentExpiresAt ? `Expires ${formatDate(currentExpiresAt)}` : 'Upload a passport to verify tier'}
+          description={currentExpiresAt ? `Expires ${formatDate(currentExpiresAt)}` : 'Start on Medusa to verify tier'}
           tone={currentTierLabel === 'Not verified' ? 'warn' : 'good'}
           icon={ShieldCheck}
         />
         <StatusTile
-          label="Presale"
-          value={currentRegistered ? 'Registered' : 'Not registered'}
-          description={registration?.registeredAt ? formatDate(registration.registeredAt) : config?.campaignId ?? 'Campaign loading'}
+          label="Agent link"
+          value={currentRegistered ? 'Linked' : 'Not linked'}
+          description={currentRegisteredAt ? `Linked ${formatDate(currentRegisteredAt)}` : 'Link a passport to this agent wallet'}
           tone={currentRegistered ? 'good' : 'muted'}
           icon={CheckCircle2}
         />
         <StatusTile
-          label="Claim wallet"
+          label="Agent wallet"
           value={shortMedusaValue(claimWallet || savedStatus.claimWallet)}
-          description="Presales see this wallet only"
+          description="Apps see this wallet, not your private wallet"
           tone={claimWallet || savedStatus.claimWallet ? 'muted' : 'warn'}
           icon={Wallet}
         />
@@ -403,7 +403,7 @@ export function MedusaWalletPanel({
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="min-w-0">
               <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">
-                <ShieldCheck size={13} /> Agent Medusa Passport
+                <ShieldCheck size={13} /> Agent Passport
               </div>
               <div className="mt-3 flex flex-wrap items-baseline gap-3">
                 <span className="text-2xl font-semibold text-[var(--text-primary)]">{currentTierLabel}</span>
@@ -413,22 +413,22 @@ export function MedusaWalletPanel({
               </div>
             </div>
             <span className="rounded-full border border-[var(--color-success-border)] bg-[var(--color-success-bg)] px-3 py-1 text-xs font-semibold text-[var(--color-success)]">
-              {currentRegistered ? 'Registered' : 'Verified'}
+              {currentRegistered ? 'Linked' : 'Verified'}
             </span>
           </div>
           <div className="mt-4 grid gap-2 text-xs text-[var(--text-muted)] md:grid-cols-2">
             <div className="rounded-md border border-[var(--border-subtle)] bg-black/10 p-3">
-              <div className="text-[10px] uppercase tracking-[0.14em]">Claim wallet</div>
+              <div className="text-[10px] uppercase tracking-[0.14em]">Agent wallet</div>
               <div className="mt-1 truncate font-mono text-[var(--text-primary)]">{shortMedusaValue(claimWallet || savedStatus.claimWallet)}</div>
             </div>
             <div className="rounded-md border border-[var(--border-subtle)] bg-black/10 p-3">
-              <div className="text-[10px] uppercase tracking-[0.14em]">Presale</div>
+              <div className="text-[10px] uppercase tracking-[0.14em]">Agent link</div>
               <div className="mt-1 truncate text-[var(--text-primary)]">
-                {currentRegisteredAt ? `Registered ${formatDate(currentRegisteredAt)}` : config?.campaignId ?? '-'}
+                {currentRegisteredAt ? `Linked ${formatDate(currentRegisteredAt)}` : currentRegistered ? 'Linked to this agent' : '-'}
               </div>
             </div>
             <div className="rounded-md border border-[var(--border-subtle)] bg-black/10 p-3 md:col-span-2">
-              <div className="text-[10px] uppercase tracking-[0.14em]">cNFT badge</div>
+              <div className="text-[10px] uppercase tracking-[0.14em]">Medusa badge</div>
               {currentBadge?.solscanUrl ? (
                 <a
                   href={currentBadge.solscanUrl}
@@ -441,7 +441,7 @@ export function MedusaWalletPanel({
                 </a>
               ) : (
                 <div className="mt-1 text-[var(--text-secondary)]">
-                  {badgeRequired ? 'Required badge not found yet' : 'Badge optional for this campaign'}
+                  {badgeRequired ? 'Required badge not found yet' : 'Badge optional for this integration'}
                 </div>
               )}
             </div>
@@ -453,19 +453,19 @@ export function MedusaWalletPanel({
         <div className="space-y-3">
           <div className="grid gap-3 md:grid-cols-2">
             <div className="space-y-2">
-              <FormLabel>Campaign requirement</FormLabel>
+              <FormLabel>Passport requirement</FormLabel>
               <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2 text-sm font-semibold text-[var(--text-primary)]">
                 {formatMedusaRequirement(minTier)}
               </div>
               <p className="text-xs leading-relaxed text-[var(--text-muted)]">
-                The passport tier is assigned by Medusa after verification.
+                Medusa assigns the tier after scanning the private wallet on their site.
               </p>
             </div>
 
             <div className="space-y-2">
-              <FormLabel>cNFT badge</FormLabel>
+              <FormLabel>Medusa badge</FormLabel>
               <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2 text-sm font-semibold text-[var(--text-primary)]">
-                {badgeRequired ? 'Required by campaign' : 'Optional for this campaign'}
+                {badgeRequired ? 'Required for this integration' : 'Optional for this integration'}
               </div>
               <p className="text-xs leading-relaxed text-[var(--text-muted)]">
                 {config?.dasRpcConfigured ? 'Badge lookup is ready.' : 'Badge lookup needs a DAS RPC URL.'}
@@ -474,25 +474,28 @@ export function MedusaWalletPanel({
           </div>
 
           <div className="space-y-2">
-            <FormLabel>Claim wallet</FormLabel>
+            <FormLabel>Agent wallet</FormLabel>
             <select
               value={claimWalletChoice}
               onChange={(event) => setClaimWalletChoice(event.target.value as ClaimWalletChoice)}
               className="w-full rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2 text-sm text-[var(--text-primary)] outline-none transition focus:border-[var(--border-hover)]"
             >
               <option value="agent" disabled={!solanaWallet}>
-                {solanaWallet ? `Agent Solana wallet - ${shortMedusaValue(solanaWallet)}` : 'Agent Solana wallet unavailable'}
+                {solanaWallet ? `Use this agent's Solana wallet - ${shortMedusaValue(solanaWallet)}` : 'Agent Solana wallet unavailable'}
               </option>
-              <option value="custom">Another Solana wallet</option>
+              <option value="custom">Use a different Solana wallet</option>
             </select>
             {claimWalletChoice === 'custom' && (
               <input
                 value={customClaimWallet}
                 onChange={(event) => setCustomClaimWallet(event.target.value)}
-                placeholder="Paste claim wallet address"
+                placeholder="Paste agent wallet address"
                 className="w-full rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2 font-mono text-sm text-[var(--text-primary)] outline-none transition placeholder:text-[var(--text-dim)] focus:border-[var(--border-hover)]"
               />
             )}
+            <p className="text-xs leading-relaxed text-[var(--text-muted)]">
+              Medusa links the passport to this public wallet. Your proving wallet stays private.
+            </p>
           </div>
 
           <a
@@ -501,14 +504,14 @@ export function MedusaWalletPanel({
             rel="noreferrer"
             className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-[var(--border-hover)] bg-[var(--bg-surface)] px-4 py-2 text-xs font-semibold uppercase tracking-wider text-[var(--accent)] transition hover:bg-[var(--tech-accent-soft)]"
           >
-            <ExternalLink size={14} /> Get Medusa Passport
+            <ExternalLink size={14} /> Start Medusa verification
           </a>
 
           <details className="rounded-md border border-[var(--border-subtle)] bg-black/10 p-3">
-            <summary className="cursor-pointer text-xs font-semibold text-[var(--text-secondary)]">Technical receipt</summary>
+            <summary className="cursor-pointer text-xs font-semibold text-[var(--text-secondary)]">Verification details</summary>
             <div className="mt-3 grid gap-2 text-xs text-[var(--text-muted)]">
               <div className="flex justify-between gap-3">
-                <span>Campaign</span>
+                <span>Campaign ID</span>
                 <span className="truncate font-mono text-[var(--text-primary)]">{config?.campaignId ?? '-'}</span>
               </div>
               <div className="flex justify-between gap-3">
@@ -526,54 +529,60 @@ export function MedusaWalletPanel({
         </div>
 
         <div className="min-w-0 space-y-3">
-          <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-2 text-xs font-semibold text-[var(--text-secondary)]">
-                <FileText size={14} /> Passport file
+          <details className="rounded-md border border-[var(--border-subtle)] bg-black/10 p-3">
+            <summary className="cursor-pointer text-xs font-semibold text-[var(--text-secondary)]">Manual passport import</summary>
+            <p className="mt-3 text-xs leading-relaxed text-[var(--text-muted)]">
+              Use this only if Medusa support sends a passport JSON directly. The normal flow opens Medusa and returns automatically.
+            </p>
+            <div className="mt-3 rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2 text-xs font-semibold text-[var(--text-secondary)]">
+                  <FileText size={14} /> Passport file
+                </div>
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-[var(--border-subtle)] px-3 py-1.5 text-xs font-semibold text-[var(--text-secondary)] transition hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]">
+                  <Upload size={13} /> Upload JSON
+                  <input type="file" accept="application/json,.json" className="hidden" onChange={(event) => void handleFile(event)} />
+                </label>
               </div>
-              <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-[var(--border-subtle)] px-3 py-1.5 text-xs font-semibold text-[var(--text-secondary)] transition hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]">
-                <Upload size={13} /> Upload JSON
-                <input type="file" accept="application/json,.json" className="hidden" onChange={(event) => void handleFile(event)} />
-              </label>
+              <textarea
+                value={passportText}
+                onChange={(event) => updatePassportText(event.target.value)}
+                placeholder="Paste Medusa passport JSON"
+                rows={10}
+                className="mt-3 min-h-48 w-full resize-y rounded-md border border-[var(--border-default)] bg-black/20 p-3 font-mono text-xs leading-relaxed text-[var(--text-primary)] outline-none transition placeholder:text-[var(--text-dim)] focus:border-[var(--border-hover)]"
+              />
             </div>
-            <textarea
-              value={passportText}
-              onChange={(event) => updatePassportText(event.target.value)}
-              placeholder="Paste Medusa passport JSON"
-              rows={10}
-              className="mt-3 min-h-48 w-full resize-y rounded-md border border-[var(--border-default)] bg-black/20 p-3 font-mono text-xs leading-relaxed text-[var(--text-primary)] outline-none transition placeholder:text-[var(--text-dim)] focus:border-[var(--border-hover)]"
-            />
-          </div>
 
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => void verifyPassport()}
-              disabled={verifying || !passportText.trim()}
-              className="inline-flex items-center gap-2 rounded-md border border-[var(--border-hover)] px-4 py-2 text-xs font-semibold uppercase tracking-wider text-[var(--accent)] transition hover:bg-[var(--tech-accent-soft)] disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {verifying ? <Loader2 size={14} className="animate-spin" /> : <ShieldCheck size={14} />}
-              Verify passport
-            </button>
-            <button
-              type="button"
-              onClick={() => void registerPassport()}
-              disabled={registering || !canRegister || (badgeRequired && !config?.dasRpcConfigured)}
-              className="inline-flex items-center gap-2 rounded-md border border-[var(--color-success-border)] bg-[var(--color-success-bg)] px-4 py-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-success)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {registering ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
-              {getMedusaPrimaryActionLabel(savedStatus.registered)}
-            </button>
-            <button
-              type="button"
-              onClick={() => void mintBadge()}
-              disabled={mintingBadge || !passportText.trim() || !(registration || savedStatus.registered) || Boolean(currentBadge)}
-              className="inline-flex items-center gap-2 rounded-md border border-[var(--border-hover)] px-4 py-2 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] transition hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {mintingBadge ? <Loader2 size={14} className="animate-spin" /> : <ShieldCheck size={14} />}
-              Mint cNFT badge
-            </button>
-          </div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => void verifyPassport()}
+                disabled={verifying || !passportText.trim()}
+                className="inline-flex items-center gap-2 rounded-md border border-[var(--border-hover)] px-4 py-2 text-xs font-semibold uppercase tracking-wider text-[var(--accent)] transition hover:bg-[var(--tech-accent-soft)] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {verifying ? <Loader2 size={14} className="animate-spin" /> : <ShieldCheck size={14} />}
+                Verify passport
+              </button>
+              <button
+                type="button"
+                onClick={() => void registerPassport()}
+                disabled={registering || !canRegister || (badgeRequired && !config?.dasRpcConfigured)}
+                className="inline-flex items-center gap-2 rounded-md border border-[var(--color-success-border)] bg-[var(--color-success-bg)] px-4 py-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-success)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {registering ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
+                {getMedusaPrimaryActionLabel(savedStatus.registered)}
+              </button>
+              <button
+                type="button"
+                onClick={() => void mintBadge()}
+                disabled={mintingBadge || !passportText.trim() || !(registration || savedStatus.registered) || Boolean(currentBadge)}
+                className="inline-flex items-center gap-2 rounded-md border border-[var(--border-hover)] px-4 py-2 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] transition hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {mintingBadge ? <Loader2 size={14} className="animate-spin" /> : <ShieldCheck size={14} />}
+                Mint cNFT badge
+              </button>
+            </div>
+          </details>
         </div>
       </div>
     </GlassCard>

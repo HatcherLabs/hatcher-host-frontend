@@ -30,15 +30,15 @@ describe('MedusaWalletPanel helpers', () => {
   });
 
   it('turns duplicate/nullifier errors into user-facing copy', () => {
-    expect(humanizeMedusaError('409 duplicate nullifier')).toContain('already used');
+    expect(humanizeMedusaError('409 duplicate nullifier')).toContain('already linked');
   });
 
-  it('shortens long values for receipts and dropdown labels', () => {
+  it('shortens long values for detail rows and dropdown labels', () => {
     expect(shortMedusaValue('ESbGCiveNEWmSRnW9quAo5XU7BUzkk2j1ZyacdFA7zAs')).toBe('ESbGCive...FA7zAs');
   });
 
-  it('describes tier as a campaign requirement instead of a user-selected value', () => {
-    expect(formatMedusaRequirement(2)).toBe('Campaign requirement: Silver or better');
+  it('describes tier as a passport requirement instead of a user-selected value', () => {
+    expect(formatMedusaRequirement(2)).toBe('Required passport tier: Silver or better');
   });
 
   it('builds a Solscan badge URL from a cNFT asset id', () => {
@@ -48,7 +48,7 @@ describe('MedusaWalletPanel helpers', () => {
   });
 
   it('uses rotate copy only after a saved registration exists', () => {
-    expect(getMedusaPrimaryActionLabel(false)).toBe('Register for presale');
-    expect(getMedusaPrimaryActionLabel(true)).toBe('Rotate claim wallet');
+    expect(getMedusaPrimaryActionLabel(false)).toBe('Link agent wallet');
+    expect(getMedusaPrimaryActionLabel(true)).toBe('Update agent wallet');
   });
 });
