@@ -42,6 +42,7 @@ import { MirariWalletPanel } from './MirariWalletPanel';
 import { XonaPartnerResourcesPanel } from './XonaPartnerResourcesPanel';
 import { Mpp32WalletPanel } from './Mpp32WalletPanel';
 import { MedusaWalletPanel } from './MedusaWalletPanel';
+import { MetaplexWalletPanel } from './MetaplexWalletPanel';
 
 interface ReputationState {
   upCount: number;
@@ -61,7 +62,7 @@ interface ReputationState {
 
 type WalletPanel = 'passport' | AgentPassportNetworkId;
 type WalletSection = 'overview' | 'networks' | 'providers' | 'security';
-type ProviderPanelId = 'xona' | 'conduit' | 'earnfi' | 'oobe' | 'clawville' | 'kausalayer' | 'mirari' | 'mpp32' | 'medusa' | 'orbis';
+type ProviderPanelId = 'xona' | 'conduit' | 'earnfi' | 'oobe' | 'clawville' | 'kausalayer' | 'mirari' | 'mpp32' | 'medusa' | 'metaplex' | 'orbis';
 
 const TAB_ORDER: WalletPanel[] = ['passport', 'skale', 'solana', 'base'];
 const NETWORK_ORDER: AgentPassportNetworkId[] = ['skale', 'solana', 'base'];
@@ -87,6 +88,7 @@ const SOLANA_PROVIDERS: ReadonlyArray<{ id: ProviderPanelId; label: string; desc
   { id: 'mirari', label: 'Mirari', description: 'Signal ingest and live mirror.', network: 'Solana' },
   { id: 'mpp32', label: 'MPP32', description: 'Signed AGTP intelligence and x402 settlement.', network: 'Solana' },
   { id: 'medusa', label: 'Medusa', description: 'Privacy passport and presale enrollment.', network: 'Solana' },
+  { id: 'metaplex', label: 'Metaplex', description: 'Agent Registry identity and public metadata.', network: 'Solana' },
 ];
 
 const BASE_PROVIDERS: ReadonlyArray<{ id: ProviderPanelId; label: string; description: string; network: 'Base' }> = [
@@ -852,6 +854,8 @@ function ProviderPanel({ provider, agentId, solanaWallet }: { provider: Provider
       return <Mpp32WalletPanel agentId={agentId} />;
     case 'medusa':
       return <MedusaWalletPanel agentId={agentId} solanaWallet={solanaWallet} />;
+    case 'metaplex':
+      return <MetaplexWalletPanel agentId={agentId} solanaWallet={solanaWallet} />;
     case 'orbis':
       return <OrbisWalletPanel agentId={agentId} />;
     default:

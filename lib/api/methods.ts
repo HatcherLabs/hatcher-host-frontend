@@ -73,6 +73,9 @@ import type {
   OrbisSearchResponse,
   Mpp32ConfigBody,
   Mpp32ConfigStatus,
+  MetaplexConfigStatus,
+  MetaplexMintAgentPlan,
+  MetaplexRegistrationResponse,
   MirariConfigStatus,
   MirariDreamResult,
   MirariDreamBody,
@@ -650,6 +653,18 @@ export const api = {
     req<Mpp32ConfigStatus>(`/agents/${id}/mpp32/config`, {
       method: "PATCH",
       body: JSON.stringify(body),
+    }),
+
+  /** Metaplex Agent Registry identity controls. */
+  getAgentMetaplexConfig: (id: string) =>
+    req<MetaplexConfigStatus>(`/agents/${id}/metaplex/config`),
+
+  getAgentMetaplexMintPlan: (id: string) =>
+    req<MetaplexMintAgentPlan>(`/agents/${id}/metaplex/mint-plan`),
+
+  registerAgentMetaplex: (id: string) =>
+    req<MetaplexRegistrationResponse>(`/agents/${id}/metaplex/register`, {
+      method: "POST",
     }),
 
   /** Mirari live mirror signals and dashboard grant. */

@@ -625,6 +625,100 @@ export interface Mpp32ConfigBody {
   maxPerCallUsd?: number;
 }
 
+export type MetaplexConfigStatusValue = "disabled" | "wallet-missing" | "metadata-ready" | "registered";
+
+export interface MetaplexAgentService {
+  name: "web" | "A2A" | "MCP" | "Hatcher API" | string;
+  endpoint: string;
+  version?: string;
+  skills?: string[];
+  domains?: string[];
+}
+
+export interface MetaplexRegistrationDocument {
+  type: string;
+  name: string;
+  description: string;
+  image: string;
+  services: MetaplexAgentService[];
+  active: boolean;
+  x402Support: boolean;
+  registrations: Array<{
+    agentId: string;
+    agentRegistry: string;
+  }>;
+  supportedTrust: Array<"reputation" | "crypto-economic" | string>;
+  payment?: {
+    settlement: "x402" | string;
+    network: string;
+    token: string | null;
+    payTo: string;
+    resource: string;
+  };
+  hatcher: {
+    agentId: string;
+    slug: string;
+    runtime: string;
+    owner: string;
+    createdAt: string;
+    profile: string;
+    registrationUri: string;
+  };
+}
+
+export interface MetaplexConfigStatus {
+  enabled: boolean;
+  registrationEnabled: boolean;
+  configured: boolean;
+  status: MetaplexConfigStatusValue;
+  missing: string[];
+  capabilities: {
+    metadata: boolean;
+    registration: boolean;
+    x402: boolean;
+    executive: boolean;
+    genesis: boolean;
+  };
+  metadataUri: string;
+  coreAssetMetadataUri: string;
+  metaplexStatus: string;
+  solanaWalletAddress: string | null;
+  metaplexAsset: string | null;
+  registryAddress: string;
+  registeredAt: string | null;
+  registrationDocument: MetaplexRegistrationDocument;
+}
+
+export interface MetaplexMintAgentPlan {
+  kind: "metaplex.mint-agent.v1";
+  sdkFunction: "mintAndSubmitAgent";
+  ready: boolean;
+  missing: string[];
+  rpcUrl: string;
+  network: string;
+  request: {
+    wallet: string | null;
+    network: "solana-mainnet" | "solana-devnet" | "localnet";
+    name: string;
+    uri: string;
+    agentMetadata: MetaplexRegistrationDocument;
+  };
+  packages: {
+    agentRegistry: string;
+    umi: string;
+    umiBundleDefaults: string;
+  };
+  notes: string[];
+}
+
+export interface MetaplexRegistrationResponse {
+  agentId: string;
+  metadataUri: string;
+  txHash: string;
+  registeredAt: string;
+  status: "cached" | "registered";
+}
+
 export type MirariRuntime = "hermes" | "openclaw";
 export type MirariSignalKind = "drift" | "contradiction" | "skill_misfire" | "focus_hit" | "judge_score";
 export type MirariDreamMode = "stress_test" | "replay" | "consolidate";
