@@ -1096,6 +1096,7 @@ export const api = {
     data: {
       name?: string;
       description?: string;
+      avatarUrl?: string | null;
       commitMessage?: string;
       isPublic?: boolean;
       config?: {

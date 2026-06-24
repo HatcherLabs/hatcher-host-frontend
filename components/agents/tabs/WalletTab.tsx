@@ -80,6 +80,7 @@ const WALLET_SECTIONS: ReadonlyArray<{
 ];
 
 const SOLANA_PROVIDERS: ReadonlyArray<{ id: ProviderPanelId; label: string; description: string; network: 'Solana' }> = [
+  { id: 'metaplex', label: 'Metaplex', description: 'Agent Registry identity and public metadata.', network: 'Solana' },
   { id: 'xona', label: 'Xona', description: 'xPay partner resources and agent tools.', network: 'Solana' },
   { id: 'conduit', label: 'Conduit', description: 'Provider listing and payout routing.', network: 'Solana' },
   { id: 'earnfi', label: 'EarnFi', description: 'Paid task creation and verification.', network: 'Solana' },
@@ -89,7 +90,6 @@ const SOLANA_PROVIDERS: ReadonlyArray<{ id: ProviderPanelId; label: string; desc
   { id: 'mirari', label: 'Mirari', description: 'Signal ingest and live mirror.', network: 'Solana' },
   { id: 'mpp32', label: 'MPP32', description: 'Signed AGTP intelligence and x402 settlement.', network: 'Solana' },
   { id: 'medusa', label: 'Medusa', description: 'Privacy passport and presale enrollment.', network: 'Solana' },
-  { id: 'metaplex', label: 'Metaplex', description: 'Agent Registry identity and public metadata.', network: 'Solana' },
 ];
 
 const BASE_PROVIDERS: ReadonlyArray<{ id: ProviderPanelId; label: string; description: string; network: 'Base' }> = [
@@ -150,7 +150,8 @@ export function getInitialWalletProviderFromSearch(
   runtime: AgentRuntime | null | undefined = 'hermes',
 ): ProviderPanelId {
   const requested = new URLSearchParams(search).get('walletProvider');
-  return providerIds(runtime).includes(requested as ProviderPanelId) ? requested as ProviderPanelId : 'xona';
+  const ids = providerIds(runtime);
+  return ids.includes(requested as ProviderPanelId) ? requested as ProviderPanelId : ids[0] ?? 'metaplex';
 }
 
 function readInitialWalletPanel(): WalletPanel {
