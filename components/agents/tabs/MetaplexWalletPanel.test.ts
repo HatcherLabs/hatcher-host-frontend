@@ -3,7 +3,10 @@ import { describe, expect, it } from 'vitest';
 import {
   buildMetaplexRegistrationButtonState,
   formatMetaplexStatusLabel,
+  getMetaplexAvatarPreview,
+  getMetaplexProfileUrl,
   getMetaplexPublicLinks,
+  getMetaplexRegisteredLinks,
   humanizeMetaplexError,
 } from './MetaplexWalletPanel';
 import type { MetaplexConfigStatus } from '@/lib/api';
@@ -32,7 +35,7 @@ const READY_CONFIG: MetaplexConfigStatus = {
     type: 'https://eips.ethereum.org/EIPS/eip-8004#registration-v1',
     name: 'Hatch',
     description: 'HatcherLabs agent',
-    image: 'https://hatcher.host/icon.png',
+    image: 'https://hatcher.host/hatcher-metaplex-avatar.png',
     services: [],
     active: true,
     x402Support: true,
@@ -93,6 +96,37 @@ describe('Metaplex wallet panel helpers', () => {
       {
         label: 'Core asset metadata',
         href: 'https://api.hatcher.host/agents/agent-1/metaplex/core-asset.json',
+      },
+    ]);
+  });
+
+  it('builds the user-facing Metaplex profile link from the registered asset', () => {
+    expect(getMetaplexProfileUrl('AHyHiHQojvS2QeL4MdxzWD8Yjrnf1P1SF5SegtyKauZj')).toBe(
+      'https://www.metaplex.com/agents/AHyHiHQojvS2QeL4MdxzWD8Yjrnf1P1SF5SegtyKauZj',
+    );
+  });
+
+  it('summarizes the avatar Metaplex will show', () => {
+    expect(getMetaplexAvatarPreview(READY_CONFIG)).toEqual({
+      image: 'https://hatcher.host/hatcher-metaplex-avatar.png',
+      label: 'Metaplex profile image',
+      helper: 'Uses the agent avatar when one is set; otherwise Hatcher uses the default agent avatar.',
+    });
+  });
+
+  it('prioritizes Metaplex profile links after registration', () => {
+    expect(getMetaplexRegisteredLinks('AHyHiHQojvS2QeL4MdxzWD8Yjrnf1P1SF5SegtyKauZj', '5tx')).toEqual([
+      {
+        label: 'Metaplex profile',
+        href: 'https://www.metaplex.com/agents/AHyHiHQojvS2QeL4MdxzWD8Yjrnf1P1SF5SegtyKauZj',
+      },
+      {
+        label: 'Core asset on Solscan',
+        href: 'https://solscan.io/account/AHyHiHQojvS2QeL4MdxzWD8Yjrnf1P1SF5SegtyKauZj',
+      },
+      {
+        label: 'Registration transaction',
+        href: 'https://solscan.io/tx/5tx',
       },
     ]);
   });
