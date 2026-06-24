@@ -24,6 +24,7 @@ const MAX_BODY_BYTES = 512 * 1024;
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const READ_RATE_LIMIT_MAX = 120;
 const WRITE_RATE_LIMIT_MAX = 20;
+const SOLANA_RPC_UPSTREAM_TIMEOUT_MS = 15_000;
 
 const rateBuckets = new Map<string, { count: number; resetAt: number }>();
 
@@ -70,12 +71,30 @@ export async function POST(request: NextRequest) {
     return jsonRpcError(id, -32005, 'Rate limit exceeded', 429);
   }
 
-  const upstream = await fetch(upstreamRpc(shouldUsePaidSolanaRpc(authorization)), {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body,
-    cache: 'no-store',
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), SOLANA_RPC_UPSTREAM_TIMEOUT_MS);
+  let upstream: Response;
+  try {
+    upstream = await fetch(upstreamRpc(shouldUsePaidSolanaRpc(
+      authorization,
+      process.env,
+      { trustedBrowserRequest: isTrustedBrowserRequest },
+    )), {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body,
+      cache: 'no-store',
+      signal: controller.signal,
+    });
+  } catch (err) {
+    const id = rpcErrorId(payload);
+    if (isAbortError(err)) {
+      return jsonRpcError(id, -32006, 'Solana RPC upstream timed out', 504);
+    }
+    return jsonRpcError(id, -32007, 'Solana RPC upstream request failed', 502);
+  } finally {
+    clearTimeout(timeout);
+  }
 
   return new NextResponse(await upstream.text(), {
     status: upstream.status,
@@ -88,6 +107,14 @@ export async function POST(request: NextRequest) {
 
 function isRpcObject(payload: unknown): payload is { method?: unknown; id?: unknown } {
   return typeof payload === 'object' && payload !== null && !Array.isArray(payload);
+}
+
+function rpcErrorId(payload: unknown): unknown {
+  return isRpcObject(payload) ? payload.id ?? null : null;
+}
+
+function isAbortError(err: unknown): boolean {
+  return err instanceof Error && err.name === 'AbortError';
 }
 
 function publicSiteOrigins(request: NextRequest): string[] {

@@ -97,3 +97,13 @@ export function groupActiveStakesByPool(
       return aOrder - bOrder;
     });
 }
+
+export function stakesInExpandedPoolGroups(
+  groups: ActiveStakePoolGroup[],
+  expandedPoolKeys: ReadonlySet<StakingPoolKey>,
+): StakingStakeEntry[] {
+  if (expandedPoolKeys.size === 0) return [];
+  return groups
+    .filter((group) => expandedPoolKeys.has(group.poolKey))
+    .flatMap((group) => group.stakes);
+}

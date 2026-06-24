@@ -103,11 +103,11 @@ export function paidSolanaRpcUrl(
 export function shouldUsePaidSolanaRpc(
   authorization: string | null,
   env: Record<string, string | undefined> = process.env,
+  options: { trustedBrowserRequest?: boolean } = {},
 ): boolean {
-  return Boolean(paidSolanaRpcUrl(env) && isAuthorizedSolanaRpcProxyRequest(
-    authorization,
-    env.SOLANA_RPC_PROXY_TOKEN,
-  ));
+  if (!paidSolanaRpcUrl(env)) return false;
+  if (options.trustedBrowserRequest) return true;
+  return isAuthorizedSolanaRpcProxyRequest(authorization, env.SOLANA_RPC_PROXY_TOKEN);
 }
 
 export function isAuthorizedSolanaRpcProxyRequest(

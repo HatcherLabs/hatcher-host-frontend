@@ -31,6 +31,7 @@ const TOKEN_2022_PROGRAM_ID = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqC
 const ASSOCIATED_TOKEN_PROGRAM_ID = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
 const HATCHER_MINT = new PublicKey(HATCH_TOKEN_MINT);
 const HATCHER_REWARD_POOL_NONCE = 0;
+const STAKING_PREFLIGHT_ERROR_MESSAGE = 'Staking transaction failed preflight simulation. Refresh staking data and try again.';
 let resolvedHatcherTokenProgramId: PublicKey | null = null;
 
 export type StakeHatcherResult = {
@@ -132,7 +133,7 @@ async function preparePreflightedWalletTransaction(params: {
     replaceRecentBlockhash: true,
   });
   if (simulation.value.err) {
-    throw new Error('Staking transaction failed preflight simulation. Refresh staking data and try again.');
+    throw new Error(STAKING_PREFLIGHT_ERROR_MESSAGE);
   }
 
   return {
@@ -199,6 +200,10 @@ async function sendPreparedWalletTransaction(params: {
   }
 
   return signAndBroadcastPreparedTransaction(params);
+}
+
+function isStakingPreflightSimulationError(err: unknown): boolean {
+  return err instanceof Error && err.message === STAKING_PREFLIGHT_ERROR_MESSAGE;
 }
 
 export async function fetchHatcherWalletBalance(
@@ -376,10 +381,34 @@ export async function unstakeHatcherWithStreamflow(params: {
     }],
   }, { invoker });
 
+  try {
+    const prepared = await preparePreflightedWalletTransaction({
+      connection: client.connection,
+      payer: params.wallet.publicKey,
+      instructions: ixs,
+    });
+    const txId = await sendPreparedWalletTransaction({
+      wallet: params.wallet,
+      connection: client.connection,
+      prepared,
+      onTransactionSubmitted: params.onTransactionSubmitted,
+    });
+    return { txId };
+  } catch (err) {
+    if (!isStakingPreflightSimulationError(err)) throw err;
+  }
+
+  const { ixs: unstakeOnlyIxs } = await client.prepareUnstakeInstructions({
+    stakePool: params.stakePoolAddress,
+    stakePoolMint: HATCHER_MINT,
+    tokenProgramId,
+    nonce: params.depositNonce,
+  }, { invoker });
+
   const prepared = await preparePreflightedWalletTransaction({
     connection: client.connection,
     payer: params.wallet.publicKey,
-    instructions: ixs,
+    instructions: unstakeOnlyIxs,
   });
   const txId = await sendPreparedWalletTransaction({
     wallet: params.wallet,
