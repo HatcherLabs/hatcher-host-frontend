@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react';
 import {
   Activity,
   AlertTriangle,
@@ -49,7 +49,9 @@ export const MIRARI_LAYOUT_GRID_CLASSNAME = 'mt-5 grid min-w-0 gap-4 xl:grid-col
 export const MIRARI_RESULT_PANEL_CLASSNAME = 'min-w-0 max-w-full overflow-hidden border border-[var(--color-info-border)] bg-[var(--color-info-bg)] p-4';
 export const MIRARI_RESULT_PRE_CLASSNAME = 'mt-3 max-h-64 max-w-full overflow-auto whitespace-pre-wrap break-words border border-[var(--border-subtle)] bg-black/30 p-3 text-xs text-[var(--text-primary)]';
 export const MIRARI_DASHBOARD_SCOPES = ['mirror:read', 'signals:read', 'dreams:read'] as const;
-export const MIRARI_DASHBOARD_FRAME_CLASSNAME = 'mt-4 min-h-[520px] overflow-hidden border border-[var(--color-info-border)] bg-black/20';
+export const MIRARI_DASHBOARD_SECTION_CLASSNAME = 'mt-5 border-t border-cyan-400/20 pt-4';
+export const MIRARI_DASHBOARD_FRAME_CLASSNAME = 'relative mt-4 aspect-video w-full overflow-hidden border border-[var(--color-info-border)] bg-black/20';
+export const MIRARI_DASHBOARD_IFRAME_STYLE: CSSProperties = { minHeight: 0 };
 const MIRARI_DASHBOARD_VIEWS: DashboardView[] = ['mirror', 'signals', 'dreams'];
 
 export function buildMirariConnectionCheckPayload(form: MirariConnectionCheckFormState): MirariTestSignalBody {
@@ -400,89 +402,90 @@ export function MirariWalletPanel({ agentId }: { agentId: string }) {
               </p>
             )}
           </div>
-
-          <div className="mt-5 border-t border-cyan-400/20 pt-4">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="min-w-0">
-                <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-cyan-100">
-                  <MonitorUp size={13} /> Live dashboard
-                </div>
-                <p className="mt-2 text-xs leading-relaxed text-[var(--text-muted)]">
-                  Mirror, signals, and dreams for this agent.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => void loadDashboard()}
-                disabled={!canSend || dashboardLoading}
-                className="inline-flex items-center gap-2 border border-cyan-400/40 bg-cyan-500/10 px-3 py-2 text-xs uppercase tracking-wider text-cyan-100 transition hover:bg-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {dashboardLoading
-                  ? <Loader2 size={13} className="animate-spin" />
-                  : dashboardGrant
-                    ? <RefreshCw size={13} />
-                    : <MonitorUp size={13} />
-                }
-                {dashboardGrant ? 'Refresh dashboard' : 'Load dashboard'}
-              </button>
-            </div>
-
-            <div className="mt-3 flex flex-wrap gap-2">
-              {MIRARI_DASHBOARD_VIEWS.map((view) => (
-                <button
-                  key={view}
-                  type="button"
-                  onClick={() => setDashboardView(view)}
-                  className={`border px-3 py-1.5 text-[10px] uppercase tracking-[0.16em] transition ${
-                    dashboardView === view
-                      ? 'border-cyan-300/60 bg-cyan-500/20 text-cyan-50'
-                      : 'border-[var(--border-subtle)] bg-black/20 text-[var(--text-muted)] hover:border-cyan-300/40 hover:text-cyan-100'
-                  }`}
-                >
-                  {view}
-                </button>
-              ))}
-            </div>
-
-            {dashboardError && (
-              <div className="mt-3 flex items-start gap-2 border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] p-3 text-xs text-[var(--color-warning)]">
-                <AlertTriangle size={14} className="mt-0.5 flex-shrink-0" />
-                <span className="min-w-0 break-words">{dashboardError}</span>
-              </div>
-            )}
-
-            {dashboardGrant ? (
-              <div className={MIRARI_DASHBOARD_FRAME_CLASSNAME}>
-                {!dashboardReady && (
-                  <div className="flex items-center gap-2 border-b border-cyan-400/20 px-3 py-2 text-xs text-[var(--text-muted)]">
-                    <Loader2 size={13} className="animate-spin" /> Connecting
-                  </div>
-                )}
-                <MirariDashboard
-                  token={dashboardGrant.token}
-                  workspaceId={dashboardGrant.workspaceId}
-                  orgId={dashboardGrant.orgId}
-                  agentId={dashboardGrant.agentId}
-                  runtime={config?.runtime ?? '*'}
-                  view={dashboardView}
-                  theme="dark"
-                  title="Mirari live dashboard"
-                  onReady={() => setDashboardReady(true)}
-                  onError={(err) => {
-                    const message = err.message || err.code || 'Mirari dashboard failed';
-                    setDashboardError(message);
-                    toast.error(message);
-                  }}
-                  onNavigate={(event) => setDashboardView(event.view)}
-                />
-              </div>
-            ) : (
-              <p className="mt-4 text-xs leading-relaxed text-[var(--text-muted)]">
-                Available when Mirari is configured for this agent.
-              </p>
-            )}
-          </div>
         </div>
+      </div>
+
+      <div className={MIRARI_DASHBOARD_SECTION_CLASSNAME}>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-cyan-100">
+              <MonitorUp size={13} /> Live dashboard
+            </div>
+            <p className="mt-2 text-xs leading-relaxed text-[var(--text-muted)]">
+              Mirror, signals, and dreams for this agent.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => void loadDashboard()}
+            disabled={!canSend || dashboardLoading}
+            className="inline-flex items-center gap-2 border border-cyan-400/40 bg-cyan-500/10 px-3 py-2 text-xs uppercase tracking-wider text-cyan-100 transition hover:bg-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {dashboardLoading
+              ? <Loader2 size={13} className="animate-spin" />
+              : dashboardGrant
+                ? <RefreshCw size={13} />
+                : <MonitorUp size={13} />
+            }
+            {dashboardGrant ? 'Refresh dashboard' : 'Load dashboard'}
+          </button>
+        </div>
+
+        <div className="mt-3 flex flex-wrap gap-2">
+          {MIRARI_DASHBOARD_VIEWS.map((view) => (
+            <button
+              key={view}
+              type="button"
+              onClick={() => setDashboardView(view)}
+              className={`border px-3 py-1.5 text-[10px] uppercase tracking-[0.16em] transition ${
+                dashboardView === view
+                  ? 'border-cyan-300/60 bg-cyan-500/20 text-cyan-50'
+                  : 'border-[var(--border-subtle)] bg-black/20 text-[var(--text-muted)] hover:border-cyan-300/40 hover:text-cyan-100'
+              }`}
+            >
+              {view}
+            </button>
+          ))}
+        </div>
+
+        {dashboardError && (
+          <div className="mt-3 flex items-start gap-2 border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] p-3 text-xs text-[var(--color-warning)]">
+            <AlertTriangle size={14} className="mt-0.5 flex-shrink-0" />
+            <span className="min-w-0 break-words">{dashboardError}</span>
+          </div>
+        )}
+
+        {dashboardGrant ? (
+          <div className={MIRARI_DASHBOARD_FRAME_CLASSNAME}>
+            {!dashboardReady && (
+              <div className="absolute left-0 right-0 top-0 z-10 flex items-center gap-2 border-b border-cyan-400/20 bg-black/70 px-3 py-2 text-xs text-[var(--text-muted)] backdrop-blur-sm">
+                <Loader2 size={13} className="animate-spin" /> Connecting
+              </div>
+            )}
+            <MirariDashboard
+              token={dashboardGrant.token}
+              workspaceId={dashboardGrant.workspaceId}
+              orgId={dashboardGrant.orgId}
+              agentId={dashboardGrant.agentId}
+              runtime={config?.runtime ?? '*'}
+              view={dashboardView}
+              theme="dark"
+              title="Mirari live dashboard"
+              style={MIRARI_DASHBOARD_IFRAME_STYLE}
+              onReady={() => setDashboardReady(true)}
+              onError={(err) => {
+                const message = err.message || err.code || 'Mirari dashboard failed';
+                setDashboardError(message);
+                toast.error(message);
+              }}
+              onNavigate={(event) => setDashboardView(event.view)}
+            />
+          </div>
+        ) : (
+          <p className="mt-4 text-xs leading-relaxed text-[var(--text-muted)]">
+            Available when Mirari is configured for this agent.
+          </p>
+        )}
       </div>
     </GlassCard>
   );

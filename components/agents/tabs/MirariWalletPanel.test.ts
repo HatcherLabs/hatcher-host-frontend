@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 import {
   MIRARI_LAYOUT_GRID_CLASSNAME,
   MIRARI_DASHBOARD_FRAME_CLASSNAME,
+  MIRARI_DASHBOARD_IFRAME_STYLE,
+  MIRARI_DASHBOARD_SECTION_CLASSNAME,
   MIRARI_DASHBOARD_SCOPES,
   MIRARI_PANEL_COPY,
   MIRARI_RESULT_PANEL_CLASSNAME,
@@ -64,7 +66,12 @@ describe('Mirari wallet panel helpers', () => {
   it('requests read-only dashboard scopes for the embedded Mirari dashboard', () => {
     expect(MIRARI_DASHBOARD_SCOPES).toEqual(['mirror:read', 'signals:read', 'dreams:read']);
     expect(MIRARI_DASHBOARD_SCOPES).not.toContain('signals:write');
-    expect(MIRARI_DASHBOARD_FRAME_CLASSNAME).toContain('min-h-[520px]');
+    expect(MIRARI_DASHBOARD_SECTION_CLASSNAME).toContain('mt-5');
+    expect(MIRARI_DASHBOARD_SECTION_CLASSNAME).toContain('border-t');
+    expect(MIRARI_DASHBOARD_FRAME_CLASSNAME).toContain('aspect-video');
+    expect(MIRARI_DASHBOARD_FRAME_CLASSNAME).toContain('relative');
+    expect(MIRARI_DASHBOARD_FRAME_CLASSNAME).toContain('w-full');
     expect(MIRARI_DASHBOARD_FRAME_CLASSNAME).toContain('overflow-hidden');
+    expect(MIRARI_DASHBOARD_IFRAME_STYLE).toEqual({ minHeight: 0 });
   });
 });
