@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import {
   MIRARI_LAYOUT_GRID_CLASSNAME,
+  MIRARI_DASHBOARD_FRAME_CLASSNAME,
+  MIRARI_DASHBOARD_SCOPES,
   MIRARI_PANEL_COPY,
   MIRARI_RESULT_PANEL_CLASSNAME,
   MIRARI_RESULT_PRE_CLASSNAME,
@@ -57,5 +59,12 @@ describe('Mirari wallet panel helpers', () => {
     expect(MIRARI_RESULT_PRE_CLASSNAME).toContain('max-w-full');
     expect(MIRARI_RESULT_PRE_CLASSNAME).toContain('whitespace-pre-wrap');
     expect(MIRARI_RESULT_PRE_CLASSNAME).toContain('break-words');
+  });
+
+  it('requests read-only dashboard scopes for the embedded Mirari dashboard', () => {
+    expect(MIRARI_DASHBOARD_SCOPES).toEqual(['mirror:read', 'signals:read', 'dreams:read']);
+    expect(MIRARI_DASHBOARD_SCOPES).not.toContain('signals:write');
+    expect(MIRARI_DASHBOARD_FRAME_CLASSNAME).toContain('min-h-[520px]');
+    expect(MIRARI_DASHBOARD_FRAME_CLASSNAME).toContain('overflow-hidden');
   });
 });
