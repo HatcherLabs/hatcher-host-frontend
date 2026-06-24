@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { type ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   AlertTriangle,
   CheckCircle2,
@@ -12,8 +12,10 @@ import {
   ListChecks,
   Loader2,
   RefreshCw,
+  RotateCcw,
   Share2,
   ShieldCheck,
+  Upload,
   Wallet,
 } from 'lucide-react';
 import { api } from '@/lib/api';
@@ -61,6 +63,26 @@ export function getMetaplexAvatarPreview(config: MetaplexConfigStatus): {
     label: 'Metaplex profile image',
     helper: 'Uses the agent avatar when one is set; otherwise Hatcher uses the default agent avatar.',
   };
+}
+
+export const METAPLEX_AVATAR_MAX_BYTES = 1_450_000;
+const METAPLEX_AVATAR_ALLOWED_TYPES = new Set([
+  'image/png',
+  'image/jpeg',
+  'image/webp',
+  'image/gif',
+  'image/svg+xml',
+]);
+
+export function validateMetaplexAvatarFile(file: Pick<File, 'type' | 'size'>): string | null {
+  if (!file.type || !file.type.startsWith('image/')) return 'Choose an image file.';
+  if (!METAPLEX_AVATAR_ALLOWED_TYPES.has(file.type.toLowerCase())) return 'Choose a PNG, JPG, WebP, GIF, or SVG image.';
+  if (file.size > METAPLEX_AVATAR_MAX_BYTES) return 'Choose an image up to 1.45 MB.';
+  return null;
+}
+
+export function shouldShowMetaplexMainnetConfirmation(registeredAsset: string | null | undefined): boolean {
+  return !registeredAsset;
 }
 
 export function getMetaplexRegisteredLinks(
@@ -150,6 +172,21 @@ function networkLabel(plan: MetaplexMintAgentPlan | null): string {
   return 'Solana';
 }
 
+function readAvatarFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string' && reader.result.startsWith('data:image/')) {
+        resolve(reader.result);
+        return;
+      }
+      reject(new Error('Choose an image file.'));
+    };
+    reader.onerror = () => reject(new Error('Could not read this image.'));
+    reader.readAsDataURL(file);
+  });
+}
+
 function StatusTile({
   label,
   value,
@@ -224,11 +261,13 @@ export function MetaplexWalletPanel({
   solanaWallet?: string | null;
 }) {
   const { toast } = useToast();
+  const avatarInputRef = useRef<HTMLInputElement | null>(null);
   const [config, setConfig] = useState<MetaplexConfigStatus | null>(null);
   const [mintPlan, setMintPlan] = useState<MetaplexMintAgentPlan | null>(null);
   const [result, setResult] = useState<MetaplexRegistrationResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [registering, setRegistering] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
   const [mainnetConfirmed, setMainnetConfirmed] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -277,6 +316,51 @@ export function MetaplexWalletPanel({
       .catch(() => toast.error('Copy failed'));
   };
 
+  const saveAvatar = async (avatarUrl: string | null, successMessage: string) => {
+    setAvatarUploading(true);
+    setError(null);
+    try {
+      const res = await api.updateAgent(agentId, { avatarUrl });
+      if (!res.success) {
+        const message = res.error || 'Could not update this avatar.';
+        setError(message);
+        toast.error(message);
+        return;
+      }
+      setResult(null);
+      toast.success(successMessage);
+      await load();
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Could not update this avatar.';
+      setError(message);
+      toast.error(message);
+    } finally {
+      setAvatarUploading(false);
+    }
+  };
+
+  const uploadAvatar = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] ?? null;
+    event.target.value = '';
+    if (!file) return;
+
+    const validationError = validateMetaplexAvatarFile(file);
+    if (validationError) {
+      setError(validationError);
+      toast.error(validationError);
+      return;
+    }
+
+    try {
+      const avatarUrl = await readAvatarFileAsDataUrl(file);
+      await saveAvatar(avatarUrl, 'Agent avatar updated');
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Could not read this image.';
+      setError(message);
+      toast.error(message);
+    }
+  };
+
   const register = async () => {
     if (button.disabled) return;
     setRegistering(true);
@@ -309,9 +393,13 @@ export function MetaplexWalletPanel({
           <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">
             <Fingerprint size={13} /> Metaplex Agent Registry
           </div>
-          <h3 className="text-base font-semibold text-[var(--text-primary)]">Register this agent on Metaplex</h3>
+          <h3 className="text-base font-semibold text-[var(--text-primary)]">
+            {registeredAsset ? 'Metaplex identity registered' : 'Register this agent on Metaplex'}
+          </h3>
           <p className="mt-1 max-w-2xl text-xs leading-relaxed text-[var(--text-muted)]">
-            Publish a Solana mainnet agent identity with Hatcher metadata, A2A discovery, MCP discovery, and x402-ready endpoints.
+            {registeredAsset
+              ? 'Manage the public profile, avatar, metadata links, A2A discovery, MCP discovery, and x402-ready endpoints.'
+              : 'Publish a Solana mainnet agent identity with Hatcher metadata, A2A discovery, MCP discovery, and x402-ready endpoints.'}
           </p>
         </div>
         <button
@@ -432,15 +520,35 @@ export function MetaplexWalletPanel({
                 <p className="mt-1 text-xs leading-relaxed text-[var(--text-muted)]">
                   {avatarPreview?.helper ?? 'The public image is loaded from the agent metadata before registration.'}
                 </p>
-                {avatarPreview?.image && (
+                <input
+                  ref={avatarInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
+                  className="hidden"
+                  onChange={(event) => void uploadAvatar(event)}
+                />
+                <div className="mt-3 flex flex-wrap gap-2">
                   <button
                     type="button"
-                    onClick={() => copy(avatarPreview.image, 'Metaplex avatar URL')}
-                    className="mt-3 inline-flex items-center gap-1 rounded-md border border-[var(--border-subtle)] px-2 py-1 text-[10px] font-semibold text-[var(--text-secondary)] transition hover:border-[var(--border-hover)] hover:text-[var(--accent)]"
+                    onClick={() => avatarInputRef.current?.click()}
+                    disabled={avatarUploading}
+                    className="inline-flex items-center gap-1 rounded-md border border-[var(--border-subtle)] px-2 py-1 text-[10px] font-semibold text-[var(--text-secondary)] transition hover:border-[var(--border-hover)] hover:text-[var(--accent)]"
                   >
-                    <Copy size={11} /> Copy image URL
+                    {avatarUploading ? <Loader2 size={11} className="animate-spin" /> : <Upload size={11} />}
+                    Upload image
                   </button>
-                )}
+                  <button
+                    type="button"
+                    onClick={() => void saveAvatar(null, 'Using Hatcher default avatar')}
+                    disabled={avatarUploading}
+                    className="inline-flex items-center gap-1 rounded-md border border-[var(--border-subtle)] px-2 py-1 text-[10px] font-semibold text-[var(--text-secondary)] transition hover:border-[var(--border-hover)] hover:text-[var(--accent)]"
+                  >
+                    <RotateCcw size={11} /> Use Hatcher default
+                  </button>
+                </div>
+                <p className="mt-2 text-[11px] leading-relaxed text-[var(--text-muted)]">
+                  PNG, JPG, WebP, GIF, or SVG up to 1.45 MB. Only image files are accepted.
+                </p>
               </div>
             </div>
           </div>
@@ -506,40 +614,56 @@ export function MetaplexWalletPanel({
             </div>
           </div>
 
-          <div className="rounded-md border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] p-4">
-            <label className="flex items-start gap-3">
-              <input
-                type="checkbox"
-                checked={mainnetConfirmed}
-                disabled={Boolean(registeredAsset)}
-                onChange={(event) => setMainnetConfirmed(event.target.checked)}
-                className="mt-1 h-4 w-4 accent-[var(--color-warning)]"
-              />
-              <span>
-                <span className="block text-sm font-semibold text-[var(--text-primary)]">
-                  Confirm Solana mainnet registration
+          {shouldShowMetaplexMainnetConfirmation(registeredAsset) ? (
+            <div className="rounded-md border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] p-4">
+              <label className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  checked={mainnetConfirmed}
+                  onChange={(event) => setMainnetConfirmed(event.target.checked)}
+                  className="mt-1 h-4 w-4 accent-[var(--color-warning)]"
+                />
+                <span>
+                  <span className="block text-sm font-semibold text-[var(--text-primary)]">
+                    Confirm Solana mainnet registration
+                  </span>
+                  <span className="mt-1 block text-xs leading-relaxed text-[var(--text-muted)]">
+                    This creates a public Metaplex Core asset and Agent Identity for this agent. Hatcher submits the transaction; no private key is requested in the browser.
+                  </span>
                 </span>
-                <span className="mt-1 block text-xs leading-relaxed text-[var(--text-muted)]">
-                  This creates a public Metaplex Core asset and Agent Identity for this agent. Hatcher submits the transaction; no private key is requested in the browser.
-                </span>
-              </span>
-            </label>
-            {button.reason && <div className="mt-3 text-xs text-[var(--color-warning)]">{button.reason}</div>}
-            {config?.missing.length ? (
-              <div className="mt-3 text-xs text-[var(--color-warning)]">
-                Missing: {config.missing.map((item) => item.replace('METAPLEX_PAYER_PRIVATE_KEY', 'Hatcher payer')).join(', ')}
+              </label>
+              {button.reason && <div className="mt-3 text-xs text-[var(--color-warning)]">{button.reason}</div>}
+              {config?.missing.length ? (
+                <div className="mt-3 text-xs text-[var(--color-warning)]">
+                  Missing: {config.missing.map((item) => item.replace('METAPLEX_PAYER_PRIVATE_KEY', 'Hatcher payer')).join(', ')}
+                </div>
+              ) : null}
+              <button
+                type="button"
+                onClick={() => void register()}
+                disabled={button.disabled || registering}
+                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-md border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-4 py-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-warning)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {registering ? <Loader2 size={14} className="animate-spin" /> : <Fingerprint size={14} />}
+                {registering ? 'Registering' : button.label}
+              </button>
+            </div>
+          ) : (
+            <div className="rounded-md border border-[var(--color-success-border)] bg-[var(--color-success-bg)] p-4">
+              <div className="flex items-start gap-3">
+                <CheckCircle2 size={16} className="mt-0.5 flex-shrink-0 text-[var(--color-success)]" />
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold text-[var(--text-primary)]">Already registered on Metaplex</div>
+                  <p className="mt-1 text-xs leading-relaxed text-[var(--text-muted)]">
+                    This agent has a live Metaplex identity. Avatar or metadata changes here update Hatcher's public metadata endpoints for the registered profile.
+                  </p>
+                  <div className="mt-2 truncate font-mono text-[11px] text-[var(--color-success)]">
+                    {shortMetaplexValue(registeredAsset)}
+                  </div>
+                </div>
               </div>
-            ) : null}
-            <button
-              type="button"
-              onClick={() => void register()}
-              disabled={button.disabled || registering}
-              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-md border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-4 py-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-warning)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {registering ? <Loader2 size={14} className="animate-spin" /> : <Fingerprint size={14} />}
-              {registering ? 'Registering' : button.label}
-            </button>
-          </div>
+            </div>
+          )}
         </div>
 
         <div className="min-w-0 rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-4">

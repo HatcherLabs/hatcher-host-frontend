@@ -20,7 +20,7 @@ describe('Wallet tab integration placement', () => {
     expect(getInitialWalletProviderFromSearch(
       '?tab=wallet&walletSection=providers&walletProvider=mirari',
       'openclaw',
-    )).toBe('xona');
+    )).toBe('metaplex');
   });
 
   it('places MPP32 with Solana provider rails', () => {
@@ -36,7 +36,7 @@ describe('Wallet tab integration placement', () => {
   });
 
   it('places Metaplex with Solana identity provider rails', () => {
-    expect(getProviderPanelIdsForWallet('solana')).toContain('metaplex');
+    expect(getProviderPanelIdsForWallet('solana')[0]).toBe('metaplex');
     expect(getProviderPanelIdsForWallet('base')).not.toContain('metaplex');
     expect(getProviderPanelIdsForWallet('skale')).not.toContain('metaplex');
   });

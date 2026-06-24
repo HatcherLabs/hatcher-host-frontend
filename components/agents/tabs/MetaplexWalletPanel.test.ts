@@ -8,6 +8,8 @@ import {
   getMetaplexPublicLinks,
   getMetaplexRegisteredLinks,
   humanizeMetaplexError,
+  shouldShowMetaplexMainnetConfirmation,
+  validateMetaplexAvatarFile,
 } from './MetaplexWalletPanel';
 import type { MetaplexConfigStatus } from '@/lib/api';
 
@@ -112,6 +114,24 @@ describe('Metaplex wallet panel helpers', () => {
       label: 'Metaplex profile image',
       helper: 'Uses the agent avatar when one is set; otherwise Hatcher uses the default agent avatar.',
     });
+  });
+
+  it('only accepts image files for custom Metaplex avatars', () => {
+    expect(validateMetaplexAvatarFile({ type: 'image/png', size: 128_000 })).toBeNull();
+    expect(validateMetaplexAvatarFile({ type: 'image/webp', size: 128_000 })).toBeNull();
+    expect(validateMetaplexAvatarFile({ type: 'text/plain', size: 128_000 })).toBe('Choose an image file.');
+    expect(validateMetaplexAvatarFile({ type: '', size: 128_000 })).toBe('Choose an image file.');
+    expect(validateMetaplexAvatarFile({ type: 'image/avif', size: 128_000 })).toBe('Choose a PNG, JPG, WebP, GIF, or SVG image.');
+  });
+
+  it('keeps uploaded avatars below the API data URL limit', () => {
+    expect(validateMetaplexAvatarFile({ type: 'image/png', size: 1_450_000 })).toBeNull();
+    expect(validateMetaplexAvatarFile({ type: 'image/png', size: 1_450_001 })).toBe('Choose an image up to 1.45 MB.');
+  });
+
+  it('does not show the mainnet confirmation panel once an asset exists', () => {
+    expect(shouldShowMetaplexMainnetConfirmation(null)).toBe(true);
+    expect(shouldShowMetaplexMainnetConfirmation('AHyHiHQojvS2QeL4MdxzWD8Yjrnf1P1SF5SegtyKauZj')).toBe(false);
   });
 
   it('prioritizes Metaplex profile links after registration', () => {
