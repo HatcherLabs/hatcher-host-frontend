@@ -63,6 +63,7 @@ interface ReputationState {
 type WalletPanel = 'passport' | AgentPassportNetworkId;
 type WalletSection = 'overview' | 'networks' | 'providers' | 'security';
 type ProviderPanelId = 'xona' | 'conduit' | 'earnfi' | 'oobe' | 'clawville' | 'kausalayer' | 'mirari' | 'mpp32' | 'medusa' | 'metaplex' | 'orbis';
+type AgentRuntime = 'hermes' | 'openclaw' | (string & {});
 
 const TAB_ORDER: WalletPanel[] = ['passport', 'skale', 'solana', 'base'];
 const NETWORK_ORDER: AgentPassportNetworkId[] = ['skale', 'solana', 'base'];
@@ -109,18 +110,34 @@ function iconForPanel(panel: WalletPanel) {
   return <Layers3 size={14} />;
 }
 
-export function shouldShowMirariPanelForWallet(networkId: AgentPassportNetworkId): boolean {
-  return networkId === 'solana';
+export function shouldShowMirariPanelForWallet(
+  networkId: AgentPassportNetworkId,
+  runtime: AgentRuntime | null | undefined,
+): boolean {
+  return networkId === 'solana' && runtime === 'hermes';
 }
 
-export function getProviderPanelIdsForWallet(networkId: AgentPassportNetworkId): ProviderPanelId[] {
-  if (networkId === 'solana') return SOLANA_PROVIDERS.map((provider) => provider.id);
+function solanaProvidersForRuntime(runtime: AgentRuntime | null | undefined) {
+  return SOLANA_PROVIDERS.filter((provider) => (
+    provider.id !== 'mirari' || shouldShowMirariPanelForWallet('solana', runtime)
+  ));
+}
+
+function providersForRuntime(runtime: AgentRuntime | null | undefined) {
+  return [...solanaProvidersForRuntime(runtime), ...BASE_PROVIDERS];
+}
+
+export function getProviderPanelIdsForWallet(
+  networkId: AgentPassportNetworkId,
+  runtime: AgentRuntime | null | undefined = 'hermes',
+): ProviderPanelId[] {
+  if (networkId === 'solana') return solanaProvidersForRuntime(runtime).map((provider) => provider.id);
   if (networkId === 'base') return BASE_PROVIDERS.map((provider) => provider.id);
   return [];
 }
 
-function providerIds(): ProviderPanelId[] {
-  return [...SOLANA_PROVIDERS, ...BASE_PROVIDERS].map((provider) => provider.id);
+function providerIds(runtime: AgentRuntime | null | undefined = 'hermes'): ProviderPanelId[] {
+  return providersForRuntime(runtime).map((provider) => provider.id);
 }
 
 export function getInitialWalletSectionFromSearch(search: string): WalletSection {
@@ -128,9 +145,12 @@ export function getInitialWalletSectionFromSearch(search: string): WalletSection
   return WALLET_SECTIONS.some((section) => section.id === requested) ? requested as WalletSection : 'overview';
 }
 
-export function getInitialWalletProviderFromSearch(search: string): ProviderPanelId {
+export function getInitialWalletProviderFromSearch(
+  search: string,
+  runtime: AgentRuntime | null | undefined = 'hermes',
+): ProviderPanelId {
   const requested = new URLSearchParams(search).get('walletProvider');
-  return providerIds().includes(requested as ProviderPanelId) ? requested as ProviderPanelId : 'xona';
+  return providerIds(runtime).includes(requested as ProviderPanelId) ? requested as ProviderPanelId : 'xona';
 }
 
 function readInitialWalletPanel(): WalletPanel {
@@ -206,7 +226,7 @@ export function WalletTab() {
   ));
   const [activePanel, setActivePanelRaw] = useState<WalletPanel>(() => readInitialWalletPanel());
   const [activeProvider, setActiveProvider] = useState<ProviderPanelId>(() => (
-    typeof window === 'undefined' ? 'xona' : getInitialWalletProviderFromSearch(window.location.search)
+    typeof window === 'undefined' ? 'xona' : getInitialWalletProviderFromSearch(window.location.search, agent.framework)
   ));
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -526,6 +546,7 @@ export function WalletTab() {
       ) : activeSection === 'providers' ? (
         <ProviderIntegrationsPanel
           agentId={agent.id}
+          runtime={agent.framework}
           solanaWallet={networkById.get('solana')?.address}
           activeProvider={activeProvider}
           onProviderChange={setActiveProvider}
@@ -765,17 +786,22 @@ function NetworkSelector({
 
 function ProviderIntegrationsPanel({
   agentId,
+  runtime,
   solanaWallet,
   activeProvider,
   onProviderChange,
 }: {
   agentId: string;
+  runtime: AgentRuntime | null | undefined;
   solanaWallet?: string | null;
   activeProvider: ProviderPanelId;
   onProviderChange: (provider: ProviderPanelId) => void;
 }) {
-  const providers = [...SOLANA_PROVIDERS, ...BASE_PROVIDERS];
-  const current = providers.find((provider) => provider.id === activeProvider) ?? providers[0];
+  const providers = providersForRuntime(runtime);
+  const effectiveProvider = providers.some((provider) => provider.id === activeProvider)
+    ? activeProvider
+    : providers[0]?.id ?? 'xona';
+  const current = providers.find((provider) => provider.id === effectiveProvider) ?? providers[0];
 
   return (
     <div className="grid gap-4 xl:grid-cols-[330px_minmax(0,1fr)]">
@@ -789,7 +815,7 @@ function ProviderIntegrationsPanel({
         </div>
         <div className="space-y-2">
           {providers.map((provider) => {
-            const selected = activeProvider === provider.id;
+            const selected = effectiveProvider === provider.id;
             return (
               <button
                 key={provider.id}
@@ -828,7 +854,7 @@ function ProviderIntegrationsPanel({
             </span>
           </div>
         </WalletSurface>
-        <ProviderPanel provider={activeProvider} agentId={agentId} solanaWallet={solanaWallet} />
+        <ProviderPanel provider={effectiveProvider} agentId={agentId} solanaWallet={solanaWallet} />
       </div>
     </div>
   );
