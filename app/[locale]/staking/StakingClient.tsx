@@ -29,7 +29,7 @@ import {
   estimateActiveStakeRewards,
   estimateStakingRewards,
 } from '@/lib/staking-reward-estimator';
-import { groupActiveStakesByPool } from '@/lib/staking-active-stakes';
+import { groupActiveStakesByPool, stakesInExpandedPoolGroups } from '@/lib/staking-active-stakes';
 import { isWalletTrustRevokedError, isWalletUserCancellationError } from '@/lib/wallet-errors';
 import { buildPhantomBrowseUrl } from '@/lib/wallet-links';
 import {
@@ -56,11 +56,35 @@ import type {
 
 const DAY_MS = 86_400_000;
 const STAKE_PERCENTAGES = [25, 50, 75, 100] as const;
+const HATCHER_REWARD_STATUS_CONCURRENCY = 2;
 
 type HatcherRewardUiStatus = HatcherRewardStatus & {
   loading: boolean;
   error: string | null;
 };
+
+async function mapWithConcurrency<T, R>(
+  items: T[],
+  concurrency: number,
+  worker: (item: T) => Promise<R>,
+): Promise<R[]> {
+  const results: R[] = [];
+  let nextIndex = 0;
+
+  async function runWorker() {
+    while (nextIndex < items.length) {
+      const currentIndex = nextIndex;
+      nextIndex += 1;
+      results[currentIndex] = await worker(items[currentIndex] as T);
+    }
+  }
+
+  await Promise.all(
+    Array.from({ length: Math.min(concurrency, items.length) }, () => runWorker()),
+  );
+
+  return results;
+}
 
 function formatNumber(value: number, maximumFractionDigits = 0): string {
   return new Intl.NumberFormat('en-US', { maximumFractionDigits }).format(value);
@@ -225,6 +249,7 @@ export function StakingClient() {
   const [hatcherRewardTxId, setHatcherRewardTxId] = useState<string | null>(null);
   const [claimingHatcherStake, setClaimingHatcherStake] = useState<string | null>(null);
   const [unstakingStake, setUnstakingStake] = useState<string | null>(null);
+  const [expandedStakePoolKeys, setExpandedStakePoolKeys] = useState<Set<StakingPoolKey>>(() => new Set());
   const [hatcherRewardStatuses, setHatcherRewardStatuses] = useState<Record<string, HatcherRewardUiStatus>>({});
   const [linkingWallet, setLinkingWallet] = useState(false);
   const [optimisticLinkedWalletAddress, setOptimisticLinkedWalletAddress] = useState<string | null>(null);
@@ -305,6 +330,10 @@ export function StakingClient() {
     summary?.activeStakes ?? [],
     config?.pools ?? [],
   ), [config?.pools, summary?.activeStakes]);
+  const visibleRewardStatusStakes = useMemo(
+    () => stakesInExpandedPoolGroups(activeStakeGroups, expandedStakePoolKeys),
+    [activeStakeGroups, expandedStakePoolKeys],
+  );
 
   const rewardSplitSummary = useMemo(() => {
     if (!config?.pools.length) return null;
@@ -410,50 +439,84 @@ export function StakingClient() {
   }, [connectedWalletAddress, loadWalletBalance]);
 
   useEffect(() => {
-    const stakes = summary?.activeStakes ?? [];
-    if (stakes.length === 0) {
-      setHatcherRewardStatuses({});
-      return;
-    }
+    const activeStakeKeys = new Set((summary?.activeStakes ?? []).map((stake) => stake.stakeEntryAddress));
+    setHatcherRewardStatuses((current) => {
+      const entries = Object.entries(current).filter(([stakeEntryAddress]) => activeStakeKeys.has(stakeEntryAddress));
+      if (entries.length === Object.keys(current).length) return current;
+      return Object.fromEntries(entries);
+    });
+  }, [summary?.activeStakes]);
+
+  useEffect(() => {
+    const activePoolKeys = new Set(activeStakeGroups.map((group) => group.poolKey));
+    setExpandedStakePoolKeys((current) => {
+      const next = new Set(Array.from(current).filter((poolKey) => activePoolKeys.has(poolKey)));
+      return next.size === current.size ? current : next;
+    });
+  }, [activeStakeGroups]);
+
+  const setStakePoolGroupExpanded = useCallback((poolKey: StakingPoolKey, expanded: boolean) => {
+    setExpandedStakePoolKeys((current) => {
+      if (current.has(poolKey) === expanded) return current;
+      const next = new Set(current);
+      if (expanded) next.add(poolKey);
+      else next.delete(poolKey);
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (visibleRewardStatusStakes.length === 0) return;
 
     let cancelled = false;
-    setHatcherRewardStatuses(Object.fromEntries(stakes.map((stake) => [
-      stake.stakeEntryAddress,
-      {
-        loading: true,
-        canClaim: false,
-        rewardEntryExists: false,
-        reason: null,
-        error: null,
-      },
-    ])));
-
-    void Promise.all(stakes.map(async (stake): Promise<[string, HatcherRewardUiStatus]> => {
-      try {
-        const status = await fetchHatcherRewardStatusWithStreamflow({
-          walletAddress: stake.walletAddress,
-          stakePoolAddress: stake.poolAddress,
-          stakeEntryAddress: stake.stakeEntryAddress,
-          depositNonce: stake.depositNonce,
-        });
-        return [stake.stakeEntryAddress, { ...status, loading: false, error: null }];
-      } catch (err) {
-        return [stake.stakeEntryAddress, {
-          loading: false,
-          canClaim: false,
-          rewardEntryExists: false,
-          reason: null,
-          error: err instanceof Error ? err.message : 'Could not load HATCHER rewards',
-        }];
+    setHatcherRewardStatuses((current) => {
+      const next = { ...current };
+      for (const stake of visibleRewardStatusStakes) {
+        next[stake.stakeEntryAddress] = {
+          loading: true,
+          canClaim: current[stake.stakeEntryAddress]?.canClaim ?? false,
+          rewardEntryExists: current[stake.stakeEntryAddress]?.rewardEntryExists ?? false,
+          reason: current[stake.stakeEntryAddress]?.reason ?? null,
+          error: null,
+        };
       }
-    })).then((entries) => {
-      if (!cancelled) setHatcherRewardStatuses(Object.fromEntries(entries));
+      return next;
+    });
+
+    void mapWithConcurrency(
+      visibleRewardStatusStakes,
+      HATCHER_REWARD_STATUS_CONCURRENCY,
+      async (stake): Promise<[string, HatcherRewardUiStatus]> => {
+        try {
+          const status = await fetchHatcherRewardStatusWithStreamflow({
+            walletAddress: stake.walletAddress,
+            stakePoolAddress: stake.poolAddress,
+            stakeEntryAddress: stake.stakeEntryAddress,
+            depositNonce: stake.depositNonce,
+          });
+          return [stake.stakeEntryAddress, { ...status, loading: false, error: null }];
+        } catch (err) {
+          return [stake.stakeEntryAddress, {
+            loading: false,
+            canClaim: false,
+            rewardEntryExists: false,
+            reason: null,
+            error: err instanceof Error ? err.message : 'Could not load HATCHER rewards',
+          }];
+        }
+      },
+    ).then((entries) => {
+      if (cancelled) return;
+      setHatcherRewardStatuses((current) => ({
+        ...current,
+        ...Object.fromEntries(entries),
+      }));
     });
 
     return () => {
       cancelled = true;
     };
-  }, [summary?.activeStakes]);
+  }, [visibleRewardStatusStakes]);
 
   const connectWalletOnly = useCallback(async (): Promise<string> => {
     const current = walletRef.current;
@@ -1202,6 +1265,7 @@ export function StakingClient() {
               ) : (
                 <div className="space-y-3 p-4 sm:p-5">
                   {activeStakeGroups.map((group) => {
+                    const groupExpanded = expandedStakePoolKeys.has(group.poolKey);
                     const claimableHatcherPositionCount = group.stakes.filter((stake) => (
                       canClaimHatcherReward(hatcherRewardStatuses[stake.stakeEntryAddress])
                     )).length;
@@ -1210,6 +1274,8 @@ export function StakingClient() {
                     return (
                       <details
                         key={group.poolKey}
+                        open={groupExpanded}
+                        onToggle={(event) => setStakePoolGroupExpanded(group.poolKey, event.currentTarget.open)}
                         className="group overflow-hidden rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)]"
                       >
                         <summary className="flex cursor-pointer list-none flex-col gap-4 p-4 transition hover:bg-[var(--bg-elevated)] sm:p-5 [&::-webkit-details-marker]:hidden">

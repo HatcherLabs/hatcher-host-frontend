@@ -338,6 +338,45 @@ describe('streamflow staking rewards', () => {
     expect(onTransactionSubmitted).toHaveBeenCalledWith('unstake-tx');
   });
 
+  it('falls back to unstake-only instructions when unstake-and-claim fails preflight', async () => {
+    const walletKeypair = Keypair.generate();
+    stakingMocks.getAccountInfo.mockResolvedValue({
+      owner: new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'),
+    });
+    stakingMocks.simulateTransaction
+      .mockResolvedValueOnce({ value: { err: { InstructionError: [0, 'Custom'] } } })
+      .mockResolvedValueOnce({ value: { err: null } });
+    const wallet = {
+      publicKey: walletKeypair.publicKey,
+      signTransaction: vi.fn(),
+      sendTransaction: vi.fn(async () => 'unstake-only-tx'),
+    } as unknown as WalletContextState;
+
+    await expect(unstakeHatcherWithStreamflow({
+      wallet,
+      stakePoolAddress: '7BVxRYGoTJjr3bgvDhpJggJrnUhyYoGPbnxTRAWuDmtH',
+      depositNonce: 123,
+      unlockAt: new Date(Date.now() - 60_000).toISOString(),
+    })).resolves.toEqual({ txId: 'unstake-only-tx' });
+
+    expect(stakingMocks.prepareUnstakeAndClaimInstructions).toHaveBeenCalled();
+    expect(stakingMocks.prepareUnstakeInstructions).toHaveBeenCalledWith(
+      expect.objectContaining({
+        nonce: 123,
+        stakePool: '7BVxRYGoTJjr3bgvDhpJggJrnUhyYoGPbnxTRAWuDmtH',
+        stakePoolMint: expect.any(PublicKey),
+        tokenProgramId: expect.any(PublicKey),
+      }),
+      { invoker: wallet },
+    );
+    expect(stakingMocks.simulateTransaction).toHaveBeenCalledTimes(2);
+    expect(wallet.sendTransaction).toHaveBeenCalledWith(
+      expect.any(VersionedTransaction),
+      expect.anything(),
+      expect.objectContaining({ preflightCommitment: 'confirmed' }),
+    );
+  });
+
   it('rejects unstake before the lock period has ended', async () => {
     const wallet = {
       publicKey: Keypair.generate().publicKey,

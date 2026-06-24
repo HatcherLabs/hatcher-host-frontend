@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { groupActiveStakesByPool } from '@/lib/staking-active-stakes';
+import { groupActiveStakesByPool, stakesInExpandedPoolGroups } from '@/lib/staking-active-stakes';
 import type { StakingPoolConfig, StakingStakeEntry } from '@/lib/api';
 
 function stakingPool(overrides: Partial<StakingPoolConfig> = {}): StakingPoolConfig {
@@ -146,5 +146,26 @@ describe('active stake grouping', () => {
       estimatedHatcherRewards: null,
       poolSharePercent: null,
     });
+  });
+
+  it('selects reward status checks only for expanded pool groups', () => {
+    const groups = groupActiveStakesByPool([
+      stakeEntry({ stakeEntryAddress: 'stake-90d-a', poolKey: '90d', poolAddress: 'pool-90d' }),
+      stakeEntry({
+        stakeEntryAddress: 'stake-7d-a',
+        poolKey: '7d',
+        poolAddress: 'pool-7d',
+        unlockAt: '2026-06-08T00:00:00.000Z',
+        durationDays: 7,
+      }),
+    ], [
+      stakingPool({ key: '7d', label: '7 days', durationDays: 7, poolAddress: 'pool-7d' }),
+      stakingPool(),
+    ]);
+
+    expect(stakesInExpandedPoolGroups(groups, new Set())).toEqual([]);
+    expect(stakesInExpandedPoolGroups(groups, new Set(['7d'])).map((stake) => stake.stakeEntryAddress)).toEqual([
+      'stake-7d-a',
+    ]);
   });
 });
