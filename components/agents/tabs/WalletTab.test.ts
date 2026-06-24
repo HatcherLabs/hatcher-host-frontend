@@ -8,10 +8,19 @@ import {
 } from './WalletTab';
 
 describe('Wallet tab integration placement', () => {
-  it('shows Mirari with Solana-side integrations instead of the Base wallet', () => {
-    expect(shouldShowMirariPanelForWallet('solana')).toBe(true);
-    expect(shouldShowMirariPanelForWallet('base')).toBe(false);
-    expect(shouldShowMirariPanelForWallet('skale')).toBe(false);
+  it('shows Mirari with Solana-side integrations for Hermes agents', () => {
+    expect(shouldShowMirariPanelForWallet('solana', 'hermes')).toBe(true);
+    expect(shouldShowMirariPanelForWallet('base', 'hermes')).toBe(false);
+    expect(shouldShowMirariPanelForWallet('skale', 'hermes')).toBe(false);
+  });
+
+  it('hides Mirari completely for OpenClaw agents', () => {
+    expect(shouldShowMirariPanelForWallet('solana', 'openclaw')).toBe(false);
+    expect(getProviderPanelIdsForWallet('solana', 'openclaw')).not.toContain('mirari');
+    expect(getInitialWalletProviderFromSearch(
+      '?tab=wallet&walletSection=providers&walletProvider=mirari',
+      'openclaw',
+    )).toBe('xona');
   });
 
   it('places MPP32 with Solana provider rails', () => {

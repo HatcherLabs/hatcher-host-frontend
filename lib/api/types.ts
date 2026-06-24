@@ -719,7 +719,7 @@ export interface MetaplexRegistrationResponse {
   status: "cached" | "registered";
 }
 
-export type MirariRuntime = "hermes" | "openclaw";
+export type MirariRuntime = "hermes";
 export type MirariSignalKind = "drift" | "contradiction" | "skill_misfire" | "focus_hit" | "judge_score";
 export type MirariDreamMode = "stress_test" | "replay" | "consolidate";
 export type MirariDreamTrigger = "manual" | "idle" | "scheduled";
