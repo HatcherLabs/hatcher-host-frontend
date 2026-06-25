@@ -296,14 +296,14 @@ describe('Metaplex wallet panel helpers', () => {
     );
   });
 
-  it('uses the wallet sendTransaction path for a single Metaplex registration transaction', async () => {
+  it('signs and broadcasts a single Metaplex registration transaction', async () => {
     const wallet = {
       publicKey: new PublicKey('11111111111111111111111111111111'),
-      signTransaction: vi.fn(),
+      signTransaction: vi.fn(async () => ({ serialize: () => new Uint8Array([9]) })),
       sendTransaction: vi.fn(async () => 'register-signature'),
     };
     const connection = {
-      sendRawTransaction: vi.fn(),
+      sendRawTransaction: vi.fn(async () => 'register-signature'),
       confirmTransaction: vi.fn(async () => ({ value: { err: null } })),
       getSignatureStatus: vi.fn(),
     };
@@ -315,9 +315,12 @@ describe('Metaplex wallet panel helpers', () => {
       { blockhash: '11111111111111111111111111111111', lastValidBlockHeight: 123 },
     )).resolves.toEqual(['register-signature']);
 
-    expect(wallet.sendTransaction).toHaveBeenCalledTimes(1);
-    expect(wallet.signTransaction).not.toHaveBeenCalled();
-    expect(connection.sendRawTransaction).not.toHaveBeenCalled();
+    expect(wallet.signTransaction).toHaveBeenCalledTimes(1);
+    expect(wallet.sendTransaction).not.toHaveBeenCalled();
+    expect(connection.sendRawTransaction).toHaveBeenCalledWith(new Uint8Array([9]), {
+      maxRetries: 5,
+      skipPreflight: false,
+    });
     expect(connection.confirmTransaction).toHaveBeenCalledWith({
       signature: 'register-signature',
       blockhash: '11111111111111111111111111111111',
@@ -325,49 +328,7 @@ describe('Metaplex wallet panel helpers', () => {
     }, 'confirmed');
   });
 
-  it('uses the wallet sendTransaction path for multi-step Metaplex launches when available', async () => {
-    const events: string[] = [];
-    const wallet = {
-      publicKey: new PublicKey('11111111111111111111111111111111'),
-      signTransaction: vi.fn(),
-      signAllTransactions: vi.fn(),
-      sendTransaction: vi.fn(async (_transaction: Transaction, _connection: unknown, options: { skipPreflight?: boolean }) => {
-        const signature = `send-${events.filter((event) => event.startsWith('send-')).length + 1}`;
-        events.push(signature);
-        expect(options.skipPreflight).toBe(true);
-        return signature;
-      }),
-    };
-    const connection = {
-      sendRawTransaction: vi.fn(),
-      confirmTransaction: vi.fn(async (request: string | { signature: string }) => {
-        const signature = typeof request === 'string' ? request : request.signature;
-        events.push(`confirm-${signature}`);
-        return { value: { err: null } };
-      }),
-      getSignatureStatus: vi.fn(),
-    };
-
-    await expect(signAndSendMetaplexTransactions(
-      [makeEncodedMetaplexTransaction(), makeEncodedMetaplexTransaction()],
-      wallet as never,
-      connection as never,
-      { blockhash: '11111111111111111111111111111111', lastValidBlockHeight: 123 },
-    )).resolves.toEqual(['send-1', 'send-2']);
-
-    expect(wallet.sendTransaction).toHaveBeenCalledTimes(2);
-    expect(wallet.signTransaction).not.toHaveBeenCalled();
-    expect(wallet.signAllTransactions).not.toHaveBeenCalled();
-    expect(connection.sendRawTransaction).not.toHaveBeenCalled();
-    expect(events).toEqual([
-      'send-1',
-      'send-2',
-      'confirm-send-1',
-      'confirm-send-2',
-    ]);
-  });
-
-  it('batch signs and broadcasts all Metaplex launch transactions before confirmation when sendTransaction is unavailable', async () => {
+  it('batch signs and broadcasts all Metaplex launch transactions before confirmation', async () => {
     const events: string[] = [];
     const wallet = {
       publicKey: new PublicKey('11111111111111111111111111111111'),
@@ -378,6 +339,12 @@ describe('Metaplex wallet panel helpers', () => {
           { serialize: () => new Uint8Array([1]) },
           { serialize: () => new Uint8Array([2]) },
         ];
+      }),
+      sendTransaction: vi.fn(async (_transaction: Transaction, _connection: unknown, options: { skipPreflight?: boolean }) => {
+        const signature = `send-${events.filter((event) => event.startsWith('send-')).length + 1}`;
+        events.push(signature);
+        expect(options.skipPreflight).toBe(true);
+        return signature;
       }),
     };
     const connection = {
@@ -403,6 +370,7 @@ describe('Metaplex wallet panel helpers', () => {
 
     expect(wallet.signTransaction).not.toHaveBeenCalled();
     expect(wallet.signAllTransactions).toHaveBeenCalledTimes(1);
+    expect(wallet.sendTransaction).not.toHaveBeenCalled();
     expect(events).toEqual([
       'sign-all',
       'send-1',
@@ -414,6 +382,44 @@ describe('Metaplex wallet panel helpers', () => {
       maxRetries: 5,
       skipPreflight: true,
     });
+  });
+
+  it('falls back to wallet sendTransaction when signTransaction is unavailable', async () => {
+    const events: string[] = [];
+    const wallet = {
+      publicKey: new PublicKey('11111111111111111111111111111111'),
+      sendTransaction: vi.fn(async (_transaction: Transaction, _connection: unknown, options: { skipPreflight?: boolean }) => {
+        const signature = `send-${events.filter((event) => event.startsWith('send-')).length + 1}`;
+        events.push(signature);
+        expect(options.skipPreflight).toBe(true);
+        return signature;
+      }),
+    };
+    const connection = {
+      sendRawTransaction: vi.fn(),
+      confirmTransaction: vi.fn(async (request: string | { signature: string }) => {
+        const signature = typeof request === 'string' ? request : request.signature;
+        events.push(`confirm-${signature}`);
+        return { value: { err: null } };
+      }),
+      getSignatureStatus: vi.fn(),
+    };
+
+    await expect(signAndSendMetaplexTransactions(
+      [makeEncodedMetaplexTransaction(), makeEncodedMetaplexTransaction()],
+      wallet as never,
+      connection as never,
+      { blockhash: '11111111111111111111111111111111', lastValidBlockHeight: 123 },
+    )).resolves.toEqual(['send-1', 'send-2']);
+
+    expect(wallet.sendTransaction).toHaveBeenCalledTimes(2);
+    expect(connection.sendRawTransaction).not.toHaveBeenCalled();
+    expect(events).toEqual([
+      'send-1',
+      'send-2',
+      'confirm-send-1',
+      'confirm-send-2',
+    ]);
   });
 
   it('recognizes Solana blockhash expiry confirmation errors', () => {
