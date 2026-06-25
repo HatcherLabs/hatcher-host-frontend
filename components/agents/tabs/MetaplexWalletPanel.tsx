@@ -411,6 +411,61 @@ function decodeMetaplexSerializedTransaction(value: string): Transaction | Versi
   }
 }
 
+export function isMetaplexBlockhashExpiryError(error: unknown): boolean {
+  const message = error instanceof Error ? `${error.name} ${error.message}` : String(error);
+  return /block height exceeded|blockhash.*expired|signature .*expired|TransactionExpiredBlockheightExceededError/i.test(message);
+}
+
+const waitForMetaplexSignatureStatusDelay = (delayMs: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, delayMs));
+
+export async function waitForMetaplexSignatureConfirmation(
+  connection: Pick<Connection, 'getSignatureStatus'>,
+  signature: string,
+  attempts = 8,
+  delayMs = 750,
+): Promise<boolean> {
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    const status = await connection.getSignatureStatus(signature, { searchTransactionHistory: true });
+    const value = status.value;
+    if (value?.err) {
+      throw new Error(`Transaction failed on-chain: ${JSON.stringify(value.err)}`);
+    }
+    if (value?.confirmationStatus === 'confirmed' || value?.confirmationStatus === 'finalized') {
+      return true;
+    }
+    if (attempt < attempts - 1) {
+      await waitForMetaplexSignatureStatusDelay(delayMs);
+    }
+  }
+  return false;
+}
+
+async function confirmMetaplexSignature(
+  connection: Connection,
+  signature: string,
+  blockhash?: { blockhash: string; lastValidBlockHeight: number },
+): Promise<void> {
+  try {
+    const result = blockhash?.blockhash && Number.isFinite(blockhash.lastValidBlockHeight)
+      ? await connection.confirmTransaction({
+        signature,
+        blockhash: blockhash.blockhash,
+        lastValidBlockHeight: blockhash.lastValidBlockHeight,
+      }, 'confirmed')
+      : await connection.confirmTransaction(signature, 'confirmed');
+    if (result.value.err) {
+      throw new Error(`Transaction failed on-chain: ${JSON.stringify(result.value.err)}`);
+    }
+  } catch (error) {
+    if (isMetaplexBlockhashExpiryError(error)) {
+      const recovered = await waitForMetaplexSignatureConfirmation(connection, signature);
+      if (recovered) return;
+    }
+    throw error;
+  }
+}
+
 async function signAndSendMetaplexTransactions(
   transactions: string[],
   wallet: WalletContextState,
@@ -428,16 +483,8 @@ async function signAndSendMetaplexTransactions(
     const signature = await connection.sendRawTransaction(signed.serialize(), {
       skipPreflight: false,
     });
-    if (blockhash?.blockhash && Number.isFinite(blockhash.lastValidBlockHeight)) {
-      await connection.confirmTransaction({
-        signature,
-        blockhash: blockhash.blockhash,
-        lastValidBlockHeight: blockhash.lastValidBlockHeight,
-      }, 'confirmed');
-    } else {
-      await connection.confirmTransaction(signature, 'confirmed');
-    }
     signatures.push(signature);
+    await confirmMetaplexSignature(connection, signature, blockhash);
   }
   return signatures;
 }
