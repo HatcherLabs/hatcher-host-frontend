@@ -38,7 +38,7 @@ let resolvedHatcherTokenProgramId: PublicKey | null = null;
 
 export type StakeHatcherResult = {
   txId: string;
-  preparedOnly?: boolean;
+  setupTxId?: string;
 };
 
 function cluster(): ICluster {
@@ -291,6 +291,7 @@ export async function stakeHatcherWithStreamflow(params: {
   const stakeMint = deriveStakeMintPDA(client.getCurrentProgramId('stakePoolProgram'), stakePool);
   const receiptTokenAccount = associatedTokenAddress(stakeMint, params.wallet.publicKey, tokenProgramId);
   const receiptAccountInfo = await client.connection.getAccountInfo(receiptTokenAccount, 'confirmed');
+  let setupTxId: string | undefined;
 
   if (!receiptAccountInfo) {
     const prepared = await preparePreflightedWalletTransaction({
@@ -309,7 +310,7 @@ export async function stakeHatcherWithStreamflow(params: {
       connection: client.connection,
       prepared,
     });
-    return { txId, preparedOnly: true };
+    setupTxId = txId;
   }
 
   const { ixs } = await client.prepareStakeAndCreateEntriesInstructions({
@@ -340,7 +341,7 @@ export async function stakeHatcherWithStreamflow(params: {
     prepared,
     onTransactionSubmitted: params.onTransactionSubmitted,
   });
-  return { txId };
+  return { txId, setupTxId };
 }
 
 export function isStakeUnlocked(unlockAt: string | Date, now = new Date()): boolean {
