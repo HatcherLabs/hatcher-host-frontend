@@ -1,17 +1,22 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  buildMetaplexTokenLaunchButtonState,
+  buildMetaplexTokenLaunchDefaults,
   buildMetaplexRegistrationButtonState,
+  deriveMetaplexTokenSymbol,
   formatMetaplexStatusLabel,
   getMetaplexAvatarPreview,
   getMetaplexProfileUrl,
   getMetaplexPublicLinks,
   getMetaplexRegisteredLinks,
+  getMetaplexTokenLinks,
   humanizeMetaplexError,
+  isMetaplexIrysImageUrl,
   shouldShowMetaplexMainnetConfirmation,
   validateMetaplexAvatarFile,
 } from './MetaplexWalletPanel';
-import type { MetaplexConfigStatus } from '@/lib/api';
+import type { MetaplexConfigStatus, MetaplexTokenLaunchPlan } from '@/lib/api';
 
 const READY_CONFIG: MetaplexConfigStatus = {
   enabled: true,
@@ -33,6 +38,7 @@ const READY_CONFIG: MetaplexConfigStatus = {
   metaplexAsset: null,
   registryAddress: 'mpl-agent-registry',
   registeredAt: null,
+  agentToken: null,
   registrationDocument: {
     type: 'https://eips.ethereum.org/EIPS/eip-8004#registration-v1',
     name: 'Hatch',
@@ -53,6 +59,44 @@ const READY_CONFIG: MetaplexConfigStatus = {
       registrationUri: 'https://api.hatcher.host/agents/agent-1/metaplex/registration.json',
     },
   },
+};
+
+const REGISTERED_CONFIG: MetaplexConfigStatus = {
+  ...READY_CONFIG,
+  status: 'registered',
+  metaplexStatus: 'registered',
+  metaplexAsset: 'MetaplexAsset1111111111111111111111111',
+  registeredAt: '2026-06-24T10:00:00.000Z',
+  capabilities: {
+    ...READY_CONFIG.capabilities,
+    genesis: true,
+  },
+};
+
+const READY_TOKEN_PLAN: MetaplexTokenLaunchPlan = {
+  kind: 'metaplex.genesis-agent-token.v1',
+  sdkFunction: 'createAndRegisterLaunch',
+  ready: true,
+  status: 'ready',
+  missing: [],
+  oneTokenPerAgent: true,
+  existingToken: null,
+  request: {
+    wallet: 'Payer111111111111111111111111111111111111111',
+    network: 'solana-mainnet',
+    agent: {
+      mint: 'MetaplexAsset1111111111111111111111111',
+      setToken: true,
+    },
+    launchType: 'bondingCurve',
+    token: {
+      name: 'Hatch Token',
+      symbol: 'HATCH',
+      image: 'https://gateway.irys.xyz/hatch-token-image',
+    },
+    launch: {},
+  },
+  notes: [],
 };
 
 describe('Metaplex wallet panel helpers', () => {
@@ -158,5 +202,116 @@ describe('Metaplex wallet panel helpers', () => {
     expect(humanizeMetaplexError('insufficient funds for fee')).toBe(
       'The Hatcher payer wallet needs more SOL before this mainnet registration can be submitted.',
     );
+  });
+
+  it('derives compact token launch defaults from the registered agent metadata', () => {
+    expect(deriveMetaplexTokenSymbol('Research Operator 42!')).toBe('RESEARCHOP');
+    expect(deriveMetaplexTokenSymbol('Hatch')).toBe('HATCH');
+    expect(buildMetaplexTokenLaunchDefaults(REGISTERED_CONFIG)).toEqual({
+      name: 'Hatch Token',
+      symbol: 'HATCH',
+      image: '',
+      description: 'HatcherLabs agent',
+      externalLinks: {
+        website: 'https://hatcher.host/agent/hatch',
+        twitter: '',
+        telegram: '',
+      },
+      firstBuyAmount: '',
+      confirmPermanentToken: false,
+    });
+  });
+
+  it('requires an Irys image URL for Genesis token launch metadata', () => {
+    expect(isMetaplexIrysImageUrl('https://gateway.irys.xyz/hatch-token-image')).toBe(true);
+    expect(isMetaplexIrysImageUrl('https://hatcher.host/hatcher-metaplex-avatar.png')).toBe(false);
+    expect(isMetaplexIrysImageUrl('data:image/png;base64,AAAA')).toBe(false);
+  });
+
+  it('keeps the launch button disabled until the agent identity, plan, image, and confirmation are ready', () => {
+    expect(buildMetaplexTokenLaunchButtonState(READY_CONFIG, READY_TOKEN_PLAN, {
+      image: 'https://gateway.irys.xyz/hatch-token-image',
+      confirmed: true,
+      launching: false,
+    })).toEqual({
+      disabled: true,
+      label: 'Register identity first',
+      reason: 'Launch the Metaplex agent identity before creating its token.',
+    });
+
+    expect(buildMetaplexTokenLaunchButtonState(REGISTERED_CONFIG, {
+      ...READY_TOKEN_PLAN,
+      ready: false,
+      missing: ['METAPLEX_GENESIS_ENABLED'],
+      status: 'not_ready',
+    }, {
+      image: 'https://gateway.irys.xyz/hatch-token-image',
+      confirmed: true,
+      launching: false,
+    })).toEqual({
+      disabled: true,
+      label: 'Token launch unavailable',
+      reason: 'Missing: Genesis launch is not enabled',
+    });
+
+    expect(buildMetaplexTokenLaunchButtonState(REGISTERED_CONFIG, READY_TOKEN_PLAN, {
+      image: 'https://gateway.irys.xyz/hatch-token-image',
+      confirmed: false,
+      launching: false,
+    })).toEqual({
+      disabled: true,
+      label: 'Review and confirm token',
+      reason: 'Confirm the permanent one-token-per-agent launch before submitting.',
+    });
+
+    expect(buildMetaplexTokenLaunchButtonState(REGISTERED_CONFIG, READY_TOKEN_PLAN, {
+      image: 'https://gateway.irys.xyz/hatch-token-image',
+      confirmed: true,
+      launching: false,
+    })).toEqual({
+      disabled: false,
+      label: 'Launch agent token',
+      reason: null,
+    });
+  });
+
+  it('shows a durable token launched state and launch links', () => {
+    const launchedPlan: MetaplexTokenLaunchPlan = {
+      ...READY_TOKEN_PLAN,
+      ready: false,
+      status: 'launched',
+      missing: ['AGENT_TOKEN_ALREADY_SET'],
+      existingToken: {
+        mintAddress: 'TokenMint111111111111111111111111111111111',
+        genesisAccount: 'Genesis1111111111111111111111111111111111',
+        launchId: 'launch_123',
+        launchUrl: 'https://www.metaplex.com/genesis/launch_123',
+        launchedAt: '2026-06-25T08:00:00.000Z',
+      },
+    };
+
+    expect(buildMetaplexTokenLaunchButtonState(REGISTERED_CONFIG, launchedPlan, {
+      image: 'https://gateway.irys.xyz/hatch-token-image',
+      confirmed: true,
+      launching: false,
+    })).toEqual({
+      disabled: true,
+      label: 'Token launched',
+      reason: 'This agent already has its permanent Metaplex token.',
+    });
+    expect(getMetaplexTokenLinks(launchedPlan.existingToken)).toEqual([
+      {
+        label: 'Genesis launch',
+        href: 'https://www.metaplex.com/genesis/launch_123',
+      },
+      {
+        label: 'Token mint on Solscan',
+        href: 'https://solscan.io/token/TokenMint111111111111111111111111111111111',
+      },
+      {
+        label: 'Genesis account on Solscan',
+        href: 'https://solscan.io/account/Genesis1111111111111111111111111111111111',
+      },
+    ]);
   });
 });
