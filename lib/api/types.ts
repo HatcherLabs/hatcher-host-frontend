@@ -756,13 +756,17 @@ export interface MetaplexRegistrationPrepareResponse {
     blockhash: string;
     lastValidBlockHeight: number;
   };
+  signingMode?: "wallet-first-asset-cosign" | "hosted-mint-agent";
+  cosignerToken?: string;
   status: "prepared";
 }
 
 export interface MetaplexRegistrationCompleteInput {
   wallet: string;
   assetAddress: string;
-  signature: string;
+  signature?: string;
+  signedTransaction?: string;
+  cosignerToken?: string;
 }
 
 export interface MetaplexTokenLaunchPlan {
