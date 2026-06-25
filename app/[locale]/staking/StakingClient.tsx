@@ -755,8 +755,8 @@ export function StakingClient() {
 
       setStakeTxId(result.txId);
       setNotice(result.setupIncluded
-        ? 'Stake confirmed. Streamflow receipt setup was included in the same transaction. Positions are refreshing.'
-        : 'Stake confirmed. Positions are refreshing.');
+        ? 'Stake transaction submitted. Streamflow receipt setup was included in the same transaction. Positions are refreshing.'
+        : 'Stake transaction submitted. Positions are refreshing.');
       setStakeAmount('');
       void refreshStakingDataAfterTransaction({
         refresh: async () => {
@@ -771,7 +771,7 @@ export function StakingClient() {
       const message = err instanceof Error ? err.message : 'Could not stake HATCHER';
       if (message !== 'Cancelled') {
         if (/block height exceeded|signature .*expired/i.test(message)) {
-          setError('Solana confirmation expired before the site could verify the transaction. If this was the receipt setup step, no HATCHER was staked; wait a few seconds, refresh the wallet balance, and try Stake HATCHER again.');
+          setError('Solana confirmation expired before the site could verify the transaction. Wait a few seconds and refresh staking data before trying again.');
         } else {
           setError(message);
         }
@@ -878,7 +878,7 @@ export function StakingClient() {
       });
 
       setUnstakeTxId(result.txId);
-      setNotice('Stake unstaked. Streamflow will return the unlocked HATCHER and available rewards to your wallet.');
+      setNotice('Unstake transaction submitted. Streamflow will return the unlocked HATCHER and available rewards to your wallet.');
       await Promise.all([load(), loadWalletBalance()]);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Could not unstake HATCHER';
