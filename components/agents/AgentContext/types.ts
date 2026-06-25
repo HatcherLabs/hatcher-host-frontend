@@ -1,6 +1,8 @@
 import type { Agent, AgentFeature, ChatAttachmentPayload, ChatSessionSummary } from '@/lib/api';
 import type { AgentFramework } from '@hatcher/shared';
 import type { ActiveModelDisplay } from '@/lib/hosted-model-catalog';
+import type { ChatMessageToolEvent } from '../tabs/ChatTab/chatToolEvents';
+import type { ChatMessageThinkingState } from '../tabs/ChatTab/chatThinkingEvents';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -12,6 +14,8 @@ export interface Message {
   content: string;
   streaming?: boolean;
   timestamp?: Date;
+  toolEvents?: ChatMessageToolEvent[];
+  thinking?: ChatMessageThinkingState;
 }
 
 export interface LogEntry {

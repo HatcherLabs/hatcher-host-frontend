@@ -1559,6 +1559,40 @@ export interface AgentWalletsResponse {
   };
 }
 
+export type AgentWalletActivityDirection = "in" | "out" | "self" | "unknown";
+
+export interface AgentWalletActivityTransaction {
+  id: string;
+  network: AgentPassportNetworkId;
+  chainType: AgentPassportChainType;
+  signature: string;
+  timestamp: string | null;
+  type: string;
+  direction: AgentWalletActivityDirection;
+  amount: string | null;
+  asset: string | null;
+  from: string | null;
+  to: string | null;
+  description: string;
+  explorerUrl: string | null;
+}
+
+export interface AgentWalletActivityNetwork {
+  id: AgentPassportNetworkId;
+  label: string;
+  chainType: AgentPassportChainType;
+  address: string | null;
+  explorerUrl: string | null;
+  transactions: AgentWalletActivityTransaction[];
+  error: string | null;
+}
+
+export interface AgentWalletActivityResponse {
+  generatedAt: string;
+  networks: AgentWalletActivityNetwork[];
+  notes: string[];
+}
+
 export interface AgentWalletPrivateKeyResponse {
   network: AgentPassportNetworkId;
   chainType: AgentPassportChainType;

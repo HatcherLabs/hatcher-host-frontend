@@ -9,7 +9,7 @@ import { api } from '@/lib/api';
 import { API_URL } from '@/lib/config';
 import type { Agent, AgentFeature, ChatAttachmentPayload, ChatSessionSummary } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { useWebSocketChat, type ChatToolEvent } from '@/hooks/useWebSocketChat';
+import { useWebSocketChat, type ChatThinkingEvent, type ChatToolEvent } from '@/hooks/useWebSocketChat';
 import { FRAMEWORKS, getBYOKProvider } from '@hatcher/shared';
 import type { UserTierKey } from '@hatcher/shared';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -43,7 +43,14 @@ import { AgentSidebar } from '@/components/agents/AgentSidebar';
 import { PortAgentModal } from '@/components/agents/PortAgentModal';
 import { shouldMountTerminalTab } from '@/components/agents/terminalPersistence';
 import { resolveLoadedModelConfig, useAgentConfig } from '@/hooks/useAgentConfig';
-import { DEFAULT_AGENT_VIEW_MODE, EASY_AGENT_TABS } from '@/components/agents/navigationModel';
+import { DEFAULT_AGENT_VIEW_MODE, EASY_AGENT_TABS, resolveAgentViewMode } from '@/components/agents/navigationModel';
+import { applyChatToolEvent, streamToolEventToChatToolEvent } from '@/components/agents/tabs/ChatTab/chatToolEvents';
+import { applyChatThinkingEvent } from '@/components/agents/tabs/ChatTab/chatThinkingEvents';
+import {
+  chatMessageMetadataSignature,
+  normalizeChatMessageMetadata,
+  serializeChatMessageMetadata,
+} from '@/components/agents/tabs/ChatTab/chatHistoryMetadata';
 import { useAgentIntegrations } from '@/hooks/useAgentIntegrations';
 import { useAgentActions } from '@/hooks/useAgentActions';
 import { useAgentLogs } from '@/hooks/useAgentLogs';
@@ -174,11 +181,12 @@ export default function AgentManagePage() {
   const tStatusPoll = useTranslations('dashboard.agentDetail.statusPoll');
 
   // View mode (easy = operational tabs only, advanced = everything).
-  // Default to easy so new users land on the highest-signal operator workflow.
+  // Default to advanced so the full dashboard is visible for new workspaces.
   const [viewMode, setViewModeRaw] = useState<'easy' | 'advanced'>(DEFAULT_AGENT_VIEW_MODE);
   useEffect(() => {
-    const saved = localStorage.getItem('hatcher-view-mode') as 'easy' | 'advanced' | null;
-    if (saved) setViewModeRaw(saved);
+    const mode = resolveAgentViewMode(localStorage.getItem('hatcher-view-mode'));
+    setViewModeRaw(mode);
+    localStorage.setItem('hatcher-view-mode', mode);
   }, []);
   const setViewMode = useCallback((mode: 'easy' | 'advanced') => {
     setViewModeRaw(mode);
@@ -289,7 +297,7 @@ export default function AgentManagePage() {
 
   // ─── Data loaders ────────────────────────────────────────
 
-  const normalizeHistoryMessages = useCallback((raw: { role: string; content: string; ts: number }[]) => {
+  const normalizeHistoryMessages = useCallback((raw: { role: string; content: string; ts: number; metadata?: unknown }[]) => {
     const deduped: typeof raw = [];
     for (const m of raw) {
       const prev = deduped[deduped.length - 1];
@@ -297,18 +305,23 @@ export default function AgentManagePage() {
       deduped.push(m);
     }
 
-    return deduped.map((m, i) => ({
-      id: `hist-${m.ts ?? i}-${i}`,
-      role: m.role as 'user' | 'assistant',
-      content: m.content,
-      timestamp: m.ts ? new Date(m.ts) : new Date(),
-    }));
+    return deduped.map((m, i) => {
+      const metadata = normalizeChatMessageMetadata(m.metadata);
+      return {
+        id: `hist-${m.ts ?? i}-${i}`,
+        role: m.role as 'user' | 'assistant',
+        content: m.content,
+        timestamp: m.ts ? new Date(m.ts) : new Date(),
+        ...(metadata?.thinking ? { thinking: metadata.thinking } : {}),
+        ...(metadata?.toolEvents ? { toolEvents: metadata.toolEvents } : {}),
+      };
+    });
   }, []);
 
   const historySignature = useCallback((items: Message[]) => (
     items
       .filter((m) => !m.streaming && m.content)
-      .map((m) => `${m.role}:${m.timestamp?.getTime() ?? 0}:${m.content}`)
+      .map((m) => `${m.role}:${m.timestamp?.getTime() ?? 0}:${m.content}:${chatMessageMetadataSignature(m)}`)
       .join('\n')
   ), []);
 
@@ -792,7 +805,15 @@ export default function AgentManagePage() {
     const saveSessionId = loadedChatSessionIdRef.current ?? activeChatSessionIdRef.current;
     saveTimerRef.current = setTimeout(() => {
       lastSavedCountRef.current = complete.length;
-      const toSave = complete.map(m => ({ role: m.role, content: m.content, ts: m.timestamp?.getTime() }));
+      const toSave = complete.map(m => {
+        const metadata = serializeChatMessageMetadata(m);
+        return {
+          role: m.role,
+          content: m.content,
+          ts: m.timestamp?.getTime(),
+          ...(metadata ? { metadata } : {}),
+        };
+      });
       const deduped: typeof toSave = [];
       for (const m of toSave) {
         const prev = deduped[deduped.length - 1];
@@ -821,6 +842,64 @@ export default function AgentManagePage() {
 
   // ─── WebSocket streaming chat ──────────────────────────────
 
+  const updateLastStreamingAssistant = useCallback((updater: (message: Message) => Message) => {
+    setMessages((prev) => {
+      const updated = [...prev];
+      let targetIndex = -1;
+      for (let i = updated.length - 1; i >= 0; i -= 1) {
+        const candidate = updated[i];
+        if (candidate?.role === 'assistant' && candidate.streaming) {
+          targetIndex = i;
+          break;
+        }
+      }
+      const target = targetIndex >= 0 ? updated[targetIndex] : undefined;
+      if (!target) return prev;
+      updated[targetIndex] = updater(target);
+      return updated;
+    });
+  }, []);
+
+  const handleChatThinkingEvent = useCallback((evt: ChatThinkingEvent) => {
+    updateLastStreamingAssistant((target) => ({
+      ...target,
+      thinking: applyChatThinkingEvent(target.thinking, {
+        phase: evt.phase,
+        ...(evt.label !== undefined ? { label: evt.label } : {}),
+        ...(evt.content !== undefined ? { content: evt.content } : {}),
+        now: Date.now(),
+      }),
+    }));
+  }, [updateLastStreamingAssistant]);
+
+  const handleChatToolEvent = useCallback((evt: ChatToolEvent) => {
+    const toolEvent = streamToolEventToChatToolEvent(evt);
+    updateLastStreamingAssistant((target) => ({
+      ...target,
+      thinking: target.thinking?.streaming
+        ? applyChatThinkingEvent(target.thinking, { phase: 'done', now: Date.now() })
+        : target.thinking,
+      toolEvents: applyChatToolEvent(target.toolEvents ?? [], toolEvent),
+    }));
+
+    if (evt.phase === 'start') {
+      setInflightTools((prev) => prev.some((t) => t.callId === evt.callId)
+        ? prev
+        : [...prev, { callId: evt.callId, name: evt.name, argsPreview: evt.argsPreview }]);
+    } else if (evt.callId === 'all' && evt.name === '*') {
+      setInflightTools((prev) => {
+        setCompletedTools((c) => [...c, ...prev.map((t) => ({ callId: t.callId, name: t.name }))].slice(-6));
+        return [];
+      });
+    } else {
+      setInflightTools((prev) => {
+        const matched = prev.find((t) => t.callId === evt.callId);
+        if (matched) setCompletedTools((c) => [...c, { callId: matched.callId, name: matched.name }].slice(-6));
+        return prev.filter((t) => t.callId !== evt.callId);
+      });
+    }
+  }, [updateLastStreamingAssistant]);
+
   const wsChat = useWebSocketChat({
     agentId: id,
     enabled: isAuthenticated && !!id && shouldRunChatWorkloads(tab),
@@ -831,29 +910,19 @@ export default function AgentManagePage() {
         const updated = [...prev];
         const last = updated[updated.length - 1];
         if (last?.streaming) {
-          updated[updated.length - 1] = { ...last, content: last.content + token };
+          updated[updated.length - 1] = {
+            ...last,
+            content: last.content + token,
+            thinking: last.thinking?.streaming
+              ? applyChatThinkingEvent(last.thinking, { phase: 'done', now: Date.now() })
+              : last.thinking,
+          };
         }
         return updated;
       });
     },
-    onToolEvent: (evt: ChatToolEvent) => {
-      if (evt.phase === 'start') {
-        setInflightTools((prev) => prev.some((t) => t.callId === evt.callId)
-          ? prev
-          : [...prev, { callId: evt.callId, name: evt.name, argsPreview: evt.argsPreview }]);
-      } else if (evt.callId === 'all' && evt.name === '*') {
-        setInflightTools((prev) => {
-          setCompletedTools((c) => [...c, ...prev.map((t) => ({ callId: t.callId, name: t.name }))].slice(-6));
-          return [];
-        });
-      } else {
-        setInflightTools((prev) => {
-          const matched = prev.find((t) => t.callId === evt.callId);
-          if (matched) setCompletedTools((c) => [...c, { callId: matched.callId, name: matched.name }].slice(-6));
-          return prev.filter((t) => t.callId !== evt.callId);
-        });
-      }
-    },
+    onToolEvent: handleChatToolEvent,
+    onThinkingEvent: handleChatThinkingEvent,
     onMessage: (message) => {
       if (message.role !== 'assistant' || !message.content.trim()) return;
       setChatError(null);
@@ -888,6 +957,9 @@ export default function AgentManagePage() {
             ...last,
             content: _content || last.content,
             streaming: false,
+            thinking: last.thinking?.streaming
+              ? applyChatThinkingEvent(last.thinking, { phase: 'done', now: Date.now() })
+              : last.thinking,
           };
         }
         return updated;
@@ -946,7 +1018,13 @@ export default function AgentManagePage() {
       const last = updated[updated.length - 1];
       if (!last?.streaming) return prev;
       if (!last.content.trim()) return updated.slice(0, -1);
-      updated[updated.length - 1] = { ...last, streaming: false };
+      updated[updated.length - 1] = {
+        ...last,
+        streaming: false,
+        thinking: last.thinking?.streaming
+          ? applyChatThinkingEvent(last.thinking, { phase: 'done', now: Date.now() })
+          : last.thinking,
+      };
       return updated;
     });
     setSending(false);
@@ -1001,7 +1079,17 @@ export default function AgentManagePage() {
     const abortController = new AbortController();
     chatAbortControllerRef.current = abortController;
     const history = selectedHistory;
-    setMessages((prev) => [...prev, { id: genId(), role: 'assistant', content: '', streaming: true, timestamp: new Date() }]);
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: genId(),
+        role: 'assistant',
+        content: '',
+        streaming: true,
+        timestamp: new Date(),
+        thinking: { content: '', streaming: true, label: 'Thinking', startedAt: Date.now() },
+      },
+    ]);
 
     if (wsChat.isConnected) {
       wsStreamingMsgRef.current = true;
@@ -1024,7 +1112,13 @@ export default function AgentManagePage() {
             const updated = [...prev];
             const last = updated[updated.length - 1];
             if (last?.streaming) {
-              updated[updated.length - 1] = { ...last, content: last.content + token };
+              updated[updated.length - 1] = {
+                ...last,
+                content: last.content + token,
+                thinking: last.thinking?.streaming
+                  ? applyChatThinkingEvent(last.thinking, { phase: 'done', now: Date.now() })
+                  : last.thinking,
+              };
             }
             return updated;
           });
@@ -1039,7 +1133,13 @@ export default function AgentManagePage() {
               if (!last.content) {
                 return updated.filter((m) => m.id !== last.id);
               }
-              updated[updated.length - 1] = { ...last, streaming: false };
+              updated[updated.length - 1] = {
+                ...last,
+                streaming: false,
+                thinking: last.thinking?.streaming
+                  ? applyChatThinkingEvent(last.thinking, { phase: 'done', now: Date.now() })
+                  : last.thinking,
+              };
             }
             return updated;
           });
@@ -1077,6 +1177,8 @@ export default function AgentManagePage() {
         requestSessionId,
         options?.attachments,
         abortController.signal,
+        handleChatToolEvent,
+        handleChatThinkingEvent,
       );
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {

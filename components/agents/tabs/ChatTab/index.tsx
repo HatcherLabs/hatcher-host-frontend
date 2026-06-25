@@ -24,6 +24,12 @@ import {
   formatAttachmentSize,
   isChatDataUrlAttachmentMimeType,
 } from './attachmentLimits';
+import {
+  CHAT_SHOW_THINKING_STORAGE_KEY,
+  CHAT_SHOW_TOOL_CALLS_STORAGE_KEY,
+  DEFAULT_CHAT_DISPLAY_PREFERENCES,
+  resolveChatDisplayPreference,
+} from './chatDisplayPreferences';
 
 function readFileAsDataUrl(file: File): Promise<string> {
   return new Promise<string>((resolve, reject) => {
@@ -60,6 +66,35 @@ export function ChatTab() {
   const speakingMsgIdRef = useRef<string | null>(null);
   const lastAutoSpokenIdRef = useRef<string | null>(null);
   const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
+  const [showThinking, setShowThinking] = useState(DEFAULT_CHAT_DISPLAY_PREFERENCES.showThinking);
+  const [showToolCalls, setShowToolCalls] = useState(DEFAULT_CHAT_DISPLAY_PREFERENCES.showToolCalls);
+
+  useEffect(() => {
+    setShowThinking(resolveChatDisplayPreference(
+      window.localStorage.getItem(CHAT_SHOW_THINKING_STORAGE_KEY),
+      DEFAULT_CHAT_DISPLAY_PREFERENCES.showThinking,
+    ));
+    setShowToolCalls(resolveChatDisplayPreference(
+      window.localStorage.getItem(CHAT_SHOW_TOOL_CALLS_STORAGE_KEY),
+      DEFAULT_CHAT_DISPLAY_PREFERENCES.showToolCalls,
+    ));
+  }, []);
+
+  const toggleThinking = useCallback(() => {
+    setShowThinking((current) => {
+      const next = !current;
+      window.localStorage.setItem(CHAT_SHOW_THINKING_STORAGE_KEY, String(next));
+      return next;
+    });
+  }, []);
+
+  const toggleToolCalls = useCallback(() => {
+    setShowToolCalls((current) => {
+      const next = !current;
+      window.localStorage.setItem(CHAT_SHOW_TOOL_CALLS_STORAGE_KEY, String(next));
+      return next;
+    });
+  }, []);
 
   // ── Chat attachments ──────────────────────────────────────────
   //
@@ -410,10 +445,14 @@ export function ChatTab() {
         ttsSupported={voice.ttsSupported}
         isAuthenticated={isAuthenticated}
         autoSpeak={voice.autoSpeak}
+        showThinking={showThinking}
+        showToolCalls={showToolCalls}
         activeModel={activeModelDisplay}
         onOpenModelSettings={() => setTab('config')}
         onOpenMobilePanel={() => setMobilePanelOpen(true)}
         onToggleAutoSpeak={voice.toggleAutoSpeak}
+        onToggleThinking={toggleThinking}
+        onToggleToolCalls={toggleToolCalls}
         onStartVoiceCall={startVoiceCall}
       />
 
@@ -469,6 +508,8 @@ export function ChatTab() {
             onSendMessage={sendMessage}
             messagesContainerRef={messagesContainerRef}
             bottomRef={bottomRef}
+            showThinking={showThinking}
+            showToolCalls={showToolCalls}
           />
 
           <VoiceControlBar

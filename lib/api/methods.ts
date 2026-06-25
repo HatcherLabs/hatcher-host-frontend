@@ -4,6 +4,11 @@
 
 import { API_URL } from "@/lib/config";
 import { getToken, req } from "./core";
+import {
+  parseAgentChatStreamEvent,
+  type ChatThinkingEventPayload,
+  type ChatToolEventPayload,
+} from "./chatStreamEvents";
 import type {
   Agent,
   AgentCommCallBody,
@@ -22,6 +27,7 @@ import type {
   CreateCovenantConnectorResponse,
   AgentPassport,
   AgentPassportNetworkId,
+  AgentWalletActivityResponse,
   AgentWalletPrivateKeyResponse,
   AgentWalletsResponse,
   Payment,
@@ -471,6 +477,10 @@ export const api = {
   /** Get owner-visible wallet addresses and best-effort balances for every managed chain. */
   getAgentWallets: (id: string) =>
     req<AgentWalletsResponse>(`/agents/${id}/wallets`),
+
+  /** Get owner-visible recent transaction activity for managed agent wallets. */
+  getAgentWalletActivity: (id: string, limit = 10) =>
+    req<AgentWalletActivityResponse>(`/agents/${id}/wallets/activity?limit=${limit}`),
 
   /** Export an owner-only managed wallet private key after account password confirmation. */
   exportAgentWalletPrivateKey: (
@@ -2427,6 +2437,8 @@ export const api = {
     sessionId?: string | null,
     attachments?: ChatAttachmentPayload[],
     signal?: AbortSignal,
+    onToolEvent?: (event: ChatToolEventPayload) => void,
+    onThinkingEvent?: (event: ChatThinkingEventPayload) => void,
   ) => {
     const token = getToken();
 
@@ -2540,6 +2552,7 @@ export const api = {
     const decoder = new TextDecoder();
     let buf = "";
     let detectedModel = "unknown";
+    let sseEventName: string | undefined;
 
     while (true) {
       const { done, value } = await reader.read();
@@ -2551,26 +2564,37 @@ export const api = {
 
       for (const line of lines) {
         const trimmed = line.trim();
+        if (!trimmed) {
+          sseEventName = undefined;
+          continue;
+        }
+        if (trimmed.startsWith(":")) continue;
+        if (trimmed.startsWith("event:")) {
+          sseEventName = trimmed.slice(6).trim();
+          continue;
+        }
         if (!trimmed.startsWith("data: ")) continue;
+        const eventName = sseEventName;
+        sseEventName = undefined;
         const data = trimmed.slice(6);
-        if (data === "[DONE]") {
+        const event = parseAgentChatStreamEvent(eventName, data);
+        if (event.kind === "done") {
           onDone(detectedModel);
           return;
         }
-        try {
-          const json = JSON.parse(data) as {
-            token?: string;
-            error?: string;
-            model?: string;
-          };
-          if (json.error) {
-            onError(json.error);
-            return;
-          }
-          if (json.model) detectedModel = json.model;
-          if (json.token) onToken(json.token);
-        } catch {
-          /* skip */
+        if (event.kind === "error") {
+          onError(event.error);
+          return;
+        }
+        if (event.kind === "token") {
+          if (event.model) detectedModel = event.model;
+          onToken(event.token);
+        } else if (event.kind === "tool") {
+          onToolEvent?.(event.event);
+        } else if (event.kind === "thinking") {
+          onThinkingEvent?.(event.event);
+        } else if (event.model) {
+          detectedModel = event.model;
         }
       }
     }
@@ -2644,7 +2668,7 @@ export const api = {
   /** Load chat history */
   getChatHistory: (agentId: string, sessionId?: string) =>
     req<{
-      messages: Array<{ role: string; content: string; ts: number }>;
+      messages: Array<{ role: string; content: string; ts: number; metadata?: unknown }>;
       nextCursor?: string | null;
     }>(
       `/agents/${agentId}/chat/history${sessionId ? `?sessionId=${encodeURIComponent(sessionId)}` : ""}`,
@@ -2653,7 +2677,7 @@ export const api = {
   /** Save chat messages to history */
   saveChatHistory: (
     agentId: string,
-    messages: Array<{ role: string; content: string; ts?: number }>,
+    messages: Array<{ role: string; content: string; ts?: number; metadata?: unknown }>,
     sessionId?: string | null,
   ) =>
     req<{ saved: number }>(`/agents/${agentId}/chat/history`, {

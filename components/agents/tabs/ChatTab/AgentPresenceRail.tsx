@@ -18,11 +18,14 @@ import {
   type AvatarVariant,
   type RoomEmoteId,
 } from '@/components/agent-room/v2/stations/AgentBody';
+import {
+  AVATAR_SELECT_CLASSNAME,
+  AVATAR_SELECT_OPTION_CLASSNAME,
+  AVATAR_SELECT_STYLE,
+} from '@/components/agent-room/v2/hud/avatarSelectTheme';
 import { api } from '@/lib/api';
 import { useAgentContext } from '../../AgentContext';
 import { AgentEyesLiveCard } from './AgentEyesLiveCard';
-
-const AVATAR_SELECT_OPTION_CLASS = 'bg-[#0b1018] text-[var(--text-primary)]';
 
 const AgentRoomAvatarPreview = dynamic(
   () =>
@@ -288,10 +291,10 @@ export function AgentPresenceRail({
             value={selectedVariant ?? ''}
             onChange={(event) => void handleAvatarChange(event.target.value)}
             disabled={!isAuthenticated || savingVariant}
-            className="h-9 w-full rounded-md border border-[var(--border-default)] bg-black/25 px-2 text-xs text-[var(--text-primary)] outline-none transition-colors hover:border-[var(--color-accent)]/40 focus:border-[var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-60"
-            style={{ colorScheme: 'dark' }}
+            className={`${AVATAR_SELECT_CLASSNAME} h-9 text-xs`}
+            style={AVATAR_SELECT_STYLE}
           >
-            <option value="" className={AVATAR_SELECT_OPTION_CLASS}>
+            <option value="" className={AVATAR_SELECT_OPTION_CLASSNAME}>
               Auto
             </option>
             {selectedVariant &&
@@ -300,7 +303,7 @@ export function AgentPresenceRail({
               ) && (
                 <option
                   value={selectedVariant}
-                  className={AVATAR_SELECT_OPTION_CLASS}
+                  className={AVATAR_SELECT_OPTION_CLASSNAME}
                 >
                   {AVATAR_VARIANTS.find(
                     (variant) => variant.id === selectedVariant,
@@ -312,7 +315,7 @@ export function AgentPresenceRail({
               <option
                 key={variant.id}
                 value={variant.id}
-                className={AVATAR_SELECT_OPTION_CLASS}
+                className={AVATAR_SELECT_OPTION_CLASSNAME}
               >
                 {variant.name}
               </option>

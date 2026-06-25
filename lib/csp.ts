@@ -8,13 +8,17 @@ const GOOGLE_ADS_HOSTS = [
 ].join(' ');
 
 const MIRARI_HOST = 'https://entermirari.cloud';
+const DEFAULT_LOCAL_API_URL = 'http://localhost:3001';
+
+function isLocalApiUrl(url: URL): boolean {
+  return ['localhost', '127.0.0.1', '0.0.0.0', '[::1]'].includes(url.hostname);
+}
 
 function configuredApiConnectSource(): string {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (!apiUrl) return '';
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || DEFAULT_LOCAL_API_URL;
   try {
     const url = new URL(apiUrl);
-    const ws = process.env.NODE_ENV === 'development'
+    const ws = process.env.NODE_ENV === 'development' || isLocalApiUrl(url)
       ? ` ${url.protocol === 'https:' ? 'wss' : 'ws'}://${url.host}`
       : '';
     return ` ${url.origin}${ws}`;

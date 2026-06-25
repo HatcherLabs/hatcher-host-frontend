@@ -1,6 +1,6 @@
 'use client';
 
-import { Bot, Menu, Phone, Volume2, VolumeX } from 'lucide-react';
+import { Bot, Brain, Menu, Phone, Volume2, VolumeX, Wrench } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { FRAMEWORKS, type AgentFramework } from '@hatcher/shared';
 import type { ActiveModelDisplay } from '@/lib/hosted-model-catalog';
@@ -14,10 +14,14 @@ interface ChatHeaderProps {
   ttsSupported: boolean;
   isAuthenticated: boolean;
   autoSpeak: boolean;
+  showThinking: boolean;
+  showToolCalls: boolean;
   activeModel: ActiveModelDisplay;
   onOpenModelSettings: () => void;
   onOpenMobilePanel: () => void;
   onToggleAutoSpeak: () => void;
+  onToggleThinking: () => void;
+  onToggleToolCalls: () => void;
   onStartVoiceCall: () => void;
 }
 
@@ -29,10 +33,14 @@ export function ChatHeader({
   ttsSupported,
   isAuthenticated,
   autoSpeak,
+  showThinking,
+  showToolCalls,
   activeModel,
   onOpenModelSettings,
   onOpenMobilePanel,
   onToggleAutoSpeak,
+  onToggleThinking,
+  onToggleToolCalls,
   onStartVoiceCall,
 }: ChatHeaderProps) {
   const t = useTranslations('dashboard.agentDetail.chat');
@@ -72,6 +80,34 @@ export function ChatHeader({
         </button>
       </div>
       <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={onToggleThinking}
+          className={`flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border transition-all duration-200 cursor-pointer ${
+            showThinking
+              ? 'border-[var(--color-accent)]/40 bg-[var(--color-accent)]/10 text-[var(--color-accent)]'
+              : 'border-[var(--border-default)] bg-transparent text-[var(--text-muted)] hover:border-[var(--text-muted)]/40 hover:text-[var(--text-secondary)]'
+          }`}
+          title={showThinking ? 'Hide thinking traces' : 'Show thinking traces'}
+          aria-pressed={showThinking}
+        >
+          <Brain size={11} />
+          <span className="hidden sm:inline">{showThinking ? 'Hide thinking' : 'Show thinking'}</span>
+        </button>
+        <button
+          type="button"
+          onClick={onToggleToolCalls}
+          className={`flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border transition-all duration-200 cursor-pointer ${
+            showToolCalls
+              ? 'border-[var(--color-accent)]/40 bg-[var(--color-accent)]/10 text-[var(--color-accent)]'
+              : 'border-[var(--border-default)] bg-transparent text-[var(--text-muted)] hover:border-[var(--text-muted)]/40 hover:text-[var(--text-secondary)]'
+          }`}
+          title={showToolCalls ? 'Hide tool calls' : 'Show tool calls'}
+          aria-pressed={showToolCalls}
+        >
+          <Wrench size={11} />
+          <span className="hidden lg:inline">{showToolCalls ? 'Hide tools' : 'Show tools'}</span>
+        </button>
         {/* Voice Call button */}
         {hasVoiceSupport && sttSupported && isAuthenticated && (
           <button

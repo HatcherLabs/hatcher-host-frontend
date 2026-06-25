@@ -4,15 +4,20 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react
 import { motion } from 'framer-motion';
 import {
   AlertTriangle,
+  ArrowDownLeft,
+  ArrowUpRight,
+  CircleDot,
   Copy,
   Eye,
   EyeOff,
   ExternalLink,
   Fingerprint,
+  History,
   Key,
   Layers3,
   Lock,
   RefreshCw,
+  Repeat2,
   ShieldCheck,
   Star,
   ThumbsDown,
@@ -27,17 +32,19 @@ import type {
   AgentPassport,
   AgentPassportNetwork,
   AgentPassportNetworkId,
+  AgentWalletActivityDirection,
+  AgentWalletActivityNetwork,
+  AgentWalletActivityResponse,
+  AgentWalletActivityTransaction,
   AgentWalletNetworkBalance,
   AgentWalletPrivateKeyResponse,
   AgentWalletsResponse,
 } from '@/lib/api';
 import { buildFallbackPassport, shortAddress } from '@/lib/agent-passport';
 import { KausalayerWalletPanel } from './KausalayerWalletPanel';
-import { ConduitWalletPanel } from './ConduitWalletPanel';
 import { EarnFiWalletPanel } from './EarnFiWalletPanel';
 import { OobeWalletPanel } from './OobeWalletPanel';
 import { ClawVilleWalletPanel } from './ClawVilleWalletPanel';
-import { OrbisWalletPanel } from './OrbisWalletPanel';
 import { MirariWalletPanel } from './MirariWalletPanel';
 import { XonaPartnerResourcesPanel } from './XonaPartnerResourcesPanel';
 import { Mpp32WalletPanel } from './Mpp32WalletPanel';
@@ -62,7 +69,7 @@ interface ReputationState {
 
 type WalletPanel = 'passport' | AgentPassportNetworkId;
 type WalletSection = 'overview' | 'networks' | 'providers' | 'security';
-type ProviderPanelId = 'xona' | 'conduit' | 'earnfi' | 'oobe' | 'clawville' | 'kausalayer' | 'mirari' | 'mpp32' | 'medusa' | 'metaplex' | 'orbis';
+type ProviderPanelId = 'xona' | 'earnfi' | 'oobe' | 'clawville' | 'kausalayer' | 'mirari' | 'mpp32' | 'medusa' | 'metaplex';
 type AgentRuntime = 'hermes' | 'openclaw' | (string & {});
 
 const TAB_ORDER: WalletPanel[] = ['passport', 'skale', 'solana', 'base'];
@@ -82,7 +89,6 @@ const WALLET_SECTIONS: ReadonlyArray<{
 const SOLANA_PROVIDERS: ReadonlyArray<{ id: ProviderPanelId; label: string; description: string; network: 'Solana' }> = [
   { id: 'metaplex', label: 'Metaplex', description: 'Agent Registry identity and public metadata.', network: 'Solana' },
   { id: 'xona', label: 'Xona', description: 'xPay partner resources and agent tools.', network: 'Solana' },
-  { id: 'conduit', label: 'Conduit', description: 'Provider listing and payout routing.', network: 'Solana' },
   { id: 'earnfi', label: 'EarnFi', description: 'Paid task creation and verification.', network: 'Solana' },
   { id: 'oobe', label: 'Oobe', description: 'SAP registration and x402 access.', network: 'Solana' },
   { id: 'clawville', label: 'ClawVille', description: 'Identity wallet and access state.', network: 'Solana' },
@@ -92,9 +98,7 @@ const SOLANA_PROVIDERS: ReadonlyArray<{ id: ProviderPanelId; label: string; desc
   { id: 'medusa', label: 'Medusa', description: 'Privacy passport and presale enrollment.', network: 'Solana' },
 ];
 
-const BASE_PROVIDERS: ReadonlyArray<{ id: ProviderPanelId; label: string; description: string; network: 'Base' }> = [
-  { id: 'orbis', label: 'Orbis', description: 'Marketplace API proxy and x402 settlement.', network: 'Base' },
-];
+const BASE_PROVIDERS: ReadonlyArray<{ id: ProviderPanelId; label: string; description: string; network: 'Base' }> = [];
 
 function labelForPanel(panel: WalletPanel): string {
   if (panel === 'passport') return 'Passport';
@@ -181,6 +185,27 @@ function formatBalance(value: string | null | undefined): string {
   return trimmed ? `${whole}.${trimmed}` : whole;
 }
 
+export function formatWalletActivityAmount(amount: string | null, asset: string | null): string {
+  if (!amount) return '-';
+  const formatted = formatBalance(amount);
+  if (!asset) return formatted;
+  return `${formatted} ${asset.length > 18 ? shortAddress(asset) : asset}`;
+}
+
+export function getWalletActivityNetworkForId(
+  activity: AgentWalletActivityResponse | null,
+  networkId: AgentPassportNetworkId,
+): AgentWalletActivityNetwork | null {
+  return activity?.networks.find((network) => network.id === networkId) ?? null;
+}
+
+export function getWalletActivityTransactionsForNetwork(
+  activity: AgentWalletActivityResponse | null,
+  networkId: AgentPassportNetworkId,
+): AgentWalletActivityTransaction[] {
+  return getWalletActivityNetworkForId(activity, networkId)?.transactions ?? [];
+}
+
 function walletEnvFor(id: AgentPassportNetworkId): { walletEnvVar: string; privateKeyEnvVar: string } {
   if (id === 'skale') return { walletEnvVar: 'SKALE_WALLET_ADDRESS', privateKeyEnvVar: 'SKALE_PRIVATE_KEY' };
   if (id === 'base') return { walletEnvVar: 'BASE_WALLET_ADDRESS', privateKeyEnvVar: 'BASE_PRIVATE_KEY' };
@@ -221,6 +246,8 @@ export function WalletTab() {
   const { agent, loadAgent } = useAgentContext();
   const [passport, setPassport] = useState<AgentPassport | null>(null);
   const [wallets, setWallets] = useState<AgentWalletsResponse | null>(null);
+  const [walletActivity, setWalletActivity] = useState<AgentWalletActivityResponse | null>(null);
+  const [walletActivityError, setWalletActivityError] = useState<string | null>(null);
   const [reputation, setReputation] = useState<ReputationState | null>(null);
   const [activeSection, setActiveSection] = useState<WalletSection>(() => (
     typeof window === 'undefined' ? 'overview' : getInitialWalletSectionFromSearch(window.location.search)
@@ -269,11 +296,13 @@ export function WalletTab() {
   const loadWalletData = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setWalletActivityError(null);
 
-    const [walletsRes, passportRes, reputationRes] = await Promise.allSettled([
+    const [walletsRes, passportRes, reputationRes, activityRes] = await Promise.allSettled([
       api.getAgentWallets(agent.id),
       api.getAgentPassport(agent.id),
       api.getAgentReputation(agent.id),
+      api.getAgentWalletActivity(agent.id, 10),
     ]);
 
     if (walletsRes.status === 'fulfilled' && walletsRes.value.success) {
@@ -294,6 +323,18 @@ export function WalletTab() {
 
     if (reputationRes.status === 'fulfilled' && reputationRes.value.success) {
       setReputation(reputationRes.value.data);
+    }
+
+    if (activityRes.status === 'fulfilled' && activityRes.value.success) {
+      setWalletActivity(activityRes.value.data);
+    } else {
+      let message: string | null = null;
+      if (activityRes.status === 'fulfilled') {
+        message = activityRes.value.success ? null : activityRes.value.error;
+      } else if (activityRes.reason instanceof Error) {
+        message = activityRes.reason.message;
+      }
+      setWalletActivityError(message ?? 'Could not load wallet activity');
     }
 
     setLoading(false);
@@ -534,6 +575,9 @@ export function WalletTab() {
           {activeNetwork ? (
             <ChainWalletPanel
               network={activeNetwork}
+              activity={walletActivity}
+              activityLoading={loading && !walletActivity}
+              activityError={walletActivityError}
               reputation={reputation}
               registeringSkale={registeringSkale}
               registerMsg={registerMsg}
@@ -865,8 +909,6 @@ function ProviderPanel({ provider, agentId, solanaWallet }: { provider: Provider
   switch (provider) {
     case 'xona':
       return <XonaPartnerResourcesPanel agentId={agentId} />;
-    case 'conduit':
-      return <ConduitWalletPanel agentId={agentId} />;
     case 'earnfi':
       return <EarnFiWalletPanel agentId={agentId} />;
     case 'oobe':
@@ -883,8 +925,6 @@ function ProviderPanel({ provider, agentId, solanaWallet }: { provider: Provider
       return <MedusaWalletPanel agentId={agentId} solanaWallet={solanaWallet} />;
     case 'metaplex':
       return <MetaplexWalletPanel agentId={agentId} solanaWallet={solanaWallet} />;
-    case 'orbis':
-      return <OrbisWalletPanel agentId={agentId} />;
     default:
       return null;
   }
@@ -975,6 +1015,9 @@ function RuntimeAccessPanel({
 
 function ChainWalletPanel({
   network,
+  activity,
+  activityLoading,
+  activityError,
   reputation,
   registeringSkale,
   registerMsg,
@@ -982,6 +1025,9 @@ function ChainWalletPanel({
   onCopy,
 }: {
   network: AgentWalletNetworkBalance;
+  activity: AgentWalletActivityResponse | null;
+  activityLoading: boolean;
+  activityError: string | null;
   reputation: ReputationState | null;
   registeringSkale: boolean;
   registerMsg: string | null;
@@ -1060,6 +1106,13 @@ function ChainWalletPanel({
         </div>
       </WalletSurface>
 
+      <WalletActivityPanel
+        network={network}
+        activity={activity}
+        loading={activityLoading}
+        error={activityError}
+      />
+
       {isSkale ? (
         <SkaleIdentityPanel
           network={network}
@@ -1072,6 +1125,132 @@ function ChainWalletPanel({
       ) : null}
     </div>
   );
+}
+
+function WalletActivityPanel({
+  network,
+  activity,
+  loading,
+  error,
+}: {
+  network: AgentWalletNetworkBalance;
+  activity: AgentWalletActivityResponse | null;
+  loading: boolean;
+  error: string | null;
+}) {
+  const activityNetwork = getWalletActivityNetworkForId(activity, network.id);
+  const transactions = getWalletActivityTransactionsForNetwork(activity, network.id);
+  const networkError = activityNetwork?.error ?? null;
+
+  return (
+    <WalletSurface className="p-5">
+      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-[var(--text-muted)]">
+            <History size={12} /> Transaction activity
+          </div>
+          <h3 className="text-base font-semibold text-[var(--text-primary)]">{network.label} recent activity</h3>
+        </div>
+        <span className="rounded-full border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-1 text-xs font-semibold text-[var(--text-secondary)]">
+          {transactions.length} tx
+        </span>
+      </div>
+
+      {loading ? (
+        <div className="space-y-2">
+          {[0, 1, 2].map((item) => (
+            <div key={item} className="h-16 rounded-xl shimmer" />
+          ))}
+        </div>
+      ) : error ? (
+        <ActivityNotice tone="warn" message={error} />
+      ) : !network.address ? (
+        <ActivityNotice tone="muted" message={`${network.label} wallet activity appears after the wallet is provisioned.`} />
+      ) : networkError ? (
+        <div className="space-y-3">
+          <ActivityNotice tone="muted" message={networkError} />
+          {activity?.notes.map((note) => (
+            <p key={note} className="text-xs leading-relaxed text-[var(--text-muted)]">{note}</p>
+          ))}
+        </div>
+      ) : transactions.length === 0 ? (
+        <ActivityNotice tone="muted" message="No recent transaction activity found for this wallet." />
+      ) : (
+        <div className="space-y-2">
+          {transactions.map((tx) => (
+            <WalletActivityRow key={tx.id} tx={tx} />
+          ))}
+        </div>
+      )}
+    </WalletSurface>
+  );
+}
+
+function WalletActivityRow({ tx }: { tx: AgentWalletActivityTransaction }) {
+  return (
+    <div className="flex min-w-0 items-start gap-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] p-3">
+      <div className={`mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border ${walletActivityDirectionClass(tx.direction)}`}>
+        <WalletActivityDirectionIcon direction={tx.direction} />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <span className="text-xs font-semibold text-[var(--text-primary)]">{formatWalletActivityType(tx.type)}</span>
+          <span className="font-mono text-xs text-[var(--accent)]">{formatWalletActivityAmount(tx.amount, tx.asset)}</span>
+        </div>
+        <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-[var(--text-secondary)]">
+          {tx.description || 'Wallet transaction'}
+        </p>
+        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-[var(--text-muted)]">
+          <span>{formatDate(tx.timestamp)}</span>
+          {tx.from && <span>from {shortAddress(tx.from)}</span>}
+          {tx.to && <span>to {shortAddress(tx.to)}</span>}
+        </div>
+      </div>
+      {tx.explorerUrl && (
+        <a
+          href={tx.explorerUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-[var(--border-default)] text-[var(--text-muted)] transition hover:border-[var(--border-hover)] hover:text-[var(--accent)]"
+          aria-label="Open transaction"
+        >
+          <ExternalLink size={13} />
+        </a>
+      )}
+    </div>
+  );
+}
+
+function ActivityNotice({ tone, message }: { tone: 'muted' | 'warn'; message: string }) {
+  return (
+    <div className={`flex items-start gap-2 rounded-xl border p-3 text-xs ${
+      tone === 'warn'
+        ? 'border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] text-[var(--color-warning)]'
+        : 'border-[var(--border-default)] bg-[var(--bg-surface)] text-[var(--text-muted)]'
+    }`}>
+      {tone === 'warn' ? <AlertTriangle size={14} className="mt-0.5 flex-shrink-0" /> : <History size={14} className="mt-0.5 flex-shrink-0" />}
+      <span className="leading-relaxed">{message}</span>
+    </div>
+  );
+}
+
+function WalletActivityDirectionIcon({ direction }: { direction: AgentWalletActivityDirection }) {
+  if (direction === 'in') return <ArrowDownLeft size={14} />;
+  if (direction === 'out') return <ArrowUpRight size={14} />;
+  if (direction === 'self') return <Repeat2 size={14} />;
+  return <CircleDot size={14} />;
+}
+
+function walletActivityDirectionClass(direction: AgentWalletActivityDirection): string {
+  if (direction === 'in') return 'border-[var(--status-live)]/40 bg-[color-mix(in_srgb,var(--status-live)_12%,transparent)] text-[var(--status-live)]';
+  if (direction === 'out') return 'border-[var(--phosphor)]/35 bg-[var(--tech-accent-soft)] text-[var(--phosphor)]';
+  if (direction === 'self') return 'border-[var(--accent)]/35 bg-[color-mix(in_srgb,var(--accent)_10%,transparent)] text-[var(--accent)]';
+  return 'border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-muted)]';
+}
+
+function formatWalletActivityType(type: string): string {
+  const normalized = type.replace(/_/g, ' ').trim().toLowerCase();
+  return normalized.replace(/\b\w/g, (letter) => letter.toUpperCase()) || 'Transaction';
 }
 
 function PrivateKeyModal({

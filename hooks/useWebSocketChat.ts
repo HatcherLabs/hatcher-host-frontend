@@ -6,6 +6,7 @@
 import { useRef, useCallback, useEffect, useState } from 'react';
 import { API_URL } from '@/lib/config';
 import type { ChatAttachmentPayload } from '@/lib/api/methods';
+import type { ChatThinkingEventPayload, ChatToolEventPayload } from '@/lib/api/chatStreamEvents';
 
 /** Derive ws:// or wss:// URL from the API base URL */
 function getWsUrl(agentId: string): string {
@@ -19,13 +20,8 @@ type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';
  *  it runs its agentic loop. UI consumers render an inline indicator
  *  ("🔧 calling exec…") so users see what the agent is doing instead
  *  of staring at silence between thinking and final answer. */
-export interface ChatToolEvent {
-  callId: string;
-  name: string;
-  phase: 'start' | 'done';
-  argsPreview?: string;
-  agentId?: string;
-}
+export type ChatToolEvent = ChatToolEventPayload;
+export type ChatThinkingEvent = ChatThinkingEventPayload;
 
 export interface LiveChatMessage {
   id: string;
@@ -48,6 +44,8 @@ interface UseWebSocketChatOptions {
   /** Called when the agent invokes a tool mid-stream. Optional — chats
    *  that don't render tool indicators can omit. */
   onToolEvent?: (evt: ChatToolEvent) => void;
+  /** Called when the runtime/provider emits visible reasoning trace events. */
+  onThinkingEvent?: (evt: ChatThinkingEvent) => void;
   /** Called when the server pushes a complete message that was not
    *  initiated by the current input request, e.g. cron/workflow output. */
   onMessage?: (message: LiveChatMessage) => void;
@@ -86,6 +84,7 @@ export function useWebSocketChat({
   onDone,
   onError,
   onToolEvent,
+  onThinkingEvent,
   onMessage,
   onStatusChange,
   onRateLimit,
@@ -106,6 +105,7 @@ export function useWebSocketChat({
   const onDoneRef = useRef(onDone);
   const onErrorRef = useRef(onError);
   const onToolEventRef = useRef(onToolEvent);
+  const onThinkingEventRef = useRef(onThinkingEvent);
   const onMessageRef = useRef(onMessage);
   const onStatusChangeRef = useRef(onStatusChange);
   const onRateLimitRef = useRef(onRateLimit);
@@ -113,6 +113,7 @@ export function useWebSocketChat({
   onDoneRef.current = onDone;
   onErrorRef.current = onError;
   onToolEventRef.current = onToolEvent;
+  onThinkingEventRef.current = onThinkingEvent;
   onMessageRef.current = onMessage;
   onStatusChangeRef.current = onStatusChange;
   onRateLimitRef.current = onRateLimit;
@@ -187,6 +188,17 @@ export function useWebSocketChat({
               name: msg.payload.name as string,
               phase: msg.payload.phase as 'start' | 'done',
               argsPreview: msg.payload.argsPreview as string | undefined,
+              resultPreview: msg.payload.resultPreview as string | undefined,
+              agentId: msg.payload.agentId as string | undefined,
+            });
+          }
+          break;
+        case 'chat_thinking_event':
+          if (onThinkingEventRef.current) {
+            onThinkingEventRef.current({
+              phase: msg.payload.phase as 'start' | 'delta' | 'done',
+              label: msg.payload.label as string | undefined,
+              content: msg.payload.content as string | undefined,
               agentId: msg.payload.agentId as string | undefined,
             });
           }
