@@ -1045,6 +1045,7 @@ export function MetaplexWalletPanel({
 
       <div className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
         <div className="space-y-3">
+
           <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-4">
             <div className="flex items-start gap-3">
               <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center overflow-hidden rounded-md border border-[var(--border-subtle)] bg-black/30">
@@ -1218,7 +1219,9 @@ export function MetaplexWalletPanel({
             </div>
           )}
 
-          <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-4">
+        </div>
+
+          <div className="min-w-0 rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-4 xl:order-3 xl:col-span-2 xl:aspect-video xl:min-h-[560px]">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="flex items-center gap-2 text-xs font-semibold text-[var(--text-primary)]">
@@ -1249,20 +1252,60 @@ export function MetaplexWalletPanel({
                 Register the Metaplex identity before launching an agent token.
               </div>
             ) : existingToken ? (
-              <div className="mt-4 space-y-2">
-                <div className="rounded-md border border-[var(--color-success-border)] bg-[var(--color-success-bg)] p-3">
-                  <div className="text-xs font-semibold text-[var(--color-success)]">Permanent token linked</div>
-                  <div className="mt-1 truncate font-mono text-[11px] text-[var(--text-primary)]">{existingToken.mintAddress}</div>
-                  {existingToken.launchedAt && (
-                    <div className="mt-1 text-[11px] text-[var(--text-muted)]">Launched {formatDate(existingToken.launchedAt)}</div>
-                  )}
+              <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+                <div className="rounded-md border border-[var(--color-success-border)] bg-[var(--color-success-bg)] p-4">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 size={18} className="mt-0.5 flex-shrink-0 text-[var(--color-success)]" />
+                    <div className="min-w-0">
+                      <div className="text-sm font-semibold text-[var(--text-primary)]">Permanent token linked</div>
+                      <p className="mt-1 text-xs leading-relaxed text-[var(--text-muted)]">
+                        This is the canonical Genesis token for this agent. Metaplex does not expose embedded market stats through the current agent-token API; use the Genesis launch page for live trading details.
+                      </p>
+                      <div className="mt-3 truncate font-mono text-[11px] text-[var(--text-primary)]">{existingToken.mintAddress}</div>
+                      {existingToken.launchedAt && (
+                        <div className="mt-1 text-[11px] text-[var(--text-muted)]">Launched {formatDate(existingToken.launchedAt)}</div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                {tokenLinks.map((link) => (
-                  <LinkRow key={link.href} label={link.label} href={link.href} onCopy={copy} />
-                ))}
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <StatusTile
+                    label="Status"
+                    value="Live"
+                    description="Token is linked to this Metaplex agent."
+                    tone="good"
+                    icon={CheckCircle2}
+                  />
+                  <StatusTile
+                    label="Mint"
+                    value={shortMetaplexValue(existingToken.mintAddress)}
+                    description="SPL token mint on Solana."
+                    tone="muted"
+                    icon={Coins}
+                  />
+                  <StatusTile
+                    label="Genesis"
+                    value={shortMetaplexValue(existingToken.genesisAccount)}
+                    description="Launch account tracked by Metaplex Genesis."
+                    tone="muted"
+                    icon={Rocket}
+                  />
+                  <StatusTile
+                    label="Market stats"
+                    value={existingToken.launchUrl ? 'Metaplex page' : 'Not exposed'}
+                    description="Open the Genesis launch page for live price and volume."
+                    tone="muted"
+                    icon={ExternalLink}
+                  />
+                </div>
+                <div className="grid gap-2 xl:col-span-2 lg:grid-cols-3">
+                  {tokenLinks.map((link) => (
+                    <LinkRow key={link.href} label={link.label} href={link.href} onCopy={copy} />
+                  ))}
+                </div>
               </div>
             ) : (
-              <div className="mt-4 space-y-3">
+              <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
                 <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_112px]">
                   <label className="min-w-0">
                     <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">Name</span>
@@ -1495,9 +1538,8 @@ export function MetaplexWalletPanel({
               </div>
             )}
           </div>
-        </div>
 
-        <div className="min-w-0 rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-4">
+        <div className="min-w-0 rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-4 xl:order-2">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <div className="text-xs font-semibold text-[var(--text-primary)]">Review public metadata</div>
