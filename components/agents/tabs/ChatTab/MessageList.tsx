@@ -1,24 +1,18 @@
 'use client';
 
-import { type RefObject } from 'react';
+import { Fragment, type RefObject, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Bot } from 'lucide-react';
+import {
+  Bot,
+  BriefcaseBusiness,
+  Sparkles,
+  TrendingUp,
+  WalletCards,
+} from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { DEFAULT_PROMPTS, useAgentContext } from '../../AgentContext';
 import ChatMessage from './ChatMessage';
-import { MESSAGES_WINDOW } from './constants';
 import type { ChatMsg } from './types';
-
-function toolGlyph(name: string): string {
-  if (name === '*') return '🔧';
-  if (name.startsWith('exec') || name === 'shell' || name === 'bash') return '⚡';
-  if (name.includes('web_search') || name === 'search') return '🔎';
-  if (name.includes('web_fetch') || name === 'fetch' || name === 'curl') return '🌐';
-  if (name.includes('write') || name.includes('mkdir') || name.includes('create')) return '✏️';
-  if (name.includes('read') || name.includes('cat') || name.includes('ls')) return '📂';
-  if (name.includes('memory')) return '🧠';
-  return '🔧';
-}
+import { CHAT_PROMPT_CATEGORIES, type ChatPromptCategoryId } from './chatPromptCategories';
 
 interface MessageListProps {
   messages: ChatMsg[];
@@ -37,6 +31,15 @@ interface MessageListProps {
   onSendMessage: (text: string) => void;
   messagesContainerRef: RefObject<HTMLDivElement | null>;
   bottomRef: RefObject<HTMLDivElement | null>;
+  showThinking: boolean;
+  showToolCalls: boolean;
+}
+
+function categoryIcon(id: ChatPromptCategoryId) {
+  if (id === 'jobs') return <BriefcaseBusiness size={13} />;
+  if (id === 'productivity') return <Sparkles size={13} />;
+  if (id === 'wallet') return <WalletCards size={13} />;
+  return <TrendingUp size={13} />;
 }
 
 export function MessageList({
@@ -56,12 +59,15 @@ export function MessageList({
   onSendMessage,
   messagesContainerRef,
   bottomRef,
+  showThinking,
+  showToolCalls,
 }: MessageListProps) {
   const t = useTranslations('dashboard.agentDetail.chat');
-  const { inflightTools, completedTools } = useAgentContext();
-  const showToolStrip = (inflightTools.length > 0 || completedTools.length > 0)
-    && messages.length > 0
-    && messages[messages.length - 1]?.streaming;
+  const [activeCategoryId, setActiveCategoryId] = useState<ChatPromptCategoryId>('jobs');
+  const activeCategory = useMemo(
+    () => CHAT_PROMPT_CATEGORIES.find((category) => category.id === activeCategoryId) ?? CHAT_PROMPT_CATEGORIES[0],
+    [activeCategoryId],
+  );
   return (
     <div
       ref={messagesContainerRef}
@@ -86,20 +92,57 @@ export function MessageList({
             {t('emptySubtitle')}
           </p>
 
-          {/* Suggested prompts */}
-          <div className="flex flex-wrap gap-2 justify-center mt-6">
-            {DEFAULT_PROMPTS.map((prompt, i) => (
-              <motion.button
-                key={prompt}
-                onClick={() => onSendMessage(prompt)}
-                className="text-xs px-4 py-2 rounded-full border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/5 transition-all cursor-pointer"
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 + i * 0.1 }}
-              >
-                {prompt}
-              </motion.button>
-            ))}
+          <div className="mx-auto mt-6 w-full max-w-[48rem]">
+            <div className="mb-3 flex flex-wrap justify-center gap-2">
+              {CHAT_PROMPT_CATEGORIES.map((category) => {
+                const selected = category.id === activeCategory.id;
+                return (
+                  <button
+                    key={category.id}
+                    type="button"
+                    onClick={() => setActiveCategoryId(category.id)}
+                    className={`inline-flex h-9 items-center gap-2 rounded-full border px-3 text-xs font-semibold transition-colors ${
+                      selected
+                        ? 'border-[var(--color-accent)]/45 bg-[var(--color-accent)]/10 text-[var(--text-primary)]'
+                        : 'border-[var(--border-default)] bg-[var(--bg-card)] text-[var(--text-muted)] hover:border-[var(--border-hover)] hover:text-[var(--text-secondary)]'
+                    }`}
+                    aria-pressed={selected}
+                  >
+                    {categoryIcon(category.id)}
+                    <span>{category.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <motion.div
+              key={activeCategory.id}
+              className="overflow-hidden rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)] text-left"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.18 }}
+            >
+              <div className="flex items-center gap-3 border-b border-[var(--border-default)] px-4 py-3">
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--color-accent)]/25 bg-[var(--color-accent)]/10 text-[var(--color-accent)]">
+                  {categoryIcon(activeCategory.id)}
+                </span>
+                <div>
+                  <div className="text-sm font-semibold text-[var(--text-primary)]">{activeCategory.label}</div>
+                  <div className="text-xs text-[var(--text-muted)]">{activeCategory.eyebrow}</div>
+                </div>
+              </div>
+              <div className="divide-y divide-[var(--border-default)]">
+                {activeCategory.prompts.map((prompt) => (
+                  <button
+                    key={prompt}
+                    type="button"
+                    onClick={() => onSendMessage(prompt)}
+                    className="block w-full px-4 py-3 text-left text-sm text-[var(--text-secondary)] transition-colors hover:bg-white/[0.03] hover:text-[var(--text-primary)]"
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
           </div>
         </motion.div>
       )}
@@ -115,43 +158,20 @@ export function MessageList({
         </div>
       )}
       {visibleMessages.map((msg) => (
-        <ChatMessage
-          key={msg.id}
-          msg={msg}
-          isSpeakingThis={isSpeaking && speakingMsgId === msg.id}
-          ttsSupported={ttsSupported}
-          onSpeak={onSpeak}
-          agentId={agentId}
-          isAuthenticated={isAuthenticated}
-          framework={framework}
-        />
+        <Fragment key={msg.id}>
+          <ChatMessage
+            msg={msg}
+            isSpeakingThis={isSpeaking && speakingMsgId === msg.id}
+            ttsSupported={ttsSupported}
+            onSpeak={onSpeak}
+            agentId={agentId}
+            isAuthenticated={isAuthenticated}
+            framework={framework}
+            showThinking={showThinking}
+            showToolCalls={showToolCalls}
+          />
+        </Fragment>
       ))}
-
-      {showToolStrip && (
-        <div className="ml-1 space-y-1 pl-2 border-l border-[var(--border-subtle)]">
-          {completedTools.map((t) => (
-            <div key={`done-${t.callId}`} className="flex items-center gap-2 text-[11px] text-[var(--text-muted)]">
-              <span>{toolGlyph(t.name)}</span>
-              <span className="font-mono">{t.name}</span>
-              <span className="text-[var(--text-muted)] opacity-60">· done</span>
-            </div>
-          ))}
-          {inflightTools.map((tool) => (
-            <div key={`live-${tool.callId}`} className="flex items-center gap-2 text-[11px] text-[var(--color-accent)]">
-              <span className="animate-pulse">{toolGlyph(tool.name)}</span>
-              <span className="font-mono">{tool.name}</span>
-              {tool.argsPreview && (
-                <span
-                  className="truncate font-mono text-[var(--text-muted)] max-w-[40ch]"
-                  title={tool.argsPreview}
-                >
-                  {tool.argsPreview.length > 60 ? tool.argsPreview.slice(0, 57) + '…' : tool.argsPreview}
-                </span>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
 
       <div ref={bottomRef} />
     </div>

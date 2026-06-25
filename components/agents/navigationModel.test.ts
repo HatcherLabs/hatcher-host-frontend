@@ -3,13 +3,23 @@ import {
   DEFAULT_AGENT_VIEW_MODE,
   EASY_AGENT_TABS,
   buildAgentNavigationTabs,
+  resolveAgentViewMode,
 } from './navigationModel';
 
 const labelFor = (id: string) => id;
 
 describe('agent navigation model', () => {
-  it('defaults the agent workspace to the simplified task-first mode', () => {
-    expect(DEFAULT_AGENT_VIEW_MODE).toBe('easy');
+  it('defaults the agent workspace to advanced mode', () => {
+    expect(DEFAULT_AGENT_VIEW_MODE).toBe('advanced');
+  });
+
+  it('keeps an explicitly saved easy mode', () => {
+    expect(resolveAgentViewMode('easy')).toBe('easy');
+  });
+
+  it('falls back to advanced for missing or invalid saved modes', () => {
+    expect(resolveAgentViewMode(null)).toBe('advanced');
+    expect(resolveAgentViewMode('legacy')).toBe('advanced');
   });
 
   it('keeps easy mode focused on primary operator tasks', () => {

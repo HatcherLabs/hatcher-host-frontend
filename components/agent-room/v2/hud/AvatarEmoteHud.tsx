@@ -7,6 +7,11 @@ import {
   type AvatarVariant,
   type RoomEmoteId,
 } from '../stations/AgentBody';
+import {
+  AVATAR_SELECT_CLASSNAME,
+  AVATAR_SELECT_OPTION_CLASSNAME,
+  AVATAR_SELECT_STYLE,
+} from './avatarSelectTheme';
 
 interface Props {
   selectedAvatarVariant: AvatarVariant | null;
@@ -37,8 +42,6 @@ const EMOTE_TONE: Record<RoomEmoteId, string> = {
   celebrate: 'border-[#ffd166]/55 bg-[#302411] text-[#fff2c9]',
   alert: 'border-[#ff6b8a]/55 bg-[#32131a] text-[#ffe1e8]',
 };
-
-const SELECT_OPTION_CLASS = 'bg-[#21160e] text-[#fff7e8]';
 
 function selectedVariantName(variant: AvatarVariant | null): string {
   return AVATAR_VARIANTS.find((item) => item.id === variant)?.name ?? 'Auto';
@@ -76,7 +79,7 @@ export function AvatarEmoteControls({
         >
           Avatar
         </span>
-        <span className="flex min-w-0 flex-1 items-center gap-2 rounded-md border border-[#5a3a20] bg-[#2b1d12] px-2">
+        <span className="flex min-w-0 flex-1 items-center gap-2 rounded-md border border-[var(--border-default)] bg-[var(--bg-elevated)] px-2">
           <span
             aria-hidden
             className="h-3 w-3 shrink-0 rounded-full shadow-[0_0_14px_currentColor]"
@@ -93,17 +96,17 @@ export function AvatarEmoteControls({
             onChange={(event) =>
               void onAvatarChange(event.target.value as AvatarVariant)
             }
-            className="h-9 min-w-0 flex-1 bg-transparent text-sm text-[#fff7e8] outline-none"
-            style={{ colorScheme: 'dark' }}
+            className={`${AVATAR_SELECT_CLASSNAME} h-9 min-w-0 flex-1 py-0 text-sm`}
+            style={AVATAR_SELECT_STYLE}
             aria-label="Avatar variant"
           >
-            <option value="" disabled className={SELECT_OPTION_CLASS}>
+            <option value="" disabled className={AVATAR_SELECT_OPTION_CLASSNAME}>
               Auto
             </option>
             {selectedIsLegacy && (
               <option
                 value={selectedVariant.id}
-                className={SELECT_OPTION_CLASS}
+                className={AVATAR_SELECT_OPTION_CLASSNAME}
               >
                 {selectedVariant.name} (legacy)
               </option>
@@ -112,7 +115,7 @@ export function AvatarEmoteControls({
               <option
                 key={variant.id}
                 value={variant.id}
-                className={SELECT_OPTION_CLASS}
+                className={AVATAR_SELECT_OPTION_CLASSNAME}
               >
                 {variant.name}
               </option>

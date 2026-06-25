@@ -77,4 +77,14 @@ describe('CSP', () => {
     expect(getDirective(csp, 'connect-src')).toContain('http://localhost:3101');
     expect(getDirective(csp, 'connect-src')).toContain('ws://localhost:3101');
   });
+
+  it('allows the default local API origin when running a production build locally', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('NEXT_PUBLIC_API_URL', '');
+
+    const csp = buildCsp('testnonce', false);
+
+    expect(getDirective(csp, 'connect-src')).toContain('http://localhost:3001');
+    expect(getDirective(csp, 'connect-src')).toContain('ws://localhost:3001');
+  });
 });

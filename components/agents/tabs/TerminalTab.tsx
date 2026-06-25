@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { useTheme } from 'next-themes';
 import { useAgentContext } from '../AgentContext';
 import { API_URL } from '@/lib/config';
 import { canRunNativeTerminalFork, nativeTerminalForkInput } from '@/components/agents/terminalNativeCommands';
+import { resolveTerminalTheme } from './terminalTheme';
 import {
   ChevronDown,
   ChevronUp,
@@ -206,6 +208,12 @@ function credentialEnv(mounts: TerminalCredentialMount[]): Array<{ key: string; 
 export function TerminalTab({ isVisible = true }: TerminalTabProps) {
   const tTerminal = useTranslations('dashboard.agentDetail.terminal');
   const { agent, stats } = useAgentContext();
+  const { resolvedTheme, theme } = useTheme();
+  const terminalTheme = useMemo(
+    () => resolveTerminalTheme(resolvedTheme ?? theme),
+    [resolvedTheme, theme],
+  );
+  const terminalThemeRef = useRef(terminalTheme);
   const termRef = useRef<HTMLDivElement>(null);
   const terminalFrameRef = useRef<HTMLDivElement>(null);
   const terminalInteractionRef = useRef<HTMLDivElement>(null);
@@ -454,29 +462,7 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
           cursorBlink: false,
           fontSize: 13,
           fontFamily: '"JetBrains Mono", "Fira Code", "Cascadia Code", Menlo, Monaco, monospace',
-	          theme: {
-	            background: '#0f1112',
-	            foreground: '#e6eeec',
-	            cursor: '#9ed5e7',
-	            cursorAccent: '#0f1112',
-	            selectionBackground: 'rgba(115, 164, 185, 0.24)',
-	            black: '#0f1112',
-	            red: '#ff5555',
-	            green: '#89d6c6',
-	            yellow: '#d5b46b',
-	            blue: '#73a4b9',
-	            magenta: '#aab7ff',
-	            cyan: '#9ed5e7',
-	            white: '#e6eeec',
-	            brightBlack: '#647173',
-	            brightRed: '#ff6e6e',
-	            brightGreen: '#a8e2d6',
-	            brightYellow: '#ffe0a0',
-	            brightBlue: '#9ed5e7',
-	            brightMagenta: '#c9d0ff',
-	            brightCyan: '#d7eff5',
-	            brightWhite: '#ffffff',
-	          },
+          theme: terminalThemeRef.current,
           allowTransparency: true,
           scrollback: 50000,
           scrollSensitivity: scrollLinesRef.current,
@@ -650,6 +636,13 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
   }, [isActive, connect, disconnect]);
 
   useEffect(() => {
+    terminalThemeRef.current = terminalTheme;
+    if (termInstance.current) {
+      termInstance.current.options.theme = terminalTheme;
+    }
+  }, [terminalTheme]);
+
+  useEffect(() => {
     if (!isVisible) return;
     const frame = requestAnimationFrame(() => {
       fitAddonRef.current?.fit();
@@ -755,18 +748,18 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
   if (!isActive) {
     const isStarting = agent?.status === 'starting';
     return (
-      <div className="flex h-[calc(100dvh-190px)] min-h-[520px] flex-col items-center justify-center gap-4 text-zinc-400 lg:min-h-[620px] 2xl:min-h-[720px]">
+      <div className="flex h-[calc(100dvh-190px)] min-h-[520px] flex-col items-center justify-center gap-4 text-[var(--text-muted)] lg:min-h-[620px] 2xl:min-h-[720px]">
         {isStarting ? (
           <>
             <div className="w-10 h-10 rounded-full border-2 border-[var(--color-accent)]/40 border-t-[var(--color-accent)] animate-spin" />
             <p className="text-lg font-medium text-[var(--text-primary)]">{tTerminal('agentNotActive')}</p>
-            <p className="text-sm text-zinc-500">The terminal will connect automatically when ready</p>
+            <p className="text-sm text-[var(--text-muted)]">The terminal will connect automatically when ready</p>
           </>
         ) : (
           <>
             <div className="text-5xl opacity-50">⬛</div>
             <p className="text-lg font-medium">{tTerminal('agentNotActive')}</p>
-            <p className="text-sm text-zinc-500">{tTerminal('startAgent')}</p>
+            <p className="text-sm text-[var(--text-muted)]">{tTerminal('startAgent')}</p>
           </>
         )}
       </div>
@@ -774,7 +767,7 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
   }
 
   return (
-    <div ref={terminalFrameRef} className="hatcher-terminal-frame flex h-[calc(100dvh-190px)] min-h-[520px] flex-col overflow-hidden border border-[var(--border-default)] bg-[#0a0a0a] lg:min-h-[620px] 2xl:h-[calc(100dvh-170px)] 2xl:min-h-[720px]">
+    <div ref={terminalFrameRef} className="hatcher-terminal-frame flex h-[calc(100dvh-190px)] min-h-[520px] flex-col overflow-hidden border border-[var(--border-default)] bg-[var(--bg-elevated)] lg:min-h-[620px] 2xl:h-[calc(100dvh-170px)] 2xl:min-h-[720px]">
       {/* Terminal header */}
       <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--border-default)] bg-[var(--bg-elevated)]">
         <div className="flex min-w-0 items-center gap-3">
@@ -792,7 +785,7 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
           <span className="min-w-0 truncate text-xs font-mono text-[var(--text-muted)]">
             {agent.name} ({agent.framework})
           </span>
-          <span className="hidden min-w-0 truncate rounded-md border border-[var(--border-default)] bg-[#0a0a0a] px-2 py-1 text-[10px] font-mono text-[var(--text-secondary)] md:inline">
+          <span className="hidden min-w-0 truncate rounded-md border border-[var(--border-default)] bg-[var(--bg-card)] px-2 py-1 text-[10px] font-mono text-[var(--text-secondary)] md:inline">
             {activeTerminalSession.name}
           </span>
           <span className="hidden xl:inline-flex items-center gap-1.5 rounded-md border border-[var(--color-success-border)] bg-[var(--color-success-bg)] px-2 py-0.5 text-[10px] font-mono text-[var(--color-success)]">
@@ -809,7 +802,7 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
             <select
               value={scrollLines}
               onChange={(event) => setScrollLines(Number(event.target.value))}
-              className="h-6 rounded-md border border-[var(--border-default)] bg-[#0a0a0a] px-1.5 text-[10px] text-[var(--text-secondary)] outline-none transition-colors hover:border-[var(--accent)] focus:border-[var(--accent)]"
+              className="h-6 rounded-md border border-[var(--border-default)] bg-[var(--bg-card)] px-1.5 text-[10px] text-[var(--text-secondary)] outline-none transition-colors hover:border-[var(--accent)] focus:border-[var(--accent)]"
               title="Mouse wheel scroll speed"
             >
               {TERMINAL_SCROLL_SPEEDS.map((value) => (
@@ -886,7 +879,7 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
           ) : (
             <div className="grid gap-2">
               {credentialMounts.map((mount) => (
-                <div key={mount.id} className="grid gap-2 rounded-md border border-[var(--border-default)] bg-[#0a0a0a] p-2 md:grid-cols-[auto,120px,1fr,1.4fr,auto] md:items-center">
+                <div key={mount.id} className="grid gap-2 rounded-md border border-[var(--border-default)] bg-[var(--bg-card)] p-2 md:grid-cols-[auto,120px,1fr,1.4fr,auto] md:items-center">
                   <label className="inline-flex items-center gap-2 text-xs text-[var(--text-secondary)]">
                     <input
                       type="checkbox"
@@ -901,7 +894,7 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
                       scope: event.target.value as CredentialScope,
                       agentId: event.target.value === 'agent' ? agent?.id : undefined,
                     })}
-                    className="h-8 rounded-md border border-[var(--border-default)] bg-[#0a0a0a] px-2 text-xs text-[var(--text-secondary)] outline-none"
+                    className="h-8 rounded-md border border-[var(--border-default)] bg-[var(--bg-elevated)] px-2 text-xs text-[var(--text-secondary)] outline-none"
                   >
                     <option value="account">account</option>
                     <option value="agent">agent</option>
@@ -910,14 +903,14 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
                     value={mount.key}
                     onChange={(event) => patchCredentialMount(mount.id, { key: event.target.value.toUpperCase() })}
                     placeholder="API_KEY"
-                    className="h-8 rounded-md border border-[var(--border-default)] bg-[#0a0a0a] px-2 text-xs font-mono text-[var(--text-secondary)] outline-none focus:border-[var(--accent)]"
+                    className="h-8 rounded-md border border-[var(--border-default)] bg-[var(--bg-elevated)] px-2 text-xs font-mono text-[var(--text-secondary)] outline-none focus:border-[var(--accent)]"
                   />
                   <input
                     value={mount.value}
                     onChange={(event) => patchCredentialMount(mount.id, { value: event.target.value })}
                     placeholder="Value"
                     type="password"
-                    className="h-8 rounded-md border border-[var(--border-default)] bg-[#0a0a0a] px-2 text-xs font-mono text-[var(--text-secondary)] outline-none focus:border-[var(--accent)]"
+                    className="h-8 rounded-md border border-[var(--border-default)] bg-[var(--bg-elevated)] px-2 text-xs font-mono text-[var(--text-secondary)] outline-none focus:border-[var(--accent)]"
                   />
                   <button
                     type="button"
@@ -938,7 +931,7 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
       )}
 
       <div className="flex min-h-0 flex-1 overflow-hidden">
-        <aside className="hidden w-56 flex-shrink-0 flex-col border-r border-[var(--border-default)] bg-[#070707] lg:flex">
+        <aside className="hidden w-56 flex-shrink-0 flex-col border-r border-[var(--border-default)] bg-[var(--bg-card)] lg:flex">
           <div className="flex items-center justify-between gap-2 border-b border-[var(--border-default)] px-3 py-2">
             <div>
               <p className="text-[10px] font-mono font-bold uppercase tracking-[0.14em] text-[var(--text-muted)]">
@@ -967,7 +960,7 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
                     className={`group rounded-md border transition-colors ${
                       isActiveSession
 	                        ? 'border-[var(--accent)] bg-[var(--color-accent-bg)]'
-                        : 'border-[var(--border-default)] bg-[#0a0a0a] hover:border-[var(--border-strong)]'
+                        : 'border-[var(--border-default)] bg-[var(--bg-elevated)] hover:border-[var(--border-strong)]'
                     }`}
                   >
                     <div className="flex min-w-0 items-center">
@@ -1024,7 +1017,7 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
         </aside>
 
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-          <div className="flex items-center gap-2 overflow-x-auto border-b border-[var(--border-default)] bg-[#070707] px-2 py-2 lg:hidden">
+          <div className="flex items-center gap-2 overflow-x-auto border-b border-[var(--border-default)] bg-[var(--bg-card)] px-2 py-2 lg:hidden">
             <button
               type="button"
               onClick={() => createTerminalSession(`Session ${terminalSessions.length + 1}`)}
@@ -1060,10 +1053,10 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
           </div>
 
           {/* Terminal container */}
-          <div ref={terminalInteractionRef} className="min-h-0 flex-1 overflow-hidden bg-[#0a0a0a] p-1">
+          <div ref={terminalInteractionRef} className="min-h-0 flex-1 overflow-hidden bg-[var(--bg-elevated)] p-1">
             <div className="flex h-full min-h-0 flex-col gap-1 sm:flex-row">
               <div ref={termRef} className="order-2 min-h-0 min-w-0 flex-1 overflow-hidden sm:order-1 [&_.xterm-viewport]:overflow-y-auto" />
-              <div className="order-1 flex flex-shrink-0 flex-row self-end overflow-hidden rounded-md border border-[var(--border-default)] bg-black/70 backdrop-blur-sm sm:order-2 sm:flex-col sm:self-start">
+              <div className="order-1 flex flex-shrink-0 flex-row self-end overflow-hidden rounded-md border border-[var(--border-default)] bg-[var(--bg-card)]/90 backdrop-blur-sm sm:order-2 sm:flex-col sm:self-start">
                 <button
                   type="button"
                   onClick={() => scrollTerminal('line-up')}
