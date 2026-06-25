@@ -31,6 +31,8 @@ const TOKEN_2022_PROGRAM_ID = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqC
 const ASSOCIATED_TOKEN_PROGRAM_ID = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
 const HATCHER_MINT = new PublicKey(HATCH_TOKEN_MINT);
 const HATCHER_REWARD_POOL_NONCE = 0;
+// Streamflow fetches a governor when this is undefined; Hatcher dynamic reward pools are permissionless.
+const HATCHER_DYNAMIC_REWARD_GOVERNOR = null as unknown as PublicKey;
 const STAKING_PREFLIGHT_ERROR_MESSAGE = 'Staking transaction failed preflight simulation. Refresh staking data and try again.';
 let resolvedHatcherTokenProgramId: PublicKey | null = null;
 
@@ -378,6 +380,7 @@ export async function unstakeHatcherWithStreamflow(params: {
       mint: HATCHER_MINT,
       tokenProgramId,
       rewardPoolType: 'dynamic',
+      governor: HATCHER_DYNAMIC_REWARD_GOVERNOR,
     }],
   }, { invoker });
 
@@ -396,27 +399,8 @@ export async function unstakeHatcherWithStreamflow(params: {
     return { txId };
   } catch (err) {
     if (!isStakingPreflightSimulationError(err)) throw err;
+    throw new Error('Unstake with rewards failed preflight. Refresh staking data and try again; the stake was not unstaked.');
   }
-
-  const { ixs: unstakeOnlyIxs } = await client.prepareUnstakeInstructions({
-    stakePool: params.stakePoolAddress,
-    stakePoolMint: HATCHER_MINT,
-    tokenProgramId,
-    nonce: params.depositNonce,
-  }, { invoker });
-
-  const prepared = await preparePreflightedWalletTransaction({
-    connection: client.connection,
-    payer: params.wallet.publicKey,
-    instructions: unstakeOnlyIxs,
-  });
-  const txId = await sendPreparedWalletTransaction({
-    wallet: params.wallet,
-    connection: client.connection,
-    prepared,
-    onTransactionSubmitted: params.onTransactionSubmitted,
-  });
-  return { txId };
 }
 
 async function fetchHatcherRewardStatusFromClient(params: {
@@ -467,6 +451,7 @@ async function fetchHatcherRewardStatusFromClient(params: {
     rewardPoolNonce: HATCHER_REWARD_POOL_NONCE,
     rewardMint: HATCHER_MINT,
     rewardPoolType: 'dynamic',
+    governor: HATCHER_DYNAMIC_REWARD_GOVERNOR,
   }, { invoker });
 
   const transaction = new Transaction();
@@ -537,6 +522,7 @@ export async function claimHatcherRewardsWithStreamflow(params: {
     rewardPoolNonce: HATCHER_REWARD_POOL_NONCE,
     rewardMint: HATCHER_MINT,
     rewardPoolType: 'dynamic',
+    governor: HATCHER_DYNAMIC_REWARD_GOVERNOR,
   }, { invoker });
 
   const prepared = await preparePreflightedWalletTransaction({
