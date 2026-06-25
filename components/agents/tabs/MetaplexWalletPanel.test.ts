@@ -20,6 +20,7 @@ import {
   METAPLEX_TOKEN_LAUNCH_MIN_LAMPORTS,
   isMetaplexIrysImageUrl,
   signAndSendMetaplexTransactions,
+  signMetaplexTransactions,
   shouldShowMetaplexMainnetConfirmation,
   validateMetaplexAvatarFile,
   validateMetaplexTokenImageFile,
@@ -326,6 +327,22 @@ describe('Metaplex wallet panel helpers', () => {
       blockhash: '11111111111111111111111111111111',
       lastValidBlockHeight: 123,
     }, 'confirmed');
+  });
+
+  it('signs a wallet-first Metaplex registration transaction without broadcasting it', async () => {
+    const wallet = {
+      publicKey: new PublicKey('11111111111111111111111111111111'),
+      signTransaction: vi.fn(async () => ({ serialize: () => new Uint8Array([7, 8, 9]) })),
+      sendTransaction: vi.fn(),
+    };
+
+    await expect(signMetaplexTransactions(
+      [makeEncodedMetaplexTransaction()],
+      wallet as never,
+    )).resolves.toEqual([Buffer.from([7, 8, 9]).toString('base64')]);
+
+    expect(wallet.signTransaction).toHaveBeenCalledTimes(1);
+    expect(wallet.sendTransaction).not.toHaveBeenCalled();
   });
 
   it('batch signs and broadcasts all Metaplex launch transactions before confirmation', async () => {

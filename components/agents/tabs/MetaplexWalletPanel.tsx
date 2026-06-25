@@ -441,6 +441,22 @@ function decodeMetaplexSerializedTransaction(value: string): Transaction | Versi
   }
 }
 
+function encodeMetaplexSerializedTransaction(transaction: Transaction | VersionedTransaction): string {
+  const bytes = transaction instanceof VersionedTransaction
+    ? transaction.serialize()
+    : transaction.serialize({
+        requireAllSignatures: false,
+        verifySignatures: false,
+      });
+  let binary = '';
+  const chunkSize = 0x8000;
+  for (let index = 0; index < bytes.length; index += chunkSize) {
+    const chunk = bytes.subarray(index, index + chunkSize);
+    binary += String.fromCharCode(...chunk);
+  }
+  return btoa(binary);
+}
+
 export function isMetaplexBlockhashExpiryError(error: unknown): boolean {
   const message = error instanceof Error ? `${error.name} ${error.message}` : String(error);
   return /block height exceeded|blockhash.*expired|signature .*expired|TransactionExpiredBlockheightExceededError/i.test(message);
@@ -546,6 +562,25 @@ export async function signAndSendMetaplexTransactions(
   }
 
   throw new Error('Connect a Solana wallet that can sign transactions.');
+}
+
+export async function signMetaplexTransactions(
+  transactions: string[],
+  wallet: WalletContextState,
+): Promise<string[]> {
+  if (!wallet.publicKey || !wallet.signTransaction) {
+    throw new Error('Connect a Solana wallet that can sign transactions.');
+  }
+
+  const decodedTransactions = transactions.map(decodeMetaplexSerializedTransaction);
+  const signedTransactions = wallet.signAllTransactions && decodedTransactions.length > 1
+    ? await wallet.signAllTransactions(decodedTransactions)
+    : await Promise.all(decodedTransactions.map((transaction) => wallet.signTransaction?.(transaction)));
+
+  return signedTransactions.map((signed) => {
+    if (!signed) throw new Error('Wallet did not return a signed Metaplex transaction.');
+    return encodeMetaplexSerializedTransaction(signed);
+  });
 }
 
 function StatusTile({
@@ -1028,12 +1063,24 @@ export function MetaplexWalletPanel({
         toast.error(message);
         return;
       }
-      const signatures = await signAndSendMetaplexTransactions(prepared.data.transactions, wallet, connection, prepared.data.blockhash);
-      const completed = await api.completeAgentMetaplexRegistration(agentId, {
-        wallet: connectedWallet,
-        assetAddress: prepared.data.assetAddress,
-        signature: signatures[0] ?? '',
-      });
+      const completionPayload = prepared.data.cosignerToken
+        ? {
+            wallet: connectedWallet,
+            assetAddress: prepared.data.assetAddress,
+            signedTransaction: (await signMetaplexTransactions(prepared.data.transactions, wallet))[0] ?? '',
+            cosignerToken: prepared.data.cosignerToken,
+          }
+        : {
+            wallet: connectedWallet,
+            assetAddress: prepared.data.assetAddress,
+            signature: (await signAndSendMetaplexTransactions(
+              prepared.data.transactions,
+              wallet,
+              connection,
+              prepared.data.blockhash,
+            ))[0] ?? '',
+          };
+      const completed = await api.completeAgentMetaplexRegistration(agentId, completionPayload);
       if (!completed.success) {
         const message = humanizeMetaplexError(completed.error || 'Metaplex registration failed.');
         setError(message);
