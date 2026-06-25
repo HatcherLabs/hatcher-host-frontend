@@ -686,6 +686,7 @@ export interface MetaplexConfigStatus {
   metaplexAsset: string | null;
   registryAddress: string;
   registeredAt: string | null;
+  agentToken: MetaplexExistingAgentToken | null;
   registrationDocument: MetaplexRegistrationDocument;
 }
 
@@ -709,6 +710,81 @@ export interface MetaplexMintAgentPlan {
     umiBundleDefaults: string;
   };
   notes: string[];
+}
+
+export interface MetaplexExistingAgentToken {
+  mintAddress: string;
+  genesisAccount: string | null;
+  launchId: string | null;
+  launchUrl: string | null;
+  launchedAt: string | null;
+}
+
+export interface MetaplexTokenLaunchInput {
+  name: string;
+  symbol: string;
+  image: string | null;
+  description?: string;
+  externalLinks?: {
+    website?: string;
+    twitter?: string;
+    telegram?: string;
+  };
+  firstBuyAmount?: number;
+  launchType?: "bondingCurve";
+  confirmPermanentToken?: boolean;
+}
+
+export interface MetaplexTokenLaunchPlan {
+  kind: "metaplex.genesis-agent-token.v1";
+  sdkFunction: "createAndRegisterLaunch";
+  ready: boolean;
+  status: "disabled" | "asset_missing" | "not_ready" | "ready" | "launched";
+  missing: string[];
+  oneTokenPerAgent: true;
+  existingToken: {
+    mintAddress: string;
+    genesisAccount: string;
+    launchId: string;
+    launchUrl: string;
+    launchedAt: string | null;
+  } | null;
+  request: {
+    wallet: string | null;
+    network: "solana-mainnet" | "solana-devnet";
+    agent: {
+      mint: string | null;
+      setToken: true;
+    };
+    launchType: "bondingCurve";
+    token: {
+      name: string;
+      symbol: string;
+      image: string | null;
+      description?: string;
+      externalLinks?: {
+        website?: string;
+        twitter?: string;
+        telegram?: string;
+      };
+    };
+    launch: {
+      firstBuyAmount?: number;
+    };
+  };
+  notes: string[];
+}
+
+export interface MetaplexTokenLaunchResponse {
+  mintAddress: string;
+  genesisAccount: string;
+  launchId: string;
+  launchUrl: string;
+  tokenId: string;
+  tokenMintAddress: string;
+  txHashes: string[];
+  launchedAt: string;
+  status: "cached" | "launched";
 }
 
 export interface MetaplexRegistrationResponse {

@@ -76,6 +76,9 @@ import type {
   MetaplexConfigStatus,
   MetaplexMintAgentPlan,
   MetaplexRegistrationResponse,
+  MetaplexTokenLaunchInput,
+  MetaplexTokenLaunchPlan,
+  MetaplexTokenLaunchResponse,
   MirariConfigStatus,
   MirariDreamResult,
   MirariDreamBody,
@@ -665,6 +668,18 @@ export const api = {
   registerAgentMetaplex: (id: string) =>
     req<MetaplexRegistrationResponse>(`/agents/${id}/metaplex/register`, {
       method: "POST",
+    }),
+
+  prepareAgentMetaplexTokenLaunch: (id: string, body: MetaplexTokenLaunchInput) =>
+    req<MetaplexTokenLaunchPlan>(`/agents/${id}/metaplex/token/prepare`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  launchAgentMetaplexToken: (id: string, body: MetaplexTokenLaunchInput) =>
+    req<MetaplexTokenLaunchResponse>(`/agents/${id}/metaplex/token/launch`, {
+      method: "POST",
+      body: JSON.stringify(body),
     }),
 
   /** Mirari live mirror signals and dashboard grant. */

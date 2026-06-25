@@ -5,6 +5,7 @@ import { type ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } f
 import {
   AlertTriangle,
   CheckCircle2,
+  Coins,
   Copy,
   ExternalLink,
   Fingerprint,
@@ -12,6 +13,7 @@ import {
   ListChecks,
   Loader2,
   RefreshCw,
+  Rocket,
   RotateCcw,
   Share2,
   ShieldCheck,
@@ -22,8 +24,12 @@ import { api } from '@/lib/api';
 import type {
   MetaplexConfigStatus,
   MetaplexConfigStatusValue,
+  MetaplexExistingAgentToken,
   MetaplexMintAgentPlan,
   MetaplexRegistrationResponse,
+  MetaplexTokenLaunchInput,
+  MetaplexTokenLaunchPlan,
+  MetaplexTokenLaunchResponse,
 } from '@/lib/api';
 import { GlassCard, Skeleton } from '@/components/agents/AgentContext';
 import { useToast } from '@/components/ui/ToastProvider';
@@ -146,6 +152,144 @@ export function buildMetaplexRegistrationButtonState(
   return { disabled: false, label: 'Register on Metaplex', reason: null };
 }
 
+type MetaplexTokenFormState = {
+  name: string;
+  symbol: string;
+  image: string;
+  description: string;
+  externalLinks: {
+    website: string;
+    twitter: string;
+    telegram: string;
+  };
+  firstBuyAmount: string;
+  confirmPermanentToken: boolean;
+};
+
+export function deriveMetaplexTokenSymbol(name: string): string {
+  const compact = name.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  return (compact || 'AGENT').slice(0, 10);
+}
+
+export function buildMetaplexTokenLaunchDefaults(config: MetaplexConfigStatus): MetaplexTokenFormState {
+  const agentName = config.registrationDocument.name.trim() || 'Agent';
+  return {
+    name: `${agentName.slice(0, 26)} Token`.slice(0, 32),
+    symbol: deriveMetaplexTokenSymbol(agentName),
+    image: '',
+    description: (config.registrationDocument.description || '').slice(0, 250),
+    externalLinks: {
+      website: config.registrationDocument.hatcher.profile,
+      twitter: '',
+      telegram: '',
+    },
+    firstBuyAmount: '',
+    confirmPermanentToken: false,
+  };
+}
+
+export function isMetaplexIrysImageUrl(value: string): boolean {
+  return value.trim().startsWith('https://gateway.irys.xyz/');
+}
+
+function metaplexTokenMissingLabel(value: string): string {
+  if (value === 'METAPLEX_GENESIS_ENABLED') return 'Genesis launch is not enabled';
+  if (value === 'METAPLEX_PAYER_PRIVATE_KEY') return 'Hatcher payer is not configured';
+  if (value === 'METAPLEX_AGENT_ASSET') return 'Metaplex agent identity is missing';
+  if (value === 'TOKEN_IMAGE') return 'Token image is missing';
+  if (value === 'IRYS_TOKEN_IMAGE') return 'Token image must be an Irys URL';
+  if (value === 'CONFIRM_PERMANENT_AGENT_TOKEN') return 'Permanent token confirmation is missing';
+  if (value === 'AGENT_TOKEN_ALREADY_SET') return 'Agent token is already set';
+  return value;
+}
+
+export function buildMetaplexTokenLaunchButtonState(
+  config: MetaplexConfigStatus | null,
+  plan: MetaplexTokenLaunchPlan | null,
+  state: {
+    image: string;
+    confirmed: boolean;
+    launching: boolean;
+  },
+): { disabled: boolean; label: string; reason: string | null } {
+  if (state.launching) return { disabled: true, label: 'Launching token', reason: null };
+  if (!config) return { disabled: true, label: 'Checking Metaplex', reason: 'Load Metaplex status first.' };
+  if (!config.metaplexAsset) {
+    return {
+      disabled: true,
+      label: 'Register identity first',
+      reason: 'Launch the Metaplex agent identity before creating its token.',
+    };
+  }
+  if (plan?.status === 'launched' || plan?.existingToken || config.agentToken) {
+    return {
+      disabled: true,
+      label: 'Token launched',
+      reason: 'This agent already has its permanent Metaplex token.',
+    };
+  }
+  if (!isMetaplexIrysImageUrl(state.image)) {
+    return {
+      disabled: true,
+      label: 'Add Irys image URL',
+      reason: 'Genesis token images must use https://gateway.irys.xyz/...',
+    };
+  }
+  if (!plan) {
+    return {
+      disabled: true,
+      label: 'Check token launch',
+      reason: 'Review launch readiness before submitting.',
+    };
+  }
+  if (!plan.ready) {
+    return {
+      disabled: true,
+      label: 'Token launch unavailable',
+      reason: plan.missing.length ? `Missing: ${plan.missing.map(metaplexTokenMissingLabel).join(', ')}` : 'Metaplex Genesis is not ready.',
+    };
+  }
+  if (!state.confirmed) {
+    return {
+      disabled: true,
+      label: 'Review and confirm token',
+      reason: 'Confirm the permanent one-token-per-agent launch before submitting.',
+    };
+  }
+  return { disabled: false, label: 'Launch agent token', reason: null };
+}
+
+export function getMetaplexTokenLinks(
+  token: MetaplexExistingAgentToken | MetaplexTokenLaunchPlan['existingToken'] | null | undefined,
+): Array<{ label: string; href: string }> {
+  if (!token) return [];
+  const links: Array<{ label: string; href: string }> = [];
+  if (token.launchUrl) links.push({ label: 'Genesis launch', href: token.launchUrl });
+  if (token.mintAddress) links.push({ label: 'Token mint on Solscan', href: `https://solscan.io/token/${token.mintAddress}` });
+  if (token.genesisAccount) links.push({ label: 'Genesis account on Solscan', href: `https://solscan.io/account/${token.genesisAccount}` });
+  return links;
+}
+
+function buildMetaplexTokenLaunchPayload(form: MetaplexTokenFormState): MetaplexTokenLaunchInput {
+  const firstBuyAmount = Number(form.firstBuyAmount);
+  const externalLinks = {
+    website: form.externalLinks.website.trim(),
+    twitter: form.externalLinks.twitter.trim(),
+    telegram: form.externalLinks.telegram.trim(),
+  };
+  const filteredLinks = Object.fromEntries(Object.entries(externalLinks).filter(([, value]) => value.length > 0));
+  return {
+    name: form.name.trim(),
+    symbol: form.symbol.trim().toUpperCase(),
+    image: form.image.trim() || null,
+    description: form.description.trim() || undefined,
+    externalLinks: Object.keys(filteredLinks).length > 0 ? filteredLinks : undefined,
+    firstBuyAmount: Number.isFinite(firstBuyAmount) && firstBuyAmount > 0 ? firstBuyAmount : undefined,
+    launchType: 'bondingCurve',
+    confirmPermanentToken: form.confirmPermanentToken,
+  };
+}
+
 function metaplexTxUrl(txHash: string): string {
   return `https://solscan.io/tx/${txHash}`;
 }
@@ -264,9 +408,14 @@ export function MetaplexWalletPanel({
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
   const [config, setConfig] = useState<MetaplexConfigStatus | null>(null);
   const [mintPlan, setMintPlan] = useState<MetaplexMintAgentPlan | null>(null);
+  const [tokenPlan, setTokenPlan] = useState<MetaplexTokenLaunchPlan | null>(null);
+  const [tokenResult, setTokenResult] = useState<MetaplexTokenLaunchResponse | null>(null);
+  const [tokenForm, setTokenForm] = useState<MetaplexTokenFormState | null>(null);
   const [result, setResult] = useState<MetaplexRegistrationResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [registering, setRegistering] = useState(false);
+  const [checkingToken, setCheckingToken] = useState(false);
+  const [launchingToken, setLaunchingToken] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [mainnetConfirmed, setMainnetConfirmed] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -279,8 +428,41 @@ export function MetaplexWalletPanel({
       api.getAgentMetaplexMintPlan(agentId),
     ]);
 
-    if (configRes.success) setConfig(configRes.data);
-    else setError(humanizeMetaplexError(configRes.error || 'Could not load Metaplex status.'));
+    if (configRes.success) {
+      setConfig(configRes.data);
+      setTokenForm((current) => current ?? buildMetaplexTokenLaunchDefaults(configRes.data));
+      const agentToken = configRes.data.agentToken;
+      if (agentToken) {
+        setTokenPlan((current) => current ?? {
+          kind: 'metaplex.genesis-agent-token.v1',
+          sdkFunction: 'createAndRegisterLaunch',
+          ready: false,
+          status: 'launched',
+          missing: ['AGENT_TOKEN_ALREADY_SET'],
+          oneTokenPerAgent: true,
+          existingToken: {
+            mintAddress: agentToken.mintAddress,
+            genesisAccount: agentToken.genesisAccount ?? '',
+            launchId: agentToken.launchId ?? '',
+            launchUrl: agentToken.launchUrl ?? '',
+            launchedAt: agentToken.launchedAt,
+          },
+          request: {
+            wallet: null,
+            network: 'solana-mainnet',
+            agent: { mint: configRes.data.metaplexAsset, setToken: true },
+            launchType: 'bondingCurve',
+            token: {
+              name: configRes.data.registrationDocument.name,
+              symbol: deriveMetaplexTokenSymbol(configRes.data.registrationDocument.name),
+              image: null,
+            },
+            launch: {},
+          },
+          notes: [],
+        });
+      }
+    } else setError(humanizeMetaplexError(configRes.error || 'Could not load Metaplex status.'));
 
     if (planRes.success) setMintPlan(planRes.data);
     setLoading(false);
@@ -294,11 +476,32 @@ export function MetaplexWalletPanel({
     () => buildMetaplexRegistrationButtonState(config, mainnetConfirmed),
     [config, mainnetConfirmed],
   );
+  const tokenButton = useMemo(
+    () => buildMetaplexTokenLaunchButtonState(config, tokenPlan, {
+      image: tokenForm?.image ?? '',
+      confirmed: tokenForm?.confirmPermanentToken ?? false,
+      launching: launchingToken,
+    }),
+    [config, tokenForm?.confirmPermanentToken, tokenForm?.image, tokenPlan, launchingToken],
+  );
   const publicLinks = useMemo(() => (config ? getMetaplexPublicLinks(config) : []), [config]);
   const avatarPreview = useMemo(() => (config ? getMetaplexAvatarPreview(config) : null), [config]);
   const displayWallet = config?.solanaWalletAddress ?? solanaWallet ?? null;
   const registeredAsset = result?.agentId ?? config?.metaplexAsset ?? null;
   const registeredAt = result?.registeredAt ?? config?.registeredAt ?? null;
+  const existingToken = useMemo(
+    () => (tokenResult
+      ? {
+          mintAddress: tokenResult.mintAddress,
+          genesisAccount: tokenResult.genesisAccount,
+          launchId: tokenResult.launchId,
+          launchUrl: tokenResult.launchUrl,
+          launchedAt: tokenResult.launchedAt,
+        }
+      : tokenPlan?.existingToken ?? config?.agentToken ?? null),
+    [config?.agentToken, tokenPlan?.existingToken, tokenResult],
+  );
+  const tokenLinks = useMemo(() => getMetaplexTokenLinks(existingToken), [existingToken]);
   const registeredLinks = useMemo(
     () => (registeredAsset ? getMetaplexRegisteredLinks(registeredAsset, result?.txHash) : []),
     [registeredAsset, result?.txHash],
@@ -336,6 +539,95 @@ export function MetaplexWalletPanel({
       toast.error(message);
     } finally {
       setAvatarUploading(false);
+    }
+  };
+
+  const updateTokenForm = <K extends keyof MetaplexTokenFormState>(key: K, value: MetaplexTokenFormState[K]) => {
+    setTokenPlan((current) => (current?.status === 'launched' ? current : null));
+    setTokenForm((current) => {
+      const base = current ?? (config ? buildMetaplexTokenLaunchDefaults(config) : {
+        name: '',
+        symbol: '',
+        image: '',
+        description: '',
+        externalLinks: { website: '', twitter: '', telegram: '' },
+        firstBuyAmount: '',
+        confirmPermanentToken: false,
+      });
+      return {
+        ...base,
+        [key]: value,
+      };
+    });
+  };
+
+  const updateTokenLink = (key: keyof MetaplexTokenFormState['externalLinks'], value: string) => {
+    setTokenPlan((current) => (current?.status === 'launched' ? current : null));
+    setTokenForm((current) => {
+      const base = current ?? (config ? buildMetaplexTokenLaunchDefaults(config) : {
+        name: '',
+        symbol: '',
+        image: '',
+        description: '',
+        externalLinks: { website: '', twitter: '', telegram: '' },
+        firstBuyAmount: '',
+        confirmPermanentToken: false,
+      });
+      return {
+        ...base,
+        externalLinks: {
+          ...base.externalLinks,
+          [key]: value,
+        },
+      };
+    });
+  };
+
+  const checkTokenLaunch = async () => {
+    if (!tokenForm) return;
+    setCheckingToken(true);
+    setError(null);
+    try {
+      const res = await api.prepareAgentMetaplexTokenLaunch(agentId, buildMetaplexTokenLaunchPayload(tokenForm));
+      if (!res.success) {
+        const message = res.error || 'Could not check token launch readiness.';
+        setError(message);
+        toast.error(message);
+        return;
+      }
+      setTokenPlan(res.data);
+      if (res.data.ready) toast.success('Agent token launch is ready');
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Could not check token launch readiness.';
+      setError(message);
+      toast.error(message);
+    } finally {
+      setCheckingToken(false);
+    }
+  };
+
+  const launchToken = async () => {
+    if (!tokenForm || tokenButton.disabled) return;
+    setLaunchingToken(true);
+    setError(null);
+    try {
+      const res = await api.launchAgentMetaplexToken(agentId, buildMetaplexTokenLaunchPayload(tokenForm));
+      if (!res.success) {
+        const message = res.error || 'Metaplex token launch failed.';
+        setError(message);
+        toast.error(message);
+        return;
+      }
+      setTokenResult(res.data);
+      setTokenForm((current) => current ? { ...current, confirmPermanentToken: false } : current);
+      toast.success('Agent token launched');
+      await load();
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Metaplex token launch failed.';
+      setError(message);
+      toast.error(message);
+    } finally {
+      setLaunchingToken(false);
     }
   };
 
@@ -664,6 +956,171 @@ export function MetaplexWalletPanel({
               </div>
             </div>
           )}
+
+          <div className="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-4">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 text-xs font-semibold text-[var(--text-primary)]">
+                  <Coins size={14} /> Agent token
+                </div>
+                <p className="mt-1 text-xs leading-relaxed text-[var(--text-muted)]">
+                  {existingToken
+                    ? 'This agent has its permanent Genesis token linked on Metaplex.'
+                    : 'Launch the one canonical Genesis token for this Metaplex agent identity.'}
+                </p>
+              </div>
+              {tokenPlan?.status && (
+                <span className={`rounded-md border px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${
+                  tokenPlan.status === 'ready'
+                    ? 'border-[var(--color-success-border)] text-[var(--color-success)]'
+                    : tokenPlan.status === 'launched'
+                      ? 'border-[var(--color-success-border)] text-[var(--color-success)]'
+                      : 'border-[var(--color-warning-border)] text-[var(--color-warning)]'
+                }`}
+                >
+                  {tokenPlan.status.replace('_', ' ')}
+                </span>
+              )}
+            </div>
+
+            {!registeredAsset ? (
+              <div className="mt-4 rounded-md border border-[var(--border-subtle)] bg-black/10 p-3 text-xs text-[var(--text-muted)]">
+                Register the Metaplex identity before launching an agent token.
+              </div>
+            ) : existingToken ? (
+              <div className="mt-4 space-y-2">
+                <div className="rounded-md border border-[var(--color-success-border)] bg-[var(--color-success-bg)] p-3">
+                  <div className="text-xs font-semibold text-[var(--color-success)]">Permanent token linked</div>
+                  <div className="mt-1 truncate font-mono text-[11px] text-[var(--text-primary)]">{existingToken.mintAddress}</div>
+                  {existingToken.launchedAt && (
+                    <div className="mt-1 text-[11px] text-[var(--text-muted)]">Launched {formatDate(existingToken.launchedAt)}</div>
+                  )}
+                </div>
+                {tokenLinks.map((link) => (
+                  <LinkRow key={link.href} label={link.label} href={link.href} onCopy={copy} />
+                ))}
+              </div>
+            ) : (
+              <div className="mt-4 space-y-3">
+                <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_112px]">
+                  <label className="min-w-0">
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">Name</span>
+                    <input
+                      value={tokenForm?.name ?? ''}
+                      maxLength={32}
+                      onChange={(event) => updateTokenForm('name', event.target.value)}
+                      className="mt-1 w-full rounded-md border border-[var(--border-subtle)] bg-black/20 px-3 py-2 text-sm text-[var(--text-primary)] outline-none transition focus:border-[var(--accent)]"
+                      placeholder="Hatch Token"
+                    />
+                  </label>
+                  <label className="min-w-0">
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">Symbol</span>
+                    <input
+                      value={tokenForm?.symbol ?? ''}
+                      maxLength={10}
+                      onChange={(event) => updateTokenForm('symbol', event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
+                      className="mt-1 w-full rounded-md border border-[var(--border-subtle)] bg-black/20 px-3 py-2 text-sm text-[var(--text-primary)] outline-none transition focus:border-[var(--accent)]"
+                      placeholder="HATCH"
+                    />
+                  </label>
+                </div>
+
+                <label className="block min-w-0">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">Irys image URL</span>
+                  <input
+                    value={tokenForm?.image ?? ''}
+                    onChange={(event) => updateTokenForm('image', event.target.value)}
+                    className="mt-1 w-full rounded-md border border-[var(--border-subtle)] bg-black/20 px-3 py-2 text-sm text-[var(--text-primary)] outline-none transition focus:border-[var(--accent)]"
+                    placeholder="https://gateway.irys.xyz/..."
+                  />
+                  {tokenForm?.image && !isMetaplexIrysImageUrl(tokenForm.image) && (
+                    <div className="mt-1 text-[11px] text-[var(--color-warning)]">Genesis requires a gateway.irys.xyz image URL.</div>
+                  )}
+                </label>
+
+                <label className="block min-w-0">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">Description</span>
+                  <textarea
+                    value={tokenForm?.description ?? ''}
+                    maxLength={250}
+                    rows={3}
+                    onChange={(event) => updateTokenForm('description', event.target.value)}
+                    className="mt-1 w-full resize-none rounded-md border border-[var(--border-subtle)] bg-black/20 px-3 py-2 text-sm text-[var(--text-primary)] outline-none transition focus:border-[var(--accent)]"
+                  />
+                </label>
+
+                <div className="grid gap-3 md:grid-cols-3">
+                  <label className="min-w-0">
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">Website</span>
+                    <input
+                      value={tokenForm?.externalLinks.website ?? ''}
+                      onChange={(event) => updateTokenLink('website', event.target.value)}
+                      className="mt-1 w-full rounded-md border border-[var(--border-subtle)] bg-black/20 px-3 py-2 text-sm text-[var(--text-primary)] outline-none transition focus:border-[var(--accent)]"
+                    />
+                  </label>
+                  <label className="min-w-0">
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">X</span>
+                    <input
+                      value={tokenForm?.externalLinks.twitter ?? ''}
+                      onChange={(event) => updateTokenLink('twitter', event.target.value)}
+                      className="mt-1 w-full rounded-md border border-[var(--border-subtle)] bg-black/20 px-3 py-2 text-sm text-[var(--text-primary)] outline-none transition focus:border-[var(--accent)]"
+                      placeholder="@hatcherlabs"
+                    />
+                  </label>
+                  <label className="min-w-0">
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">First buy SOL</span>
+                    <input
+                      value={tokenForm?.firstBuyAmount ?? ''}
+                      inputMode="decimal"
+                      onChange={(event) => updateTokenForm('firstBuyAmount', event.target.value.replace(/[^0-9.]/g, ''))}
+                      className="mt-1 w-full rounded-md border border-[var(--border-subtle)] bg-black/20 px-3 py-2 text-sm text-[var(--text-primary)] outline-none transition focus:border-[var(--accent)]"
+                      placeholder="0.1"
+                    />
+                  </label>
+                </div>
+
+                <label className="flex items-start gap-3 rounded-md border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] p-3">
+                  <input
+                    type="checkbox"
+                    checked={tokenForm?.confirmPermanentToken ?? false}
+                    onChange={(event) => updateTokenForm('confirmPermanentToken', event.target.checked)}
+                    className="mt-1 h-4 w-4 accent-[var(--color-warning)]"
+                  />
+                  <span className="text-xs leading-relaxed text-[var(--text-muted)]">
+                    <span className="block font-semibold text-[var(--text-primary)]">I understand this permanently links one token to this agent.</span>
+                    Metaplex only allows one canonical agent token once `setToken` is submitted.
+                  </span>
+                </label>
+
+                {tokenButton.reason && (
+                  <div className="rounded-md border border-[var(--border-subtle)] bg-black/10 p-3 text-xs text-[var(--text-muted)]">
+                    {tokenButton.reason}
+                  </div>
+                )}
+
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => void checkTokenLaunch()}
+                    disabled={checkingToken || !registeredAsset}
+                    className="inline-flex items-center justify-center gap-2 rounded-md border border-[var(--border-subtle)] px-3 py-2 text-xs font-semibold text-[var(--text-secondary)] transition hover:border-[var(--border-hover)] hover:text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {checkingToken ? <Loader2 size={13} className="animate-spin" /> : <ListChecks size={13} />}
+                    {checkingToken ? 'Checking' : 'Check readiness'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void launchToken()}
+                    disabled={tokenButton.disabled}
+                    className="inline-flex flex-1 items-center justify-center gap-2 rounded-md border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-4 py-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-warning)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
+                  >
+                    {launchingToken ? <Loader2 size={14} className="animate-spin" /> : <Rocket size={14} />}
+                    {tokenButton.label}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="min-w-0 rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] p-4">
