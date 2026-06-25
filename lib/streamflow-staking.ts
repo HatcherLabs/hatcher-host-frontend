@@ -34,6 +34,9 @@ const HATCHER_REWARD_POOL_NONCE = 0;
 // Streamflow fetches a governor when this is undefined; Hatcher dynamic reward pools are permissionless.
 const HATCHER_DYNAMIC_REWARD_GOVERNOR = null as unknown as PublicKey;
 const STAKING_PREFLIGHT_ERROR_MESSAGE = 'Staking transaction failed preflight simulation. Refresh staking data and try again.';
+const STAKING_BROADCAST_ERROR_MESSAGE = 'Staking transaction failed after broadcast. Refresh staking data and try again.';
+const POST_SUBMIT_CONFIRMATION_TIMEOUT_MS = 4_000;
+const POST_SUBMIT_STATUS_TIMEOUT_MS = 2_500;
 let resolvedHatcherTokenProgramId: PublicKey | null = null;
 
 export type StakeHatcherResult = {
@@ -163,16 +166,73 @@ async function signAndBroadcastPreparedTransaction(params: {
   });
   params.onTransactionSubmitted?.(txId);
 
-  const confirmation = await params.connection.confirmTransaction({
+  await confirmSubmittedTransaction({
+    connection: params.connection,
     signature: txId,
     blockhash: params.prepared.blockhash,
     lastValidBlockHeight: params.prepared.lastValidBlockHeight,
-  }, 'confirmed');
-  if (confirmation.value.err) {
-    throw new Error('Staking transaction failed after broadcast. Refresh staking data and try again.');
-  }
+  });
 
   return txId;
+}
+
+async function confirmSubmittedTransaction(params: {
+  connection: Connection;
+  signature: string;
+  blockhash: string;
+  lastValidBlockHeight: number;
+}): Promise<void> {
+  const confirmation = await settleWithin(params.connection.confirmTransaction({
+    signature: params.signature,
+    blockhash: params.blockhash,
+    lastValidBlockHeight: params.lastValidBlockHeight,
+  }, 'confirmed'), POST_SUBMIT_CONFIRMATION_TIMEOUT_MS);
+
+  if (confirmation.status === 'fulfilled') {
+    if (confirmation.value.value.err) {
+      throw new Error(STAKING_BROADCAST_ERROR_MESSAGE);
+    }
+    return;
+  }
+
+  const statusResult = await settleWithin(
+    params.connection.getSignatureStatuses([params.signature]),
+    POST_SUBMIT_STATUS_TIMEOUT_MS,
+  );
+  if (statusResult.status !== 'fulfilled') return;
+
+  const signatureStatus = statusResult.value.value[0];
+  if (signatureStatus?.err) {
+    throw new Error(STAKING_BROADCAST_ERROR_MESSAGE);
+  }
+}
+
+function settleWithin<T>(
+  promise: Promise<T>,
+  timeoutMs: number,
+): Promise<
+  | { status: 'fulfilled'; value: T }
+  | { status: 'rejected'; reason: unknown }
+  | { status: 'timeout' }
+> {
+  return new Promise((resolve) => {
+    let settled = false;
+    let timeout: ReturnType<typeof setTimeout>;
+    const finish = (result:
+      | { status: 'fulfilled'; value: T }
+      | { status: 'rejected'; reason: unknown }
+      | { status: 'timeout' }) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      resolve(result);
+    };
+    timeout = setTimeout(() => finish({ status: 'timeout' }), timeoutMs);
+    promise.then(
+      (value) => finish({ status: 'fulfilled', value }),
+      (reason) => finish({ status: 'rejected', reason }),
+    );
+  });
 }
 
 async function sendPreparedWalletTransaction(params: {
@@ -189,14 +249,12 @@ async function sendPreparedWalletTransaction(params: {
     });
     params.onTransactionSubmitted?.(txId);
 
-    const confirmation = await params.connection.confirmTransaction({
+    await confirmSubmittedTransaction({
+      connection: params.connection,
       signature: txId,
       blockhash: params.prepared.blockhash,
       lastValidBlockHeight: params.prepared.lastValidBlockHeight,
-    }, 'confirmed');
-    if (confirmation.value.err) {
-      throw new Error('Staking transaction failed after broadcast. Refresh staking data and try again.');
-    }
+    });
 
     return txId;
   }
