@@ -67,3 +67,40 @@ export function formatRewardFundingSources(sources: readonly string[]): string {
   if (sources.length === 2) return `${sources[0]} and ${sources[1]}`;
   return `${sources.slice(0, -1).join(', ')}, and ${sources[sources.length - 1]}`;
 }
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
+}
+
+export async function refreshStakingDataAfterTransaction({
+  refresh,
+  retryDelaysMs = [1_000, 3_000, 7_000],
+  sleep: sleepFn = sleep,
+  onError,
+}: {
+  refresh: () => Promise<void>;
+  retryDelaysMs?: number[];
+  sleep?: (ms: number) => Promise<void>;
+  onError?: (err: unknown) => void;
+}): Promise<void> {
+  let lastError: unknown = null;
+  let sawSuccess = false;
+
+  for (let attempt = 0; attempt <= retryDelaysMs.length; attempt += 1) {
+    try {
+      await refresh();
+      sawSuccess = true;
+      lastError = null;
+    } catch (err) {
+      lastError = err;
+    }
+
+    const retryDelay = retryDelaysMs[attempt];
+    if (retryDelay === undefined) break;
+    await sleepFn(retryDelay);
+  }
+
+  if (!sawSuccess && lastError) onError?.(lastError);
+}

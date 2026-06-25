@@ -1,9 +1,10 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   bytesToBase64,
   formatRewardFundingSources,
   formatStakingTokenAmount,
   formatStakingWalletStepNotice,
+  refreshStakingDataAfterTransaction,
   resolveStakingLinkedWalletAddress,
   resolveStakingWalletStep,
   shouldUseWalletSignInForLinking,
@@ -36,6 +37,27 @@ describe('staking linked wallet state', () => {
     expect(formatRewardFundingSources(['creator fees', 'buybacks', 'dev wallet'])).toBe(
       'creator fees, buybacks, and dev wallet',
     );
+  });
+
+  it('keeps refreshing staking data after a confirmed transaction so new positions can appear', async () => {
+    const refresh = vi.fn()
+      .mockResolvedValueOnce(undefined)
+      .mockRejectedValueOnce(new Error('summary stale'))
+      .mockResolvedValueOnce(undefined);
+    const sleep = vi.fn(async () => undefined);
+    const onError = vi.fn();
+
+    await refreshStakingDataAfterTransaction({
+      refresh,
+      sleep,
+      retryDelaysMs: [750, 2_000],
+      onError,
+    });
+
+    expect(refresh).toHaveBeenCalledTimes(3);
+    expect(sleep).toHaveBeenNthCalledWith(1, 750);
+    expect(sleep).toHaveBeenNthCalledWith(2, 2_000);
+    expect(onError).not.toHaveBeenCalled();
   });
 
   it('keeps mobile wallet connect, link signing, and staking as separate user steps', () => {
