@@ -123,6 +123,9 @@ export function humanizeMetaplexError(message: string): string {
   if (/METAPLEX_NOT_CONFIGURED|payer|configured/i.test(message)) {
     return 'Metaplex registration is not enabled for this agent yet.';
   }
+  if (/METAPLEX_WALLET_ACCOUNT_NOT_FOUND|AccountNotFound/i.test(message)) {
+    return 'The connected wallet needs SOL on Solana mainnet before Metaplex can prepare this transaction.';
+  }
   if (/insufficient|funds|lamports|balance/i.test(message)) {
     return 'The connected wallet needs more SOL before this mainnet transaction can be submitted.';
   }
@@ -466,7 +469,7 @@ async function confirmMetaplexSignature(
   }
 }
 
-async function signAndSendMetaplexTransactions(
+export async function signAndSendMetaplexTransactions(
   transactions: string[],
   wallet: WalletContextState,
   connection: Connection,
@@ -476,14 +479,22 @@ async function signAndSendMetaplexTransactions(
     throw new Error('Connect a Solana wallet that can sign transactions.');
   }
 
+  const decodedTransactions = transactions.map(decodeMetaplexSerializedTransaction);
+  const signedTransactions = wallet.signAllTransactions && decodedTransactions.length > 1
+    ? await wallet.signAllTransactions(decodedTransactions)
+    : await Promise.all(decodedTransactions.map((transaction) => wallet.signTransaction?.(transaction)));
+
   const signatures: string[] = [];
-  for (const serialized of transactions) {
-    const transaction = decodeMetaplexSerializedTransaction(serialized);
-    const signed = await wallet.signTransaction(transaction);
+  const multiTransactionFlow = signedTransactions.length > 1;
+  for (const signed of signedTransactions) {
+    if (!signed) throw new Error('Wallet did not return a signed Metaplex transaction.');
     const signature = await connection.sendRawTransaction(signed.serialize(), {
-      skipPreflight: false,
+      maxRetries: 5,
+      skipPreflight: multiTransactionFlow,
     });
     signatures.push(signature);
+  }
+  for (const signature of signatures) {
     await confirmMetaplexSignature(connection, signature, blockhash);
   }
   return signatures;
@@ -1231,6 +1242,9 @@ export function MetaplexWalletPanel({
                   <span className="mt-1 block text-xs leading-relaxed text-[var(--text-muted)]">
                     This creates a public Metaplex Core asset and Agent Identity for this agent. Your connected wallet signs and pays the Solana transaction.
                   </span>
+                  <span className="mt-2 block text-xs leading-relaxed text-[var(--text-muted)]">
+                    Phantom may mark this custom Metaplex transaction as unsafe. Continue only if the fee payer is your connected wallet and the transaction references Metaplex Core and Agent Registry programs.
+                  </span>
                 </span>
               </label>
               {button.reason && <div className="mt-3 text-xs text-[var(--color-warning)]">{button.reason}</div>}
@@ -1553,6 +1567,9 @@ export function MetaplexWalletPanel({
                   <span className="text-xs leading-relaxed text-[var(--text-muted)]">
                     <span className="block font-semibold text-[var(--text-primary)]">I understand this permanently links one token to this agent.</span>
                     Metaplex only allows one canonical agent token once `setToken` is submitted.
+                    <span className="mt-2 block">
+                      Phantom may flag Genesis/Core Execute transactions as unsafe. Continue only if the fee payer is your connected wallet and the transaction references Metaplex programs.
+                    </span>
                   </span>
                 </label>
 
