@@ -692,7 +692,7 @@ export interface MetaplexConfigStatus {
 
 export interface MetaplexMintAgentPlan {
   kind: "metaplex.mint-agent.v1";
-  sdkFunction: "mintAndSubmitAgent";
+  sdkFunction: "mintAgent";
   ready: boolean;
   missing: string[];
   rpcUrl: string;
@@ -731,8 +731,38 @@ export interface MetaplexTokenLaunchInput {
     telegram?: string;
   };
   firstBuyAmount?: number;
-  launchType?: "bondingCurve";
+  launchType?: "bondingCurve" | "launchpool";
+  launchpool?: {
+    tokenAllocation: number;
+    depositStartTime: string;
+    raiseGoal: number;
+    raydiumLiquidityBps: number;
+    fundsRecipient?: string;
+  };
   confirmPermanentToken?: boolean;
+}
+
+export interface MetaplexRegistrationPrepareInput {
+  wallet: string;
+}
+
+export interface MetaplexRegistrationPrepareResponse {
+  wallet: string;
+  assetAddress: string;
+  agentRegistrationUri: string;
+  metadataUri: string;
+  transactions: string[];
+  blockhash: {
+    blockhash: string;
+    lastValidBlockHeight: number;
+  };
+  status: "prepared";
+}
+
+export interface MetaplexRegistrationCompleteInput {
+  wallet: string;
+  assetAddress: string;
+  signature: string;
 }
 
 export interface MetaplexTokenLaunchPlan {
@@ -756,7 +786,7 @@ export interface MetaplexTokenLaunchPlan {
       mint: string | null;
       setToken: true;
     };
-    launchType: "bondingCurve";
+    launchType: "bondingCurve" | "launchpool";
     token: {
       name: string;
       symbol: string;
@@ -770,9 +800,38 @@ export interface MetaplexTokenLaunchPlan {
     };
     launch: {
       firstBuyAmount?: number;
+      launchpool?: {
+        tokenAllocation: number;
+        depositStartTime: string;
+        raiseGoal: number;
+        raydiumLiquidityBps: number;
+        fundsRecipient: string;
+      };
     };
   };
   notes: string[];
+}
+
+export interface MetaplexTokenLaunchPrepareInput extends MetaplexTokenLaunchInput {
+  wallet: string;
+}
+
+export interface MetaplexTokenLaunchPrepareResponse {
+  wallet: string;
+  status: "prepared";
+  transactions: string[];
+  blockhash: {
+    blockhash: string;
+    lastValidBlockHeight: number;
+  };
+  mintAddress: string;
+  genesisAccount: string;
+}
+
+export interface MetaplexTokenLaunchCompleteInput extends MetaplexTokenLaunchPrepareInput {
+  signatures: string[];
+  mintAddress: string;
+  genesisAccount: string;
 }
 
 export interface MetaplexTokenLaunchResponse {
