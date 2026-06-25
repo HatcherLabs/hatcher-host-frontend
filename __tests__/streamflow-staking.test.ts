@@ -318,6 +318,7 @@ describe('streamflow staking rewards', () => {
       expect.objectContaining({
         nonce: 123,
         rewardPools: [expect.objectContaining({
+          governor: null,
           mint: expect.any(PublicKey),
           nonce: 0,
           rewardPoolType: 'dynamic',
@@ -338,7 +339,7 @@ describe('streamflow staking rewards', () => {
     expect(onTransactionSubmitted).toHaveBeenCalledWith('unstake-tx');
   });
 
-  it('falls back to unstake-only instructions when unstake-and-claim fails preflight', async () => {
+  it('does not close an unlocked stake without rewards when unstake-and-claim fails preflight', async () => {
     const walletKeypair = Keypair.generate();
     stakingMocks.getAccountInfo.mockResolvedValue({
       owner: new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'),
@@ -357,24 +358,12 @@ describe('streamflow staking rewards', () => {
       stakePoolAddress: '7BVxRYGoTJjr3bgvDhpJggJrnUhyYoGPbnxTRAWuDmtH',
       depositNonce: 123,
       unlockAt: new Date(Date.now() - 60_000).toISOString(),
-    })).resolves.toEqual({ txId: 'unstake-only-tx' });
+    })).rejects.toThrow('Unstake with rewards failed preflight');
 
     expect(stakingMocks.prepareUnstakeAndClaimInstructions).toHaveBeenCalled();
-    expect(stakingMocks.prepareUnstakeInstructions).toHaveBeenCalledWith(
-      expect.objectContaining({
-        nonce: 123,
-        stakePool: '7BVxRYGoTJjr3bgvDhpJggJrnUhyYoGPbnxTRAWuDmtH',
-        stakePoolMint: expect.any(PublicKey),
-        tokenProgramId: expect.any(PublicKey),
-      }),
-      { invoker: wallet },
-    );
-    expect(stakingMocks.simulateTransaction).toHaveBeenCalledTimes(2);
-    expect(wallet.sendTransaction).toHaveBeenCalledWith(
-      expect.any(VersionedTransaction),
-      expect.anything(),
-      expect.objectContaining({ preflightCommitment: 'confirmed' }),
-    );
+    expect(stakingMocks.prepareUnstakeInstructions).not.toHaveBeenCalled();
+    expect(stakingMocks.simulateTransaction).toHaveBeenCalledTimes(1);
+    expect(wallet.sendTransaction).not.toHaveBeenCalled();
   });
 
   it('rejects unstake before the lock period has ended', async () => {
@@ -412,6 +401,14 @@ describe('streamflow staking rewards', () => {
 
     expect(stakingMocks.createRewardEntry).not.toHaveBeenCalled();
     expect(stakingMocks.claimRewards).not.toHaveBeenCalled();
+    expect(stakingMocks.prepareClaimRewardsInstructions).toHaveBeenCalledTimes(2);
+    const claimCalls = stakingMocks.prepareClaimRewardsInstructions.mock.calls as unknown as Array<[Record<string, unknown>]>;
+    for (const [claimArgs] of claimCalls) {
+      expect(claimArgs).toEqual(expect.objectContaining({
+        governor: null,
+        rewardPoolType: 'dynamic',
+      }));
+    }
     expect(wallet.sendTransaction).toHaveBeenCalledWith(
       expect.any(VersionedTransaction),
       expect.anything(),
