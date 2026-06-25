@@ -76,6 +76,7 @@ import type {
   MetaplexConfigStatus,
   MetaplexMintAgentPlan,
   MetaplexRegistrationResponse,
+  MetaplexTokenImageUploadResponse,
   MetaplexTokenLaunchInput,
   MetaplexTokenLaunchPlan,
   MetaplexTokenLaunchResponse,
@@ -675,6 +676,15 @@ export const api = {
       method: "POST",
       body: JSON.stringify(body),
     }),
+
+  uploadAgentMetaplexTokenImage: (id: string, file: File) => {
+    const body = new FormData();
+    body.append("image", file);
+    return req<MetaplexTokenImageUploadResponse>(`/agents/${id}/metaplex/token/image`, {
+      method: "POST",
+      body,
+    });
+  },
 
   launchAgentMetaplexToken: (id: string, body: MetaplexTokenLaunchInput) =>
     req<MetaplexTokenLaunchResponse>(`/agents/${id}/metaplex/token/launch`, {

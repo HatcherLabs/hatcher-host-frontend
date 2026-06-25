@@ -76,9 +76,11 @@ export async function req<T>(
   const headers: Record<string, string> = {
     ...(options.headers as Record<string, string>),
   };
-  // Only set Content-Type: application/json when there's actually a body to send.
+  const isFormDataBody = typeof FormData !== 'undefined' && options.body instanceof FormData;
+  // Only set Content-Type: application/json when there's actually a JSON body to send.
   // Fastify rejects POST requests with JSON content-type but no body.
-  if (options.body) {
+  // Multipart FormData must keep the browser-generated boundary header.
+  if (options.body && !isFormDataBody && !headers['Content-Type']) {
     headers['Content-Type'] = 'application/json';
   }
   // Send only explicit API keys as Authorization. Browser JWTs are cookie-only.

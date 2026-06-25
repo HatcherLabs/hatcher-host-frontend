@@ -15,6 +15,7 @@ import {
   isMetaplexIrysImageUrl,
   shouldShowMetaplexMainnetConfirmation,
   validateMetaplexAvatarFile,
+  validateMetaplexTokenImageFile,
 } from './MetaplexWalletPanel';
 import type { MetaplexConfigStatus, MetaplexTokenLaunchPlan } from '@/lib/api';
 
@@ -222,10 +223,19 @@ describe('Metaplex wallet panel helpers', () => {
     });
   });
 
-  it('requires an Irys image URL for Genesis token launch metadata', () => {
+  it('recognizes token image URLs produced by Hatcher Irys uploads', () => {
     expect(isMetaplexIrysImageUrl('https://gateway.irys.xyz/hatch-token-image')).toBe(true);
     expect(isMetaplexIrysImageUrl('https://hatcher.host/hatcher-metaplex-avatar.png')).toBe(false);
     expect(isMetaplexIrysImageUrl('data:image/png;base64,AAAA')).toBe(false);
+  });
+
+  it('only accepts compact image files before token image upload', () => {
+    expect(validateMetaplexTokenImageFile({ type: 'image/png', size: 500_000 })).toBeNull();
+    expect(validateMetaplexTokenImageFile({ type: 'image/jpeg', size: 500_000 })).toBeNull();
+    expect(validateMetaplexTokenImageFile({ type: 'image/webp', size: 500_000 })).toBeNull();
+    expect(validateMetaplexTokenImageFile({ type: 'text/plain', size: 500_000 })).toBe('Choose a PNG, JPG, or WebP image.');
+    expect(validateMetaplexTokenImageFile({ type: 'image/gif', size: 500_000 })).toBe('Choose a PNG, JPG, or WebP image.');
+    expect(validateMetaplexTokenImageFile({ type: 'image/png', size: 5_000_001 })).toBe('Choose an image up to 5 MB.');
   });
 
   it('keeps the launch button disabled until the agent identity, plan, image, and confirmation are ready', () => {
@@ -252,6 +262,16 @@ describe('Metaplex wallet panel helpers', () => {
       disabled: true,
       label: 'Token launch unavailable',
       reason: 'Missing: Genesis launch is not enabled',
+    });
+
+    expect(buildMetaplexTokenLaunchButtonState(REGISTERED_CONFIG, READY_TOKEN_PLAN, {
+      image: '',
+      confirmed: true,
+      launching: false,
+    })).toEqual({
+      disabled: true,
+      label: 'Upload token image',
+      reason: 'Upload a PNG, JPG, or WebP image to Irys before launching.',
     });
 
     expect(buildMetaplexTokenLaunchButtonState(REGISTERED_CONFIG, READY_TOKEN_PLAN, {

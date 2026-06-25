@@ -87,6 +87,19 @@ export function validateMetaplexAvatarFile(file: Pick<File, 'type' | 'size'>): s
   return null;
 }
 
+export const METAPLEX_TOKEN_IMAGE_MAX_BYTES = 5_000_000;
+const METAPLEX_TOKEN_IMAGE_ALLOWED_TYPES = new Set([
+  'image/png',
+  'image/jpeg',
+  'image/webp',
+]);
+
+export function validateMetaplexTokenImageFile(file: Pick<File, 'type' | 'size'>): string | null {
+  if (!METAPLEX_TOKEN_IMAGE_ALLOWED_TYPES.has(file.type.toLowerCase())) return 'Choose a PNG, JPG, or WebP image.';
+  if (file.size > METAPLEX_TOKEN_IMAGE_MAX_BYTES) return 'Choose an image up to 5 MB.';
+  return null;
+}
+
 export function shouldShowMetaplexMainnetConfirmation(registeredAsset: string | null | undefined): boolean {
   return !registeredAsset;
 }
@@ -231,8 +244,8 @@ export function buildMetaplexTokenLaunchButtonState(
   if (!isMetaplexIrysImageUrl(state.image)) {
     return {
       disabled: true,
-      label: 'Add Irys image URL',
-      reason: 'Genesis token images must use https://gateway.irys.xyz/...',
+      label: 'Upload token image',
+      reason: 'Upload a PNG, JPG, or WebP image to Irys before launching.',
     };
   }
   if (!plan) {
@@ -406,6 +419,7 @@ export function MetaplexWalletPanel({
 }) {
   const { toast } = useToast();
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
+  const tokenImageInputRef = useRef<HTMLInputElement | null>(null);
   const [config, setConfig] = useState<MetaplexConfigStatus | null>(null);
   const [mintPlan, setMintPlan] = useState<MetaplexMintAgentPlan | null>(null);
   const [tokenPlan, setTokenPlan] = useState<MetaplexTokenLaunchPlan | null>(null);
@@ -417,6 +431,7 @@ export function MetaplexWalletPanel({
   const [checkingToken, setCheckingToken] = useState(false);
   const [launchingToken, setLaunchingToken] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
+  const [tokenImageUploading, setTokenImageUploading] = useState(false);
   const [mainnetConfirmed, setMainnetConfirmed] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -650,6 +665,39 @@ export function MetaplexWalletPanel({
       const message = e instanceof Error ? e.message : 'Could not read this image.';
       setError(message);
       toast.error(message);
+    }
+  };
+
+  const uploadTokenImage = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] ?? null;
+    event.target.value = '';
+    if (!file) return;
+
+    const validationError = validateMetaplexTokenImageFile(file);
+    if (validationError) {
+      setError(validationError);
+      toast.error(validationError);
+      return;
+    }
+
+    setTokenImageUploading(true);
+    setError(null);
+    try {
+      const res = await api.uploadAgentMetaplexTokenImage(agentId, file);
+      if (!res.success) {
+        const message = res.error || 'Could not upload this token image.';
+        setError(message);
+        toast.error(message);
+        return;
+      }
+      updateTokenForm('image', res.data.url);
+      toast.success('Token image uploaded to Irys');
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Could not upload this token image.';
+      setError(message);
+      toast.error(message);
+    } finally {
+      setTokenImageUploading(false);
     }
   };
 
@@ -1025,18 +1073,50 @@ export function MetaplexWalletPanel({
                   </label>
                 </div>
 
-                <label className="block min-w-0">
-                  <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">Irys image URL</span>
+                <div className="rounded-md border border-[var(--border-subtle)] bg-black/10 p-3">
                   <input
-                    value={tokenForm?.image ?? ''}
-                    onChange={(event) => updateTokenForm('image', event.target.value)}
-                    className="mt-1 w-full rounded-md border border-[var(--border-subtle)] bg-black/20 px-3 py-2 text-sm text-[var(--text-primary)] outline-none transition focus:border-[var(--accent)]"
-                    placeholder="https://gateway.irys.xyz/..."
+                    ref={tokenImageInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    onChange={(event) => void uploadTokenImage(event)}
+                    className="hidden"
                   />
-                  {tokenForm?.image && !isMetaplexIrysImageUrl(tokenForm.image) && (
-                    <div className="mt-1 text-[11px] text-[var(--color-warning)]">Genesis requires a gateway.irys.xyz image URL.</div>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="relative flex h-14 w-14 flex-shrink-0 items-center justify-center overflow-hidden rounded-md border border-[var(--border-subtle)] bg-black/20">
+                      {tokenForm?.image && isMetaplexIrysImageUrl(tokenForm.image) ? (
+                        <Image
+                          src={tokenForm.image}
+                          alt=""
+                          fill
+                          sizes="56px"
+                          className="object-cover"
+                        />
+                      ) : (
+                        <ImageIcon size={22} className="text-[var(--text-muted)]" />
+                      )}
+                    </div>
+                    <div className="min-w-[180px] flex-1">
+                      <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">Token image</div>
+                      <div className="mt-1 text-xs text-[var(--text-secondary)]">
+                        {tokenForm?.image && isMetaplexIrysImageUrl(tokenForm.image)
+                          ? 'Uploaded to Irys and ready for Genesis metadata.'
+                          : 'PNG, JPG, or WebP. Hatcher uploads it to Irys automatically.'}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => tokenImageInputRef.current?.click()}
+                      disabled={tokenImageUploading}
+                      className="inline-flex items-center justify-center gap-2 rounded-md border border-[var(--border-subtle)] px-3 py-2 text-xs font-semibold text-[var(--text-secondary)] transition hover:border-[var(--border-hover)] hover:text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {tokenImageUploading ? <Loader2 size={13} className="animate-spin" /> : <Upload size={13} />}
+                      {tokenImageUploading ? 'Uploading' : tokenForm?.image ? 'Replace image' : 'Upload image'}
+                    </button>
+                  </div>
+                  {tokenForm?.image && isMetaplexIrysImageUrl(tokenForm.image) && (
+                    <div className="mt-3 truncate font-mono text-[11px] text-[var(--text-muted)]">{tokenForm.image}</div>
                   )}
-                </label>
+                </div>
 
                 <label className="block min-w-0">
                   <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">Description</span>
