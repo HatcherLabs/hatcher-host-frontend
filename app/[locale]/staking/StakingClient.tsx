@@ -20,6 +20,7 @@ import {
   formatRewardFundingSources,
   formatStakingTokenAmount,
   formatStakingWalletStepNotice,
+  refreshStakingDataAfterTransaction,
   resolveStakingLinkedWalletAddress,
   resolveStakingWalletStep,
   shouldUseWalletSignInForLinking,
@@ -753,11 +754,15 @@ export function StakingClient() {
       });
 
       setStakeTxId(result.txId);
-      if (result.setupTxId) {
-        setNotice('Streamflow receipt setup completed, then the staking transaction was submitted.');
-      }
+      setNotice(result.setupIncluded
+        ? 'Stake confirmed. Streamflow receipt setup was included in the same transaction. Positions are refreshing.'
+        : 'Stake confirmed. Positions are refreshing.');
       setStakeAmount('');
-      await Promise.all([load(), loadWalletBalance()]);
+      void refreshStakingDataAfterTransaction({
+        refresh: async () => {
+          await Promise.all([load(), loadWalletBalance()]);
+        },
+      });
     } catch (err) {
       if (isWalletFlowStepRequiredError(err)) {
         setNotice(err.message);

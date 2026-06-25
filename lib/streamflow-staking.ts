@@ -38,7 +38,7 @@ let resolvedHatcherTokenProgramId: PublicKey | null = null;
 
 export type StakeHatcherResult = {
   txId: string;
-  setupTxId?: string;
+  setupIncluded?: boolean;
 };
 
 function cluster(): ICluster {
@@ -291,27 +291,15 @@ export async function stakeHatcherWithStreamflow(params: {
   const stakeMint = deriveStakeMintPDA(client.getCurrentProgramId('stakePoolProgram'), stakePool);
   const receiptTokenAccount = associatedTokenAddress(stakeMint, params.wallet.publicKey, tokenProgramId);
   const receiptAccountInfo = await client.connection.getAccountInfo(receiptTokenAccount, 'confirmed');
-  let setupTxId: string | undefined;
-
-  if (!receiptAccountInfo) {
-    const prepared = await preparePreflightedWalletTransaction({
-      connection: client.connection,
+  const setupInstructions = receiptAccountInfo
+    ? []
+    : [createAssociatedTokenAccountIdempotentInstruction({
       payer: params.wallet.publicKey,
-      instructions: [createAssociatedTokenAccountIdempotentInstruction({
-        payer: params.wallet.publicKey,
-        associatedToken: receiptTokenAccount,
-        owner: params.wallet.publicKey,
-        mint: stakeMint,
-        tokenProgramId,
-      })],
-    });
-    const txId = await sendPreparedWalletTransaction({
-      wallet: params.wallet,
-      connection: client.connection,
-      prepared,
-    });
-    setupTxId = txId;
-  }
+      associatedToken: receiptTokenAccount,
+      owner: params.wallet.publicKey,
+      mint: stakeMint,
+      tokenProgramId,
+    })];
 
   const { ixs } = await client.prepareStakeAndCreateEntriesInstructions({
     stakePool: params.stakePoolAddress,
@@ -333,7 +321,7 @@ export async function stakeHatcherWithStreamflow(params: {
   const prepared = await preparePreflightedWalletTransaction({
     connection: client.connection,
     payer: params.wallet.publicKey,
-    instructions: ixs,
+    instructions: [...setupInstructions, ...ixs],
   });
   const txId = await sendPreparedWalletTransaction({
     wallet: params.wallet,
@@ -341,7 +329,7 @@ export async function stakeHatcherWithStreamflow(params: {
     prepared,
     onTransactionSubmitted: params.onTransactionSubmitted,
   });
-  return { txId, setupTxId };
+  return { txId, setupIncluded: setupInstructions.length > 0 || undefined };
 }
 
 export function isStakeUnlocked(unlockAt: string | Date, now = new Date()): boolean {
