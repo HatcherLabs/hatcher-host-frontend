@@ -507,6 +507,27 @@ export async function signAndSendMetaplexTransactions(
   }
 
   const decodedTransactions = transactions.map(decodeMetaplexSerializedTransaction);
+  if (wallet.signTransaction) {
+    const signedTransactions = wallet.signAllTransactions && decodedTransactions.length > 1
+      ? await wallet.signAllTransactions(decodedTransactions)
+      : await Promise.all(decodedTransactions.map((transaction) => wallet.signTransaction?.(transaction)));
+
+    const signatures: string[] = [];
+    const multiTransactionFlow = signedTransactions.length > 1;
+    for (const signed of signedTransactions) {
+      if (!signed) throw new Error('Wallet did not return a signed Metaplex transaction.');
+      const signature = await connection.sendRawTransaction(signed.serialize(), {
+        maxRetries: 5,
+        skipPreflight: multiTransactionFlow,
+      });
+      signatures.push(signature);
+    }
+    for (const signature of signatures) {
+      await confirmMetaplexSignature(connection, signature, blockhash);
+    }
+    return signatures;
+  }
+
   if (wallet.sendTransaction) {
     const signatures: string[] = [];
     const multiTransactionFlow = decodedTransactions.length > 1;
@@ -524,28 +545,7 @@ export async function signAndSendMetaplexTransactions(
     return signatures;
   }
 
-  if (!wallet.signTransaction) {
-    throw new Error('Connect a Solana wallet that can sign transactions.');
-  }
-
-  const signedTransactions = wallet.signAllTransactions && decodedTransactions.length > 1
-    ? await wallet.signAllTransactions(decodedTransactions)
-    : await Promise.all(decodedTransactions.map((transaction) => wallet.signTransaction?.(transaction)));
-
-  const signatures: string[] = [];
-  const multiTransactionFlow = signedTransactions.length > 1;
-  for (const signed of signedTransactions) {
-    if (!signed) throw new Error('Wallet did not return a signed Metaplex transaction.');
-    const signature = await connection.sendRawTransaction(signed.serialize(), {
-      maxRetries: 5,
-      skipPreflight: multiTransactionFlow,
-    });
-    signatures.push(signature);
-  }
-  for (const signature of signatures) {
-    await confirmMetaplexSignature(connection, signature, blockhash);
-  }
-  return signatures;
+  throw new Error('Connect a Solana wallet that can sign transactions.');
 }
 
 function StatusTile({
