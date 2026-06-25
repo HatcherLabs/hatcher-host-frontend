@@ -787,6 +787,13 @@ export interface MetaplexTokenLaunchResponse {
   status: "cached" | "launched";
 }
 
+export interface MetaplexTokenImageUploadResponse {
+  id: string;
+  url: string;
+  size: number;
+  contentType: "image/png" | "image/jpeg" | "image/webp";
+}
+
 export interface MetaplexRegistrationResponse {
   agentId: string;
   metadataUri: string;

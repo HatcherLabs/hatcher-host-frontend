@@ -81,6 +81,7 @@ const nextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: '*.ipfs.nftstorage.link' },
       { protocol: 'https', hostname: 'arweave.net' },
+      { protocol: 'https', hostname: 'gateway.irys.xyz' },
       { protocol: 'https', hostname: 'raw.githubusercontent.com' },
     ],
     formats: ['image/avif', 'image/webp'],
