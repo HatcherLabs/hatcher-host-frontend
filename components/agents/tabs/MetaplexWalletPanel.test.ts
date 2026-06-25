@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import {
   buildMetaplexTokenLaunchButtonState,
@@ -13,10 +13,12 @@ import {
   getMetaplexRegisteredLinks,
   getMetaplexTokenLinks,
   humanizeMetaplexError,
+  isMetaplexBlockhashExpiryError,
   isMetaplexIrysImageUrl,
   shouldShowMetaplexMainnetConfirmation,
   validateMetaplexAvatarFile,
   validateMetaplexTokenImageFile,
+  waitForMetaplexSignatureConfirmation,
 } from './MetaplexWalletPanel';
 import type { MetaplexConfigStatus, MetaplexTokenLaunchPlan } from '@/lib/api';
 
@@ -209,6 +211,49 @@ describe('Metaplex wallet panel helpers', () => {
     );
     expect(humanizeMetaplexError('insufficient funds for fee')).toBe(
       'The connected wallet needs more SOL before this mainnet transaction can be submitted.',
+    );
+  });
+
+  it('recognizes Solana blockhash expiry confirmation errors', () => {
+    expect(isMetaplexBlockhashExpiryError(
+      new Error('Signature 3AA has expired: block height exceeded.'),
+    )).toBe(true);
+    expect(isMetaplexBlockhashExpiryError(
+      Object.assign(new Error('transaction was not confirmed'), { name: 'TransactionExpiredBlockheightExceededError' }),
+    )).toBe(true);
+    expect(isMetaplexBlockhashExpiryError(new Error('User rejected the request.'))).toBe(false);
+  });
+
+  it('recovers a Metaplex signature when status finalizes after confirmation expiry', async () => {
+    const connection = {
+      getSignatureStatus: vi.fn()
+        .mockResolvedValueOnce({ value: null })
+        .mockResolvedValueOnce({
+          value: {
+            confirmationStatus: 'finalized',
+            confirmations: null,
+            err: null,
+          },
+        }),
+    };
+
+    await expect(waitForMetaplexSignatureConfirmation(connection, '3AA', 2, 0)).resolves.toBe(true);
+    expect(connection.getSignatureStatus).toHaveBeenCalledWith('3AA', { searchTransactionHistory: true });
+  });
+
+  it('fails a Metaplex signature when the chain reports an on-chain error', async () => {
+    const connection = {
+      getSignatureStatus: vi.fn().mockResolvedValue({
+        value: {
+          confirmationStatus: 'confirmed',
+          confirmations: 1,
+          err: { InstructionError: [0, 'Custom'] },
+        },
+      }),
+    };
+
+    await expect(waitForMetaplexSignatureConfirmation(connection, '3AA', 1, 0)).rejects.toThrow(
+      'Transaction failed on-chain',
     );
   });
 
