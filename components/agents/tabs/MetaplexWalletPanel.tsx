@@ -2,6 +2,9 @@
 
 import Image from 'next/image';
 import { type ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useConnection, useWallet, type WalletContextState } from '@solana/wallet-adapter-react';
+import { useWalletModal } from '@solana/wallet-adapter-react-ui';
+import { Transaction, VersionedTransaction, type Connection } from '@solana/web3.js';
 import {
   AlertTriangle,
   CheckCircle2,
@@ -121,7 +124,7 @@ export function humanizeMetaplexError(message: string): string {
     return 'Metaplex registration is not enabled for this agent yet.';
   }
   if (/insufficient|funds|lamports|balance/i.test(message)) {
-    return 'The Hatcher payer wallet needs more SOL before this mainnet registration can be submitted.';
+    return 'The connected wallet needs more SOL before this mainnet transaction can be submitted.';
   }
   if (/wallet/i.test(message)) {
     return 'This agent needs a Solana wallet before it can be registered on Metaplex.';
@@ -135,6 +138,7 @@ export function humanizeMetaplexError(message: string): string {
 export function buildMetaplexRegistrationButtonState(
   config: MetaplexConfigStatus | null,
   mainnetConfirmed: boolean,
+  walletConnected = true,
 ): { disabled: boolean; label: string; reason: string | null } {
   if (!config) {
     return { disabled: true, label: 'Checking Metaplex', reason: 'Load Metaplex status first.' };
@@ -162,6 +166,13 @@ export function buildMetaplexRegistrationButtonState(
       reason: 'Confirm the mainnet registration before submitting.',
     };
   }
+  if (!walletConnected) {
+    return {
+      disabled: true,
+      label: 'Connect wallet',
+      reason: 'Connect the Solana wallet that will own and pay for the Metaplex registration.',
+    };
+  }
   return { disabled: false, label: 'Register on Metaplex', reason: null };
 }
 
@@ -175,7 +186,15 @@ type MetaplexTokenFormState = {
     twitter: string;
     telegram: string;
   };
+  launchType: 'bondingCurve' | 'launchpool';
   firstBuyAmount: string;
+  launchpool: {
+    tokenAllocation: string;
+    depositStartTime: string;
+    raiseGoal: string;
+    raydiumLiquidityBps: string;
+    fundsRecipient: string;
+  };
   confirmPermanentToken: boolean;
 };
 
@@ -196,7 +215,15 @@ export function buildMetaplexTokenLaunchDefaults(config: MetaplexConfigStatus): 
       twitter: '',
       telegram: '',
     },
+    launchType: 'bondingCurve',
     firstBuyAmount: '',
+    launchpool: {
+      tokenAllocation: '500000000',
+      depositStartTime: '',
+      raiseGoal: '',
+      raydiumLiquidityBps: '5000',
+      fundsRecipient: '',
+    },
     confirmPermanentToken: false,
   };
 }
@@ -208,9 +235,11 @@ export function isMetaplexIrysImageUrl(value: string): boolean {
 function metaplexTokenMissingLabel(value: string): string {
   if (value === 'METAPLEX_GENESIS_ENABLED') return 'Genesis launch is not enabled';
   if (value === 'METAPLEX_PAYER_PRIVATE_KEY') return 'Hatcher payer is not configured';
+  if (value === 'USER_WALLET') return 'Solana wallet is not connected';
   if (value === 'METAPLEX_AGENT_ASSET') return 'Metaplex agent identity is missing';
   if (value === 'TOKEN_IMAGE') return 'Token image is missing';
   if (value === 'IRYS_TOKEN_IMAGE') return 'Token image must be an Irys URL';
+  if (value.startsWith('LAUNCHPOOL_')) return value.replace('LAUNCHPOOL_', 'Launchpool ').replaceAll('_', ' ').toLowerCase();
   if (value === 'CONFIRM_PERMANENT_AGENT_TOKEN') return 'Permanent token confirmation is missing';
   if (value === 'AGENT_TOKEN_ALREADY_SET') return 'Agent token is already set';
   return value;
@@ -223,6 +252,7 @@ export function buildMetaplexTokenLaunchButtonState(
     image: string;
     confirmed: boolean;
     launching: boolean;
+    walletConnected?: boolean;
   },
 ): { disabled: boolean; label: string; reason: string | null } {
   if (state.launching) return { disabled: true, label: 'Launching token', reason: null };
@@ -269,6 +299,13 @@ export function buildMetaplexTokenLaunchButtonState(
       reason: 'Confirm the permanent one-token-per-agent launch before submitting.',
     };
   }
+  if (state.walletConnected === false) {
+    return {
+      disabled: true,
+      label: 'Connect wallet',
+      reason: 'Connect the Solana wallet that will sign and pay for the agent token launch.',
+    };
+  }
   return { disabled: false, label: 'Launch agent token', reason: null };
 }
 
@@ -283,23 +320,40 @@ export function getMetaplexTokenLinks(
   return links;
 }
 
-function buildMetaplexTokenLaunchPayload(form: MetaplexTokenFormState): MetaplexTokenLaunchInput {
+export function buildMetaplexTokenLaunchPayload(form: MetaplexTokenFormState): MetaplexTokenLaunchInput {
   const firstBuyAmount = Number(form.firstBuyAmount);
+  const launchType = form.launchType ?? 'bondingCurve';
   const externalLinks = {
     website: form.externalLinks.website.trim(),
     twitter: form.externalLinks.twitter.trim(),
     telegram: form.externalLinks.telegram.trim(),
   };
   const filteredLinks = Object.fromEntries(Object.entries(externalLinks).filter(([, value]) => value.length > 0));
-  return {
+  const payload: MetaplexTokenLaunchInput = {
     name: form.name.trim(),
     symbol: form.symbol.trim().toUpperCase(),
     image: form.image.trim() || null,
     description: form.description.trim() || undefined,
     externalLinks: Object.keys(filteredLinks).length > 0 ? filteredLinks : undefined,
-    firstBuyAmount: Number.isFinite(firstBuyAmount) && firstBuyAmount > 0 ? firstBuyAmount : undefined,
-    launchType: 'bondingCurve',
+    launchType,
     confirmPermanentToken: form.confirmPermanentToken,
+  };
+  if (launchType === 'bondingCurve') {
+    return {
+      ...payload,
+      firstBuyAmount: Number.isFinite(firstBuyAmount) && firstBuyAmount > 0 ? firstBuyAmount : undefined,
+    };
+  }
+
+  return {
+    ...payload,
+    launchpool: {
+      tokenAllocation: Number(form.launchpool.tokenAllocation),
+      depositStartTime: form.launchpool.depositStartTime.trim(),
+      raiseGoal: Number(form.launchpool.raiseGoal),
+      raydiumLiquidityBps: Number(form.launchpool.raydiumLiquidityBps),
+      fundsRecipient: form.launchpool.fundsRecipient.trim() || undefined,
+    },
   };
 }
 
@@ -342,6 +396,50 @@ function readAvatarFileAsDataUrl(file: File): Promise<string> {
     reader.onerror = () => reject(new Error('Could not read this image.'));
     reader.readAsDataURL(file);
   });
+}
+
+function decodeMetaplexSerializedTransaction(value: string): Transaction | VersionedTransaction {
+  const binary = atob(value);
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+  try {
+    return VersionedTransaction.deserialize(bytes);
+  } catch {
+    return Transaction.from(bytes);
+  }
+}
+
+async function signAndSendMetaplexTransactions(
+  transactions: string[],
+  wallet: WalletContextState,
+  connection: Connection,
+  blockhash?: { blockhash: string; lastValidBlockHeight: number },
+): Promise<string[]> {
+  if (!wallet.publicKey || !wallet.signTransaction) {
+    throw new Error('Connect a Solana wallet that can sign transactions.');
+  }
+
+  const signatures: string[] = [];
+  for (const serialized of transactions) {
+    const transaction = decodeMetaplexSerializedTransaction(serialized);
+    const signed = await wallet.signTransaction(transaction);
+    const signature = await connection.sendRawTransaction(signed.serialize(), {
+      skipPreflight: false,
+    });
+    if (blockhash?.blockhash && Number.isFinite(blockhash.lastValidBlockHeight)) {
+      await connection.confirmTransaction({
+        signature,
+        blockhash: blockhash.blockhash,
+        lastValidBlockHeight: blockhash.lastValidBlockHeight,
+      }, 'confirmed');
+    } else {
+      await connection.confirmTransaction(signature, 'confirmed');
+    }
+    signatures.push(signature);
+  }
+  return signatures;
 }
 
 function StatusTile({
@@ -418,6 +516,9 @@ export function MetaplexWalletPanel({
   solanaWallet?: string | null;
 }) {
   const { toast } = useToast();
+  const wallet = useWallet();
+  const { connection } = useConnection();
+  const { setVisible: setWalletModalVisible } = useWalletModal();
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
   const tokenImageInputRef = useRef<HTMLInputElement | null>(null);
   const [config, setConfig] = useState<MetaplexConfigStatus | null>(null);
@@ -487,17 +588,20 @@ export function MetaplexWalletPanel({
     void load();
   }, [load]);
 
+  const connectedWallet = wallet.publicKey?.toBase58() ?? null;
+  const walletCanSign = !!connectedWallet && !!wallet.signTransaction;
   const button = useMemo(
-    () => buildMetaplexRegistrationButtonState(config, mainnetConfirmed),
-    [config, mainnetConfirmed],
+    () => buildMetaplexRegistrationButtonState(config, mainnetConfirmed, walletCanSign),
+    [config, mainnetConfirmed, walletCanSign],
   );
   const tokenButton = useMemo(
     () => buildMetaplexTokenLaunchButtonState(config, tokenPlan, {
       image: tokenForm?.image ?? '',
       confirmed: tokenForm?.confirmPermanentToken ?? false,
       launching: launchingToken,
+      walletConnected: walletCanSign,
     }),
-    [config, tokenForm?.confirmPermanentToken, tokenForm?.image, tokenPlan, launchingToken],
+    [config, tokenForm?.confirmPermanentToken, tokenForm?.image, tokenPlan, launchingToken, walletCanSign],
   );
   const publicLinks = useMemo(() => (config ? getMetaplexPublicLinks(config) : []), [config]);
   const avatarPreview = useMemo(() => (config ? getMetaplexAvatarPreview(config) : null), [config]);
@@ -566,7 +670,15 @@ export function MetaplexWalletPanel({
         image: '',
         description: '',
         externalLinks: { website: '', twitter: '', telegram: '' },
+        launchType: 'bondingCurve',
         firstBuyAmount: '',
+        launchpool: {
+          tokenAllocation: '500000000',
+          depositStartTime: '',
+          raiseGoal: '',
+          raydiumLiquidityBps: '5000',
+          fundsRecipient: '',
+        },
         confirmPermanentToken: false,
       });
       return {
@@ -585,7 +697,15 @@ export function MetaplexWalletPanel({
         image: '',
         description: '',
         externalLinks: { website: '', twitter: '', telegram: '' },
+        launchType: 'bondingCurve',
         firstBuyAmount: '',
+        launchpool: {
+          tokenAllocation: '500000000',
+          depositStartTime: '',
+          raiseGoal: '',
+          raydiumLiquidityBps: '5000',
+          fundsRecipient: '',
+        },
         confirmPermanentToken: false,
       });
       return {
@@ -598,12 +718,63 @@ export function MetaplexWalletPanel({
     });
   };
 
+  const updateLaunchpoolForm = (key: keyof MetaplexTokenFormState['launchpool'], value: string) => {
+    setTokenPlan((current) => (current?.status === 'launched' ? current : null));
+    setTokenForm((current) => {
+      const base = current ?? (config ? buildMetaplexTokenLaunchDefaults(config) : {
+        name: '',
+        symbol: '',
+        image: '',
+        description: '',
+        externalLinks: { website: '', twitter: '', telegram: '' },
+        launchType: 'bondingCurve',
+        firstBuyAmount: '',
+        launchpool: {
+          tokenAllocation: '500000000',
+          depositStartTime: '',
+          raiseGoal: '',
+          raydiumLiquidityBps: '5000',
+          fundsRecipient: '',
+        },
+        confirmPermanentToken: false,
+      });
+      return {
+        ...base,
+        launchpool: {
+          ...base.launchpool,
+          [key]: value,
+        },
+      };
+    });
+  };
+
+  const tokenPayloadWithWalletDefault = () => {
+    if (!tokenForm) return null;
+    const payload = buildMetaplexTokenLaunchPayload(tokenForm);
+    if (payload.launchType === 'launchpool' && payload.launchpool && !payload.launchpool.fundsRecipient && connectedWallet) {
+      payload.launchpool = {
+        ...payload.launchpool,
+        fundsRecipient: connectedWallet,
+      };
+    }
+    return payload;
+  };
+
   const checkTokenLaunch = async () => {
     if (!tokenForm) return;
+    if (!connectedWallet) {
+      setWalletModalVisible(true);
+      return;
+    }
     setCheckingToken(true);
     setError(null);
     try {
-      const res = await api.prepareAgentMetaplexTokenLaunch(agentId, buildMetaplexTokenLaunchPayload(tokenForm));
+      const payload = tokenPayloadWithWalletDefault();
+      if (!payload) return;
+      const res = await api.prepareAgentMetaplexTokenLaunch(agentId, {
+        ...payload,
+        wallet: connectedWallet,
+      });
       if (!res.success) {
         const message = res.error || 'Could not check token launch readiness.';
         setError(message);
@@ -622,18 +793,42 @@ export function MetaplexWalletPanel({
   };
 
   const launchToken = async () => {
-    if (!tokenForm || tokenButton.disabled) return;
+    if (!tokenForm) return;
+    if (!connectedWallet || !wallet.signTransaction) {
+      setWalletModalVisible(true);
+      return;
+    }
+    if (tokenButton.disabled && tokenButton.label !== 'Connect wallet') return;
     setLaunchingToken(true);
     setError(null);
     try {
-      const res = await api.launchAgentMetaplexToken(agentId, buildMetaplexTokenLaunchPayload(tokenForm));
-      if (!res.success) {
-        const message = res.error || 'Metaplex token launch failed.';
+      const payload = tokenPayloadWithWalletDefault();
+      if (!payload) return;
+      const prepared = await api.prepareAgentMetaplexTokenLaunchTransaction(agentId, {
+        ...payload,
+        wallet: connectedWallet,
+      });
+      if (!prepared.success) {
+        const message = prepared.error || 'Metaplex token launch failed.';
         setError(message);
         toast.error(message);
         return;
       }
-      setTokenResult(res.data);
+      const signatures = await signAndSendMetaplexTransactions(prepared.data.transactions, wallet, connection, prepared.data.blockhash);
+      const completed = await api.completeAgentMetaplexTokenLaunch(agentId, {
+        ...payload,
+        wallet: connectedWallet,
+        signatures,
+        mintAddress: prepared.data.mintAddress,
+        genesisAccount: prepared.data.genesisAccount,
+      });
+      if (!completed.success) {
+        const message = completed.error || 'Metaplex token launch failed.';
+        setError(message);
+        toast.error(message);
+        return;
+      }
+      setTokenResult(completed.data);
       setTokenForm((current) => current ? { ...current, confirmPermanentToken: false } : current);
       toast.success('Agent token launched');
       await load();
@@ -702,18 +897,34 @@ export function MetaplexWalletPanel({
   };
 
   const register = async () => {
-    if (button.disabled) return;
+    if (!connectedWallet || !wallet.signTransaction) {
+      setWalletModalVisible(true);
+      return;
+    }
+    if (button.disabled && button.label !== 'Connect wallet') return;
     setRegistering(true);
     setError(null);
     try {
-      const res = await api.registerAgentMetaplex(agentId);
-      if (!res.success) {
-        const message = humanizeMetaplexError(res.error || 'Metaplex registration failed.');
+      const prepared = await api.prepareAgentMetaplexRegistration(agentId, { wallet: connectedWallet });
+      if (!prepared.success) {
+        const message = humanizeMetaplexError(prepared.error || 'Metaplex registration failed.');
         setError(message);
         toast.error(message);
         return;
       }
-      setResult(res.data);
+      const signatures = await signAndSendMetaplexTransactions(prepared.data.transactions, wallet, connection, prepared.data.blockhash);
+      const completed = await api.completeAgentMetaplexRegistration(agentId, {
+        wallet: connectedWallet,
+        assetAddress: prepared.data.assetAddress,
+        signature: signatures[0] ?? '',
+      });
+      if (!completed.success) {
+        const message = humanizeMetaplexError(completed.error || 'Metaplex registration failed.');
+        setError(message);
+        toast.error(message);
+        return;
+      }
+      setResult(completed.data);
       setMainnetConfirmed(false);
       toast.success('Metaplex identity registered');
       await load();
@@ -788,7 +999,7 @@ export function MetaplexWalletPanel({
             <StatusTile
               label="Metaplex asset"
               value={shortMetaplexValue(registeredAsset)}
-              description={registeredAsset ? 'Core asset identity is active.' : 'Created by mintAndSubmitAgent.'}
+              description={registeredAsset ? 'Core asset identity is active.' : 'Created by a user-signed mintAgent transaction.'}
               tone={registeredAsset ? 'good' : 'muted'}
               icon={CheckCircle2}
             />
@@ -923,8 +1134,10 @@ export function MetaplexWalletPanel({
                 </span>
               </div>
               <div className="flex justify-between gap-3">
-                <span>Hatcher signs</span>
-                <span className="font-semibold text-[var(--text-primary)]">Server-side payer</span>
+                <span>Owner / payer</span>
+                <span className="font-semibold text-[var(--text-primary)]">
+                  {connectedWallet ? shortMetaplexValue(connectedWallet) : 'Connect wallet'}
+                </span>
               </div>
             </div>
           </div>
@@ -968,7 +1181,7 @@ export function MetaplexWalletPanel({
                     Confirm Solana mainnet registration
                   </span>
                   <span className="mt-1 block text-xs leading-relaxed text-[var(--text-muted)]">
-                    This creates a public Metaplex Core asset and Agent Identity for this agent. Hatcher submits the transaction; no private key is requested in the browser.
+                    This creates a public Metaplex Core asset and Agent Identity for this agent. Your connected wallet signs and pays the Solana transaction.
                   </span>
                 </span>
               </label>
@@ -981,7 +1194,7 @@ export function MetaplexWalletPanel({
               <button
                 type="button"
                 onClick={() => void register()}
-                disabled={button.disabled || registering}
+                disabled={registering || (button.disabled && button.label !== 'Connect wallet')}
                 className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-md border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-4 py-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-warning)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {registering ? <Loader2 size={14} className="animate-spin" /> : <Fingerprint size={14} />}
@@ -1129,7 +1342,34 @@ export function MetaplexWalletPanel({
                   />
                 </label>
 
-                <div className="grid gap-3 md:grid-cols-3">
+                <div className="rounded-md border border-[var(--border-subtle)] bg-black/10 p-1">
+                  <div className="grid grid-cols-2 gap-1">
+                    <button
+                      type="button"
+                      onClick={() => updateTokenForm('launchType', 'bondingCurve')}
+                      className={`rounded px-3 py-2 text-xs font-semibold transition ${
+                        (tokenForm?.launchType ?? 'bondingCurve') === 'bondingCurve'
+                          ? 'bg-[var(--accent)] text-black'
+                          : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                      }`}
+                    >
+                      Bonding curve
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateTokenForm('launchType', 'launchpool')}
+                      className={`rounded px-3 py-2 text-xs font-semibold transition ${
+                        tokenForm?.launchType === 'launchpool'
+                          ? 'bg-[var(--accent)] text-black'
+                          : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                      }`}
+                    >
+                      Launchpool
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid gap-3 md:grid-cols-2">
                   <label className="min-w-0">
                     <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">Website</span>
                     <input
@@ -1147,17 +1387,71 @@ export function MetaplexWalletPanel({
                       placeholder="@hatcherlabs"
                     />
                   </label>
-                  <label className="min-w-0">
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">First buy SOL</span>
+                </div>
+
+                {(tokenForm?.launchType ?? 'bondingCurve') === 'bondingCurve' ? (
+                  <label className="block min-w-0">
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">Agent first buy SOL</span>
                     <input
                       value={tokenForm?.firstBuyAmount ?? ''}
                       inputMode="decimal"
                       onChange={(event) => updateTokenForm('firstBuyAmount', event.target.value.replace(/[^0-9.]/g, ''))}
                       className="mt-1 w-full rounded-md border border-[var(--border-subtle)] bg-black/20 px-3 py-2 text-sm text-[var(--text-primary)] outline-none transition focus:border-[var(--accent)]"
-                      placeholder="0.1"
+                      placeholder="Optional"
                     />
                   </label>
-                </div>
+                ) : (
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <label className="min-w-0">
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">Token allocation</span>
+                      <input
+                        value={tokenForm?.launchpool.tokenAllocation ?? ''}
+                        inputMode="numeric"
+                        onChange={(event) => updateLaunchpoolForm('tokenAllocation', event.target.value.replace(/[^0-9]/g, ''))}
+                        className="mt-1 w-full rounded-md border border-[var(--border-subtle)] bg-black/20 px-3 py-2 text-sm text-[var(--text-primary)] outline-none transition focus:border-[var(--accent)]"
+                        placeholder="500000000"
+                      />
+                    </label>
+                    <label className="min-w-0">
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">Deposit start</span>
+                      <input
+                        type="datetime-local"
+                        value={tokenForm?.launchpool.depositStartTime ?? ''}
+                        onChange={(event) => updateLaunchpoolForm('depositStartTime', event.target.value)}
+                        className="mt-1 w-full rounded-md border border-[var(--border-subtle)] bg-black/20 px-3 py-2 text-sm text-[var(--text-primary)] outline-none transition focus:border-[var(--accent)]"
+                      />
+                    </label>
+                    <label className="min-w-0">
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">Raise goal SOL</span>
+                      <input
+                        value={tokenForm?.launchpool.raiseGoal ?? ''}
+                        inputMode="decimal"
+                        onChange={(event) => updateLaunchpoolForm('raiseGoal', event.target.value.replace(/[^0-9.]/g, ''))}
+                        className="mt-1 w-full rounded-md border border-[var(--border-subtle)] bg-black/20 px-3 py-2 text-sm text-[var(--text-primary)] outline-none transition focus:border-[var(--accent)]"
+                        placeholder="250"
+                      />
+                    </label>
+                    <label className="min-w-0">
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">Raydium LP bps</span>
+                      <input
+                        value={tokenForm?.launchpool.raydiumLiquidityBps ?? ''}
+                        inputMode="numeric"
+                        onChange={(event) => updateLaunchpoolForm('raydiumLiquidityBps', event.target.value.replace(/[^0-9]/g, ''))}
+                        className="mt-1 w-full rounded-md border border-[var(--border-subtle)] bg-black/20 px-3 py-2 text-sm text-[var(--text-primary)] outline-none transition focus:border-[var(--accent)]"
+                        placeholder="5000"
+                      />
+                    </label>
+                    <label className="min-w-0 md:col-span-2">
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">Funds recipient</span>
+                      <input
+                        value={tokenForm?.launchpool.fundsRecipient ?? ''}
+                        onChange={(event) => updateLaunchpoolForm('fundsRecipient', event.target.value)}
+                        className="mt-1 w-full rounded-md border border-[var(--border-subtle)] bg-black/20 px-3 py-2 font-mono text-sm text-[var(--text-primary)] outline-none transition focus:border-[var(--accent)]"
+                        placeholder={connectedWallet ?? 'Wallet address'}
+                      />
+                    </label>
+                  </div>
+                )}
 
                 <label className="flex items-start gap-3 rounded-md border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] p-3">
                   <input
@@ -1191,7 +1485,7 @@ export function MetaplexWalletPanel({
                   <button
                     type="button"
                     onClick={() => void launchToken()}
-                    disabled={tokenButton.disabled}
+                    disabled={launchingToken || (tokenButton.disabled && tokenButton.label !== 'Connect wallet')}
                     className="inline-flex flex-1 items-center justify-center gap-2 rounded-md border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-4 py-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-warning)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
                   >
                     {launchingToken ? <Loader2 size={14} className="animate-spin" /> : <Rocket size={14} />}

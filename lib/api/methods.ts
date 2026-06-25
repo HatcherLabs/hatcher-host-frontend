@@ -75,10 +75,16 @@ import type {
   Mpp32ConfigStatus,
   MetaplexConfigStatus,
   MetaplexMintAgentPlan,
+  MetaplexRegistrationCompleteInput,
+  MetaplexRegistrationPrepareInput,
+  MetaplexRegistrationPrepareResponse,
   MetaplexRegistrationResponse,
   MetaplexTokenImageUploadResponse,
+  MetaplexTokenLaunchCompleteInput,
   MetaplexTokenLaunchInput,
   MetaplexTokenLaunchPlan,
+  MetaplexTokenLaunchPrepareInput,
+  MetaplexTokenLaunchPrepareResponse,
   MetaplexTokenLaunchResponse,
   MirariConfigStatus,
   MirariDreamResult,
@@ -671,7 +677,19 @@ export const api = {
       method: "POST",
     }),
 
-  prepareAgentMetaplexTokenLaunch: (id: string, body: MetaplexTokenLaunchInput) =>
+  prepareAgentMetaplexRegistration: (id: string, body: MetaplexRegistrationPrepareInput) =>
+    req<MetaplexRegistrationPrepareResponse>(`/agents/${id}/metaplex/register/prepare`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  completeAgentMetaplexRegistration: (id: string, body: MetaplexRegistrationCompleteInput) =>
+    req<MetaplexRegistrationResponse>(`/agents/${id}/metaplex/register/complete`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  prepareAgentMetaplexTokenLaunch: (id: string, body: MetaplexTokenLaunchInput & { wallet?: string }) =>
     req<MetaplexTokenLaunchPlan>(`/agents/${id}/metaplex/token/prepare`, {
       method: "POST",
       body: JSON.stringify(body),
@@ -688,6 +706,18 @@ export const api = {
 
   launchAgentMetaplexToken: (id: string, body: MetaplexTokenLaunchInput) =>
     req<MetaplexTokenLaunchResponse>(`/agents/${id}/metaplex/token/launch`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  prepareAgentMetaplexTokenLaunchTransaction: (id: string, body: MetaplexTokenLaunchPrepareInput) =>
+    req<MetaplexTokenLaunchPrepareResponse>(`/agents/${id}/metaplex/token/launch/prepare`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  completeAgentMetaplexTokenLaunch: (id: string, body: MetaplexTokenLaunchCompleteInput) =>
+    req<MetaplexTokenLaunchResponse>(`/agents/${id}/metaplex/token/launch/complete`, {
       method: "POST",
       body: JSON.stringify(body),
     }),

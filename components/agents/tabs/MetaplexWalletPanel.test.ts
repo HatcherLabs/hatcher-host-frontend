@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildMetaplexTokenLaunchButtonState,
   buildMetaplexTokenLaunchDefaults,
+  buildMetaplexTokenLaunchPayload,
   buildMetaplexRegistrationButtonState,
   deriveMetaplexTokenSymbol,
   formatMetaplexStatusLabel,
@@ -119,6 +120,12 @@ describe('Metaplex wallet panel helpers', () => {
       label: 'Register on Metaplex',
       reason: null,
     });
+
+    expect(buildMetaplexRegistrationButtonState(READY_CONFIG, true, false)).toEqual({
+      disabled: true,
+      label: 'Connect wallet',
+      reason: 'Connect the Solana wallet that will own and pay for the Metaplex registration.',
+    });
   });
 
   it('does not offer registration when the agent is already registered', () => {
@@ -201,7 +208,7 @@ describe('Metaplex wallet panel helpers', () => {
       'Metaplex registration is not enabled for this agent yet.',
     );
     expect(humanizeMetaplexError('insufficient funds for fee')).toBe(
-      'The Hatcher payer wallet needs more SOL before this mainnet registration can be submitted.',
+      'The connected wallet needs more SOL before this mainnet transaction can be submitted.',
     );
   });
 
@@ -218,8 +225,61 @@ describe('Metaplex wallet panel helpers', () => {
         twitter: '',
         telegram: '',
       },
+      launchType: 'bondingCurve',
       firstBuyAmount: '',
+      launchpool: {
+        tokenAllocation: '500000000',
+        depositStartTime: '',
+        raiseGoal: '',
+        raydiumLiquidityBps: '5000',
+        fundsRecipient: '',
+      },
       confirmPermanentToken: false,
+    });
+  });
+
+  it('builds bonding curve and launchpool payloads for user-signed Genesis launches', () => {
+    const defaults = buildMetaplexTokenLaunchDefaults(REGISTERED_CONFIG);
+
+    expect(buildMetaplexTokenLaunchPayload({
+      ...defaults,
+      image: 'https://gateway.irys.xyz/hatch-token-image',
+      firstBuyAmount: '0',
+      confirmPermanentToken: true,
+    })).toEqual({
+      name: 'Hatch Token',
+      symbol: 'HATCH',
+      image: 'https://gateway.irys.xyz/hatch-token-image',
+      description: 'HatcherLabs agent',
+      externalLinks: {
+        website: 'https://hatcher.host/agent/hatch',
+      },
+      launchType: 'bondingCurve',
+      confirmPermanentToken: true,
+    });
+
+    expect(buildMetaplexTokenLaunchPayload({
+      ...defaults,
+      image: 'https://gateway.irys.xyz/hatch-token-image',
+      launchType: 'launchpool',
+      launchpool: {
+        tokenAllocation: '500000000',
+        depositStartTime: '2026-07-01T12:00',
+        raiseGoal: '250',
+        raydiumLiquidityBps: '5000',
+        fundsRecipient: 'UserWallet11111111111111111111111111111111111',
+      },
+      confirmPermanentToken: true,
+    })).toMatchObject({
+      launchType: 'launchpool',
+      launchpool: {
+        tokenAllocation: 500000000,
+        depositStartTime: '2026-07-01T12:00',
+        raiseGoal: 250,
+        raydiumLiquidityBps: 5000,
+        fundsRecipient: 'UserWallet11111111111111111111111111111111111',
+      },
+      confirmPermanentToken: true,
     });
   });
 
@@ -288,6 +348,18 @@ describe('Metaplex wallet panel helpers', () => {
       image: 'https://gateway.irys.xyz/hatch-token-image',
       confirmed: true,
       launching: false,
+      walletConnected: false,
+    })).toEqual({
+      disabled: true,
+      label: 'Connect wallet',
+      reason: 'Connect the Solana wallet that will sign and pay for the agent token launch.',
+    });
+
+    expect(buildMetaplexTokenLaunchButtonState(REGISTERED_CONFIG, READY_TOKEN_PLAN, {
+      image: 'https://gateway.irys.xyz/hatch-token-image',
+      confirmed: true,
+      launching: false,
+      walletConnected: true,
     })).toEqual({
       disabled: false,
       label: 'Launch agent token',
