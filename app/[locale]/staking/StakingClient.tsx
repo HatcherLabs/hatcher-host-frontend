@@ -753,8 +753,8 @@ export function StakingClient() {
       });
 
       setStakeTxId(result.txId);
-      if (result.setupTxId) {
-        setNotice('Streamflow receipt setup completed, then the staking transaction was submitted.');
+      if (result.setupIncluded) {
+        setNotice('Streamflow receipt setup was included in this staking transaction.');
       }
       setStakeAmount('');
       await Promise.all([load(), loadWalletBalance()]);
