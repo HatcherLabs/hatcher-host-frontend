@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { type ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useConnection, useWallet, type WalletContextState } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
-import { Transaction, VersionedTransaction, type Connection } from '@solana/web3.js';
+import { LAMPORTS_PER_SOL, PublicKey, Transaction, VersionedTransaction, type Connection } from '@solana/web3.js';
 import {
   AlertTriangle,
   CheckCircle2,
@@ -60,6 +60,33 @@ export function getMetaplexPublicLinks(config: MetaplexConfigStatus): Array<{ la
 
 export function getMetaplexProfileUrl(asset: string): string {
   return `https://www.metaplex.com/agents/${asset}`;
+}
+
+const METAPLEX_CORE_PROGRAM_ID = new PublicKey('CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d');
+const METAPLEX_ASSET_SIGNER_SEED = new TextEncoder().encode('mpl-core-execute');
+export const METAPLEX_TOKEN_LAUNCH_MIN_LAMPORTS = 60_000_000;
+
+export function getMetaplexAssetSignerWallet(asset: string | null | undefined): string | null {
+  const value = asset?.trim();
+  if (!value) return null;
+  try {
+    const [assetSigner] = PublicKey.findProgramAddressSync(
+      [METAPLEX_ASSET_SIGNER_SEED, new PublicKey(value).toBuffer()],
+      METAPLEX_CORE_PROGRAM_ID,
+    );
+    return assetSigner.toBase58();
+  } catch {
+    return null;
+  }
+}
+
+function formatMetaplexSolBalance(lamports: number): string {
+  return (lamports / LAMPORTS_PER_SOL).toLocaleString('en-US', { maximumFractionDigits: 4 });
+}
+
+export function getMetaplexTokenLaunchBalanceError(lamports: number): string | null {
+  if (lamports >= METAPLEX_TOKEN_LAUNCH_MIN_LAMPORTS) return null;
+  return `The connected wallet has ${formatMetaplexSolBalance(lamports)} SOL. Add at least 0.06 SOL before launching this Metaplex token.`;
 }
 
 export function getMetaplexAvatarPreview(config: MetaplexConfigStatus): {
@@ -475,11 +502,32 @@ export async function signAndSendMetaplexTransactions(
   connection: Connection,
   blockhash?: { blockhash: string; lastValidBlockHeight: number },
 ): Promise<string[]> {
-  if (!wallet.publicKey || !wallet.signTransaction) {
-    throw new Error('Connect a Solana wallet that can sign transactions.');
+  if (!wallet.publicKey || (!wallet.sendTransaction && !wallet.signTransaction)) {
+    throw new Error('Connect a Solana wallet that can submit transactions.');
   }
 
   const decodedTransactions = transactions.map(decodeMetaplexSerializedTransaction);
+  if (wallet.sendTransaction) {
+    const signatures: string[] = [];
+    const multiTransactionFlow = decodedTransactions.length > 1;
+    for (const transaction of decodedTransactions) {
+      const signature = await wallet.sendTransaction(transaction, connection, {
+        maxRetries: 5,
+        skipPreflight: multiTransactionFlow,
+        preflightCommitment: 'confirmed',
+      });
+      signatures.push(signature);
+    }
+    for (const signature of signatures) {
+      await confirmMetaplexSignature(connection, signature, blockhash);
+    }
+    return signatures;
+  }
+
+  if (!wallet.signTransaction) {
+    throw new Error('Connect a Solana wallet that can sign transactions.');
+  }
+
   const signedTransactions = wallet.signAllTransactions && decodedTransactions.length > 1
     ? await wallet.signAllTransactions(decodedTransactions)
     : await Promise.all(decodedTransactions.map((transaction) => wallet.signTransaction?.(transaction)));
@@ -647,7 +695,7 @@ export function MetaplexWalletPanel({
   }, [load]);
 
   const connectedWallet = wallet.publicKey?.toBase58() ?? null;
-  const walletCanSign = !!connectedWallet && !!wallet.signTransaction;
+  const walletCanSign = !!connectedWallet && (!!wallet.sendTransaction || !!wallet.signTransaction);
   const button = useMemo(
     () => buildMetaplexRegistrationButtonState(config, mainnetConfirmed, walletCanSign),
     [config, mainnetConfirmed, walletCanSign],
@@ -663,8 +711,9 @@ export function MetaplexWalletPanel({
   );
   const publicLinks = useMemo(() => (config ? getMetaplexPublicLinks(config) : []), [config]);
   const avatarPreview = useMemo(() => (config ? getMetaplexAvatarPreview(config) : null), [config]);
-  const displayWallet = config?.solanaWalletAddress ?? solanaWallet ?? null;
+  const hatcherSolanaWallet = config?.solanaWalletAddress ?? solanaWallet ?? null;
   const registeredAsset = result?.agentId ?? config?.metaplexAsset ?? null;
+  const metaplexAgentWallet = getMetaplexAssetSignerWallet(registeredAsset);
   const registeredAt = result?.registeredAt ?? config?.registeredAt ?? null;
   const existingToken = useMemo(
     () => (tokenResult
@@ -852,7 +901,8 @@ export function MetaplexWalletPanel({
 
   const launchToken = async () => {
     if (!tokenForm) return;
-    if (!connectedWallet || !wallet.signTransaction) {
+    const walletPublicKey = wallet.publicKey;
+    if (!connectedWallet || !walletPublicKey || (!wallet.sendTransaction && !wallet.signTransaction)) {
       setWalletModalVisible(true);
       return;
     }
@@ -862,6 +912,14 @@ export function MetaplexWalletPanel({
     try {
       const payload = tokenPayloadWithWalletDefault();
       if (!payload) return;
+      const balanceError = getMetaplexTokenLaunchBalanceError(
+        await connection.getBalance(walletPublicKey, 'confirmed'),
+      );
+      if (balanceError) {
+        setError(balanceError);
+        toast.error(balanceError);
+        return;
+      }
       const prepared = await api.prepareAgentMetaplexTokenLaunchTransaction(agentId, {
         ...payload,
         wallet: connectedWallet,
@@ -955,7 +1013,7 @@ export function MetaplexWalletPanel({
   };
 
   const register = async () => {
-    if (!connectedWallet || !wallet.signTransaction) {
+    if (!connectedWallet || (!wallet.sendTransaction && !wallet.signTransaction)) {
       setWalletModalVisible(true);
       return;
     }
@@ -1048,10 +1106,12 @@ export function MetaplexWalletPanel({
               icon={AlertTriangle}
             />
             <StatusTile
-              label="Agent wallet"
-              value={shortMetaplexValue(displayWallet)}
-              description="Public wallet attached to this agent identity."
-              tone={displayWallet ? 'muted' : 'warn'}
+              label={registeredAsset ? 'Metaplex wallet' : 'Hatcher wallet'}
+              value={shortMetaplexValue(registeredAsset ? metaplexAgentWallet : hatcherSolanaWallet)}
+              description={registeredAsset
+                ? 'Asset signer PDA derived from the Core asset.'
+                : 'Used for Hatcher Solana routing before Metaplex registration.'}
+              tone={registeredAsset ? 'good' : hatcherSolanaWallet ? 'muted' : 'warn'}
               icon={Wallet}
             />
             <StatusTile
@@ -1241,9 +1301,6 @@ export function MetaplexWalletPanel({
                   </span>
                   <span className="mt-1 block text-xs leading-relaxed text-[var(--text-muted)]">
                     This creates a public Metaplex Core asset and Agent Identity for this agent. Your connected wallet signs and pays the Solana transaction.
-                  </span>
-                  <span className="mt-2 block text-xs leading-relaxed text-[var(--text-muted)]">
-                    Phantom may mark this custom Metaplex transaction as unsafe. Continue only if the fee payer is your connected wallet and the transaction references Metaplex Core and Agent Registry programs.
                   </span>
                 </span>
               </label>
@@ -1567,9 +1624,6 @@ export function MetaplexWalletPanel({
                   <span className="text-xs leading-relaxed text-[var(--text-muted)]">
                     <span className="block font-semibold text-[var(--text-primary)]">I understand this permanently links one token to this agent.</span>
                     Metaplex only allows one canonical agent token once `setToken` is submitted.
-                    <span className="mt-2 block">
-                      Phantom may flag Genesis/Core Execute transactions as unsafe. Continue only if the fee payer is your connected wallet and the transaction references Metaplex programs.
-                    </span>
                   </span>
                 </label>
 

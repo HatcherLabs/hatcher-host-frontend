@@ -9,12 +9,15 @@ import {
   deriveMetaplexTokenSymbol,
   formatMetaplexStatusLabel,
   getMetaplexAvatarPreview,
+  getMetaplexAssetSignerWallet,
   getMetaplexProfileUrl,
   getMetaplexPublicLinks,
   getMetaplexRegisteredLinks,
+  getMetaplexTokenLaunchBalanceError,
   getMetaplexTokenLinks,
   humanizeMetaplexError,
   isMetaplexBlockhashExpiryError,
+  METAPLEX_TOKEN_LAUNCH_MIN_LAMPORTS,
   isMetaplexIrysImageUrl,
   signAndSendMetaplexTransactions,
   shouldShowMetaplexMainnetConfirmation,
@@ -180,6 +183,21 @@ describe('Metaplex wallet panel helpers', () => {
     );
   });
 
+  it('derives the Metaplex agent wallet from the Core asset, not the Hatcher Solana wallet', () => {
+    const asset = 'AHyHiHQojvS2QeL4MdxzWD8Yjrnf1P1SF5SegtyKauZj';
+    const hatcherSolanaWallet = 'Birv6WKC6royqRKTX2MCVPuueeRCSKPBaj5eDg5tsVWz';
+
+    expect(getMetaplexAssetSignerWallet(asset)).toBe('BHpMijtXxnVzdwweVrqtP95JUHtrf5SRVFCgVgSigDyB');
+    expect(getMetaplexAssetSignerWallet(asset)).not.toBe(hatcherSolanaWallet);
+  });
+
+  it('blocks token launch before Phantom when the connected wallet cannot cover Genesis costs', () => {
+    expect(getMetaplexTokenLaunchBalanceError(15_931_991)).toBe(
+      'The connected wallet has 0.0159 SOL. Add at least 0.06 SOL before launching this Metaplex token.',
+    );
+    expect(getMetaplexTokenLaunchBalanceError(METAPLEX_TOKEN_LAUNCH_MIN_LAMPORTS)).toBeNull();
+  });
+
   it('summarizes the avatar Metaplex will show', () => {
     expect(getMetaplexAvatarPreview(READY_CONFIG)).toEqual({
       image: 'https://hatcher.host/hatcher-metaplex-avatar.png',
@@ -278,7 +296,78 @@ describe('Metaplex wallet panel helpers', () => {
     );
   });
 
-  it('batch signs and broadcasts all Metaplex launch transactions before confirmation', async () => {
+  it('uses the wallet sendTransaction path for a single Metaplex registration transaction', async () => {
+    const wallet = {
+      publicKey: new PublicKey('11111111111111111111111111111111'),
+      signTransaction: vi.fn(),
+      sendTransaction: vi.fn(async () => 'register-signature'),
+    };
+    const connection = {
+      sendRawTransaction: vi.fn(),
+      confirmTransaction: vi.fn(async () => ({ value: { err: null } })),
+      getSignatureStatus: vi.fn(),
+    };
+
+    await expect(signAndSendMetaplexTransactions(
+      [makeEncodedMetaplexTransaction()],
+      wallet as never,
+      connection as never,
+      { blockhash: '11111111111111111111111111111111', lastValidBlockHeight: 123 },
+    )).resolves.toEqual(['register-signature']);
+
+    expect(wallet.sendTransaction).toHaveBeenCalledTimes(1);
+    expect(wallet.signTransaction).not.toHaveBeenCalled();
+    expect(connection.sendRawTransaction).not.toHaveBeenCalled();
+    expect(connection.confirmTransaction).toHaveBeenCalledWith({
+      signature: 'register-signature',
+      blockhash: '11111111111111111111111111111111',
+      lastValidBlockHeight: 123,
+    }, 'confirmed');
+  });
+
+  it('uses the wallet sendTransaction path for multi-step Metaplex launches when available', async () => {
+    const events: string[] = [];
+    const wallet = {
+      publicKey: new PublicKey('11111111111111111111111111111111'),
+      signTransaction: vi.fn(),
+      signAllTransactions: vi.fn(),
+      sendTransaction: vi.fn(async (_transaction: Transaction, _connection: unknown, options: { skipPreflight?: boolean }) => {
+        const signature = `send-${events.filter((event) => event.startsWith('send-')).length + 1}`;
+        events.push(signature);
+        expect(options.skipPreflight).toBe(true);
+        return signature;
+      }),
+    };
+    const connection = {
+      sendRawTransaction: vi.fn(),
+      confirmTransaction: vi.fn(async (request: string | { signature: string }) => {
+        const signature = typeof request === 'string' ? request : request.signature;
+        events.push(`confirm-${signature}`);
+        return { value: { err: null } };
+      }),
+      getSignatureStatus: vi.fn(),
+    };
+
+    await expect(signAndSendMetaplexTransactions(
+      [makeEncodedMetaplexTransaction(), makeEncodedMetaplexTransaction()],
+      wallet as never,
+      connection as never,
+      { blockhash: '11111111111111111111111111111111', lastValidBlockHeight: 123 },
+    )).resolves.toEqual(['send-1', 'send-2']);
+
+    expect(wallet.sendTransaction).toHaveBeenCalledTimes(2);
+    expect(wallet.signTransaction).not.toHaveBeenCalled();
+    expect(wallet.signAllTransactions).not.toHaveBeenCalled();
+    expect(connection.sendRawTransaction).not.toHaveBeenCalled();
+    expect(events).toEqual([
+      'send-1',
+      'send-2',
+      'confirm-send-1',
+      'confirm-send-2',
+    ]);
+  });
+
+  it('batch signs and broadcasts all Metaplex launch transactions before confirmation when sendTransaction is unavailable', async () => {
     const events: string[] = [];
     const wallet = {
       publicKey: new PublicKey('11111111111111111111111111111111'),
