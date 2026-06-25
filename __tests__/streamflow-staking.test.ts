@@ -134,7 +134,7 @@ describe('streamflow staking rewards', () => {
     stakingMocks.simulateTransaction.mockResolvedValue({ value: { err: null } });
   });
 
-  it('continues with the staking transaction after preparing a missing Streamflow receipt account', async () => {
+  it('includes missing Streamflow receipt account setup in the staking transaction', async () => {
     const keypair = Keypair.generate();
     const stakeMint = Keypair.generate().publicKey;
     stakingMocks.deriveStakeMintPDA.mockReturnValueOnce(stakeMint);
@@ -142,9 +142,7 @@ describe('streamflow staking rewards', () => {
     const wallet = {
       publicKey: keypair.publicKey,
       signTransaction: vi.fn(),
-      sendTransaction: vi.fn()
-        .mockResolvedValueOnce('prepare-ata-tx')
-        .mockResolvedValueOnce('sdk-stake-tx'),
+      sendTransaction: vi.fn(async () => 'sdk-stake-tx'),
     } as unknown as WalletContextState;
     const onTransactionSubmitted = vi.fn();
 
@@ -154,10 +152,12 @@ describe('streamflow staking rewards', () => {
       amountBaseUnits: 1_000_000n,
       durationDays: 7,
       onTransactionSubmitted,
-    })).resolves.toEqual({ txId: 'sdk-stake-tx', setupTxId: 'prepare-ata-tx' });
+    })).resolves.toEqual({ txId: 'sdk-stake-tx', setupIncluded: true });
 
     expect(stakingMocks.stakeAndCreateEntries).not.toHaveBeenCalled();
-    expect(wallet.sendTransaction).toHaveBeenCalledTimes(2);
+    expect(wallet.sendTransaction).toHaveBeenCalledTimes(1);
+    const [transaction] = (wallet.sendTransaction as ReturnType<typeof vi.fn>).mock.calls[0] as [VersionedTransaction];
+    expect(transaction.message.compiledInstructions.length).toBeGreaterThanOrEqual(2);
     expect(stakingMocks.prepareStakeAndCreateEntriesInstructions).toHaveBeenCalled();
     expect(stakingMocks.simulateTransaction).toHaveBeenCalledWith(
       expect.any(VersionedTransaction),
@@ -167,7 +167,7 @@ describe('streamflow staking rewards', () => {
     expect(stakingMocks.sendRawTransaction).not.toHaveBeenCalled();
   });
 
-  it('continues with the staking transaction after receipt setup on mobile', async () => {
+  it('includes missing receipt account setup in the mobile staking transaction', async () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148',
       maxTouchPoints: 5,
@@ -179,9 +179,7 @@ describe('streamflow staking rewards', () => {
     const wallet = {
       publicKey: keypair.publicKey,
       signTransaction: vi.fn(async (transaction) => transaction),
-      sendTransaction: vi.fn()
-        .mockResolvedValueOnce('prepare-ata-tx')
-        .mockResolvedValueOnce('sdk-stake-tx'),
+      sendTransaction: vi.fn(async () => 'sdk-stake-tx'),
     } as unknown as WalletContextState;
     const onTransactionSubmitted = vi.fn();
 
@@ -191,9 +189,11 @@ describe('streamflow staking rewards', () => {
       amountBaseUnits: 1_000_000n,
       durationDays: 7,
       onTransactionSubmitted,
-    })).resolves.toEqual({ txId: 'sdk-stake-tx', setupTxId: 'prepare-ata-tx' });
+    })).resolves.toEqual({ txId: 'sdk-stake-tx', setupIncluded: true });
 
-    expect(wallet.sendTransaction).toHaveBeenCalledTimes(2);
+    expect(wallet.sendTransaction).toHaveBeenCalledTimes(1);
+    const [transaction] = (wallet.sendTransaction as ReturnType<typeof vi.fn>).mock.calls[0] as [VersionedTransaction];
+    expect(transaction.message.compiledInstructions.length).toBeGreaterThanOrEqual(2);
     expect(wallet.signTransaction).not.toHaveBeenCalled();
     expect(onTransactionSubmitted).toHaveBeenCalledWith('sdk-stake-tx');
     expect(stakingMocks.sendRawTransaction).not.toHaveBeenCalled();
