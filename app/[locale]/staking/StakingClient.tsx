@@ -752,13 +752,10 @@ export function StakingClient() {
         onTransactionSubmitted: setStakeTxId,
       });
 
-      if (result.preparedOnly) {
-        setNotice('Streamflow receipt setup submitted. No HATCHER was staked in that transaction; tap Stake HATCHER again after it confirms.');
-        await loadWalletBalance();
-        return;
-      }
-
       setStakeTxId(result.txId);
+      if (result.setupTxId) {
+        setNotice('Streamflow receipt setup completed, then the staking transaction was submitted.');
+      }
       setStakeAmount('');
       await Promise.all([load(), loadWalletBalance()]);
     } catch (err) {
