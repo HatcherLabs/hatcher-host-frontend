@@ -25,6 +25,7 @@ const stakingMocks = vi.hoisted(() => ({
     },
   })),
   confirmTransaction: vi.fn(async (): Promise<unknown> => ({ value: { err: null } })),
+  getSignatureStatuses: vi.fn(async (): Promise<unknown> => ({ value: [null] })),
   sendRawTransaction: vi.fn(async (): Promise<string> => 'stake-tx'),
   prepareClaimRewardsInstructions: vi.fn(async (): Promise<{ ixs: unknown[] }> => ({ ixs: [] })),
   prepareStakeAndCreateEntriesInstructions: vi.fn(async (): Promise<{ ixs: unknown[] }> => ({ ixs: [] })),
@@ -40,6 +41,7 @@ vi.mock('@streamflow/staking', () => ({
       getAccountInfo: stakingMocks.getAccountInfo,
       getLatestBlockhashAndContext: stakingMocks.getLatestBlockhashAndContext,
       confirmTransaction: stakingMocks.confirmTransaction,
+      getSignatureStatuses: stakingMocks.getSignatureStatuses,
       sendRawTransaction: stakingMocks.sendRawTransaction,
       simulateTransaction: stakingMocks.simulateTransaction,
     };
@@ -81,6 +83,7 @@ describe('streamflow staking rewards', () => {
     stakingMocks.getAccountInfo.mockClear();
     stakingMocks.getLatestBlockhashAndContext.mockClear();
     stakingMocks.confirmTransaction.mockClear();
+    stakingMocks.getSignatureStatuses.mockClear();
     stakingMocks.sendRawTransaction.mockClear();
     stakingMocks.prepareClaimRewardsInstructions.mockClear();
     stakingMocks.prepareStakeAndCreateEntriesInstructions.mockClear();
@@ -129,6 +132,7 @@ describe('streamflow staking rewards', () => {
       },
     });
     stakingMocks.confirmTransaction.mockResolvedValue({ value: { err: null } });
+    stakingMocks.getSignatureStatuses.mockResolvedValue({ value: [null] });
     stakingMocks.sendRawTransaction.mockResolvedValue('stake-tx');
     stakingMocks.rewardEntryFetchNullable.mockResolvedValue({ accountedAmount: { toString: () => '100' } });
     stakingMocks.simulateTransaction.mockResolvedValue({ value: { err: null } });
@@ -293,6 +297,78 @@ describe('streamflow staking rewards', () => {
     expect(wallet.signTransaction).not.toHaveBeenCalled();
     expect(stakingMocks.sendRawTransaction).not.toHaveBeenCalled();
     expect(onTransactionSubmitted).toHaveBeenCalledWith('sdk-stake-tx');
+  });
+
+  it('does not fail a submitted stake when the RPC confirmation times out and signature status is confirmed', async () => {
+    const walletKeypair = Keypair.generate();
+    const tokenProgramId = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
+    stakingMocks.getAccountInfo.mockResolvedValue({
+      owner: tokenProgramId,
+    });
+    stakingMocks.confirmTransaction.mockRejectedValueOnce(new Error('Solana RPC upstream timed out'));
+    stakingMocks.getSignatureStatuses.mockResolvedValueOnce({
+      value: [{ confirmationStatus: 'confirmed', err: null }],
+    });
+    const wallet = {
+      publicKey: walletKeypair.publicKey,
+      signTransaction: vi.fn(),
+      sendTransaction: vi.fn(async () => 'sdk-stake-tx'),
+    } as unknown as WalletContextState;
+
+    await expect(stakeHatcherWithStreamflow({
+      wallet,
+      stakePoolAddress: '7BVxRYGoTJjr3bgvDhpJggJrnUhyYoGPbnxTRAWuDmtH',
+      amountBaseUnits: 1_000_000n,
+      durationDays: 7,
+    })).resolves.toEqual({ txId: 'sdk-stake-tx' });
+
+    expect(stakingMocks.getSignatureStatuses).toHaveBeenCalledWith(['sdk-stake-tx']);
+  });
+
+  it('keeps a submitted stake pending when post-submit RPC status lookup is inconclusive', async () => {
+    const walletKeypair = Keypair.generate();
+    const tokenProgramId = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
+    stakingMocks.getAccountInfo.mockResolvedValue({
+      owner: tokenProgramId,
+    });
+    stakingMocks.confirmTransaction.mockRejectedValueOnce(new Error('Solana RPC upstream timed out'));
+    stakingMocks.getSignatureStatuses.mockRejectedValueOnce(new Error('Solana RPC upstream timed out'));
+    const wallet = {
+      publicKey: walletKeypair.publicKey,
+      signTransaction: vi.fn(),
+      sendTransaction: vi.fn(async () => 'sdk-stake-tx'),
+    } as unknown as WalletContextState;
+
+    await expect(stakeHatcherWithStreamflow({
+      wallet,
+      stakePoolAddress: '7BVxRYGoTJjr3bgvDhpJggJrnUhyYoGPbnxTRAWuDmtH',
+      amountBaseUnits: 1_000_000n,
+      durationDays: 7,
+    })).resolves.toEqual({ txId: 'sdk-stake-tx' });
+  });
+
+  it('still fails a submitted stake when RPC reports an on-chain transaction error', async () => {
+    const walletKeypair = Keypair.generate();
+    const tokenProgramId = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
+    stakingMocks.getAccountInfo.mockResolvedValue({
+      owner: tokenProgramId,
+    });
+    stakingMocks.confirmTransaction.mockRejectedValueOnce(new Error('Solana RPC upstream timed out'));
+    stakingMocks.getSignatureStatuses.mockResolvedValueOnce({
+      value: [{ confirmationStatus: 'confirmed', err: { InstructionError: [0, 'Custom'] } }],
+    });
+    const wallet = {
+      publicKey: walletKeypair.publicKey,
+      signTransaction: vi.fn(),
+      sendTransaction: vi.fn(async () => 'sdk-stake-tx'),
+    } as unknown as WalletContextState;
+
+    await expect(stakeHatcherWithStreamflow({
+      wallet,
+      stakePoolAddress: '7BVxRYGoTJjr3bgvDhpJggJrnUhyYoGPbnxTRAWuDmtH',
+      amountBaseUnits: 1_000_000n,
+      durationDays: 7,
+    })).rejects.toThrow('Staking transaction failed after broadcast');
   });
 
   it('unstakes an unlocked Streamflow stake through wallet sendTransaction', async () => {
