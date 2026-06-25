@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
 
 import {
   buildMetaplexTokenLaunchButtonState,
@@ -15,6 +16,7 @@ import {
   humanizeMetaplexError,
   isMetaplexBlockhashExpiryError,
   isMetaplexIrysImageUrl,
+  signAndSendMetaplexTransactions,
   shouldShowMetaplexMainnetConfirmation,
   validateMetaplexAvatarFile,
   validateMetaplexTokenImageFile,
@@ -102,6 +104,22 @@ const READY_TOKEN_PLAN: MetaplexTokenLaunchPlan = {
   },
   notes: [],
 };
+
+function makeEncodedMetaplexTransaction(): string {
+  const wallet = new PublicKey('11111111111111111111111111111111');
+  const tx = new Transaction({
+    feePayer: wallet,
+    recentBlockhash: '11111111111111111111111111111111',
+  }).add(SystemProgram.transfer({
+    fromPubkey: wallet,
+    toPubkey: wallet,
+    lamports: 0,
+  }));
+  return Buffer.from(tx.serialize({
+    requireAllSignatures: false,
+    verifySignatures: false,
+  })).toString('base64');
+}
 
 describe('Metaplex wallet panel helpers', () => {
   it('labels the user-facing registration state', () => {
@@ -212,6 +230,9 @@ describe('Metaplex wallet panel helpers', () => {
     expect(humanizeMetaplexError('insufficient funds for fee')).toBe(
       'The connected wallet needs more SOL before this mainnet transaction can be submitted.',
     );
+    expect(humanizeMetaplexError('AccountNotFound')).toBe(
+      'The connected wallet needs SOL on Solana mainnet before Metaplex can prepare this transaction.',
+    );
   });
 
   it('recognizes Solana blockhash expiry confirmation errors', () => {
@@ -255,6 +276,55 @@ describe('Metaplex wallet panel helpers', () => {
     await expect(waitForMetaplexSignatureConfirmation(connection, '3AA', 1, 0)).rejects.toThrow(
       'Transaction failed on-chain',
     );
+  });
+
+  it('batch signs and broadcasts all Metaplex launch transactions before confirmation', async () => {
+    const events: string[] = [];
+    const wallet = {
+      publicKey: new PublicKey('11111111111111111111111111111111'),
+      signTransaction: vi.fn(),
+      signAllTransactions: vi.fn(async () => {
+        events.push('sign-all');
+        return [
+          { serialize: () => new Uint8Array([1]) },
+          { serialize: () => new Uint8Array([2]) },
+        ];
+      }),
+    };
+    const connection = {
+      sendRawTransaction: vi.fn(async (raw: Uint8Array) => {
+        const label = `send-${raw[0]}`;
+        events.push(label);
+        return label;
+      }),
+      confirmTransaction: vi.fn(async (request: string | { signature: string }) => {
+        const signature = typeof request === 'string' ? request : request.signature;
+        events.push(`confirm-${signature}`);
+        return { value: { err: null } };
+      }),
+      getSignatureStatus: vi.fn(),
+    };
+
+    await expect(signAndSendMetaplexTransactions(
+      [makeEncodedMetaplexTransaction(), makeEncodedMetaplexTransaction()],
+      wallet as never,
+      connection as never,
+      { blockhash: '11111111111111111111111111111111', lastValidBlockHeight: 123 },
+    )).resolves.toEqual(['send-1', 'send-2']);
+
+    expect(wallet.signTransaction).not.toHaveBeenCalled();
+    expect(wallet.signAllTransactions).toHaveBeenCalledTimes(1);
+    expect(events).toEqual([
+      'sign-all',
+      'send-1',
+      'send-2',
+      'confirm-send-1',
+      'confirm-send-2',
+    ]);
+    expect(connection.sendRawTransaction).toHaveBeenCalledWith(new Uint8Array([1]), {
+      maxRetries: 5,
+      skipPreflight: true,
+    });
   });
 
   it('derives compact token launch defaults from the registered agent metadata', () => {
