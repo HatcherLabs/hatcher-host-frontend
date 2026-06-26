@@ -6,6 +6,7 @@ import {
   buildMetaplexTokenLaunchButtonState,
   buildMetaplexTokenLaunchDefaults,
   buildMetaplexTokenLaunchPayload,
+  buildMetaplexCreateTokenUrl,
   buildMetaplexRegistrationButtonState,
   buildMetaplexLaunchFundingTransaction,
   deriveMetaplexTokenSymbol,
@@ -23,6 +24,7 @@ import {
   humanizeMetaplexError,
   isMetaplexBlockhashExpiryError,
   METAPLEX_TOKEN_LAUNCH_MIN_LAMPORTS,
+  METAPLEX_INTERNAL_LAUNCH_UI_ENABLED,
   isMetaplexIrysImageUrl,
   refundMetaplexLaunchWalletFunding,
   signAndSendMetaplexTransactions,
@@ -792,6 +794,17 @@ describe('Metaplex wallet panel helpers', () => {
     expect(isMetaplexIrysImageUrl('https://gateway.irys.xyz/hatch-token-image')).toBe(true);
     expect(isMetaplexIrysImageUrl('https://hatcher.host/hatcher-metaplex-avatar.png')).toBe(false);
     expect(isMetaplexIrysImageUrl('data:image/png;base64,AAAA')).toBe(false);
+  });
+
+  it('uses the official Metaplex create-token flow for agent token launches', () => {
+    expect(buildMetaplexCreateTokenUrl('7gkXXBj3wd8rm9QhFvUGNgX7YjWhGxLEqNT6CH9j24gk')).toBe(
+      'https://www.metaplex.com/create-token?agent=7gkXXBj3wd8rm9QhFvUGNgX7YjWhGxLEqNT6CH9j24gk',
+    );
+    expect(buildMetaplexCreateTokenUrl(' 7gkXXBj3wd8rm9QhFvUGNgX7YjWhGxLEqNT6CH9j24gk ')).toBe(
+      'https://www.metaplex.com/create-token?agent=7gkXXBj3wd8rm9QhFvUGNgX7YjWhGxLEqNT6CH9j24gk',
+    );
+    expect(buildMetaplexCreateTokenUrl(null)).toBeNull();
+    expect(METAPLEX_INTERNAL_LAUNCH_UI_ENABLED).toBe(false);
   });
 
   it('only accepts compact image files before token image upload', () => {

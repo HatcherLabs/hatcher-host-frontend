@@ -74,10 +74,17 @@ export function getMetaplexProfileUrl(asset: string): string {
 
 const METAPLEX_CORE_PROGRAM_ID = new PublicKey('CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d');
 const METAPLEX_ASSET_SIGNER_SEED = new TextEncoder().encode('mpl-core-execute');
+export const METAPLEX_INTERNAL_LAUNCH_UI_ENABLED = false;
 export const METAPLEX_TOKEN_LAUNCH_MIN_LAMPORTS = 70_000_000;
 export const METAPLEX_LAUNCH_WALLET_BASE_LAMPORTS = 5_000_000;
 export const METAPLEX_AGENT_WALLET_BASE_LAMPORTS = 5_000_000;
 export const METAPLEX_TOKEN_LAUNCH_WALLET_FEE_PADDING_LAMPORTS = 10_000_000;
+
+export function buildMetaplexCreateTokenUrl(agentAsset: string | null | undefined): string | null {
+  const asset = agentAsset?.trim();
+  if (!asset) return null;
+  return `https://www.metaplex.com/create-token?agent=${encodeURIComponent(asset)}`;
+}
 
 export function getMetaplexAssetSignerWallet(asset: string | null | undefined): string | null {
   const value = asset?.trim();
@@ -1276,6 +1283,7 @@ export function MetaplexWalletPanel({
   const hatcherSolanaWallet = config?.solanaWalletAddress ?? solanaWallet ?? null;
   const registeredAsset = result?.agentId ?? config?.metaplexAsset ?? null;
   const metaplexAgentWallet = getMetaplexAssetSignerWallet(registeredAsset);
+  const metaplexCreateTokenUrl = useMemo(() => buildMetaplexCreateTokenUrl(registeredAsset), [registeredAsset]);
   const registeredAt = result?.registeredAt ?? config?.registeredAt ?? null;
   const existingToken = useMemo(
     () => (tokenResult
@@ -2204,6 +2212,85 @@ export function MetaplexWalletPanel({
                   {tokenLinks.map((link) => (
                     <LinkRow key={link.href} label={link.label} href={link.href} onCopy={copy} />
                   ))}
+                </div>
+              </div>
+            ) : !METAPLEX_INTERNAL_LAUNCH_UI_ENABLED ? (
+              <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+                <div className="rounded-md border border-[var(--border-subtle)] bg-black/10 p-4">
+                  <div className="flex items-start gap-3">
+                    <Rocket size={18} className="mt-0.5 flex-shrink-0 text-[var(--accent)]" />
+                    <div className="min-w-0">
+                      <div className="text-sm font-semibold text-[var(--text-primary)]">Launch token on Metaplex</div>
+                      <p className="mt-1 text-xs leading-relaxed text-[var(--text-muted)]">
+                        No permanent token is linked yet. Continue in Metaplex Genesis using this agent identity.
+                      </p>
+                      {registeredAsset && (
+                        <div className="mt-3 truncate font-mono text-[11px] text-[var(--text-primary)]">{registeredAsset}</div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <StatusTile
+                    label="Status"
+                    value="No token"
+                    description="Hatcher checks Metaplex for a linked token on panel load."
+                    tone="warn"
+                    icon={AlertTriangle}
+                  />
+                  <StatusTile
+                    label="Agent"
+                    value={shortMetaplexValue(registeredAsset)}
+                    description="Core asset passed into the official Metaplex launch flow."
+                    tone="muted"
+                    icon={Fingerprint}
+                  />
+                  <StatusTile
+                    label="Launch flow"
+                    value="Metaplex"
+                    description="Token details, bonding curve, and launch signing happen there."
+                    tone="muted"
+                    icon={ExternalLink}
+                  />
+                  <StatusTile
+                    label="After launch"
+                    value="Refresh"
+                    description="The linked token and launch links appear here after registry sync."
+                    tone="muted"
+                    icon={RefreshCw}
+                  />
+                </div>
+                <div className="flex flex-wrap gap-2 xl:col-span-2">
+                  <button
+                    type="button"
+                    onClick={() => void load()}
+                    disabled={loading || checkingToken}
+                    className="inline-flex items-center justify-center gap-2 rounded-md border border-[var(--border-subtle)] px-3 py-2 text-xs font-semibold text-[var(--text-secondary)] transition hover:border-[var(--border-hover)] hover:text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {loading ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
+                    Refresh status
+                  </button>
+                  {metaplexCreateTokenUrl ? (
+                    <a
+                      href={metaplexCreateTokenUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex flex-1 items-center justify-center gap-2 rounded-md border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-4 py-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-warning)] transition hover:brightness-110 sm:flex-none"
+                    >
+                      <Rocket size={14} />
+                      Launch on Metaplex
+                      <ExternalLink size={13} />
+                    </a>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled
+                      className="inline-flex flex-1 cursor-not-allowed items-center justify-center gap-2 rounded-md border border-[var(--border-subtle)] px-4 py-2 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] opacity-50 sm:flex-none"
+                    >
+                      <Rocket size={14} />
+                      Launch on Metaplex
+                    </button>
+                  )}
                 </div>
               </div>
             ) : (
