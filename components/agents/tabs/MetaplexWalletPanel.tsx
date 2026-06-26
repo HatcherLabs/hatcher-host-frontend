@@ -167,6 +167,7 @@ export function buildMetaplexRegistrationButtonState(
   config: MetaplexConfigStatus | null,
   mainnetConfirmed: boolean,
   walletConnected = true,
+  avatarUploading = false,
 ): { disabled: boolean; label: string; reason: string | null } {
   if (!config) {
     return { disabled: true, label: 'Checking Metaplex', reason: 'Load Metaplex status first.' };
@@ -192,6 +193,13 @@ export function buildMetaplexRegistrationButtonState(
       disabled: true,
       label: 'Review and confirm mainnet',
       reason: 'Confirm the mainnet registration before submitting.',
+    };
+  }
+  if (avatarUploading) {
+    return {
+      disabled: true,
+      label: 'Uploading avatar',
+      reason: 'Wait for the avatar upload to finish before registering on Metaplex.',
     };
   }
   if (!walletConnected) {
@@ -534,28 +542,42 @@ export async function signAndSendMetaplexTransactions(
     const walletAddress = wallet.publicKey.toBase58();
     const signatures: string[] = [];
     const multiTransactionFlow = decodedTransactions.length > 1;
+    const rawSignMultiTransactionFlow = multiTransactionFlow && !!wallet.signTransaction;
     for (const transaction of decodedTransactions) {
       const fullySigned = metaplexTransactionHasAllRequiredSignatures(transaction);
       const requiresWalletSignature = metaplexTransactionRequiredSigners(transaction).includes(walletAddress);
-      const signature = fullySigned
-        ? await connection.sendRawTransaction(transaction.serialize(), {
-            maxRetries: 5,
-            skipPreflight: multiTransactionFlow,
-          })
-        : requiresWalletSignature
-          ? await wallet.sendTransaction(transaction, connection, {
-              maxRetries: 5,
-              skipPreflight: multiTransactionFlow,
-              preflightCommitment: 'confirmed',
-            })
-          : null;
+      let signature: string | null = null;
+      if (fullySigned) {
+        signature = await connection.sendRawTransaction(transaction.serialize(), {
+          maxRetries: 5,
+          skipPreflight: multiTransactionFlow,
+        });
+      } else if (requiresWalletSignature && rawSignMultiTransactionFlow && wallet.signTransaction) {
+        const signed = await wallet.signTransaction(transaction);
+        if (!signed) throw new Error('Wallet did not return a signed Metaplex transaction.');
+        signature = await connection.sendRawTransaction(signed.serialize(), {
+          maxRetries: 5,
+          skipPreflight: true,
+        });
+      } else if (requiresWalletSignature) {
+        signature = await wallet.sendTransaction(transaction, connection, {
+          maxRetries: 5,
+          skipPreflight: multiTransactionFlow,
+          preflightCommitment: 'confirmed',
+        });
+      }
       if (!signature) {
         throw new Error('Metaplex returned a transaction that is missing a non-wallet signature.');
       }
       signatures.push(signature);
+      if (multiTransactionFlow) {
+        await confirmMetaplexSignature(connection, signature, blockhash);
+      }
     }
-    for (const signature of signatures) {
-      await confirmMetaplexSignature(connection, signature, blockhash);
+    if (!multiTransactionFlow) {
+      for (const signature of signatures) {
+        await confirmMetaplexSignature(connection, signature, blockhash);
+      }
     }
     return signatures;
   }
@@ -752,8 +774,8 @@ export function MetaplexWalletPanel({
   const connectedWallet = wallet.publicKey?.toBase58() ?? null;
   const walletCanSign = !!connectedWallet && (!!wallet.sendTransaction || !!wallet.signTransaction);
   const button = useMemo(
-    () => buildMetaplexRegistrationButtonState(config, mainnetConfirmed, walletCanSign),
-    [config, mainnetConfirmed, walletCanSign],
+    () => buildMetaplexRegistrationButtonState(config, mainnetConfirmed, walletCanSign, avatarUploading),
+    [avatarUploading, config, mainnetConfirmed, walletCanSign],
   );
   const tokenButton = useMemo(
     () => buildMetaplexTokenLaunchButtonState(config, tokenPlan, {
@@ -1082,6 +1104,12 @@ export function MetaplexWalletPanel({
   const register = async () => {
     if (!connectedWallet || (!wallet.sendTransaction && !wallet.signTransaction)) {
       setWalletModalVisible(true);
+      return;
+    }
+    if (avatarUploading) {
+      const message = 'Wait for the avatar upload to finish before registering on Metaplex.';
+      setError(message);
+      toast.error(message);
       return;
     }
     if (button.disabled && button.label !== 'Connect wallet') return;

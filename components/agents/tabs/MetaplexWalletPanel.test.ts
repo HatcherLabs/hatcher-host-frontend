@@ -166,6 +166,14 @@ describe('Metaplex wallet panel helpers', () => {
     });
   });
 
+  it('blocks registration while a custom avatar is still uploading', () => {
+    expect(buildMetaplexRegistrationButtonState(READY_CONFIG, true, true, true)).toEqual({
+      disabled: true,
+      label: 'Uploading avatar',
+      reason: 'Wait for the avatar upload to finish before registering on Metaplex.',
+    });
+  });
+
   it('does not offer registration when the agent is already registered', () => {
     expect(buildMetaplexRegistrationButtonState({
       ...READY_CONFIG,
@@ -364,18 +372,18 @@ describe('Metaplex wallet panel helpers', () => {
     expect(wallet.sendTransaction).not.toHaveBeenCalled();
   });
 
-  it('submits all Metaplex launch transactions through the wallet before confirmation', async () => {
+  it('signs and raw-sends multi-step Metaplex launch transactions sequentially', async () => {
     const events: string[] = [];
+    let signedIndex = 0;
     const wallet = {
       publicKey: new PublicKey('11111111111111111111111111111111'),
-      signTransaction: vi.fn(),
-      signAllTransactions: vi.fn(async () => {
-        events.push('sign-all');
-        return [
-          { serialize: () => new Uint8Array([1]) },
-          { serialize: () => new Uint8Array([2]) },
-        ];
+      signTransaction: vi.fn(async () => {
+        signedIndex += 1;
+        const serializedValue = signedIndex;
+        events.push(`sign-${serializedValue}`);
+        return { serialize: () => new Uint8Array([serializedValue]) };
       }),
+      signAllTransactions: vi.fn(),
       sendTransaction: vi.fn(async (_transaction: Transaction, _connection: unknown, options: { skipPreflight?: boolean }) => {
         const signature = `send-${events.filter((event) => event.startsWith('send-')).length + 1}`;
         events.push(signature);
@@ -404,16 +412,25 @@ describe('Metaplex wallet panel helpers', () => {
       { blockhash: '11111111111111111111111111111111', lastValidBlockHeight: 123 },
     )).resolves.toEqual(['send-1', 'send-2']);
 
-    expect(wallet.signTransaction).not.toHaveBeenCalled();
+    expect(wallet.signTransaction).toHaveBeenCalledTimes(2);
     expect(wallet.signAllTransactions).not.toHaveBeenCalled();
-    expect(wallet.sendTransaction).toHaveBeenCalledTimes(2);
+    expect(wallet.sendTransaction).not.toHaveBeenCalled();
     expect(events).toEqual([
+      'sign-1',
       'send-1',
-      'send-2',
       'confirm-send-1',
+      'sign-2',
+      'send-2',
       'confirm-send-2',
     ]);
-    expect(connection.sendRawTransaction).not.toHaveBeenCalled();
+    expect(connection.sendRawTransaction).toHaveBeenCalledWith(new Uint8Array([1]), {
+      maxRetries: 5,
+      skipPreflight: true,
+    });
+    expect(connection.sendRawTransaction).toHaveBeenCalledWith(new Uint8Array([2]), {
+      maxRetries: 5,
+      skipPreflight: true,
+    });
   });
 
   it('broadcasts already signed Metaplex transactions that do not require the connected wallet', async () => {
