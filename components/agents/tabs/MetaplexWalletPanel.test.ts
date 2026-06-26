@@ -24,6 +24,7 @@ import {
   isMetaplexBlockhashExpiryError,
   METAPLEX_TOKEN_LAUNCH_MIN_LAMPORTS,
   isMetaplexIrysImageUrl,
+  refundMetaplexLaunchWalletFunding,
   signAndSendMetaplexTransactions,
   signMetaplexTransactions,
   shouldShowMetaplexMainnetConfirmation,
@@ -919,5 +920,39 @@ describe('Metaplex wallet panel helpers', () => {
     expect(fundingIndex).toBeGreaterThan(-1);
     expect(prepareIndex).toBeGreaterThan(-1);
     expect(fundingIndex).toBeLessThan(prepareIndex);
+  });
+
+  it('refunds temporary launch wallet funding when Genesis prepare fails before submission', async () => {
+    const launchKeypair = Keypair.generate();
+    const refundWallet = Keypair.generate().publicKey;
+    let serializedRefund: Buffer | null = null;
+    const connection = {
+      getBalance: vi.fn(async () => 1_000_000),
+      getLatestBlockhash: vi.fn(async () => ({
+        blockhash: '11111111111111111111111111111111',
+        lastValidBlockHeight: 123,
+      })),
+      getFeeForMessage: vi.fn(async () => ({ value: 5_000 })),
+      sendRawTransaction: vi.fn(async (serialized: Buffer | Uint8Array) => {
+        serializedRefund = Buffer.from(serialized);
+        return 'refund-signature';
+      }),
+      confirmTransaction: vi.fn(async () => ({ value: { err: null } })),
+      getSignatureStatus: vi.fn(),
+    };
+
+    await expect(refundMetaplexLaunchWalletFunding(
+      connection as never,
+      launchKeypair,
+      refundWallet,
+    )).resolves.toBe('refund-signature');
+
+    expect(connection.getBalance).toHaveBeenCalledWith(launchKeypair.publicKey, 'confirmed');
+    expect(connection.sendRawTransaction).toHaveBeenCalledTimes(1);
+    const refundTransaction = Transaction.from(serializedRefund!);
+    const transfer = SystemInstruction.decodeTransfer(refundTransaction.instructions[0]);
+    expect(transfer.fromPubkey.toBase58()).toBe(launchKeypair.publicKey.toBase58());
+    expect(transfer.toPubkey.toBase58()).toBe(refundWallet.toBase58());
+    expect(transfer.lamports).toBe(995_000n);
   });
 });

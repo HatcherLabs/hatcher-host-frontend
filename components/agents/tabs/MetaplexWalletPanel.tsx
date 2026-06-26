@@ -1074,6 +1074,42 @@ async function fundMetaplexLaunchWallets(
   return signature;
 }
 
+export async function refundMetaplexLaunchWalletFunding(
+  connection: Connection,
+  launchKeypair: Keypair,
+  refundWallet: PublicKey,
+): Promise<string | null> {
+  const balance = await connection.getBalance(launchKeypair.publicKey, 'confirmed');
+  if (balance <= 0) return null;
+  const latestBlockhash = await connection.getLatestBlockhash('confirmed');
+  const feeProbe = new Transaction({
+    feePayer: launchKeypair.publicKey,
+    recentBlockhash: latestBlockhash.blockhash,
+  }).add(SystemProgram.transfer({
+    fromPubkey: launchKeypair.publicKey,
+    toPubkey: refundWallet,
+    lamports: 1,
+  }));
+  const fee = (await connection.getFeeForMessage(feeProbe.compileMessage(), 'confirmed')).value ?? 5_000;
+  const refundableLamports = balance - fee;
+  if (refundableLamports <= 0) return null;
+  const transaction = new Transaction({
+    feePayer: launchKeypair.publicKey,
+    recentBlockhash: latestBlockhash.blockhash,
+  }).add(SystemProgram.transfer({
+    fromPubkey: launchKeypair.publicKey,
+    toPubkey: refundWallet,
+    lamports: refundableLamports,
+  }));
+  transaction.sign(launchKeypair);
+  const signature = await connection.sendRawTransaction(transaction.serialize(), {
+    maxRetries: 5,
+    preflightCommitment: 'confirmed',
+  });
+  await confirmMetaplexSignature(connection, signature, latestBlockhash);
+  return signature;
+}
+
 function StatusTile({
   label,
   value,
@@ -1443,6 +1479,10 @@ export function MetaplexWalletPanel({
     if (tokenButton.disabled && tokenButton.label !== 'Connect wallet') return;
     setLaunchingToken(true);
     setError(null);
+    let launchKeypairForRefund: Keypair | null = null;
+    let launchWalletForRefund: string | null = null;
+    let launchWalletFunded = false;
+    let genesisSubmissionStarted = false;
     try {
       const payload = tokenPayloadWithWalletDefault();
       if (!payload) return;
@@ -1466,7 +1506,9 @@ export function MetaplexWalletPanel({
         return;
       }
       const launchKeypair = Keypair.generate();
+      launchKeypairForRefund = launchKeypair;
       const launchWallet = launchKeypair.publicKey.toBase58();
+      launchWalletForRefund = launchWallet;
       const delegationPrepared = await api.prepareAgentMetaplexTokenLaunchDelegation(agentId, {
         wallet: connectedWallet,
       });
@@ -1554,6 +1596,7 @@ export function MetaplexWalletPanel({
         agentWallet: metaplexAgentWallet,
         signature: fundingSignature,
       });
+      launchWalletFunded = true;
       const prepared = await api.prepareAgentMetaplexTokenLaunchTransaction(agentId, {
         ...payload,
         wallet: connectedWallet,
@@ -1579,6 +1622,7 @@ export function MetaplexWalletPanel({
         txCount: prepared.data.transactions.length,
       });
       let completed: Awaited<ReturnType<typeof api.completeAgentMetaplexTokenLaunch>> | null = null;
+      genesisSubmissionStarted = true;
       const signatures = await signAndSendMetaplexTransactions(
         prepared.data.transactions,
         wallet,
@@ -1626,9 +1670,36 @@ export function MetaplexWalletPanel({
       toast.success('Agent token launched');
       await load();
     } catch (e) {
+      if (launchWalletFunded && !genesisSubmissionStarted && launchKeypairForRefund && walletPublicKey) {
+        try {
+          const refundSignature = await refundMetaplexLaunchWalletFunding(
+            connection,
+            launchKeypairForRefund,
+            walletPublicKey,
+          );
+          if (refundSignature) {
+            await logTokenLaunchEvent({
+              phase: 'launch_wallet_refunded',
+              wallet: connectedWallet,
+              launchWallet: launchWalletForRefund ?? undefined,
+              agentWallet: metaplexAgentWallet,
+              signature: refundSignature,
+            });
+          }
+        } catch (refundError) {
+          await logTokenLaunchEvent({
+            phase: 'launch_wallet_refund_error',
+            wallet: connectedWallet,
+            launchWallet: launchWalletForRefund ?? undefined,
+            agentWallet: metaplexAgentWallet,
+            error: metaplexWalletErrorSummary(refundError),
+          });
+        }
+      }
       await logTokenLaunchEvent({
         phase: 'flow_error',
         wallet: connectedWallet,
+        launchWallet: launchWalletForRefund ?? undefined,
         agentWallet: metaplexAgentWallet,
         error: metaplexWalletErrorSummary(e),
       });
