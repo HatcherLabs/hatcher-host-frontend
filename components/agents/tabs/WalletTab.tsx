@@ -849,58 +849,38 @@ function ProviderIntegrationsPanel({
   const current = providers.find((provider) => provider.id === effectiveProvider) ?? providers[0];
 
   return (
-    <div className="grid gap-4 xl:grid-cols-[330px_minmax(0,1fr)]">
+    <div className="space-y-4">
       <WalletSurface className="p-4">
-        <div className="mb-4">
-          <div className="text-[11px] font-semibold text-[var(--text-muted)]">Provider integrations</div>
-          <h3 className="mt-1 text-base font-semibold text-[var(--text-primary)]">Runtime provider rails</h3>
-          <p className="mt-1 text-xs leading-relaxed text-[var(--text-muted)]">
-            Partner-specific setup is grouped here so wallet balances, addresses, and key safety stay readable.
-          </p>
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="min-w-0">
+            <div className="text-[11px] font-semibold text-[var(--text-muted)]">Provider integrations</div>
+            <h3 className="mt-1 text-lg font-semibold text-[var(--text-primary)]">{current.label}</h3>
+            <p className="mt-1 max-w-3xl text-xs leading-relaxed text-[var(--text-muted)]">
+              {current.description}
+            </p>
+          </div>
+          <label className="w-full text-xs font-medium text-[var(--text-muted)] lg:max-w-sm">
+            Provider
+            <select
+              value={effectiveProvider}
+              onChange={(event) => onProviderChange(event.target.value as ProviderPanelId)}
+              className="mt-1 w-full rounded-lg border border-[var(--border-subtle)] bg-black/30 px-3 py-2 text-sm font-semibold text-[var(--text-primary)] outline-none focus:border-[var(--phosphor)]"
+            >
+              {providers.map((provider) => (
+                <option key={provider.id} value={provider.id}>
+                  {provider.label} - {provider.network}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
-        <div className="space-y-2">
-          {providers.map((provider) => {
-            const selected = effectiveProvider === provider.id;
-            return (
-              <button
-                key={provider.id}
-                type="button"
-                onClick={() => onProviderChange(provider.id)}
-                className={`w-full rounded-xl border p-3 text-left transition ${
-                  selected
-                    ? 'border-[var(--border-hover)] bg-[color-mix(in_srgb,var(--accent)_10%,transparent)]'
-                    : 'border-[var(--border-default)] bg-[var(--bg-surface)] hover:border-[var(--border-hover)]'
-                }`}
-              >
-                <span className="flex items-center justify-between gap-3">
-                  <span className="text-sm font-semibold text-[var(--text-primary)]">{provider.label}</span>
-                  <span className="rounded-full border border-[var(--border-default)] px-2 py-0.5 text-[10px] font-semibold text-[var(--text-muted)]">
-                    {provider.network}
-                  </span>
-                </span>
-                <span className="mt-1 block text-xs leading-relaxed text-[var(--text-muted)]">
-                  {provider.description}
-                </span>
-              </button>
-            );
-          })}
+        <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-[var(--text-muted)]">
+          <span className="rounded border border-[var(--border-default)] bg-[var(--bg-surface)] px-2 py-1">{current.network}</span>
+          <span className="rounded border border-[var(--border-default)] bg-[var(--bg-surface)] px-2 py-1">Advanced setup</span>
         </div>
       </WalletSurface>
 
-      <div className="min-w-0 space-y-4">
-        <WalletSurface className="p-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <div className="text-[11px] font-semibold text-[var(--text-muted)]">{current.network}</div>
-              <h3 className="mt-1 text-lg font-semibold text-[var(--text-primary)]">{current.label}</h3>
-            </div>
-            <span className="rounded-full border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-1 text-xs font-semibold text-[var(--text-secondary)]">
-              Advanced setup
-            </span>
-          </div>
-        </WalletSurface>
-        <ProviderPanel provider={effectiveProvider} agentId={agentId} solanaWallet={solanaWallet} />
-      </div>
+      <ProviderPanel provider={effectiveProvider} agentId={agentId} solanaWallet={solanaWallet} />
     </div>
   );
 }

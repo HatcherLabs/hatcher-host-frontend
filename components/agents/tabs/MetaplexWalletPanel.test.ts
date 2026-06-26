@@ -528,6 +528,31 @@ describe('Metaplex wallet panel helpers', () => {
     expect(connection.sendRawTransaction).toHaveBeenCalledTimes(1);
   });
 
+  it('blocks Genesis launch transactions that still require the connected wallet signature', async () => {
+    const wallet = {
+      publicKey: new PublicKey('11111111111111111111111111111111'),
+      signTransaction: vi.fn(),
+      sendTransaction: vi.fn(async () => 'wallet-send-signature'),
+    };
+    const connection = {
+      sendRawTransaction: vi.fn(),
+      confirmTransaction: vi.fn(),
+      getSignatureStatus: vi.fn(),
+    };
+
+    await expect(signAndSendMetaplexTransactions(
+      [makeEncodedMetaplexTransaction()],
+      wallet as never,
+      connection as never,
+      { blockhash: '11111111111111111111111111111111', lastValidBlockHeight: 123 },
+      { disallowWalletSignature: true },
+    )).rejects.toThrow('still requires the connected wallet signature');
+
+    expect(wallet.sendTransaction).not.toHaveBeenCalled();
+    expect(wallet.signTransaction).not.toHaveBeenCalled();
+    expect(connection.sendRawTransaction).not.toHaveBeenCalled();
+  });
+
   it('builds a simple funding transaction for generated launch and agent wallets', () => {
     const payer = Keypair.generate().publicKey;
     const launchWallet = Keypair.generate().publicKey;
