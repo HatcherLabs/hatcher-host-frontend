@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { Keypair, PublicKey, SystemInstruction, SystemProgram, Transaction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 
 import {
@@ -112,6 +113,10 @@ const READY_TOKEN_PLAN: MetaplexTokenLaunchPlan = {
   },
   notes: [],
 };
+
+function readMetaplexWalletPanelSource(): string {
+  return readFileSync(new URL('./MetaplexWalletPanel.tsx', import.meta.url), 'utf8');
+}
 
 function makeEncodedMetaplexTransaction(): string {
   const wallet = new PublicKey('11111111111111111111111111111111');
@@ -904,5 +909,15 @@ describe('Metaplex wallet panel helpers', () => {
         href: 'https://solscan.io/account/Genesis1111111111111111111111111111111111',
       },
     ]);
+  });
+
+  it('funds launch wallets before asking Genesis to prepare launch transactions', () => {
+    const source = readMetaplexWalletPanelSource();
+    const fundingIndex = source.indexOf("phase: 'launch_wallet_fund_start'");
+    const prepareIndex = source.indexOf('prepareAgentMetaplexTokenLaunchTransaction');
+
+    expect(fundingIndex).toBeGreaterThan(-1);
+    expect(prepareIndex).toBeGreaterThan(-1);
+    expect(fundingIndex).toBeLessThan(prepareIndex);
   });
 });

@@ -1511,30 +1511,6 @@ export function MetaplexWalletPanel({
           txCount: delegationSignatures.length,
         });
       }
-      const prepared = await api.prepareAgentMetaplexTokenLaunchTransaction(agentId, {
-        ...payload,
-        wallet: connectedWallet,
-        launchWallet,
-      });
-      if (!prepared.success) {
-        const message = prepared.error || 'Metaplex token launch failed.';
-        setError(message);
-        toast.error(message);
-        return;
-      }
-      const preparedLaunchWallet = prepared.data.launchWallet ?? launchWallet;
-      if (preparedLaunchWallet !== launchWallet) {
-        throw new Error('Metaplex returned transactions for a different launch wallet.');
-      }
-      await logTokenLaunchEvent({
-        phase: 'prepare_success',
-        wallet: connectedWallet,
-        launchWallet,
-        agentWallet: metaplexAgentWallet,
-        mintAddress: prepared.data.mintAddress,
-        genesisAccount: prepared.data.genesisAccount,
-        txCount: prepared.data.transactions.length,
-      });
       const agentWalletPublicKey = new PublicKey(metaplexAgentWallet);
       const agentWalletBalance = await connection.getBalance(agentWalletPublicKey, 'confirmed');
       const launchWalletFundingLamports = getMetaplexLaunchWalletFundingLamports();
@@ -1577,6 +1553,30 @@ export function MetaplexWalletPanel({
         launchWallet,
         agentWallet: metaplexAgentWallet,
         signature: fundingSignature,
+      });
+      const prepared = await api.prepareAgentMetaplexTokenLaunchTransaction(agentId, {
+        ...payload,
+        wallet: connectedWallet,
+        launchWallet,
+      });
+      if (!prepared.success) {
+        const message = prepared.error || 'Metaplex token launch failed.';
+        setError(message);
+        toast.error(message);
+        return;
+      }
+      const preparedLaunchWallet = prepared.data.launchWallet ?? launchWallet;
+      if (preparedLaunchWallet !== launchWallet) {
+        throw new Error('Metaplex returned transactions for a different launch wallet.');
+      }
+      await logTokenLaunchEvent({
+        phase: 'prepare_success',
+        wallet: connectedWallet,
+        launchWallet,
+        agentWallet: metaplexAgentWallet,
+        mintAddress: prepared.data.mintAddress,
+        genesisAccount: prepared.data.genesisAccount,
+        txCount: prepared.data.transactions.length,
       });
       let completed: Awaited<ReturnType<typeof api.completeAgentMetaplexTokenLaunch>> | null = null;
       const signatures = await signAndSendMetaplexTransactions(
