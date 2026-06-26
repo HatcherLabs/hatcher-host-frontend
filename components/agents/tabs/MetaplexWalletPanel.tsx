@@ -487,6 +487,55 @@ function isMetaplexTransactionObject(value: unknown): value is Transaction | Ver
   return value instanceof Transaction || value instanceof VersionedTransaction;
 }
 
+type MetaplexPreservedSignature = {
+  index: number;
+  signature: Uint8Array;
+};
+
+function clearMetaplexPresignedNonWalletSignatures(
+  transaction: Transaction | VersionedTransaction,
+  walletAddress: string,
+): MetaplexPreservedSignature[] {
+  const preserved: MetaplexPreservedSignature[] = [];
+  if (transaction instanceof VersionedTransaction) {
+    const requiredSignatures = transaction.message.header.numRequiredSignatures;
+    const signers = transaction.message.staticAccountKeys.slice(0, requiredSignatures);
+    for (const [index, signer] of signers.entries()) {
+      const signature = transaction.signatures[index];
+      if (signer.toBase58() === walletAddress || isEmptyMetaplexSignature(signature)) continue;
+      preserved.push({ index, signature: new Uint8Array(signature) });
+      transaction.signatures[index] = new Uint8Array(64);
+    }
+    return preserved;
+  }
+
+  for (const [index, signer] of transaction.signatures.entries()) {
+    const signature = signer.signature ?? undefined;
+    if (signer.publicKey.toBase58() === walletAddress || isEmptyMetaplexSignature(signature)) continue;
+    if (!signature) continue;
+    preserved.push({ index, signature: new Uint8Array(signature) });
+    signer.signature = null;
+  }
+  return preserved;
+}
+
+function restoreMetaplexPreservedSignatures(
+  transaction: Transaction | VersionedTransaction,
+  preserved: MetaplexPreservedSignature[],
+): void {
+  if (transaction instanceof VersionedTransaction) {
+    for (const { index, signature } of preserved) {
+      transaction.signatures[index] = new Uint8Array(signature);
+    }
+    return;
+  }
+
+  for (const { index, signature } of preserved) {
+    const signer = transaction.signatures[index] as { signature: Uint8Array | null } | undefined;
+    if (signer) signer.signature = new Uint8Array(signature);
+  }
+}
+
 function metaplexLocalSignersForTransaction(
   transaction: Transaction | VersionedTransaction,
   localSigners: Keypair[] | undefined,
@@ -769,14 +818,23 @@ export async function signAndSendMetaplexTransactions(
             skipPreflight: multiTransactionFlow,
           });
         } else if (requiresWalletSignature && rawSignMultiTransactionFlow && wallet.signTransaction) {
+          const preservedSignatures = clearMetaplexPresignedNonWalletSignatures(transaction, walletAddress);
           await emit({
             phase: 'tx_wallet_sign_start',
             txIndex,
             txCount,
             transaction: safeMetaplexTransactionSummary(transaction, walletAddress),
           });
-          const signed = await wallet.signTransaction(transaction);
-          if (!signed) throw new Error('Wallet did not return a signed Metaplex transaction.');
+          let signed: Transaction | VersionedTransaction;
+          try {
+            const walletSigned = await wallet.signTransaction(transaction);
+            if (!walletSigned) throw new Error('Wallet did not return a signed Metaplex transaction.');
+            signed = walletSigned;
+            restoreMetaplexPreservedSignatures(signed, preservedSignatures);
+          } catch (error) {
+            restoreMetaplexPreservedSignatures(transaction, preservedSignatures);
+            throw error;
+          }
           await emit({
             phase: 'tx_wallet_sign_success',
             txIndex,
@@ -867,9 +925,16 @@ export async function signAndSendMetaplexTransactions(
         const fullySigned = metaplexTransactionHasAllRequiredSignatures(signed);
         const requiresWalletSignature = metaplexTransactionRequiredSigners(signed).includes(walletAddress);
         if (!fullySigned && requiresWalletSignature) {
-          const walletSigned = await wallet.signTransaction(signed);
-          if (!walletSigned) throw new Error('Wallet did not return a signed Metaplex transaction.');
-          signed = walletSigned;
+          const preservedSignatures = clearMetaplexPresignedNonWalletSignatures(signed, walletAddress);
+          try {
+            const walletSigned = await wallet.signTransaction(signed);
+            if (!walletSigned) throw new Error('Wallet did not return a signed Metaplex transaction.');
+            signed = walletSigned;
+            restoreMetaplexPreservedSignatures(signed, preservedSignatures);
+          } catch (error) {
+            restoreMetaplexPreservedSignatures(signed, preservedSignatures);
+            throw error;
+          }
         }
         if (isMetaplexTransactionObject(signed) && !metaplexTransactionHasAllRequiredSignatures(signed)) {
           throw new Error('Metaplex returned a transaction that is missing a non-wallet signature.');
