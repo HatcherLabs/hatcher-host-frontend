@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { Keypair, PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
+import { Keypair, PublicKey, SystemProgram, Transaction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 
 import {
   buildMetaplexTokenLaunchButtonState,
@@ -153,6 +153,27 @@ function makeUnsignedLocalSignerMetaplexTransaction(signer: Keypair, lamports = 
     requireAllSignatures: false,
     verifySignatures: false,
   })).toString('base64');
+}
+
+function makePresignedMultiSignerVersionedTransaction(wallet: PublicKey, signer: Keypair): string {
+  const message = new TransactionMessage({
+    payerKey: wallet,
+    recentBlockhash: '11111111111111111111111111111111',
+    instructions: [
+      SystemProgram.transfer({
+        fromPubkey: signer.publicKey,
+        toPubkey: wallet,
+        lamports: 0,
+      }),
+    ],
+  }).compileToV0Message();
+  const tx = new VersionedTransaction(message);
+  tx.sign([signer]);
+  return Buffer.from(tx.serialize()).toString('base64');
+}
+
+function isEmptyTestSignature(signature: Uint8Array | undefined): boolean {
+  return !signature || signature.every((byte) => byte === 0);
 }
 
 describe('Metaplex wallet panel helpers', () => {
@@ -502,6 +523,45 @@ describe('Metaplex wallet panel helpers', () => {
     expect(wallet.sendTransaction).not.toHaveBeenCalled();
     expect(wallet.signTransaction).not.toHaveBeenCalled();
     expect(connection.sendRawTransaction).toHaveBeenCalledTimes(1);
+  });
+
+  it('asks Phantom to sign before restoring preserved non-wallet signatures', async () => {
+    const walletSigner = Keypair.generate();
+    const metaplexSigner = Keypair.generate();
+    const serialized = makePresignedMultiSignerVersionedTransaction(walletSigner.publicKey, metaplexSigner);
+    const wallet = {
+      publicKey: walletSigner.publicKey,
+      signTransaction: vi.fn(async (transaction: VersionedTransaction) => {
+        expect(isEmptyTestSignature(transaction.signatures[1])).toBe(true);
+        transaction.sign([walletSigner]);
+        return transaction;
+      }),
+      sendTransaction: vi.fn(async () => 'wallet-send-signature'),
+    };
+    let rawSendIndex = 0;
+    const connection = {
+      sendRawTransaction: vi.fn(async (raw: Uint8Array) => {
+        if (rawSendIndex === 0) {
+          const sent = VersionedTransaction.deserialize(raw);
+          expect(isEmptyTestSignature(sent.signatures[0])).toBe(false);
+          expect(isEmptyTestSignature(sent.signatures[1])).toBe(false);
+        }
+        rawSendIndex += 1;
+        return 'raw-send-signature';
+      }),
+      confirmTransaction: vi.fn(async () => ({ value: { err: null } })),
+      getSignatureStatus: vi.fn(),
+    };
+
+    await expect(signAndSendMetaplexTransactions(
+      [serialized, makeSignedNonWalletMetaplexTransaction()],
+      wallet as never,
+      connection as never,
+      { blockhash: '11111111111111111111111111111111', lastValidBlockHeight: 123 },
+    )).resolves.toEqual(['raw-send-signature', 'raw-send-signature']);
+
+    expect(wallet.signTransaction).toHaveBeenCalledTimes(1);
+    expect(wallet.sendTransaction).not.toHaveBeenCalled();
   });
 
   it('falls back to raw signing when wallet sendTransaction is unavailable', async () => {
