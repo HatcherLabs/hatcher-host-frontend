@@ -818,10 +818,12 @@ export interface MetaplexTokenLaunchPlan {
 
 export interface MetaplexTokenLaunchPrepareInput extends MetaplexTokenLaunchInput {
   wallet: string;
+  launchWallet?: string;
 }
 
 export interface MetaplexTokenLaunchPrepareResponse {
   wallet: string;
+  launchWallet?: string;
   status: "prepared";
   transactions: string[];
   blockhash: {
@@ -836,6 +838,40 @@ export interface MetaplexTokenLaunchCompleteInput extends MetaplexTokenLaunchPre
   signatures: string[];
   mintAddress: string;
   genesisAccount: string;
+}
+
+export interface MetaplexTokenLaunchTransactionSummary {
+  kind?: string;
+  version?: string | number;
+  requiredSigners?: string[];
+  signerSlots?: Array<{
+    signer: string;
+    signed?: boolean;
+  }>;
+  programs?: string[];
+  writableAccounts?: string[];
+  fullySigned?: boolean;
+  requiresWalletSignature?: boolean;
+  serializedBytes?: number;
+  recentBlockhash?: string;
+}
+
+export interface MetaplexTokenLaunchClientEvent {
+  phase: string;
+  wallet?: string | null;
+  launchWallet?: string | null;
+  agentWallet?: string | null;
+  mintAddress?: string | null;
+  genesisAccount?: string | null;
+  txIndex?: number;
+  txCount?: number;
+  signature?: string;
+  transaction?: MetaplexTokenLaunchTransactionSummary;
+  error?: {
+    name?: string;
+    message?: string;
+    code?: string | number;
+  };
 }
 
 export interface MetaplexTokenLaunchResponse {

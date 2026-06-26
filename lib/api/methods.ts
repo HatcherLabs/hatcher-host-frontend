@@ -87,6 +87,7 @@ import type {
   MetaplexRegistrationPrepareResponse,
   MetaplexRegistrationResponse,
   MetaplexTokenImageUploadResponse,
+  MetaplexTokenLaunchClientEvent,
   MetaplexTokenLaunchCompleteInput,
   MetaplexTokenLaunchInput,
   MetaplexTokenLaunchPlan,
@@ -738,6 +739,12 @@ export const api = {
 
   completeAgentMetaplexTokenLaunch: (id: string, body: MetaplexTokenLaunchCompleteInput) =>
     req<MetaplexTokenLaunchResponse>(`/agents/${id}/metaplex/token/launch/complete`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  logAgentMetaplexTokenLaunchEvent: (id: string, body: MetaplexTokenLaunchClientEvent) =>
+    req<{ recorded: boolean }>(`/agents/${id}/metaplex/token/launch/client-event`, {
       method: "POST",
       body: JSON.stringify(body),
     }),
