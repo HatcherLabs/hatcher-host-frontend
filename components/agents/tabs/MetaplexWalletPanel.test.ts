@@ -10,6 +10,7 @@ import {
   deriveMetaplexTokenSymbol,
   estimateMetaplexLaunchWalletFundingLamports,
   formatMetaplexStatusLabel,
+  getMetaplexAgentWalletTargetLamports,
   getMetaplexLaunchWalletFundingLamports,
   getMetaplexAvatarPreview,
   getMetaplexAssetSignerWallet,
@@ -20,7 +21,6 @@ import {
   getMetaplexTokenLinks,
   humanizeMetaplexError,
   isMetaplexBlockhashExpiryError,
-  METAPLEX_AGENT_WALLET_TARGET_LAMPORTS,
   METAPLEX_TOKEN_LAUNCH_MIN_LAMPORTS,
   isMetaplexIrysImageUrl,
   signAndSendMetaplexTransactions,
@@ -534,14 +534,15 @@ describe('Metaplex wallet panel helpers', () => {
     const agentWallet = Keypair.generate().publicKey;
 
     expect(getMetaplexLaunchWalletFundingLamports()).toBe(5_000_000);
-    expect(getMetaplexLaunchWalletFundingLamports(0.1)).toBe(105_000_000);
+    expect(getMetaplexAgentWalletTargetLamports()).toBe(5_000_000);
+    expect(getMetaplexAgentWalletTargetLamports(0.05)).toBe(55_000_000);
 
     const transaction = buildMetaplexLaunchFundingTransaction({
       payer,
       launchWallet,
       launchLamports: 5_000_000,
       agentWallet,
-      agentLamports: METAPLEX_AGENT_WALLET_TARGET_LAMPORTS,
+      agentLamports: getMetaplexAgentWalletTargetLamports(0.05),
       blockhash: '11111111111111111111111111111111',
     });
 
@@ -556,7 +557,7 @@ describe('Metaplex wallet panel helpers', () => {
       expect.objectContaining({
         fromPubkey: payer,
         toPubkey: agentWallet,
-        lamports: BigInt(METAPLEX_AGENT_WALLET_TARGET_LAMPORTS),
+        lamports: 55_000_000n,
       }),
     ]);
   });
