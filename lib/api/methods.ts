@@ -79,6 +79,7 @@ import type {
   OrbisSearchResponse,
   Mpp32ConfigBody,
   Mpp32ConfigStatus,
+  MetaplexAvatarUploadResponse,
   MetaplexConfigStatus,
   MetaplexMintAgentPlan,
   MetaplexRegistrationCompleteInput,
@@ -709,6 +710,15 @@ export const api = {
     const body = new FormData();
     body.append("image", file);
     return req<MetaplexTokenImageUploadResponse>(`/agents/${id}/metaplex/token/image`, {
+      method: "POST",
+      body,
+    });
+  },
+
+  uploadAgentMetaplexAvatar: (id: string, file: File) => {
+    const body = new FormData();
+    body.append("image", file);
+    return req<MetaplexAvatarUploadResponse>(`/agents/${id}/metaplex/avatar`, {
       method: "POST",
       body,
     });

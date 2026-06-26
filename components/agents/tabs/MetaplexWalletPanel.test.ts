@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
+import { Keypair, PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
 
 import {
   buildMetaplexTokenLaunchButtonState,
@@ -125,6 +125,20 @@ function makeEncodedMetaplexTransaction(): string {
   })).toString('base64');
 }
 
+function makeSignedNonWalletMetaplexTransaction(): string {
+  const signer = Keypair.generate();
+  const tx = new Transaction({
+    feePayer: signer.publicKey,
+    recentBlockhash: '11111111111111111111111111111111',
+  }).add(SystemProgram.transfer({
+    fromPubkey: signer.publicKey,
+    toPubkey: signer.publicKey,
+    lamports: 0,
+  }));
+  tx.sign(signer);
+  return Buffer.from(tx.serialize()).toString('base64');
+}
+
 describe('Metaplex wallet panel helpers', () => {
   it('labels the user-facing registration state', () => {
     expect(formatMetaplexStatusLabel('wallet-missing')).toBe('Solana wallet needed');
@@ -209,15 +223,18 @@ describe('Metaplex wallet panel helpers', () => {
 
   it('only accepts image files for custom Metaplex avatars', () => {
     expect(validateMetaplexAvatarFile({ type: 'image/png', size: 128_000 })).toBeNull();
+    expect(validateMetaplexAvatarFile({ type: 'image/jpeg', size: 128_000 })).toBeNull();
     expect(validateMetaplexAvatarFile({ type: 'image/webp', size: 128_000 })).toBeNull();
     expect(validateMetaplexAvatarFile({ type: 'text/plain', size: 128_000 })).toBe('Choose an image file.');
     expect(validateMetaplexAvatarFile({ type: '', size: 128_000 })).toBe('Choose an image file.');
-    expect(validateMetaplexAvatarFile({ type: 'image/avif', size: 128_000 })).toBe('Choose a PNG, JPG, WebP, GIF, or SVG image.');
+    expect(validateMetaplexAvatarFile({ type: 'image/gif', size: 128_000 })).toBe('Choose a PNG, JPG, or WebP image.');
+    expect(validateMetaplexAvatarFile({ type: 'image/svg+xml', size: 128_000 })).toBe('Choose a PNG, JPG, or WebP image.');
+    expect(validateMetaplexAvatarFile({ type: 'image/avif', size: 128_000 })).toBe('Choose a PNG, JPG, or WebP image.');
   });
 
-  it('keeps uploaded avatars below the API data URL limit', () => {
-    expect(validateMetaplexAvatarFile({ type: 'image/png', size: 1_450_000 })).toBeNull();
-    expect(validateMetaplexAvatarFile({ type: 'image/png', size: 1_450_001 })).toBe('Choose an image up to 1.45 MB.');
+  it('keeps uploaded avatars within the Irys upload limit', () => {
+    expect(validateMetaplexAvatarFile({ type: 'image/png', size: 5_000_000 })).toBeNull();
+    expect(validateMetaplexAvatarFile({ type: 'image/png', size: 5_000_001 })).toBe('Choose an image up to 5 MB.');
   });
 
   it('does not show the mainnet confirmation panel once an asset exists', () => {
@@ -297,7 +314,7 @@ describe('Metaplex wallet panel helpers', () => {
     );
   });
 
-  it('signs and broadcasts a single Metaplex registration transaction', async () => {
+  it('submits Metaplex transactions through wallet sendTransaction when available', async () => {
     const wallet = {
       publicKey: new PublicKey('11111111111111111111111111111111'),
       signTransaction: vi.fn(async () => ({ serialize: () => new Uint8Array([9]) })),
@@ -316,12 +333,14 @@ describe('Metaplex wallet panel helpers', () => {
       { blockhash: '11111111111111111111111111111111', lastValidBlockHeight: 123 },
     )).resolves.toEqual(['register-signature']);
 
-    expect(wallet.signTransaction).toHaveBeenCalledTimes(1);
-    expect(wallet.sendTransaction).not.toHaveBeenCalled();
-    expect(connection.sendRawTransaction).toHaveBeenCalledWith(new Uint8Array([9]), {
+    expect(wallet.signTransaction).not.toHaveBeenCalled();
+    expect(wallet.sendTransaction).toHaveBeenCalledTimes(1);
+    expect(wallet.sendTransaction).toHaveBeenCalledWith(expect.anything(), connection, {
       maxRetries: 5,
       skipPreflight: false,
+      preflightCommitment: 'confirmed',
     });
+    expect(connection.sendRawTransaction).not.toHaveBeenCalled();
     expect(connection.confirmTransaction).toHaveBeenCalledWith({
       signature: 'register-signature',
       blockhash: '11111111111111111111111111111111',
@@ -345,7 +364,7 @@ describe('Metaplex wallet panel helpers', () => {
     expect(wallet.sendTransaction).not.toHaveBeenCalled();
   });
 
-  it('batch signs and broadcasts all Metaplex launch transactions before confirmation', async () => {
+  it('submits all Metaplex launch transactions through the wallet before confirmation', async () => {
     const events: string[] = [];
     const wallet = {
       publicKey: new PublicKey('11111111111111111111111111111111'),
@@ -386,34 +405,58 @@ describe('Metaplex wallet panel helpers', () => {
     )).resolves.toEqual(['send-1', 'send-2']);
 
     expect(wallet.signTransaction).not.toHaveBeenCalled();
-    expect(wallet.signAllTransactions).toHaveBeenCalledTimes(1);
-    expect(wallet.sendTransaction).not.toHaveBeenCalled();
+    expect(wallet.signAllTransactions).not.toHaveBeenCalled();
+    expect(wallet.sendTransaction).toHaveBeenCalledTimes(2);
     expect(events).toEqual([
-      'sign-all',
       'send-1',
       'send-2',
       'confirm-send-1',
       'confirm-send-2',
     ]);
-    expect(connection.sendRawTransaction).toHaveBeenCalledWith(new Uint8Array([1]), {
-      maxRetries: 5,
-      skipPreflight: true,
-    });
+    expect(connection.sendRawTransaction).not.toHaveBeenCalled();
   });
 
-  it('falls back to wallet sendTransaction when signTransaction is unavailable', async () => {
-    const events: string[] = [];
+  it('broadcasts already signed Metaplex transactions that do not require the connected wallet', async () => {
     const wallet = {
       publicKey: new PublicKey('11111111111111111111111111111111'),
-      sendTransaction: vi.fn(async (_transaction: Transaction, _connection: unknown, options: { skipPreflight?: boolean }) => {
-        const signature = `send-${events.filter((event) => event.startsWith('send-')).length + 1}`;
-        events.push(signature);
-        expect(options.skipPreflight).toBe(true);
-        return signature;
+      signTransaction: vi.fn(),
+      sendTransaction: vi.fn(async () => 'wallet-send-signature'),
+    };
+    const connection = {
+      sendRawTransaction: vi.fn(async () => 'raw-send-signature'),
+      confirmTransaction: vi.fn(async () => ({ value: { err: null } })),
+      getSignatureStatus: vi.fn(),
+    };
+
+    await expect(signAndSendMetaplexTransactions(
+      [makeSignedNonWalletMetaplexTransaction()],
+      wallet as never,
+      connection as never,
+      { blockhash: '11111111111111111111111111111111', lastValidBlockHeight: 123 },
+    )).resolves.toEqual(['raw-send-signature']);
+
+    expect(wallet.sendTransaction).not.toHaveBeenCalled();
+    expect(wallet.signTransaction).not.toHaveBeenCalled();
+    expect(connection.sendRawTransaction).toHaveBeenCalledTimes(1);
+  });
+
+  it('falls back to raw signing when wallet sendTransaction is unavailable', async () => {
+    const events: string[] = [];
+    let signedIndex = 0;
+    const wallet = {
+      publicKey: new PublicKey('11111111111111111111111111111111'),
+      signTransaction: vi.fn(async () => {
+        signedIndex += 1;
+        const serializedValue = signedIndex;
+        return { serialize: () => new Uint8Array([serializedValue]) };
       }),
     };
     const connection = {
-      sendRawTransaction: vi.fn(),
+      sendRawTransaction: vi.fn(async (raw: Uint8Array) => {
+        const label = `send-${raw[0]}`;
+        events.push(label);
+        return label;
+      }),
       confirmTransaction: vi.fn(async (request: string | { signature: string }) => {
         const signature = typeof request === 'string' ? request : request.signature;
         events.push(`confirm-${signature}`);
@@ -429,8 +472,8 @@ describe('Metaplex wallet panel helpers', () => {
       { blockhash: '11111111111111111111111111111111', lastValidBlockHeight: 123 },
     )).resolves.toEqual(['send-1', 'send-2']);
 
-    expect(wallet.sendTransaction).toHaveBeenCalledTimes(2);
-    expect(connection.sendRawTransaction).not.toHaveBeenCalled();
+    expect(wallet.signTransaction).toHaveBeenCalledTimes(2);
+    expect(connection.sendRawTransaction).toHaveBeenCalledTimes(2);
     expect(events).toEqual([
       'send-1',
       'send-2',

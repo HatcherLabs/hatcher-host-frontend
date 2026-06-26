@@ -101,19 +101,17 @@ export function getMetaplexAvatarPreview(config: MetaplexConfigStatus): {
   };
 }
 
-export const METAPLEX_AVATAR_MAX_BYTES = 1_450_000;
+export const METAPLEX_AVATAR_MAX_BYTES = 5_000_000;
 const METAPLEX_AVATAR_ALLOWED_TYPES = new Set([
   'image/png',
   'image/jpeg',
   'image/webp',
-  'image/gif',
-  'image/svg+xml',
 ]);
 
 export function validateMetaplexAvatarFile(file: Pick<File, 'type' | 'size'>): string | null {
   if (!file.type || !file.type.startsWith('image/')) return 'Choose an image file.';
-  if (!METAPLEX_AVATAR_ALLOWED_TYPES.has(file.type.toLowerCase())) return 'Choose a PNG, JPG, WebP, GIF, or SVG image.';
-  if (file.size > METAPLEX_AVATAR_MAX_BYTES) return 'Choose an image up to 1.45 MB.';
+  if (!METAPLEX_AVATAR_ALLOWED_TYPES.has(file.type.toLowerCase())) return 'Choose a PNG, JPG, or WebP image.';
+  if (file.size > METAPLEX_AVATAR_MAX_BYTES) return 'Choose an image up to 5 MB.';
   return null;
 }
 
@@ -413,21 +411,6 @@ function networkLabel(plan: MetaplexMintAgentPlan | null): string {
   return 'Solana';
 }
 
-function readAvatarFileAsDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string' && reader.result.startsWith('data:image/')) {
-        resolve(reader.result);
-        return;
-      }
-      reject(new Error('Choose an image file.'));
-    };
-    reader.onerror = () => reject(new Error('Could not read this image.'));
-    reader.readAsDataURL(file);
-  });
-}
-
 function decodeMetaplexSerializedTransaction(value: string): Transaction | VersionedTransaction {
   const binary = atob(value);
   const bytes = new Uint8Array(binary.length);
@@ -455,6 +438,30 @@ function encodeMetaplexSerializedTransaction(transaction: Transaction | Versione
     binary += String.fromCharCode(...chunk);
   }
   return btoa(binary);
+}
+
+function isEmptyMetaplexSignature(signature: Uint8Array | null | undefined): boolean {
+  return !signature || signature.every((byte) => byte === 0);
+}
+
+function metaplexTransactionRequiredSigners(transaction: Transaction | VersionedTransaction): string[] {
+  if (transaction instanceof VersionedTransaction) {
+    const requiredSignatures = transaction.message.header.numRequiredSignatures;
+    return transaction.message.staticAccountKeys
+      .slice(0, requiredSignatures)
+      .map((key) => key.toBase58());
+  }
+  return transaction.signatures.map(({ publicKey }) => publicKey.toBase58());
+}
+
+function metaplexTransactionHasAllRequiredSignatures(transaction: Transaction | VersionedTransaction): boolean {
+  if (transaction instanceof VersionedTransaction) {
+    const requiredSignatures = transaction.message.header.numRequiredSignatures;
+    return transaction.signatures
+      .slice(0, requiredSignatures)
+      .every((signature) => !isEmptyMetaplexSignature(signature));
+  }
+  return transaction.signatures.every(({ signature }) => !isEmptyMetaplexSignature(signature ?? undefined));
 }
 
 export function isMetaplexBlockhashExpiryError(error: unknown): boolean {
@@ -523,6 +530,36 @@ export async function signAndSendMetaplexTransactions(
   }
 
   const decodedTransactions = transactions.map(decodeMetaplexSerializedTransaction);
+  if (wallet.sendTransaction) {
+    const walletAddress = wallet.publicKey.toBase58();
+    const signatures: string[] = [];
+    const multiTransactionFlow = decodedTransactions.length > 1;
+    for (const transaction of decodedTransactions) {
+      const fullySigned = metaplexTransactionHasAllRequiredSignatures(transaction);
+      const requiresWalletSignature = metaplexTransactionRequiredSigners(transaction).includes(walletAddress);
+      const signature = fullySigned
+        ? await connection.sendRawTransaction(transaction.serialize(), {
+            maxRetries: 5,
+            skipPreflight: multiTransactionFlow,
+          })
+        : requiresWalletSignature
+          ? await wallet.sendTransaction(transaction, connection, {
+              maxRetries: 5,
+              skipPreflight: multiTransactionFlow,
+              preflightCommitment: 'confirmed',
+            })
+          : null;
+      if (!signature) {
+        throw new Error('Metaplex returned a transaction that is missing a non-wallet signature.');
+      }
+      signatures.push(signature);
+    }
+    for (const signature of signatures) {
+      await confirmMetaplexSignature(connection, signature, blockhash);
+    }
+    return signatures;
+  }
+
   if (wallet.signTransaction) {
     const signedTransactions = wallet.signAllTransactions && decodedTransactions.length > 1
       ? await wallet.signAllTransactions(decodedTransactions)
@@ -535,23 +572,6 @@ export async function signAndSendMetaplexTransactions(
       const signature = await connection.sendRawTransaction(signed.serialize(), {
         maxRetries: 5,
         skipPreflight: multiTransactionFlow,
-      });
-      signatures.push(signature);
-    }
-    for (const signature of signatures) {
-      await confirmMetaplexSignature(connection, signature, blockhash);
-    }
-    return signatures;
-  }
-
-  if (wallet.sendTransaction) {
-    const signatures: string[] = [];
-    const multiTransactionFlow = decodedTransactions.length > 1;
-    for (const transaction of decodedTransactions) {
-      const signature = await wallet.sendTransaction(transaction, connection, {
-        maxRetries: 5,
-        skipPreflight: multiTransactionFlow,
-        preflightCommitment: 'confirmed',
       });
       signatures.push(signature);
     }
@@ -1004,13 +1024,25 @@ export function MetaplexWalletPanel({
       return;
     }
 
+    setAvatarUploading(true);
+    setError(null);
     try {
-      const avatarUrl = await readAvatarFileAsDataUrl(file);
-      await saveAvatar(avatarUrl, 'Agent avatar updated');
+      const res = await api.uploadAgentMetaplexAvatar(agentId, file);
+      if (!res.success) {
+        const message = res.error || 'Could not upload this avatar.';
+        setError(message);
+        toast.error(message);
+        return;
+      }
+      setResult(null);
+      toast.success('Agent avatar uploaded to Irys');
+      await load();
     } catch (e) {
-      const message = e instanceof Error ? e.message : 'Could not read this image.';
+      const message = e instanceof Error ? e.message : 'Could not upload this avatar.';
       setError(message);
       toast.error(message);
+    } finally {
+      setAvatarUploading(false);
     }
   };
 
@@ -1240,7 +1272,7 @@ export function MetaplexWalletPanel({
                 <input
                   ref={avatarInputRef}
                   type="file"
-                  accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
+                  accept="image/png,image/jpeg,image/webp"
                   className="hidden"
                   onChange={(event) => void uploadAvatar(event)}
                 />

@@ -857,6 +857,8 @@ export interface MetaplexTokenImageUploadResponse {
   contentType: "image/png" | "image/jpeg" | "image/webp";
 }
 
+export type MetaplexAvatarUploadResponse = MetaplexTokenImageUploadResponse;
+
 export interface MetaplexRegistrationResponse {
   agentId: string;
   metadataUri: string;
