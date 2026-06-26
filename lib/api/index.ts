@@ -96,6 +96,7 @@ export type {
   MetaplexMintAgentPlan,
   MetaplexRegistrationDocument,
   MetaplexRegistrationResponse,
+  MetaplexAvatarUploadResponse,
   MetaplexTokenImageUploadResponse,
   MetaplexTokenLaunchInput,
   MetaplexTokenLaunchPlan,
