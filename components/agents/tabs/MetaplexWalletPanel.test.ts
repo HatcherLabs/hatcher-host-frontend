@@ -1,14 +1,16 @@
 import { describe, expect, it, vi } from 'vitest';
-import { Keypair, PublicKey, SystemProgram, Transaction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
+import { Keypair, PublicKey, SystemInstruction, SystemProgram, Transaction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 
 import {
   buildMetaplexTokenLaunchButtonState,
   buildMetaplexTokenLaunchDefaults,
   buildMetaplexTokenLaunchPayload,
   buildMetaplexRegistrationButtonState,
+  buildMetaplexLaunchFundingTransaction,
   deriveMetaplexTokenSymbol,
   estimateMetaplexLaunchWalletFundingLamports,
   formatMetaplexStatusLabel,
+  getMetaplexLaunchWalletFundingLamports,
   getMetaplexAvatarPreview,
   getMetaplexAssetSignerWallet,
   getMetaplexProfileUrl,
@@ -18,6 +20,7 @@ import {
   getMetaplexTokenLinks,
   humanizeMetaplexError,
   isMetaplexBlockhashExpiryError,
+  METAPLEX_AGENT_WALLET_TARGET_LAMPORTS,
   METAPLEX_TOKEN_LAUNCH_MIN_LAMPORTS,
   isMetaplexIrysImageUrl,
   signAndSendMetaplexTransactions,
@@ -253,7 +256,7 @@ describe('Metaplex wallet panel helpers', () => {
 
   it('blocks token launch before Phantom when the connected wallet cannot cover Genesis costs', () => {
     expect(getMetaplexTokenLaunchBalanceError(15_931_991)).toBe(
-      'The connected wallet has 0.0159 SOL. Add at least 0.06 SOL before launching this Metaplex token.',
+      'The connected wallet has 0.0159 SOL. Add at least 0.07 SOL before launching this Metaplex token.',
     );
     expect(getMetaplexTokenLaunchBalanceError(METAPLEX_TOKEN_LAUNCH_MIN_LAMPORTS)).toBeNull();
   });
@@ -455,9 +458,9 @@ describe('Metaplex wallet panel helpers', () => {
     expect(events).toEqual([
       'sign-1',
       'send-1',
-      'confirm-send-1',
       'sign-2',
       'send-2',
+      'confirm-send-1',
       'confirm-send-2',
     ]);
     expect(connection.sendRawTransaction).toHaveBeenCalledWith(new Uint8Array([1]), {
@@ -523,6 +526,39 @@ describe('Metaplex wallet panel helpers', () => {
     expect(wallet.sendTransaction).not.toHaveBeenCalled();
     expect(wallet.signTransaction).not.toHaveBeenCalled();
     expect(connection.sendRawTransaction).toHaveBeenCalledTimes(1);
+  });
+
+  it('builds a simple funding transaction for generated launch and agent wallets', () => {
+    const payer = Keypair.generate().publicKey;
+    const launchWallet = Keypair.generate().publicKey;
+    const agentWallet = Keypair.generate().publicKey;
+
+    expect(getMetaplexLaunchWalletFundingLamports()).toBe(5_000_000);
+    expect(getMetaplexLaunchWalletFundingLamports(0.1)).toBe(105_000_000);
+
+    const transaction = buildMetaplexLaunchFundingTransaction({
+      payer,
+      launchWallet,
+      launchLamports: 5_000_000,
+      agentWallet,
+      agentLamports: METAPLEX_AGENT_WALLET_TARGET_LAMPORTS,
+      blockhash: '11111111111111111111111111111111',
+    });
+
+    expect(transaction.feePayer?.toBase58()).toBe(payer.toBase58());
+    expect(transaction.instructions).toHaveLength(2);
+    expect(transaction.instructions.map((instruction) => SystemInstruction.decodeTransfer(instruction))).toEqual([
+      expect.objectContaining({
+        fromPubkey: payer,
+        toPubkey: launchWallet,
+        lamports: 5_000_000n,
+      }),
+      expect.objectContaining({
+        fromPubkey: payer,
+        toPubkey: agentWallet,
+        lamports: BigInt(METAPLEX_AGENT_WALLET_TARGET_LAMPORTS),
+      }),
+    ]);
   });
 
   it('asks Phantom to sign before restoring preserved non-wallet signatures', async () => {
