@@ -7,6 +7,7 @@ import {
   buildMetaplexTokenLaunchPayload,
   buildMetaplexRegistrationButtonState,
   deriveMetaplexTokenSymbol,
+  estimateMetaplexLaunchWalletFundingLamports,
   formatMetaplexStatusLabel,
   getMetaplexAvatarPreview,
   getMetaplexAssetSignerWallet,
@@ -137,6 +138,21 @@ function makeSignedNonWalletMetaplexTransaction(): string {
   }));
   tx.sign(signer);
   return Buffer.from(tx.serialize()).toString('base64');
+}
+
+function makeUnsignedLocalSignerMetaplexTransaction(signer: Keypair, lamports = 0): string {
+  const tx = new Transaction({
+    feePayer: signer.publicKey,
+    recentBlockhash: '11111111111111111111111111111111',
+  }).add(SystemProgram.transfer({
+    fromPubkey: signer.publicKey,
+    toPubkey: signer.publicKey,
+    lamports,
+  }));
+  return Buffer.from(tx.serialize({
+    requireAllSignatures: false,
+    verifySignatures: false,
+  })).toString('base64');
 }
 
 describe('Metaplex wallet panel helpers', () => {
@@ -451,6 +467,37 @@ describe('Metaplex wallet panel helpers', () => {
       connection as never,
       { blockhash: '11111111111111111111111111111111', lastValidBlockHeight: 123 },
     )).resolves.toEqual(['raw-send-signature']);
+
+    expect(wallet.sendTransaction).not.toHaveBeenCalled();
+    expect(wallet.signTransaction).not.toHaveBeenCalled();
+    expect(connection.sendRawTransaction).toHaveBeenCalledTimes(1);
+  });
+
+  it('signs temporary launch wallet transactions locally before raw broadcast', async () => {
+    const launchSigner = Keypair.generate();
+    const serialized = makeUnsignedLocalSignerMetaplexTransaction(launchSigner, 1234);
+    const wallet = {
+      publicKey: new PublicKey('11111111111111111111111111111111'),
+      signTransaction: vi.fn(),
+      sendTransaction: vi.fn(async () => 'wallet-send-signature'),
+    };
+    const connection = {
+      sendRawTransaction: vi.fn(async () => 'local-send-signature'),
+      confirmTransaction: vi.fn(async () => ({ value: { err: null } })),
+      getSignatureStatus: vi.fn(),
+    };
+
+    expect(estimateMetaplexLaunchWalletFundingLamports(
+      [serialized],
+      launchSigner.publicKey.toBase58(),
+    )).toBe(10_001_234);
+    await expect(signAndSendMetaplexTransactions(
+      [serialized],
+      wallet as never,
+      connection as never,
+      { blockhash: '11111111111111111111111111111111', lastValidBlockHeight: 123 },
+      { localSigners: [launchSigner] },
+    )).resolves.toEqual(['local-send-signature']);
 
     expect(wallet.sendTransaction).not.toHaveBeenCalled();
     expect(wallet.signTransaction).not.toHaveBeenCalled();
