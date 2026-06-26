@@ -76,7 +76,7 @@ const METAPLEX_CORE_PROGRAM_ID = new PublicKey('CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R
 const METAPLEX_ASSET_SIGNER_SEED = new TextEncoder().encode('mpl-core-execute');
 export const METAPLEX_TOKEN_LAUNCH_MIN_LAMPORTS = 70_000_000;
 export const METAPLEX_LAUNCH_WALLET_BASE_LAMPORTS = 5_000_000;
-export const METAPLEX_AGENT_WALLET_TARGET_LAMPORTS = 55_000_000;
+export const METAPLEX_AGENT_WALLET_BASE_LAMPORTS = 5_000_000;
 export const METAPLEX_TOKEN_LAUNCH_WALLET_FEE_PADDING_LAMPORTS = 10_000_000;
 
 export function getMetaplexAssetSignerWallet(asset: string | null | undefined): string | null {
@@ -607,11 +607,19 @@ export function estimateMetaplexLaunchWalletFundingLamports(
   return lamports + METAPLEX_TOKEN_LAUNCH_WALLET_FEE_PADDING_LAMPORTS;
 }
 
-export function getMetaplexLaunchWalletFundingLamports(firstBuyAmount?: number | null): number {
+function getMetaplexFirstBuyLamports(firstBuyAmount?: number | null): number {
   const firstBuyLamports = Number.isFinite(firstBuyAmount) && firstBuyAmount && firstBuyAmount > 0
     ? Math.ceil(firstBuyAmount * LAMPORTS_PER_SOL)
     : 0;
-  return METAPLEX_LAUNCH_WALLET_BASE_LAMPORTS + firstBuyLamports;
+  return firstBuyLamports;
+}
+
+export function getMetaplexLaunchWalletFundingLamports(): number {
+  return METAPLEX_LAUNCH_WALLET_BASE_LAMPORTS;
+}
+
+export function getMetaplexAgentWalletTargetLamports(firstBuyAmount?: number | null): number {
+  return METAPLEX_AGENT_WALLET_BASE_LAMPORTS + getMetaplexFirstBuyLamports(firstBuyAmount);
 }
 
 export function buildMetaplexLaunchFundingTransaction(input: {
@@ -1454,8 +1462,9 @@ export function MetaplexWalletPanel({
       const launchWallet = launchKeypair.publicKey.toBase58();
       const agentWalletPublicKey = new PublicKey(metaplexAgentWallet);
       const agentWalletBalance = await connection.getBalance(agentWalletPublicKey, 'confirmed');
-      const launchWalletFundingLamports = getMetaplexLaunchWalletFundingLamports(payload.firstBuyAmount);
-      const agentWalletFundingLamports = Math.max(0, METAPLEX_AGENT_WALLET_TARGET_LAMPORTS - agentWalletBalance);
+      const launchWalletFundingLamports = getMetaplexLaunchWalletFundingLamports();
+      const agentWalletTargetLamports = getMetaplexAgentWalletTargetLamports(payload.firstBuyAmount);
+      const agentWalletFundingLamports = Math.max(0, agentWalletTargetLamports - agentWalletBalance);
       const requiredLamports = launchWalletFundingLamports + agentWalletFundingLamports + METAPLEX_TOKEN_LAUNCH_WALLET_FEE_PADDING_LAMPORTS;
       if (initialWalletBalance < requiredLamports) {
         const message = `The connected wallet needs ${formatMetaplexSolBalance(requiredLamports)} SOL available for this Metaplex launch.`;
