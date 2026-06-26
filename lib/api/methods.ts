@@ -89,6 +89,8 @@ import type {
   MetaplexTokenImageUploadResponse,
   MetaplexTokenLaunchClientEvent,
   MetaplexTokenLaunchCompleteInput,
+  MetaplexTokenLaunchDelegationPrepareInput,
+  MetaplexTokenLaunchDelegationPrepareResponse,
   MetaplexTokenLaunchInput,
   MetaplexTokenLaunchPlan,
   MetaplexTokenLaunchPrepareInput,
@@ -727,6 +729,12 @@ export const api = {
 
   launchAgentMetaplexToken: (id: string, body: MetaplexTokenLaunchInput) =>
     req<MetaplexTokenLaunchResponse>(`/agents/${id}/metaplex/token/launch`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  prepareAgentMetaplexTokenLaunchDelegation: (id: string, body: MetaplexTokenLaunchDelegationPrepareInput) =>
+    req<MetaplexTokenLaunchDelegationPrepareResponse>(`/agents/${id}/metaplex/token/launch/delegate/prepare`, {
       method: "POST",
       body: JSON.stringify(body),
     }),

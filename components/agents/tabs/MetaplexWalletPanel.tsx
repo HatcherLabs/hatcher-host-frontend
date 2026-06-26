@@ -656,6 +656,7 @@ type MetaplexTransactionSigningEvent = Omit<MetaplexTokenLaunchClientEvent, 'wal
 type MetaplexTransactionSigningOptions = {
   walletAddress?: string | null;
   localSigners?: Keypair[];
+  disallowWalletSignature?: boolean;
   onEvent?: (event: MetaplexTransactionSigningEvent) => void | Promise<void>;
 };
 
@@ -852,6 +853,9 @@ export async function signAndSendMetaplexTransactions(
         }
         const fullySigned = metaplexTransactionHasAllRequiredSignatures(transaction);
         const requiresWalletSignature = metaplexTransactionRequiredSigners(transaction).includes(walletAddress);
+        if (requiresWalletSignature && options.disallowWalletSignature) {
+          throw new Error('Metaplex returned a Genesis transaction that still requires the connected wallet signature after execution delegation.');
+        }
         if (fullySigned) {
           await emit({
             phase: 'tx_send_fully_signed_start',
@@ -958,6 +962,9 @@ export async function signAndSendMetaplexTransactions(
         }
         const fullySigned = metaplexTransactionHasAllRequiredSignatures(signed);
         const requiresWalletSignature = metaplexTransactionRequiredSigners(signed).includes(walletAddress);
+        if (requiresWalletSignature && options.disallowWalletSignature) {
+          throw new Error('Metaplex returned a Genesis transaction that still requires the connected wallet signature after execution delegation.');
+        }
         if (!fullySigned && requiresWalletSignature) {
           const preservedSignatures = clearMetaplexPresignedNonWalletSignatures(signed, walletAddress);
           try {
@@ -1460,6 +1467,50 @@ export function MetaplexWalletPanel({
       }
       const launchKeypair = Keypair.generate();
       const launchWallet = launchKeypair.publicKey.toBase58();
+      const delegationPrepared = await api.prepareAgentMetaplexTokenLaunchDelegation(agentId, {
+        wallet: connectedWallet,
+      });
+      if (!delegationPrepared.success) {
+        const message = delegationPrepared.error || 'Metaplex execution delegation failed.';
+        setError(message);
+        toast.error(message);
+        return;
+      }
+      await logTokenLaunchEvent({
+        phase: delegationPrepared.data.alreadyDelegated
+          ? 'execution_delegate_already_active'
+          : 'execution_delegate_prepare_success',
+        wallet: connectedWallet,
+        launchWallet,
+        agentWallet: metaplexAgentWallet,
+        txCount: delegationPrepared.data.transactions.length,
+      });
+      if (delegationPrepared.data.transactions.length > 0) {
+        const delegationSignatures = await signAndSendMetaplexTransactions(
+          delegationPrepared.data.transactions,
+          wallet,
+          connection,
+          delegationPrepared.data.blockhash,
+          {
+            walletAddress: connectedWallet,
+            onEvent: (event) => logTokenLaunchEvent({
+              ...event,
+              phase: `execution_delegate_${event.phase}`,
+              wallet: connectedWallet,
+              launchWallet,
+              agentWallet: metaplexAgentWallet,
+            }),
+          },
+        );
+        await logTokenLaunchEvent({
+          phase: 'execution_delegate_success',
+          wallet: connectedWallet,
+          launchWallet,
+          agentWallet: metaplexAgentWallet,
+          signature: delegationSignatures[0],
+          txCount: delegationSignatures.length,
+        });
+      }
       const prepared = await api.prepareAgentMetaplexTokenLaunchTransaction(agentId, {
         ...payload,
         wallet: connectedWallet,
@@ -1536,6 +1587,7 @@ export function MetaplexWalletPanel({
         {
           walletAddress: connectedWallet,
           localSigners: [launchKeypair],
+          disallowWalletSignature: true,
           onEvent: (event) => logTokenLaunchEvent({
             ...event,
             wallet: connectedWallet,

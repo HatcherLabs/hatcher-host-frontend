@@ -821,6 +821,23 @@ export interface MetaplexTokenLaunchPrepareInput extends MetaplexTokenLaunchInpu
   launchWallet?: string;
 }
 
+export interface MetaplexTokenLaunchDelegationPrepareInput {
+  wallet: string;
+}
+
+export interface MetaplexTokenLaunchDelegationPrepareResponse {
+  wallet: string;
+  agentAsset: string;
+  status: "prepared" | "already_delegated";
+  transactions: string[];
+  blockhash: {
+    blockhash: string;
+    lastValidBlockHeight: number;
+  };
+  registeredExecutive: boolean;
+  alreadyDelegated: boolean;
+}
+
 export interface MetaplexTokenLaunchPrepareResponse {
   wallet: string;
   launchWallet?: string;
