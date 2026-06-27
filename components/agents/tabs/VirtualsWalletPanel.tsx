@@ -70,6 +70,13 @@ export function applyVirtualsBudgetPreset(form: VirtualsSettingsForm, presetId: 
   };
 }
 
+export function enableVirtualsAccess(form: VirtualsSettingsForm): VirtualsSettingsForm {
+  return {
+    ...form,
+    enabled: true,
+  };
+}
+
 function short(value: string | null | undefined): string {
   if (!value) return '-';
   if (value.length <= 22) return value;
@@ -356,11 +363,11 @@ export function VirtualsWalletPanel({ agentId }: { agentId: string }) {
     setForm((current) => applyVirtualsBudgetPreset(current, presetId));
   };
 
-  const save = async () => {
+  const saveSettings = async (nextForm: VirtualsSettingsForm = form) => {
     setSaving(true);
     setError(null);
     try {
-      const payload = buildVirtualsSettingsPayload(form);
+      const payload = buildVirtualsSettingsPayload(nextForm);
       const res = await api.updateAgentVirtualsConfig(agentId, payload);
       if (res.success) {
         setConfig(res.data);
@@ -374,6 +381,14 @@ export function VirtualsWalletPanel({ agentId }: { agentId: string }) {
     } finally {
       setSaving(false);
     }
+  };
+
+  const save = () => saveSettings(form);
+
+  const turnOnAccess = async () => {
+    const nextForm = enableVirtualsAccess(form);
+    setForm(nextForm);
+    await saveSettings(nextForm);
   };
 
   const search = async () => {
@@ -560,6 +575,17 @@ export function VirtualsWalletPanel({ agentId }: { agentId: string }) {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          {!loading && !enabled && (
+            <button
+              type="button"
+              onClick={() => void turnOnAccess()}
+              className="btn-primary inline-flex items-center gap-2"
+              disabled={saving}
+            >
+              {saving ? <Loader2 size={14} className="animate-spin" /> : <Power size={14} />}
+              {saving ? 'Turning on...' : 'Turn on access'}
+            </button>
+          )}
           <button type="button" onClick={() => void load()} className="btn-secondary inline-flex items-center gap-2" disabled={loading}>
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
             Refresh
@@ -582,7 +608,7 @@ export function VirtualsWalletPanel({ agentId }: { agentId: string }) {
             <StatusTile
               label="Access"
               value={enabled ? 'On' : 'Off'}
-              description={enabled ? 'This agent can prepare Virtuals work.' : 'Turn it on before matching or drafting jobs.'}
+              description={enabled ? 'This agent can match providers and draft jobs.' : 'Turn it on to match providers or draft jobs.'}
               tone={enabled ? 'good' : 'muted'}
               icon={Power}
             />
@@ -625,8 +651,8 @@ export function VirtualsWalletPanel({ agentId }: { agentId: string }) {
           onClick={() => setMode('auto')}
           className={`rounded-md border px-3 py-3 text-left transition-colors ${mode === 'auto' ? 'border-[var(--phosphor)]/60 bg-[var(--phosphor)]/10' : 'border-[var(--border-subtle)] bg-black/20 hover:border-[var(--border-hover)]'}`}
         >
-          <span className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]"><ShieldCheck size={14} /> Auto-hire guard</span>
-          <span className="mt-1 block text-xs text-[var(--text-muted)]">Set limits for runtime-created drafts.</span>
+          <span className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]"><ShieldCheck size={14} /> Access & budget</span>
+          <span className="mt-1 block text-xs text-[var(--text-muted)]">Control access and spend limits.</span>
         </button>
         <button
           type="button"
@@ -688,7 +714,7 @@ export function VirtualsWalletPanel({ agentId }: { agentId: string }) {
 
           {mode === 'auto' && (
             <div className="rounded-md border border-[var(--border-subtle)] bg-black/20 p-4">
-              <SectionTitle icon={ShieldCheck} step="1" title="Auto-hire guard" aside={enabled ? 'On' : 'Off'} />
+              <SectionTitle icon={ShieldCheck} step="1" title="Access & budget" aside={form.enabled ? 'On' : 'Off'} />
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border-subtle)] pb-3">
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-[var(--text-primary)]">Virtuals access</p>
@@ -773,7 +799,7 @@ export function VirtualsWalletPanel({ agentId }: { agentId: string }) {
               </label>
               <button type="button" onClick={() => void save()} className="btn-primary mt-3 inline-flex items-center gap-2" disabled={saving || loading}>
                 <CheckCircle2 size={14} />
-                {saving ? 'Saving...' : 'Save limits'}
+                {saving ? 'Saving...' : 'Save access & limits'}
               </button>
             </div>
           )}

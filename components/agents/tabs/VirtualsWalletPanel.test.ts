@@ -4,6 +4,7 @@ import {
   VIRTUALS_BUDGET_PRESETS,
   applyVirtualsBudgetPreset,
   buildVirtualsSettingsPayload,
+  enableVirtualsAccess,
   getHatcherServiceCardCopy,
   getSelectedHatcherService,
   getVirtualsOperatorCopy,
@@ -40,6 +41,23 @@ describe('Virtuals wallet panel helpers', () => {
       allowJobDrafts: true,
       dailyBudgetUsd: 5,
       maxPerJobUsd: 1,
+    });
+  });
+
+  it('turns on access without changing the rest of the saved settings', () => {
+    const current = {
+      ...baseForm,
+      enabled: false,
+      allowRuntimeSearch: false,
+      allowJobDrafts: false,
+      dailyBudgetUsd: '50',
+      maxPerJobUsd: '7',
+      preferredModel: 'openai-gpt-55',
+    };
+
+    expect(enableVirtualsAccess(current)).toEqual({
+      ...current,
+      enabled: true,
     });
   });
 
