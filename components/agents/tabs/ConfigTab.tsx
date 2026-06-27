@@ -45,10 +45,12 @@ import {
   hostedModelTags,
   hostedPrivacyLabel,
   normalizeHostedModelForUi,
+  type HostedModelOption,
   type HostedModelCost,
   type HostedModelPrivacy,
   type HostedModelTag,
 } from '@/lib/hosted-model-catalog';
+import { mergeHostedModelsWithVirtualsLive } from '@/lib/virtuals-compute-models';
 import { resolveLoadedModelConfig } from '@/hooks/useAgentConfig';
 import {
   useAgentContext,
@@ -107,6 +109,7 @@ type ModelPreset = {
 };
 
 type ConfigSubtab = 'general' | 'ai-models' | 'public-access' | 'advanced';
+type VirtualsModelCatalogStatus = 'loading' | 'ready' | 'fallback';
 
 const CONFIG_SUBTABS: Array<{
   id: ConfigSubtab;
@@ -153,6 +156,7 @@ const PROVIDER_GLYPH: Record<string, string> = {
   openserv: 'OS',
   xiaomi: 'MI',
   acedata: 'AC',
+  virtuals: 'V',
   google: 'G',
   qwen: 'Q',
   'x-ai': 'X',
@@ -243,6 +247,27 @@ function hostedCostClass(cost: HostedModelCost): string {
   }
 }
 
+function isHostedModelOption(value: unknown): value is HostedModelOption {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const source = value as Record<string, unknown>;
+  return typeof source.id === 'string'
+    && typeof source.name === 'string'
+    && typeof source.providerKey === 'string'
+    && typeof source.provider === 'string'
+    && typeof source.category === 'string'
+    && typeof source.cost === 'string'
+    && typeof source.context === 'string'
+    && typeof source.description === 'string';
+}
+
+function parseVirtualsModelsPayload(payload: unknown): HostedModelOption[] {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return [];
+  const data = (payload as { data?: unknown }).data;
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return [];
+  const models = (data as { models?: unknown }).models;
+  return Array.isArray(models) ? models.filter(isHostedModelOption) : [];
+}
+
 export function ConfigTab() {
   const searchParams = useSearchParams();
   const {
@@ -290,15 +315,21 @@ export function ConfigTab() {
   const [presetName, setPresetName] = useState('');
   const [presetDescription, setPresetDescription] = useState('');
   const [presetImportError, setPresetImportError] = useState<string | null>(null);
+  const [liveVirtualsModels, setLiveVirtualsModels] = useState<HostedModelOption[]>([]);
+  const [virtualsModelStatus, setVirtualsModelStatus] = useState<VirtualsModelCatalogStatus>('loading');
   const presetImportRef = useRef<HTMLInputElement | null>(null);
 
   const hostedProvider = 'openrouter';
   const isHostedMode = configProvider === hostedProvider;
   const normalizedHostedModel = normalizeHostedModelForUi(configModel);
+  const availableHostedModels = useMemo(
+    () => mergeHostedModelsWithVirtualsLive(HOSTED_MODELS, liveVirtualsModels),
+    [liveVirtualsModels],
+  );
   const selectedHostedModel = useMemo(
-    () => HOSTED_MODELS.find((m) => m.id === normalizedHostedModel)
+    () => availableHostedModels.find((m) => m.id === normalizedHostedModel)
       ?? createSavedHostedModelOption(normalizedHostedModel),
-    [normalizedHostedModel],
+    [availableHostedModels, normalizedHostedModel],
   );
   const selectedHostedProvider = useMemo(
     () => HOSTED_MODEL_PROVIDERS.find((p) => p.key === selectedHostedModel.providerKey)
@@ -310,8 +341,8 @@ export function ConfigTab() {
     [selectedHostedModel.provider, selectedHostedModel.providerKey],
   );
   const maxHostedContextTokens = useMemo(
-    () => Math.max(...HOSTED_MODELS.map((model) => contextToTokens(model.context)), contextToTokens(selectedHostedModel.context)),
-    [selectedHostedModel.context],
+    () => Math.max(...availableHostedModels.map((model) => contextToTokens(model.context)), contextToTokens(selectedHostedModel.context)),
+    [availableHostedModels, selectedHostedModel.context],
   );
   const selectedHostedContextTokens = contextToTokens(selectedHostedModel.context);
   const savedModelConfig = useMemo(
@@ -319,8 +350,8 @@ export function ConfigTab() {
     [agent.config],
   );
   const savedHostedModel = useMemo(
-    () => savedModelConfig.provider === hostedProvider ? getHostedModelOption(savedModelConfig.model) : null,
-    [savedModelConfig.model, savedModelConfig.provider],
+    () => savedModelConfig.provider === hostedProvider ? getHostedModelOption(savedModelConfig.model, availableHostedModels) : null,
+    [availableHostedModels, savedModelConfig.model, savedModelConfig.provider],
   );
   const savedModelName = savedModelConfig.provider === hostedProvider
     ? savedHostedModel?.name || savedModelConfig.model || 'No saved hosted model'
@@ -337,7 +368,7 @@ export function ConfigTab() {
     () => {
       const needle = modelSearch.trim().toLowerCase();
       const [minCost, maxCost] = modelCostRange;
-      return HOSTED_MODELS.filter((model) => {
+      return availableHostedModels.filter((model) => {
         if (selectedProviderFilters.length > 0 && !selectedProviderFilters.includes(model.providerKey)) return false;
         if (modelPrivacyFilter !== 'all' && hostedModelPrivacy(model) !== modelPrivacyFilter) return false;
         const rank = hostedCostRank(model.cost);
@@ -389,8 +420,13 @@ export function ConfigTab() {
         return String(left).localeCompare(String(right)) * direction;
       });
     },
-    [modelCostRange, modelPrivacyFilter, modelSearch, modelSort.direction, modelSort.key, selectedProviderFilters, selectedTagFilters],
+    [availableHostedModels, modelCostRange, modelPrivacyFilter, modelSearch, modelSort.direction, modelSort.key, selectedProviderFilters, selectedTagFilters],
   );
+  const virtualsModelStatusLabel = virtualsModelStatus === 'ready'
+    ? `Virtuals: ${liveVirtualsModels.length} models`
+    : virtualsModelStatus === 'loading'
+      ? 'Virtuals: syncing'
+      : 'Virtuals: starter list';
   const hasPendingHostedModelChange = savedHostedModel !== null && savedHostedModel.id !== selectedHostedModel.id;
   const lowAiCreditBalance = isHostedMode && aiCreditBalance !== null && aiCreditBalance.balance < 100;
   const sortedModelPresets = useMemo(
@@ -569,6 +605,32 @@ export function ConfigTab() {
       setConfigModel(normalizedHostedModel);
     }
   }, [configModel, isHostedMode, normalizedHostedModel, setConfigModel]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadVirtualsModels() {
+      setVirtualsModelStatus('loading');
+      try {
+        const response = await fetch('/api/virtuals/models', { signal: controller.signal });
+        if (!response.ok) throw new Error('Virtuals model catalog unavailable');
+        const models = parseVirtualsModelsPayload(await response.json());
+        if (controller.signal.aborted) return;
+        setLiveVirtualsModels(models);
+        setVirtualsModelStatus(models.length > 0 ? 'ready' : 'fallback');
+      } catch {
+        if (controller.signal.aborted) return;
+        setLiveVirtualsModels([]);
+        setVirtualsModelStatus('fallback');
+      }
+    }
+
+    loadVirtualsModels();
+
+    return () => {
+      controller.abort();
+    };
+  }, []);
 
   useEffect(() => {
     if (!isHostedMode && configPublicChatEnabled) {
@@ -962,6 +1024,8 @@ export function ConfigTab() {
                         ? 'Inference routes through UsePod with OpenRouter fallback for Xiaomi MiMo. AI Credit billing applies.'
                         : selectedHostedModel.providerKey === 'acedata'
                           ? 'Inference routes through AceData first with OpenRouter fallback when needed. Review partner policy before using sensitive data.'
+                        : selectedHostedModel.providerKey === 'virtuals'
+                          ? 'Inference routes through Virtuals Compute with the Hatcher server-side Virtuals key. Review Virtuals policy before using sensitive data.'
                         : selectedHostedModel.providerKey === 'openserv'
                           ? 'Inference routes through OpenServ first with OpenRouter fallback when needed. Review partner policy before using sensitive data.'
                         : hostedModelPrivacy(selectedHostedModel) === 'partner'
@@ -1228,11 +1292,22 @@ export function ConfigTab() {
               <div>
                 <div className="mb-2 flex items-center justify-between gap-2">
                   <span className="text-xs font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">Providers</span>
-                  {selectedProviderFilters.length > 0 && (
-                    <button type="button" onClick={() => setSelectedProviderFilters([])} className="text-xs text-[var(--accent-primary)] hover:underline">
-                      Clear
-                    </button>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`rounded border px-2 py-0.5 text-[10px] ${
+                        virtualsModelStatus === 'ready'
+                          ? 'border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success)]'
+                          : 'border-[var(--border-subtle)] bg-[var(--bg-panel)] text-[var(--text-tertiary)]'
+                      }`}
+                    >
+                      {virtualsModelStatusLabel}
+                    </span>
+                    {selectedProviderFilters.length > 0 && (
+                      <button type="button" onClick={() => setSelectedProviderFilters([])} className="text-xs text-[var(--accent-primary)] hover:underline">
+                        Clear
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {hostedModelProviders.map((provider) => {
@@ -1344,7 +1419,7 @@ export function ConfigTab() {
                         <span
                           className="inline-flex h-fit items-center gap-1.5 text-xs text-[var(--text-secondary)]"
                           title={hostedModelPrivacy(model) === 'partner'
-                            ? 'Partner-hosted inference. IDLE and AceData use explicit partner routes; Xiaomi MiMo is routed through UsePod/OpenRouter.'
+                            ? 'Partner-hosted inference. IDLE, AceData, OpenServ, and Virtuals use explicit partner routes; Xiaomi MiMo is routed through UsePod/OpenRouter.'
                             : 'Hatcher-managed route. UsePod primary with OpenRouter fallback where needed.'}
                         >
                           <Info className="h-3 w-3" />

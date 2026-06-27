@@ -50,6 +50,7 @@ import { XonaPartnerResourcesPanel } from './XonaPartnerResourcesPanel';
 import { Mpp32WalletPanel } from './Mpp32WalletPanel';
 import { MedusaWalletPanel } from './MedusaWalletPanel';
 import { MetaplexWalletPanel } from './MetaplexWalletPanel';
+import { VirtualsWalletPanel } from './VirtualsWalletPanel';
 
 interface ReputationState {
   upCount: number;
@@ -69,7 +70,7 @@ interface ReputationState {
 
 type WalletPanel = 'passport' | AgentPassportNetworkId;
 type WalletSection = 'overview' | 'networks' | 'providers' | 'security';
-type ProviderPanelId = 'xona' | 'earnfi' | 'oobe' | 'clawville' | 'kausalayer' | 'mirari' | 'mpp32' | 'medusa' | 'metaplex';
+type ProviderPanelId = 'xona' | 'earnfi' | 'oobe' | 'clawville' | 'kausalayer' | 'mirari' | 'mpp32' | 'medusa' | 'metaplex' | 'virtuals';
 type AgentRuntime = 'hermes' | 'openclaw' | (string & {});
 
 const TAB_ORDER: WalletPanel[] = ['passport', 'skale', 'solana', 'base'];
@@ -98,7 +99,13 @@ const SOLANA_PROVIDERS: ReadonlyArray<{ id: ProviderPanelId; label: string; desc
   { id: 'medusa', label: 'Medusa', description: 'Privacy passport and presale enrollment.', network: 'Solana' },
 ];
 
-const BASE_PROVIDERS: ReadonlyArray<{ id: ProviderPanelId; label: string; description: string; network: 'Base' }> = [];
+const BASE_PROVIDERS: ReadonlyArray<{ id: ProviderPanelId; label: string; description: string; network: 'Base' }> = [
+  { id: 'virtuals', label: 'Virtuals', description: 'Hire Virtuals agents and publish Hatcher services.', network: 'Base' },
+];
+
+export function getProviderSelectorOptions() {
+  return [...SOLANA_PROVIDERS, ...BASE_PROVIDERS];
+}
 
 function labelForPanel(panel: WalletPanel): string {
   if (panel === 'passport') return 'Passport';
@@ -905,6 +912,8 @@ function ProviderPanel({ provider, agentId, solanaWallet }: { provider: Provider
       return <MedusaWalletPanel agentId={agentId} solanaWallet={solanaWallet} />;
     case 'metaplex':
       return <MetaplexWalletPanel agentId={agentId} solanaWallet={solanaWallet} />;
+    case 'virtuals':
+      return <VirtualsWalletPanel agentId={agentId} />;
     default:
       return null;
   }
