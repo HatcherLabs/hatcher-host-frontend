@@ -5,6 +5,7 @@ import {
   getInitialWalletProviderFromSearch,
   getInitialWalletSectionFromSearch,
   getProviderPanelIdsForWallet,
+  getProviderSelectorOptions,
   getWalletActivityTransactionsForNetwork,
   shouldShowMirariPanelForWallet,
 } from './WalletTab';
@@ -113,5 +114,14 @@ describe('Wallet tab integration placement', () => {
   it('formats wallet activity amounts with their asset symbol', () => {
     expect(formatWalletActivityAmount('1.250000', 'SOL')).toBe('1.25 SOL');
     expect(formatWalletActivityAmount(null, null)).toBe('-');
+  });
+
+  it('builds compact provider selector options for the top picker', () => {
+    expect(getProviderSelectorOptions()).toContainEqual({
+      id: 'virtuals',
+      label: 'Virtuals',
+      network: 'Base',
+      description: 'Hire Virtuals agents and publish Hatcher services.',
+    });
   });
 });

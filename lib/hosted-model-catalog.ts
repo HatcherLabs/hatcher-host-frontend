@@ -58,6 +58,7 @@ export const HOSTED_MODEL_PROVIDERS: HostedModelProvider[] = [
   { key: 'openserv', name: 'OpenServ', description: 'Private-beta SERV reasoning models for agent workflows.' },
   { key: 'xiaomi', name: 'Xiaomi MiMo', description: 'MiMo models routed through UsePod with OpenRouter fallback.' },
   { key: 'acedata', name: 'AceData', description: 'Partner-hosted frontier models plus data and media intelligence APIs.' },
+  { key: 'virtuals', name: 'Virtuals', description: 'Virtuals Compute models routed through the Hatcher server key.' },
   { key: 'minimax', name: 'MiniMax', description: 'MiniMax M-series models routed through UsePod and OpenRouter.' },
   { key: 'google', name: 'Google', description: 'Gemini models with large context windows.' },
   { key: 'qwen', name: 'Qwen', description: 'Efficient coding and agentic tool-use models.' },
@@ -803,6 +804,66 @@ export const HOSTED_MODELS: HostedModelOption[] = [
     description: 'Low-cost NVIDIA model for lightweight workflows.',
   },
   {
+    id: 'virtuals/moonshotai-kimi-k2-5',
+    name: 'Kimi K2 5',
+    providerKey: 'virtuals',
+    provider: 'Virtuals',
+    category: 'Balanced',
+    cost: 'Variable',
+    context: 'Provider-defined',
+    description: 'Virtuals Compute Kimi model for general agent work, routed with the platform Virtuals key.',
+  },
+  {
+    id: 'virtuals/moonshotai-kimi-k2-6',
+    name: 'Kimi K2 6',
+    providerKey: 'virtuals',
+    provider: 'Virtuals',
+    category: 'Reasoning',
+    cost: 'Variable',
+    context: 'Provider-defined',
+    description: 'Virtuals Compute Kimi variant for analysis-heavy prompts and longer planning loops.',
+  },
+  {
+    id: 'virtuals/moonshotai-kimi-k2-7-code',
+    name: 'Kimi K2 7 Code',
+    providerKey: 'virtuals',
+    provider: 'Virtuals',
+    category: 'Coding',
+    cost: 'Variable',
+    context: 'Provider-defined',
+    description: 'Virtuals Compute coding-oriented Kimi route for repo analysis and implementation tasks.',
+  },
+  {
+    id: 'virtuals/llama-3-3-70b',
+    name: 'Llama 3.3 70B',
+    providerKey: 'virtuals',
+    provider: 'Virtuals',
+    category: 'Balanced',
+    cost: 'Variable',
+    context: 'Provider-defined',
+    description: 'Virtuals Compute Llama route for broad language and tool-planning workloads.',
+  },
+  {
+    id: 'virtuals/deepseek-deepseek-v3-2',
+    name: 'DeepSeek V3.2',
+    providerKey: 'virtuals',
+    provider: 'Virtuals',
+    category: 'Reasoning',
+    cost: 'Variable',
+    context: 'Provider-defined',
+    description: 'Virtuals Compute DeepSeek route for reasoning and structured task decomposition.',
+  },
+  {
+    id: 'virtuals/google-gemini-3-flash-preview',
+    name: 'Gemini 3 Flash Preview',
+    providerKey: 'virtuals',
+    provider: 'Virtuals',
+    category: 'Fast',
+    cost: 'Variable',
+    context: 'Provider-defined',
+    description: 'Virtuals Compute Gemini route for quick responses and multimodal-adjacent workflows.',
+  },
+  {
     id: 'openrouter/auto',
     name: 'OpenRouter Auto',
     providerKey: 'openrouter',
@@ -876,9 +937,12 @@ export function createSavedHostedModelOption(modelId: string): HostedModelOption
   };
 }
 
-export function getHostedModelOption(model: string | undefined): HostedModelOption {
+export function getHostedModelOption(
+  model: string | undefined,
+  catalog: HostedModelOption[] = HOSTED_MODELS,
+): HostedModelOption {
   const normalized = normalizeHostedModelForUi(model);
-  return HOSTED_MODELS.find((m) => m.id === normalized)
+  return catalog.find((m) => m.id === normalized)
     ?? createSavedHostedModelOption(normalized);
 }
 
@@ -887,11 +951,12 @@ export function hostedModelRoute(model: HostedModelOption): string {
   if (model.providerKey === 'openserv') return 'OpenServ direct / OpenRouter fallback';
   if (model.providerKey === 'xiaomi') return 'UsePod primary / OpenRouter fallback';
   if (model.providerKey === 'acedata') return 'AceData primary / OpenRouter fallback';
+  if (model.providerKey === 'virtuals') return 'Virtuals Compute';
   return 'UsePod primary / OpenRouter fallback';
 }
 
 export function hostedModelPrivacy(model: HostedModelOption): HostedModelPrivacy {
-  return model.providerKey === 'idle' || model.providerKey === 'openserv' || model.providerKey === 'xiaomi' || model.providerKey === 'acedata'
+  return model.providerKey === 'idle' || model.providerKey === 'openserv' || model.providerKey === 'xiaomi' || model.providerKey === 'acedata' || model.providerKey === 'virtuals'
     ? 'partner'
     : 'hatcher';
 }
@@ -901,6 +966,7 @@ export function hostedPrivacyLabel(model: HostedModelOption): string {
   if (model.providerKey === 'openserv') return 'OpenServ-hosted';
   if (model.providerKey === 'xiaomi') return 'UsePod/OpenRouter';
   if (model.providerKey === 'acedata') return 'AceData-hosted';
+  if (model.providerKey === 'virtuals') return 'Virtuals Compute';
   return 'Hatcher-hosted';
 }
 
@@ -948,9 +1014,12 @@ export function hostedModelTags(model: HostedModelOption): HostedModelTag[] {
   return Array.from(tags);
 }
 
-export function filterHostedModels(filter: HostedModelFilter): HostedModelOption[] {
+export function filterHostedModels(
+  filter: HostedModelFilter,
+  catalog: HostedModelOption[] = HOSTED_MODELS,
+): HostedModelOption[] {
   const needle = filter.search?.trim().toLowerCase();
-  return HOSTED_MODELS.filter((model) => {
+  return catalog.filter((model) => {
     if (filter.provider && filter.provider !== 'all' && model.providerKey !== filter.provider) {
       return false;
     }
@@ -983,10 +1052,11 @@ export function filterHostedModels(filter: HostedModelFilter): HostedModelOption
 export function resolveActiveModelDisplay(input: {
   provider?: string;
   model?: string;
+  catalog?: HostedModelOption[];
 }): ActiveModelDisplay {
   const provider = input.provider?.trim() || 'openrouter';
   if (provider === 'openrouter') {
-    const model = getHostedModelOption(input.model);
+    const model = getHostedModelOption(input.model, input.catalog);
     return {
       id: model.id,
       name: model.name,

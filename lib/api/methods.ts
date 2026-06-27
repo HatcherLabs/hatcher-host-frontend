@@ -77,6 +77,23 @@ import type {
   OrbisConfigStatus,
   OrbisSearchParams,
   OrbisSearchResponse,
+  VirtualsAcpSearchParams,
+  VirtualsAcpCliExecutionResponse,
+  VirtualsAcpDrainEventsBody,
+  VirtualsAcpOperatorStatus,
+  VirtualsAcpProviderResponseBody,
+  VirtualsAcpProviderResponseResult,
+  VirtualsAcpPublishServicesBody,
+  VirtualsAcpPublishServicesResponse,
+  VirtualsAgentSummary,
+  VirtualsComputeProbeBody,
+  VirtualsComputeProbeResponse,
+  VirtualsConfigBody,
+  VirtualsConfigStatus,
+  VirtualsJobDraftBody,
+  VirtualsJobDraftResponse,
+  VirtualsScoutBody,
+  VirtualsScoutResult,
   Mpp32ConfigBody,
   Mpp32ConfigStatus,
   MetaplexAvatarUploadResponse,
@@ -665,6 +682,65 @@ export const api = {
 
   callAgentOrbisApi: (id: string, body: OrbisCallBody) =>
     req<OrbisCallResponse>(`/agents/${id}/orbis/call`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  /** Virtuals EconomyOS / ACP managed layer. */
+  getAgentVirtualsConfig: (id: string) =>
+    req<VirtualsConfigStatus>(`/agents/${id}/virtuals/config`),
+
+  updateAgentVirtualsConfig: (id: string, body: VirtualsConfigBody) =>
+    req<VirtualsConfigStatus>(`/agents/${id}/virtuals/config`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+
+  searchAgentVirtualsAcp: (id: string, params: VirtualsAcpSearchParams = {}) => {
+    const query = new URLSearchParams();
+    if (params.q) query.set("q", params.q);
+    if (params.topK !== undefined) query.set("topK", String(params.topK));
+    if (params.agentVersions) query.set("agentVersions", params.agentVersions);
+    if (params.includeHidden !== undefined) query.set("includeHidden", String(params.includeHidden));
+    const suffix = query.toString() ? `?${query.toString()}` : "";
+    return req<VirtualsAgentSummary[]>(`/agents/${id}/virtuals/acp/search${suffix}`);
+  },
+
+  scoutAgentVirtualsAcp: (id: string, body: VirtualsScoutBody = {}) =>
+    req<VirtualsScoutResult[]>(`/agents/${id}/virtuals/acp/scout`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  draftAgentVirtualsJob: (id: string, body: VirtualsJobDraftBody) =>
+    req<VirtualsJobDraftResponse>(`/agents/${id}/virtuals/acp/job-draft`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  getAgentVirtualsAcpOperator: (id: string) =>
+    req<VirtualsAcpOperatorStatus>(`/agents/${id}/virtuals/acp/operator`),
+
+  publishAgentVirtualsHatcherServices: (id: string, body: VirtualsAcpPublishServicesBody) =>
+    req<VirtualsAcpPublishServicesResponse>(`/agents/${id}/virtuals/acp/hatcher-services/publish`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  drainAgentVirtualsAcpEvents: (id: string, body: VirtualsAcpDrainEventsBody = {}) =>
+    req<VirtualsAcpCliExecutionResponse>(`/agents/${id}/virtuals/acp/events/drain`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  respondAgentVirtualsAcpJob: (id: string, body: VirtualsAcpProviderResponseBody) =>
+    req<VirtualsAcpProviderResponseResult>(`/agents/${id}/virtuals/acp/jobs/respond`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  probeAgentVirtualsCompute: (id: string, body: VirtualsComputeProbeBody = {}) =>
+    req<VirtualsComputeProbeResponse>(`/agents/${id}/virtuals/compute/probe`, {
       method: "POST",
       body: JSON.stringify(body),
     }),

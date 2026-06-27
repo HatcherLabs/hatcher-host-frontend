@@ -595,6 +595,260 @@ export interface OrbisCallResponse {
   data: unknown;
 }
 
+export interface VirtualsAgentSettings {
+  enabled: boolean;
+  allowRuntimeSearch: boolean;
+  allowJobDrafts: boolean;
+  dailyBudgetUsd: number;
+  maxPerJobUsd: number;
+  preferredModel: string;
+  scoutQueries: string[];
+}
+
+export interface VirtualsConfigStatus {
+  enabled: boolean;
+  acpApiUrl: string;
+  computeBaseUrl: string;
+  computeConfigured: boolean;
+  computeModel: string;
+  hatcherLabsAgent: {
+    id: string | null;
+    walletAddress: string | null;
+    solWalletAddress: string | null;
+    builderCode: string | null;
+    consoleAgentId: string | null;
+  };
+  defaultChainId: number;
+  maxTopK: number;
+  hatcherServices: VirtualsHatcherService[];
+  settings: VirtualsAgentSettings;
+}
+
+export interface VirtualsHatcherService {
+  id: string;
+  title: string;
+  summary: string;
+  category: 'execution' | 'review' | 'launch' | 'data' | 'integration' | 'evaluation';
+  providerName: 'HatcherLabs';
+  providerWalletAddress: string | null;
+  providerConsoleAgentId: string | null;
+  offeringName: string;
+  priceValue: number;
+  priceType: 'fixed';
+  slaMinutes: number;
+  publishable: boolean;
+  idealFor: string[];
+  outcomes: string[];
+  requirementTemplate: Record<string, unknown>;
+  deliverableTemplate: Record<string, unknown>;
+  publishPayload: {
+    agentId: string | null;
+    consoleAgentId: string | null;
+    providerWalletAddress: string | null;
+    offeringName: string;
+    name: string;
+    description: string;
+    priceValue: number;
+    priceType: 'fixed';
+    slaMinutes: number;
+    requirement: Record<string, unknown>;
+    deliverable: Record<string, unknown>;
+  };
+}
+
+export interface VirtualsConfigBody {
+  enabled?: boolean;
+  allowRuntimeSearch?: boolean;
+  allowJobDrafts?: boolean;
+  dailyBudgetUsd?: number;
+  maxPerJobUsd?: number;
+  preferredModel?: string;
+  scoutQueries?: string[];
+}
+
+export interface VirtualsAcpSearchParams {
+  q?: string;
+  topK?: number;
+  agentVersions?: string;
+  includeHidden?: boolean;
+}
+
+export interface VirtualsOfferingSummary {
+  id: string | null;
+  name: string;
+  description: string | null;
+  priceValue: number | null;
+  priceType: string | null;
+  slaMinutes: number | null;
+  requiredFunds: boolean;
+  isHidden: boolean;
+  requirement: unknown;
+  deliverable: unknown;
+}
+
+export interface VirtualsAgentSummary {
+  id: string;
+  name: string;
+  description: string | null;
+  imageUrl: string | null;
+  walletAddress: string | null;
+  solWalletAddress: string | null;
+  role: string | null;
+  rating: number | null;
+  successRate: number | null;
+  builderCode: string | null;
+  consoleAgentId: string | null;
+  isHidden: boolean;
+  createdAt: string | null;
+  updatedAt: string | null;
+  lastActiveAt: string | null;
+  offerings: VirtualsOfferingSummary[];
+  resourcesCount: number;
+  subscriptionsCount: number;
+}
+
+export interface VirtualsScoutResult extends VirtualsAgentSummary {
+  queryMatches: string[];
+  hatcherScore: number;
+  reasons: string[];
+}
+
+export interface VirtualsScoutBody {
+  queries?: string[];
+  topK?: number;
+  maxResults?: number;
+}
+
+export interface VirtualsJobDraftBody {
+  providerWalletAddress: string;
+  providerName?: string;
+  offeringId?: string;
+  offeringName: string;
+  offering?: Record<string, unknown>;
+  requirements?: Record<string, unknown>;
+  maxBudgetUsd?: number;
+  chainId?: number;
+  evaluatorAddress?: string;
+}
+
+export interface VirtualsJobDraftResponse {
+  provider: {
+    name: string | null;
+    walletAddress: string;
+  };
+  offering: {
+    id: string | null;
+    name: string;
+    raw: Record<string, unknown> | null;
+  };
+  chainId: number;
+  requirements: Record<string, unknown>;
+  maxBudgetUsd: number | null;
+  evaluatorAddress: string | null;
+  guardrails: {
+    requiresHumanApproval: true;
+    fundEscrowAutomatically: false;
+    maxBudgetUsd: number | null;
+  };
+  sdkPlan: {
+    packageName: string;
+    method: string;
+    args: Record<string, unknown>;
+  };
+  cliPlan: {
+    listen: string;
+    createJob: string;
+    fund: string;
+    complete: string;
+  };
+}
+
+export interface VirtualsComputeProbeBody {
+  model?: string;
+  message?: string;
+  maxTokens?: number;
+}
+
+export interface VirtualsComputeProbeResponse {
+  model: string;
+  id: string | null;
+  outputText: string;
+  usage: unknown;
+}
+
+export interface VirtualsAcpCliCommand {
+  file: string;
+  args: string[];
+  display: string;
+}
+
+export interface VirtualsAcpOperatorStatus {
+  enabled: boolean;
+  command: VirtualsAcpCliCommand;
+  eventsFile: string;
+  listenCommand: VirtualsAcpCliCommand;
+  hatcherLabsAgent: {
+    id: string | null;
+    walletAddress: string | null;
+    solWalletAddress?: string | null;
+    builderCode?: string | null;
+    consoleAgentId?: string | null;
+  };
+}
+
+export interface VirtualsAcpPublishServicesBody {
+  serviceIds?: string[];
+  dryRun?: boolean;
+}
+
+export interface VirtualsAcpPublishServiceResult {
+  serviceId: string;
+  offeringName: string;
+  dryRun: boolean;
+  executed: boolean;
+  command?: VirtualsAcpCliCommand;
+  stdout?: string | null;
+  stderr?: string | null;
+  parsedOutput?: unknown;
+}
+
+export interface VirtualsAcpPublishServicesResponse {
+  dryRun: boolean;
+  results: VirtualsAcpPublishServiceResult[];
+}
+
+export interface VirtualsAcpDrainEventsBody {
+  file?: string;
+  limit?: number;
+}
+
+export interface VirtualsAcpCliExecutionResponse {
+  command: VirtualsAcpCliCommand;
+  stdout: string;
+  stderr: string;
+  parsedOutput: unknown;
+}
+
+export interface VirtualsAcpProviderResponseBody {
+  jobId: string;
+  amountUsd: number;
+  deliverable: string | Record<string, unknown>;
+  chainId?: number;
+  dryRun?: boolean;
+}
+
+export interface VirtualsAcpProviderResponseResult {
+  dryRun: boolean;
+  results: Array<{
+    action: 'set-budget' | 'submit';
+    executed: boolean;
+    command?: VirtualsAcpCliCommand;
+    stdout?: string;
+    stderr?: string;
+    parsedOutput?: unknown;
+  }>;
+}
+
 export interface Mpp32AgentSettings {
   enabled: boolean;
   dailyBudgetUsd: number;
