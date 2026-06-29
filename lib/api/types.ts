@@ -46,6 +46,101 @@ export interface Payment {
   agent?: { name: string };
 }
 
+export type SolanaRecurringAsset = "usdc";
+
+export type SolanaRecurringTarget =
+  | { kind: "tier"; key: string; billingPeriod?: "monthly" }
+  | { kind: "addon"; key: string; billingPeriod?: "monthly"; agentId?: string };
+
+export interface SolanaRecurringAssetConfig {
+  asset: SolanaRecurringAsset;
+  symbol: string;
+  tokenMint: string;
+  tokenProgram: string;
+  decimals: number;
+  stableUsd: boolean;
+  requiresWrappedBalance: boolean;
+}
+
+export interface SolanaRecurringQuote {
+  target: SolanaRecurringTarget;
+  featureKey: string;
+  description: string;
+  amountUsd: number;
+  asset: SolanaRecurringAssetConfig;
+  amountPerPeriodBaseUnits: string;
+  amountPerPeriodHuman: number;
+  periodSeconds: number;
+  allowancePeriods: number;
+  startAt: string;
+  expiresAt: string;
+  delegateeWallet: string;
+  subscriptionsProgramId: string;
+  notes: string[];
+}
+
+export type SolanaRecurringQuoteRequest = SolanaRecurringTarget & {
+  asset: SolanaRecurringAsset;
+  allowancePeriods?: number;
+};
+
+export interface SolanaRecurringCancelRequest {
+  revocationTxSignature: string;
+}
+
+export type SolanaRecurringSetupRecordInput = SolanaRecurringQuoteRequest & {
+  ownerWallet: string;
+  tokenAccount: string;
+  subscriptionAuthority: string;
+  delegationPda: string;
+  nonce: string;
+  authorityTxSignature?: string;
+  delegationTxSignature: string;
+  amountPerPeriodBaseUnits: string;
+  amountPerPeriodHuman: number;
+  startAt: string;
+  expiresAt: string;
+  walletProofSignature: string;
+  metadata?: Record<string, unknown>;
+};
+
+export interface SolanaRecurringAuthorization {
+  id: string;
+  userId: string;
+  agentId: string | null;
+  targetKind: "tier" | "addon";
+  targetKey: string;
+  billingPeriod: "monthly";
+  featureKey: string;
+  asset: SolanaRecurringAsset;
+  tokenMint: string;
+  tokenProgram: string;
+  amountUsd: string | number;
+  amountPerPeriod: string | number;
+  amountPerPeriodBaseUnits: string;
+  periodSeconds: number;
+  allowancePeriods: number;
+  ownerWallet: string;
+  tokenAccount: string;
+  delegateeWallet: string;
+  subscriptionAuthority: string;
+  delegationPda: string;
+  nonce: string;
+  authorityTxSignature: string | null;
+  delegationTxSignature: string;
+  status: string;
+  startAt: string;
+  expiresAt: string;
+  nextChargeAt: string | null;
+  lastChargedAt: string | null;
+  lastAttemptAt?: string | null;
+  lastFailureAt?: string | null;
+  lastError?: string | null;
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+}
+
 /**
  * AgentFeature as returned by the API (serialized dates, simpler type field).
  * Differs from shared AgentFeature which uses FeatureKey/FeatureType enums and Date fields.

@@ -52,6 +52,9 @@ export const HATCH_TOKEN_MINT =
 export const USDC_TOKEN_MINT =
   process.env.NEXT_PUBLIC_USDC_MINT || 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
 
+export const SOLANA_SUBSCRIPTIONS_PROGRAM_ID =
+  process.env.NEXT_PUBLIC_SOLANA_SUBSCRIPTIONS_PROGRAM_ID || 'De1egAFMkMWZSN5rYXRj9CAdheBamobVNubTsi9avR44';
+
 // $KAUSA SPL mint on Solana mainnet. Partner token payment rail.
 export const KAUSA_TOKEN_MINT =
   process.env.NEXT_PUBLIC_KAUSA_MINT || 'BWXSNRBKMviG68MqavyssnzDq4qSArcN7eNYjqEfpump';

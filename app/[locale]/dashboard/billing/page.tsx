@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
-import type { Payment } from '@/lib/api';
+import type { Payment, SolanaRecurringAuthorization, SolanaRecurringQuote, SolanaRecurringQuoteRequest } from '@/lib/api';
 import { Link } from '@/i18n/routing';
+import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { TIERS, TIER_ORDER, ADDONS } from '@hatcher/shared';
@@ -15,6 +16,10 @@ import { usePaymentDrivers } from '@/lib/payment-drivers';
 import { ConfirmPaymentModal } from '@/components/payments/ConfirmPaymentModal';
 import { formatFeatureKey } from '@/lib/feature-labels';
 import { payWithSolanaX402 } from '@/lib/solana-x402-client';
+import {
+  cancelSolanaRecurringAuthorizationOnChain,
+  setupSolanaRecurringAuthorization,
+} from '@/lib/solana-recurring-payments';
 import {
   createPendingCryptoSettlement,
   hasPendingCryptoSettlement,
@@ -417,6 +422,8 @@ export default function BillingPage() {
     typeof value === 'number' && value > 0 ? value.toLocaleString() : '0';
   const { isAuthenticated, isLoading: authLoading, user } = useAuth();
   const searchParams = useSearchParams();
+  const solanaWallet = useWallet();
+  const { connection: solanaConnection } = useConnection();
   const {
     confirmState, closeConfirm, driveSol, driveUsdc, driveHatch, driveKausa,
     openWalletModal, reconnect: reconnectWallet, disconnect: disconnectWallet,
@@ -440,6 +447,13 @@ export default function BillingPage() {
   const [aiCreditHistory, setAiCreditHistory] = useState<AiCreditHistoryItem[]>([]);
   const [userAgents, setUserAgents] = useState<Array<{ id: string; name: string }>>([]);
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
+  const [recurringAuthorizations, setRecurringAuthorizations] = useState<SolanaRecurringAuthorization[]>([]);
+  const [recurringMode, setRecurringMode] = useState<'tier' | 'ai_credits'>('ai_credits');
+  const [recurringTierKey, setRecurringTierKey] = useState<UserTierKey>('starter');
+  const [recurringAiCreditKey, setRecurringAiCreditKey] = useState<BillingAddonKey>('addon.ai_credits.5000');
+  const [recurringQuote, setRecurringQuote] = useState<SolanaRecurringQuote | null>(null);
+  const [recurringBusy, setRecurringBusy] = useState(false);
+  const [recurringCancelId, setRecurringCancelId] = useState<string | null>(null);
 
   // Wallet pill dropdown state (Switch / Disconnect).
   const [walletMenuOpen, setWalletMenuOpen] = useState(false);
@@ -538,19 +552,21 @@ export default function BillingPage() {
   // founding slots, agent list). The only difference vs. the initial
   // load is that we don't flip the top-level `loading` spinner.
   const loadAccountData = useCallback(async () => {
-    const [acctRes, balRes, payRes, histRes, catalogRes, agentsRes] = await Promise.all([
+    const [acctRes, balRes, payRes, histRes, catalogRes, agentsRes, recurringRes] = await Promise.all([
       api.getAccountFeatures(),
       api.getAiCreditBalance(),
       api.getPayments(),
       api.getAiCreditHistory(10),
       api.getTiersCatalog(),
       api.getMyAgents(),
+      api.getSolanaRecurringAuthorizations(),
     ]);
     if (acctRes.success) setAccountData(acctRes.data as unknown as AccountFeatures);
     if (balRes.success) setAiCreditBalance(balRes.data.balance);
     if (payRes.success) setPayments(payRes.data.payments);
     if (histRes.success) setAiCreditHistory(histRes.data.usage);
     if (catalogRes.success) setFoundingInfo(catalogRes.data.founding);
+    if (recurringRes.success) setRecurringAuthorizations(recurringRes.data.authorizations);
     if (agentsRes.success && agentsRes.data) {
       const agents = (agentsRes.data as unknown as Array<{ id: string; name: string }>);
       setUserAgents(agents.map(a => ({ id: a.id, name: a.name })));
@@ -655,7 +671,8 @@ export default function BillingPage() {
       api.getAiCreditHistory(10),
       api.getMyAgents(),
       api.getTiersCatalog(),
-    ]).then(([acctRes, payRes, balRes, histRes, agentsRes, catalogRes]) => {
+      api.getSolanaRecurringAuthorizations(),
+    ]).then(([acctRes, payRes, balRes, histRes, agentsRes, catalogRes, recurringRes]) => {
       if (acctRes.success) setAccountData(acctRes.data as unknown as AccountFeatures);
       if (payRes.success) setPayments(payRes.data.payments);
       if (balRes.success) setAiCreditBalance(balRes.data.balance);
@@ -665,6 +682,7 @@ export default function BillingPage() {
         setUserAgents(agents.map(a => ({ id: a.id, name: a.name })));
       }
       if (catalogRes.success) setFoundingInfo(catalogRes.data.founding);
+      if (recurringRes.success) setRecurringAuthorizations(recurringRes.data.authorizations);
       if (!acctRes.success) setError(acctRes.error ?? 'Failed to load account');
       setLoading(false);
     }).catch(() => {
@@ -672,6 +690,115 @@ export default function BillingPage() {
       setLoading(false);
     });
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    setRecurringQuote(null);
+  }, [recurringMode, recurringTierKey, recurringAiCreditKey]);
+
+  const recurringQuotePayload = useCallback((): SolanaRecurringQuoteRequest => {
+    if (recurringMode === 'tier') {
+      return {
+        kind: 'tier',
+        key: recurringTierKey,
+        billingPeriod: 'monthly',
+        asset: 'usdc',
+        allowancePeriods: 12,
+      };
+    }
+    return {
+      kind: 'addon',
+      key: recurringAiCreditKey,
+      billingPeriod: 'monthly',
+      asset: 'usdc',
+      allowancePeriods: 12,
+    };
+  }, [recurringAiCreditKey, recurringMode, recurringTierKey]);
+
+  const loadRecurringQuote = useCallback(async (): Promise<SolanaRecurringQuote | null> => {
+    setRecurringBusy(true);
+    setError(null);
+    try {
+      const res = await api.getSolanaRecurringQuote(recurringQuotePayload());
+      if (!res.success) {
+        setError(res.error);
+        return null;
+      }
+      setRecurringQuote(res.data);
+      return res.data;
+    } finally {
+      setRecurringBusy(false);
+    }
+  }, [recurringQuotePayload]);
+
+  const handleSetupRecurring = async () => {
+    setRecurringBusy(true);
+    setError(null);
+    try {
+      let quote = recurringQuote;
+      if (!quote) {
+        const res = await api.getSolanaRecurringQuote(recurringQuotePayload());
+        if (!res.success) throw new Error(res.error);
+        quote = res.data;
+        setRecurringQuote(quote);
+      }
+
+      if (!solanaWallet.connected || !solanaWallet.publicKey) {
+        openWalletModal();
+        return;
+      }
+
+      const recordPayload = await setupSolanaRecurringAuthorization({
+        wallet: solanaWallet,
+        connection: solanaConnection,
+        quote,
+      });
+      const recordRes = await api.recordSolanaRecurringSetup(recordPayload);
+      if (!recordRes.success) throw new Error(recordRes.error);
+
+      await loadAccountData();
+      setRecurringQuote(null);
+      showSuccess('Solana recurring authorization active.');
+    } catch (err) {
+      reportCatch(err, 'Solana recurring setup failed');
+    } finally {
+      setRecurringBusy(false);
+    }
+  };
+
+  const handleCancelRecurring = async (authorization: SolanaRecurringAuthorization) => {
+    setRecurringCancelId(authorization.id);
+    setError(null);
+    try {
+      if (!solanaWallet.connected || !solanaWallet.publicKey) {
+        openWalletModal();
+        return;
+      }
+      const revocationTxSignature = await cancelSolanaRecurringAuthorizationOnChain({
+        wallet: solanaWallet,
+        connection: solanaConnection,
+        authorization,
+      });
+      const res = await api.cancelSolanaRecurringAuthorization(authorization.id, {
+        revocationTxSignature,
+      });
+      if (!res.success) throw new Error(res.error);
+      await loadAccountData();
+      showSuccess('USDC token approval revoked and monthly authorization cancelled.');
+    } catch (err) {
+      reportCatch(err, 'Solana recurring cancellation failed');
+    } finally {
+      setRecurringCancelId(null);
+    }
+  };
+
+  const revocableRecurringAuthorizations = useMemo(
+    () => recurringAuthorizations.filter((row) => row.status === 'active' || row.status === 'action_required'),
+    [recurringAuthorizations],
+  );
+  const activeRecurringAuthorizationCount = useMemo(
+    () => revocableRecurringAuthorizations.filter((row) => row.status === 'active').length,
+    [revocableRecurringAuthorizations],
+  );
 
   /* ── Open payment modal ────────────────────────────────── */
   const openSubscribeModal = (tierKey: UserTierKey, mode: 'upgrade' | 'renew' = 'upgrade') => {
@@ -1458,6 +1585,168 @@ export default function BillingPage() {
 	              </div>
 	            )}
 	          </div>
+        </div>
+      </motion.div>
+
+      {/* ── Solana Recurring Billing ──────────────────────── */}
+      <motion.div className={`mb-8 ${cardClass}`} variants={itemVariants}>
+        <div className="px-4 sm:px-6 py-4 flex flex-col gap-1 border-b border-[var(--border-default)] sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2">
+            <Clock className="w-4 h-4 text-[var(--color-accent)]" />
+            <h2 className="font-semibold text-[var(--text-primary)]">Solana recurring billing</h2>
+          </div>
+	          <span className="text-[11px] font-medium text-[var(--text-muted)]">USDC only</span>
+        </div>
+        <div className="p-4 sm:p-6 space-y-5">
+          <div className="grid gap-4 lg:grid-cols-[1fr_1fr_auto] lg:items-end">
+            <div>
+              <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">Target</p>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { key: 'ai_credits' as const, label: 'AI Credits' },
+                  { key: 'tier' as const, label: 'Tier renewal' },
+                ].map((option) => (
+                  <button
+                    key={option.key}
+                    type="button"
+                    onClick={() => setRecurringMode(option.key)}
+                    className={`h-10 rounded-lg border px-3 text-xs font-semibold transition-colors ${
+                      recurringMode === option.key
+                        ? 'border-[var(--color-accent)] bg-[var(--color-accent)]/10 text-[var(--color-accent)]'
+                        : 'border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:border-[var(--color-accent)]/40'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="mb-2 block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+                {recurringMode === 'tier' ? 'Plan' : 'Top-up'}
+              </label>
+              {recurringMode === 'tier' ? (
+                <select
+                  value={recurringTierKey}
+                  onChange={(event) => setRecurringTierKey(event.target.value as UserTierKey)}
+                  className="h-10 w-full rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-accent)]"
+                >
+                  {TIER_ORDER.filter((key) => key !== 'free' && key !== 'founding_member').map((key) => (
+                    <option key={key} value={key}>{TIERS[key].name}</option>
+                  ))}
+                </select>
+              ) : (
+                <select
+                  value={recurringAiCreditKey}
+                  onChange={(event) => setRecurringAiCreditKey(event.target.value as BillingAddonKey)}
+                  className="h-10 w-full rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-accent)]"
+                >
+                  {AI_CREDIT_ADDONS.map((addon) => (
+                    <option key={addon.key} value={addon.key}>{addon.name}</option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+	            <div>
+	              <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">Asset</p>
+	              <div className="flex h-10 items-center justify-between rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 lg:w-48">
+	                <span className="text-sm font-semibold text-[var(--text-primary)]">USDC</span>
+	                <span className="text-[11px] text-[var(--text-muted)]">fixed USD</span>
+	              </div>
+	            </div>
+          </div>
+
+          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-4 py-3">
+            {recurringQuote ? (
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-[var(--text-primary)]">{recurringQuote.description}</p>
+                  <p className="mt-1 text-xs text-[var(--text-muted)]">
+                    {recurringQuote.amountPerPeriodHuman.toLocaleString(undefined, { maximumFractionDigits: 9 })} {recurringQuote.asset.symbol} monthly · expires {formatDate(recurringQuote.expiresAt)}
+                  </p>
+	                  <p className="mt-1 text-xs text-[var(--text-muted)]">Recurring billing is limited to USDC so the monthly dollar amount stays stable.</p>
+	                  <p className="mt-1 text-xs text-[var(--text-muted)]">
+	                    Phantom may show an unlimited USDC approval. The subscriptions program enforces this monthly limit, and cancel signs an on-chain revocation that clears the token approval.
+	                  </p>
+                </div>
+                <span className="text-lg font-bold tabular-nums text-[var(--text-primary)]">${recurringQuote.amountUsd}</span>
+              </div>
+            ) : (
+              <p className="text-sm text-[var(--text-muted)]">
+                Preview the monthly USDC allowance before opening your wallet. Phantom will show a broad token approval; Hatcher records the monthly limit on-chain and cancel revokes the approval.
+              </p>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="text-xs text-[var(--text-muted)]">
+              {revocableRecurringAuthorizations.length > 0
+                ? `${activeRecurringAuthorizationCount} active authorization${activeRecurringAuthorizationCount === 1 ? '' : 's'}`
+                : 'No active recurring authorizations'}
+            </div>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <button
+                type="button"
+                onClick={() => void loadRecurringQuote()}
+                disabled={recurringBusy}
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[var(--border-default)] px-4 text-xs font-semibold text-[var(--text-primary)] transition-colors hover:border-[var(--color-accent)]/40 disabled:opacity-50"
+              >
+                {recurringBusy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Receipt className="h-3.5 w-3.5" />}
+                Preview
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleSetupRecurring()}
+                disabled={recurringBusy}
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[var(--color-accent)] px-4 text-xs font-semibold text-[var(--bg-base)] transition-colors hover:bg-[var(--color-accent-hover)] disabled:opacity-50"
+              >
+                {recurringBusy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Wallet className="h-3.5 w-3.5" />}
+                Set up monthly
+              </button>
+            </div>
+          </div>
+
+          {revocableRecurringAuthorizations.length > 0 && (
+            <div className="space-y-2 border-t border-[var(--border-default)] pt-4">
+              {revocableRecurringAuthorizations.slice(0, 4).map((row) => (
+	                <div key={row.id} className="flex flex-col gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-2 text-xs sm:flex-row sm:items-center sm:justify-between">
+	                  <div className="min-w-0">
+	                    <p className="font-semibold text-[var(--text-primary)] truncate">{formatFeatureKey(row.featureKey)}</p>
+	                    <p className="mt-0.5 text-[var(--text-muted)]">
+	                      {Number(row.amountPerPeriod).toLocaleString(undefined, { maximumFractionDigits: 9 })} {row.asset.toUpperCase()} · next {row.nextChargeAt ? formatDate(row.nextChargeAt) : 'paused'}
+	                    </p>
+	                    {(row.status === 'active' || row.status === 'action_required') && (
+	                      <p className="mt-0.5 text-[var(--text-muted)]">
+	                        Cancel signs a wallet transaction that revokes the USDC token approval. Because USDC approval is shared per wallet, this disables all active USDC monthly authorizations for this wallet.
+	                      </p>
+	                    )}
+	                  </div>
+	                  <div className="flex shrink-0 items-center gap-2">
+	                    <span className={`w-fit rounded-full border px-2 py-0.5 text-[10px] font-semibold ${
+	                      row.status === 'active'
+	                        ? 'border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success)]'
+	                        : 'border-[var(--border-default)] bg-[var(--bg-card)] text-[var(--text-muted)]'
+	                    }`}>
+	                      {row.status}
+	                    </span>
+	                    {(row.status === 'active' || row.status === 'action_required') && (
+	                      <button
+	                        type="button"
+	                        onClick={() => void handleCancelRecurring(row)}
+	                        disabled={recurringCancelId === row.id}
+	                        className="inline-flex h-8 items-center justify-center gap-1.5 rounded-lg border border-[var(--border-default)] px-2.5 text-[11px] font-semibold text-[var(--text-secondary)] transition-colors hover:border-[var(--color-destructive)] hover:text-[var(--color-destructive)] disabled:opacity-50"
+	                      >
+	                        {recurringCancelId === row.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <X className="h-3 w-3" />}
+	                        Revoke monthly
+	                      </button>
+	                    )}
+	                  </div>
+	                </div>
+	              ))}
+            </div>
+          )}
         </div>
       </motion.div>
 

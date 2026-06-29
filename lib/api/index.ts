@@ -6,6 +6,13 @@ export { getToken, setToken, clearToken, isAuthenticated, req } from "./core";
 export type { AuthProfileData, ChatAttachmentPayload } from "./methods";
 export type {
   Payment,
+  SolanaRecurringAsset,
+  SolanaRecurringAssetConfig,
+  SolanaRecurringAuthorization,
+  SolanaRecurringQuote,
+  SolanaRecurringQuoteRequest,
+  SolanaRecurringSetupRecordInput,
+  SolanaRecurringTarget,
   AgentFeature,
   Agent,
   AgentCommCallBody,
