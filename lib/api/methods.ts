@@ -31,6 +31,11 @@ import type {
   AgentWalletPrivateKeyResponse,
   AgentWalletsResponse,
   Payment,
+  SolanaRecurringAuthorization,
+  SolanaRecurringCancelRequest,
+  SolanaRecurringQuote,
+  SolanaRecurringQuoteRequest,
+  SolanaRecurringSetupRecordInput,
   AgentFeature,
   ChatMessage,
   ChatSessionSummary,
@@ -1328,6 +1333,33 @@ export const api = {
   getPayments: (skip = 0, take = 50) =>
     req<{ payments: Payment[]; total: number; skip: number; take: number }>(
       `/payments?skip=${skip}&take=${take}`,
+    ),
+
+  getSolanaRecurringAuthorizations: () =>
+    req<{ authorizations: SolanaRecurringAuthorization[] }>("/payments/recurring"),
+
+  getSolanaRecurringQuote: (payload: SolanaRecurringQuoteRequest) =>
+    req<SolanaRecurringQuote>("/payments/recurring/quote", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  recordSolanaRecurringSetup: (payload: SolanaRecurringSetupRecordInput) =>
+    req<{ authorization: SolanaRecurringAuthorization }>("/payments/recurring/record", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  cancelSolanaRecurringAuthorization: (id: string, payload?: SolanaRecurringCancelRequest) =>
+    req<{
+      authorization: SolanaRecurringAuthorization;
+      cancelledAuthorizations?: SolanaRecurringAuthorization[];
+    }>(
+      `/payments/recurring/${encodeURIComponent(id)}/cancel`,
+      {
+        method: "POST",
+        ...(payload ? { body: JSON.stringify(payload) } : {}),
+      },
     ),
 
   /** Get active features for an agent */
