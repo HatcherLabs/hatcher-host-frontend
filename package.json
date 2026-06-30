@@ -1,6 +1,6 @@
 {
   "name": "hatcher-host-frontend",
-  "version": "1.4.67",
+  "version": "1.4.68",
   "private": true,
   "scripts": {
     "dev": "next dev",
