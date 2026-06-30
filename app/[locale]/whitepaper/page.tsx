@@ -118,11 +118,6 @@ const PARTNER_COMPUTE = [
       'Hatcher agents can consume selected partner compute tasks, while running or idle agents can be registered as providers where appropriate.',
   },
   {
-    name: 'Conduit',
-    body:
-      'Hatcher agents can register as provider endpoints, execute jobs through the Hatcher runtime, and record settlements. Owners may receive equivalent AI Credits or direct USDC payouts depending on payout mode.',
-  },
-  {
     name: 'KausaLayer',
     body:
       'Agents can access selected privacy wallet and MCP-style tools through Hatcher-managed or user-supplied keys.',

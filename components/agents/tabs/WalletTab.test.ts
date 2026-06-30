@@ -44,11 +44,6 @@ describe('Wallet tab integration placement', () => {
     expect(getProviderPanelIdsForWallet('skale')).not.toContain('metaplex');
   });
 
-  it('hides disabled Conduit and Orbis provider rails from users', () => {
-    expect(getProviderPanelIdsForWallet('solana')).not.toContain('conduit');
-    expect(getProviderPanelIdsForWallet('base')).not.toContain('orbis');
-  });
-
   it('deep-links to the Medusa provider panel', () => {
     const search = '?tab=wallet&walletSection=providers&walletProvider=medusa';
 
@@ -61,11 +56,6 @@ describe('Wallet tab integration placement', () => {
 
     expect(getInitialWalletSectionFromSearch(search)).toBe('providers');
     expect(getInitialWalletProviderFromSearch(search)).toBe('metaplex');
-  });
-
-  it('ignores deep links to disabled Conduit and Orbis provider panels', () => {
-    expect(getInitialWalletProviderFromSearch('?walletProvider=conduit')).toBe('metaplex');
-    expect(getInitialWalletProviderFromSearch('?walletProvider=orbis')).toBe('metaplex');
   });
 
   it('selects transaction activity for the active wallet network', () => {

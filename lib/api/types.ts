@@ -558,7 +558,7 @@ export interface XonaToolSummary {
 export interface XonaConfigStatus {
   enabled: boolean;
   configured: boolean;
-  keySource: "xona" | "conduit" | "none";
+  keySource: "xona" | "none";
   baseUrl: string;
   networks: string[];
   allowedHosts: string[];
@@ -591,104 +591,6 @@ export interface XonaCallResponse {
 }
 
 export type XonaDiscoverResponse = unknown[];
-
-export type OrbisPayerSource = "orbis" | "base_hub" | "skale_hub" | "none";
-
-export interface OrbisAgentSettings {
-  enabled: boolean;
-  dailyBudgetUsd: number;
-  maxPerCallUsd: number;
-  allowedApiSlugs: string[];
-}
-
-export interface OrbisConfigStatus {
-  enabled: boolean;
-  configured: boolean;
-  baseUrl: string;
-  network: string;
-  payerAddress: string | null;
-  payerSource: OrbisPayerSource;
-  allowedCategories: string[];
-  allowedApiSlugs: string[];
-  allowedHosts: string[];
-  maxPerCallUsdc: number;
-  maxPerDayUsdc: number;
-  maxResponseBytes: number;
-  settings: OrbisAgentSettings;
-}
-
-export interface OrbisConfigBody {
-  enabled?: boolean;
-  dailyBudgetUsd?: number;
-  maxPerCallUsd?: number;
-  allowedApiSlugs?: string[];
-}
-
-export interface OrbisSearchParams {
-  q?: string;
-  category?: string;
-  chain?: "base" | "eip155:8453" | "solana";
-  minPriceUsd?: number;
-  maxPriceUsd?: number;
-  limit?: number;
-}
-
-export interface OrbisApiSummary {
-  id?: string | null;
-  slug?: string | null;
-  name?: string | null;
-  categorySlug?: string | null;
-  categoryName?: string | null;
-  tags?: unknown;
-  baseUrl?: string | null;
-  lowestPriceUsdc?: number | null;
-  callCount?: number | null;
-  uptimeScore?: number | null;
-  healthStatus?: string | null;
-  isActive?: boolean | null;
-  [key: string]: unknown;
-}
-
-export interface OrbisApiDetail {
-  api?: OrbisApiSummary;
-  tiers?: Array<Record<string, unknown>>;
-  endpoints?: Array<{
-    method?: string | null;
-    path?: string | null;
-    overridePrice?: number | null;
-    [key: string]: unknown;
-  }>;
-  [key: string]: unknown;
-}
-
-export type OrbisCategoriesResponse = unknown;
-export type OrbisSearchResponse = OrbisApiSummary[] | { apis?: OrbisApiSummary[]; data?: OrbisApiSummary[]; [key: string]: unknown };
-
-export interface OrbisCallBody {
-  apiSlug?: string;
-  apiId?: string;
-  endpointUrl?: string;
-  path?: string;
-  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-  query?: Record<string, unknown>;
-  body?: Record<string, unknown>;
-  headers?: Record<string, string>;
-  workflowId?: string;
-  maxCostUsd?: number;
-}
-
-export interface OrbisCallResponse {
-  apiSlug: string | null;
-  endpointUrl: string;
-  status: number;
-  network: string;
-  amountPaid: string;
-  amountPaidUsdc: number;
-  txSig: string | null;
-  payer: string | null;
-  aiCreditsCharged: number;
-  data: unknown;
-}
 
 export interface VirtualsAgentSettings {
   enabled: boolean;
@@ -957,7 +859,7 @@ export interface Mpp32ConfigStatus {
   settlement: "x402";
   agtpIdentityMode: "x402_only" | "hmac_sha256";
   payerConfigured: boolean;
-  payerSource: "mpp32" | "xona" | "conduit" | "none";
+  payerSource: "mpp32" | "xona" | "none";
   network: string;
   maxPerCallUsdc: number;
   maxResponseBytes: number;
@@ -1480,72 +1382,6 @@ export interface MedusaMintBadgeResponse {
   alreadyMinted: boolean;
   badge: MedusaPassportBadge;
 }
-
-export type ConduitPayoutMode = "ai_credits" | "usdc_wallet";
-
-export interface ConduitConfigBody {
-  payoutMode: ConduitPayoutMode;
-}
-
-export interface ConduitConfigStatus {
-  enabled: boolean;
-  providerEnabled: boolean;
-  baseUrl: string;
-  payoutMode: ConduitPayoutMode;
-  recipientWallet: string;
-  agentWallet: string | null;
-  defaultPriceUsdc: number;
-  providerShareBps: number;
-}
-
-export interface ConduitProviderRegistration {
-  id: string;
-  providerId: string;
-  agentId: string;
-  walletAddress: string;
-  endpointUrl: string;
-  status: string;
-  region: string | null;
-  payoutMode: ConduitPayoutMode;
-  pricePerCallUsdc: number;
-  hmacSecretStored: boolean;
-  hmacSecretStoredAt: string | null;
-  hmacSecretRotatedAt: string | null;
-  metadata: unknown;
-  rawResponse: unknown;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ConduitProvidersResponse {
-  providers: ConduitProviderRegistration[];
-}
-
-export interface ConduitRegisterProviderBody {
-  pricePerCall?: number;
-  payoutMode?: ConduitPayoutMode;
-}
-
-export interface ConduitProviderPatchBody {
-  name?: string;
-  description?: string;
-  endpointUrl?: string;
-  region?: string;
-  status?: "active" | "offline";
-}
-
-export interface ConduitRegisterProviderResponse {
-  provider: ConduitProviderRegistration;
-  upstream: unknown;
-}
-
-export interface ConduitProviderActionResponse {
-  provider: ConduitProviderRegistration;
-  upstream?: unknown;
-}
-
-export type ConduitProtocolInfoResponse = unknown;
-export type ConduitManifestResponse = unknown;
 
 export interface ClawVilleProtocolPointer {
   version?: number;
@@ -2268,102 +2104,6 @@ export interface AdminIdleOverviewResponse {
       totalEarnedUsd: number;
       stale: boolean;
     }>;
-  };
-}
-
-export interface AdminConduitProviderRow {
-  providerId: string;
-  agentId: string;
-  agentName: string;
-  agentSlug: string | null;
-  ownerId: string;
-  ownerEmail: string | null;
-  walletAddress: string;
-  endpointUrl: string;
-  status: string;
-  region: string | null;
-  payoutMode: ConduitPayoutMode;
-  pricePerCallUsdc: number;
-  hmacSecretStored: boolean;
-  hmacSecretStoredAt: string | null;
-  hmacSecretRotatedAt: string | null;
-  adoptedLegacyProvider: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface AdminConduitSettlementRow {
-  referenceId: string;
-  jobId: string | null;
-  agentId: string;
-  agentName: string;
-  ownerId: string;
-  ownerEmail: string | null;
-  payoutMode: ConduitPayoutMode;
-  amountUsdc: number;
-  providerShareUsdc: number;
-  aiCreditsGranted: number;
-  status: string;
-  txHash: string | null;
-  createdAt: string;
-}
-
-export interface AdminConduitExemptionWallet {
-  walletAddress: string;
-  activeProviders: number;
-  providerIds: string[];
-  agentNames: string[];
-  payoutModes: ConduitPayoutMode[];
-}
-
-export interface AdminConduitOverviewResponse {
-  generatedAt: string;
-  config: {
-    enabled: boolean;
-    providerEnabled: boolean;
-    baseUrl: string;
-    treasurySignerConfigured: boolean;
-    sharedHmacConfigured: boolean;
-    payoutWalletConfigured: boolean;
-    defaultPriceUsdc: number;
-    providerShareBps: number;
-  };
-  errors: string[];
-  protocol: {
-    status: number | null;
-    error: string | null;
-    programs: Array<{ name: string; id: string }>;
-    body: unknown;
-  };
-  tokenGate: {
-    exemptionWallets: AdminConduitExemptionWallet[];
-    note: string;
-  };
-  providers: {
-    coverage: {
-      total: number;
-      active: number;
-      archived: number;
-      missingSecret: number;
-      legacyAdopted: number;
-      aiCreditsPayout: number;
-      usdcPayout: number;
-    };
-    byStatus: Array<{ status: string; count: number }>;
-    byPayoutMode: Array<{ status: ConduitPayoutMode; count: number }>;
-    missingSecret: AdminConduitProviderRow[];
-    legacyAdopted: AdminConduitProviderRow[];
-    recent: AdminConduitProviderRow[];
-  };
-  settlements: {
-    totalCount: number;
-    totalAmountUsdc: number;
-    totalProviderShareUsdc: number;
-    aiCreditsGranted: number;
-    last24hCount: number;
-    last24hAmountUsdc: number;
-    byPayoutMode: Array<{ status: ConduitPayoutMode; count: number }>;
-    recent: AdminConduitSettlementRow[];
   };
 }
 
