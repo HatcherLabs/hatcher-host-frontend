@@ -2037,36 +2037,6 @@ export interface AdminIdleOverviewResponse {
     payoutSchedule: string | null;
     wallets: unknown[];
   };
-  directNode?: {
-    configured: boolean;
-    wallet: string | null;
-    status: number | null;
-    errors: string[];
-    container: {
-      name: string;
-      running: boolean;
-      status: string;
-      restartCount: number;
-      startedAt: string | null;
-      cpuLimitCores: number | null;
-      memoryLimitMb: number | null;
-      cpuPercent: number | null;
-      memoryUsageMb: number | null;
-    } | null;
-    session: {
-      processedJobs: number | null;
-      lastJob: { type: string; earnedUsd: number; line: string } | null;
-      logLines: string[];
-    };
-    earnings: {
-      completedJobs: number;
-      failedJobs: number;
-      totalEarnedUsd: number;
-      totalPaidUsd: number;
-      pendingUsd: number;
-      byType: Array<{ type: string; jobs: number }>;
-    };
-  };
   providers: {
     requiredCapabilities: string[];
     coverage: {
@@ -2084,13 +2054,6 @@ export interface AdminIdleOverviewResponse {
       framework: string;
       reason: string;
     }>;
-    staleRegistrations: Array<{
-      agentId: string;
-      registryId: string | null;
-      name: string | null;
-      status: string | null;
-      totalRequests: number;
-    }>;
     duplicateRegistrations: Array<{ agentId: string; count: number }>;
     registrations: Array<{
       registryId: string | null;
@@ -2102,7 +2065,6 @@ export interface AdminIdleOverviewResponse {
       pricePerRequest: number | null;
       totalRequests: number;
       totalEarnedUsd: number;
-      stale: boolean;
     }>;
   };
 }
