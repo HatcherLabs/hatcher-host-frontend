@@ -73,7 +73,6 @@ export function getExploreStats(agents: PublicExploreAgent[]): {
 
 export function publicAgentAccent(agent: PublicExploreAgent): string {
   if (agent.status === 'crashed') return '#f97316';
-  if (agent.framework.toLowerCase() === 'autr') return '#89d6c6';
   return agent.framework.toLowerCase() === 'hermes' ? '#38bdf8' : '#486a79';
 }
 
@@ -90,31 +89,5 @@ export function frameworkDisplayName(framework: string): string {
   const normalized = framework.toLowerCase();
   if (normalized === 'openclaw') return 'OpenClaw';
   if (normalized === 'hermes') return 'Hermes';
-  if (normalized === 'autr') return 'AUTR';
   return framework;
-}
-
-export const AUTR_LIVE_TRADER_AGENT: PublicExploreAgent = {
-  id: 'autr-live-trader',
-  slug: 'autr-live-trader',
-  name: 'AUTR Live Trader',
-  description: 'Real AUTR BUY/SELL webhook signals tracked through a Hatcher guarded live-test wallet.',
-  avatarUrl: null,
-  framework: 'autr',
-  status: 'running',
-  messageCount: 0,
-  createdAt: '2026-06-18T00:00:00.000Z',
-  publicChatEnabled: true,
-  publicHref: '/autr-live-trader',
-  capabilityLabel: 'Live trader',
-  ctaLabel: 'View trader',
-  featuredPriority: 100,
-  owner: { username: 'Hatcher Labs', walletAddress: null },
-};
-
-export function withAutrLiveTraderAgent(agents: PublicExploreAgent[]): PublicExploreAgent[] {
-  if (agents.some((agent) => agent.id === AUTR_LIVE_TRADER_AGENT.id || agent.slug === AUTR_LIVE_TRADER_AGENT.slug)) {
-    return agents;
-  }
-  return [AUTR_LIVE_TRADER_AGENT, ...agents];
 }

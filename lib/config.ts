@@ -4,8 +4,6 @@
 export const DOCS_URL = process.env.NEXT_PUBLIC_DOCS_URL || 'http://localhost:3003';
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-export const AUTR_DEPLOY_URL =
-  process.env.NEXT_PUBLIC_AUTR_DEPLOY_URL || 'https://autonomustrencheragent.tech/';
 
 const PUBLIC_SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ||

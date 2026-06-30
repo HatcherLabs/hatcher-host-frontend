@@ -7,7 +7,7 @@ import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 import { buildLanguagesMap } from '@/lib/seo';
 import { shouldSkipStaticApiFetch } from '@/lib/static-api-fetch';
 import { PublicAgentsExplorer } from '@/components/explore/PublicAgentsExplorer';
-import { getExploreStats, type PublicExploreAgent, withAutrLiveTraderAgent } from '@/components/explore/publicAgents';
+import { getExploreStats, type PublicExploreAgent } from '@/components/explore/publicAgents';
 
 type ExploreResponse = {
   success?: boolean;
@@ -53,7 +53,7 @@ async function fetchPublicAgents(): Promise<PublicExploreAgent[]> {
 
 export default async function ExplorePage() {
   const [t, locale] = await Promise.all([getTranslations('explorePage'), getLocale()]);
-  const agents = withAutrLiveTraderAgent(await fetchPublicAgents());
+  const agents = await fetchPublicAgents();
   const stats = getExploreStats(agents);
 
   return (
