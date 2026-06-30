@@ -51,7 +51,6 @@ import type {
   ErrorRateResponse,
   WsCountResponse,
   LlmStatsResponse,
-  AdminConduitOverviewResponse,
   AdminOobeOverviewResponse,
   AdminEgressEventsResponse,
   AgentEgressEventsResponse,
@@ -74,14 +73,6 @@ import type {
   XonaCallResponse,
   XonaConfigStatus,
   XonaDiscoverResponse,
-  OrbisApiDetail,
-  OrbisCallBody,
-  OrbisCallResponse,
-  OrbisCategoriesResponse,
-  OrbisConfigBody,
-  OrbisConfigStatus,
-  OrbisSearchParams,
-  OrbisSearchResponse,
   VirtualsAcpSearchParams,
   VirtualsAcpCliExecutionResponse,
   VirtualsAcpDrainEventsBody,
@@ -134,15 +125,6 @@ import type {
   MedusaRotateResponse,
   MedusaVerifyBody,
   MedusaPassportSummary,
-  ConduitConfigBody,
-  ConduitConfigStatus,
-  ConduitManifestResponse,
-  ConduitProviderActionResponse,
-  ConduitProviderPatchBody,
-  ConduitProvidersResponse,
-  ConduitProtocolInfoResponse,
-  ConduitRegisterProviderBody,
-  ConduitRegisterProviderResponse,
   ClawVilleConfigStatus,
   ClawVilleLaunchResponse,
   ClawVillePatchBody,
@@ -657,40 +639,6 @@ export const api = {
       body: JSON.stringify(body),
     }),
 
-  /** Orbis API Marketplace consumer tools proxied through Hatcher. */
-  getAgentOrbisConfig: (id: string) =>
-    req<OrbisConfigStatus>(`/agents/${id}/orbis/config`),
-
-  updateAgentOrbisConfig: (id: string, body: OrbisConfigBody) =>
-    req<OrbisConfigStatus>(`/agents/${id}/orbis/config`, {
-      method: "PATCH",
-      body: JSON.stringify(body),
-    }),
-
-  getAgentOrbisCategories: (id: string) =>
-    req<OrbisCategoriesResponse>(`/agents/${id}/orbis/categories`),
-
-  searchAgentOrbisApis: (id: string, params: OrbisSearchParams = {}) => {
-    const query = new URLSearchParams();
-    if (params.q) query.set("q", params.q);
-    if (params.category) query.set("category", params.category);
-    if (params.chain) query.set("chain", params.chain);
-    if (params.minPriceUsd !== undefined) query.set("minPriceUsd", String(params.minPriceUsd));
-    if (params.maxPriceUsd !== undefined) query.set("maxPriceUsd", String(params.maxPriceUsd));
-    if (params.limit !== undefined) query.set("limit", String(params.limit));
-    const suffix = query.toString() ? `?${query.toString()}` : "";
-    return req<OrbisSearchResponse>(`/agents/${id}/orbis/search${suffix}`);
-  },
-
-  getAgentOrbisApiDetails: (id: string, slug: string) =>
-    req<OrbisApiDetail>(`/agents/${id}/orbis/apis/${encodeURIComponent(slug)}`),
-
-  callAgentOrbisApi: (id: string, body: OrbisCallBody) =>
-    req<OrbisCallResponse>(`/agents/${id}/orbis/call`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
-
   /** Virtuals EconomyOS / ACP managed layer. */
   getAgentVirtualsConfig: (id: string) =>
     req<VirtualsConfigStatus>(`/agents/${id}/virtuals/config`),
@@ -893,85 +841,6 @@ export const api = {
       method: "POST",
       body: JSON.stringify(body),
     }),
-
-  /** Conduit Protocol provider settlement controls. */
-  getAgentConduitConfig: (id: string) =>
-    req<ConduitConfigStatus>(`/agents/${id}/conduit/config`),
-
-  updateAgentConduitConfig: (id: string, body: ConduitConfigBody) =>
-    req<ConduitConfigStatus>(`/agents/${id}/conduit/config`, {
-      method: "PUT",
-      body: JSON.stringify(body),
-    }),
-
-  getAgentConduitProtocolInfo: (id: string) =>
-    req<ConduitProtocolInfoResponse>(`/agents/${id}/conduit/protocol-info`),
-
-  getAgentConduitManifest: (id: string) =>
-    req<ConduitManifestResponse>(`/agents/${id}/conduit/manifest`),
-
-  registerAgentConduitProvider: (
-    id: string,
-    body: ConduitRegisterProviderBody = {},
-  ) =>
-    req<ConduitRegisterProviderResponse>(
-      `/agents/${id}/conduit/register-provider`,
-      {
-        method: "POST",
-        body: JSON.stringify(body),
-      },
-    ),
-
-  getAgentConduitProviders: (id: string) =>
-    req<ConduitProvidersResponse>(`/agents/${id}/conduit/providers`),
-
-  patchAgentConduitProvider: (
-    id: string,
-    providerId: string,
-    body: ConduitProviderPatchBody,
-  ) =>
-    req<ConduitProviderActionResponse>(
-      `/agents/${id}/conduit/providers/${encodeURIComponent(providerId)}`,
-      {
-        method: "PATCH",
-        body: JSON.stringify(body),
-      },
-    ),
-
-  syncAgentConduitProviderSecret: (id: string, providerId: string) =>
-    req<ConduitProviderActionResponse>(
-      `/agents/${id}/conduit/providers/${encodeURIComponent(providerId)}/sync-secret`,
-      {
-        method: "POST",
-        body: JSON.stringify({}),
-      },
-    ),
-
-  rotateAgentConduitProviderSecret: (id: string, providerId: string) =>
-    req<ConduitProviderActionResponse>(
-      `/agents/${id}/conduit/providers/${encodeURIComponent(providerId)}/rotate-secret`,
-      {
-        method: "POST",
-        body: JSON.stringify({}),
-      },
-    ),
-
-  refreshAgentConduitProviderEndpoint: (id: string, providerId: string) =>
-    req<ConduitProviderActionResponse>(
-      `/agents/${id}/conduit/providers/${encodeURIComponent(providerId)}/refresh-endpoint`,
-      {
-        method: "POST",
-        body: JSON.stringify({}),
-      },
-    ),
-
-  archiveAgentConduitProvider: (id: string, providerId: string) =>
-    req<ConduitProviderActionResponse>(
-      `/agents/${id}/conduit/providers/${encodeURIComponent(providerId)}`,
-      {
-        method: "DELETE",
-      },
-    ),
 
   /** ClawVille world registration and live callback setup. */
   getAgentClawVilleConfig: (id: string) =>
@@ -2442,10 +2311,6 @@ export const api = {
 
   /** Admin: IDLE consumer/provider integration overview */
   adminGetIdleOverview: () => req<AdminIdleOverviewResponse>("/admin/idle"),
-
-  /** Admin: Conduit provider registration and settlement overview */
-  adminGetConduitOverview: () =>
-    req<AdminConduitOverviewResponse>("/admin/conduit"),
 
   /** Admin: OOBE Synapse RPC and SAP registration overview */
   adminGetOobeOverview: () =>

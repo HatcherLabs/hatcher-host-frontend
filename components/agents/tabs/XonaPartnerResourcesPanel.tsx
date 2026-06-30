@@ -65,7 +65,7 @@ export function XonaPartnerResourcesPanel({ agentId }: { agentId: string }) {
           </span>
           {config?.keySource && config.keySource !== 'none' && (
             <span className="rounded-full border border-[var(--border-default)] bg-[var(--bg-card)] px-2 py-1 text-[var(--text-muted)]">
-              {config.keySource === 'conduit' ? 'Treasury fallback' : 'Xona payer'}
+              Xona payer
             </span>
           )}
         </div>
