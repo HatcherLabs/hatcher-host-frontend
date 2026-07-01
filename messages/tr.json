@@ -992,6 +992,8 @@
       "hatcherDiscountDesc": "$HATCHER ile %10 indirim: {price}",
       "payWithKausa": "Ödeme $KAUSA",
       "kausaDesc": "KausaLayer ortak tokenı Solana",
+      "payWithAnsem": "$ANSEM ile öde",
+      "ansemDesc": "Tam fiyat, %10 on-chain yakılır",
       "payWithUsdcSolana": "Ödeme USDC Solana",
       "usdcSolanaDesc": "SPL USDC Solana cüzdan üzerinden",
       "payWithCryptoNow": "CryptoNow üzerinden ödeme yapın",
@@ -1008,7 +1010,9 @@
       "monthAgent": "/ 30 gün / ajan",
       "manageBilling": "Faturalamayı Yönetin",
       "successPayment": "Ödeme başarılı! Hesabınız yükseltiliyor. Düşünmek biraz zaman alabilir.",
-      "canceledPayment": "Ödeme iptal edildi. Herhangi bir suçlama yapılmadı."
+      "canceledPayment": "Ödeme iptal edildi. Herhangi bir suçlama yapılmadı.",
+      "paymentErrorTitle": "Ödeme sorunu",
+      "dismissPaymentError": "Ödeme hatasını kapat"
     },
     "analytics": {
       "eyebrow": "Dashboard",

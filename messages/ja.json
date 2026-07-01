@@ -992,6 +992,8 @@
       "hatcherDiscountDesc": "$HATCHERで10%オフ:{price}",
       "payWithKausa": "支払って$KAUSA",
       "kausaDesc": "KausaLayerパートナートークンはSolana",
+      "payWithAnsem": "$ANSEMで支払う",
+      "ansemDesc": "定価、10%をオンチェーンでバーン",
       "payWithUsdcSolana": "USDCで支払うSolana",
       "usdcSolanaDesc": "SPLはウォレット経由でUSDC Solana",
       "payWithCryptoNow": "CryptoNowで支払う",
@@ -1008,7 +1010,9 @@
       "monthAgent": "/ 30日間 / エージェント",
       "manageBilling": "請求管理",
       "successPayment": "支払い成功!あなたのアカウントはアップグレードされます。振り返るのに少し時間がかかるかもしれません。",
-      "canceledPayment": "支払いはキャンセルされました。起訴はされませんでした。"
+      "canceledPayment": "支払いはキャンセルされました。起訴はされませんでした。",
+      "paymentErrorTitle": "支払いの問題",
+      "dismissPaymentError": "支払いエラーを閉じる"
     },
     "analytics": {
       "eyebrow": "ダッシュボード",

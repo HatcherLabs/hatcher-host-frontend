@@ -970,6 +970,8 @@
       "hatcherDiscountDesc": "使用 $HATCHER 享 9 折：{price}",
       "payWithKausa": "用 $KAUSA 付款",
       "kausaDesc": "Solana 上的 KausaLayer 合作伙伴代币",
+      "payWithAnsem": "使用 $ANSEM 支付",
+      "ansemDesc": "全价支付，10% 链上销毁",
       "payWithUsdcSolana": "用 Solana 上的 USDC 付款",
       "usdcSolanaDesc": "通过 Solana 钱包支付 SPL USDC",
       "payWithCryptoNow": "通过 CryptoNow 付款",
@@ -986,7 +988,9 @@
       "monthAgent": "/ 30天/智能体",
       "manageBilling": "管理账单",
       "successPayment": "付款成功！您的账户正在升级，可能需要片刻时间生效。",
-      "canceledPayment": "付款已取消，未产生任何费用。"
+      "canceledPayment": "付款已取消，未产生任何费用。",
+      "paymentErrorTitle": "付款问题",
+      "dismissPaymentError": "关闭付款错误"
     },
     "analytics": {
       "eyebrow": "控制台",

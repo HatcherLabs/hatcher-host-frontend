@@ -57,6 +57,10 @@ export const SOLANA_SUBSCRIPTIONS_PROGRAM_ID =
 export const KAUSA_TOKEN_MINT =
   process.env.NEXT_PUBLIC_KAUSA_MINT || 'BWXSNRBKMviG68MqavyssnzDq4qSArcN7eNYjqEfpump';
 
+// $ANSEM SPL mint on Solana mainnet. Partner token payment rail.
+export const ANSEM_TOKEN_MINT =
+  process.env.NEXT_PUBLIC_ANSEM_MINT || '9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump';
+
 export const SOCIAL_LINKS = {
   twitter: 'https://x.com/HatcherLabs',
   github: 'https://github.com/HatcherLabs',

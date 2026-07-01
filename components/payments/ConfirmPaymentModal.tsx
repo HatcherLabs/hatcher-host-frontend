@@ -5,7 +5,7 @@
 //
 // Replaces `window.confirm()` across every payment surface (billing page,
 // agent File Manager unlock, etc.). Shows live rate, breakdown of burn
-// split for $HATCHER, and an Approve / Cancel pair that resolves a
+// split for burn-enabled token rails, and an Approve / Cancel pair that resolves a
 // promise back to the caller. The caller owns the promise lifecycle
 // (usePaymentDrivers does this), this component just renders + fires
 // the resolver.
@@ -13,7 +13,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 
-export type PayToken = 'sol' | 'usdc' | 'hatch' | 'kausa';
+export type PayToken = 'sol' | 'usdc' | 'hatch' | 'kausa' | 'ansem';
 
 export type ConfirmPaymentModalState = {
   isOpen: boolean;
@@ -39,9 +39,12 @@ export function ConfirmPaymentModal(props: {
   const tokenLabel = state.token === 'sol' ? 'SOL'
     : state.token === 'usdc' ? 'USDC'
     : state.token === 'kausa' ? '$KAUSA'
+    : state.token === 'ansem' ? '$ANSEM'
     : '$HATCHER';
   const tokenTone = state.token === 'hatch'
     ? 'border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] text-[var(--color-warning)]'
+    : state.token === 'ansem'
+      ? 'border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] text-[var(--color-warning)]'
     : state.token === 'kausa'
       ? 'border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success)]'
       : 'border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-primary)]';
@@ -66,7 +69,13 @@ export function ConfirmPaymentModal(props: {
           <div className="flex items-center gap-3">
             <div className={`w-11 h-11 rounded-xl border flex items-center justify-center shrink-0 ${tokenTone}`}>
               <span className="font-bold text-xs">
-                {tokenLabel === '$HATCHER' ? 'HATCH' : tokenLabel === '$KAUSA' ? 'KAUSA' : tokenLabel}
+                {tokenLabel === '$HATCHER'
+                  ? 'HATCH'
+                  : tokenLabel === '$KAUSA'
+                    ? 'KAUSA'
+                    : tokenLabel === '$ANSEM'
+                      ? 'ANSEM'
+                      : tokenLabel}
               </span>
             </div>
             <div className="flex-1 min-w-0">
@@ -100,7 +109,7 @@ export function ConfirmPaymentModal(props: {
             )}
           </div>
 
-          {state.token === 'hatch' && state.burnAmount !== undefined && state.treasuryAmount !== undefined && (
+          {(state.token === 'hatch' || state.token === 'ansem') && state.burnAmount !== undefined && state.treasuryAmount !== undefined && (
             <div className="rounded-xl border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] p-4 space-y-1.5">
               <div className="flex items-center gap-2 text-xs font-semibold text-[var(--color-warning)]">
                 <span aria-hidden>•</span>
@@ -109,13 +118,13 @@ export function ConfirmPaymentModal(props: {
               <div className="flex justify-between text-xs text-[var(--text-secondary)]">
                 <span>Burned on-chain</span>
                 <span className="font-mono">
-                  {state.burnAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })} $HATCHER
+                  {state.burnAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })} {tokenLabel}
                 </span>
               </div>
               <div className="flex justify-between text-xs text-[var(--text-secondary)]">
                 <span>To treasury</span>
                 <span className="font-mono">
-                  {state.treasuryAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })} $HATCHER
+                  {state.treasuryAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })} {tokenLabel}
                 </span>
               </div>
               <p className="text-[10px] text-[var(--text-muted)] pt-1">

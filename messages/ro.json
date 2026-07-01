@@ -992,6 +992,8 @@
       "hatcherDiscountDesc": "10% reducere cu $HATCHER: {price}",
       "payWithKausa": "Plătește cu $KAUSA",
       "kausaDesc": "Token partener KausaLayer pe Solana",
+      "payWithAnsem": "Plătește cu $ANSEM",
+      "ansemDesc": "Preț întreg, 10% ars on-chain",
       "payWithUsdcSolana": "Plătește cu USDC pe Solana",
       "usdcSolanaDesc": "SPL USDC prin portofel Solana",
       "payWithCryptoNow": "Plătește prin CryptoNow",
@@ -1008,7 +1010,9 @@
       "monthAgent": "/ 30 zile / agent",
       "manageBilling": "Gestionează facturarea",
       "successPayment": "Plată reușită! Contul tău este în curs de actualizare. Poate dura câteva momente.",
-      "canceledPayment": "Plata a fost anulată. Nu s-a efectuat nicio taxă."
+      "canceledPayment": "Plata a fost anulată. Nu s-a efectuat nicio taxă.",
+      "paymentErrorTitle": "Problemă la plată",
+      "dismissPaymentError": "Închide eroarea de plată"
     },
     "analytics": {
       "eyebrow": "Panou",

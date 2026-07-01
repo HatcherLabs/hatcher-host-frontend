@@ -992,6 +992,8 @@
       "hatcherDiscountDesc": "Diskon 10% dengan $HATCHER: {price}",
       "payWithKausa": "Bayar dengan $KAUSA",
       "kausaDesc": "Token mitra KausaLayer di Solana",
+      "payWithAnsem": "Bayar dengan $ANSEM",
+      "ansemDesc": "Harga penuh, 10% dibakar on-chain",
       "payWithUsdcSolana": "Bayar dengan USDC di Solana",
       "usdcSolanaDesc": "SPL USDC melalui dompet Solana",
       "payWithCryptoNow": "Bayar melalui CryptoNow",
@@ -1008,7 +1010,9 @@
       "monthAgent": "/ 30 hari / agen",
       "manageBilling": "Kelola Penagihan",
       "successPayment": "Pembayaran berhasil! Akun Anda sedang ditingkatkan. Mungkin perlu beberapa saat untuk merenung.",
-      "canceledPayment": "Pembayaran dibatalkan. Tidak ada biaya yang dikenakan."
+      "canceledPayment": "Pembayaran dibatalkan. Tidak ada biaya yang dikenakan.",
+      "paymentErrorTitle": "Masalah pembayaran",
+      "dismissPaymentError": "Tutup kesalahan pembayaran"
     },
     "analytics": {
       "eyebrow": "Dasbor",

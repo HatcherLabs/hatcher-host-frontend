@@ -19,6 +19,7 @@ export interface PaymentRailButtonsProps {
   onPayWithUSDC: () => void;
   onPayWithHATCHER: () => void;
   onPayWithKAUSA?: (() => void) | undefined;
+  onPayWithANSEM?: (() => void) | undefined;
   /** Stripe is a placeholder unless a handler is provided. */
   onPayWithCard?: (() => void) | undefined;
   /** Disables every button while a payment is mid-flight. */
@@ -26,7 +27,7 @@ export interface PaymentRailButtonsProps {
 }
 
 export function PaymentRailButtons(props: PaymentRailButtonsProps) {
-  const { onPayWithSOL, onPayWithUSDC, onPayWithHATCHER, onPayWithKAUSA, onPayWithCard, loading } = props;
+  const { onPayWithSOL, onPayWithUSDC, onPayWithHATCHER, onPayWithKAUSA, onPayWithANSEM, onPayWithCard, loading } = props;
   const stripeEnabled = !!onPayWithCard;
   const iconShell = 'w-10 h-10 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] flex items-center justify-center flex-shrink-0 text-[var(--text-primary)]';
 
@@ -89,6 +90,23 @@ export function PaymentRailButtons(props: PaymentRailButtonsProps) {
           <div className="text-left flex-1">
             <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with $KAUSA</p>
             <p className="text-[11px] text-[var(--text-muted)]">Partner token on Solana</p>
+          </div>
+          {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)]" />}
+        </button>
+      )}
+
+      {onPayWithANSEM && (
+        <button
+          onClick={onPayWithANSEM}
+          disabled={loading}
+          className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[var(--color-warning)]/35 hover:bg-[var(--color-warning-bg)] transition-all disabled:opacity-40"
+        >
+          <div className={iconShell}>
+            <span className="font-extrabold text-[9px] tracking-tight">ANSEM</span>
+          </div>
+          <div className="text-left flex-1">
+            <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with $ANSEM</p>
+            <p className="text-[11px] text-[var(--text-muted)]">Full price, 10% burned on-chain</p>
           </div>
           {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)]" />}
         </button>

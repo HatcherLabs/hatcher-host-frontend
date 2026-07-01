@@ -29,12 +29,18 @@ import {
 } from '@solana/web3.js';
 import { Buffer } from 'buffer';
 import type { WalletContextState } from '@solana/wallet-adapter-react';
-import { TREASURY_WALLET, HATCH_TOKEN_MINT, USDC_TOKEN_MINT, KAUSA_TOKEN_MINT } from './config';
+import {
+  TREASURY_WALLET,
+  HATCH_TOKEN_MINT,
+  USDC_TOKEN_MINT,
+  KAUSA_TOKEN_MINT,
+  ANSEM_TOKEN_MINT,
+} from './config';
 
 const ASSOCIATED_TOKEN_PROGRAM_ID = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
 const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
 const TOKEN_2022_PROGRAM_ID = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
-export type SplPaymentMint = 'usdc' | 'hatch' | 'kausa';
+export type SplPaymentMint = 'usdc' | 'hatch' | 'kausa' | 'ansem';
 
 const SPL_PAYMENT_TOKENS: Record<SplPaymentMint, {
   mint: string;
@@ -63,6 +69,13 @@ const SPL_PAYMENT_TOKENS: Record<SplPaymentMint, {
     symbol: '$KAUSA',
     tokenProgramId: TOKEN_2022_PROGRAM_ID,
     burnBps: 0,
+  },
+  ansem: {
+    mint: ANSEM_TOKEN_MINT,
+    decimals: 6,
+    symbol: '$ANSEM',
+    tokenProgramId: TOKEN_2022_PROGRAM_ID,
+    burnBps: 1000,
   },
 };
 
@@ -388,8 +401,8 @@ export async function payWithSplToken(params: {
     );
   }
 
-  // $HATCHER keeps its existing 90/10 treasury/burn split. Partner tokens
-  // such as $KAUSA and stablecoins transfer 100% to treasury.
+  // Burn-enabled Token-2022 rails use a 90/10 treasury/burn split.
+  // Non-burn partner tokens such as $KAUSA and stablecoins transfer 100%.
   const burnBaseUnits = token.burnBps > 0 ? (totalBaseUnits * BigInt(token.burnBps)) / 10_000n : 0n;
   const transferBaseUnits = totalBaseUnits - burnBaseUnits;
 
