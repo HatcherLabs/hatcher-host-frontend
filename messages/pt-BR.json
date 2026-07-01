@@ -992,6 +992,8 @@
       "hatcherDiscountDesc": "10% de desconto com $HATCHER: {price}",
       "payWithKausa": "Pague com $KAUSA",
       "kausaDesc": "Token de parceiro KausaLayer em Solana",
+      "payWithAnsem": "Pagar com $ANSEM",
+      "ansemDesc": "Preço cheio, 10% queimado on-chain",
       "payWithUsdcSolana": "Pague com USDC em Solana",
       "usdcSolanaDesc": "SPL USDC através da carteira Solana",
       "payWithCryptoNow": "Pague via CryptoNow",
@@ -1008,7 +1010,9 @@
       "monthAgent": "/ 30 dias / agente",
       "manageBilling": "Gerenciar faturamento",
       "successPayment": "Pagamento realizado com sucesso! Sua conta está sendo atualizada. Pode levar um momento para refletir.",
-      "canceledPayment": "O pagamento foi cancelado. Nenhuma cobrança foi feita."
+      "canceledPayment": "O pagamento foi cancelado. Nenhuma cobrança foi feita.",
+      "paymentErrorTitle": "Problema no pagamento",
+      "dismissPaymentError": "Fechar erro de pagamento"
     },
     "analytics": {
       "eyebrow": "Painel",

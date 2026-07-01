@@ -220,4 +220,41 @@ describe('Solana payment helpers', () => {
     );
     expect(calls).toEqual(['send', `signature:${signature}`, 'confirm']);
   });
+
+  it('uses Token-2022 and burns 10% for ANSEM payments', async () => {
+    const calls: string[] = [];
+    const signature = 'ansem-signature-789';
+    const sentTransactions: Array<{ instructions: Array<{ programId: PublicKey; data: Buffer }> }> = [];
+    const owner = Keypair.generate().publicKey;
+    const wallet = {
+      publicKey: owner,
+      sendTransaction: vi.fn(async (tx) => {
+        sentTransactions.push(tx as { instructions: Array<{ programId: PublicKey; data: Buffer }> });
+        calls.push('send');
+        return signature;
+      }),
+    } as unknown as WalletContextState;
+    const connection = mockConnection(calls, '100000000');
+
+    await expect(
+      payWithSplToken({
+        wallet,
+        connection,
+        mint: 'ansem',
+        amountHuman: 10,
+        onSignature: (value) => calls.push(`signature:${value}`),
+      }),
+    ).rejects.toThrow('confirmation expired after broadcast');
+
+    const token2022 = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
+    expect(sentTransactions).toHaveLength(1);
+    expect(sentTransactions[0].instructions).toHaveLength(2);
+    expect(sentTransactions[0].instructions[0].programId.equals(token2022)).toBe(true);
+    expect(sentTransactions[0].instructions[1].programId.equals(token2022)).toBe(true);
+    expect(sentTransactions[0].instructions[0].data[0]).toBe(3);
+    expect(sentTransactions[0].instructions[0].data.readBigUInt64LE(1)).toBe(9_000_000n);
+    expect(sentTransactions[0].instructions[1].data[0]).toBe(8);
+    expect(sentTransactions[0].instructions[1].data.readBigUInt64LE(1)).toBe(1_000_000n);
+    expect(calls).toEqual(['send', `signature:${signature}`, 'confirm']);
+  });
 });

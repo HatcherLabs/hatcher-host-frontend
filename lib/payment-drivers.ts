@@ -12,7 +12,7 @@
 //
 // The hook is intentionally thin:
 //   - knows how to connect the wallet-adapter,
-//   - fetches SOL / $HATCHER / $KAUSA rates from /prices,
+//   - fetches SOL / $HATCHER / $KAUSA / $ANSEM rates from /prices,
 //   - opens the confirm modal via state and awaits the user's click,
 //   - calls payWithSol / payWithSplToken,
 //   - returns the resulting tx signature (or throws on cancel/error).
@@ -29,7 +29,7 @@ import { api } from '@/lib/api';
 import { payWithSol, payWithSplToken, quoteSolForUsd } from '@/lib/solana-payments';
 import type { ConfirmPaymentModalState } from '@/components/payments/ConfirmPaymentModal';
 
-export type PaymentRail = 'sol' | 'usdc' | 'hatch' | 'kausa';
+export type PaymentRail = 'sol' | 'usdc' | 'hatch' | 'kausa' | 'ansem';
 
 export interface PaymentDriverOptions {
   onSignature?: (signature: string) => void;
@@ -52,6 +52,8 @@ export interface UsePaymentDrivers {
   driveHatch: (usdAmount: number, label: string, options?: PaymentDriverOptions) => Promise<string>;
   /** $KAUSA → treasury SPL ATA. Live Jupiter quote with 1% buffer. */
   driveKausa: (usdAmount: number, label: string, options?: PaymentDriverOptions) => Promise<string>;
+  /** $ANSEM → 90% to treasury + 10% burn. Live Jupiter quote with 1% buffer. */
+  driveAnsem: (usdAmount: number, label: string, options?: PaymentDriverOptions) => Promise<string>;
   /** Open the wallet-select modal so the user can connect / switch. */
   openWalletModal: () => void;
   /** Disconnect + re-prompt. Use when the wallet is stuck after the
@@ -264,6 +266,36 @@ export function usePaymentDrivers(): UsePaymentDrivers {
     }
   }, [connection, ensureConnected, askConfirm, forceReconnect]);
 
+  const driveAnsem = useCallback(async (usdAmount: number, label: string, options: PaymentDriverOptions = {}): Promise<string> => {
+    await ensureConnected();
+    const priceRes = await api.getPrice('ansem');
+    if (!priceRes.success || !priceRes.data?.price) {
+      throw new Error('Could not fetch live $ANSEM price — try again in a moment');
+    }
+    const ansemAmount = (usdAmount / priceRes.data.price) * 1.01;
+    const burnAmount = ansemAmount * 0.1;
+    const approved = await askConfirm({
+      token: 'ansem', label, usdAmount,
+      tokenAmount: ansemAmount, rate: priceRes.data.price,
+      burnAmount, treasuryAmount: ansemAmount - burnAmount,
+    });
+    if (!approved) throw new Error('Cancelled');
+    try {
+      const { signature } = await payWithSplToken({
+        wallet: walletRef.current, connection, mint: 'ansem', amountHuman: ansemAmount, onSignature: options.onSignature,
+      });
+      return signature;
+    } catch (e) {
+      if (isUserCancellation(e)) throw new Error('Cancelled');
+      if (!isTrustRevokedError(e)) throw e;
+      await forceReconnect();
+      const { signature } = await payWithSplToken({
+        wallet: walletRef.current, connection, mint: 'ansem', amountHuman: ansemAmount, onSignature: options.onSignature,
+      });
+      return signature;
+    }
+  }, [connection, ensureConnected, askConfirm, forceReconnect]);
+
   const openWalletModal = useCallback(() => {
     setWalletModalVisible(true);
   }, [setWalletModalVisible]);
@@ -290,6 +322,7 @@ export function usePaymentDrivers(): UsePaymentDrivers {
     driveUsdc,
     driveHatch,
     driveKausa,
+    driveAnsem,
     openWalletModal,
     reconnect: forceReconnect,
     disconnect,

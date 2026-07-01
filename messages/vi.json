@@ -992,6 +992,8 @@
       "hatcherDiscountDesc": "Giảm 10% với $HATCHER: {price}",
       "payWithKausa": "Thanh toán bằng $KAUSA",
       "kausaDesc": "Mã thông báo đối tác KausaLayer trên Solana",
+      "payWithAnsem": "Thanh toán bằng $ANSEM",
+      "ansemDesc": "Giá đầy đủ, đốt 10% on-chain",
       "payWithUsdcSolana": "Thanh toán bằng USDC trên Solana",
       "usdcSolanaDesc": "SPL USDC qua ví Solana",
       "payWithCryptoNow": "Thanh toán qua CryptoNow",
@@ -1008,7 +1010,9 @@
       "monthAgent": "/ 30 ngày/ tác nhân",
       "manageBilling": "Quản lý thanh toán",
       "successPayment": "Thanh toán thành công! Tài khoản của bạn đang được nâng cấp. Có thể mất một chút thời gian để suy ngẫm.",
-      "canceledPayment": "Thanh toán đã bị hủy. Không có khoản phí nào được thực hiện."
+      "canceledPayment": "Thanh toán đã bị hủy. Không có khoản phí nào được thực hiện.",
+      "paymentErrorTitle": "Sự cố thanh toán",
+      "dismissPaymentError": "Đóng lỗi thanh toán"
     },
     "analytics": {
       "eyebrow": "Trang tổng quan",

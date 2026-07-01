@@ -970,6 +970,8 @@
       "hatcherDiscountDesc": "10 % Rabatt mit $HATCHER: {price}",
       "payWithKausa": "Mit $KAUSA bezahlen",
       "kausaDesc": "KausaLayer-Partner-Token auf Solana",
+      "payWithAnsem": "Mit $ANSEM zahlen",
+      "ansemDesc": "Voller Preis, 10% on-chain verbrannt",
       "payWithUsdcSolana": "Mit USDC auf Solana bezahlen",
       "usdcSolanaDesc": "SPL USDC per Solana-Wallet",
       "payWithCryptoNow": "Mit CryptoNow bezahlen",
@@ -986,7 +988,9 @@
       "monthAgent": "/ 30 Tage / Agent",
       "manageBilling": "Abrechnung verwalten",
       "successPayment": "Zahlung erfolgreich! Ihr Konto wird gerade aktualisiert. Dies kann einen Moment dauern.",
-      "canceledPayment": "Zahlung abgebrochen. Es wurden keine Gebühren erhoben."
+      "canceledPayment": "Zahlung abgebrochen. Es wurden keine Gebühren erhoben.",
+      "paymentErrorTitle": "Zahlungsproblem",
+      "dismissPaymentError": "Zahlungsfehler schließen"
     },
     "analytics": {
       "eyebrow": "Dashboard",

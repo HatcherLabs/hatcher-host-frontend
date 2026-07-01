@@ -56,18 +56,30 @@ describe('crypto settlement queue', () => {
       txSignature: 'tx-user-2',
       userId: 'user-2',
     });
+    const third = createPendingCryptoSettlement({
+      rail: 'ansem',
+      flow: 'tier',
+      targetKey: 'starter',
+      billingPeriod: 'monthly',
+      amountUsd: 6.99,
+      txSignature: 'tx-user-3',
+      userId: 'user-3',
+    });
 
     upsertPendingCryptoSettlement(first);
     upsertPendingCryptoSettlement(second);
+    upsertPendingCryptoSettlement(third);
 
     expect(readPendingCryptoSettlements('user-1')).toEqual([first]);
     expect(readPendingCryptoSettlements('user-2')).toEqual([second]);
+    expect(readPendingCryptoSettlements('user-3')).toEqual([third]);
     expect(hasPendingCryptoSettlement(first.id, 'user-1')).toBe(true);
 
     removePendingCryptoSettlement(first.id);
 
     expect(hasPendingCryptoSettlement(first.id, 'user-1')).toBe(false);
     expect(readPendingCryptoSettlements('user-2')).toEqual([second]);
+    expect(readPendingCryptoSettlements('user-3')).toEqual([third]);
   });
 
   it('does not silently drop failed verification or unknown duplicate signatures', () => {

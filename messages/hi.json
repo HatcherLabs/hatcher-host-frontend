@@ -992,6 +992,8 @@
       "hatcherDiscountDesc": "$HATCHER के साथ 10% की छूट: {price}",
       "payWithKausa": "$KAUSA के साथ भुगतान करें",
       "kausaDesc": "Solana पर KausaLayer पार्टनर टोकन",
+      "payWithAnsem": "$ANSEM से भुगतान करें",
+      "ansemDesc": "पूरी कीमत, 10% ऑन-चेन बर्न",
       "payWithUsdcSolana": "Solana पर USDC के साथ भुगतान करें",
       "usdcSolanaDesc": "Solana वॉलेट के माध्यम से एसपीएल USDC",
       "payWithCryptoNow": "CryptoNow के माध्यम से भुगतान करें",
@@ -1008,7 +1010,9 @@
       "monthAgent": "/ 30 दिन / एजेंट",
       "manageBilling": "बिलिंग प्रबंधित करें",
       "successPayment": "भुगतान सफल! आपके खाते को अपग्रेड किया जा रहा है. प्रतिबिंबित करने में कुछ समय लग सकता है।",
-      "canceledPayment": "भुगतान रद्द कर दिया गया। कोई आरोप नहीं लगाया गया।"
+      "canceledPayment": "भुगतान रद्द कर दिया गया। कोई आरोप नहीं लगाया गया।",
+      "paymentErrorTitle": "भुगतान समस्या",
+      "dismissPaymentError": "भुगतान त्रुटि बंद करें"
     },
     "analytics": {
       "eyebrow": "डैशबोर्ड",

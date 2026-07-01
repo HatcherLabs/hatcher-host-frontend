@@ -1282,7 +1282,7 @@ export const api = {
   subscribe: (
     tier: string,
     txSignature: string,
-    paymentToken: "sol" | "hatch" | "usdc" | "kausa" = "sol",
+    paymentToken: "sol" | "hatch" | "usdc" | "kausa" | "ansem" = "sol",
     billingPeriod: "monthly" | "annual" = "monthly",
   ) =>
     req<{
@@ -1303,7 +1303,7 @@ export const api = {
     addonKey: string,
     txSignature: string,
     agentId?: string,
-    paymentToken: "sol" | "hatch" | "usdc" | "kausa" = "sol",
+    paymentToken: "sol" | "hatch" | "usdc" | "kausa" | "ansem" = "sol",
     billingPeriod: "monthly" | "annual" = "monthly",
   ) =>
     req<{ addonKey: string }>("/features/addon", {
@@ -1321,7 +1321,7 @@ export const api = {
    *  This is intentionally fire-and-forget in the UI; payment must continue
    *  even if observability logging fails. */
   logCryptoPaymentIntent: (payload: {
-    rail: "sol" | "hatch" | "usdc" | "kausa";
+    rail: "sol" | "hatch" | "usdc" | "kausa" | "ansem";
     flow: "tier" | "addon";
     targetKey: string;
     billingPeriod?: "monthly" | "annual" | "lifetime";
@@ -1916,7 +1916,7 @@ export const api = {
     }),
 
   /** Get token price from Jupiter */
-  getPrice: (token: "hatch" | "kausa" | "sol") =>
+  getPrice: (token: "hatch" | "kausa" | "ansem" | "sol") =>
     req<{ price: number; currency: string; source: string; error?: string }>(
       `/prices/${token}`,
     ),

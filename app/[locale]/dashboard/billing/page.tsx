@@ -34,6 +34,7 @@ import {
   type PendingPaymentRail,
 } from '@/lib/crypto-settlements';
 import {
+  AlertCircle,
   ArrowRight,
   ArrowUpRight,
   Check,
@@ -221,6 +222,7 @@ interface PaymentModalProps {
   onPayWithSOL: () => void;
   onPayWithHATCHER: () => void;
   onPayWithKAUSA: () => void;
+  onPayWithANSEM: () => void;
   onPayWithUSDC: () => void;
   onPayWithCryptoNow: () => void;
   onPayWithCard: () => void;
@@ -231,7 +233,7 @@ interface PaymentModalProps {
   onSelectAgent?: (agentId: string) => void;
 }
 
-function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPayWithHATCHER, onPayWithKAUSA, onPayWithUSDC, onPayWithCryptoNow, onPayWithCard, loading, requiresAgent, agents, selectedAgentId, onSelectAgent }: PaymentModalProps) {
+function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPayWithHATCHER, onPayWithKAUSA, onPayWithANSEM, onPayWithUSDC, onPayWithCryptoNow, onPayWithCard, loading, requiresAgent, agents, selectedAgentId, onSelectAgent }: PaymentModalProps) {
   const t = useTranslations('dashboard.billing');
   const tc = useTranslations('dashboard.common');
   if (!isOpen) return null;
@@ -341,6 +343,22 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
               {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)] ml-auto" />}
             </button>
 
+            {/* Pay with $ANSEM */}
+            <button
+              onClick={onPayWithANSEM}
+              disabled={loading || needsAgentSelection}
+              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] hover:border-[var(--color-warning-border)] hover:bg-[var(--color-warning-bg)] transition-all disabled:opacity-40"
+            >
+              <div className={paymentIconShell}>
+                <span className="font-extrabold text-[9px] tracking-tight">ANSEM</span>
+              </div>
+              <div className="text-left min-w-0">
+                <p className="text-sm font-semibold text-[var(--text-primary)]">{t('payWithAnsem')}</p>
+                <p className="text-[11px] text-[var(--text-muted)]">{t('ansemDesc')}</p>
+              </div>
+              {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)] ml-auto" />}
+            </button>
+
             {/* Pay with Solana USDC */}
             <button
               onClick={onPayWithUSDC}
@@ -425,7 +443,7 @@ export default function BillingPage() {
   const solanaWallet = useWallet();
   const { connection: solanaConnection } = useConnection();
   const {
-    confirmState, closeConfirm, driveSol, driveUsdc, driveHatch, driveKausa,
+    confirmState, closeConfirm, driveSol, driveUsdc, driveHatch, driveKausa, driveAnsem,
     openWalletModal, reconnect: reconnectWallet, disconnect: disconnectWallet,
     address: walletAddress, connected: walletConnected,
   } = usePaymentDrivers();
@@ -435,6 +453,7 @@ export default function BillingPage() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [paymentErrorToast, setPaymentErrorToast] = useState<string | null>(null);
   const [subscribing, setSubscribing] = useState<string | null>(null);
   const [purchasingAddon, setPurchasingAddon] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -508,11 +527,16 @@ export default function BillingPage() {
   const reportCatch = (err: unknown, fallback: string): void => {
     const msg = err instanceof Error ? err.message : fallback;
     if (msg === 'Cancelled') return;
+    setPaymentErrorToast(msg);
     setError(msg);
   };
 
+  useEffect(() => {
+    if (!error) setPaymentErrorToast(null);
+  }, [error]);
+
   const logCryptoPaymentIntent = (
-    rail: 'sol' | 'hatch' | 'usdc' | 'kausa',
+    rail: 'sol' | 'hatch' | 'usdc' | 'kausa' | 'ansem',
     flow: 'tier' | 'addon',
     targetKey: string,
     billingPeriod: 'monthly' | 'annual',
@@ -976,6 +1000,49 @@ export default function BillingPage() {
     }
   };
 
+  /* ── Subscribe to a tier (ANSEM token payment) ──────────── */
+  const handleSubscribeANSEM = async () => {
+    const tierKey = paymentModal.tierKey;
+    if (!tierKey) return;
+    const tierConfig = TIERS[tierKey];
+    const period = subscribePeriod(tierKey);
+    const price = subscribePrice(tierKey);
+    setPaymentLoading(true);
+    setSubscribing(tierKey);
+    setError(null);
+    setPaymentModal(prev => ({ ...prev, isOpen: false }));
+    let pending: PendingCryptoSettlement | null = null;
+    try {
+      logCryptoPaymentIntent('ansem', 'tier', tierKey, period, price);
+      const txSignature = await driveAnsem(
+        price,
+        `Subscribe to ${tierConfig.name}${period === 'annual' ? ' (annual)' : ''}`,
+        {
+          onSignature: (signature) => {
+            pending = registerPendingCryptoPayment('ansem', 'tier', tierKey, period, price, signature);
+          },
+        },
+      );
+      pending = pending ?? registerPendingCryptoPayment('ansem', 'tier', tierKey, period, price, txSignature);
+      await finalizePendingCryptoPayment(pending, {
+        successMessage: `Subscribed to ${tierConfig.name} with $ANSEM!`,
+        pendingMessage: 'Payment submitted on-chain. Tier activation will retry automatically.',
+      });
+    } catch (err) {
+      if (pending) {
+        await finalizePendingCryptoPayment(pending, {
+          successMessage: `Subscribed to ${tierConfig.name} with $ANSEM!`,
+          pendingMessage: 'Payment submitted on-chain. Tier activation will retry automatically.',
+        });
+      } else {
+        reportCatch(err, 'Subscription failed');
+      }
+    } finally {
+      setSubscribing(null);
+      setPaymentLoading(false);
+    }
+  };
+
   /* ── Subscribe to a tier (USDC payment) ─────────────────── */
   const handleSubscribeUSDC = async () => {
     const tierKey = paymentModal.tierKey;
@@ -1217,6 +1284,51 @@ export default function BillingPage() {
       if (pending) {
         await finalizePendingCryptoPayment(pending, {
           successMessage: `${addonConfig.name} purchased with $KAUSA!`,
+          pendingMessage: 'Payment submitted on-chain. Add-on activation will retry automatically.',
+        });
+      } else {
+        reportCatch(err, 'Purchase failed');
+      }
+    } finally {
+      setPurchasingAddon(null);
+      setPaymentLoading(false);
+    }
+  };
+
+  /* ── Purchase add-on (ANSEM token payment) ─────────────── */
+  const handlePurchaseAddonANSEM = async () => {
+    const addonKey = paymentModal.addonKey;
+    if (!addonKey) return;
+    const addonConfig = findBillingAddon(addonKey);
+    if (!addonConfig) return;
+    if (addonConfig.perAgent && !selectedAgentId) return;
+    const period = addonPeriod(addonConfig);
+    const price = addonPrice(addonConfig);
+    setPaymentLoading(true);
+    setPurchasingAddon(addonKey);
+    setError(null);
+    setPaymentModal(prev => ({ ...prev, isOpen: false }));
+    let pending: PendingCryptoSettlement | null = null;
+    try {
+      logCryptoPaymentIntent('ansem', 'addon', addonKey, period, price, selectedAgentId ?? undefined);
+      const txSignature = await driveAnsem(
+        price,
+        `${addonConfig.name}${period === 'annual' ? ' (annual)' : ''}`,
+        {
+          onSignature: (signature) => {
+            pending = registerPendingCryptoPayment('ansem', 'addon', addonKey, period, price, signature, selectedAgentId ?? undefined);
+          },
+        },
+      );
+      pending = pending ?? registerPendingCryptoPayment('ansem', 'addon', addonKey, period, price, txSignature, selectedAgentId ?? undefined);
+      await finalizePendingCryptoPayment(pending, {
+        successMessage: `${addonConfig.name} purchased with $ANSEM!`,
+        pendingMessage: 'Payment submitted on-chain. Add-on activation will retry automatically.',
+      });
+    } catch (err) {
+      if (pending) {
+        await finalizePendingCryptoPayment(pending, {
+          successMessage: `${addonConfig.name} purchased with $ANSEM!`,
           pendingMessage: 'Payment submitted on-chain. Add-on activation will retry automatically.',
         });
       } else {
@@ -2332,6 +2444,7 @@ export default function BillingPage() {
         onPayWithSOL={paymentModal.type === 'subscription' ? handleSubscribeSOL : handlePurchaseAddonSOL}
         onPayWithHATCHER={paymentModal.type === 'subscription' ? handleSubscribeHATCHER : handlePurchaseAddonHATCHER}
         onPayWithKAUSA={paymentModal.type === 'subscription' ? handleSubscribeKAUSA : handlePurchaseAddonKAUSA}
+        onPayWithANSEM={paymentModal.type === 'subscription' ? handleSubscribeANSEM : handlePurchaseAddonANSEM}
         onPayWithUSDC={paymentModal.type === 'subscription' ? handleSubscribeUSDC : handlePurchaseAddonUSDC}
         onPayWithCryptoNow={paymentModal.type === 'subscription' ? handleSubscribeCryptoNow : handlePurchaseAddonCryptoNow}
         onPayWithCard={paymentModal.type === 'subscription' ? handleSubscribeStripe : handlePurchaseAddonStripe}
@@ -2350,6 +2463,32 @@ export default function BillingPage() {
           className="fixed top-20 left-1/2 -translate-x-1/2 z-50 card-solid px-5 py-3 border-l-4 border-[var(--color-success)] shadow-lg max-w-[calc(100vw-2rem)]"
         >
           <p className="text-sm text-[var(--color-success)]">{successMsg}</p>
+        </motion.div>
+      )}
+
+      {paymentErrorToast && (
+        <motion.div
+          role="alert"
+          aria-live="assertive"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed top-20 left-4 right-4 sm:left-auto sm:right-6 z-[60] card-solid max-w-md border-l-4 border-[var(--color-destructive)] shadow-xl"
+        >
+          <div className="flex items-start gap-3 px-4 py-3">
+            <AlertCircle className="w-5 h-5 mt-0.5 shrink-0 text-[var(--color-destructive)]" />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-[var(--text-primary)]">{t('paymentErrorTitle')}</p>
+              <p className="text-xs text-[var(--text-secondary)] break-words">{paymentErrorToast}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setPaymentErrorToast(null)}
+              aria-label={t('dismissPaymentError')}
+              className="rounded-lg p-1 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </motion.div>
       )}
     </motion.div>
