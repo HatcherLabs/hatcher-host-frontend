@@ -401,7 +401,7 @@ export async function unstakeHatcherWithStreamflow(params: {
   depositNonce: number;
   unlockAt: string | Date;
   onTransactionSubmitted?: (txId: string) => void;
-}): Promise<{ txId: string }> {
+}): Promise<{ txId: string; rewardsIncluded?: boolean }> {
   if (!params.wallet.publicKey || (!params.wallet.sendTransaction && !params.wallet.signTransaction)) {
     throw new Error('Connect a wallet that supports Solana transaction signing.');
   }
@@ -446,7 +446,25 @@ export async function unstakeHatcherWithStreamflow(params: {
     return { txId };
   } catch (err) {
     if (!isStakingPreflightSimulationError(err)) throw err;
-    throw new Error('Unstake with rewards failed preflight. Refresh staking data and try again; the stake was not unstaked.');
+
+    const { ixs: unstakeOnlyIxs } = await client.prepareUnstakeInstructions({
+      stakePool: params.stakePoolAddress,
+      stakePoolMint: HATCHER_MINT,
+      tokenProgramId,
+      nonce: params.depositNonce,
+    }, { invoker });
+    const prepared = await preparePreflightedWalletTransaction({
+      connection: client.connection,
+      payer: params.wallet.publicKey,
+      instructions: unstakeOnlyIxs,
+    });
+    const txId = await sendPreparedWalletTransaction({
+      wallet: params.wallet,
+      connection: client.connection,
+      prepared,
+      onTransactionSubmitted: params.onTransactionSubmitted,
+    });
+    return { txId, rewardsIncluded: false };
   }
 }
 

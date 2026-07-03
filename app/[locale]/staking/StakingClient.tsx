@@ -878,7 +878,9 @@ export function StakingClient() {
       });
 
       setUnstakeTxId(result.txId);
-      setNotice('Unstake transaction submitted. Streamflow will return the unlocked HATCHER and available rewards to your wallet.');
+      setNotice(result.rewardsIncluded === false
+        ? 'Unstake transaction submitted. Streamflow will return the unlocked HATCHER to your wallet. HATCHER rewards were already claimed or not available.'
+        : 'Unstake transaction submitted. Streamflow will return the unlocked HATCHER and available rewards to your wallet.');
       await Promise.all([load(), loadWalletBalance()]);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Could not unstake HATCHER';
