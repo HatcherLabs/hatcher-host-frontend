@@ -122,6 +122,24 @@ const PUBLIC_CHAT_SUGGESTIONS = [
   'Find current market research on liquid restaking.',
 ];
 
+const PUBLIC_CHAT_TASK_ID_RE = /\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/gi;
+const PUBLIC_CHAT_PENDING_TASK_RE = /\b(async|generating|in progress|pending|processing|running|started|still)\b/i;
+
+function publicChatStatusTaskId(content: string): string | null {
+  if (/```hatcher[-_]artifact/i.test(content)) return null;
+
+  const explicit = content.match(/check status for\s+`?([0-9a-f-]{36})`?/i);
+  if (explicit?.[1]) return explicit[1];
+
+  if (!PUBLIC_CHAT_PENDING_TASK_RE.test(content)) return null;
+
+  const taskMatch = content.match(/task(?:\s+id)?\s*:?\s*`?([0-9a-f-]{36})`?/i);
+  if (taskMatch?.[1]) return taskMatch[1];
+
+  PUBLIC_CHAT_TASK_ID_RE.lastIndex = 0;
+  return PUBLIC_CHAT_TASK_ID_RE.exec(content)?.[0] ?? null;
+}
+
 type PublicChatUsage = {
   dailyAiCreditsAvailable?: boolean;
   dailyAiCreditCap?: number | null;
@@ -587,7 +605,27 @@ function PublicAgentChat({
                     }`}
                   >
                     {message.role === 'assistant' ? (
-                      <RichMarkdown content={message.content} agentId={agentId} />
+                      <>
+                        <RichMarkdown content={message.content} agentId={agentId} />
+                        {(() => {
+                          const taskId = publicChatStatusTaskId(message.content);
+                          if (!taskId) return null;
+                          return (
+                            <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-[var(--border-default)] pt-3">
+                              <button
+                                type="button"
+                                onClick={() => void sendMessage(`check status for ${taskId}`)}
+                                disabled={busy}
+                                className="inline-flex h-9 items-center gap-2 rounded-lg border border-[var(--color-accent)]/30 bg-[var(--color-accent)]/10 px-3 text-xs font-medium text-[var(--color-accent)] transition-colors hover:border-[var(--color-accent)]/60 hover:bg-[var(--color-accent)]/15 disabled:cursor-not-allowed disabled:opacity-50"
+                                aria-label={`Check status for task ${taskId}`}
+                              >
+                                <Clock className="h-3.5 w-3.5" />
+                                Check status
+                              </button>
+                            </div>
+                          );
+                        })()}
+                      </>
                     ) : (
                       <span className="whitespace-pre-wrap">{message.content}</span>
                     )}
