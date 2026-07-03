@@ -32,6 +32,12 @@ describe('Wallet tab integration placement', () => {
     expect(getProviderPanelIdsForWallet('skale')).not.toContain('mpp32');
   });
 
+  it('places Vantara with Solana provider rails', () => {
+    expect(getProviderPanelIdsForWallet('solana')).toContain('vantara');
+    expect(getProviderPanelIdsForWallet('base')).not.toContain('vantara');
+    expect(getProviderPanelIdsForWallet('skale')).not.toContain('vantara');
+  });
+
   it('places Medusa with Solana provider rails', () => {
     expect(getProviderPanelIdsForWallet('solana')).toContain('medusa');
     expect(getProviderPanelIdsForWallet('base')).not.toContain('medusa');
