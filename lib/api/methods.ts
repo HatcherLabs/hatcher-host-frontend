@@ -92,6 +92,12 @@ import type {
   VirtualsScoutResult,
   Mpp32ConfigBody,
   Mpp32ConfigStatus,
+  VantaraConfigStatus,
+  VantaraHermesInvokeBody,
+  VantaraHermesInvokeResponse,
+  VantaraProviderPinBody,
+  VantaraProviderSettingsBody,
+  VantaraCapabilityRegistration,
   MetaplexAvatarUploadResponse,
   MetaplexConfigStatus,
   MetaplexMintAgentPlan,
@@ -705,6 +711,28 @@ export const api = {
   updateAgentMpp32Config: (id: string, body: Mpp32ConfigBody) =>
     req<Mpp32ConfigStatus>(`/agents/${id}/mpp32/config`, {
       method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+
+  /** Vantara MPP paid compute and provider publishing controls. */
+  getAgentVantaraConfig: (id: string) =>
+    req<VantaraConfigStatus>(`/agents/${id}/vantara/config`),
+
+  updateAgentVantaraProvider: (id: string, body: VantaraProviderSettingsBody) =>
+    req<VantaraCapabilityRegistration>(`/agents/${id}/vantara/provider`, {
+      method: "PUT",
+      body: JSON.stringify(body),
+    }),
+
+  pinAgentVantaraCapability: (id: string, body: VantaraProviderPinBody) =>
+    req<VantaraCapabilityRegistration>(`/agents/${id}/vantara/provider/pin`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  invokeAgentVantaraHermes: (id: string, body: VantaraHermesInvokeBody) =>
+    req<VantaraHermesInvokeResponse>(`/agents/${id}/vantara/hermes/invoke`, {
+      method: "POST",
       body: JSON.stringify(body),
     }),
 

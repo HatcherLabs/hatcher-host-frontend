@@ -876,6 +876,106 @@ export interface Mpp32ConfigBody {
   maxPerCallUsd?: number;
 }
 
+export interface VantaraCapabilityRegistration {
+  id: string;
+  agentId: string;
+  ownerId: string;
+  capabilityId: string | null;
+  name: string;
+  description: string;
+  pricePerCallUsdc: number;
+  providerReceiveWallet: string;
+  platformFeeWallet: string;
+  split: {
+    providerBps: number;
+    platformBps: number;
+    vantaraBps: number;
+  };
+  callbackUrl: string;
+  status: "draft" | "pending_registration" | "pending_update" | "live" | "suspended" | "failed" | string;
+  mode: "escrow" | "pay_then_serve" | "free" | string;
+  acceptanceStatus: "not_started" | "pending_acceptance" | "accepted" | "failed" | string;
+  acceptanceRequestId: string | null;
+  metadata: Record<string, unknown>;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+export interface VantaraConfigStatus {
+  enabled: boolean;
+  baseUrl: string;
+  hermesAgentId: string;
+  route: string;
+  settlement: "mpp-solana-usdc";
+  maxPerCallUsdc: number;
+  allowlist: {
+    mint: string;
+    recipient: string;
+    memo: string;
+  };
+  consumer: {
+    enabled: boolean;
+    hermesAgentId: string;
+    route: string;
+    agentWallet: string | null;
+    maxPerCallUsdc: number;
+  };
+  provider: {
+    enabled: boolean;
+    defaultName: string;
+    defaultDescription: string;
+    callbackUrl: string;
+    platformFeeWallet: string;
+    split: {
+      providerBps: number;
+      platformBps: number;
+      vantaraBps: number;
+    };
+    registration: VantaraCapabilityRegistration | null;
+  };
+  recentCalls: Array<{
+    id: string;
+    requestId: string | null;
+    status: string;
+    verificationStatus: string;
+    latencyMs: number;
+    settlementMetadata: Record<string, unknown>;
+    requestMetadata: Record<string, unknown>;
+    createdAt: string | null;
+  }>;
+}
+
+export interface VantaraProviderSettingsBody {
+  name: string;
+  description: string;
+  pricePerCallUsdc: number;
+  providerReceiveWallet?: string;
+}
+
+export interface VantaraProviderPinBody {
+  capabilityId: string;
+  acceptanceStatus?: "pending_acceptance" | "accepted" | "failed";
+}
+
+export interface VantaraHermesInvokeBody {
+  prompt: string;
+  maxTokens?: number;
+}
+
+export interface VantaraHermesInvokeResponse {
+  status: number;
+  vantaraRequestId: string | null;
+  amountPaidUsdc: number;
+  txSignature: string;
+  payer: string;
+  paymentReceipt: string | null;
+  data: {
+    output: string;
+    latencyMs: number;
+    modelTier: string;
+  };
+}
+
 export type MetaplexConfigStatusValue = "disabled" | "wallet-missing" | "metadata-ready" | "registered";
 
 export interface MetaplexAgentService {

@@ -51,6 +51,7 @@ import { Mpp32WalletPanel } from './Mpp32WalletPanel';
 import { MedusaWalletPanel } from './MedusaWalletPanel';
 import { MetaplexWalletPanel } from './MetaplexWalletPanel';
 import { VirtualsWalletPanel } from './VirtualsWalletPanel';
+import { VantaraWalletPanel } from './VantaraWalletPanel';
 
 interface ReputationState {
   upCount: number;
@@ -70,7 +71,7 @@ interface ReputationState {
 
 type WalletPanel = 'passport' | AgentPassportNetworkId;
 type WalletSection = 'overview' | 'networks' | 'providers' | 'security';
-type ProviderPanelId = 'xona' | 'earnfi' | 'oobe' | 'clawville' | 'kausalayer' | 'mirari' | 'mpp32' | 'medusa' | 'metaplex' | 'virtuals';
+type ProviderPanelId = 'xona' | 'earnfi' | 'oobe' | 'clawville' | 'kausalayer' | 'mirari' | 'mpp32' | 'vantara' | 'medusa' | 'metaplex' | 'virtuals';
 type AgentRuntime = 'hermes' | 'openclaw' | (string & {});
 
 const TAB_ORDER: WalletPanel[] = ['passport', 'skale', 'solana', 'base'];
@@ -96,6 +97,7 @@ const SOLANA_PROVIDERS: ReadonlyArray<{ id: ProviderPanelId; label: string; desc
   { id: 'kausalayer', label: 'KausaLayer', description: 'Private pockets and saved wallets.', network: 'Solana' },
   { id: 'mirari', label: 'Mirari', description: 'Signal ingest and live mirror.', network: 'Solana' },
   { id: 'mpp32', label: 'MPP32', description: 'Signed AGTP intelligence and x402 settlement.', network: 'Solana' },
+  { id: 'vantara', label: 'Vantara', description: 'Paid compute and provider earnings over MPP/x402.', network: 'Solana' },
   { id: 'medusa', label: 'Medusa', description: 'Privacy passport and presale enrollment.', network: 'Solana' },
 ];
 
@@ -908,6 +910,8 @@ function ProviderPanel({ provider, agentId, solanaWallet }: { provider: Provider
       return <MirariWalletPanel agentId={agentId} />;
     case 'mpp32':
       return <Mpp32WalletPanel agentId={agentId} />;
+    case 'vantara':
+      return <VantaraWalletPanel agentId={agentId} />;
     case 'medusa':
       return <MedusaWalletPanel agentId={agentId} solanaWallet={solanaWallet} />;
     case 'metaplex':
