@@ -104,6 +104,8 @@ export type {
   Mpp32ConfigBody,
   Mpp32ConfigStatus,
   VantaraCapabilityRegistration,
+  VantaraCapabilityCallsResponse,
+  VantaraCapabilityStatusBody,
   VantaraConfigStatus,
   VantaraHermesInvokeBody,
   VantaraHermesInvokeResponse,

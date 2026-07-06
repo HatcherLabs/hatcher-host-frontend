@@ -6,14 +6,18 @@ import {
   CheckCircle2,
   Copy,
   Loader2,
+  PauseCircle,
+  PlayCircle,
   RefreshCw,
   Send,
   ShieldCheck,
+  Trash2,
   Wallet,
   Zap,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import type {
+  VantaraCapabilityCallsResponse,
   VantaraCapabilityRegistration,
   VantaraConfigStatus,
   VantaraProviderSettingsBody,
@@ -34,6 +38,9 @@ function parseUsdc(value: string, label: string): number {
   if (!Number.isFinite(parsed) || parsed <= 0) {
     throw new Error(`${label} must be a positive USDC amount`);
   }
+  if (parsed > 5) {
+    throw new Error(`${label} must be at most 5 USDC`);
+  }
   return parsed;
 }
 
@@ -44,7 +51,9 @@ export function buildVantaraProviderPayload(
   const name = form.name.trim();
   const description = form.description.trim();
   if (!name) throw new Error('Name is required');
+  if (name.length > 120) throw new Error('Name must be 120 characters or fewer');
   if (!description) throw new Error('Description is required');
+  if (description.length > 2000) throw new Error('Description must be 2000 characters or fewer');
   const providerReceiveWallet = form.providerReceiveWallet.trim() || agentWallet?.trim();
   if (!providerReceiveWallet) throw new Error('Provider receive wallet is required');
   return {
@@ -109,6 +118,7 @@ function StatusTile({
 function registrationTone(registration: VantaraCapabilityRegistration | null): 'good' | 'warn' | 'muted' {
   if (!registration) return 'muted';
   if (registration.status === 'live') return 'good';
+  if (registration.status === 'deleted') return 'muted';
   return 'warn';
 }
 
@@ -122,13 +132,31 @@ export function VantaraWalletPanel({ agentId }: { agentId: string }) {
     providerReceiveWallet: '',
   });
   const [prompt, setPrompt] = useState('Say hello through paid Vantara compute.');
-  const [capabilityId, setCapabilityId] = useState('');
   const [paidResult, setPaidResult] = useState<VantaraHermesInvokeResponse | null>(null);
+  const [providerCalls, setProviderCalls] = useState<VantaraCapabilityCallsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [pinning, setPinning] = useState(false);
+  const [callsLoading, setCallsLoading] = useState(false);
+  const [statusUpdating, setStatusUpdating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [invoking, setInvoking] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const loadProviderCalls = useCallback(async () => {
+    setCallsLoading(true);
+    try {
+      const res = await api.getAgentVantaraProviderCalls(agentId);
+      if (res.success) {
+        setProviderCalls(res.data);
+      } else {
+        setError(res.error || 'Vantara provider ledger unavailable');
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Vantara provider ledger unavailable');
+    } finally {
+      setCallsLoading(false);
+    }
+  }, [agentId]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -138,7 +166,11 @@ export function VantaraWalletPanel({ agentId }: { agentId: string }) {
       if (res.success) {
         setConfig(res.data);
         setForm(formFromConfig(res.data));
-        setCapabilityId(res.data.provider.registration?.capabilityId ?? '');
+        if (res.data.provider.registration?.capabilityId && res.data.provider.registration.status !== 'deleted') {
+          void loadProviderCalls();
+        } else {
+          setProviderCalls(null);
+        }
       } else {
         setError(res.error || 'Vantara status unavailable');
       }
@@ -147,7 +179,7 @@ export function VantaraWalletPanel({ agentId }: { agentId: string }) {
     } finally {
       setLoading(false);
     }
-  }, [agentId]);
+  }, [agentId, loadProviderCalls]);
 
   useEffect(() => {
     void load();
@@ -159,6 +191,12 @@ export function VantaraWalletPanel({ agentId }: { agentId: string }) {
     if (!split) return '-';
     return `${split.providerBps / 100}% / ${split.platformBps / 100}% / ${split.vantaraBps / 100}%`;
   }, [config]);
+  const paidRoute = useMemo(() => {
+    if (!config?.baseUrl || !registration?.capabilityId || registration.status === 'deleted') return null;
+    return `${config.baseUrl.replace(/\/+$/, '')}/capabilities/${registration.capabilityId}/call`;
+  }, [config?.baseUrl, registration?.capabilityId, registration?.status]);
+  const providerCallRows = providerCalls?.calls ?? [];
+  const hasActiveProviderCapability = !!registration?.capabilityId && registration.status !== 'deleted';
 
   const copy = async (value: string | null | undefined, label: string) => {
     if (!value) return;
@@ -173,35 +211,52 @@ export function VantaraWalletPanel({ agentId }: { agentId: string }) {
       const payload = buildVantaraProviderPayload(form, config?.consumer.agentWallet);
       const res = await api.updateAgentVantaraProvider(agentId, payload);
       if (res.success) {
-        toast.success('Vantara provider request saved');
+        toast.success(res.data.capabilityId ? 'Vantara capability registered' : 'Vantara provider request saved');
         await load();
       } else {
-        setError(res.error || 'Could not save Vantara provider request');
+        setError(res.error || 'Could not register Vantara capability');
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not save Vantara provider request');
+      setError(e instanceof Error ? e.message : 'Could not register Vantara capability');
     } finally {
       setSaving(false);
     }
   };
 
-  const pinCapability = async () => {
-    setPinning(true);
+  const updateProviderStatus = async (status: 'live' | 'paused') => {
+    setStatusUpdating(true);
     setError(null);
     try {
-      const res = await api.pinAgentVantaraCapability(agentId, {
-        capabilityId: capabilityId.trim(),
-      });
+      const res = await api.updateAgentVantaraProviderStatus(agentId, { status });
       if (res.success) {
-        toast.success('Vantara capability pinned');
+        toast.success(status === 'live' ? 'Vantara capability resumed' : 'Vantara capability paused');
         await load();
       } else {
-        setError(res.error || 'Could not pin Vantara capability');
+        setError(res.error || 'Could not update Vantara capability');
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not pin Vantara capability');
+      setError(e instanceof Error ? e.message : 'Could not update Vantara capability');
     } finally {
-      setPinning(false);
+      setStatusUpdating(false);
+    }
+  };
+
+  const deleteProvider = async () => {
+    if (!window.confirm('Delete this Vantara capability?')) return;
+    setDeleting(true);
+    setError(null);
+    try {
+      const res = await api.deleteAgentVantaraProvider(agentId);
+      if (res.success) {
+        toast.success('Vantara capability deleted');
+        await load();
+      } else {
+        setError(res.error || 'Could not delete Vantara capability');
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not delete Vantara capability');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -343,7 +398,7 @@ export function VantaraWalletPanel({ agentId }: { agentId: string }) {
         <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-4">
           <div>
             <h4 className="text-sm font-semibold text-[var(--text-primary)]">Publish provider capability</h4>
-            <p className="mt-1 text-xs text-[var(--text-muted)]">Escrow-on-success capability routed by capabilityId into this agent.</p>
+            <p className="mt-1 text-xs text-[var(--text-muted)]">Self-serve escrow capability routed by capabilityId into this agent.</p>
           </div>
           <div className="mt-4 grid gap-3">
             <label className="block">
@@ -352,7 +407,7 @@ export function VantaraWalletPanel({ agentId }: { agentId: string }) {
             </label>
             <label className="block">
               <span className="text-xs text-[var(--text-muted)]">Description</span>
-              <textarea value={form.description} onChange={(event) => setForm((prev) => ({ ...prev, description: event.target.value }))} className="config-input mt-1 min-h-20 text-sm" maxLength={500} />
+              <textarea value={form.description} onChange={(event) => setForm((prev) => ({ ...prev, description: event.target.value }))} className="config-input mt-1 min-h-20 text-sm" maxLength={2000} />
             </label>
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="block">
@@ -368,12 +423,35 @@ export function VantaraWalletPanel({ agentId }: { agentId: string }) {
           <div className="mt-4 flex flex-wrap gap-2">
             <button type="button" onClick={saveProvider} disabled={saving || loading} className="btn-primary inline-flex items-center gap-2">
               {saving ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
-              Save publish request
+              {hasActiveProviderCapability ? 'Update capability' : 'Register capability'}
             </button>
             <button type="button" onClick={() => copy(config?.provider.callbackUrl, 'Callback URL')} className="btn-secondary inline-flex items-center gap-2">
               <Copy size={13} />
               Callback
             </button>
+            {hasActiveProviderCapability ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => updateProviderStatus(registration.status === 'paused' ? 'live' : 'paused')}
+                  disabled={statusUpdating}
+                  className="btn-secondary inline-flex items-center gap-2"
+                >
+                  {statusUpdating ? (
+                    <Loader2 size={13} className="animate-spin" />
+                  ) : registration.status === 'paused' ? (
+                    <PlayCircle size={13} />
+                  ) : (
+                    <PauseCircle size={13} />
+                  )}
+                  {registration.status === 'paused' ? 'Resume' : 'Pause'}
+                </button>
+                <button type="button" onClick={deleteProvider} disabled={deleting} className="btn-secondary inline-flex items-center gap-2 text-[var(--color-destructive)]">
+                  {deleting ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
+                  Delete
+                </button>
+              </>
+            ) : null}
           </div>
 
           <div className="mt-4 rounded-md border border-[var(--border-subtle)] bg-black/20 p-3">
@@ -381,6 +459,16 @@ export function VantaraWalletPanel({ agentId }: { agentId: string }) {
               <div className="flex justify-between gap-3">
                 <span className="text-[var(--text-muted)]">Capability</span>
                 <span className="font-mono text-[var(--text-primary)]">{short(registration?.capabilityId)}</span>
+              </div>
+              <div className="flex justify-between gap-3">
+                <span className="text-[var(--text-muted)]">Paid route</span>
+                {paidRoute ? (
+                  <button type="button" onClick={() => copy(paidRoute, 'Paid route')} className="min-w-0 truncate font-mono text-[var(--text-primary)] hover:text-[var(--text-accent)]">
+                    {short(paidRoute)}
+                  </button>
+                ) : (
+                  <span className="font-mono text-[var(--text-primary)]">-</span>
+                )}
               </div>
               <div className="flex justify-between gap-3">
                 <span className="text-[var(--text-muted)]">Acceptance</span>
@@ -391,42 +479,78 @@ export function VantaraWalletPanel({ agentId }: { agentId: string }) {
                 <span className="font-mono text-[var(--text-primary)]">{formatDate(registration?.updatedAt)}</span>
               </div>
             </div>
-            <div className="mt-3 flex gap-2">
-              <input
-                value={capabilityId}
-                onChange={(event) => setCapabilityId(event.target.value)}
-                placeholder="capabilityId from Vantara"
-                className="config-input min-w-0 flex-1 font-mono text-xs"
-              />
-              <button type="button" onClick={pinCapability} disabled={pinning || !capabilityId.trim()} className="btn-secondary inline-flex items-center gap-2">
-                {pinning ? <Loader2 size={13} className="animate-spin" /> : <ShieldCheck size={13} />}
-                Pin
-              </button>
-            </div>
           </div>
         </div>
       </div>
 
       <div className="mt-4 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-4">
-        <div className="flex items-center justify-between gap-3">
-          <h4 className="text-sm font-semibold text-[var(--text-primary)]">Recent Vantara calls</h4>
-          <span className="font-mono text-[10px] uppercase text-[var(--text-muted)]">{config?.recentCalls.length ?? 0} rows</span>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h4 className="text-sm font-semibold text-[var(--text-primary)]">Provider ledger</h4>
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-[10px] uppercase text-[var(--text-muted)]">{providerCallRows.length} Vantara rows</span>
+            <button
+              type="button"
+              onClick={loadProviderCalls}
+              disabled={callsLoading || !hasActiveProviderCapability}
+              className="btn-secondary inline-flex items-center gap-2"
+            >
+              <RefreshCw size={13} className={callsLoading ? 'animate-spin' : ''} />
+              Ledger
+            </button>
+          </div>
         </div>
-        {config?.recentCalls.length ? (
+        {providerCallRows.length ? (
           <div className="mt-3 divide-y divide-[var(--border-subtle)]">
-            {config.recentCalls.slice(0, 6).map((call) => (
-              <div key={call.id} className="grid gap-1 py-2 text-xs sm:grid-cols-[1fr_auto_auto] sm:items-center">
-                <span className="font-mono text-[var(--text-primary)]">{short(call.requestId ?? call.id)}</span>
-                <span className="text-[var(--text-muted)]">{call.status} / {call.verificationStatus}</span>
-                <span className="font-mono text-[var(--text-muted)]">{formatDate(call.createdAt)}</span>
+            {providerCallRows.slice(0, 6).map((call, index) => (
+              <div key={String(call.requestId ?? call.paymentSig ?? index)} className="grid gap-2 py-3 text-xs lg:grid-cols-[1fr_0.7fr_1.2fr] lg:items-center">
+                <div className="min-w-0">
+                  <div className="font-mono text-[var(--text-primary)]">{short(call.requestId ?? call.paymentSig ?? `row-${index + 1}`)}</div>
+                  <div className="mt-1 text-[var(--text-muted)]">{call.status ?? '-'} / callback {call.callbackStatus ?? '-'}</div>
+                </div>
+                <div className="font-mono text-[var(--text-muted)]">
+                  {typeof call.amountUsdc === 'number' ? `${call.amountUsdc} USDC` : '-'}
+                </div>
+                <div className="grid gap-1 font-mono text-[var(--text-muted)] sm:grid-cols-3">
+                  <button type="button" onClick={() => copy(call.paymentSig, 'Payment tx')} className="truncate text-left hover:text-[var(--text-primary)]">
+                    pay {short(call.paymentSig)}
+                  </button>
+                  <button type="button" onClick={() => copy(call.releaseSig, 'Provider release tx')} className="truncate text-left hover:text-[var(--text-primary)]">
+                    rel {short(call.releaseSig)}
+                  </button>
+                  <button type="button" onClick={() => copy(call.platformSig, 'Platform tx')} className="truncate text-left hover:text-[var(--text-primary)]">
+                    fee {short(call.platformSig)}
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         ) : (
           <div className="mt-3 rounded border border-dashed border-[var(--border-subtle)] px-3 py-4 text-xs text-[var(--text-muted)]">
-            No Vantara audit rows yet.
+            No Vantara payout rows yet.
           </div>
         )}
+
+        <div className="mt-5 border-t border-[var(--border-subtle)] pt-4">
+          <div className="flex items-center justify-between gap-3">
+            <h5 className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">Local callback audit</h5>
+            <span className="font-mono text-[10px] uppercase text-[var(--text-muted)]">{config?.recentCalls.length ?? 0} rows</span>
+          </div>
+          {config?.recentCalls.length ? (
+            <div className="mt-3 divide-y divide-[var(--border-subtle)]">
+              {config.recentCalls.slice(0, 4).map((call) => (
+                <div key={call.id} className="grid gap-1 py-2 text-xs sm:grid-cols-[1fr_auto_auto] sm:items-center">
+                  <span className="font-mono text-[var(--text-primary)]">{short(call.requestId ?? call.id)}</span>
+                  <span className="text-[var(--text-muted)]">{call.status} / {call.verificationStatus}</span>
+                  <span className="font-mono text-[var(--text-muted)]">{formatDate(call.createdAt)}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-3 rounded border border-dashed border-[var(--border-subtle)] px-3 py-4 text-xs text-[var(--text-muted)]">
+              No local callback rows yet.
+            </div>
+          )}
+        </div>
       </div>
     </GlassCard>
   );
