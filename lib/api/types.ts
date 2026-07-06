@@ -896,6 +896,7 @@ export interface VantaraCapabilityRegistration {
   mode: "escrow" | "pay_then_serve" | "free" | string;
   acceptanceStatus: "not_started" | "pending_acceptance" | "accepted" | "failed" | string;
   acceptanceRequestId: string | null;
+  selfServeManaged?: boolean;
   metadata: Record<string, unknown>;
   createdAt: string | null;
   updatedAt: string | null;
@@ -963,6 +964,7 @@ export interface VantaraCapabilityStatusBody {
 
 export interface VantaraCapabilityCallsResponse {
   capabilityId: string;
+  selfServeManaged?: boolean;
   calls: Array<{
     requestId?: string | null;
     mode?: string;

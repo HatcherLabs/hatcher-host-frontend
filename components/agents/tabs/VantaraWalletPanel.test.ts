@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildVantaraProviderPayload } from './VantaraWalletPanel';
+import { buildVantaraProviderPayload, isVantaraSelfServeManaged } from './VantaraWalletPanel';
 
 describe('Vantara wallet panel helpers', () => {
   it('builds a trimmed provider publication payload and falls back to the agent wallet', () => {
@@ -49,5 +49,24 @@ describe('Vantara wallet panel helpers', () => {
       pricePerCallUsdc: '0.05',
       providerReceiveWallet: 'AgentSolanaWallet111111111111111111111111111',
     }, null)).toThrow('Description must be 2000 characters or fewer');
+  });
+
+  it('only treats self-serve-owned capabilities as manageable', () => {
+    expect(isVantaraSelfServeManaged(null)).toBe(false);
+    expect(isVantaraSelfServeManaged({
+      capabilityId: 'legacy-cap',
+      status: 'live',
+      metadata: { source: 'vantara_batch_registration' },
+    })).toBe(false);
+    expect(isVantaraSelfServeManaged({
+      capabilityId: 'self-serve-cap',
+      status: 'live',
+      metadata: { selfServeAction: 'register' },
+    })).toBe(true);
+    expect(isVantaraSelfServeManaged({
+      capabilityId: 'deleted-cap',
+      status: 'deleted',
+      metadata: { selfServeAction: 'register' },
+    })).toBe(false);
   });
 });
