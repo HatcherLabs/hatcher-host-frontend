@@ -122,6 +122,19 @@ function registrationTone(registration: VantaraCapabilityRegistration | null): '
   return 'warn';
 }
 
+export function isVantaraSelfServeManaged(
+  registration: Pick<VantaraCapabilityRegistration, 'capabilityId' | 'status' | 'metadata'> | null | undefined,
+): boolean {
+  if (!registration?.capabilityId || registration.status === 'deleted') return false;
+  const metadata = registration.metadata ?? {};
+  return (
+    metadata.registrationSource === 'hatcher_self_service' ||
+    metadata.selfServeAction === 'register' ||
+    metadata.selfServeAction === 'update' ||
+    typeof metadata.vantaraCapability === 'object'
+  );
+}
+
 export function VantaraWalletPanel({ agentId }: { agentId: string }) {
   const { toast } = useToast();
   const [config, setConfig] = useState<VantaraConfigStatus | null>(null);
@@ -166,7 +179,7 @@ export function VantaraWalletPanel({ agentId }: { agentId: string }) {
       if (res.success) {
         setConfig(res.data);
         setForm(formFromConfig(res.data));
-        if (res.data.provider.registration?.capabilityId && res.data.provider.registration.status !== 'deleted') {
+        if (isVantaraSelfServeManaged(res.data.provider.registration)) {
           void loadProviderCalls();
         } else {
           setProviderCalls(null);
@@ -197,6 +210,7 @@ export function VantaraWalletPanel({ agentId }: { agentId: string }) {
   }, [config?.baseUrl, registration?.capabilityId, registration?.status]);
   const providerCallRows = providerCalls?.calls ?? [];
   const hasActiveProviderCapability = !!registration?.capabilityId && registration.status !== 'deleted';
+  const hasSelfServeManagedCapability = isVantaraSelfServeManaged(registration);
 
   const copy = async (value: string | null | undefined, label: string) => {
     if (!value) return;
@@ -423,13 +437,13 @@ export function VantaraWalletPanel({ agentId }: { agentId: string }) {
           <div className="mt-4 flex flex-wrap gap-2">
             <button type="button" onClick={saveProvider} disabled={saving || loading} className="btn-primary inline-flex items-center gap-2">
               {saving ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
-              {hasActiveProviderCapability ? 'Update capability' : 'Register capability'}
+              {hasSelfServeManagedCapability ? 'Update capability' : 'Register capability'}
             </button>
             <button type="button" onClick={() => copy(config?.provider.callbackUrl, 'Callback URL')} className="btn-secondary inline-flex items-center gap-2">
               <Copy size={13} />
               Callback
             </button>
-            {hasActiveProviderCapability ? (
+            {registration && hasSelfServeManagedCapability ? (
               <>
                 <button
                   type="button"
@@ -491,7 +505,7 @@ export function VantaraWalletPanel({ agentId }: { agentId: string }) {
             <button
               type="button"
               onClick={loadProviderCalls}
-              disabled={callsLoading || !hasActiveProviderCapability}
+              disabled={callsLoading || !hasSelfServeManagedCapability}
               className="btn-secondary inline-flex items-center gap-2"
             >
               <RefreshCw size={13} className={callsLoading ? 'animate-spin' : ''} />
