@@ -892,7 +892,7 @@ export interface VantaraCapabilityRegistration {
     vantaraBps: number;
   };
   callbackUrl: string;
-  status: "draft" | "pending_registration" | "pending_update" | "live" | "suspended" | "failed" | string;
+  status: "draft" | "pending_registration" | "pending_update" | "live" | "paused" | "deleted" | "suspended" | "failed" | string;
   mode: "escrow" | "pay_then_serve" | "free" | string;
   acceptanceStatus: "not_started" | "pending_acceptance" | "accepted" | "failed" | string;
   acceptanceRequestId: string | null;
@@ -955,6 +955,29 @@ export interface VantaraProviderSettingsBody {
 export interface VantaraProviderPinBody {
   capabilityId: string;
   acceptanceStatus?: "pending_acceptance" | "accepted" | "failed";
+}
+
+export interface VantaraCapabilityStatusBody {
+  status: "live" | "paused";
+}
+
+export interface VantaraCapabilityCallsResponse {
+  capabilityId: string;
+  calls: Array<{
+    requestId?: string | null;
+    mode?: string;
+    status?: string;
+    amountUsdc?: number;
+    payerWallet?: string | null;
+    providerWallet?: string | null;
+    paymentSig?: string | null;
+    releaseSig?: string | null;
+    platformSig?: string | null;
+    refundSig?: string | null;
+    callbackStatus?: number | string | null;
+    createdAt?: string | null;
+    [key: string]: unknown;
+  }>;
 }
 
 export interface VantaraHermesInvokeBody {

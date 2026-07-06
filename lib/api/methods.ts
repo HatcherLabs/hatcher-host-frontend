@@ -93,6 +93,8 @@ import type {
   Mpp32ConfigBody,
   Mpp32ConfigStatus,
   VantaraConfigStatus,
+  VantaraCapabilityCallsResponse,
+  VantaraCapabilityStatusBody,
   VantaraHermesInvokeBody,
   VantaraHermesInvokeResponse,
   VantaraProviderPinBody,
@@ -729,6 +731,20 @@ export const api = {
       method: "POST",
       body: JSON.stringify(body),
     }),
+
+  updateAgentVantaraProviderStatus: (id: string, body: VantaraCapabilityStatusBody) =>
+    req<VantaraCapabilityRegistration>(`/agents/${id}/vantara/provider/status`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+
+  deleteAgentVantaraProvider: (id: string) =>
+    req<VantaraCapabilityRegistration>(`/agents/${id}/vantara/provider`, {
+      method: "DELETE",
+    }),
+
+  getAgentVantaraProviderCalls: (id: string) =>
+    req<VantaraCapabilityCallsResponse>(`/agents/${id}/vantara/provider/calls`),
 
   invokeAgentVantaraHermes: (id: string, body: VantaraHermesInvokeBody) =>
     req<VantaraHermesInvokeResponse>(`/agents/${id}/vantara/hermes/invoke`, {
