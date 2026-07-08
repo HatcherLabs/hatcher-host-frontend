@@ -1316,6 +1316,7 @@
         "dev": "देव",
         "config": "कॉन्फिग",
         "integrations": "एकीकरण",
+        "connectors": "Connectors",
         "plugins": "प्लगइन्स और कौशल",
         "logs": "लॉग",
         "stats": "आँकड़े",

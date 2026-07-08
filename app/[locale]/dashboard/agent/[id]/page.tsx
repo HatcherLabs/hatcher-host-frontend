@@ -93,6 +93,11 @@ const IntegrationsTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
+const ConnectorsTab = dynamic(
+  () => import('@/components/agents/tabs/ConnectorsTab').then(mod => ({ default: mod.ConnectorsTab })),
+  { loading: () => <TabSkeleton /> }
+);
+
 const FilesTab = dynamic(
   () => import('@/components/agents/tabs/FilesTab').then(mod => ({ default: mod.FilesTab })),
   { loading: () => <TabSkeleton /> }
@@ -203,7 +208,7 @@ export default function AgentManagePage() {
   const [ownedAgentsLoading, setOwnedAgentsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const statusPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const validTabs: Tab[] = ['overview','config','integrations','skills','plugins','files','logs','terminal','dev','memory','sessions','knowledge','schedules','workflows','chat','mail','stats','wallet'];
+  const validTabs: Tab[] = ['overview','config','integrations','connectors','skills','plugins','files','logs','terminal','dev','memory','sessions','knowledge','schedules','workflows','chat','mail','stats','wallet'];
   // 'skills' kept in validTabs for backwards compat (deep links), but redirects to plugins tab
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
   const rawTab = searchParams.get('tab');
@@ -1584,6 +1589,7 @@ export default function AgentManagePage() {
               {tab === 'overview' && <OverviewTab />}
               {tab === 'config' && <ConfigTab />}
               {tab === 'integrations' && <IntegrationsTab />}
+              {tab === 'connectors' && <ConnectorsTab />}
               {(tab === 'skills' || tab === 'plugins') && <PluginsTab />}
               {tab === 'files' && <FilesTab />}
               {tab === 'logs' && <LogsTab />}

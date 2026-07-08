@@ -35,4 +35,18 @@ describe('agent navigation model', () => {
     expect(easyTabs).not.toContain('dev');
     expect(easyTabs).not.toContain('workflows');
   });
+
+  it('exposes MCP connectors as an advanced configuration tab', () => {
+    const advancedTabs = buildAgentNavigationTabs('openclaw', labelFor, 'advanced');
+    const connectorTab = advancedTabs.find((tab) => tab.id === 'connectors');
+
+    expect(connectorTab).toMatchObject({
+      id: 'connectors',
+      label: 'connectors',
+      group: 'configure',
+    });
+
+    const easyTabs = buildAgentNavigationTabs('openclaw', labelFor, 'easy').map((tab) => tab.id);
+    expect(easyTabs).not.toContain('connectors');
+  });
 });

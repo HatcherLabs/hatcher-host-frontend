@@ -1316,6 +1316,7 @@
         "dev": "Desenvolvedor",
         "config": "Configuração",
         "integrations": "Integrações",
+        "connectors": "Conectores",
         "plugins": "Plug-ins e habilidades",
         "logs": "Registros",
         "stats": "Estatísticas",

@@ -1316,6 +1316,7 @@
         "dev": "Dev",
         "config": "Config",
         "integrations": "Integrations",
+        "connectors": "Connectors",
         "plugins": "Plugins & Skills",
         "logs": "Logs",
         "stats": "Stats",

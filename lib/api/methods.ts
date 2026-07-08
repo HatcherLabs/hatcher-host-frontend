@@ -24,7 +24,10 @@ import type {
   CovenantDispatchBody,
   CovenantDispatchResponse,
   CovenantTask,
+  CreateMcpConnectorBody,
   CreateCovenantConnectorResponse,
+  CreateMcpConnectorResponse,
+  McpConnector,
   AgentPassport,
   AgentPassportNetworkId,
   AgentWalletActivityResponse,
@@ -3378,6 +3381,22 @@ export const api = {
     req<{ task: CovenantTask; sent: boolean }>(
       `/agents/${agentId}/covenant/tasks/${taskId}/cancel`,
       { method: "POST" },
+    ),
+
+  // ─── Remote MCP Connectors ─────────────────────────────────
+  getMcpConnectors: (agentId: string) =>
+    req<{ connectors: McpConnector[] }>(`/agents/${agentId}/mcp/connectors`),
+
+  createMcpConnector: (agentId: string, body: CreateMcpConnectorBody) =>
+    req<CreateMcpConnectorResponse>(`/agents/${agentId}/mcp/connectors`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  revokeMcpConnector: (agentId: string, connectorId: string) =>
+    req<{ connector: McpConnector }>(
+      `/agents/${agentId}/mcp/connectors/${connectorId}`,
+      { method: "DELETE" },
     ),
 
   testAgentGithubAccess: (agentId: string, repo?: string) =>

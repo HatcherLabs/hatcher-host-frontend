@@ -1316,6 +1316,7 @@
         "dev": "Geliştirici",
         "config": "Yapılandırma",
         "integrations": "Entegrasyonlar",
+        "connectors": "Connectors",
         "plugins": "Eklentiler ve Beceriler",
         "logs": "Kütükler",
         "stats": "İstatistikler",

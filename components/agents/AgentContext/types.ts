@@ -6,7 +6,7 @@ import type { ChatMessageThinkingState } from '../tabs/ChatTab/chatThinkingEvent
 
 // ─── Types ───────────────────────────────────────────────────
 
-export type Tab = 'overview' | 'config' | 'integrations' | 'skills' | 'plugins' | 'files' | 'logs' | 'terminal' | 'dev' | 'memory' | 'sessions' | 'knowledge' | 'schedules' | 'workflows' | 'chat' | 'mail' | 'stats' | 'wallet';
+export type Tab = 'overview' | 'config' | 'integrations' | 'connectors' | 'skills' | 'plugins' | 'files' | 'logs' | 'terminal' | 'dev' | 'memory' | 'sessions' | 'knowledge' | 'schedules' | 'workflows' | 'chat' | 'mail' | 'stats' | 'wallet';
 
 export interface Message {
   id: string;

@@ -1293,6 +1293,7 @@
         "terminal": "Terminal",
         "config": "Konfiguration",
         "integrations": "Integrationen",
+        "connectors": "Connectors",
         "plugins": "Plugins & Fähigkeiten",
         "logs": "Protokolle",
         "stats": "Statistiken",

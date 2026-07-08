@@ -365,6 +365,57 @@ export interface CreateCovenantConnectorResponse {
   pairingCode: string;
 }
 
+export type McpConnectorTransport = "streamable_http" | "sse";
+export type McpConnectorAuthType = "none" | "bearer";
+export type McpConnectorApprovalMode = "auto" | "prompt" | "approve";
+
+export interface McpConnectorTool {
+  name: string;
+  title?: string;
+  description?: string;
+  inputSchema?: unknown;
+}
+
+export interface McpConnectorToolPolicy {
+  enabledTools?: string[];
+  disabledTools?: string[];
+  approvalMode?: McpConnectorApprovalMode;
+}
+
+export interface McpConnector {
+  id: string;
+  userId: string;
+  agentId: string;
+  name: string;
+  serverUrl: string;
+  transport: McpConnectorTransport | string;
+  authType: McpConnectorAuthType | string;
+  tokenPrefix: string | null;
+  status: "pending" | "ready" | "error" | "revoked" | string;
+  tools: McpConnectorTool[];
+  toolPolicy: McpConnectorToolPolicy;
+  metadata: unknown;
+  lastCheckedAt: string | null;
+  lastError: string | null;
+  revokedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateMcpConnectorBody {
+  name: string;
+  serverUrl: string;
+  transport?: McpConnectorTransport;
+  auth?: { type: "none" } | { type: "bearer"; bearerToken: string };
+  enabledTools?: string[];
+  disabledTools?: string[];
+  approvalMode?: McpConnectorApprovalMode;
+}
+
+export interface CreateMcpConnectorResponse {
+  connector: McpConnector;
+}
+
 export interface CovenantDispatchBody {
   connectorId?: string;
   text: string;

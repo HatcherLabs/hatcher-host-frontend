@@ -1316,6 +1316,7 @@
         "dev": "Dev",
         "config": "Configurare",
         "integrations": "Integrări",
+        "connectors": "Conectori",
         "plugins": "Plugin-uri & Abilități",
         "logs": "Jurnale",
         "stats": "Statistici",
