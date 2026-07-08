@@ -1316,6 +1316,7 @@
         "dev": "Nhà phát triển",
         "config": "Cấu hình",
         "integrations": "Tích hợp",
+        "connectors": "Connectors",
         "plugins": "Plugin & Kỹ năng",
         "logs": "Nhật ký",
         "stats": "Thống kê",

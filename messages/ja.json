@@ -1316,6 +1316,7 @@
         "dev": "開発者",
         "config": "構成",
         "integrations": "統合",
+        "connectors": "Connectors",
         "plugins": "プラグインとスキル",
         "logs": "ログ",
         "stats": "統計",

@@ -1293,6 +1293,7 @@
         "terminal": "终端",
         "config": "配置",
         "integrations": "集成",
+        "connectors": "Connectors",
         "plugins": "插件与技能",
         "logs": "日志",
         "stats": "统计",

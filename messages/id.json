@@ -1316,6 +1316,7 @@
         "dev": "Dev",
         "config": "Konfigurasi",
         "integrations": "Integrasi",
+        "connectors": "Connectors",
         "plugins": "Plugin & Keterampilan",
         "logs": "Log",
         "stats": "Statistik",

@@ -39,6 +39,7 @@ const AGENT_NAVIGATION: AgentNavigationSpec[] = [
   { id: 'stats', group: 'operate' },
   { id: 'config', group: 'configure' },
   { id: 'integrations', group: 'configure' },
+  { id: 'connectors', group: 'configure' },
   { id: 'knowledge', group: 'configure' },
   { id: 'plugins', group: 'configure' },
   { id: 'wallet', group: 'assets' },
