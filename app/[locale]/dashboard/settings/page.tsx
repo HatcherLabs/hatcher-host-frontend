@@ -228,7 +228,7 @@ export default function SettingsPage() {
   // ── Notification prefs (localStorage) ────────────────────
   const [notifPush, setNotifPush] = useState(true);
   const [notifAgentAlerts, setNotifAgentAlerts] = useState(true);
-  const [notifBilling, setNotifBilling] = useState(true);
+  const [notifTransactions, setNotifTransactions] = useState(true);
 
   // ── Privacy prefs ─────────────────────────────────────────
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
@@ -303,12 +303,12 @@ export default function SettingsPage() {
     const b = localStorage.getItem('hatcher:pref:notifBilling');
     if (p !== null) setNotifPush(p === 'true');
     if (a !== null) setNotifAgentAlerts(a === 'true');
-    if (b !== null) setNotifBilling(b === 'true');
+    if (b !== null) setNotifTransactions(b === 'true');
   }, []);
 
   useEffect(() => { localStorage.setItem('hatcher:pref:notifPush', String(notifPush)); }, [notifPush]);
   useEffect(() => { localStorage.setItem('hatcher:pref:agentAlerts', String(notifAgentAlerts)); }, [notifAgentAlerts]);
-  useEffect(() => { localStorage.setItem('hatcher:pref:notifBilling', String(notifBilling)); }, [notifBilling]);
+  useEffect(() => { localStorage.setItem('hatcher:pref:notifBilling', String(notifTransactions)); }, [notifTransactions]);
 
   useEffect(() => {
     const syncConsent = () => {
@@ -924,7 +924,7 @@ export default function SettingsPage() {
                       {[
                         { key: 'push', label: 'Push Notifications', desc: 'Browser push notifications for real-time updates', value: notifPush, onChange: setNotifPush },
                         { key: 'agents', label: 'Agent Alerts', desc: 'Get notified when agents change status, crash, or need attention', value: notifAgentAlerts, onChange: setNotifAgentAlerts },
-                        { key: 'billing', label: 'Billing Alerts', desc: 'Payment confirmations, subscription renewals, and credits', value: notifBilling, onChange: setNotifBilling },
+                        { key: 'billing', label: 'Billing Alerts', desc: 'Payment confirmations, subscription renewals, and credits', value: notifTransactions, onChange: setNotifTransactions },
                       ].map(({ key, label, desc, value, onChange }, i, arr) => (
                         <div key={key}>
                           <div className="flex items-center justify-between p-3 rounded-xl transition-colors hover:bg-[var(--bg-card)]">

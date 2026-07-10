@@ -1,7 +1,11 @@
 import dns from 'node:dns/promises';
+import https from 'node:https';
+import type { IncomingHttpHeaders, IncomingMessage } from 'node:http';
 import net from 'node:net';
+import { Readable } from 'node:stream';
 import { NextRequest, NextResponse } from 'next/server';
 import { API_URL } from '@/lib/config';
+import { safeDownloadFilename } from '@/lib/safe-download-filename';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -9,6 +13,7 @@ export const dynamic = 'force-dynamic';
 const MAX_DOWNLOAD_BYTES = 100 * 1024 * 1024;
 const MAX_REDIRECTS = 3;
 const AUTH_TIMEOUT_MS = 5000;
+const ARTIFACT_TIMEOUT_MS = 30_000;
 
 const DEFAULT_ALLOWED_ARTIFACT_HOSTS = [
   'v3.fal.media',
@@ -46,66 +51,70 @@ function isAllowedArtifactHost(hostname: string): boolean {
   });
 }
 
-function safeFilename(value: string): string {
-  return value
-    .replace(/["\\/:*?<>|\r\n]+/g, '-')
-    .replace(/\s+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 160)
-    || 'artifact';
-}
-
 function filenameFromUrl(url: URL): string {
   const name = url.pathname.split('/').filter(Boolean).pop();
-  return safeFilename(name ? decodeURIComponent(name) : 'artifact');
-}
-
-function isPrivateIpv4(ip: string): boolean {
-  const parts = ip.split('.').map((part) => Number(part));
-  if (parts.length !== 4 || parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)) {
-    return true;
+  if (!name) return 'artifact';
+  try {
+    return safeDownloadFilename(decodeURIComponent(name));
+  } catch {
+    return safeDownloadFilename(name);
   }
-  const [a, b] = parts;
-  return (
-    a === 0
-    || a === 10
-    || a === 127
-    || (a === 169 && b === 254)
-    || (a === 172 && b >= 16 && b <= 31)
-    || (a === 192 && (b === 0 || b === 168))
-    || (a === 198 && (b === 18 || b === 19 || b === 51))
-    || (a === 203 && b === 0)
-    || (a === 100 && b >= 64 && b <= 127)
-    || a >= 224
-  );
 }
 
-function isPrivateIpv6(ip: string): boolean {
-  const normalized = ip.toLowerCase();
-  const mappedIpv4 = /^::ffff:(\d+\.\d+\.\d+\.\d+)$/.exec(normalized)?.[1];
-  if (mappedIpv4) return isPrivateIpv4(mappedIpv4);
-  return (
-    normalized === '::1'
-    || normalized === '::'
-    || normalized.startsWith('fc')
-    || normalized.startsWith('fd')
-    || normalized.startsWith('fe80:')
-    || normalized.startsWith('::ffff:127.')
-    || normalized.startsWith('::ffff:10.')
-    || normalized.startsWith('::ffff:192.168.')
-  );
+const NON_PUBLIC_IPS = new net.BlockList();
+
+for (const [network, prefix] of [
+  ['0.0.0.0', 8],
+  ['10.0.0.0', 8],
+  ['100.64.0.0', 10],
+  ['127.0.0.0', 8],
+  ['169.254.0.0', 16],
+  ['172.16.0.0', 12],
+  ['192.0.0.0', 24],
+  ['192.0.2.0', 24],
+  ['192.88.99.0', 24],
+  ['192.168.0.0', 16],
+  ['198.18.0.0', 15],
+  ['198.51.100.0', 24],
+  ['203.0.113.0', 24],
+  ['224.0.0.0', 4],
+  ['240.0.0.0', 4],
+] as const) {
+  NON_PUBLIC_IPS.addSubnet(network, prefix, 'ipv4');
+}
+
+for (const [network, prefix] of [
+  ['::', 96],
+  ['::1', 128],
+  ['64:ff9b:1::', 48],
+  ['100::', 64],
+  ['2001::', 23],
+  ['2001:db8::', 32],
+  ['2002::', 16],
+  ['fc00::', 7],
+  ['fe80::', 10],
+  ['ff00::', 8],
+] as const) {
+  NON_PUBLIC_IPS.addSubnet(network, prefix, 'ipv6');
 }
 
 function isPrivateIp(ip: string): boolean {
   const family = net.isIP(ip);
-  if (family === 4) return isPrivateIpv4(ip);
-  if (family === 6) return isPrivateIpv6(ip);
-  return true;
+  if (family !== 4 && family !== 6) return true;
+  return NON_PUBLIC_IPS.check(ip, family === 4 ? 'ipv4' : 'ipv6');
 }
 
-async function assertPublicHttpUrl(url: URL): Promise<void> {
+type PublicHostAddress = {
+  address: string;
+  family: 4 | 6;
+};
+
+function assertAllowedArtifactUrl(url: URL): void {
   if (url.protocol !== 'https:') {
     throw new Error('Only https artifact URLs are supported');
+  }
+  if (url.port && url.port !== '443') {
+    throw new Error('Artifact URLs must use port 443');
   }
   if (url.username || url.password) {
     throw new Error('Artifact URLs cannot include credentials');
@@ -113,10 +122,20 @@ async function assertPublicHttpUrl(url: URL): Promise<void> {
   if (!isAllowedArtifactHost(url.hostname)) {
     throw new Error('Artifact host is not allowed');
   }
+}
+
+async function resolvePublicArtifactHost(url: URL): Promise<PublicHostAddress> {
+  assertAllowedArtifactUrl(url);
   const records = await dns.lookup(url.hostname, { all: true, verbatim: true });
   if (records.length === 0 || records.some((record) => isPrivateIp(record.address))) {
     throw new Error('Artifact host is not allowed');
   }
+
+  const selected = records[0];
+  if (!selected || (selected.family !== 4 && selected.family !== 6)) {
+    throw new Error('Artifact host is not allowed');
+  }
+  return { address: selected.address, family: selected.family };
 }
 
 async function isAuthorizedArtifactRequest(request: NextRequest): Promise<boolean> {
@@ -140,21 +159,67 @@ async function isAuthorizedArtifactRequest(request: NextRequest): Promise<boolea
   }
 }
 
-async function fetchPublicArtifact(url: URL, redirects = 0): Promise<Response> {
-  await assertPublicHttpUrl(url);
-  const response = await fetch(url, {
-    redirect: 'manual',
-    cache: 'no-store',
-    headers: {
-      accept: 'image/*,video/*,audio/*,application/pdf,text/*,application/octet-stream,*/*;q=0.5',
-      'user-agent': 'HatcherArtifactDownloader/1.0',
-    },
+function responseHeaders(headers: IncomingHttpHeaders): Headers {
+  const result = new Headers();
+  for (const [name, value] of Object.entries(headers)) {
+    if (Array.isArray(value)) {
+      for (const item of value) result.append(name, item);
+    } else if (value !== undefined) {
+      result.set(name, value);
+    }
+  }
+  return result;
+}
+
+function requestPinnedArtifact(url: URL, target: PublicHostAddress): Promise<Response> {
+  return new Promise((resolve, reject) => {
+    const request = https.request({
+      protocol: 'https:',
+      hostname: target.address,
+      family: target.family,
+      port: 443,
+      method: 'GET',
+      path: `${url.pathname}${url.search}`,
+      servername: url.hostname,
+      headers: {
+        host: url.host,
+        accept: 'image/*,video/*,audio/*,application/pdf,text/*,application/octet-stream,*/*;q=0.5',
+        'user-agent': 'HatcherArtifactDownloader/1.0',
+      },
+    }, (upstream) => {
+      const status = upstream.statusCode ?? 502;
+      const hasBody = status !== 204 && status !== 205 && status !== 304;
+      const body = hasBody
+        ? Readable.toWeb(upstream as IncomingMessage) as ReadableStream<Uint8Array>
+        : null;
+      resolve(new Response(body, {
+        status,
+        statusText: upstream.statusMessage,
+        headers: responseHeaders(upstream.headers),
+      }));
+    });
+
+    request.setTimeout(ARTIFACT_TIMEOUT_MS, () => {
+      request.destroy(new Error('Artifact request timed out'));
+    });
+    request.once('error', reject);
+    request.end();
   });
+}
+
+async function fetchPublicArtifact(
+  url: URL,
+  redirects = 0,
+  initialTarget?: PublicHostAddress,
+): Promise<Response> {
+  const target = initialTarget ?? await resolvePublicArtifactHost(url);
+  const response = await requestPinnedArtifact(url, target);
 
   if ([301, 302, 303, 307, 308].includes(response.status)) {
     if (redirects >= MAX_REDIRECTS) throw new Error('Too many redirects');
     const location = response.headers.get('location');
     if (!location) throw new Error('Redirect missing location');
+    await response.body?.cancel();
     return fetchPublicArtifact(new URL(location, url), redirects + 1);
   }
 
@@ -202,15 +267,15 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
   }
 
+  let upstream: Response;
+  let initialTarget: PublicHostAddress;
   try {
-    await assertPublicHttpUrl(url);
+    initialTarget = await resolvePublicArtifactHost(url);
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message || 'Invalid artifact URL' }, { status: 400 });
   }
-
-  let upstream: Response;
   try {
-    upstream = await fetchPublicArtifact(url);
+    upstream = await fetchPublicArtifact(url, 0, initialTarget);
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message || 'Unable to fetch artifact' }, { status: 502 });
   }
@@ -227,7 +292,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Artifact is too large' }, { status: 413 });
   }
 
-  const filename = safeFilename(request.nextUrl.searchParams.get('filename') || filenameFromUrl(url));
+  const filename = safeDownloadFilename(request.nextUrl.searchParams.get('filename') || filenameFromUrl(url));
   const headers = new Headers();
   headers.set('content-type', upstream.headers.get('content-type') ?? 'application/octet-stream');
   if (contentLength > 0) headers.set('content-length', String(contentLength));

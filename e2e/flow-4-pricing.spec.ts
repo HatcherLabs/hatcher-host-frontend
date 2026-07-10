@@ -7,6 +7,17 @@
 
 import { test, expect } from '@playwright/test';
 
+function isExpectedCheckoutDestination(url: URL, appOrigin: string): boolean {
+  if (url.protocol === 'https:' && url.hostname === 'checkout.stripe.com') return true;
+  if (url.origin !== appOrigin) return false;
+  return (
+    url.pathname === '/dashboard/billing'
+    || url.pathname.startsWith('/dashboard/billing/')
+    || url.pathname === '/login'
+    || url.pathname.startsWith('/login/')
+  );
+}
+
 test('pricing page renders all tiers', async ({ page }) => {
   await page.goto('/pricing');
   await page.waitForLoadState('networkidle', { timeout: 10_000 });
@@ -26,13 +37,11 @@ test('pricing page renders all tiers', async ({ page }) => {
 test('pricing page: clicking upgrade tier triggers checkout redirect', async ({ page }) => {
   await page.goto('/pricing');
   await page.waitForLoadState('networkidle', { timeout: 10_000 });
+  const appOrigin = new URL(page.url()).origin;
 
   // Intercept navigation to Stripe or billing
   const navigationPromise = page.waitForURL(
-    (url) =>
-      url.href.includes('checkout.stripe.com') ||
-      url.href.includes('/dashboard/billing') ||
-      url.href.includes('/login'), // unauthenticated users redirected to login
+    (url) => isExpectedCheckoutDestination(url, appOrigin),
     { timeout: 15_000 }
   );
 
@@ -46,11 +55,7 @@ test('pricing page: clicking upgrade tier triggers checkout redirect', async ({ 
   // Should redirect somewhere meaningful
   await navigationPromise;
 
-  const currentUrl = page.url();
-  const isValidRedirect =
-    currentUrl.includes('checkout.stripe.com') ||
-    currentUrl.includes('/dashboard/billing') ||
-    currentUrl.includes('/login');
+  const isValidRedirect = isExpectedCheckoutDestination(new URL(page.url()), appOrigin);
 
   expect(isValidRedirect).toBe(true);
 });

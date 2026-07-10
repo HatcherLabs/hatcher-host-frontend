@@ -6,15 +6,20 @@
 
 import { type Page, expect } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
+import { randomUUID } from 'node:crypto';
+
+function uniqueSuffix(): string {
+  return randomUUID().replaceAll('-', '').slice(0, 8);
+}
 
 /** Generate a unique email that won't collide across test runs */
 export function uniqueEmail(prefix = 'e2e'): string {
-  return `${prefix}+${Date.now()}_${Math.random().toString(36).slice(2, 6)}@hatcher-test.local`;
+  return `${prefix}+${Date.now()}_${uniqueSuffix()}@hatcher-test.local`;
 }
 
 /** Generate a unique username */
 export function uniqueUsername(prefix = 'e2e'): string {
-  return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+  return `${prefix}_${Date.now()}_${uniqueSuffix()}`;
 }
 
 /** Default test password */

@@ -58,4 +58,25 @@ describe('agent media proxy route', () => {
     expect(response.status).toBe(200);
     expect(response.headers.get('content-disposition')).toBe('inline; filename="image.png"');
   });
+
+  it('bounds generated video filenames and removes header-unsafe characters', async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockResolvedValueOnce(new Response('video', {
+      status: 200,
+      headers: { 'content-type': 'video/mp4' },
+    }));
+    const requestUrl = new URL('https://hatcher.host/api/agents/agent_1/media');
+    requestUrl.searchParams.set('videoJobId', `job/\r\n${'a'.repeat(500)}`);
+    const { GET } = await loadRoute();
+
+    const response = await GET(
+      makeRequest(requestUrl.toString()),
+      { params: Promise.resolve({ agentId: 'agent_1' }) },
+    );
+
+    const disposition = response.headers.get('content-disposition');
+    expect(disposition).not.toContain('\r');
+    expect(disposition).not.toContain('\n');
+    expect(disposition).toMatch(/^inline; filename=".{160}"$/);
+  });
 });
