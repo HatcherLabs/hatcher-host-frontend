@@ -24,6 +24,7 @@ export type ConfirmPaymentModalState = {
   rate: number;
   burnAmount?: number;
   treasuryAmount?: number;
+  recipientWallet?: string;
   resolve?: (approved: boolean) => void;
 };
 
@@ -108,6 +109,15 @@ export function ConfirmPaymentModal(props: {
               </div>
             )}
           </div>
+
+          {state.recipientWallet && (
+            <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)]/50 px-3 py-2">
+              <p className="text-[10px] uppercase tracking-wider text-[var(--text-muted)]">Recipient</p>
+              <p className="mt-1 break-all font-mono text-[11px] text-[var(--text-secondary)]">
+                {state.recipientWallet}
+              </p>
+            </div>
+          )}
 
           {(state.token === 'hatch' || state.token === 'ansem') && state.burnAmount !== undefined && state.treasuryAmount !== undefined && (
             <div className="rounded-xl border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] p-4 space-y-1.5">

@@ -49,6 +49,17 @@ describe('CSP', () => {
     expect(csp).not.toContain('api.qwerti.ai');
   });
 
+  it('does not allow removed Google advertising runtimes', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    const csp = buildCsp('testnonce', false);
+
+    expect(csp).not.toContain('googletagmanager.com');
+    expect(csp).not.toContain('google-analytics.com');
+    expect(csp).not.toContain('doubleclick.net');
+    expect(csp).not.toContain('googleadservices.com');
+    expect(csp).not.toContain('googlesyndication.com');
+  });
+
   it('allows the Mirari dashboard embed origin in browser-facing directives', () => {
     vi.stubEnv('NODE_ENV', 'production');
     const csp = buildCsp('testnonce', false);

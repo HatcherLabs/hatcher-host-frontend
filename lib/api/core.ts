@@ -11,33 +11,39 @@ import { API_URL } from '@/lib/config';
 
 const API_BASE = API_URL;
 const TOKEN_KEY = 'hatcher_token';
+let inMemoryApiKey: string | null = null;
 
 // ─── Token helpers ───────────────────────────────────────────
 export function getToken(): string | null {
   if (typeof window === 'undefined') return null;
-  const token = localStorage.getItem(TOKEN_KEY);
-  if (!token) return null;
-  if (token.startsWith('hk_')) return token;
+  // Remove values written by older releases. Browser credentials are never
+  // persisted because any XSS would otherwise retain them across reloads.
   localStorage.removeItem(TOKEN_KEY);
-  return null;
+  return inMemoryApiKey;
 }
 
 /**
- * Store only explicit API keys in localStorage. JWT browser sessions are
- * cookie-only; if a login/refresh response passes a JWT here, clear the
- * legacy fallback instead of persisting it.
+ * Browser JWT sessions are cookie-only. Explicit API keys are held in memory
+ * for the current document and disappear on reload or logout.
  */
 export function setToken(token: string) {
-  if (token.startsWith('hk_')) localStorage.setItem(TOKEN_KEY, token);
-  else localStorage.removeItem(TOKEN_KEY);
+  inMemoryApiKey = token.startsWith('hk_') ? token : null;
+  if (typeof window !== 'undefined') localStorage.removeItem(TOKEN_KEY);
 }
 
 /**
- * Clear token from localStorage.
+ * Clear the in-memory API key and any legacy browser storage.
  * Called on logout alongside the /auth/logout endpoint (which clears the cookie).
  */
 export function clearToken() {
-  localStorage.removeItem(TOKEN_KEY);
+  inMemoryApiKey = null;
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.removeItem(TOKEN_KEY);
+    } catch {
+      // The in-memory credential is already cleared when storage is blocked.
+    }
+  }
 }
 
 export function isAuthenticated(): boolean {

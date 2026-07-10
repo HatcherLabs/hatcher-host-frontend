@@ -1,9 +1,19 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatchStore } from '@/lib/agent-dispatch/store';
 import { DISPATCH_SKINS, type DispatchSkin } from '@/lib/agent-dispatch/config';
 import { usePaymentDrivers } from '@/lib/payment-drivers';
-import { purchaseSkinCnft } from '@/lib/agent-dispatch/leaderboard';
+import {
+  DispatchSkinClaimableError,
+  clearPendingDispatchSkinSettlement,
+  claimPaidSkinCnft,
+  createSkinPaymentIntent,
+  fetchDispatchSkinCnfts,
+  getPendingDispatchSkinSettlement,
+  purchaseSkinCnft,
+  savePendingDispatchSkinSettlement,
+  type DispatchSkinCnftRow,
+} from '@/lib/agent-dispatch/leaderboard';
 import { ConfirmPaymentModal } from '@/components/payments/ConfirmPaymentModal';
 
 export function SkinShop({ onClose }: { onClose: () => void }) {
@@ -14,10 +24,30 @@ export function SkinShop({ onClose }: { onClose: () => void }) {
   const grantSkin = useDispatchStore((s) => s.grantSkin);
   const equipSkin = useDispatchStore((s) => s.equipSkin);
 
-  const { driveHatch, confirmState, closeConfirm, connected, openWalletModal } = usePaymentDrivers();
+  const {
+    driveHatch,
+    ensurePaymentWallet,
+    confirmState,
+    closeConfirm,
+    connected,
+    openWalletModal,
+  } = usePaymentDrivers();
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [cnft, setCnft] = useState<{ skin: string; minting: boolean; minted: boolean; solscan?: string | null } | null>(null);
+  const [skinCnfts, setSkinCnfts] = useState<DispatchSkinCnftRow[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    void fetchDispatchSkinCnfts().then((rows) => {
+      if (cancelled) return;
+      setSkinCnfts(rows);
+      for (const row of rows) {
+        if (row.status === 'claimable' || row.status === 'minting' || row.status === 'minted') grantSkin(row.skinId);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [grantSkin]);
 
   const handleBuy = async (skin: DispatchSkin) => {
     setError(null);
@@ -32,16 +62,97 @@ export function SkinShop({ onClose }: { onClose: () => void }) {
     }
     setBusyId(skin.id);
     try {
-      const txSignature = await driveHatch(skin.price, `Dispatch skin: ${skin.name}`);
-      grantSkin(skin.id); // cosmetic-only, unlocked locally on tx success
-      equipSkin(skin.id);
-      // Settle the purchase server-side (verifies the payment on-chain) and mint
-      // the collectible cNFT to the paying wallet. The skin is already usable;
-      // this is the on-chain proof of ownership.
+      const payerWallet = await ensurePaymentWallet();
+      const applySettledSkin = (
+        settled: Awaited<ReturnType<typeof purchaseSkinCnft>>,
+      ) => {
+        grantSkin(skin.id);
+        equipSkin(skin.id);
+        setSkinCnfts((rows) => [
+          ...rows.filter((row) => row.skinId !== skin.id),
+          {
+            skinId: skin.id,
+            status: settled.minted ? 'minted' : settled.status ?? 'minting',
+            wallet: payerWallet,
+            tx: null,
+            solscan: settled.solscan ?? null,
+          },
+        ]);
+        setCnft({ skin: skin.name, minting: false, minted: settled.minted, solscan: settled.solscan });
+      };
+      const recoverPaidSkin = async () => {
+        setCnft({ skin: skin.name, minting: true, minted: false });
+        const recovered = await claimPaidSkinCnft(skin.id, payerWallet);
+        grantSkin(skin.id);
+        equipSkin(skin.id);
+        setSkinCnfts((rows) => [
+          ...rows.filter((row) => row.skinId !== skin.id),
+          {
+            skinId: skin.id,
+            status: recovered.minted ? 'minted' : recovered.status ?? 'minting',
+            wallet: payerWallet,
+            tx: null,
+            solscan: recovered.solscan ?? null,
+          },
+        ]);
+        setCnft({ skin: skin.name, minting: false, minted: recovered.minted, solscan: recovered.solscan });
+      };
+
+      const pendingSettlement = getPendingDispatchSkinSettlement(skin.id, payerWallet);
+      if (pendingSettlement) {
+        setCnft({ skin: skin.name, minting: true, minted: false });
+        const settled = await purchaseSkinCnft(
+          skin.id,
+          pendingSettlement.txSignature,
+          pendingSettlement.paymentIntentId,
+        );
+        clearPendingDispatchSkinSettlement(skin.id, payerWallet);
+        applySettledSkin(settled);
+        return;
+      }
+
+      const existing = skinCnfts.find((row) => row.skinId === skin.id);
+      if (existing?.status === 'minted') {
+        grantSkin(skin.id);
+        equipSkin(skin.id);
+        setCnft({ skin: skin.name, minting: false, minted: true, solscan: existing.solscan });
+        return;
+      }
+      if (existing?.status === 'claimable') {
+        await recoverPaidSkin();
+        return;
+      }
+      if (existing?.status === 'minting') {
+        grantSkin(skin.id);
+        equipSkin(skin.id);
+        setCnft({ skin: skin.name, minting: false, minted: false, solscan: existing.solscan });
+        return;
+      }
+
+      let intent: Awaited<ReturnType<typeof createSkinPaymentIntent>>;
+      try {
+        intent = await createSkinPaymentIntent(skin.id, payerWallet);
+      } catch (intentError) {
+        if (intentError instanceof DispatchSkinClaimableError) {
+          await recoverPaidSkin();
+          return;
+        }
+        throw intentError;
+      }
+      const txSignature = await driveHatch(intent, `Dispatch skin: ${skin.name}`);
+      savePendingDispatchSkinSettlement({
+        skinId: skin.id,
+        payerWallet,
+        paymentIntentId: intent.intentId,
+        txSignature,
+      });
       setCnft({ skin: skin.name, minting: true, minted: false });
-      const res = await purchaseSkinCnft(skin.id, txSignature);
-      setCnft({ skin: skin.name, minting: false, minted: res.minted, solscan: res.solscan });
+      const res = await purchaseSkinCnft(skin.id, txSignature, intent.intentId);
+      clearPendingDispatchSkinSettlement(skin.id, payerWallet);
+      // Local ownership follows authoritative settlement, not wallet broadcast.
+      applySettledSkin(res);
     } catch (e) {
+      setCnft(null);
       setError(e instanceof Error ? e.message : 'Payment cancelled.');
     } finally {
       setBusyId(null);
@@ -104,6 +215,7 @@ export function SkinShop({ onClose }: { onClose: () => void }) {
             {DISPATCH_SKINS.map((skin) => {
               const owned = ownedSkins.includes(skin.id);
               const equipped = equippedSkin === skin.id;
+              const claimable = skinCnfts.some((row) => row.skinId === skin.id && row.status === 'claimable');
               const canAfford = skin.currency === 'data' ? data >= skin.price : true;
               return (
                 <div
@@ -122,7 +234,15 @@ export function SkinShop({ onClose }: { onClose: () => void }) {
                     {skin.premium && <span className="text-[10px] text-[#ffd46b]">★</span>}
                   </div>
                   <p className="mb-2 line-clamp-2 text-[10px] text-[#9fc1c7]">{skin.desc}</p>
-                  {equipped ? (
+                  {claimable ? (
+                    <button
+                      onClick={() => handleBuy(skin)}
+                      disabled={busyId === skin.id}
+                      className="mt-auto rounded-lg border border-[#ffd46b]/50 py-1.5 text-center text-xs font-bold text-[#ffd46b] transition hover:bg-[#ffd46b]/10 disabled:opacity-40"
+                    >
+                      {busyId === skin.id ? '…' : 'Retry cNFT'}
+                    </button>
+                  ) : equipped ? (
                     <span className="mt-auto rounded-lg bg-white/10 py-1.5 text-center text-xs font-semibold">Equipped</span>
                   ) : owned ? (
                     <button

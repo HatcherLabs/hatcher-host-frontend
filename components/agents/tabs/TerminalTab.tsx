@@ -5,6 +5,14 @@ import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 import { useAgentContext } from '../AgentContext';
 import { API_URL } from '@/lib/config';
+import { useAuth } from '@/lib/auth-context';
+import {
+  clearLegacyTerminalCredentialStorage,
+  loadTerminalCredentialMounts,
+  persistTerminalCredentialMounts,
+  type TerminalCredentialMount,
+  type TerminalCredentialScope,
+} from '@/lib/terminal-credentials';
 import { canRunNativeTerminalFork, nativeTerminalForkInput } from '@/components/agents/terminalNativeCommands';
 import { resolveTerminalTheme } from './terminalTheme';
 import {
@@ -53,7 +61,6 @@ const TERMINAL_RECONNECT_DELAY_MS = 1_500;
 const TERMINAL_SCROLL_SPEED_KEY = 'hatcher-terminal-scroll-lines';
 const TERMINAL_SCROLL_SPEEDS = [3, 6, 10, 16] as const;
 const TERMINAL_SESSION_STORAGE_PREFIX = 'hatcher-terminal-sessions:';
-const TERMINAL_CREDENTIAL_STORAGE_KEY = 'hatcher-terminal-credential-mounts-v1';
 const DEFAULT_TERMINAL_SESSION_ID = 'main';
 const DEFAULT_TERMINAL_TAIL_LINES = '600';
 
@@ -62,17 +69,6 @@ interface TerminalSession {
   name: string;
   createdAt: number;
   updatedAt: number;
-}
-
-type CredentialScope = 'account' | 'agent';
-
-interface TerminalCredentialMount {
-  id: string;
-  scope: CredentialScope;
-  key: string;
-  value: string;
-  enabled: boolean;
-  agentId?: string;
 }
 
 type TerminalScrollState = {
@@ -156,42 +152,6 @@ function persistTerminalSessions(agentId: string, sessions: TerminalSession[]): 
   window.localStorage.setItem(`${TERMINAL_SESSION_STORAGE_PREFIX}${agentId}`, JSON.stringify(sessions));
 }
 
-function readAllCredentialMounts(): TerminalCredentialMount[] {
-  if (typeof window === 'undefined') return [];
-  try {
-    const raw = window.sessionStorage.getItem(TERMINAL_CREDENTIAL_STORAGE_KEY);
-    const parsed = raw ? JSON.parse(raw) : null;
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter((candidate): candidate is TerminalCredentialMount => (
-      candidate &&
-      typeof candidate.id === 'string' &&
-      (candidate.scope === 'account' || candidate.scope === 'agent') &&
-      typeof candidate.key === 'string' &&
-      typeof candidate.value === 'string' &&
-      typeof candidate.enabled === 'boolean'
-    ));
-  } catch {
-    return [];
-  }
-}
-
-function loadCredentialMounts(agentId: string): TerminalCredentialMount[] {
-  return readAllCredentialMounts().filter((mount) => (
-    mount.scope === 'account' || mount.agentId === agentId
-  ));
-}
-
-function persistCredentialMounts(agentId: string, visibleMounts: TerminalCredentialMount[]): void {
-  if (typeof window === 'undefined') return;
-  const otherAgentMounts = readAllCredentialMounts().filter((mount) => (
-    mount.scope === 'agent' && mount.agentId !== agentId
-  ));
-  window.sessionStorage.setItem(
-    TERMINAL_CREDENTIAL_STORAGE_KEY,
-    JSON.stringify([...otherAgentMounts, ...visibleMounts]),
-  );
-}
-
 function credentialEnv(mounts: TerminalCredentialMount[]): Array<{ key: string; value: string }> {
   const seenKeys = new Set<string>();
   const envValues: Array<{ key: string; value: string }> = [];
@@ -208,6 +168,7 @@ function credentialEnv(mounts: TerminalCredentialMount[]): Array<{ key: string; 
 export function TerminalTab({ isVisible = true }: TerminalTabProps) {
   const tTerminal = useTranslations('dashboard.agentDetail.terminal');
   const { agent, stats } = useAgentContext();
+  const { user } = useAuth();
   const { resolvedTheme, theme } = useTheme();
   const terminalTheme = useMemo(
     () => resolveTerminalTheme(resolvedTheme ?? theme),
@@ -319,15 +280,22 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
   useEffect(() => { credentialEnvRef.current = credentialEnv(credentialMounts); }, [credentialMounts]);
 
   useEffect(() => {
-    if (!agent?.id) return;
+    clearLegacyTerminalCredentialStorage();
+  }, []);
+
+  useEffect(() => {
+    if (!agent?.id || !user?.id) {
+      setCredentialMounts([]);
+      return;
+    }
     const sessions = loadTerminalSessions(agent.id);
     setTerminalSessions(sessions);
     setActiveSessionId((current) => (
       sessions.some((session) => session.id === current) ? current : sessions[0]?.id ?? DEFAULT_TERMINAL_SESSION_ID
     ));
-    setCredentialMounts(loadCredentialMounts(agent.id));
+    setCredentialMounts(loadTerminalCredentialMounts(user.id, agent.id));
     setShowCredentials(false);
-  }, [agent?.id]);
+  }, [agent?.id, user?.id]);
 
   const updateTerminalSessions = useCallback((updater: (sessions: TerminalSession[]) => TerminalSession[]) => {
     if (!agent?.id) return;
@@ -388,15 +356,15 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
   const updateCredentialMounts = useCallback((
     updater: (mounts: TerminalCredentialMount[]) => TerminalCredentialMount[],
   ) => {
-    if (!agent?.id) return;
+    if (!agent?.id || !user?.id) return;
     setCredentialMounts((current) => {
       const next = updater(current);
-      persistCredentialMounts(agent.id, next);
+      persistTerminalCredentialMounts(user.id, agent.id, next);
       return next;
     });
-  }, [agent?.id]);
+  }, [agent?.id, user?.id]);
 
-  const addCredentialMount = useCallback((scope: CredentialScope) => {
+  const addCredentialMount = useCallback((scope: TerminalCredentialScope) => {
     updateCredentialMounts((mounts) => [
       ...mounts,
       {
@@ -891,7 +859,7 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
                   <select
                     value={mount.scope}
                     onChange={(event) => patchCredentialMount(mount.id, {
-                      scope: event.target.value as CredentialScope,
+                      scope: event.target.value as TerminalCredentialScope,
                       agentId: event.target.value === 'agent' ? agent?.id : undefined,
                     })}
                     className="h-8 rounded-md border border-[var(--border-default)] bg-[var(--bg-elevated)] px-2 text-xs text-[var(--text-secondary)] outline-none"

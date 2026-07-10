@@ -25,8 +25,11 @@ const RATE_LIMIT_WINDOW_MS = 60_000;
 const READ_RATE_LIMIT_MAX = 120;
 const WRITE_RATE_LIMIT_MAX = 20;
 const SOLANA_RPC_UPSTREAM_TIMEOUT_MS = 15_000;
+const RATE_BUCKET_SWEEP_INTERVAL_MS = 60_000;
+const MAX_RATE_BUCKETS = 10_000;
 
 const rateBuckets = new Map<string, { count: number; resetAt: number }>();
+let lastRateBucketSweep = 0;
 
 export async function POST(request: NextRequest) {
   const requestOrigins = publicSiteOrigins(request);
@@ -75,11 +78,7 @@ export async function POST(request: NextRequest) {
   const timeout = setTimeout(() => controller.abort(), SOLANA_RPC_UPSTREAM_TIMEOUT_MS);
   let upstream: Response;
   try {
-    upstream = await fetch(upstreamRpc(shouldUsePaidSolanaRpc(
-      authorization,
-      process.env,
-      { trustedBrowserRequest: isTrustedBrowserRequest },
-    )), {
+    upstream = await fetch(upstreamRpc(shouldUsePaidSolanaRpc(authorization)), {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body,
@@ -141,6 +140,7 @@ function clientRateKey(request: NextRequest): string {
 }
 
 function consumeRateLimit(key: string, max: number, now = Date.now()): boolean {
+  sweepExpiredRateBuckets(now);
   const existing = rateBuckets.get(key);
   if (!existing || existing.resetAt <= now) {
     rateBuckets.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
@@ -149,6 +149,24 @@ function consumeRateLimit(key: string, max: number, now = Date.now()): boolean {
   if (existing.count >= max) return false;
   existing.count++;
   return true;
+}
+
+function sweepExpiredRateBuckets(now: number): void {
+  if (
+    rateBuckets.size < MAX_RATE_BUCKETS
+    && now - lastRateBucketSweep < RATE_BUCKET_SWEEP_INTERVAL_MS
+  ) return;
+
+  for (const [key, bucket] of rateBuckets) {
+    if (bucket.resetAt <= now) rateBuckets.delete(key);
+  }
+  lastRateBucketSweep = now;
+
+  while (rateBuckets.size > MAX_RATE_BUCKETS) {
+    const oldestKey = rateBuckets.keys().next().value as string | undefined;
+    if (!oldestKey) break;
+    rateBuckets.delete(oldestKey);
+  }
 }
 
 function jsonRpcError(id: unknown, code: number, message: string, status: number) {

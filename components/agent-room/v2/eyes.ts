@@ -257,6 +257,7 @@ export function normalizeRoomEyesConfig(
 
 export function normalizeRoomEyesLiveFeed(value: unknown): RoomEyesLiveFeed {
   const record = asRecord(value);
+  const state = normalizeLiveState(record.state);
   const rawLines = Array.isArray(record.lines) ? record.lines : [];
   const updatedAt =
     typeof record.updatedAt === 'number' && Number.isFinite(record.updatedAt)
@@ -284,8 +285,10 @@ export function normalizeRoomEyesLiveFeed(value: unknown): RoomEyesLiveFeed {
     updatedAt,
     messagesToday,
     uptimeSec,
-    state: normalizeLiveState(record.state),
-    screenshot: normalizeLiveScreenshot(record.screenshot),
+    state,
+    screenshot: state?.publicSafe === true
+      ? normalizeLiveScreenshot(record.screenshot)
+      : undefined,
   };
 }
 

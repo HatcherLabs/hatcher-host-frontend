@@ -1,12 +1,3 @@
-const GOOGLE_ADS_HOSTS = [
-  'https://www.googletagmanager.com',
-  'https://www.google-analytics.com',
-  'https://www.google.com',
-  'https://googleads.g.doubleclick.net',
-  'https://www.googleadservices.com',
-  'https://pagead2.googlesyndication.com',
-].join(' ');
-
 const MIRARI_HOST = 'https://entermirari.cloud';
 const DEFAULT_LOCAL_API_URL = 'http://localhost:3001';
 
@@ -42,15 +33,15 @@ export function buildCsp(nonce: string, isEmbedRoute: boolean): string {
     : `style-src-elem 'self' 'nonce-${nonce}' https://fonts.googleapis.com`;
   const parts = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'wasm-unsafe-eval' https://s3.tradingview.com ${GOOGLE_ADS_HOSTS}${scriptDev}`,
+    `script-src 'self' 'nonce-${nonce}' 'wasm-unsafe-eval' https://s3.tradingview.com${scriptDev}`,
     "worker-src 'self' blob:",
     styleSrc,
     styleSrcElem,
     "style-src-attr 'unsafe-inline'",
     "font-src 'self' https://fonts.gstatic.com",
-    `img-src 'self' data: blob: https: ${MIRARI_HOST} ${GOOGLE_ADS_HOSTS}`,
-    `media-src 'self' data: blob: https: ${GOOGLE_ADS_HOSTS}`,
-    `connect-src 'self' blob: https://api.hatcher.host wss://api.hatcher.host ${MIRARI_HOST} https://*.solana.com wss://*.solana.com https://*.helius-rpc.com wss://*.helius-rpc.com https://api.dexscreener.com https://threejs.org ${GOOGLE_ADS_HOSTS}${apiConnect}${devConnect}`,
+    `img-src 'self' data: blob: https: ${MIRARI_HOST}`,
+    "media-src 'self' data: blob: https:",
+    `connect-src 'self' blob: https://api.hatcher.host wss://api.hatcher.host ${MIRARI_HOST} https://*.solana.com wss://*.solana.com https://*.helius-rpc.com wss://*.helius-rpc.com https://api.dexscreener.com https://threejs.org${apiConnect}${devConnect}`,
     `frame-src 'self' ${MIRARI_HOST} https://www.tradingview.com https://s.tradingview.com https://tradingview.com https://www.tradingview-widget.com https://www.geckoterminal.com https://geckoterminal.com https://dexscreener.com https://www.dexscreener.com`,
     "base-uri 'self'",
     "form-action 'self'",

@@ -12,7 +12,7 @@
 //
 // The hook is intentionally thin:
 //   - knows how to connect the wallet-adapter,
-//   - fetches SOL / $HATCHER / $KAUSA / $ANSEM rates from /prices,
+//   - validates the server-issued payer/recipient/mint/amount quote,
 //   - opens the confirm modal via state and awaits the user's click,
 //   - calls payWithSol / payWithSplToken,
 //   - returns the resulting tx signature (or throws on cancel/error).
@@ -25,9 +25,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
-import { api } from '@/lib/api';
-import { payWithSol, payWithSplToken, quoteSolForUsd } from '@/lib/solana-payments';
+import { payWithSol, payWithSplToken, validateSolanaPaymentQuote } from '@/lib/solana-payments';
 import type { ConfirmPaymentModalState } from '@/components/payments/ConfirmPaymentModal';
+import type { SolanaPaymentQuote } from '@/lib/api/types';
 
 export type PaymentRail = 'sol' | 'usdc' | 'hatch' | 'kausa' | 'ansem';
 
@@ -40,20 +40,19 @@ export interface UsePaymentDrivers {
   confirmState: ConfirmPaymentModalState;
   /** Fire this as the modal's onClose handler. */
   closeConfirm: (approved: boolean) => void;
-  /** SOL → treasury. Live Jupiter quote, 1% buffer for slippage. */
-  driveSol: (usdAmount: number, label: string, options?: PaymentDriverOptions) => Promise<string>;
-  /** USDC (1:1 pegged) → treasury SPL ATA, or an explicit x402 recipient. */
-  driveUsdc: (usdAmount: number, label: string, recipientWallet?: string, options?: PaymentDriverOptions) => Promise<string>;
+  /** SOL payment using the server-bound amount and recipient. */
+  driveSol: (quote: SolanaPaymentQuote, label: string, options?: PaymentDriverOptions) => Promise<string>;
+  /** USDC payment using the server-bound amount, mint, and recipient. */
+  driveUsdc: (quote: SolanaPaymentQuote, label: string, options?: PaymentDriverOptions) => Promise<string>;
   /**
-   * $HATCHER → 90% to treasury + 10% burn in the same signed tx. Live
-   * Jupiter quote with 1% buffer. On-chain proof of burn visible to the
-   * buyer before signing (breakdown in the confirm modal).
+   * $HATCHER → 90% to the quoted recipient + 10% burn in the same signed
+   * transaction. The server's Jupiter quote is used without re-pricing.
    */
-  driveHatch: (usdAmount: number, label: string, options?: PaymentDriverOptions) => Promise<string>;
-  /** $KAUSA → treasury SPL ATA. Live Jupiter quote with 1% buffer. */
-  driveKausa: (usdAmount: number, label: string, options?: PaymentDriverOptions) => Promise<string>;
-  /** $ANSEM → 90% to treasury + 10% burn. Live Jupiter quote with 1% buffer. */
-  driveAnsem: (usdAmount: number, label: string, options?: PaymentDriverOptions) => Promise<string>;
+  driveHatch: (quote: SolanaPaymentQuote, label: string, options?: PaymentDriverOptions) => Promise<string>;
+  /** $KAUSA payment using the server-bound amount, mint, and recipient. */
+  driveKausa: (quote: SolanaPaymentQuote, label: string, options?: PaymentDriverOptions) => Promise<string>;
+  /** $ANSEM → 90% to the quoted recipient + 10% burn. */
+  driveAnsem: (quote: SolanaPaymentQuote, label: string, options?: PaymentDriverOptions) => Promise<string>;
   /** Open the wallet-select modal so the user can connect / switch. */
   openWalletModal: () => void;
   /** Disconnect + re-prompt. Use when the wallet is stuck after the
@@ -64,6 +63,8 @@ export interface UsePaymentDrivers {
   /** Currently-connected address in base58, or null when disconnected. */
   address: string | null;
   connected: boolean;
+  /** Ensure a wallet is connected and return the payer address for a server intent. */
+  ensurePaymentWallet: () => Promise<string>;
 }
 
 export function usePaymentDrivers(): UsePaymentDrivers {
@@ -142,6 +143,13 @@ export function usePaymentDrivers(): UsePaymentDrivers {
     }
   }, [setWalletModalVisible]);
 
+  const ensurePaymentWallet = useCallback(async (): Promise<string> => {
+    await ensureConnected();
+    const publicKey = walletRef.current.publicKey;
+    if (!publicKey) throw new Error('Connect a Solana wallet first');
+    return publicKey.toBase58();
+  }, [ensureConnected]);
+
   // Matches the Phantom "trust revoked" error that fires when the user
   // disconnected the site from the extension but the adapter still
   // thinks it's connected. Deliberately NARROW — we must NOT match
@@ -160,16 +168,14 @@ export function usePaymentDrivers(): UsePaymentDrivers {
     return /User rejected|User denied|cancelled|canceled/i.test(msg);
   };
 
-  const driveSol = useCallback(async (usdAmount: number, label: string, options: PaymentDriverOptions = {}): Promise<string> => {
+  const driveSol = useCallback(async (quote: SolanaPaymentQuote, label: string, options: PaymentDriverOptions = {}): Promise<string> => {
     await ensureConnected();
-    const priceRes = await api.getPrice('sol');
-    if (!priceRes.success || !priceRes.data?.price) {
-      throw new Error('Could not fetch live SOL price — try again in a moment');
-    }
-    const quote = quoteSolForUsd(usdAmount, priceRes.data.price);
+    const payer = walletRef.current.publicKey!.toBase58();
+    validateSolanaPaymentQuote(quote, 'sol', payer);
     const approved = await askConfirm({
-      token: 'sol', label, usdAmount,
-      tokenAmount: quote.solAmount, rate: quote.solUsdPrice,
+      token: 'sol', label, usdAmount: quote.amountUsd,
+      tokenAmount: quote.expectedAmount, rate: quote.amountUsd / quote.expectedAmount,
+      recipientWallet: quote.recipientWallet,
     });
     if (!approved) throw new Error('Cancelled');
     try {
@@ -185,16 +191,18 @@ export function usePaymentDrivers(): UsePaymentDrivers {
     }
   }, [connection, ensureConnected, askConfirm, forceReconnect]);
 
-  const driveUsdc = useCallback(async (usdAmount: number, label: string, recipientWallet?: string, options: PaymentDriverOptions = {}): Promise<string> => {
+  const driveUsdc = useCallback(async (quote: SolanaPaymentQuote, label: string, options: PaymentDriverOptions = {}): Promise<string> => {
     await ensureConnected();
+    validateSolanaPaymentQuote(quote, 'usdc', walletRef.current.publicKey!.toBase58());
     const approved = await askConfirm({
-      token: 'usdc', label, usdAmount,
-      tokenAmount: usdAmount, rate: 1,
+      token: 'usdc', label, usdAmount: quote.amountUsd,
+      tokenAmount: quote.expectedAmount, rate: quote.amountUsd / quote.expectedAmount,
+      recipientWallet: quote.recipientWallet,
     });
     if (!approved) throw new Error('Cancelled');
     try {
       const { signature } = await payWithSplToken({
-        wallet: walletRef.current, connection, mint: 'usdc', amountHuman: usdAmount, recipientWallet, onSignature: options.onSignature,
+        wallet: walletRef.current, connection, mint: 'usdc', quote, onSignature: options.onSignature,
       });
       return signature;
     } catch (e) {
@@ -202,29 +210,26 @@ export function usePaymentDrivers(): UsePaymentDrivers {
       if (!isTrustRevokedError(e)) throw e;
       await forceReconnect();
       const { signature } = await payWithSplToken({
-        wallet: walletRef.current, connection, mint: 'usdc', amountHuman: usdAmount, recipientWallet, onSignature: options.onSignature,
+        wallet: walletRef.current, connection, mint: 'usdc', quote, onSignature: options.onSignature,
       });
       return signature;
     }
   }, [connection, ensureConnected, askConfirm, forceReconnect]);
 
-  const driveHatch = useCallback(async (usdAmount: number, label: string, options: PaymentDriverOptions = {}): Promise<string> => {
+  const driveHatch = useCallback(async (quote: SolanaPaymentQuote, label: string, options: PaymentDriverOptions = {}): Promise<string> => {
     await ensureConnected();
-    const priceRes = await api.getPrice('hatch');
-    if (!priceRes.success || !priceRes.data?.price) {
-      throw new Error('Could not fetch live $HATCHER price — try again in a moment');
-    }
-    const hatchAmount = (usdAmount / priceRes.data.price) * 1.01;
-    const burnAmount = hatchAmount * 0.1;
+    validateSolanaPaymentQuote(quote, 'hatch', walletRef.current.publicKey!.toBase58());
+    const burnAmount = quote.expectedAmount * 0.1;
     const approved = await askConfirm({
-      token: 'hatch', label, usdAmount,
-      tokenAmount: hatchAmount, rate: priceRes.data.price,
-      burnAmount, treasuryAmount: hatchAmount - burnAmount,
+      token: 'hatch', label, usdAmount: quote.amountUsd,
+      tokenAmount: quote.expectedAmount, rate: quote.amountUsd / quote.expectedAmount,
+      burnAmount, treasuryAmount: quote.expectedAmount - burnAmount,
+      recipientWallet: quote.recipientWallet,
     });
     if (!approved) throw new Error('Cancelled');
     try {
       const { signature } = await payWithSplToken({
-        wallet: walletRef.current, connection, mint: 'hatch', amountHuman: hatchAmount, onSignature: options.onSignature,
+        wallet: walletRef.current, connection, mint: 'hatch', quote, onSignature: options.onSignature,
       });
       return signature;
     } catch (e) {
@@ -232,27 +237,24 @@ export function usePaymentDrivers(): UsePaymentDrivers {
       if (!isTrustRevokedError(e)) throw e;
       await forceReconnect();
       const { signature } = await payWithSplToken({
-        wallet: walletRef.current, connection, mint: 'hatch', amountHuman: hatchAmount, onSignature: options.onSignature,
+        wallet: walletRef.current, connection, mint: 'hatch', quote, onSignature: options.onSignature,
       });
       return signature;
     }
   }, [connection, ensureConnected, askConfirm, forceReconnect]);
 
-  const driveKausa = useCallback(async (usdAmount: number, label: string, options: PaymentDriverOptions = {}): Promise<string> => {
+  const driveKausa = useCallback(async (quote: SolanaPaymentQuote, label: string, options: PaymentDriverOptions = {}): Promise<string> => {
     await ensureConnected();
-    const priceRes = await api.getPrice('kausa');
-    if (!priceRes.success || !priceRes.data?.price) {
-      throw new Error('Could not fetch live $KAUSA price — try again in a moment');
-    }
-    const kausaAmount = (usdAmount / priceRes.data.price) * 1.01;
+    validateSolanaPaymentQuote(quote, 'kausa', walletRef.current.publicKey!.toBase58());
     const approved = await askConfirm({
-      token: 'kausa', label, usdAmount,
-      tokenAmount: kausaAmount, rate: priceRes.data.price,
+      token: 'kausa', label, usdAmount: quote.amountUsd,
+      tokenAmount: quote.expectedAmount, rate: quote.amountUsd / quote.expectedAmount,
+      recipientWallet: quote.recipientWallet,
     });
     if (!approved) throw new Error('Cancelled');
     try {
       const { signature } = await payWithSplToken({
-        wallet: walletRef.current, connection, mint: 'kausa', amountHuman: kausaAmount, onSignature: options.onSignature,
+        wallet: walletRef.current, connection, mint: 'kausa', quote, onSignature: options.onSignature,
       });
       return signature;
     } catch (e) {
@@ -260,29 +262,26 @@ export function usePaymentDrivers(): UsePaymentDrivers {
       if (!isTrustRevokedError(e)) throw e;
       await forceReconnect();
       const { signature } = await payWithSplToken({
-        wallet: walletRef.current, connection, mint: 'kausa', amountHuman: kausaAmount, onSignature: options.onSignature,
+        wallet: walletRef.current, connection, mint: 'kausa', quote, onSignature: options.onSignature,
       });
       return signature;
     }
   }, [connection, ensureConnected, askConfirm, forceReconnect]);
 
-  const driveAnsem = useCallback(async (usdAmount: number, label: string, options: PaymentDriverOptions = {}): Promise<string> => {
+  const driveAnsem = useCallback(async (quote: SolanaPaymentQuote, label: string, options: PaymentDriverOptions = {}): Promise<string> => {
     await ensureConnected();
-    const priceRes = await api.getPrice('ansem');
-    if (!priceRes.success || !priceRes.data?.price) {
-      throw new Error('Could not fetch live $ANSEM price — try again in a moment');
-    }
-    const ansemAmount = (usdAmount / priceRes.data.price) * 1.01;
-    const burnAmount = ansemAmount * 0.1;
+    validateSolanaPaymentQuote(quote, 'ansem', walletRef.current.publicKey!.toBase58());
+    const burnAmount = quote.expectedAmount * 0.1;
     const approved = await askConfirm({
-      token: 'ansem', label, usdAmount,
-      tokenAmount: ansemAmount, rate: priceRes.data.price,
-      burnAmount, treasuryAmount: ansemAmount - burnAmount,
+      token: 'ansem', label, usdAmount: quote.amountUsd,
+      tokenAmount: quote.expectedAmount, rate: quote.amountUsd / quote.expectedAmount,
+      burnAmount, treasuryAmount: quote.expectedAmount - burnAmount,
+      recipientWallet: quote.recipientWallet,
     });
     if (!approved) throw new Error('Cancelled');
     try {
       const { signature } = await payWithSplToken({
-        wallet: walletRef.current, connection, mint: 'ansem', amountHuman: ansemAmount, onSignature: options.onSignature,
+        wallet: walletRef.current, connection, mint: 'ansem', quote, onSignature: options.onSignature,
       });
       return signature;
     } catch (e) {
@@ -290,7 +289,7 @@ export function usePaymentDrivers(): UsePaymentDrivers {
       if (!isTrustRevokedError(e)) throw e;
       await forceReconnect();
       const { signature } = await payWithSplToken({
-        wallet: walletRef.current, connection, mint: 'ansem', amountHuman: ansemAmount, onSignature: options.onSignature,
+        wallet: walletRef.current, connection, mint: 'ansem', quote, onSignature: options.onSignature,
       });
       return signature;
     }
@@ -323,6 +322,7 @@ export function usePaymentDrivers(): UsePaymentDrivers {
     driveHatch,
     driveKausa,
     driveAnsem,
+    ensurePaymentWallet,
     openWalletModal,
     reconnect: forceReconnect,
     disconnect,

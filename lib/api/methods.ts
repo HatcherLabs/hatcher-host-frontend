@@ -34,6 +34,8 @@ import type {
   AgentWalletPrivateKeyResponse,
   AgentWalletsResponse,
   Payment,
+  SolanaPaymentIntent,
+  SolanaPaymentIntentRequest,
   SolanaRecurringAuthorization,
   SolanaRecurringCancelRequest,
   SolanaRecurringQuote,
@@ -129,6 +131,8 @@ import type {
   MedusaConfigStatus,
   MedusaHandoffBody,
   MedusaHandoffResponse,
+  MedusaHandoffStateBody,
+  MedusaHandoffStateResponse,
   MedusaMintBadgeBody,
   MedusaMintBadgeResponse,
   MedusaRegisterBody,
@@ -871,8 +875,14 @@ export const api = {
       body: JSON.stringify(body),
     }),
 
-  completeAgentMedusaHandoff: (id: string, body: MedusaHandoffBody) =>
-    req<MedusaHandoffResponse>(`/agents/${id}/medusa/handoff/complete`, {
+  createAgentMedusaHandoffState: (id: string, body: MedusaHandoffStateBody) =>
+    req<MedusaHandoffStateResponse>(`/agents/${id}/medusa/handoff/state`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  completeAgentMedusaHandoff: (body: MedusaHandoffBody) =>
+    req<MedusaHandoffResponse>("/agents/medusa/handoff/complete", {
       method: "POST",
       body: JSON.stringify(body),
     }),
@@ -1323,12 +1333,19 @@ export const api = {
       founding: { maxSlots: number; taken: number; remaining: number };
     }>("/features"),
 
+  createSolanaPaymentIntent: (body: SolanaPaymentIntentRequest) =>
+    req<SolanaPaymentIntent>("/payments/solana-intents", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
   /** Subscribe to a tier. Upgrades may grant prorated AI Credits for the
    *  unused portion of the current billing period.
    *  `billingPeriod='annual'` → 12 months at 15% off (server enforces). */
   subscribe: (
     tier: string,
     txSignature: string,
+    paymentIntentId: string,
     paymentToken: "sol" | "hatch" | "usdc" | "kausa" | "ansem" = "sol",
     billingPeriod: "monthly" | "annual" = "monthly",
   ) =>
@@ -1340,7 +1357,7 @@ export const api = {
       monthlyAiCreditsGranted?: number;
     }>("/features/subscribe", {
       method: "POST",
-      body: JSON.stringify({ tier, txSignature, paymentToken, billingPeriod }),
+      body: JSON.stringify({ tier, txSignature, paymentToken, billingPeriod, paymentIntentId }),
     }),
 
   /** Purchase an add-on (optionally per-agent). Subscription-type addons
@@ -1349,6 +1366,7 @@ export const api = {
   purchaseAddon: (
     addonKey: string,
     txSignature: string,
+    paymentIntentId: string,
     agentId?: string,
     paymentToken: "sol" | "hatch" | "usdc" | "kausa" | "ansem" = "sol",
     billingPeriod: "monthly" | "annual" = "monthly",
@@ -1360,6 +1378,7 @@ export const api = {
         txSignature,
         paymentToken,
         billingPeriod,
+        paymentIntentId,
         ...(agentId ? { agentId } : {}),
       }),
     }),
@@ -1377,6 +1396,7 @@ export const api = {
     source?: string;
     stage?: "clicked" | "wallet_confirmed";
     txSignature?: string;
+    paymentIntentId?: string;
   }) =>
     req<{ logged: true }>("/payments/intent-log", {
       method: "POST",

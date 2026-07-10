@@ -1,7 +1,42 @@
 import { describe, expect, it, vi } from 'vitest';
-import { Connection, Keypair, PublicKey } from '@solana/web3.js';
+import { Connection, Keypair, PublicKey, SystemInstruction, Transaction } from '@solana/web3.js';
 import type { WalletContextState } from '@solana/wallet-adapter-react';
-import { payWithSol, payWithSplToken, quoteSolForUsd } from '@/lib/solana-payments';
+import { payWithSol, payWithSplToken, validateSolanaPaymentQuote } from '@/lib/solana-payments';
+import type { SolanaPaymentQuote, SolanaPaymentToken } from '@/lib/api/types';
+import {
+  ANSEM_TOKEN_MINT,
+  HATCH_TOKEN_MINT,
+  KAUSA_TOKEN_MINT,
+  TREASURY_WALLET,
+  USDC_TOKEN_MINT,
+} from '@/lib/config';
+
+const MINTS: Record<Exclude<SolanaPaymentToken, 'sol'>, string> = {
+  usdc: USDC_TOKEN_MINT,
+  hatch: HATCH_TOKEN_MINT,
+  kausa: KAUSA_TOKEN_MINT,
+  ansem: ANSEM_TOKEN_MINT,
+};
+
+function serverQuote(
+  payerWallet: string,
+  paymentToken: SolanaPaymentToken,
+  overrides: Partial<SolanaPaymentQuote> = {},
+): SolanaPaymentQuote {
+  return {
+    intentId: 'intent-123',
+    payerWallet,
+    recipientWallet: TREASURY_WALLET,
+    tokenMint: paymentToken === 'sol' ? null : MINTS[paymentToken],
+    paymentToken,
+    amountUsd: 10,
+    expectedAmount: 10,
+    minAcceptable: 9.5,
+    memo: 'hatcher-payment:intent-123',
+    expiresAt: new Date(Date.now() + 5 * 60_000).toISOString(),
+    ...overrides,
+  };
+}
 
 function mockWallet(signature: string, calls: string[]): WalletContextState {
   return {
@@ -53,16 +88,70 @@ function mockConnection(calls: string[], tokenBalance = '1000000000000000'): Con
 }
 
 describe('Solana payment helpers', () => {
+  it('rejects substituted payer, token, or expired server quotes', () => {
+    const payer = Keypair.generate().publicKey.toBase58();
+    const otherPayer = Keypair.generate().publicKey.toBase58();
+    expect(() => validateSolanaPaymentQuote(serverQuote(payer, 'sol'), 'sol', otherPayer)).toThrow('different payer');
+    expect(() => validateSolanaPaymentQuote(serverQuote(payer, 'usdc'), 'hatch', payer)).toThrow('unexpected token');
+    expect(() => validateSolanaPaymentQuote(
+      serverQuote(payer, 'sol', { expiresAt: new Date(Date.now() - 1).toISOString() }),
+      'sol',
+      payer,
+    )).toThrow('expired');
+  });
+
+  it('rejects quotes too close to expiry or whose memo does not match the intent id', () => {
+    const payer = Keypair.generate().publicKey.toBase58();
+    expect(() => validateSolanaPaymentQuote(
+      serverQuote(payer, 'sol', { expiresAt: new Date(Date.now() + 119_999).toISOString() }),
+      'sol',
+      payer,
+    )).toThrow('too close to expiry');
+    expect(() => validateSolanaPaymentQuote(
+      serverQuote(payer, 'sol', { memo: 'hatcher-payment:different-intent' }),
+      'sol',
+      payer,
+    )).toThrow('invalid memo');
+  });
+
+  it('uses the exact SOL amount and recipient from the server quote', async () => {
+    const calls: string[] = [];
+    const payer = Keypair.generate();
+    const recipient = Keypair.generate().publicKey;
+    const transfers: Array<ReturnType<typeof SystemInstruction.decodeTransfer>> = [];
+    const wallet = {
+      publicKey: payer.publicKey,
+      sendTransaction: vi.fn(async (transaction: Transaction) => {
+        transfers.push(SystemInstruction.decodeTransfer(transaction.instructions[0]));
+        calls.push('send');
+        return 'exact-sol-signature';
+      }),
+    } as unknown as WalletContextState;
+
+    await expect(payWithSol({
+      wallet,
+      connection: mockConnection(calls),
+      quote: serverQuote(payer.publicKey.toBase58(), 'sol', {
+        recipientWallet: recipient.toBase58(),
+        expectedAmount: 0.123456789,
+        minAcceptable: 0.12,
+      }),
+    })).rejects.toThrow('confirmation expired after broadcast');
+
+    expect(transfers[0].toPubkey.toBase58()).toBe(recipient.toBase58());
+    expect(transfers[0].lamports).toBe(123_456_789n);
+  });
+
   it('uses wallet signing plus app RPC broadcast when signTransaction is available', async () => {
     const calls: string[] = [];
-    const { wallet } = mockSigningWallet(calls);
+    const { wallet, keypair } = mockSigningWallet(calls);
     const connection = mockConnection(calls);
 
     await expect(
       payWithSol({
         wallet,
         connection,
-        quote: quoteSolForUsd(10, 100),
+        quote: serverQuote(keypair.publicKey.toBase58(), 'sol', { expectedAmount: 0.1, minAcceptable: 0.095 }),
         onSignature: (value) => calls.push(`signature:${value}`),
       }),
     ).rejects.toThrow('confirmation expired after broadcast');
@@ -73,15 +162,42 @@ describe('Solana payment helpers', () => {
     expect(calls).toEqual(['sign', 'broadcast', 'signature:raw-signature-123', 'confirm']);
   });
 
+  it('does not broadcast when the quote expires while the wallet approval is open', async () => {
+    let now = new Date('2026-07-10T10:00:00.000Z').getTime();
+    const dateNow = vi.spyOn(Date, 'now').mockImplementation(() => now);
+    const calls: string[] = [];
+    const { wallet, keypair } = mockSigningWallet(calls);
+    vi.mocked(wallet.signTransaction!).mockImplementationOnce(async (tx) => {
+      calls.push('sign');
+      if (!(tx instanceof Transaction)) throw new Error('Expected a legacy transaction');
+      tx.partialSign(keypair);
+      now += 181_000;
+      return tx;
+    });
+    const connection = mockConnection(calls);
+
+    await expect(payWithSol({
+      wallet,
+      connection,
+      quote: serverQuote(keypair.publicKey.toBase58(), 'sol', {
+        expiresAt: new Date(now + 180_000).toISOString(),
+      }),
+    })).rejects.toThrow('expired');
+    dateNow.mockRestore();
+
+    expect(connection.sendRawTransaction).not.toHaveBeenCalled();
+  });
+
   it('emits the SOL signature before confirmation can fail', async () => {
     const calls: string[] = [];
     const signature = 'sol-signature-123';
 
+    const wallet = mockWallet(signature, calls);
     await expect(
       payWithSol({
-        wallet: mockWallet(signature, calls),
+        wallet,
         connection: mockConnection(calls),
-        quote: quoteSolForUsd(10, 100),
+        quote: serverQuote(wallet.publicKey!.toBase58(), 'sol', { expectedAmount: 0.1, minAcceptable: 0.095 }),
         onSignature: (value) => calls.push(`signature:${value}`),
       }),
     ).rejects.toThrow('confirmation expired after broadcast');
@@ -89,16 +205,41 @@ describe('Solana payment helpers', () => {
     expect(calls).toEqual(['send', `signature:${signature}`, 'confirm']);
   });
 
+  it('adds the server-issued payment intent memo to the transaction', async () => {
+    const calls: string[] = [];
+    let memo: string | null = null;
+    const wallet = {
+      publicKey: Keypair.generate().publicKey,
+      sendTransaction: vi.fn(async (transaction: Transaction) => {
+        const memoInstruction = transaction.instructions.find((instruction) => (
+          instruction.programId.toBase58() === 'MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr'
+        ));
+        memo = memoInstruction?.data.toString('utf8') ?? null;
+        calls.push('send');
+        return 'memo-signature';
+      }),
+    } as unknown as WalletContextState;
+
+    await expect(payWithSol({
+      wallet,
+      connection: mockConnection(calls),
+      quote: serverQuote(wallet.publicKey!.toBase58(), 'sol'),
+    })).rejects.toThrow('confirmation expired after broadcast');
+
+    expect(memo).toBe('hatcher-payment:intent-123');
+  });
+
   it('emits the SPL signature before confirmation can fail', async () => {
     const calls: string[] = [];
     const signature = 'spl-signature-456';
+    const wallet = mockWallet(signature, calls);
 
     await expect(
       payWithSplToken({
-        wallet: mockWallet(signature, calls),
+        wallet,
         connection: mockConnection(calls),
         mint: 'hatch',
-        amountHuman: 10,
+        quote: serverQuote(wallet.publicKey!.toBase58(), 'hatch'),
         onSignature: (value) => calls.push(`signature:${value}`),
       }),
     ).rejects.toThrow('confirmation expired after broadcast');
@@ -108,13 +249,14 @@ describe('Solana payment helpers', () => {
 
   it('fails before wallet signing when SPL balance is too low', async () => {
     const calls: string[] = [];
+    const wallet = mockWallet('not-sent', calls);
 
     await expect(
       payWithSplToken({
-        wallet: mockWallet('not-sent', calls),
+        wallet,
         connection: mockConnection(calls, '123'),
         mint: 'usdc',
-        amountHuman: 10,
+        quote: serverQuote(wallet.publicKey!.toBase58(), 'usdc'),
       }),
     ).rejects.toThrow('Insufficient USDC balance');
 
@@ -158,7 +300,7 @@ describe('Solana payment helpers', () => {
         wallet,
         connection,
         mint: 'usdc',
-        amountHuman: 10,
+        quote: serverQuote(owner.toBase58(), 'usdc'),
         onSignature: (value) => calls.push(`signature:${value}`),
       }),
     ).rejects.toThrow('confirmation expired after broadcast');
@@ -208,7 +350,7 @@ describe('Solana payment helpers', () => {
         wallet,
         connection,
         mint: 'kausa',
-        amountHuman: 10,
+        quote: serverQuote(owner.toBase58(), 'kausa'),
         onSignature: (value) => calls.push(`signature:${value}`),
       }),
     ).rejects.toThrow('confirmation expired after broadcast');
@@ -241,20 +383,21 @@ describe('Solana payment helpers', () => {
         wallet,
         connection,
         mint: 'ansem',
-        amountHuman: 10,
+        quote: serverQuote(owner.toBase58(), 'ansem'),
         onSignature: (value) => calls.push(`signature:${value}`),
       }),
     ).rejects.toThrow('confirmation expired after broadcast');
 
     const token2022 = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
     expect(sentTransactions).toHaveLength(1);
-    expect(sentTransactions[0].instructions).toHaveLength(2);
+    expect(sentTransactions[0].instructions).toHaveLength(3);
     expect(sentTransactions[0].instructions[0].programId.equals(token2022)).toBe(true);
     expect(sentTransactions[0].instructions[1].programId.equals(token2022)).toBe(true);
     expect(sentTransactions[0].instructions[0].data[0]).toBe(3);
     expect(sentTransactions[0].instructions[0].data.readBigUInt64LE(1)).toBe(9_000_000n);
     expect(sentTransactions[0].instructions[1].data[0]).toBe(8);
     expect(sentTransactions[0].instructions[1].data.readBigUInt64LE(1)).toBe(1_000_000n);
+    expect(sentTransactions[0].instructions[2].programId.toBase58()).toBe('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
     expect(calls).toEqual(['send', `signature:${signature}`, 'confirm']);
   });
 });

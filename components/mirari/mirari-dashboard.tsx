@@ -213,7 +213,7 @@ export function MirariDashboard(props: MirariDashboardProps) {
       }}
       sandbox="allow-scripts allow-same-origin"
       allow="clipboard-write"
-      referrerPolicy="strict-origin-when-cross-origin"
+      referrerPolicy="no-referrer"
       loading="lazy"
     />
   );

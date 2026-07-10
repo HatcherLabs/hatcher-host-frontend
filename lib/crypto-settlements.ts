@@ -5,6 +5,8 @@ import {
   settleSolanaX402Payment,
   type PaymentTarget,
   type SettleResult,
+  type SolanaX402Network,
+  SOLANA_MAINNET_CAIP2,
 } from '@/lib/solana-x402-client';
 
 export type PendingPaymentRail = 'sol' | 'hatch' | 'usdc' | 'kausa' | 'ansem';
@@ -18,6 +20,8 @@ export interface PendingCryptoSettlement {
   billingPeriod: 'monthly' | 'annual';
   amountUsd: number;
   txSignature: string;
+  paymentIntentId: string;
+  x402Network?: SolanaX402Network;
   userId?: string;
   agentId?: string;
   createdAt: number;
@@ -31,7 +35,7 @@ export type CryptoSettlementResult =
   | { success: false; error: string };
 
 const STORAGE_KEY = 'hatcher.pendingCryptoSettlements.v1';
-const MAX_SETTLEMENT_AGE_MS = 35 * 60 * 1000;
+const MAX_SETTLEMENT_AGE_MS = 24 * 60 * 60 * 1000;
 
 function storage(): Storage | null {
   if (typeof window === 'undefined') return null;
@@ -61,6 +65,8 @@ function normalizePending(raw: unknown): PendingCryptoSettlement | null {
     (item.flow !== 'tier' && item.flow !== 'addon') ||
     typeof item.targetKey !== 'string' ||
     typeof item.txSignature !== 'string' ||
+    typeof item.paymentIntentId !== 'string' ||
+    (item.rail === 'usdc' && item.x402Network !== SOLANA_MAINNET_CAIP2) ||
     (item.billingPeriod !== 'monthly' && item.billingPeriod !== 'annual') ||
     typeof item.createdAt !== 'number'
   ) {
@@ -84,6 +90,8 @@ function normalizePending(raw: unknown): PendingCryptoSettlement | null {
     billingPeriod: item.billingPeriod,
     amountUsd: typeof item.amountUsd === 'number' ? item.amountUsd : 0,
     txSignature: item.txSignature,
+    paymentIntentId: item.paymentIntentId,
+    ...(item.x402Network === SOLANA_MAINNET_CAIP2 ? { x402Network: item.x402Network } : {}),
     ...(typeof item.userId === 'string' ? { userId: item.userId } : {}),
     ...(typeof item.agentId === 'string' ? { agentId: item.agentId } : {}),
     createdAt: item.createdAt,
@@ -127,7 +135,12 @@ export function readPendingCryptoSettlements(userId?: string): PendingCryptoSett
 function writePendingCryptoSettlements(items: PendingCryptoSettlement[]): void {
   const store = storage();
   if (!store) return;
-  store.setItem(STORAGE_KEY, JSON.stringify(items));
+  try {
+    store.setItem(STORAGE_KEY, JSON.stringify(items));
+  } catch {
+    // Immediate settlement must continue after broadcast even when storage is
+    // blocked or full. The caller still retains the in-memory pending object.
+  }
 }
 
 export function upsertPendingCryptoSettlement(item: PendingCryptoSettlement): void {
@@ -159,6 +172,9 @@ export function shouldDropPendingCryptoSettlement(error: string): boolean {
 
 export async function settlePendingCryptoPayment(item: PendingCryptoSettlement): Promise<CryptoSettlementResult> {
   if (item.rail === 'usdc') {
+    if (item.x402Network !== SOLANA_MAINNET_CAIP2) {
+      return { success: false, error: 'Missing intent-bound Solana x402 network' };
+    }
     const target: PaymentTarget = item.flow === 'tier'
       ? { kind: 'tier', key: item.targetKey as PaymentTarget['key'], billingPeriod: item.billingPeriod }
       : {
@@ -168,7 +184,12 @@ export async function settlePendingCryptoPayment(item: PendingCryptoSettlement):
           ...(item.agentId ? { agentId: item.agentId } : {}),
         };
     try {
-      const data: SettleResult = await settleSolanaX402Payment(target, item.txSignature);
+      const data: SettleResult = await settleSolanaX402Payment(
+        target,
+        item.txSignature,
+        item.paymentIntentId,
+        item.x402Network,
+      );
       return { success: true, data };
     } catch (error) {
       return { success: false, error: error instanceof Error ? error.message : 'Payment settlement failed' };
@@ -176,12 +197,19 @@ export async function settlePendingCryptoPayment(item: PendingCryptoSettlement):
   }
 
   if (item.flow === 'tier') {
-    return api.subscribe(item.targetKey, item.txSignature, item.rail, item.billingPeriod);
+    return api.subscribe(
+      item.targetKey,
+      item.txSignature,
+      item.paymentIntentId,
+      item.rail,
+      item.billingPeriod,
+    );
   }
 
   return api.purchaseAddon(
     item.targetKey,
     item.txSignature,
+    item.paymentIntentId,
     item.agentId,
     item.rail,
     item.billingPeriod,

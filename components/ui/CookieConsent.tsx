@@ -24,6 +24,15 @@ import { usePathname } from 'next/navigation';
 // so it must use plain next/link — the i18n Link's useLocale call would throw
 // "No intl context found" on bare routes (/privacy, /terms, /cookies, /impressum).
 import Link from 'next/link';
+import {
+  getAnalyticsConsentStatus,
+  isDoNotTrackEnabled,
+  persistAnalyticsConsent,
+  readAnalyticsConsent,
+  syncAnalyticsConsentCookie,
+  type AnalyticsConsentState,
+  type AnalyticsConsentStatus,
+} from '@/lib/analytics-consent';
 
 // Routes that take over the full viewport and shouldn't show a
 // consent banner blocking the canvas. The pathname here still has
@@ -32,85 +41,12 @@ import Link from 'next/link';
 const IMMERSIVE_RE = /\/agent\/[^/]+\/room(?:-legacy)?(?:\/|$)/;
 import { Shield, BarChart3, Cookie as CookieIcon } from 'lucide-react';
 
-const CONSENT_KEY = 'hatcher-cookie-consent';
-const CONSENT_VERSION = 2; // bump when categories change so the banner re-prompts
-
-export interface ConsentState {
-  version: number;
-  necessary: true; // always true — can't opt out
-  analytics: boolean;
-  decidedAt: string; // ISO timestamp
-}
-
-export type ConsentStatus = 'accepted-all' | 'essential-only' | 'custom' | null;
-
-const ESSENTIAL_ONLY: ConsentState = {
-  version: CONSENT_VERSION,
-  necessary: true,
-  analytics: false,
-  decidedAt: new Date(0).toISOString(),
-};
-
-function readConsent(): ConsentState | null {
-  if (typeof window === 'undefined') return null;
-  const raw = localStorage.getItem(CONSENT_KEY);
-  if (!raw) return null;
-  try {
-    const parsed = JSON.parse(raw) as ConsentState;
-    if (parsed.version !== CONSENT_VERSION) return null; // schema changed → re-prompt
-    return parsed;
-  } catch {
-    return null;
-  }
-}
-
-function writeConsent(state: ConsentState) {
-  try {
-    localStorage.setItem(CONSENT_KEY, JSON.stringify(state));
-    // Global event so any subsystem listening (PostHog, Sentry) can react.
-    window.dispatchEvent(new CustomEvent('hatcher:consent-changed', { detail: state }));
-  } catch { /* storage disabled */ }
-}
-
 /** Read current consent; returns false if the user never decided
  *  OR if their choice was decline-analytics. */
-export function hasAnalyticsConsent(): boolean {
-  return readConsent()?.analytics === true;
-}
-
-export function getConsentStatus(): ConsentStatus {
-  const c = readConsent();
-  if (!c) return null;
-  if (c.analytics) return 'accepted-all';
-  return 'essential-only';
-}
-
-function initPostHogIfConsented(state: ConsentState) {
-  if (!state.analytics) return;
-  try {
-    // posthog-js is lazy to avoid blocking first paint + to respect consent.
-    const posthog = require('posthog-js').default;
-    if (posthog && !posthog.__loaded) {
-      const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
-      if (!key) return;
-      posthog.init(key, {
-        api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
-        person_profiles: 'identified_only',
-        capture_pageview: true,
-        capture_pageleave: true,
-      });
-    } else if (posthog && posthog.__loaded) {
-      posthog.opt_in_capturing();
-    }
-  } catch { /* module not installed */ }
-}
-
-function optOutPostHog() {
-  try {
-    const posthog = require('posthog-js').default;
-    if (posthog && posthog.__loaded) posthog.opt_out_capturing();
-  } catch { /* noop */ }
-}
+export { hasAnalyticsConsent } from '@/lib/analytics-consent';
+export type ConsentState = AnalyticsConsentState;
+export type ConsentStatus = AnalyticsConsentStatus;
+export const getConsentStatus = getAnalyticsConsentStatus;
 
 export function CookieConsent() {
   const pathname = usePathname();
@@ -120,27 +56,25 @@ export function CookieConsent() {
   const [analyticsChoice, setAnalyticsChoice] = useState(false);
 
   useEffect(() => {
-    const current = readConsent();
+    const current = readAnalyticsConsent();
     if (current) {
       // Already decided — honor the stored choice.
-      if (current.analytics) initPostHogIfConsented(current);
+      syncAnalyticsConsentCookie();
       return;
     }
     // Honor DNT: if the browser sends Do-Not-Track, don't show the
     // banner and don't load analytics. Crucially, we do NOT write a
     // consent record here — if the user previously opted IN explicitly
     // (e.g., via Settings) and we later bump the schema version, their
-    // old record becomes stale and readConsent returns null, landing us
-    // here. Writing ESSENTIAL_ONLY would silently override their
+    // old record becomes stale and readAnalyticsConsent returns null, landing us
+    // here. Writing an essential-only record would silently override their
     // explicit opt-in. By NOT writing, we leave the stale record on
     // disk (harmless — version mismatch means it's ignored) and let
     // the user re-opt-in via Settings if they want. Analytics stays
-    // off either way because readConsent returned null → PostHog
+    // off either way because readAnalyticsConsent returned null → PostHog
     // default is opt-out.
-    const dnt = typeof navigator !== 'undefined'
-      && ('doNotTrack' in navigator)
-      && (navigator.doNotTrack === '1' || navigator.doNotTrack === 'yes');
-    if (dnt) {
+    if (isDoNotTrackEnabled()) {
+      syncAnalyticsConsentCookie();
       return; // skip banner, skip analytics, don't overwrite old consent
     }
     // Slight delay so we don't flash the banner before first paint.
@@ -149,15 +83,7 @@ export function CookieConsent() {
   }, []);
 
   function persist(analytics: boolean) {
-    const state: ConsentState = {
-      version: CONSENT_VERSION,
-      necessary: true,
-      analytics,
-      decidedAt: new Date().toISOString(),
-    };
-    writeConsent(state);
-    if (analytics) initPostHogIfConsented(state);
-    else optOutPostHog();
+    persistAnalyticsConsent(analytics);
     setVisible(false);
   }
 
@@ -181,7 +107,7 @@ export function CookieConsent() {
             <div className="flex items-center gap-2.5 flex-1 min-w-0">
               <CookieIcon className="w-4 h-4 text-[var(--accent)] shrink-0" />
               <p className="text-[13px] text-[var(--text-secondary)] leading-snug">
-                We use strictly necessary cookies + optional analytics (PostHog) with your consent.{' '}
+                We use strictly necessary cookies plus optional analytics and browser diagnostics (PostHog and Sentry) with your consent.{' '}
                 <Link href="/cookies" className="text-[var(--color-accent)] hover:underline">Cookie Policy</Link>
                 {' · '}
                 <Link href="/privacy" className="text-[var(--color-accent)] hover:underline">Privacy Policy</Link>.
@@ -239,8 +165,8 @@ export function CookieConsent() {
                 We respect your privacy
               </p>
               <p className="text-[13px] text-[var(--text-secondary)] leading-relaxed">
-                We use strictly necessary cookies for login + theme, and optional analytics (PostHog) only with your
-                consent. No advertising, no cross-site tracking. Read our{' '}
+                We use strictly necessary cookies for login + theme, and optional analytics and browser diagnostics
+                (PostHog and Sentry) only with your consent. No advertising, no cross-site tracking. Read our{' '}
                 <Link href="/cookies" className="text-[var(--color-accent)] hover:underline">Cookie Policy</Link>{' '}
                 or{' '}
                 <Link href="/privacy" className="text-[var(--color-accent)] hover:underline">Privacy Policy</Link>.
@@ -269,7 +195,7 @@ export function CookieConsent() {
                   <BarChart3 className="w-4 h-4 text-[var(--accent)]" />
                   <div>
                     <p className="text-xs font-semibold text-[var(--text-primary)]">Analytics</p>
-                    <p className="text-[11px] text-[var(--text-muted)]">Anonymized product usage (PostHog). Opt-in.</p>
+                    <p className="text-[11px] text-[var(--text-muted)]">Anonymized product usage and browser error diagnostics (PostHog and Sentry). Opt-in.</p>
                   </div>
                 </div>
                 <input

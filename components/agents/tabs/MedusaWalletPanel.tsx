@@ -15,7 +15,6 @@ import {
 import { api } from '@/lib/api';
 import {
   buildMedusaCallbackUrl,
-  encodeMedusaCallbackState,
 } from '@/lib/medusa-callback';
 import type {
   MedusaConfigStatus,
@@ -55,20 +54,15 @@ export function getMedusaPrimaryActionLabel(hasSavedRegistration: boolean): stri
 }
 
 function buildMedusaPartnerUrl(input: {
-  agentId: string;
+  state: string;
   campaignId?: string;
   claimWallet?: string;
 }): string {
   const origin = typeof window === 'undefined' ? 'https://hatcher.host' : window.location.origin;
   const pathname = typeof window === 'undefined' ? undefined : window.location.pathname;
-  const state = encodeMedusaCallbackState({
-    agentId: input.agentId,
-    campaignId: input.campaignId,
-    claimWallet: input.claimWallet,
-  });
   const params = new URLSearchParams({
     returnUrl: buildMedusaCallbackUrl(origin, pathname),
-    state,
+    state: input.state,
   });
   if (input.campaignId) params.set('campaignId', input.campaignId);
   if (input.claimWallet) params.set('claimWallet', input.claimWallet);
@@ -191,6 +185,7 @@ export function MedusaWalletPanel({
   const [verifying, setVerifying] = useState(false);
   const [registering, setRegistering] = useState(false);
   const [mintingBadge, setMintingBadge] = useState(false);
+  const [launchingPartner, setLaunchingPartner] = useState(false);
 
   const loadConfig = useCallback(async () => {
     setLoading(true);
@@ -236,11 +231,43 @@ export function MedusaWalletPanel({
   const badgeRequired = config?.requireBadge ?? false;
   const canRegister = Boolean(passportText.trim() && claimWallet && (verification || registration));
   const hasVisiblePassport = currentTierLabel !== 'Not verified' || Boolean(savedStatus.registered);
-  const medusaPartnerUrl = buildMedusaPartnerUrl({
-    agentId,
-    campaignId: config?.campaignId,
-    claimWallet: claimWallet || savedStatus.claimWallet || undefined,
-  });
+  const startMedusaVerification = async () => {
+    const selectedWallet = claimWallet || savedStatus.claimWallet;
+    if (!selectedWallet) {
+      const message = 'Select a Solana claim wallet first.';
+      setError(message);
+      toast.error(message);
+      return;
+    }
+
+    const launchWindow = window.open('about:blank', '_blank');
+    if (launchWindow) launchWindow.opener = null;
+    setLaunchingPartner(true);
+    setError(null);
+    try {
+      const response = await api.createAgentMedusaHandoffState(agentId, {
+        claimWallet: selectedWallet,
+        ...(config?.campaignId ? { campaignId: config.campaignId } : {}),
+      });
+      if (!response.success) throw new Error(response.error);
+      const partnerUrl = buildMedusaPartnerUrl({
+        state: response.data.state,
+        campaignId: config?.campaignId,
+        claimWallet: selectedWallet,
+      });
+      if (launchWindow) launchWindow.location.href = partnerUrl;
+      else window.location.assign(partnerUrl);
+    } catch (launchError) {
+      if (launchWindow) launchWindow.close();
+      const message = humanizeMedusaError(
+        launchError instanceof Error ? launchError.message : 'Could not start Medusa verification.',
+      );
+      setError(message);
+      toast.error(message);
+    } finally {
+      setLaunchingPartner(false);
+    }
+  };
 
   const updatePassportText = (value: string) => {
     setPassportText(value);
@@ -498,14 +525,15 @@ export function MedusaWalletPanel({
             </p>
           </div>
 
-          <a
-            href={medusaPartnerUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-[var(--border-hover)] bg-[var(--bg-surface)] px-4 py-2 text-xs font-semibold uppercase tracking-wider text-[var(--accent)] transition hover:bg-[var(--tech-accent-soft)]"
+          <button
+            type="button"
+            onClick={() => void startMedusaVerification()}
+            disabled={launchingPartner || !claimWallet}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-[var(--border-hover)] bg-[var(--bg-surface)] px-4 py-2 text-xs font-semibold uppercase tracking-wider text-[var(--accent)] transition hover:bg-[var(--tech-accent-soft)] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <ExternalLink size={14} /> Start Medusa verification
-          </a>
+            {launchingPartner ? <Loader2 size={14} className="animate-spin" /> : <ExternalLink size={14} />}
+            Start Medusa verification
+          </button>
 
           <details className="rounded-md border border-[var(--border-subtle)] bg-black/10 p-3">
             <summary className="cursor-pointer text-xs font-semibold text-[var(--text-secondary)]">Verification details</summary>

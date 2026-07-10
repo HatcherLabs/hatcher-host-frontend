@@ -24,6 +24,10 @@ import { defaultLocale, locales } from './i18n/config';
 import { HATCHER_LOCALE_HEADER, resolveLocaleFromPathAndCookie } from './i18n/localeHeader';
 import { buildCsp } from './lib/csp';
 import { buildSensitiveAuthTokenRedirectUrl } from './lib/reset-password-token-url';
+import {
+  ANALYTICS_CONSENT_COOKIE,
+  shouldSendAnalyticsBeacon,
+} from './lib/analytics-consent';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 const PUBLIC_SITE_URL = process.env.NEXT_PUBLIC_SITE_URL
@@ -141,7 +145,11 @@ export default function middleware(req: NextRequest): NextResponse {
   // /zh/pricing, /de/pricing, etc. all match just like /pricing does.
   const unprefixed = stripLocalePrefix(req.nextUrl.pathname);
 
-  if (isTrackablePath(unprefixed)) {
+  const shouldTrack = shouldSendAnalyticsBeacon(
+    req.cookies.get(ANALYTICS_CONSENT_COOKIE)?.value,
+    req.headers.get('dnt'),
+  );
+  if (isTrackablePath(unprefixed) && shouldTrack) {
     // Forward visitor IP + referrer so the API can hash them into its
     // HLL unique-visitor bucket. We don't await — fire and forget.
     const ipForward =

@@ -19,6 +19,7 @@ import { NotificationCenter } from '@/components/ui/NotificationCenter';
 import { LocaleSwitcher } from './LocaleSwitcher';
 import { VersionBadge } from './VersionBadge';
 import { formatFeatureKey } from '@/lib/feature-labels';
+import { useToast } from '@/components/ui/ToastProvider';
 
 function isActive(pathname: string, href: string) {
   if (pathname === href) return true;
@@ -32,6 +33,7 @@ export function Header() {
   const t = useTranslations('nav');
   const [mobileOpen, setMobileOpen] = useState(false);
   const { isAuthenticated, isLoading: authLoading, user, logout } = useAuth();
+  const { toast } = useToast();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isAdmin = user?.isAdmin ?? false;
@@ -142,9 +144,17 @@ export function Header() {
     };
   }, []);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
     setDropdownOpen(false);
+    try {
+      await logout();
+    } catch (error) {
+      toast.warning(
+        error instanceof Error
+          ? error.message
+          : 'Signed out locally, but the server session could not be closed.',
+      );
+    }
     router.push('/');
   };
 
