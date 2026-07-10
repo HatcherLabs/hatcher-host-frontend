@@ -5,6 +5,7 @@ import net from 'node:net';
 import { Readable } from 'node:stream';
 import { NextRequest, NextResponse } from 'next/server';
 import { API_URL } from '@/lib/config';
+import { cappedDownloadStream } from '@/lib/capped-download-stream';
 import { safeDownloadFilename } from '@/lib/safe-download-filename';
 
 export const runtime = 'nodejs';
@@ -92,6 +93,7 @@ for (const [network, prefix] of [
   ['2001:db8::', 32],
   ['2002::', 16],
   ['fc00::', 7],
+  ['fec0::', 10],
   ['fe80::', 10],
   ['ff00::', 8],
 ] as const) {
@@ -107,6 +109,11 @@ function isPrivateIp(ip: string): boolean {
 type PublicHostAddress = {
   address: string;
   family: 4 | 6;
+};
+
+type PinnedArtifactResponse = {
+  response: Response;
+  destroy: (reason?: Error) => void;
 };
 
 function assertAllowedArtifactUrl(url: URL): void {
@@ -171,7 +178,7 @@ function responseHeaders(headers: IncomingHttpHeaders): Headers {
   return result;
 }
 
-function requestPinnedArtifact(url: URL, target: PublicHostAddress): Promise<Response> {
+function requestPinnedArtifact(url: URL, target: PublicHostAddress): Promise<PinnedArtifactResponse> {
   return new Promise((resolve, reject) => {
     const request = https.request({
       protocol: 'https:',
@@ -192,11 +199,17 @@ function requestPinnedArtifact(url: URL, target: PublicHostAddress): Promise<Res
       const body = hasBody
         ? Readable.toWeb(upstream as IncomingMessage) as ReadableStream<Uint8Array>
         : null;
-      resolve(new Response(body, {
-        status,
-        statusText: upstream.statusMessage,
-        headers: responseHeaders(upstream.headers),
-      }));
+      resolve({
+        response: new Response(body, {
+          status,
+          statusText: upstream.statusMessage,
+          headers: responseHeaders(upstream.headers),
+        }),
+        destroy(reason) {
+          upstream.destroy(reason);
+          request.destroy(reason);
+        },
+      });
     });
 
     request.setTimeout(ARTIFACT_TIMEOUT_MS, () => {
@@ -211,43 +224,27 @@ async function fetchPublicArtifact(
   url: URL,
   redirects = 0,
   initialTarget?: PublicHostAddress,
-): Promise<Response> {
+): Promise<PinnedArtifactResponse> {
   const target = initialTarget ?? await resolvePublicArtifactHost(url);
-  const response = await requestPinnedArtifact(url, target);
+  const pinned = await requestPinnedArtifact(url, target);
+  const { response } = pinned;
 
   if ([301, 302, 303, 307, 308].includes(response.status)) {
-    if (redirects >= MAX_REDIRECTS) throw new Error('Too many redirects');
+    if (redirects >= MAX_REDIRECTS) {
+      pinned.destroy();
+      throw new Error('Too many redirects');
+    }
     const location = response.headers.get('location');
-    if (!location) throw new Error('Redirect missing location');
+    if (!location) {
+      pinned.destroy();
+      throw new Error('Redirect missing location');
+    }
     await response.body?.cancel();
+    pinned.destroy();
     return fetchPublicArtifact(new URL(location, url), redirects + 1);
   }
 
-  return response;
-}
-
-function cappedStream(source: ReadableStream<Uint8Array>, maxBytes: number): ReadableStream<Uint8Array> {
-  const reader = source.getReader();
-  let total = 0;
-  return new ReadableStream<Uint8Array>({
-    async pull(controller) {
-      const { done, value } = await reader.read();
-      if (done) {
-        controller.close();
-        return;
-      }
-      total += value.byteLength;
-      if (total > maxBytes) {
-        controller.error(new Error('Artifact is too large'));
-        await reader.cancel().catch(() => {});
-        return;
-      }
-      controller.enqueue(value);
-    },
-    cancel(reason) {
-      return reader.cancel(reason);
-    },
-  });
+  return pinned;
 }
 
 export async function GET(request: NextRequest) {
@@ -267,7 +264,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
   }
 
-  let upstream: Response;
+  let pinnedUpstream: PinnedArtifactResponse;
   let initialTarget: PublicHostAddress;
   try {
     initialTarget = await resolvePublicArtifactHost(url);
@@ -275,12 +272,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: (error as Error).message || 'Invalid artifact URL' }, { status: 400 });
   }
   try {
-    upstream = await fetchPublicArtifact(url, 0, initialTarget);
+    pinnedUpstream = await fetchPublicArtifact(url, 0, initialTarget);
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message || 'Unable to fetch artifact' }, { status: 502 });
   }
 
+  const upstream = pinnedUpstream.response;
   if (!upstream.ok || !upstream.body) {
+    pinnedUpstream.destroy();
     return NextResponse.json(
       { error: `Artifact download failed with status ${upstream.status}` },
       { status: upstream.status || 502 },
@@ -289,6 +288,7 @@ export async function GET(request: NextRequest) {
 
   const contentLength = Number(upstream.headers.get('content-length') ?? '0');
   if (contentLength > MAX_DOWNLOAD_BYTES) {
+    pinnedUpstream.destroy(new Error('Artifact is too large'));
     return NextResponse.json({ error: 'Artifact is too large' }, { status: 413 });
   }
 
@@ -299,7 +299,11 @@ export async function GET(request: NextRequest) {
   headers.set('cache-control', 'private, max-age=300');
   headers.set('content-disposition', `attachment; filename="${filename}"`);
 
-  return new NextResponse(cappedStream(upstream.body, MAX_DOWNLOAD_BYTES), {
+  return new NextResponse(cappedDownloadStream(
+    upstream.body,
+    MAX_DOWNLOAD_BYTES,
+    (error) => pinnedUpstream.destroy(error),
+  ), {
     status: 200,
     headers,
   });

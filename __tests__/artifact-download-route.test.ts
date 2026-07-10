@@ -130,11 +130,14 @@ describe('artifact download route', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it('blocks private IPv4 destinations encoded as IPv6-mapped addresses', async () => {
+  it.each([
+    ['IPv4 destinations encoded as IPv6-mapped addresses', '::ffff:7f00:1'],
+    ['deprecated site-local IPv6 destinations', 'fec0::1'],
+  ])('blocks private %s', async (_label, address) => {
     const fetchMock = vi.mocked(fetch);
     fetchMock.mockResolvedValueOnce(Response.json({ success: true, data: { id: 'user_1' } }));
     mockedDns.lookup.mockResolvedValueOnce([
-      { address: '::ffff:7f00:1', family: 6 },
+      { address, family: 6 },
     ] as never);
     const requestSpy = vi.spyOn(https, 'request');
     const { GET } = await loadRoute();
