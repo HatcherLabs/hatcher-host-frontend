@@ -801,6 +801,8 @@ export default function BillingPage() {
     setRecurringBusy(true);
     setError(null);
     try {
+      if (!user?.id) throw new Error('Sign in again to set up recurring billing');
+
       let quote = recurringQuote;
       if (!quote) {
         const res = await api.getSolanaRecurringQuote(recurringQuotePayload());
@@ -818,6 +820,7 @@ export default function BillingPage() {
         wallet: solanaWallet,
         connection: solanaConnection,
         quote,
+        userId: user.id,
       });
       const recordRes = await api.recordSolanaRecurringSetup(recordPayload);
       if (!recordRes.success) throw new Error(recordRes.error);

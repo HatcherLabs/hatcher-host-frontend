@@ -198,7 +198,33 @@ describe('Solana recurring setup helpers', () => {
       amountPerPeriodHuman: 7,
       allowancePeriods: 12,
     });
-    expect(recurringWalletProofMessage({ input: plan.recordInput, delegatee })).toContain('asset:usdc');
+    const proof = recurringWalletProofMessage({
+      input: plan.recordInput,
+      delegatee,
+      userId: 'user-recurring',
+    });
+    expect(proof).toBe([
+      'Hatcher Solana recurring authorization',
+      'userId:user-recurring',
+      'kind:addon',
+      'key:addon.ai_credits.5000',
+      'agentId:',
+      'billingPeriod:monthly',
+      'asset:usdc',
+      `ownerWallet:${plan.recordInput.ownerWallet}`,
+      `tokenAccount:${plan.recordInput.tokenAccount}`,
+      `subscriptionAuthority:${plan.recordInput.subscriptionAuthority}`,
+      `delegationPda:${plan.recordInput.delegationPda}`,
+      'nonce:7',
+      `delegateeWallet:${delegatee}`,
+      'amountPerPeriodBaseUnits:7000000',
+      'periodSeconds:2592000',
+      'allowancePeriods:12',
+      'startAt:2026-06-03T00:00:00.000Z',
+      'expiresAt:2027-06-03T00:00:00.000Z',
+      'authorityTxSignature:',
+      'delegationTxSignature:',
+    ].join('\n'));
     expect(plan.authorityTransaction.instructions).toHaveLength(1);
     expect(plan.delegationTransaction.instructions).toHaveLength(1);
   });
@@ -233,6 +259,45 @@ describe('Solana recurring setup helpers', () => {
     const wallet = {
       publicKey: owner,
       sendTransaction,
+      signMessage: vi.fn(async (_message: Uint8Array) => new Uint8Array([9, 9, 9])),
+    };
+
+    const input = await setupSolanaRecurringAuthorization({
+      wallet: wallet as never,
+      connection: connection as never,
+      quote: quote(owner.toBase58(), delegatee),
+      userId: 'user-recurring',
+      tokenAccount,
+    });
+
+    expect(mocks.createRecurringDelegation).toHaveBeenCalledTimes(1);
+    expect(sendTransaction).toHaveBeenCalledTimes(2);
+    expect(input.authorityTxSignature).toBe('authority-signature');
+    expect(input.delegationTxSignature).toBe('delegation-signature');
+    expect(new TextDecoder().decode(wallet.signMessage.mock.calls[0]?.[0])).toContain(
+      '\nuserId:user-recurring\n',
+    );
+  });
+
+  it('omits an empty authority signature when the authority already exists', async () => {
+    const owner = Keypair.generate().publicKey;
+    const tokenAccount = Keypair.generate().publicKey;
+    const delegatee = Keypair.generate().publicKey.toBase58();
+    const sendTransaction = vi.fn(async () => {
+      if (sendTransaction.mock.calls.length === 1) throw new Error('account already in use');
+      return 'delegation-signature';
+    });
+    const connection = {
+      rpcEndpoint: 'https://api.mainnet-beta.solana.com',
+      getLatestBlockhash: vi.fn(async () => ({
+        blockhash: '11111111111111111111111111111111',
+        lastValidBlockHeight: 123,
+      })),
+      confirmTransaction: vi.fn(async () => ({ value: { err: null } })),
+    };
+    const wallet = {
+      publicKey: owner,
+      sendTransaction,
       signMessage: vi.fn(async () => new Uint8Array([9, 9, 9])),
     };
 
@@ -240,12 +305,12 @@ describe('Solana recurring setup helpers', () => {
       wallet: wallet as never,
       connection: connection as never,
       quote: quote(owner.toBase58(), delegatee),
+      userId: 'user-recurring',
       tokenAccount,
     });
 
-    expect(mocks.createRecurringDelegation).toHaveBeenCalledTimes(1);
     expect(sendTransaction).toHaveBeenCalledTimes(2);
-    expect(input.authorityTxSignature).toBe('authority-signature');
+    expect(input).not.toHaveProperty('authorityTxSignature');
     expect(input.delegationTxSignature).toBe('delegation-signature');
   });
 

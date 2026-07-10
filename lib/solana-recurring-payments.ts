@@ -35,7 +35,11 @@ import { SOLANA_SUBSCRIPTIONS_PROGRAM_ID } from '@/lib/config';
 
 const ASSOCIATED_TOKEN_PROGRAM_ID = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
 
-type SolanaRecurringRecordMessageInput = Omit<SolanaRecurringSetupRecordInput, 'walletProofSignature'>;
+type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never;
+type SolanaRecurringRecordMessageInput = DistributiveOmit<
+  SolanaRecurringSetupRecordInput,
+  'walletProofSignature'
+>;
 
 export interface SolanaRecurringSetupPlan {
   authorityTransaction: Transaction;
@@ -51,6 +55,7 @@ export interface SetupSolanaRecurringAuthorizationParams {
   wallet: WalletContextState;
   connection: Connection;
   quote: SolanaRecurringQuote;
+  userId: string;
   tokenAccount?: PublicKey;
   onSignature?: (stage: 'authority' | 'delegation', signature: string) => void;
 }
@@ -182,12 +187,15 @@ function toUnixSeconds(value: string): number {
 export function recurringWalletProofMessage(params: {
   input: SolanaRecurringRecordMessageInput;
   delegatee: string;
+  userId: string;
 }): string {
   const { input } = params;
   return [
     'Hatcher Solana recurring authorization',
+    `userId:${params.userId}`,
     `kind:${input.kind}`,
     `key:${input.key}`,
+    `agentId:${input.kind === 'addon' ? input.agentId ?? '' : ''}`,
     `billingPeriod:${input.billingPeriod ?? 'monthly'}`,
     `asset:${input.asset}`,
     `ownerWallet:${input.ownerWallet}`,
@@ -410,6 +418,7 @@ export async function setupSolanaRecurringAuthorization(
   params: SetupSolanaRecurringAuthorizationParams,
 ): Promise<SolanaRecurringSetupRecordInput> {
   const { wallet, connection, quote } = params;
+  if (!params.userId.trim()) throw new Error('Authenticated user is required for recurring billing');
   if (!wallet.publicKey) throw new Error('Connect a Solana wallet first');
   if (!wallet.signMessage) throw new Error('Wallet must support message signing to set up recurring billing');
 
@@ -445,14 +454,20 @@ export async function setupSolanaRecurringAuthorization(
   });
   params.onSignature?.('delegation', delegationTxSignature);
 
+  const {
+    authorityTxSignature: _plannedAuthorityTxSignature,
+    delegationTxSignature: _plannedDelegationTxSignature,
+    ...recordInputBase
+  } = plan.recordInput;
   const recordInput: SolanaRecurringRecordMessageInput = {
-    ...plan.recordInput,
-    authorityTxSignature,
+    ...recordInputBase,
+    ...(authorityTxSignature ? { authorityTxSignature } : {}),
     delegationTxSignature,
   };
   const proof = recurringWalletProofMessage({
     input: recordInput,
     delegatee: quote.delegateeWallet,
+    userId: params.userId,
   });
   const walletProofSignature = signatureBytesToBase64(
     await wallet.signMessage(new TextEncoder().encode(proof)),
