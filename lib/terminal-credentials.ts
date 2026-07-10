@@ -18,7 +18,11 @@ function cloneMounts(mounts: TerminalCredentialMount[]): TerminalCredentialMount
 
 export function clearLegacyTerminalCredentialStorage(): void {
   if (typeof window === 'undefined') return;
-  window.sessionStorage.removeItem(LEGACY_STORAGE_KEY);
+  try {
+    window.sessionStorage.removeItem(LEGACY_STORAGE_KEY);
+  } catch {
+    // In-memory credentials are still cleared when browser storage is blocked.
+  }
 }
 
 export function loadTerminalCredentialMounts(

@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 import {
   buildMedusaAgentReturnPath,
   buildMedusaCallbackUrl,
+  MEDUSA_PASSPORT_URL_REQUIRED,
+  medusaPassportHandoffError,
 } from '@/lib/medusa-callback';
 
 describe('medusa callback helpers', () => {
@@ -21,4 +23,10 @@ describe('medusa callback helpers', () => {
     );
   });
 
+  it('requires the supported passportUrl callback contract', () => {
+    expect(medusaPassportHandoffError('https://www.zkmedusa.com/partners/hatcher/passport/123'))
+      .toBeNull();
+    expect(medusaPassportHandoffError(null)).toBe(MEDUSA_PASSPORT_URL_REQUIRED);
+    expect(MEDUSA_PASSPORT_URL_REQUIRED).toContain('passportUrl callbacks only');
+  });
 });

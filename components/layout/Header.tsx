@@ -148,8 +148,12 @@ export function Header() {
     setDropdownOpen(false);
     try {
       await logout();
-    } catch {
-      toast.error('Signed out locally, but the server session could not be closed.');
+    } catch (error) {
+      toast.warning(
+        error instanceof Error
+          ? error.message
+          : 'Signed out locally, but the server session could not be closed.',
+      );
     }
     router.push('/');
   };

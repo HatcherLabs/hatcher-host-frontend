@@ -7,6 +7,7 @@ import { AlertTriangle, Loader2, ShieldCheck } from 'lucide-react';
 import { api } from '@/lib/api';
 import {
   buildMedusaAgentReturnPath,
+  medusaPassportHandoffError,
 } from '@/lib/medusa-callback';
 
 function CallbackShell({
@@ -45,7 +46,6 @@ export default function MedusaCallbackPage() {
   const error = params.get('error');
   const status = params.get('status');
   const passportUrl = params.get('passportUrl');
-  const code = params.get('code');
 
   useEffect(() => {
     if (!state || error || consumedRef.current) return;
@@ -55,8 +55,9 @@ export default function MedusaCallbackPage() {
       return;
     }
 
-    if (!passportUrl && !code) {
-      setCompletionError('Medusa did not include a passport handoff URL.');
+    const supportedPassportUrl = passportUrl?.trim();
+    if (!supportedPassportUrl) {
+      setCompletionError(medusaPassportHandoffError(passportUrl));
       return;
     }
 
@@ -66,8 +67,7 @@ export default function MedusaCallbackPage() {
     const completeHandoff = async () => {
       const response = await api.completeAgentMedusaHandoff({
         state,
-        passportUrl: passportUrl ?? undefined,
-        code: code ?? undefined,
+        passportUrl: supportedPassportUrl,
         status: status ?? undefined,
       });
 
@@ -81,7 +81,7 @@ export default function MedusaCallbackPage() {
     };
 
     void completeHandoff();
-  }, [code, error, passportUrl, router, state, status]);
+  }, [error, passportUrl, router, state, status]);
 
   if (error || completionError) {
     return (

@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState, useCallback } from 'rea
 import { api, getToken, setToken, clearToken, isAuthenticated } from './api';
 import type { AuthProfileData } from './api';
 import { clearTerminalCredentialMounts } from './terminal-credentials';
+import { logoutWithImmediateCleanup } from './logout';
 
 interface UserProfile {
   id: string;
@@ -116,23 +117,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(async () => {
     const currentUserId = user?.id;
-    let serverError: Error | null = null;
-    try {
-      const response = await api.logout();
-      if (!response.success) {
-        serverError = new Error(response.error || 'The server session could not be closed.');
-      }
-    } catch (error) {
-      serverError = error instanceof Error
-        ? error
-        : new Error('The server session could not be closed.');
-    } finally {
-      clearTerminalCredentialMounts(currentUserId);
-      clearToken();
-      setAuthed(false);
-      setUser(null);
-    }
-    if (serverError) throw serverError;
+    await logoutWithImmediateCleanup({
+      revoke: api.logout,
+      cleanup: () => {
+        clearTerminalCredentialMounts(currentUserId);
+        clearToken();
+        setAuthed(false);
+        setUser(null);
+      },
+    });
   }, [user?.id]);
 
   const clearError = useCallback(() => setError(null), []);

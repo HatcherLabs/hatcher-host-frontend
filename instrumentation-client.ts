@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/nextjs';
 import {
+  ANALYTICS_CONSENT_EVENT,
   ANALYTICS_CONSENT_STORAGE_KEY,
   ANALYTICS_CONSENT_VERSION,
 } from '@/lib/analytics-consent';
@@ -35,7 +36,7 @@ function startSentry(): void {
 
 if (typeof window !== 'undefined') {
   startSentry();
-  window.addEventListener('hatcher:consent-changed', (event) => {
+  window.addEventListener(ANALYTICS_CONSENT_EVENT, (event) => {
     const analytics = (event as CustomEvent<{ analytics?: boolean }>).detail?.analytics === true;
     if (analytics && analyticsAllowed()) {
       startSentry();

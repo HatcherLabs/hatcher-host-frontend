@@ -11,7 +11,6 @@ import { LayoutShell } from '@/components/layout/LayoutShell';
 import { ToastProvider } from '@/components/ui/ToastProvider';
 import { CommandPalette } from '@/components/ui/CommandPalette';
 import { PosthogProvider } from '@/components/providers/PosthogProvider';
-import { GoogleAdsProvider } from '@/components/providers/GoogleAdsProvider';
 import { CookieConsent } from '@/components/ui/CookieConsent';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
@@ -282,7 +281,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <Script src="/register-sw.js" strategy="afterInteractive" nonce={nonce} />
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <GoogleAdsProvider nonce={nonce} />
           <PosthogProvider>
             <ThemeProvider nonce={nonce}>
               <AuthProvider>

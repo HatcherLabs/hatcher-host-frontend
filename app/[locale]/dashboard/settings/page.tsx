@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import NextLink from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
 import { useAuth } from '@/lib/auth-context';
@@ -10,10 +11,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/components/ui/ToastProvider';
 import { Link } from '@/i18n/routing';
 import { REFERRAL_REWARD_AI_CREDITS } from '@/lib/referral-rewards';
+import {
+  ANALYTICS_CONSENT_EVENT,
+  hasAnalyticsConsent,
+  isDoNotTrackEnabled,
+  persistAnalyticsConsent,
+} from '@/lib/analytics-consent';
 import Image from 'next/image';
 import {
   User,
   Shield,
+  ShieldCheck,
   Bell,
   CreditCard,
   AlertTriangle,
@@ -84,11 +92,22 @@ function getAvatarColor(name: string) {
 }
 
 // ── Toggle Switch ───────────────────────────────────────────
-function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
+function Toggle({
+  checked,
+  onChange,
+  label,
+  disabled = false,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  label: string;
+  disabled?: boolean;
+}) {
   return (
     <button
       onClick={() => onChange(!checked)}
-      className={`relative w-11 h-6 rounded-full transition-all duration-300 cursor-pointer ${checked ? 'bg-[var(--color-accent)]' : 'bg-[var(--bg-hover)]'}`}
+      disabled={disabled}
+      className={`relative w-11 h-6 rounded-full transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 ${disabled ? '' : 'cursor-pointer'} ${checked ? 'bg-[var(--color-accent)]' : 'bg-[var(--bg-hover)]'}`}
       role="switch"
       aria-checked={checked}
       aria-label={label}
@@ -160,6 +179,7 @@ const TABS = [
   { id: 'profile',       icon: User },
   { id: 'security',      icon: Shield },
   { id: 'notifications', icon: Bell },
+  { id: 'privacy',       icon: ShieldCheck },
   { id: 'billing',       icon: CreditCard },
   { id: 'danger',        icon: AlertTriangle },
 ] as const;
@@ -209,6 +229,10 @@ export default function SettingsPage() {
   const [notifPush, setNotifPush] = useState(true);
   const [notifAgentAlerts, setNotifAgentAlerts] = useState(true);
   const [notifBilling, setNotifBilling] = useState(true);
+
+  // ── Privacy prefs ─────────────────────────────────────────
+  const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
+  const [doNotTrack, setDoNotTrack] = useState(false);
 
   // ── Billing/profile data ──────────────────────────────────
   const [profile, setProfile] = useState<{
@@ -286,6 +310,16 @@ export default function SettingsPage() {
   useEffect(() => { localStorage.setItem('hatcher:pref:agentAlerts', String(notifAgentAlerts)); }, [notifAgentAlerts]);
   useEffect(() => { localStorage.setItem('hatcher:pref:notifBilling', String(notifBilling)); }, [notifBilling]);
 
+  useEffect(() => {
+    const syncConsent = () => {
+      setAnalyticsEnabled(hasAnalyticsConsent());
+      setDoNotTrack(isDoNotTrackEnabled());
+    };
+    syncConsent();
+    window.addEventListener(ANALYTICS_CONSENT_EVENT, syncConsent);
+    return () => window.removeEventListener(ANALYTICS_CONSENT_EVENT, syncConsent);
+  }, []);
+
   // ── Helpers ───────────────────────────────────────────────
   function copy(text: string, field: string) {
     navigator.clipboard.writeText(text).catch(() => {
@@ -346,6 +380,16 @@ export default function SettingsPage() {
       }
     } catch { toast('error', 'Failed to change password'); }
     finally { setSavingPassword(false); }
+  }
+
+  function handleAnalyticsConsent(enabled: boolean) {
+    const consent = persistAnalyticsConsent(enabled);
+    setAnalyticsEnabled(consent.analytics);
+    if (enabled && !consent.analytics) {
+      toast('info', 'Analytics remains disabled because your browser sends Do Not Track.');
+      return;
+    }
+    toast('success', consent.analytics ? 'Optional analytics enabled' : 'Optional analytics disabled');
   }
 
   // ── Delete account ────────────────────────────────────────
@@ -893,6 +937,49 @@ export default function SettingsPage() {
                           {i < arr.length - 1 && <div className="mx-3 h-px bg-[var(--bg-card)]" />}
                         </div>
                       ))}
+                    </div>
+                  </Section>
+                )}
+
+                {/* ════════════════════════════════════════
+                    PRIVACY TAB
+                    ════════════════════════════════════════ */}
+                {activeTab === 'privacy' && (
+                  <Section title={t('tabs.privacy')} icon={<ShieldCheck size={16} />}>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between gap-5 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] p-4">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium text-[var(--text-primary)]">Optional analytics</p>
+                            <span className={`rounded-md border px-2 py-0.5 text-[10px] font-semibold uppercase ${analyticsEnabled ? 'border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success)]' : 'border-[var(--border-default)] text-[var(--text-muted)]'}`}>
+                              {analyticsEnabled ? 'Enabled' : 'Disabled'}
+                            </span>
+                          </div>
+                          <p className="mt-1 text-xs leading-relaxed text-[var(--text-muted)]">
+                            Allow PostHog product analytics and Sentry browser error diagnostics. Advertising and cross-site marketing trackers are not loaded.
+                          </p>
+                        </div>
+                        <Toggle
+                          checked={analyticsEnabled}
+                          onChange={handleAnalyticsConsent}
+                          label="Toggle optional analytics"
+                          disabled={doNotTrack}
+                        />
+                      </div>
+
+                      {doNotTrack && (
+                        <div className="rounded-xl border border-[var(--color-info-border)] bg-[var(--color-info-bg)] p-4 text-xs leading-relaxed text-[var(--color-info)]">
+                          Your browser sends Do Not Track, so optional analytics stays disabled. Change that browser preference before enabling analytics here.
+                        </div>
+                      )}
+
+                      <p className="text-xs leading-relaxed text-[var(--text-muted)]">
+                        Changes apply immediately to this browser. See the{' '}
+                        <NextLink href="/cookies" className="font-medium text-[var(--color-accent)] hover:underline">
+                          Cookie Policy
+                        </NextLink>{' '}
+                        for retention and provider details.
+                      </p>
                     </div>
                   </Section>
                 )}

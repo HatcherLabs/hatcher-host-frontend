@@ -37,7 +37,13 @@ export function setToken(token: string) {
  */
 export function clearToken() {
   inMemoryApiKey = null;
-  if (typeof window !== 'undefined') localStorage.removeItem(TOKEN_KEY);
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.removeItem(TOKEN_KEY);
+    } catch {
+      // The in-memory credential is already cleared when storage is blocked.
+    }
+  }
 }
 
 export function isAuthenticated(): boolean {

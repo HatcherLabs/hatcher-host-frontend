@@ -1546,8 +1546,7 @@ export interface MedusaRegisterResponse {
 
 export interface MedusaHandoffBody {
   state: string;
-  passportUrl?: string;
-  code?: string;
+  passportUrl: string;
   status?: string;
 }
 

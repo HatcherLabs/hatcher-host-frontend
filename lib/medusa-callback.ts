@@ -1,5 +1,14 @@
 import { isLocale } from '@/i18n/config';
 
+export const MEDUSA_PASSPORT_URL_REQUIRED =
+  'Medusa did not include a supported passport handoff URL. Hatcher accepts passportUrl callbacks only.';
+
+export function medusaPassportHandoffError(
+  passportUrl: string | null | undefined,
+): string | null {
+  return passportUrl?.trim() ? null : MEDUSA_PASSPORT_URL_REQUIRED;
+}
+
 export function buildMedusaAgentReturnPath(agentId: string): string {
   const query = new URLSearchParams({
     tab: 'wallet',

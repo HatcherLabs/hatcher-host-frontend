@@ -38,8 +38,8 @@ export default function CookiePolicyPage() {
               In one sentence
             </h2>
             <p className="text-sm">
-              We use cookies + localStorage for login state (essential) and product analytics (optional — off by
-              default until you accept). No advertising cookies, no cross-site tracking.
+              We use cookies + localStorage for login state (essential), product analytics, and browser error
+              diagnostics (optional — off by default until you accept). No advertising cookies, no cross-site tracking.
             </p>
           </section>
 
@@ -140,7 +140,7 @@ export default function CookiePolicyPage() {
               </div>
               <p className="text-sm mb-3">
                 Off by default. Only set after you click &ldquo;Accept&rdquo; on our cookie banner. Used to understand
-                which features are useful in aggregate.
+                which features are useful in aggregate and diagnose browser errors.
               </p>
               <div className="overflow-x-auto">
                 <table className="w-full text-xs border border-[var(--border-default)] rounded">
