@@ -1,4 +1,9 @@
 import dns from 'node:dns/promises';
+import { EventEmitter } from 'node:events';
+import type { IncomingMessage } from 'node:http';
+import https from 'node:https';
+import type { RequestOptions } from 'node:https';
+import { PassThrough } from 'node:stream';
 import { NextRequest } from 'next/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -11,6 +16,33 @@ vi.mock('node:dns/promises', () => ({
 const mockedDns = vi.mocked(dns);
 const publicDnsRecords = [{ address: '93.184.216.34', family: 4 }] as never;
 const privateDnsRecords = [{ address: '127.0.0.1', family: 4 }] as never;
+
+function mockArtifactResponse(
+  body: string,
+  options: { status?: number; headers?: Record<string, string> } = {},
+): void {
+  vi.spyOn(https, 'request').mockImplementationOnce(((
+    _requestOptions: string | URL | RequestOptions,
+    callback?: (response: IncomingMessage) => void,
+  ) => {
+    const request = Object.assign(new EventEmitter(), {
+      setTimeout: vi.fn(),
+      destroy: vi.fn(),
+      end: vi.fn(),
+    });
+    request.setTimeout.mockReturnValue(request);
+    request.end.mockImplementation(() => {
+      const stream = new PassThrough();
+      const upstream = stream as unknown as IncomingMessage;
+      upstream.statusCode = options.status ?? 200;
+      upstream.statusMessage = 'OK';
+      upstream.headers = options.headers ?? {};
+      callback?.(upstream);
+      stream.end(body);
+    });
+    return request;
+  }) as unknown as typeof https.request);
+}
 
 function makeRequest(url: string, headers?: HeadersInit): NextRequest {
   return new NextRequest(url, { headers });
@@ -98,6 +130,28 @@ describe('artifact download route', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
+  it.each([
+    ['IPv4 destinations encoded as IPv6-mapped addresses', '::ffff:7f00:1'],
+    ['deprecated site-local IPv6 destinations', 'fec0::1'],
+  ])('blocks private %s', async (_label, address) => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockResolvedValueOnce(Response.json({ success: true, data: { id: 'user_1' } }));
+    mockedDns.lookup.mockResolvedValueOnce([
+      { address, family: 6 },
+    ] as never);
+    const requestSpy = vi.spyOn(https, 'request');
+    const { GET } = await loadRoute();
+
+    const response = await GET(makeRequest(
+      'https://hatcher.host/api/artifacts/download?url=https%3A%2F%2Fv3.fal.media%2Fartifact.txt',
+      { authorization: 'Bearer hk_test' },
+    ));
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({ error: 'Artifact host is not allowed' });
+    expect(requestSpy).not.toHaveBeenCalled();
+  });
+
   it('hard-blocks Hatcher-owned hosts so the proxy cannot probe internal APIs', async () => {
     const fetchMock = vi.mocked(fetch);
     fetchMock.mockResolvedValueOnce(Response.json({ success: true, data: { id: 'user_1' } }));
@@ -117,15 +171,13 @@ describe('artifact download route', () => {
   it('allows authenticated downloads from allowlisted public artifact hosts', async () => {
     const body = 'artifact body';
     const fetchMock = vi.mocked(fetch);
-    fetchMock
-      .mockResolvedValueOnce(Response.json({ success: true, data: { id: 'user_1' } }))
-      .mockResolvedValueOnce(new Response(body, {
-        status: 200,
-        headers: {
-          'content-type': 'text/plain',
-          'content-length': String(body.length),
-        },
-      }));
+    fetchMock.mockResolvedValueOnce(Response.json({ success: true, data: { id: 'user_1' } }));
+    mockArtifactResponse(body, {
+      headers: {
+        'content-type': 'text/plain',
+        'content-length': String(body.length),
+      },
+    });
     const { GET } = await loadRoute();
 
     const response = await GET(makeRequest(
@@ -137,7 +189,65 @@ describe('artifact download route', () => {
     expect(response.headers.get('content-disposition')).toBe('attachment; filename="report.txt"');
     expect(response.headers.get('content-type')).toBe('text/plain');
     expect(await response.text()).toBe(body);
-    expect(fetchMock).toHaveBeenCalledTimes(2);
-    expect(String(fetchMock.mock.calls[1]?.[0])).toBe('https://v3.fal.media/artifact.txt');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(https.request).toHaveBeenCalledWith(
+      expect.objectContaining({
+        hostname: '93.184.216.34',
+        servername: 'v3.fal.media',
+        path: '/artifact.txt',
+        headers: expect.objectContaining({ host: 'v3.fal.media' }),
+      }),
+      expect.any(Function),
+    );
+  });
+
+  it('pins each outbound socket to the public address that passed validation', async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockResolvedValueOnce(Response.json({ success: true, data: { id: 'user_1' } }));
+    mockedDns.lookup.mockResolvedValueOnce([
+      { address: '93.184.216.35', family: 4 },
+      { address: '93.184.216.36', family: 4 },
+    ] as never);
+    mockArtifactResponse('artifact body');
+    const { GET } = await loadRoute();
+
+    const response = await GET(makeRequest(
+      'https://hatcher.host/api/artifacts/download?url=https%3A%2F%2Fv3.fal.media%2Ffiles%2Fartifact.txt',
+      { authorization: 'Bearer hk_test' },
+    ));
+
+    expect(response.status).toBe(200);
+    expect(mockedDns.lookup).toHaveBeenCalledTimes(1);
+    expect(https.request).toHaveBeenCalledWith(
+      expect.objectContaining({
+        hostname: '93.184.216.35',
+        servername: 'v3.fal.media',
+        path: '/files/artifact.txt',
+      }),
+      expect.any(Function),
+    );
+  });
+
+  it('revalidates redirects and refuses a private destination before opening another socket', async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockResolvedValueOnce(Response.json({ success: true, data: { id: 'user_1' } }));
+    mockedDns.lookup
+      .mockResolvedValueOnce(publicDnsRecords)
+      .mockResolvedValueOnce(privateDnsRecords);
+    mockArtifactResponse('', {
+      status: 302,
+      headers: { location: 'https://fal.media/private-artifact.txt' },
+    });
+    const { GET } = await loadRoute();
+
+    const response = await GET(makeRequest(
+      'https://hatcher.host/api/artifacts/download?url=https%3A%2F%2Fv3.fal.media%2Fartifact.txt',
+      { authorization: 'Bearer hk_test' },
+    ));
+
+    expect(response.status).toBe(502);
+    expect(await response.json()).toEqual({ error: 'Artifact host is not allowed' });
+    expect(mockedDns.lookup).toHaveBeenCalledTimes(2);
+    expect(https.request).toHaveBeenCalledTimes(1);
   });
 });

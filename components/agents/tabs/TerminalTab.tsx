@@ -106,10 +106,17 @@ function wheelDeltaToRows(event: WheelEvent): number {
 }
 
 function createLocalId(prefix: string): string {
-  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-    return `${prefix}_${crypto.randomUUID().replace(/-/g, '').slice(0, 16)}`;
+  const cryptoApi = globalThis.crypto;
+  if (!cryptoApi) {
+    throw new Error('Secure random ID generation is unavailable');
   }
-  return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+  if (typeof cryptoApi.randomUUID === 'function') {
+    return `${prefix}_${cryptoApi.randomUUID().replaceAll('-', '').slice(0, 16)}`;
+  }
+
+  const bytes = cryptoApi.getRandomValues(new Uint8Array(8));
+  const suffix = Array.from(bytes, (value) => value.toString(16).padStart(2, '0')).join('');
+  return `${prefix}_${suffix}`;
 }
 
 function defaultTerminalSession(): TerminalSession {

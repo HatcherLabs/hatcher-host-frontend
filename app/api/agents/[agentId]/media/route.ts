@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { API_URL } from '@/lib/config';
+import { safeDownloadFilename } from '@/lib/safe-download-filename';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -8,17 +9,13 @@ type RouteContext = {
   params: Promise<{ agentId: string }>;
 };
 
-function safeFilename(value: string): string {
-  return value
-    .replace(/["\\/:*?<>|\r\n]+/g, '-')
-    .replace(/\s+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    || 'artifact';
-}
-
 function filenameFromPath(value: string): string {
   const name = value.split('/').filter(Boolean).pop() ?? 'artifact';
-  return safeFilename(decodeURIComponent(name));
+  try {
+    return safeDownloadFilename(decodeURIComponent(name));
+  } catch {
+    return safeDownloadFilename(name);
+  }
 }
 
 function isPassiveInlineMedia(contentType: string): boolean {
@@ -76,7 +73,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
   const filename = unavailable
     ? 'artifact-unavailable.svg'
     : videoJobId
-      ? `${safeFilename(videoJobId)}.mp4`
+      ? `${safeDownloadFilename(videoJobId, 156)}.mp4`
       : filenameFromPath(mediaPath ?? 'artifact');
   const download = request.nextUrl.searchParams.get('download') === '1';
   const contentType = upstream.headers.get('content-type') ?? 'application/octet-stream';
