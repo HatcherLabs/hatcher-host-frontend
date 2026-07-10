@@ -77,7 +77,7 @@ export function validateSolanaX402Requirements(
   intent: CheckoutResponse,
   payerWallet: string,
 ): { amount: number; network: SolanaX402Network } {
-  validateSolanaPaymentQuote(intent, 'usdc', payerWallet);
+  validateSolanaPaymentQuote({ ...intent, intentId: intent.paymentIntentId }, 'usdc', payerWallet);
   if (intent.x402Version !== 1) throw new Error('Server returned an unsupported x402 version');
   if (requirements.scheme !== 'exact' || requirements.network !== SOLANA_MAINNET_CAIP2) {
     throw new Error('Server returned unsupported Solana payment requirements');
@@ -140,7 +140,8 @@ export async function payWithSolanaX402(
   }
 
   const { network } = validateSolanaX402Requirements(requirements, checkoutBody.data, payerWallet);
-  const txSignature = await sendUsdc(checkoutBody.data, requirements.description, {
+  const paymentQuote = { ...checkoutBody.data, intentId: checkoutBody.data.paymentIntentId };
+  const txSignature = await sendUsdc(paymentQuote, requirements.description, {
     onSignature: (signature) => options.onSignature?.(
       signature,
       checkoutBody.data.paymentIntentId,

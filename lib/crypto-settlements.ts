@@ -135,7 +135,12 @@ export function readPendingCryptoSettlements(userId?: string): PendingCryptoSett
 function writePendingCryptoSettlements(items: PendingCryptoSettlement[]): void {
   const store = storage();
   if (!store) return;
-  store.setItem(STORAGE_KEY, JSON.stringify(items));
+  try {
+    store.setItem(STORAGE_KEY, JSON.stringify(items));
+  } catch {
+    // Immediate settlement must continue after broadcast even when storage is
+    // blocked or full. The caller still retains the in-memory pending object.
+  }
 }
 
 export function upsertPendingCryptoSettlement(item: PendingCryptoSettlement): void {

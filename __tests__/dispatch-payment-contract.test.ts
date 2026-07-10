@@ -2,10 +2,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Keypair } from '@solana/web3.js';
 import {
   DispatchSkinClaimableError,
+  clearPendingDispatchSkinSettlement,
   claimPaidSkinCnft,
   createSkinPaymentIntent,
   fetchDispatchSkinCnfts,
+  getPendingDispatchSkinSettlement,
   purchaseSkinCnft,
+  savePendingDispatchSkinSettlement,
 } from '@/lib/agent-dispatch/leaderboard';
 
 afterEach(() => vi.unstubAllGlobals());
@@ -57,6 +60,8 @@ describe('Dispatch premium skin payment contract', () => {
 
     await expect(purchaseSkinCnft('singularity', 'tx-signature', 'spi_dispatch_1')).resolves.toEqual({
       minted: false,
+      pending: false,
+      status: undefined,
       retry: true,
       solscan: null,
     });
@@ -103,10 +108,79 @@ describe('Dispatch premium skin payment contract', () => {
     ]);
     await expect(claimPaidSkinCnft('singularity', payerWallet)).resolves.toEqual({
       minted: true,
+      pending: false,
+      status: undefined,
       solscan: 'https://solscan.io/tx/mint',
     });
     expect(fetchMock.mock.calls[1][0]).toContain('/dispatch/skin/singularity/claim');
     expect((fetchMock.mock.calls[1][1] as RequestInit).body).toBe(JSON.stringify({ address: payerWallet }));
+  });
+
+  it('reports an ambiguous mint as pending without requesting another payment', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({
+      success: true,
+      data: { minted: false, pending: true, retry: false, status: 'minting' },
+    }), { status: 200, headers: { 'content-type': 'application/json' } })));
+
+    await expect(purchaseSkinCnft('singularity', 'tx-signature', 'spi_dispatch_1')).resolves.toEqual({
+      minted: false,
+      pending: true,
+      status: 'minting',
+      retry: false,
+      solscan: null,
+    });
+  });
+
+  it('persists a broadcast settlement for 24-hour retry before another payment', () => {
+    const storage = new Map<string, string>();
+    vi.stubGlobal('window', {
+      localStorage: {
+        getItem: (key: string) => storage.get(key) ?? null,
+        setItem: (key: string, value: string) => storage.set(key, value),
+      },
+    });
+    const payerWallet = payerWalletForTest();
+    const createdAt = new Date('2026-07-10T10:00:00.000Z').getTime();
+    savePendingDispatchSkinSettlement({
+      skinId: 'singularity',
+      payerWallet,
+      paymentIntentId: 'spi_dispatch_pending',
+      txSignature: 'broadcast-signature',
+      createdAt,
+    });
+
+    expect(getPendingDispatchSkinSettlement('singularity', payerWallet, createdAt + 23 * 60 * 60 * 1000))
+      .toMatchObject({ paymentIntentId: 'spi_dispatch_pending', txSignature: 'broadcast-signature' });
+    expect(getPendingDispatchSkinSettlement('singularity', payerWallet, createdAt + 25 * 60 * 60 * 1000))
+      .toBeNull();
+  });
+
+  it('clears only the accepted skin settlement for the matching wallet', () => {
+    const storage = new Map<string, string>();
+    vi.stubGlobal('window', {
+      localStorage: {
+        getItem: (key: string) => storage.get(key) ?? null,
+        setItem: (key: string, value: string) => storage.set(key, value),
+      },
+    });
+    const payerWallet = payerWalletForTest();
+    savePendingDispatchSkinSettlement({
+      skinId: 'singularity',
+      payerWallet,
+      paymentIntentId: 'spi_one',
+      txSignature: 'sig-one',
+    });
+    savePendingDispatchSkinSettlement({
+      skinId: 'nebula',
+      payerWallet,
+      paymentIntentId: 'spi_two',
+      txSignature: 'sig-two',
+    });
+
+    clearPendingDispatchSkinSettlement('singularity', payerWallet);
+
+    expect(getPendingDispatchSkinSettlement('singularity', payerWallet)).toBeNull();
+    expect(getPendingDispatchSkinSettlement('nebula', payerWallet)?.txSignature).toBe('sig-two');
   });
 
   it('rejects settlement errors instead of granting local ownership', async () => {

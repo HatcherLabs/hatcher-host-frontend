@@ -125,4 +125,28 @@ describe('crypto settlement queue', () => {
 
     expect(readPendingCryptoSettlements()).toEqual([recent]);
   });
+
+  it('continues in memory when localStorage rejects a post-broadcast write', () => {
+    Object.defineProperty(globalThis, 'window', {
+      configurable: true,
+      value: {
+        localStorage: {
+          getItem: () => null,
+          setItem: () => { throw new DOMException('quota exceeded', 'QuotaExceededError'); },
+        },
+      },
+    });
+    const pending = createPendingCryptoSettlement({
+      rail: 'hatch',
+      flow: 'tier',
+      targetKey: 'starter',
+      billingPeriod: 'monthly',
+      amountUsd: 6.29,
+      txSignature: 'already-broadcast-signature',
+      paymentIntentId: 'spi_broadcast',
+    });
+
+    expect(() => upsertPendingCryptoSettlement(pending)).not.toThrow();
+    expect(pending.txSignature).toBe('already-broadcast-signature');
+  });
 });

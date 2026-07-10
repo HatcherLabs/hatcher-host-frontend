@@ -24,6 +24,7 @@ function serverQuote(
   overrides: Partial<SolanaPaymentQuote> = {},
 ): SolanaPaymentQuote {
   return {
+    intentId: 'intent-123',
     payerWallet,
     recipientWallet: TREASURY_WALLET,
     tokenMint: paymentToken === 'sol' ? null : MINTS[paymentToken],
@@ -32,7 +33,7 @@ function serverQuote(
     expectedAmount: 10,
     minAcceptable: 9.5,
     memo: 'hatcher-payment:intent-123',
-    expiresAt: new Date(Date.now() + 60_000).toISOString(),
+    expiresAt: new Date(Date.now() + 5 * 60_000).toISOString(),
     ...overrides,
   };
 }
@@ -99,6 +100,20 @@ describe('Solana payment helpers', () => {
     )).toThrow('expired');
   });
 
+  it('rejects quotes too close to expiry or whose memo does not match the intent id', () => {
+    const payer = Keypair.generate().publicKey.toBase58();
+    expect(() => validateSolanaPaymentQuote(
+      serverQuote(payer, 'sol', { expiresAt: new Date(Date.now() + 119_999).toISOString() }),
+      'sol',
+      payer,
+    )).toThrow('too close to expiry');
+    expect(() => validateSolanaPaymentQuote(
+      serverQuote(payer, 'sol', { memo: 'hatcher-payment:different-intent' }),
+      'sol',
+      payer,
+    )).toThrow('invalid memo');
+  });
+
   it('uses the exact SOL amount and recipient from the server quote', async () => {
     const calls: string[] = [];
     const payer = Keypair.generate();
@@ -145,6 +160,32 @@ describe('Solana payment helpers', () => {
     expect(wallet.sendTransaction).not.toHaveBeenCalled();
     expect(connection.sendRawTransaction).toHaveBeenCalled();
     expect(calls).toEqual(['sign', 'broadcast', 'signature:raw-signature-123', 'confirm']);
+  });
+
+  it('does not broadcast when the quote expires while the wallet approval is open', async () => {
+    let now = new Date('2026-07-10T10:00:00.000Z').getTime();
+    const dateNow = vi.spyOn(Date, 'now').mockImplementation(() => now);
+    const calls: string[] = [];
+    const { wallet, keypair } = mockSigningWallet(calls);
+    vi.mocked(wallet.signTransaction!).mockImplementationOnce(async (tx) => {
+      calls.push('sign');
+      if (!(tx instanceof Transaction)) throw new Error('Expected a legacy transaction');
+      tx.partialSign(keypair);
+      now += 181_000;
+      return tx;
+    });
+    const connection = mockConnection(calls);
+
+    await expect(payWithSol({
+      wallet,
+      connection,
+      quote: serverQuote(keypair.publicKey.toBase58(), 'sol', {
+        expiresAt: new Date(now + 180_000).toISOString(),
+      }),
+    })).rejects.toThrow('expired');
+    dateNow.mockRestore();
+
+    expect(connection.sendRawTransaction).not.toHaveBeenCalled();
   });
 
   it('emits the SOL signature before confirmation can fail', async () => {

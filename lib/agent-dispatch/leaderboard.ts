@@ -112,7 +112,7 @@ export async function fetchSurge(): Promise<SurgeData | null> {
 export interface TrophyRow {
   month: string;
   rank: number;
-  status: string; // claimable | claimed
+  status: string; // claimable | minting | claimed
   wallet: string | null;
   tx: string | null;
   solscan: string | null;
@@ -125,10 +125,79 @@ export interface TrophiesData {
 
 export interface DispatchSkinCnftRow {
   skinId: string;
-  status: 'claimable' | 'minted' | string;
+  status: 'claimable' | 'minting' | 'minted' | string;
   wallet: string | null;
   tx: string | null;
   solscan: string | null;
+}
+
+export interface PendingDispatchSkinSettlement {
+  skinId: string;
+  payerWallet: string;
+  paymentIntentId: string;
+  txSignature: string;
+  createdAt: number;
+}
+
+const PENDING_DISPATCH_SKIN_SETTLEMENTS_KEY = 'hatcher:dispatch:pending-skin-settlements:v1';
+const PENDING_DISPATCH_SKIN_SETTLEMENT_TTL_MS = 24 * 60 * 60 * 1000;
+
+function readPendingDispatchSkinSettlements(now = Date.now()): PendingDispatchSkinSettlement[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(PENDING_DISPATCH_SKIN_SETTLEMENTS_KEY) ?? '[]') as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((entry): entry is PendingDispatchSkinSettlement => {
+      if (!entry || typeof entry !== 'object') return false;
+      const value = entry as Partial<PendingDispatchSkinSettlement>;
+      return typeof value.skinId === 'string'
+        && typeof value.payerWallet === 'string'
+        && typeof value.paymentIntentId === 'string'
+        && typeof value.txSignature === 'string'
+        && typeof value.createdAt === 'number'
+        && value.createdAt <= now
+        && now - value.createdAt <= PENDING_DISPATCH_SKIN_SETTLEMENT_TTL_MS;
+    });
+  } catch {
+    return [];
+  }
+}
+
+function writePendingDispatchSkinSettlements(entries: PendingDispatchSkinSettlement[]): void {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(PENDING_DISPATCH_SKIN_SETTLEMENTS_KEY, JSON.stringify(entries));
+  } catch {
+    // Settlement still remains recoverable through support and the backend.
+  }
+}
+
+export function savePendingDispatchSkinSettlement(
+  settlement: Omit<PendingDispatchSkinSettlement, 'createdAt'> & { createdAt?: number },
+): void {
+  const createdAt = settlement.createdAt ?? Date.now();
+  const entries = readPendingDispatchSkinSettlements(createdAt).filter((entry) => (
+    entry.skinId !== settlement.skinId || entry.payerWallet !== settlement.payerWallet
+  ));
+  entries.push({ ...settlement, createdAt });
+  writePendingDispatchSkinSettlements(entries);
+}
+
+export function getPendingDispatchSkinSettlement(
+  skinId: string,
+  payerWallet: string,
+  now = Date.now(),
+): PendingDispatchSkinSettlement | null {
+  const entries = readPendingDispatchSkinSettlements(now);
+  writePendingDispatchSkinSettlements(entries);
+  return entries.find((entry) => entry.skinId === skinId && entry.payerWallet === payerWallet) ?? null;
+}
+
+export function clearPendingDispatchSkinSettlement(skinId: string, payerWallet: string): void {
+  const entries = readPendingDispatchSkinSettlements().filter((entry) => (
+    entry.skinId !== skinId || entry.payerWallet !== payerWallet
+  ));
+  writePendingDispatchSkinSettlements(entries);
 }
 
 export async function fetchDispatchSkinCnfts(): Promise<DispatchSkinCnftRow[]> {
@@ -153,7 +222,7 @@ export async function fetchTrophies(): Promise<TrophiesData | null> {
 export async function claimTrophy(
   month: string,
   address: string,
-): Promise<{ ok: boolean; solscan?: string | null; error?: string }> {
+): Promise<{ ok: boolean; pending?: boolean; status?: string; solscan?: string | null; error?: string }> {
   try {
     const res = await fetch(`${API_URL}/dispatch/trophy/${month}/claim`, {
       method: 'POST',
@@ -161,9 +230,18 @@ export async function claimTrophy(
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ address }),
     });
-    const json = (await res.json()) as { success?: boolean; error?: string; data?: { solscan?: string | null } };
+    const json = (await res.json()) as {
+      success?: boolean;
+      error?: string;
+      data?: { claimed?: boolean; alreadyClaimed?: boolean; pending?: boolean; status?: string; solscan?: string | null };
+    };
     if (!res.ok || json.success === false) return { ok: false, error: json.error ?? 'Claim failed' };
-    return { ok: true, solscan: json.data?.solscan ?? null };
+    return {
+      ok: true,
+      pending: json.data?.pending === true,
+      status: json.data?.status,
+      solscan: json.data?.solscan ?? null,
+    };
   } catch {
     return { ok: false, error: 'Network error' };
   }
@@ -203,7 +281,7 @@ export async function createSkinPaymentIntent(
 export async function claimPaidSkinCnft(
   skinId: string,
   address: string,
-): Promise<{ minted: boolean; solscan?: string | null }> {
+): Promise<{ minted: boolean; pending: boolean; status?: string; solscan?: string | null }> {
   const res = await fetch(`${API_URL}/dispatch/skin/${encodeURIComponent(skinId)}/claim`, {
     method: 'POST',
     credentials: 'include',
@@ -213,13 +291,15 @@ export async function claimPaidSkinCnft(
   const json = (await res.json()) as {
     success?: boolean;
     error?: string;
-    data?: { minted?: boolean; alreadyMinted?: boolean; solscan?: string | null };
+    data?: { minted?: boolean; alreadyMinted?: boolean; pending?: boolean; status?: string; solscan?: string | null };
   };
   if (!res.ok || json.success === false || !json.data) {
     throw new Error(json.error ?? 'Skin cNFT claim failed');
   }
   return {
     minted: json.data.minted === true || json.data.alreadyMinted === true,
+    pending: json.data.pending === true,
+    status: json.data.status,
     solscan: json.data.solscan ?? null,
   };
 }
@@ -229,7 +309,7 @@ export async function purchaseSkinCnft(
   skinId: string,
   txSignature: string,
   paymentIntentId: string,
-): Promise<{ minted: boolean; solscan?: string | null; retry?: boolean }> {
+): Promise<{ minted: boolean; pending: boolean; status?: string; solscan?: string | null; retry?: boolean }> {
   const res = await fetch(`${API_URL}/dispatch/skin/${encodeURIComponent(skinId)}/purchase`, {
     method: 'POST',
     credentials: 'include',
@@ -239,12 +319,18 @@ export async function purchaseSkinCnft(
   const json = (await res.json()) as {
     success?: boolean;
     error?: string;
-    data?: { minted?: boolean; solscan?: string | null; retry?: boolean };
+    data?: { minted?: boolean; pending?: boolean; status?: string; solscan?: string | null; retry?: boolean };
   };
   if (!res.ok || json.success === false || !json.data) {
     throw new Error(json.error ?? 'Skin payment settlement failed');
   }
-  return { minted: !!json.data.minted, solscan: json.data.solscan ?? null, retry: !!json.data.retry };
+  return {
+    minted: !!json.data.minted,
+    pending: json.data.pending === true,
+    status: json.data.status,
+    solscan: json.data.solscan ?? null,
+    retry: !!json.data.retry,
+  };
 }
 
 export interface ReceiptRow {

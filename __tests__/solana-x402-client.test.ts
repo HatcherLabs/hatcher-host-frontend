@@ -19,7 +19,7 @@ function intent(overrides: Partial<CheckoutResponse> = {}): CheckoutResponse {
     accepts: [],
     paymentIntentId: 'spi_x402_123',
     memo: 'hatcher-payment:spi_x402_123',
-    expiresAt: new Date(Date.now() + 60_000).toISOString(),
+    expiresAt: new Date(Date.now() + 5 * 60_000).toISOString(),
     payerWallet,
     recipientWallet,
     tokenMint,
@@ -92,7 +92,7 @@ describe('Solana x402 payment requirements', () => {
     expect(decodedHeaders[0].scheme).toBe('exact');
   });
 
-  it('passes the intent quote unchanged to the wallet sender', async () => {
+  it('passes an intent-bound quote to the wallet sender', async () => {
     const checkout = intent();
     checkout.accepts = [requirements()];
     const fetchMock = vi.fn()
@@ -118,7 +118,7 @@ describe('Solana x402 payment requirements', () => {
     );
 
     expect(sendUsdc).toHaveBeenCalledWith(
-      checkout,
+      { ...checkout, intentId: checkout.paymentIntentId },
       'Hatcher plan',
       expect.objectContaining({ onSignature: expect.any(Function) }),
     );

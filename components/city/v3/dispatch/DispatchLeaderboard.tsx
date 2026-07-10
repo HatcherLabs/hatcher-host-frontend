@@ -451,7 +451,15 @@ function TrophiesSection({ trophies, onClaimed }: { trophies: TrophiesData | nul
     setBusy(month);
     const r = await claimTrophy(month, address);
     setBusy(null);
-    setMsg({ month, text: r.ok ? 'Claimed! NFT sent to your wallet.' : r.error ?? 'Claim failed', ok: r.ok });
+    setMsg({
+      month,
+      text: r.ok
+        ? r.pending
+          ? 'Mint submitted. On-chain confirmation is pending.'
+          : 'Claimed! NFT sent to your wallet.'
+        : r.error ?? 'Claim failed',
+      ok: r.ok,
+    });
     if (r.ok) onClaimed();
   };
 
@@ -474,11 +482,13 @@ function TrophiesSection({ trophies, onClaimed }: { trophies: TrophiesData | nul
                 ) : (
                   <span className="text-[#9ed5e7]">⛓ minted</span>
                 )
+              ) : t.status === 'minting' ? (
+                <span className="text-[#9ed5e7]">mint pending</span>
               ) : (
                 <span className="text-[#ffd24a]">claimable</span>
               )}
             </div>
-            {t.status !== 'claimed' && (
+            {t.status === 'claimable' && (
               <div className="mt-2 flex flex-col gap-1.5">
                 <div className="flex gap-1.5">
                   <input

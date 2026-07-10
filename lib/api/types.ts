@@ -58,6 +58,7 @@ export type SolanaPaymentIntentRequest = SolanaPaymentTarget & {
 };
 
 export interface SolanaPaymentQuote {
+  intentId?: string;
   memo: string;
   expiresAt: string;
   payerWallet: string;

@@ -23,6 +23,7 @@ const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ
 const TOKEN_2022_PROGRAM_ID = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
 const MEMO_PROGRAM_ID = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
 export type SplPaymentMint = 'usdc' | 'hatch' | 'kausa' | 'ansem';
+export const MIN_PAYMENT_QUOTE_VALIDITY_MS = 120_000;
 
 const SPL_PAYMENT_TOKENS: Record<SplPaymentMint, {
   decimals: number;
@@ -78,11 +79,13 @@ async function signAndBroadcastTransaction(params: {
   connection: Connection;
   transaction: Transaction;
   label: string;
+  validateBeforeBroadcast?: () => void;
 }): Promise<string> {
-  const { wallet, connection, transaction, label } = params;
+  const { wallet, connection, transaction, label, validateBeforeBroadcast } = params;
 
   if (wallet.signTransaction) {
     const signed = await wallet.signTransaction(transaction);
+    validateBeforeBroadcast?.();
     return connection.sendRawTransaction(signed.serialize(), {
       skipPreflight: false,
       preflightCommitment: 'confirmed',
@@ -102,6 +105,7 @@ export function validateSolanaPaymentQuote(
   expectedToken: SolanaPaymentToken,
   payerWallet: string,
   now = Date.now(),
+  minimumValidityMs = MIN_PAYMENT_QUOTE_VALIDITY_MS,
 ): void {
   if (quote.paymentToken !== expectedToken) {
     throw new Error('Server payment quote uses an unexpected token');
@@ -127,6 +131,9 @@ export function validateSolanaPaymentQuote(
   if (!Number.isFinite(expiresAt) || expiresAt <= now) {
     throw new Error('Server payment quote has expired');
   }
+  if (expiresAt - now < minimumValidityMs) {
+    throw new Error('Server payment quote is too close to expiry; request a fresh quote');
+  }
   if (
     !Number.isFinite(quote.amountUsd) || quote.amountUsd <= 0
     || !Number.isFinite(quote.expectedAmount) || quote.expectedAmount <= 0
@@ -136,7 +143,11 @@ export function validateSolanaPaymentQuote(
     throw new Error('Server payment quote contains an invalid amount');
   }
   const memoBytes = Buffer.byteLength(quote.memo, 'utf8');
-  if (!quote.memo.startsWith('hatcher-payment:') || memoBytes > 512) {
+  if (
+    !quote.intentId
+    || quote.memo !== `hatcher-payment:${quote.intentId}`
+    || memoBytes > 512
+  ) {
     throw new Error('Server payment quote contains an invalid memo');
   }
 }
@@ -354,6 +365,13 @@ export async function payWithSol(params: {
       connection,
       transaction: tx,
       label: 'pay-sol',
+      validateBeforeBroadcast: () => validateSolanaPaymentQuote(
+        quote,
+        'sol',
+        publicKey.toBase58(),
+        Date.now(),
+        0,
+      ),
     });
     params.onSignature?.(signature);
   } catch (e) {
@@ -479,6 +497,13 @@ export async function payWithSplToken(params: {
       connection,
       transaction: tx,
       label: `pay-${mint}`,
+      validateBeforeBroadcast: () => validateSolanaPaymentQuote(
+        quote,
+        mint,
+        publicKey.toBase58(),
+        Date.now(),
+        0,
+      ),
     });
   } catch (e) {
     console.error(`[pay-${mint}] sendTransaction FAILED`, e);
