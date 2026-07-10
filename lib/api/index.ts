@@ -6,8 +6,10 @@ export { getToken, setToken, clearToken, isAuthenticated, req } from "./core";
 export type { AuthProfileData, ChatAttachmentPayload } from "./methods";
 export type {
   Payment,
+  DispatchSkinPaymentIntent,
   SolanaPaymentIntent,
   SolanaPaymentIntentRequest,
+  SolanaPaymentQuote,
   SolanaPaymentTarget,
   SolanaPaymentToken,
   SolanaRecurringAsset,

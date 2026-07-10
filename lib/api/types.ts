@@ -57,19 +57,28 @@ export type SolanaPaymentIntentRequest = SolanaPaymentTarget & {
   payerWallet: string;
 };
 
-export interface SolanaPaymentIntent {
-  intentId: string;
+export interface SolanaPaymentQuote {
   memo: string;
   expiresAt: string;
   payerWallet: string;
   recipientWallet: string;
   tokenMint: string | null;
-  featureKey: string;
   amountUsd: number;
   expectedAmount: number;
   minAcceptable: number;
   paymentToken: SolanaPaymentToken;
+}
+
+export interface SolanaPaymentIntent extends SolanaPaymentQuote {
+  intentId: string;
+  featureKey: string;
   target: SolanaPaymentTarget;
+}
+
+export interface DispatchSkinPaymentIntent extends SolanaPaymentQuote {
+  intentId: string;
+  featureKey: string;
+  target: { kind: "dispatch_skin"; key: string };
 }
 
 export type SolanaRecurringAsset = "usdc";

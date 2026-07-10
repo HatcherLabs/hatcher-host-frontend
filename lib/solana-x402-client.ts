@@ -2,7 +2,12 @@
 // Solana x402 client for USDC payments.
 // ============================================================
 
-import { API_URL, TREASURY_WALLET, USDC_TOKEN_MINT } from '@/lib/config';
+import { API_URL } from '@/lib/config';
+import type { SolanaPaymentQuote } from '@/lib/api/types';
+import { validateSolanaPaymentQuote } from '@/lib/solana-payments';
+
+export const SOLANA_MAINNET_CAIP2 = 'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp' as const;
+export type SolanaX402Network = typeof SOLANA_MAINNET_CAIP2;
 
 export interface PaymentRequirementsRow {
   scheme: string;
@@ -17,13 +22,10 @@ export interface PaymentRequirementsRow {
   extra: { name: string; version: string; decimals?: number };
 }
 
-export interface CheckoutResponse {
+export interface CheckoutResponse extends SolanaPaymentQuote {
   x402Version: number;
   accepts: PaymentRequirementsRow[];
   paymentIntentId: string;
-  memo: string;
-  expiresAt: string;
-  payerWallet: string;
   error?: string;
 }
 
@@ -57,10 +59,9 @@ function base64Encode(input: string): string {
 }
 
 export type SolanaUsdcSender = (
-  usdAmount: number,
+  quote: SolanaPaymentQuote,
   label: string,
-  recipientWallet?: string,
-  options?: { memo?: string; onSignature?: (signature: string) => void },
+  options?: { onSignature?: (signature: string) => void },
 ) => Promise<string>;
 
 function rawUsdcToHuman(raw: string, decimals = 6): number {
@@ -73,11 +74,15 @@ function rawUsdcToHuman(raw: string, decimals = 6): number {
 
 export function validateSolanaX402Requirements(
   requirements: PaymentRequirementsRow,
-): number {
-  if (requirements.scheme !== 'exact' || requirements.network !== 'solana-mainnet') {
+  intent: CheckoutResponse,
+  payerWallet: string,
+): { amount: number; network: SolanaX402Network } {
+  validateSolanaPaymentQuote(intent, 'usdc', payerWallet);
+  if (intent.x402Version !== 1) throw new Error('Server returned an unsupported x402 version');
+  if (requirements.scheme !== 'exact' || requirements.network !== SOLANA_MAINNET_CAIP2) {
     throw new Error('Server returned unsupported Solana payment requirements');
   }
-  if (requirements.asset !== USDC_TOKEN_MINT || requirements.payTo !== TREASURY_WALLET) {
+  if (requirements.asset !== intent.tokenMint || requirements.payTo !== intent.recipientWallet) {
     throw new Error('Server returned an unexpected payment asset or recipient');
   }
   const decimals = requirements.extra?.decimals;
@@ -90,14 +95,25 @@ export function validateSolanaX402Requirements(
   if (!Number.isSafeInteger(Number(rawAmount)) || !Number.isFinite(amount) || amount <= 0) {
     throw new Error('Server returned an unsafe USDC payment amount');
   }
-  return amount;
+  const expectedRawAmount = BigInt(Math.round(intent.expectedAmount * (10 ** decimals)));
+  if (expectedRawAmount !== rawAmount || Math.abs(intent.amountUsd - amount) > 1e-9) {
+    throw new Error('Payment requirements do not match the server payment intent');
+  }
+  return { amount, network: SOLANA_MAINNET_CAIP2 };
 }
 
 export async function payWithSolanaX402(
   target: PaymentTarget,
   payerWallet: string,
   sendUsdc: SolanaUsdcSender,
-  options: { onSignature?: (signature: string, paymentIntentId: string) => void } = {},
+  options: {
+    onSignature?: (
+      signature: string,
+      paymentIntentId: string,
+      network: SolanaX402Network,
+      amountUsd: number,
+    ) => void;
+  } = {},
 ): Promise<SettleResult> {
   const checkoutRes = await fetch(`${API_URL}/payments/solana-x402/checkout`, {
     method: 'POST',
@@ -123,26 +139,28 @@ export async function payWithSolanaX402(
     throw new Error('Server returned an invalid payment intent');
   }
 
-  const amount = validateSolanaX402Requirements(requirements);
-  const txSignature = await sendUsdc(amount, requirements.description, requirements.payTo, {
+  const { network } = validateSolanaX402Requirements(requirements, checkoutBody.data, payerWallet);
+  const txSignature = await sendUsdc(checkoutBody.data, requirements.description, {
     onSignature: (signature) => options.onSignature?.(
       signature,
       checkoutBody.data.paymentIntentId,
+      network,
+      checkoutBody.data.amountUsd,
     ),
-    memo: checkoutBody.data.memo,
   });
-  return settleSolanaX402Payment(target, txSignature, checkoutBody.data.paymentIntentId);
+  return settleSolanaX402Payment(target, txSignature, checkoutBody.data.paymentIntentId, network);
 }
 
 export async function settleSolanaX402Payment(
   target: PaymentTarget,
   txSignature: string,
   paymentIntentId: string,
+  network: SolanaX402Network,
 ): Promise<SettleResult> {
   const xPayment = base64Encode(JSON.stringify({
     x402Version: 1,
     scheme: 'exact',
-    network: 'solana-mainnet',
+    network,
     payload: {
       txSignature,
       signature: txSignature,

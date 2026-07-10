@@ -3,20 +3,8 @@
 // ============================================================
 // Solana payment helpers — build + sign + send real transactions
 //
-// Usage:
-//   const { signature } = await payWithSol({
-//     wallet, connection, usdAmount, solUsdPrice,
-//   });
-//   await api.subscribe(tierKey, signature);
-//
-// The backend's verifySolanaTransaction() reads the tx from the
-// Solana RPC and checks:
-//   1. tx exists + confirmed
-//   2. signer = wallet.publicKey
-//   3. destination = TREASURY_WALLET (env)
-//   4. amount >= minAcceptable (backend re-computes from tier + live price
-//      with ~5% slippage tolerance)
-//   5. tx signature not already consumed (UNIQUE in DB)
+// Every transfer is built from a short-lived server payment quote. The
+// browser never re-prices the purchase or substitutes its own recipient/mint.
 // ============================================================
 
 import {
@@ -25,17 +13,10 @@ import {
   SystemProgram,
   Transaction,
   TransactionInstruction,
-  LAMPORTS_PER_SOL,
 } from '@solana/web3.js';
 import { Buffer } from 'buffer';
 import type { WalletContextState } from '@solana/wallet-adapter-react';
-import {
-  TREASURY_WALLET,
-  HATCH_TOKEN_MINT,
-  USDC_TOKEN_MINT,
-  KAUSA_TOKEN_MINT,
-  ANSEM_TOKEN_MINT,
-} from './config';
+import type { SolanaPaymentQuote, SolanaPaymentToken } from './api/types';
 
 const ASSOCIATED_TOKEN_PROGRAM_ID = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
 const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
@@ -44,49 +25,36 @@ const MEMO_PROGRAM_ID = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfc
 export type SplPaymentMint = 'usdc' | 'hatch' | 'kausa' | 'ansem';
 
 const SPL_PAYMENT_TOKENS: Record<SplPaymentMint, {
-  mint: string;
   decimals: number;
   symbol: string;
   tokenProgramId: PublicKey;
   burnBps: number;
 }> = {
   usdc: {
-    mint: USDC_TOKEN_MINT,
     decimals: 6,
     symbol: 'USDC',
     tokenProgramId: TOKEN_PROGRAM_ID,
     burnBps: 0,
   },
   hatch: {
-    mint: HATCH_TOKEN_MINT,
     decimals: 6,
     symbol: '$HATCHER',
     tokenProgramId: TOKEN_2022_PROGRAM_ID,
     burnBps: 1000,
   },
   kausa: {
-    mint: KAUSA_TOKEN_MINT,
     decimals: 6,
     symbol: '$KAUSA',
     tokenProgramId: TOKEN_2022_PROGRAM_ID,
     burnBps: 0,
   },
   ansem: {
-    mint: ANSEM_TOKEN_MINT,
     decimals: 6,
     symbol: '$ANSEM',
     tokenProgramId: TOKEN_2022_PROGRAM_ID,
     burnBps: 1000,
   },
 };
-
-export interface SolQuote {
-  usdAmount: number;
-  solUsdPrice: number;
-  solAmount: number;   // human-readable, e.g. 0.033
-  lamports: number;    // integer lamports sent on-chain
-  quotedAt: number;    // Date.now() — frontend expires the quote after ~60s
-}
 
 interface PaymentCallbacks {
   /** Fired immediately after wallet broadcast returns a signature, before RPC confirmation. */
@@ -129,24 +97,59 @@ async function signAndBroadcastTransaction(params: {
   });
 }
 
-/**
- * Compute how much SOL to send for a given USD amount using the live
- * SOL/USD rate. Adds a 1% buffer on top so that small price drifts
- * between quote and broadcast don't push the payment below backend's
- * minimum-accepted threshold (backend allows ~5%, we reserve ~1% of
- * that for the user).
- */
-export function quoteSolForUsd(usdAmount: number, solUsdPrice: number): SolQuote {
-  if (solUsdPrice <= 0) throw new Error('Invalid SOL price');
-  const solAmount = (usdAmount / solUsdPrice) * 1.01;
-  const lamports = Math.ceil(solAmount * LAMPORTS_PER_SOL);
-  return {
-    usdAmount,
-    solUsdPrice,
-    solAmount: lamports / LAMPORTS_PER_SOL,
-    lamports,
-    quotedAt: Date.now(),
-  };
+export function validateSolanaPaymentQuote(
+  quote: SolanaPaymentQuote,
+  expectedToken: SolanaPaymentToken,
+  payerWallet: string,
+  now = Date.now(),
+): void {
+  if (quote.paymentToken !== expectedToken) {
+    throw new Error('Server payment quote uses an unexpected token');
+  }
+  if (quote.payerWallet !== payerWallet) {
+    throw new Error('Server payment quote is bound to a different payer wallet');
+  }
+  try {
+    new PublicKey(quote.payerWallet);
+    new PublicKey(quote.recipientWallet);
+    if (expectedToken === 'sol') {
+      if (quote.tokenMint !== null) throw new Error('SOL quote must not include a token mint');
+    } else if (!quote.tokenMint) {
+      throw new Error('Token payment quote is missing its mint');
+    } else {
+      new PublicKey(quote.tokenMint);
+    }
+  } catch (error) {
+    if (error instanceof Error && /quote/.test(error.message)) throw error;
+    throw new Error('Server payment quote contains an invalid Solana address');
+  }
+  const expiresAt = Date.parse(quote.expiresAt);
+  if (!Number.isFinite(expiresAt) || expiresAt <= now) {
+    throw new Error('Server payment quote has expired');
+  }
+  if (
+    !Number.isFinite(quote.amountUsd) || quote.amountUsd <= 0
+    || !Number.isFinite(quote.expectedAmount) || quote.expectedAmount <= 0
+    || !Number.isFinite(quote.minAcceptable) || quote.minAcceptable <= 0
+    || quote.minAcceptable > quote.expectedAmount
+  ) {
+    throw new Error('Server payment quote contains an invalid amount');
+  }
+  const memoBytes = Buffer.byteLength(quote.memo, 'utf8');
+  if (!quote.memo.startsWith('hatcher-payment:') || memoBytes > 512) {
+    throw new Error('Server payment quote contains an invalid memo');
+  }
+}
+
+function exactBaseUnits(amountHuman: number, decimals: number): bigint {
+  const scale = 10 ** decimals;
+  const scaled = amountHuman * scale;
+  if (!Number.isFinite(scaled) || scaled <= 0 || scaled > Number.MAX_SAFE_INTEGER) {
+    throw new Error('Payment amount is outside the supported range');
+  }
+  const nearest = Math.round(scaled);
+  const baseUnits = Math.abs(scaled - nearest) < 1e-6 ? nearest : Math.ceil(scaled);
+  return BigInt(baseUnits);
 }
 
 function getAssociatedTokenAddress(
@@ -309,8 +312,7 @@ async function resolveSourceTokenAccount(params: {
 export async function payWithSol(params: {
   wallet: WalletContextState;
   connection: Connection;
-  quote: SolQuote;
-  memo?: string;
+  quote: SolanaPaymentQuote;
   onSignature?: PaymentCallbacks['onSignature'];
 }): Promise<{ signature: string }> {
   const { wallet, connection, quote } = params;
@@ -318,16 +320,19 @@ export async function payWithSol(params: {
   if (!publicKey || (!wallet.signTransaction && !wallet.sendTransaction)) {
     throw new Error('Connect a Solana wallet first');
   }
+  validateSolanaPaymentQuote(quote, 'sol', publicKey.toBase58());
 
-  const treasury = new PublicKey(TREASURY_WALLET);
+  const recipient = new PublicKey(quote.recipientWallet);
+  const lamports = exactBaseUnits(quote.expectedAmount, 9);
+  if (lamports > BigInt(Number.MAX_SAFE_INTEGER)) throw new Error('SOL payment amount is too large');
   const tx = new Transaction().add(
     SystemProgram.transfer({
       fromPubkey: publicKey,
-      toPubkey: treasury,
-      lamports: quote.lamports,
+      toPubkey: recipient,
+      lamports: Number(lamports),
     }),
   );
-  if (params.memo) tx.add(paymentMemoInstruction(params.memo));
+  tx.add(paymentMemoInstruction(quote.memo));
 
   let blockhash: string, lastValidBlockHeight: number;
   try {
@@ -340,6 +345,7 @@ export async function payWithSol(params: {
   }
   tx.recentBlockhash = blockhash;
   tx.feePayer = publicKey;
+  validateSolanaPaymentQuote(quote, 'sol', publicKey.toBase58());
 
   let signature: string;
   try {
@@ -381,27 +387,26 @@ export async function payWithSplToken(params: {
   wallet: WalletContextState;
   connection: Connection;
   mint: SplPaymentMint;
-  amountHuman: number; // e.g. 4.99 USDC or 100000 HATCH
-  recipientWallet?: string;
-  memo?: string;
+  quote: SolanaPaymentQuote;
   onSignature?: PaymentCallbacks['onSignature'];
 }): Promise<{ signature: string }> {
-  const { wallet, connection, mint, amountHuman, recipientWallet } = params;
+  const { wallet, connection, mint, quote } = params;
   const { publicKey } = wallet;
   if (!publicKey || (!wallet.signTransaction && !wallet.sendTransaction)) {
     throw new Error('Connect a Solana wallet first');
   }
+  validateSolanaPaymentQuote(quote, mint, publicKey.toBase58());
 
   const token = SPL_PAYMENT_TOKENS[mint];
   const tokenProgramId = token.tokenProgramId;
-  const mintPubkey = new PublicKey(token.mint);
-  const treasury = new PublicKey(recipientWallet ?? TREASURY_WALLET);
+  const mintPubkey = new PublicKey(quote.tokenMint!);
+  const recipient = new PublicKey(quote.recipientWallet);
 
   const fromAta = getAssociatedTokenAddress(mintPubkey, publicKey, tokenProgramId);
-  const toAta = getAssociatedTokenAddress(mintPubkey, treasury, tokenProgramId);
+  const toAta = getAssociatedTokenAddress(mintPubkey, recipient, tokenProgramId);
 
   const decimals = token.decimals;
-  const totalBaseUnits = BigInt(Math.floor(amountHuman * 10 ** decimals));
+  const totalBaseUnits = exactBaseUnits(quote.expectedAmount, decimals);
   const symbol = token.symbol;
   const source = await resolveSourceTokenAccount({
     connection,
@@ -431,7 +436,7 @@ export async function payWithSplToken(params: {
       createAssociatedTokenAccountInstruction(
         publicKey,       // payer
         toAta,           // ata
-        treasury,        // owner
+        recipient,       // owner
         mintPubkey,      // mint
         tokenProgramId,  // token program (Token-2022 for HATCH)
       ),
@@ -460,11 +465,12 @@ export async function payWithSplToken(params: {
     );
   }
 
-  if (params.memo) tx.add(paymentMemoInstruction(params.memo));
+  tx.add(paymentMemoInstruction(quote.memo));
 
   const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('confirmed');
   tx.recentBlockhash = blockhash;
   tx.feePayer = publicKey;
+  validateSolanaPaymentQuote(quote, mint, publicKey.toBase58());
 
   let signature: string;
   try {

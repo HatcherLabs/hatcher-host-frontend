@@ -7,6 +7,7 @@ import {
   shouldDropPendingCryptoSettlement,
   upsertPendingCryptoSettlement,
 } from '@/lib/crypto-settlements';
+import { SOLANA_MAINNET_CAIP2 } from '@/lib/solana-x402-client';
 
 const originalWindow = (globalThis as { window?: unknown }).window;
 
@@ -56,6 +57,7 @@ describe('crypto settlement queue', () => {
       amountUsd: 7,
       txSignature: 'tx-user-2',
       paymentIntentId: 'intent-user-2',
+      x402Network: SOLANA_MAINNET_CAIP2,
       userId: 'user-2',
     });
     const third = createPendingCryptoSettlement({
@@ -89,5 +91,38 @@ describe('crypto settlement queue', () => {
     expect(shouldDropPendingCryptoSettlement('Payment verification failed: Transaction too old (>30 minutes)')).toBe(false);
     expect(shouldDropPendingCryptoSettlement('Transaction signature has already been used')).toBe(false);
     expect(shouldDropPendingCryptoSettlement('Add-on already unlocked')).toBe(true);
+  });
+
+  it('keeps intent-bound transfers recoverable for 24 hours', () => {
+    installLocalStorage();
+    const recent = {
+      ...createPendingCryptoSettlement({
+        rail: 'sol' as const,
+        flow: 'tier' as const,
+        targetKey: 'starter',
+        billingPeriod: 'monthly' as const,
+        amountUsd: 6.99,
+        txSignature: 'tx-23-hours',
+        paymentIntentId: 'intent-23-hours',
+      }),
+      createdAt: Date.now() - (23 * 60 * 60 * 1000),
+    };
+    const expired = {
+      ...createPendingCryptoSettlement({
+        rail: 'sol' as const,
+        flow: 'tier' as const,
+        targetKey: 'starter',
+        billingPeriod: 'monthly' as const,
+        amountUsd: 6.99,
+        txSignature: 'tx-25-hours',
+        paymentIntentId: 'intent-25-hours',
+      }),
+      createdAt: Date.now() - (25 * 60 * 60 * 1000),
+    };
+
+    upsertPendingCryptoSettlement(recent);
+    upsertPendingCryptoSettlement(expired);
+
+    expect(readPendingCryptoSettlements()).toEqual([recent]);
   });
 });

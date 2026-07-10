@@ -15,7 +15,7 @@ import type { UserTierKey, AddonKey } from '@hatcher/shared';
 import { usePaymentDrivers } from '@/lib/payment-drivers';
 import { ConfirmPaymentModal } from '@/components/payments/ConfirmPaymentModal';
 import { formatFeatureKey } from '@/lib/feature-labels';
-import { payWithSolanaX402 } from '@/lib/solana-x402-client';
+import { payWithSolanaX402, type SolanaX402Network } from '@/lib/solana-x402-client';
 import { trustedRedirectUrl } from '@/lib/trusted-redirect';
 import {
   cancelSolanaRecurringAuthorizationOnChain,
@@ -610,6 +610,7 @@ export default function BillingPage() {
     txSignature: string,
     paymentIntentId: string,
     agentId?: string,
+    x402Network?: SolanaX402Network,
   ): PendingCryptoSettlement => {
     const pending = createPendingCryptoSettlement({
       rail,
@@ -619,6 +620,7 @@ export default function BillingPage() {
       amountUsd,
       txSignature,
       paymentIntentId,
+      ...(x402Network ? { x402Network } : {}),
       ...(user?.id ? { userId: user.id } : {}),
       ...(agentId ? { agentId } : {}),
     });
@@ -928,10 +930,9 @@ export default function BillingPage() {
       logCryptoPaymentIntent('sol', 'tier', tierKey, period, price);
       const intent = await createDirectPaymentIntent('sol', 'tier', tierKey, period);
       const txSignature = await driveSol(
-        intent.amountUsd,
+        intent,
         `Subscribe to ${tierConfig.name}${period === 'annual' ? ' (annual)' : ''}`,
         {
-          memo: intent.memo,
           onSignature: (signature) => {
             pending = registerPendingCryptoPayment('sol', 'tier', tierKey, period, intent.amountUsd, signature, intent.intentId);
           },
@@ -973,10 +974,9 @@ export default function BillingPage() {
       logCryptoPaymentIntent('hatch', 'tier', tierKey, period, price);
       const intent = await createDirectPaymentIntent('hatch', 'tier', tierKey, period);
       const txSignature = await driveHatch(
-        intent.amountUsd,
+        intent,
         `Subscribe to ${tierConfig.name}${period === 'annual' ? ' (annual)' : ''}`,
         {
-          memo: intent.memo,
           onSignature: (signature) => {
             pending = registerPendingCryptoPayment('hatch', 'tier', tierKey, period, intent.amountUsd, signature, intent.intentId);
           },
@@ -1018,10 +1018,9 @@ export default function BillingPage() {
       logCryptoPaymentIntent('kausa', 'tier', tierKey, period, price);
       const intent = await createDirectPaymentIntent('kausa', 'tier', tierKey, period);
       const txSignature = await driveKausa(
-        intent.amountUsd,
+        intent,
         `Subscribe to ${tierConfig.name}${period === 'annual' ? ' (annual)' : ''}`,
         {
-          memo: intent.memo,
           onSignature: (signature) => {
             pending = registerPendingCryptoPayment('kausa', 'tier', tierKey, period, intent.amountUsd, signature, intent.intentId);
           },
@@ -1063,10 +1062,9 @@ export default function BillingPage() {
       logCryptoPaymentIntent('ansem', 'tier', tierKey, period, price);
       const intent = await createDirectPaymentIntent('ansem', 'tier', tierKey, period);
       const txSignature = await driveAnsem(
-        intent.amountUsd,
+        intent,
         `Subscribe to ${tierConfig.name}${period === 'annual' ? ' (annual)' : ''}`,
         {
-          memo: intent.memo,
           onSignature: (signature) => {
             pending = registerPendingCryptoPayment('ansem', 'tier', tierKey, period, intent.amountUsd, signature, intent.intentId);
           },
@@ -1112,8 +1110,10 @@ export default function BillingPage() {
         payerWallet,
         driveUsdc,
         {
-          onSignature: (signature, paymentIntentId) => {
-            pending = registerPendingCryptoPayment('usdc', 'tier', tierKey, period, price, signature, paymentIntentId);
+          onSignature: (signature, paymentIntentId, network, quotedAmountUsd) => {
+            pending = registerPendingCryptoPayment(
+              'usdc', 'tier', tierKey, period, quotedAmountUsd, signature, paymentIntentId, undefined, network,
+            );
           },
         },
       );
@@ -1229,10 +1229,9 @@ export default function BillingPage() {
       logCryptoPaymentIntent('sol', 'addon', addonKey, period, price, selectedAgentId ?? undefined);
       const intent = await createDirectPaymentIntent('sol', 'addon', addonKey, period, selectedAgentId ?? undefined);
       const txSignature = await driveSol(
-        intent.amountUsd,
+        intent,
         `${addonConfig.name}${period === 'annual' ? ' (annual)' : ''}`,
         {
-          memo: intent.memo,
           onSignature: (signature) => {
             pending = registerPendingCryptoPayment('sol', 'addon', addonKey, period, intent.amountUsd, signature, intent.intentId, selectedAgentId ?? undefined);
           },
@@ -1276,10 +1275,9 @@ export default function BillingPage() {
       logCryptoPaymentIntent('hatch', 'addon', addonKey, period, price, selectedAgentId ?? undefined);
       const intent = await createDirectPaymentIntent('hatch', 'addon', addonKey, period, selectedAgentId ?? undefined);
       const txSignature = await driveHatch(
-        intent.amountUsd,
+        intent,
         `${addonConfig.name}${period === 'annual' ? ' (annual)' : ''}`,
         {
-          memo: intent.memo,
           onSignature: (signature) => {
             pending = registerPendingCryptoPayment('hatch', 'addon', addonKey, period, intent.amountUsd, signature, intent.intentId, selectedAgentId ?? undefined);
           },
@@ -1323,10 +1321,9 @@ export default function BillingPage() {
       logCryptoPaymentIntent('kausa', 'addon', addonKey, period, price, selectedAgentId ?? undefined);
       const intent = await createDirectPaymentIntent('kausa', 'addon', addonKey, period, selectedAgentId ?? undefined);
       const txSignature = await driveKausa(
-        intent.amountUsd,
+        intent,
         `${addonConfig.name}${period === 'annual' ? ' (annual)' : ''}`,
         {
-          memo: intent.memo,
           onSignature: (signature) => {
             pending = registerPendingCryptoPayment('kausa', 'addon', addonKey, period, intent.amountUsd, signature, intent.intentId, selectedAgentId ?? undefined);
           },
@@ -1370,10 +1367,9 @@ export default function BillingPage() {
       logCryptoPaymentIntent('ansem', 'addon', addonKey, period, price, selectedAgentId ?? undefined);
       const intent = await createDirectPaymentIntent('ansem', 'addon', addonKey, period, selectedAgentId ?? undefined);
       const txSignature = await driveAnsem(
-        intent.amountUsd,
+        intent,
         `${addonConfig.name}${period === 'annual' ? ' (annual)' : ''}`,
         {
-          memo: intent.memo,
           onSignature: (signature) => {
             pending = registerPendingCryptoPayment('ansem', 'addon', addonKey, period, intent.amountUsd, signature, intent.intentId, selectedAgentId ?? undefined);
           },
@@ -1422,8 +1418,11 @@ export default function BillingPage() {
         billingPeriod: period,
         ...(selectedAgentId ? { agentId: selectedAgentId } : {}),
       }, payerWallet, driveUsdc, {
-        onSignature: (signature, paymentIntentId) => {
-          pending = registerPendingCryptoPayment('usdc', 'addon', addonKey, period, price, signature, paymentIntentId, selectedAgentId ?? undefined);
+        onSignature: (signature, paymentIntentId, network, quotedAmountUsd) => {
+          pending = registerPendingCryptoPayment(
+            'usdc', 'addon', addonKey, period, quotedAmountUsd, signature, paymentIntentId,
+            selectedAgentId ?? undefined, network,
+          );
         },
       });
       const settledPending = pending as PendingCryptoSettlement | null;
