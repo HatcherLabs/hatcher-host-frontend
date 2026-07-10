@@ -61,7 +61,7 @@
     "@playwright/test": "^1.49.0",
     "@types/bn.js": "^5.2.0",
     "@types/canvas-confetti": "^1.9.0",
-    "@types/node": "^22.10.2",
+    "@types/node": "^26.1.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@types/three": "^0.184.0",
