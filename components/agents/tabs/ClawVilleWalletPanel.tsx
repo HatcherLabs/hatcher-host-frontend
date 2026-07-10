@@ -17,6 +17,7 @@ import { api } from '@/lib/api';
 import type { ClawVilleConfigStatus, ClawVillePatchBody, ClawVilleRegisterBody } from '@/lib/api';
 import { GlassCard } from '@/components/agents/AgentContext';
 import { useToast } from '@/components/ui/ToastProvider';
+import { trustedRedirectUrl } from '@/lib/trusted-redirect';
 
 function short(value: string | null | undefined): string {
   if (!value) return '-';
@@ -269,10 +270,11 @@ export function ClawVilleWalletPanel({ agentId }: { agentId: string }) {
         return;
       }
 
+      const launchUrl = trustedRedirectUrl(launchRes.data.launchUrl, 'clawville');
       if (launchWindow) {
-        launchWindow.location.href = launchRes.data.launchUrl;
+        launchWindow.location.href = launchUrl;
       } else {
-        window.location.assign(launchRes.data.launchUrl);
+        window.location.assign(launchUrl);
       }
     } catch (launchError) {
       if (launchWindow) launchWindow.close();

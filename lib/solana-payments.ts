@@ -40,6 +40,7 @@ import {
 const ASSOCIATED_TOKEN_PROGRAM_ID = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
 const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
 const TOKEN_2022_PROGRAM_ID = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
+const MEMO_PROGRAM_ID = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
 export type SplPaymentMint = 'usdc' | 'hatch' | 'kausa' | 'ansem';
 
 const SPL_PAYMENT_TOKENS: Record<SplPaymentMint, {
@@ -90,6 +91,18 @@ export interface SolQuote {
 interface PaymentCallbacks {
   /** Fired immediately after wallet broadcast returns a signature, before RPC confirmation. */
   onSignature?: (signature: string) => void;
+}
+
+function paymentMemoInstruction(memo: string): TransactionInstruction {
+  const data = Buffer.from(memo, 'utf8');
+  if (data.length === 0 || data.length > 512) {
+    throw new Error('Invalid payment intent memo');
+  }
+  return new TransactionInstruction({
+    programId: MEMO_PROGRAM_ID,
+    keys: [],
+    data,
+  });
 }
 
 async function signAndBroadcastTransaction(params: {
@@ -297,6 +310,7 @@ export async function payWithSol(params: {
   wallet: WalletContextState;
   connection: Connection;
   quote: SolQuote;
+  memo?: string;
   onSignature?: PaymentCallbacks['onSignature'];
 }): Promise<{ signature: string }> {
   const { wallet, connection, quote } = params;
@@ -313,6 +327,7 @@ export async function payWithSol(params: {
       lamports: quote.lamports,
     }),
   );
+  if (params.memo) tx.add(paymentMemoInstruction(params.memo));
 
   let blockhash: string, lastValidBlockHeight: number;
   try {
@@ -368,6 +383,7 @@ export async function payWithSplToken(params: {
   mint: SplPaymentMint;
   amountHuman: number; // e.g. 4.99 USDC or 100000 HATCH
   recipientWallet?: string;
+  memo?: string;
   onSignature?: PaymentCallbacks['onSignature'];
 }): Promise<{ signature: string }> {
   const { wallet, connection, mint, amountHuman, recipientWallet } = params;
@@ -443,6 +459,8 @@ export async function payWithSplToken(params: {
       ),
     );
   }
+
+  if (params.memo) tx.add(paymentMemoInstruction(params.memo));
 
   const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('confirmed');
   tx.recentBlockhash = blockhash;

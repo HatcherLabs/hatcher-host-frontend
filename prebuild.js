@@ -9,9 +9,14 @@ const fs = require('node:fs');
 const path = require('node:path');
 const https = require('node:https');
 
-const BASE = 'https://raw.githubusercontent.com/HatcherLabs/hatcher-skill/main';
+const lock = JSON.parse(fs.readFileSync(path.join(__dirname, 'skill-lock.json'), 'utf8'));
+if (!/^[a-f0-9]{40}$/.test(lock.commit)) {
+  throw new Error('skill-lock.json must contain a full immutable Git commit SHA.');
+}
+const BASE = `https://raw.githubusercontent.com/${lock.repository}/${lock.commit}`;
 const FILES = ['skill.md', 'auth.md', 'agents.md', 'pricing.md', 'integrations.md'];
 const OUT_DIR = path.join(__dirname, 'public', 'skill');
+const SOURCE_MARKER = path.join(OUT_DIR, '.source.json');
 
 function fetch(url) {
   return new Promise((resolve, reject) => {
@@ -43,6 +48,12 @@ function checkPublicEnv() {
 async function main() {
   checkPublicEnv();
   fs.mkdirSync(OUT_DIR, { recursive: true });
+  let cachedCommit = null;
+  try {
+    cachedCommit = JSON.parse(fs.readFileSync(SOURCE_MARKER, 'utf8')).commit;
+  } catch {
+    // No previously verified cache.
+  }
   const results = [];
   for (const file of FILES) {
     const outPath = path.join(OUT_DIR, file);
@@ -51,16 +62,18 @@ async function main() {
       fs.writeFileSync(outPath, content);
       results.push({ file, status: 'fetched', bytes: content.length });
     } catch (err) {
-      if (fs.existsSync(outPath)) {
+      if (fs.existsSync(outPath) && cachedCommit === lock.commit) {
         results.push({ file, status: 'stale', error: err.message });
       } else {
-        console.error(`[prebuild] FATAL: ${file} could not be fetched and no local copy exists.`);
+        console.error(`[prebuild] FATAL: ${file} could not be fetched and no verified copy exists for ${lock.commit}.`);
         console.error(`[prebuild] Error: ${err.message}`);
         process.exit(1);
       }
     }
   }
+  fs.writeFileSync(SOURCE_MARKER, `${JSON.stringify({ repository: lock.repository, commit: lock.commit })}\n`);
   console.log('[prebuild] skill files ready:');
+  console.log(`  source   ${lock.repository}@${lock.commit}`);
   for (const r of results) console.log(`  ${r.status.padEnd(8)} ${r.file}${r.bytes ? ` (${r.bytes} B)` : ''}`);
 }
 

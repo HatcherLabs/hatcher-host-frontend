@@ -1,13 +1,12 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AlertTriangle, Loader2, ShieldCheck } from 'lucide-react';
 import { api } from '@/lib/api';
 import {
   buildMedusaAgentReturnPath,
-  decodeMedusaCallbackState,
 } from '@/lib/medusa-callback';
 
 function CallbackShell({
@@ -45,16 +44,11 @@ export default function MedusaCallbackPage() {
   const state = params.get('state');
   const error = params.get('error');
   const status = params.get('status');
-  const campaignId = params.get('campaignId');
-  const claimWallet = params.get('claimWallet');
   const passportUrl = params.get('passportUrl');
   const code = params.get('code');
 
-  const decoded = useMemo(() => decodeMedusaCallbackState(state), [state]);
-  const targetPath = decoded ? buildMedusaAgentReturnPath(decoded.agentId) : null;
-
   useEffect(() => {
-    if (!decoded || !targetPath || error || consumedRef.current) return;
+    if (!state || error || consumedRef.current) return;
 
     if (status && status !== 'success') {
       setCompletionError('Medusa passport registration was not completed.');
@@ -70,11 +64,10 @@ export default function MedusaCallbackPage() {
     setCompletionError(null);
 
     const completeHandoff = async () => {
-      const response = await api.completeAgentMedusaHandoff(decoded.agentId, {
+      const response = await api.completeAgentMedusaHandoff({
+        state,
         passportUrl: passportUrl ?? undefined,
         code: code ?? undefined,
-        campaignId: campaignId ?? decoded.campaignId,
-        claimWallet: claimWallet ?? decoded.claimWallet,
         status: status ?? undefined,
       });
 
@@ -84,11 +77,11 @@ export default function MedusaCallbackPage() {
         return;
       }
 
-      router.replace(targetPath);
+      router.replace(buildMedusaAgentReturnPath(response.data.agentId));
     };
 
     void completeHandoff();
-  }, [campaignId, claimWallet, code, decoded, error, passportUrl, router, status, targetPath]);
+  }, [code, error, passportUrl, router, state, status]);
 
   if (error || completionError) {
     return (
@@ -97,7 +90,7 @@ export default function MedusaCallbackPage() {
           {completionError || 'Return to your agent and start the Medusa passport flow again.'}
         </p>
         <Link
-          href={targetPath ?? '/dashboard/agents'}
+          href="/dashboard/agents"
           className="mt-4 inline-flex text-sm font-semibold text-[var(--accent)] hover:underline"
         >
           Back to agent
@@ -106,7 +99,7 @@ export default function MedusaCallbackPage() {
     );
   }
 
-  if (!targetPath) {
+  if (!state) {
     return (
       <CallbackShell tone="warning" title="Missing Medusa return state">
         <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">

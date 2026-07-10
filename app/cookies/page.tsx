@@ -9,12 +9,12 @@ export const metadata: Metadata = {
     'Detailed breakdown of the cookies and local-storage mechanisms used by Hatcher — what they do, which are strictly necessary, and how to opt out.',
 };
 
-const LAST_UPDATED = 'April 16, 2026';
+const LAST_UPDATED = 'July 10, 2026';
 
 // Keep the rows in this table in sync with what the app actually sets.
-// CookieConsent.tsx reads the `cookie_consent` key in localStorage
-// (essential, not optional). PostHog + Sentry only initialize when the
-// user gives analytics consent — see the hooks in app/layout.tsx.
+// CookieConsent.tsx reads `hatcher-cookie-consent` and mirrors the analytics
+// choice into a first-party cookie so middleware can enforce it before sending
+// a page-view beacon. PostHog and browser-side Sentry start only after opt-in.
 export default function CookiePolicyPage() {
   return (
     <MarketingShell>
@@ -86,21 +86,27 @@ export default function CookiePolicyPage() {
                   </thead>
                   <tbody className="divide-y divide-[var(--border-default)]">
                     <tr>
-                      <td className="px-2 py-1.5 font-mono">jwt_token</td>
-                      <td className="px-2 py-1.5">localStorage</td>
+                      <td className="px-2 py-1.5 font-mono">hatcher_jwt</td>
+                      <td className="px-2 py-1.5">Secure HttpOnly cookie</td>
                       <td className="px-2 py-1.5">Authentication session</td>
-                      <td className="px-2 py-1.5">7 days</td>
+                      <td className="px-2 py-1.5">Up to 7 days</td>
                     </tr>
                     <tr>
-                      <td className="px-2 py-1.5 font-mono">refresh_token</td>
-                      <td className="px-2 py-1.5">localStorage</td>
-                      <td className="px-2 py-1.5">Renew JWT without re-login</td>
+                      <td className="px-2 py-1.5 font-mono">hatcher_refresh</td>
+                      <td className="px-2 py-1.5">Secure HttpOnly cookie</td>
+                      <td className="px-2 py-1.5">Rotate and renew the session</td>
                       <td className="px-2 py-1.5">30 days</td>
                     </tr>
                     <tr>
-                      <td className="px-2 py-1.5 font-mono">cookie_consent</td>
+                      <td className="px-2 py-1.5 font-mono">hatcher-cookie-consent</td>
                       <td className="px-2 py-1.5">localStorage</td>
                       <td className="px-2 py-1.5">Remember your consent choice</td>
+                      <td className="px-2 py-1.5">6 months</td>
+                    </tr>
+                    <tr>
+                      <td className="px-2 py-1.5 font-mono">hatcher_analytics_consent</td>
+                      <td className="px-2 py-1.5">First-party cookie</td>
+                      <td className="px-2 py-1.5">Enforce analytics consent in server middleware</td>
                       <td className="px-2 py-1.5">6 months</td>
                     </tr>
                     <tr>
@@ -187,6 +193,10 @@ export default function CookiePolicyPage() {
                     <tr><td className="px-2 py-1.5 font-mono">recent_agents</td><td className="px-2 py-1.5">Remember your last-opened agents for quick-switcher</td><td className="px-2 py-1.5">Persistent</td></tr>
                     <tr><td className="px-2 py-1.5 font-mono">tour_seen</td><td className="px-2 py-1.5">Dismiss onboarding tour after first time</td><td className="px-2 py-1.5">Persistent</td></tr>
                     <tr><td className="px-2 py-1.5 font-mono">dashboard:*</td><td className="px-2 py-1.5">Cache dashboard shape for fast reload</td><td className="px-2 py-1.5">24h</td></tr>
+                    <tr><td className="px-2 py-1.5 font-mono">hatcher-terminal-sessions:*</td><td className="px-2 py-1.5">Remember terminal tab names; terminal credential values are memory-only and cleared on logout</td><td className="px-2 py-1.5">Persistent</td></tr>
+                    <tr><td className="px-2 py-1.5 font-mono">hatcher:public-chat:*</td><td className="px-2 py-1.5">Keep the selected public-chat session and recent local message history</td><td className="px-2 py-1.5">Until chat reset or site data is cleared</td></tr>
+                    <tr><td className="px-2 py-1.5 font-mono">hatcher:agent:*:draft</td><td className="px-2 py-1.5">Recover an unsent agent-chat draft</td><td className="px-2 py-1.5">Until sent or cleared</td></tr>
+                    <tr><td className="px-2 py-1.5 font-mono">hatcher.pendingCryptoSettlements.v1</td><td className="px-2 py-1.5">Retry finalization after an on-chain payment was submitted</td><td className="px-2 py-1.5">Until settled or manually cleared</td></tr>
                   </tbody>
                 </table>
               </div>

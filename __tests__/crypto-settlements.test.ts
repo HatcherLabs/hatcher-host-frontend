@@ -45,6 +45,7 @@ describe('crypto settlement queue', () => {
       billingPeriod: 'monthly',
       amountUsd: 90,
       txSignature: 'tx-user-1',
+      paymentIntentId: 'intent-user-1',
       userId: 'user-1',
     });
     const second = createPendingCryptoSettlement({
@@ -54,6 +55,7 @@ describe('crypto settlement queue', () => {
       billingPeriod: 'monthly',
       amountUsd: 7,
       txSignature: 'tx-user-2',
+      paymentIntentId: 'intent-user-2',
       userId: 'user-2',
     });
     const third = createPendingCryptoSettlement({
@@ -63,6 +65,7 @@ describe('crypto settlement queue', () => {
       billingPeriod: 'monthly',
       amountUsd: 6.99,
       txSignature: 'tx-user-3',
+      paymentIntentId: 'intent-user-3',
       userId: 'user-3',
     });
 

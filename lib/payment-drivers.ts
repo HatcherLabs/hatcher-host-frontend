@@ -28,11 +28,13 @@ import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { api } from '@/lib/api';
 import { payWithSol, payWithSplToken, quoteSolForUsd } from '@/lib/solana-payments';
 import type { ConfirmPaymentModalState } from '@/components/payments/ConfirmPaymentModal';
+import { TREASURY_WALLET } from '@/lib/config';
 
 export type PaymentRail = 'sol' | 'usdc' | 'hatch' | 'kausa' | 'ansem';
 
 export interface PaymentDriverOptions {
   onSignature?: (signature: string) => void;
+  memo?: string;
 }
 
 export interface UsePaymentDrivers {
@@ -64,6 +66,8 @@ export interface UsePaymentDrivers {
   /** Currently-connected address in base58, or null when disconnected. */
   address: string | null;
   connected: boolean;
+  /** Ensure a wallet is connected and return the payer address for a server intent. */
+  ensurePaymentWallet: () => Promise<string>;
 }
 
 export function usePaymentDrivers(): UsePaymentDrivers {
@@ -142,6 +146,13 @@ export function usePaymentDrivers(): UsePaymentDrivers {
     }
   }, [setWalletModalVisible]);
 
+  const ensurePaymentWallet = useCallback(async (): Promise<string> => {
+    await ensureConnected();
+    const publicKey = walletRef.current.publicKey;
+    if (!publicKey) throw new Error('Connect a Solana wallet first');
+    return publicKey.toBase58();
+  }, [ensureConnected]);
+
   // Matches the Phantom "trust revoked" error that fires when the user
   // disconnected the site from the extension but the adapter still
   // thinks it's connected. Deliberately NARROW — we must NOT match
@@ -169,18 +180,18 @@ export function usePaymentDrivers(): UsePaymentDrivers {
     const quote = quoteSolForUsd(usdAmount, priceRes.data.price);
     const approved = await askConfirm({
       token: 'sol', label, usdAmount,
-      tokenAmount: quote.solAmount, rate: quote.solUsdPrice,
+      tokenAmount: quote.solAmount, rate: quote.solUsdPrice, recipientWallet: TREASURY_WALLET,
     });
     if (!approved) throw new Error('Cancelled');
     try {
-      const { signature } = await payWithSol({ wallet: walletRef.current, connection, quote, onSignature: options.onSignature });
+      const { signature } = await payWithSol({ wallet: walletRef.current, connection, quote, memo: options.memo, onSignature: options.onSignature });
       return signature;
     } catch (e) {
       if (isUserCancellation(e)) throw new Error('Cancelled');
       if (!isTrustRevokedError(e)) throw e;
       // Phantom revoked trust — disconnect, re-prompt, retry once.
       await forceReconnect();
-      const { signature } = await payWithSol({ wallet: walletRef.current, connection, quote, onSignature: options.onSignature });
+      const { signature } = await payWithSol({ wallet: walletRef.current, connection, quote, memo: options.memo, onSignature: options.onSignature });
       return signature;
     }
   }, [connection, ensureConnected, askConfirm, forceReconnect]);
@@ -189,12 +200,12 @@ export function usePaymentDrivers(): UsePaymentDrivers {
     await ensureConnected();
     const approved = await askConfirm({
       token: 'usdc', label, usdAmount,
-      tokenAmount: usdAmount, rate: 1,
+      tokenAmount: usdAmount, rate: 1, recipientWallet: recipientWallet ?? TREASURY_WALLET,
     });
     if (!approved) throw new Error('Cancelled');
     try {
       const { signature } = await payWithSplToken({
-        wallet: walletRef.current, connection, mint: 'usdc', amountHuman: usdAmount, recipientWallet, onSignature: options.onSignature,
+        wallet: walletRef.current, connection, mint: 'usdc', amountHuman: usdAmount, recipientWallet, memo: options.memo, onSignature: options.onSignature,
       });
       return signature;
     } catch (e) {
@@ -202,7 +213,7 @@ export function usePaymentDrivers(): UsePaymentDrivers {
       if (!isTrustRevokedError(e)) throw e;
       await forceReconnect();
       const { signature } = await payWithSplToken({
-        wallet: walletRef.current, connection, mint: 'usdc', amountHuman: usdAmount, recipientWallet, onSignature: options.onSignature,
+        wallet: walletRef.current, connection, mint: 'usdc', amountHuman: usdAmount, recipientWallet, memo: options.memo, onSignature: options.onSignature,
       });
       return signature;
     }
@@ -219,12 +230,12 @@ export function usePaymentDrivers(): UsePaymentDrivers {
     const approved = await askConfirm({
       token: 'hatch', label, usdAmount,
       tokenAmount: hatchAmount, rate: priceRes.data.price,
-      burnAmount, treasuryAmount: hatchAmount - burnAmount,
+      burnAmount, treasuryAmount: hatchAmount - burnAmount, recipientWallet: TREASURY_WALLET,
     });
     if (!approved) throw new Error('Cancelled');
     try {
       const { signature } = await payWithSplToken({
-        wallet: walletRef.current, connection, mint: 'hatch', amountHuman: hatchAmount, onSignature: options.onSignature,
+        wallet: walletRef.current, connection, mint: 'hatch', amountHuman: hatchAmount, memo: options.memo, onSignature: options.onSignature,
       });
       return signature;
     } catch (e) {
@@ -232,7 +243,7 @@ export function usePaymentDrivers(): UsePaymentDrivers {
       if (!isTrustRevokedError(e)) throw e;
       await forceReconnect();
       const { signature } = await payWithSplToken({
-        wallet: walletRef.current, connection, mint: 'hatch', amountHuman: hatchAmount, onSignature: options.onSignature,
+        wallet: walletRef.current, connection, mint: 'hatch', amountHuman: hatchAmount, memo: options.memo, onSignature: options.onSignature,
       });
       return signature;
     }
@@ -247,12 +258,12 @@ export function usePaymentDrivers(): UsePaymentDrivers {
     const kausaAmount = (usdAmount / priceRes.data.price) * 1.01;
     const approved = await askConfirm({
       token: 'kausa', label, usdAmount,
-      tokenAmount: kausaAmount, rate: priceRes.data.price,
+      tokenAmount: kausaAmount, rate: priceRes.data.price, recipientWallet: TREASURY_WALLET,
     });
     if (!approved) throw new Error('Cancelled');
     try {
       const { signature } = await payWithSplToken({
-        wallet: walletRef.current, connection, mint: 'kausa', amountHuman: kausaAmount, onSignature: options.onSignature,
+        wallet: walletRef.current, connection, mint: 'kausa', amountHuman: kausaAmount, memo: options.memo, onSignature: options.onSignature,
       });
       return signature;
     } catch (e) {
@@ -260,7 +271,7 @@ export function usePaymentDrivers(): UsePaymentDrivers {
       if (!isTrustRevokedError(e)) throw e;
       await forceReconnect();
       const { signature } = await payWithSplToken({
-        wallet: walletRef.current, connection, mint: 'kausa', amountHuman: kausaAmount, onSignature: options.onSignature,
+        wallet: walletRef.current, connection, mint: 'kausa', amountHuman: kausaAmount, memo: options.memo, onSignature: options.onSignature,
       });
       return signature;
     }
@@ -277,12 +288,12 @@ export function usePaymentDrivers(): UsePaymentDrivers {
     const approved = await askConfirm({
       token: 'ansem', label, usdAmount,
       tokenAmount: ansemAmount, rate: priceRes.data.price,
-      burnAmount, treasuryAmount: ansemAmount - burnAmount,
+      burnAmount, treasuryAmount: ansemAmount - burnAmount, recipientWallet: TREASURY_WALLET,
     });
     if (!approved) throw new Error('Cancelled');
     try {
       const { signature } = await payWithSplToken({
-        wallet: walletRef.current, connection, mint: 'ansem', amountHuman: ansemAmount, onSignature: options.onSignature,
+        wallet: walletRef.current, connection, mint: 'ansem', amountHuman: ansemAmount, memo: options.memo, onSignature: options.onSignature,
       });
       return signature;
     } catch (e) {
@@ -290,7 +301,7 @@ export function usePaymentDrivers(): UsePaymentDrivers {
       if (!isTrustRevokedError(e)) throw e;
       await forceReconnect();
       const { signature } = await payWithSplToken({
-        wallet: walletRef.current, connection, mint: 'ansem', amountHuman: ansemAmount, onSignature: options.onSignature,
+        wallet: walletRef.current, connection, mint: 'ansem', amountHuman: ansemAmount, memo: options.memo, onSignature: options.onSignature,
       });
       return signature;
     }
@@ -323,6 +334,7 @@ export function usePaymentDrivers(): UsePaymentDrivers {
     driveHatch,
     driveKausa,
     driveAnsem,
+    ensurePaymentWallet,
     openWalletModal,
     reconnect: forceReconnect,
     disconnect,

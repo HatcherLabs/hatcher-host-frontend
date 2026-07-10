@@ -2,7 +2,7 @@
 // Solana x402 client for USDC payments.
 // ============================================================
 
-import { API_URL } from '@/lib/config';
+import { API_URL, TREASURY_WALLET, USDC_TOKEN_MINT } from '@/lib/config';
 
 export interface PaymentRequirementsRow {
   scheme: string;
@@ -20,6 +20,10 @@ export interface PaymentRequirementsRow {
 export interface CheckoutResponse {
   x402Version: number;
   accepts: PaymentRequirementsRow[];
+  paymentIntentId: string;
+  memo: string;
+  expiresAt: string;
+  payerWallet: string;
   error?: string;
 }
 
@@ -56,7 +60,7 @@ export type SolanaUsdcSender = (
   usdAmount: number,
   label: string,
   recipientWallet?: string,
-  options?: { onSignature?: (signature: string) => void },
+  options?: { memo?: string; onSignature?: (signature: string) => void },
 ) => Promise<string>;
 
 function rawUsdcToHuman(raw: string, decimals = 6): number {
@@ -67,10 +71,33 @@ function rawUsdcToHuman(raw: string, decimals = 6): number {
   return Number(whole) + Number(fraction) / Number(base);
 }
 
+export function validateSolanaX402Requirements(
+  requirements: PaymentRequirementsRow,
+): number {
+  if (requirements.scheme !== 'exact' || requirements.network !== 'solana-mainnet') {
+    throw new Error('Server returned unsupported Solana payment requirements');
+  }
+  if (requirements.asset !== USDC_TOKEN_MINT || requirements.payTo !== TREASURY_WALLET) {
+    throw new Error('Server returned an unexpected payment asset or recipient');
+  }
+  const decimals = requirements.extra?.decimals;
+  if (decimals !== 6 || !/^\d+$/.test(requirements.maxAmountRequired)) {
+    throw new Error('Server returned an invalid USDC payment amount');
+  }
+  const rawAmount = BigInt(requirements.maxAmountRequired);
+  if (rawAmount <= 0n) throw new Error('Server returned an invalid USDC payment amount');
+  const amount = rawUsdcToHuman(requirements.maxAmountRequired, decimals);
+  if (!Number.isSafeInteger(Number(rawAmount)) || !Number.isFinite(amount) || amount <= 0) {
+    throw new Error('Server returned an unsafe USDC payment amount');
+  }
+  return amount;
+}
+
 export async function payWithSolanaX402(
   target: PaymentTarget,
+  payerWallet: string,
   sendUsdc: SolanaUsdcSender,
-  options: { onSignature?: (signature: string) => void } = {},
+  options: { onSignature?: (signature: string, paymentIntentId: string) => void } = {},
 ): Promise<SettleResult> {
   const checkoutRes = await fetch(`${API_URL}/payments/solana-x402/checkout`, {
     method: 'POST',
@@ -78,7 +105,7 @@ export async function payWithSolanaX402(
     headers: {
       'content-type': 'application/json',
     },
-    body: JSON.stringify(target),
+    body: JSON.stringify({ ...target, payerWallet }),
   });
   if (checkoutRes.status !== 402) {
     const errBody = await checkoutRes.json().catch(() => null);
@@ -88,17 +115,29 @@ export async function payWithSolanaX402(
   const checkoutBody = (await checkoutRes.json()) as { data: CheckoutResponse };
   const requirements = checkoutBody.data?.accepts?.[0];
   if (!requirements) throw new Error('Server returned no payment requirements');
+  if (
+    !checkoutBody.data.paymentIntentId
+    || !checkoutBody.data.memo
+    || checkoutBody.data.payerWallet !== payerWallet
+  ) {
+    throw new Error('Server returned an invalid payment intent');
+  }
 
-  const amount = rawUsdcToHuman(requirements.maxAmountRequired, requirements.extra.decimals ?? 6);
+  const amount = validateSolanaX402Requirements(requirements);
   const txSignature = await sendUsdc(amount, requirements.description, requirements.payTo, {
-    onSignature: options.onSignature,
+    onSignature: (signature) => options.onSignature?.(
+      signature,
+      checkoutBody.data.paymentIntentId,
+    ),
+    memo: checkoutBody.data.memo,
   });
-  return settleSolanaX402Payment(target, txSignature);
+  return settleSolanaX402Payment(target, txSignature, checkoutBody.data.paymentIntentId);
 }
 
 export async function settleSolanaX402Payment(
   target: PaymentTarget,
   txSignature: string,
+  paymentIntentId: string,
 ): Promise<SettleResult> {
   const xPayment = base64Encode(JSON.stringify({
     x402Version: 1,
@@ -118,7 +157,7 @@ export async function settleSolanaX402Payment(
       'content-type': 'application/json',
       'x-payment': xPayment,
     },
-    body: JSON.stringify({ ...target, txSignature }),
+    body: JSON.stringify({ ...target, txSignature, paymentIntentId }),
   });
   const settleBody = (await settleRes.json()) as { success: boolean; data?: SettleResult; error?: string };
   if (!settleBody.success || !settleBody.data) {

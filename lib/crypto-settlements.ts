@@ -18,6 +18,7 @@ export interface PendingCryptoSettlement {
   billingPeriod: 'monthly' | 'annual';
   amountUsd: number;
   txSignature: string;
+  paymentIntentId: string;
   userId?: string;
   agentId?: string;
   createdAt: number;
@@ -61,6 +62,7 @@ function normalizePending(raw: unknown): PendingCryptoSettlement | null {
     (item.flow !== 'tier' && item.flow !== 'addon') ||
     typeof item.targetKey !== 'string' ||
     typeof item.txSignature !== 'string' ||
+    typeof item.paymentIntentId !== 'string' ||
     (item.billingPeriod !== 'monthly' && item.billingPeriod !== 'annual') ||
     typeof item.createdAt !== 'number'
   ) {
@@ -84,6 +86,7 @@ function normalizePending(raw: unknown): PendingCryptoSettlement | null {
     billingPeriod: item.billingPeriod,
     amountUsd: typeof item.amountUsd === 'number' ? item.amountUsd : 0,
     txSignature: item.txSignature,
+    paymentIntentId: item.paymentIntentId,
     ...(typeof item.userId === 'string' ? { userId: item.userId } : {}),
     ...(typeof item.agentId === 'string' ? { agentId: item.agentId } : {}),
     createdAt: item.createdAt,
@@ -168,7 +171,11 @@ export async function settlePendingCryptoPayment(item: PendingCryptoSettlement):
           ...(item.agentId ? { agentId: item.agentId } : {}),
         };
     try {
-      const data: SettleResult = await settleSolanaX402Payment(target, item.txSignature);
+      const data: SettleResult = await settleSolanaX402Payment(
+        target,
+        item.txSignature,
+        item.paymentIntentId,
+      );
       return { success: true, data };
     } catch (error) {
       return { success: false, error: error instanceof Error ? error.message : 'Payment settlement failed' };
@@ -176,12 +183,19 @@ export async function settlePendingCryptoPayment(item: PendingCryptoSettlement):
   }
 
   if (item.flow === 'tier') {
-    return api.subscribe(item.targetKey, item.txSignature, item.rail, item.billingPeriod);
+    return api.subscribe(
+      item.targetKey,
+      item.txSignature,
+      item.paymentIntentId,
+      item.rail,
+      item.billingPeriod,
+    );
   }
 
   return api.purchaseAddon(
     item.targetKey,
     item.txSignature,
+    item.paymentIntentId,
     item.agentId,
     item.rail,
     item.billingPeriod,

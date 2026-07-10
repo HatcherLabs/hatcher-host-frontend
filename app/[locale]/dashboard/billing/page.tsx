@@ -5,7 +5,7 @@ import { useTranslations, useFormatter } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
-import type { Payment, SolanaRecurringAuthorization, SolanaRecurringQuote, SolanaRecurringQuoteRequest } from '@/lib/api';
+import type { Payment, SolanaPaymentIntent, SolanaRecurringAuthorization, SolanaRecurringQuote, SolanaRecurringQuoteRequest } from '@/lib/api';
 import { Link } from '@/i18n/routing';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -16,6 +16,7 @@ import { usePaymentDrivers } from '@/lib/payment-drivers';
 import { ConfirmPaymentModal } from '@/components/payments/ConfirmPaymentModal';
 import { formatFeatureKey } from '@/lib/feature-labels';
 import { payWithSolanaX402 } from '@/lib/solana-x402-client';
+import { trustedRedirectUrl } from '@/lib/trusted-redirect';
 import {
   cancelSolanaRecurringAuthorizationOnChain,
   setupSolanaRecurringAuthorization,
@@ -445,6 +446,7 @@ export default function BillingPage() {
   const {
     confirmState, closeConfirm, driveSol, driveUsdc, driveHatch, driveKausa, driveAnsem,
     openWalletModal, reconnect: reconnectWallet, disconnect: disconnectWallet,
+    ensurePaymentWallet,
     address: walletAddress, connected: walletConnected,
   } = usePaymentDrivers();
 
@@ -544,6 +546,7 @@ export default function BillingPage() {
     agentId?: string,
     stage: 'clicked' | 'wallet_confirmed' = 'clicked',
     txSignature?: string,
+    paymentIntentId?: string,
   ): void => {
     void api.logCryptoPaymentIntent({
       rail,
@@ -555,6 +558,7 @@ export default function BillingPage() {
       source: 'billing_page',
       stage,
       txSignature,
+      paymentIntentId,
     }).catch(() => {});
   };
 
@@ -604,6 +608,7 @@ export default function BillingPage() {
     period: 'monthly' | 'annual',
     amountUsd: number,
     txSignature: string,
+    paymentIntentId: string,
     agentId?: string,
   ): PendingCryptoSettlement => {
     const pending = createPendingCryptoSettlement({
@@ -613,13 +618,49 @@ export default function BillingPage() {
       billingPeriod: period,
       amountUsd,
       txSignature,
+      paymentIntentId,
       ...(user?.id ? { userId: user.id } : {}),
       ...(agentId ? { agentId } : {}),
     });
     upsertPendingCryptoSettlement(pending);
-    logCryptoPaymentIntent(rail, flow, targetKey, period, amountUsd, agentId, 'wallet_confirmed', txSignature);
+    logCryptoPaymentIntent(
+      rail,
+      flow,
+      targetKey,
+      period,
+      amountUsd,
+      agentId,
+      'wallet_confirmed',
+      txSignature,
+      paymentIntentId,
+    );
     return pending;
   };
+
+  const createDirectPaymentIntent = useCallback(async (
+    rail: Exclude<PendingPaymentRail, 'usdc'>,
+    flow: PendingPaymentFlow,
+    targetKey: string,
+    period: 'monthly' | 'annual',
+    agentId?: string,
+  ): Promise<SolanaPaymentIntent> => {
+    const payerWallet = await ensurePaymentWallet();
+    const target = flow === 'tier'
+      ? { kind: 'tier' as const, key: targetKey, billingPeriod: period }
+      : {
+          kind: 'addon' as const,
+          key: targetKey,
+          billingPeriod: period,
+          ...(agentId ? { agentId } : {}),
+        };
+    const response = await api.createSolanaPaymentIntent({
+      ...target,
+      paymentToken: rail,
+      payerWallet,
+    });
+    if (!response.success) throw new Error(response.error);
+    return response.data;
+  }, [ensurePaymentWallet]);
 
   const finalizePendingCryptoPayment = useCallback(async (
     pending: PendingCryptoSettlement,
@@ -885,16 +926,18 @@ export default function BillingPage() {
     let pending: PendingCryptoSettlement | null = null;
     try {
       logCryptoPaymentIntent('sol', 'tier', tierKey, period, price);
+      const intent = await createDirectPaymentIntent('sol', 'tier', tierKey, period);
       const txSignature = await driveSol(
-        price,
+        intent.amountUsd,
         `Subscribe to ${tierConfig.name}${period === 'annual' ? ' (annual)' : ''}`,
         {
+          memo: intent.memo,
           onSignature: (signature) => {
-            pending = registerPendingCryptoPayment('sol', 'tier', tierKey, period, price, signature);
+            pending = registerPendingCryptoPayment('sol', 'tier', tierKey, period, intent.amountUsd, signature, intent.intentId);
           },
         },
       );
-      pending = pending ?? registerPendingCryptoPayment('sol', 'tier', tierKey, period, price, txSignature);
+      pending = pending ?? registerPendingCryptoPayment('sol', 'tier', tierKey, period, intent.amountUsd, txSignature, intent.intentId);
       await finalizePendingCryptoPayment(pending, {
         successMessage: `Subscribed to ${tierConfig.name}!`,
         pendingMessage: 'Payment submitted on-chain. Tier activation will retry automatically.',
@@ -928,16 +971,18 @@ export default function BillingPage() {
     let pending: PendingCryptoSettlement | null = null;
     try {
       logCryptoPaymentIntent('hatch', 'tier', tierKey, period, price);
+      const intent = await createDirectPaymentIntent('hatch', 'tier', tierKey, period);
       const txSignature = await driveHatch(
-        price,
+        intent.amountUsd,
         `Subscribe to ${tierConfig.name}${period === 'annual' ? ' (annual)' : ''}`,
         {
+          memo: intent.memo,
           onSignature: (signature) => {
-            pending = registerPendingCryptoPayment('hatch', 'tier', tierKey, period, price, signature);
+            pending = registerPendingCryptoPayment('hatch', 'tier', tierKey, period, intent.amountUsd, signature, intent.intentId);
           },
         },
       );
-      pending = pending ?? registerPendingCryptoPayment('hatch', 'tier', tierKey, period, price, txSignature);
+      pending = pending ?? registerPendingCryptoPayment('hatch', 'tier', tierKey, period, intent.amountUsd, txSignature, intent.intentId);
       await finalizePendingCryptoPayment(pending, {
         successMessage: `Subscribed to ${tierConfig.name} with $HATCHER!`,
         pendingMessage: 'Payment submitted on-chain. Tier activation will retry automatically.',
@@ -971,16 +1016,18 @@ export default function BillingPage() {
     let pending: PendingCryptoSettlement | null = null;
     try {
       logCryptoPaymentIntent('kausa', 'tier', tierKey, period, price);
+      const intent = await createDirectPaymentIntent('kausa', 'tier', tierKey, period);
       const txSignature = await driveKausa(
-        price,
+        intent.amountUsd,
         `Subscribe to ${tierConfig.name}${period === 'annual' ? ' (annual)' : ''}`,
         {
+          memo: intent.memo,
           onSignature: (signature) => {
-            pending = registerPendingCryptoPayment('kausa', 'tier', tierKey, period, price, signature);
+            pending = registerPendingCryptoPayment('kausa', 'tier', tierKey, period, intent.amountUsd, signature, intent.intentId);
           },
         },
       );
-      pending = pending ?? registerPendingCryptoPayment('kausa', 'tier', tierKey, period, price, txSignature);
+      pending = pending ?? registerPendingCryptoPayment('kausa', 'tier', tierKey, period, intent.amountUsd, txSignature, intent.intentId);
       await finalizePendingCryptoPayment(pending, {
         successMessage: `Subscribed to ${tierConfig.name} with $KAUSA!`,
         pendingMessage: 'Payment submitted on-chain. Tier activation will retry automatically.',
@@ -1014,16 +1061,18 @@ export default function BillingPage() {
     let pending: PendingCryptoSettlement | null = null;
     try {
       logCryptoPaymentIntent('ansem', 'tier', tierKey, period, price);
+      const intent = await createDirectPaymentIntent('ansem', 'tier', tierKey, period);
       const txSignature = await driveAnsem(
-        price,
+        intent.amountUsd,
         `Subscribe to ${tierConfig.name}${period === 'annual' ? ' (annual)' : ''}`,
         {
+          memo: intent.memo,
           onSignature: (signature) => {
-            pending = registerPendingCryptoPayment('ansem', 'tier', tierKey, period, price, signature);
+            pending = registerPendingCryptoPayment('ansem', 'tier', tierKey, period, intent.amountUsd, signature, intent.intentId);
           },
         },
       );
-      pending = pending ?? registerPendingCryptoPayment('ansem', 'tier', tierKey, period, price, txSignature);
+      pending = pending ?? registerPendingCryptoPayment('ansem', 'tier', tierKey, period, intent.amountUsd, txSignature, intent.intentId);
       await finalizePendingCryptoPayment(pending, {
         successMessage: `Subscribed to ${tierConfig.name} with $ANSEM!`,
         pendingMessage: 'Payment submitted on-chain. Tier activation will retry automatically.',
@@ -1057,12 +1106,14 @@ export default function BillingPage() {
     let pending: PendingCryptoSettlement | null = null;
     try {
       logCryptoPaymentIntent('usdc', 'tier', tierKey, period, price);
+      const payerWallet = await ensurePaymentWallet();
       const result = await payWithSolanaX402(
         { kind: 'tier', key: tierKey, billingPeriod: period },
+        payerWallet,
         driveUsdc,
         {
-          onSignature: (signature) => {
-            pending = registerPendingCryptoPayment('usdc', 'tier', tierKey, period, price, signature);
+          onSignature: (signature, paymentIntentId) => {
+            pending = registerPendingCryptoPayment('usdc', 'tier', tierKey, period, price, signature, paymentIntentId);
           },
         },
       );
@@ -1113,7 +1164,7 @@ export default function BillingPage() {
         return;
       }
       // Redirect the whole tab — Stripe-hosted checkout takes over.
-      window.location.href = res.data.url;
+      window.location.href = trustedRedirectUrl(res.data.url, 'stripe');
     } catch (err) {
       reportCatch(err, `Stripe checkout for ${tierConfig.name} failed`);
       setSubscribing(null);
@@ -1145,7 +1196,7 @@ export default function BillingPage() {
         setPaymentLoading(false);
         return;
       }
-      window.location.href = res.data.url;
+      window.location.href = trustedRedirectUrl(res.data.url, 'cryptnow');
     } catch (err) {
       reportCatch(err, `CryptoNow checkout for ${tierConfig.name} failed`);
       setSubscribing(null);
@@ -1176,16 +1227,18 @@ export default function BillingPage() {
     let pending: PendingCryptoSettlement | null = null;
     try {
       logCryptoPaymentIntent('sol', 'addon', addonKey, period, price, selectedAgentId ?? undefined);
+      const intent = await createDirectPaymentIntent('sol', 'addon', addonKey, period, selectedAgentId ?? undefined);
       const txSignature = await driveSol(
-        price,
+        intent.amountUsd,
         `${addonConfig.name}${period === 'annual' ? ' (annual)' : ''}`,
         {
+          memo: intent.memo,
           onSignature: (signature) => {
-            pending = registerPendingCryptoPayment('sol', 'addon', addonKey, period, price, signature, selectedAgentId ?? undefined);
+            pending = registerPendingCryptoPayment('sol', 'addon', addonKey, period, intent.amountUsd, signature, intent.intentId, selectedAgentId ?? undefined);
           },
         },
       );
-      pending = pending ?? registerPendingCryptoPayment('sol', 'addon', addonKey, period, price, txSignature, selectedAgentId ?? undefined);
+      pending = pending ?? registerPendingCryptoPayment('sol', 'addon', addonKey, period, intent.amountUsd, txSignature, intent.intentId, selectedAgentId ?? undefined);
       await finalizePendingCryptoPayment(pending, {
         successMessage: `${addonConfig.name} purchased!`,
         pendingMessage: 'Payment submitted on-chain. Add-on activation will retry automatically.',
@@ -1221,16 +1274,18 @@ export default function BillingPage() {
     let pending: PendingCryptoSettlement | null = null;
     try {
       logCryptoPaymentIntent('hatch', 'addon', addonKey, period, price, selectedAgentId ?? undefined);
+      const intent = await createDirectPaymentIntent('hatch', 'addon', addonKey, period, selectedAgentId ?? undefined);
       const txSignature = await driveHatch(
-        price,
+        intent.amountUsd,
         `${addonConfig.name}${period === 'annual' ? ' (annual)' : ''}`,
         {
+          memo: intent.memo,
           onSignature: (signature) => {
-            pending = registerPendingCryptoPayment('hatch', 'addon', addonKey, period, price, signature, selectedAgentId ?? undefined);
+            pending = registerPendingCryptoPayment('hatch', 'addon', addonKey, period, intent.amountUsd, signature, intent.intentId, selectedAgentId ?? undefined);
           },
         },
       );
-      pending = pending ?? registerPendingCryptoPayment('hatch', 'addon', addonKey, period, price, txSignature, selectedAgentId ?? undefined);
+      pending = pending ?? registerPendingCryptoPayment('hatch', 'addon', addonKey, period, intent.amountUsd, txSignature, intent.intentId, selectedAgentId ?? undefined);
       await finalizePendingCryptoPayment(pending, {
         successMessage: `${addonConfig.name} purchased with $HATCHER!`,
         pendingMessage: 'Payment submitted on-chain. Add-on activation will retry automatically.',
@@ -1266,16 +1321,18 @@ export default function BillingPage() {
     let pending: PendingCryptoSettlement | null = null;
     try {
       logCryptoPaymentIntent('kausa', 'addon', addonKey, period, price, selectedAgentId ?? undefined);
+      const intent = await createDirectPaymentIntent('kausa', 'addon', addonKey, period, selectedAgentId ?? undefined);
       const txSignature = await driveKausa(
-        price,
+        intent.amountUsd,
         `${addonConfig.name}${period === 'annual' ? ' (annual)' : ''}`,
         {
+          memo: intent.memo,
           onSignature: (signature) => {
-            pending = registerPendingCryptoPayment('kausa', 'addon', addonKey, period, price, signature, selectedAgentId ?? undefined);
+            pending = registerPendingCryptoPayment('kausa', 'addon', addonKey, period, intent.amountUsd, signature, intent.intentId, selectedAgentId ?? undefined);
           },
         },
       );
-      pending = pending ?? registerPendingCryptoPayment('kausa', 'addon', addonKey, period, price, txSignature, selectedAgentId ?? undefined);
+      pending = pending ?? registerPendingCryptoPayment('kausa', 'addon', addonKey, period, intent.amountUsd, txSignature, intent.intentId, selectedAgentId ?? undefined);
       await finalizePendingCryptoPayment(pending, {
         successMessage: `${addonConfig.name} purchased with $KAUSA!`,
         pendingMessage: 'Payment submitted on-chain. Add-on activation will retry automatically.',
@@ -1311,16 +1368,18 @@ export default function BillingPage() {
     let pending: PendingCryptoSettlement | null = null;
     try {
       logCryptoPaymentIntent('ansem', 'addon', addonKey, period, price, selectedAgentId ?? undefined);
+      const intent = await createDirectPaymentIntent('ansem', 'addon', addonKey, period, selectedAgentId ?? undefined);
       const txSignature = await driveAnsem(
-        price,
+        intent.amountUsd,
         `${addonConfig.name}${period === 'annual' ? ' (annual)' : ''}`,
         {
+          memo: intent.memo,
           onSignature: (signature) => {
-            pending = registerPendingCryptoPayment('ansem', 'addon', addonKey, period, price, signature, selectedAgentId ?? undefined);
+            pending = registerPendingCryptoPayment('ansem', 'addon', addonKey, period, intent.amountUsd, signature, intent.intentId, selectedAgentId ?? undefined);
           },
         },
       );
-      pending = pending ?? registerPendingCryptoPayment('ansem', 'addon', addonKey, period, price, txSignature, selectedAgentId ?? undefined);
+      pending = pending ?? registerPendingCryptoPayment('ansem', 'addon', addonKey, period, intent.amountUsd, txSignature, intent.intentId, selectedAgentId ?? undefined);
       await finalizePendingCryptoPayment(pending, {
         successMessage: `${addonConfig.name} purchased with $ANSEM!`,
         pendingMessage: 'Payment submitted on-chain. Add-on activation will retry automatically.',
@@ -1356,14 +1415,15 @@ export default function BillingPage() {
     let pending: PendingCryptoSettlement | null = null;
     try {
       logCryptoPaymentIntent('usdc', 'addon', addonKey, period, price, selectedAgentId ?? undefined);
+      const payerWallet = await ensurePaymentWallet();
       await payWithSolanaX402({
         kind: 'addon',
         key: addonKey,
         billingPeriod: period,
         ...(selectedAgentId ? { agentId: selectedAgentId } : {}),
-      }, driveUsdc, {
-        onSignature: (signature) => {
-          pending = registerPendingCryptoPayment('usdc', 'addon', addonKey, period, price, signature, selectedAgentId ?? undefined);
+      }, payerWallet, driveUsdc, {
+        onSignature: (signature, paymentIntentId) => {
+          pending = registerPendingCryptoPayment('usdc', 'addon', addonKey, period, price, signature, paymentIntentId, selectedAgentId ?? undefined);
         },
       });
       const settledPending = pending as PendingCryptoSettlement | null;
@@ -1405,7 +1465,7 @@ export default function BillingPage() {
         setPaymentLoading(false);
         return;
       }
-      window.location.href = res.data.url;
+      window.location.href = trustedRedirectUrl(res.data.url, 'stripe');
     } catch (err) {
       reportCatch(err, 'Stripe checkout failed');
       setPurchasingAddon(null);
@@ -1440,7 +1500,7 @@ export default function BillingPage() {
         setPaymentLoading(false);
         return;
       }
-      window.location.href = res.data.url;
+      window.location.href = trustedRedirectUrl(res.data.url, 'cryptnow');
     } catch (err) {
       reportCatch(err, 'CryptoNow checkout failed');
       setPurchasingAddon(null);
@@ -1456,7 +1516,7 @@ export default function BillingPage() {
       const returnUrl = `${window.location.origin}/dashboard/billing`;
       const res = await api.stripePortal(returnUrl);
       if (res.success) {
-        window.location.href = res.data.url;
+        window.location.href = trustedRedirectUrl(res.data.url, 'stripe');
         return;
       }
       // Portal not configured — redirect to support

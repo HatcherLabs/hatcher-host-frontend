@@ -46,6 +46,32 @@ export interface Payment {
   agent?: { name: string };
 }
 
+export type SolanaPaymentToken = "sol" | "hatch" | "usdc" | "kausa" | "ansem";
+
+export type SolanaPaymentTarget =
+  | { kind: "tier"; key: string; billingPeriod?: "monthly" | "annual" }
+  | { kind: "addon"; key: string; billingPeriod?: "monthly" | "annual"; agentId?: string };
+
+export type SolanaPaymentIntentRequest = SolanaPaymentTarget & {
+  paymentToken: SolanaPaymentToken;
+  payerWallet: string;
+};
+
+export interface SolanaPaymentIntent {
+  intentId: string;
+  memo: string;
+  expiresAt: string;
+  payerWallet: string;
+  recipientWallet: string;
+  tokenMint: string | null;
+  featureKey: string;
+  amountUsd: number;
+  expectedAmount: number;
+  minAcceptable: number;
+  paymentToken: SolanaPaymentToken;
+  target: SolanaPaymentTarget;
+}
+
 export type SolanaRecurringAsset = "usdc";
 
 export type SolanaRecurringTarget =
@@ -1519,15 +1545,25 @@ export interface MedusaRegisterResponse {
 }
 
 export interface MedusaHandoffBody {
+  state: string;
   passportUrl?: string;
   code?: string;
-  campaignId?: string;
-  claimWallet?: string;
   status?: string;
+}
+
+export interface MedusaHandoffStateBody {
+  claimWallet: string;
+  campaignId?: string;
+}
+
+export interface MedusaHandoffStateResponse {
+  state: string;
+  expiresAt: string;
 }
 
 export interface MedusaHandoffResponse {
   completed: boolean;
+  agentId: string;
   campaignId: string;
   claimWallet: string;
   verification: MedusaPassportSummary;

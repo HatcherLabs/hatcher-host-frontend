@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { api, getToken, setToken, clearToken, isAuthenticated } from './api';
 import type { AuthProfileData } from './api';
+import { clearTerminalCredentialMounts } from './terminal-credentials';
 
 interface UserProfile {
   id: string;
@@ -21,7 +22,7 @@ interface AuthContextValue {
   user: UserProfile | null;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, username: string, password: string, referralCode?: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   clearError: () => void;
   refreshUser: () => Promise<void>;
 }
@@ -33,7 +34,7 @@ const AuthContext = createContext<AuthContextValue>({
   user: null,
   login: async () => {},
   register: async () => {},
-  logout: () => {},
+  logout: async () => {},
   clearError: () => {},
   refreshUser: async () => {},
 });
@@ -59,6 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = useCallback(async (email: string, password: string) => {
     setIsLoading(true);
     setError(null);
+    clearTerminalCredentialMounts();
 
     try {
       const res = await api.login(email, password);
@@ -112,14 +114,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const logout = useCallback(() => {
-    // Clear the httpOnly cookie via the API (best-effort, don't block on failure)
-    api.logout().catch(() => {});
-    // Clear localStorage fallback
-    clearToken();
-    setAuthed(false);
-    setUser(null);
-  }, []);
+  const logout = useCallback(async () => {
+    const currentUserId = user?.id;
+    let serverError: Error | null = null;
+    try {
+      const response = await api.logout();
+      if (!response.success) {
+        serverError = new Error(response.error || 'The server session could not be closed.');
+      }
+    } catch (error) {
+      serverError = error instanceof Error
+        ? error
+        : new Error('The server session could not be closed.');
+    } finally {
+      clearTerminalCredentialMounts(currentUserId);
+      clearToken();
+      setAuthed(false);
+      setUser(null);
+    }
+    if (serverError) throw serverError;
+  }, [user?.id]);
 
   const clearError = useCallback(() => setError(null), []);
 
@@ -156,6 +170,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Listen for auth-expired event dispatched by the API client on 401
   useEffect(() => {
     const handleAuthExpired = () => {
+      clearTerminalCredentialMounts(user?.id);
+      clearToken();
       setAuthed(false);
       setUser(null);
     };
@@ -163,7 +179,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       window.removeEventListener('hatcher:auth-expired', handleAuthExpired);
     };
-  }, []);
+  }, [user?.id]);
 
   return (
     <AuthContext.Provider value={{ isAuthenticated: authed, isLoading, error, user, login, register, logout, clearError, refreshUser }}>

@@ -6,6 +6,10 @@ export { getToken, setToken, clearToken, isAuthenticated, req } from "./core";
 export type { AuthProfileData, ChatAttachmentPayload } from "./methods";
 export type {
   Payment,
+  SolanaPaymentIntent,
+  SolanaPaymentIntentRequest,
+  SolanaPaymentTarget,
+  SolanaPaymentToken,
   SolanaRecurringAsset,
   SolanaRecurringAssetConfig,
   SolanaRecurringAuthorization,
@@ -154,6 +158,8 @@ export type {
   MedusaConfigStatus,
   MedusaHandoffBody,
   MedusaHandoffResponse,
+  MedusaHandoffStateBody,
+  MedusaHandoffStateResponse,
   MedusaMintBadgeBody,
   MedusaMintBadgeResponse,
   MedusaPassportBadge,

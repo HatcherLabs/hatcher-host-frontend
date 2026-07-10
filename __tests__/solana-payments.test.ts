@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { Connection, Keypair, PublicKey } from '@solana/web3.js';
+import { Connection, Keypair, PublicKey, Transaction } from '@solana/web3.js';
 import type { WalletContextState } from '@solana/wallet-adapter-react';
 import { payWithSol, payWithSplToken, quoteSolForUsd } from '@/lib/solana-payments';
 
@@ -87,6 +87,31 @@ describe('Solana payment helpers', () => {
     ).rejects.toThrow('confirmation expired after broadcast');
 
     expect(calls).toEqual(['send', `signature:${signature}`, 'confirm']);
+  });
+
+  it('adds the server-issued payment intent memo to the transaction', async () => {
+    const calls: string[] = [];
+    let memo: string | null = null;
+    const wallet = {
+      publicKey: Keypair.generate().publicKey,
+      sendTransaction: vi.fn(async (transaction: Transaction) => {
+        const memoInstruction = transaction.instructions.find((instruction) => (
+          instruction.programId.toBase58() === 'MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr'
+        ));
+        memo = memoInstruction?.data.toString('utf8') ?? null;
+        calls.push('send');
+        return 'memo-signature';
+      }),
+    } as unknown as WalletContextState;
+
+    await expect(payWithSol({
+      wallet,
+      connection: mockConnection(calls),
+      quote: quoteSolForUsd(10, 100),
+      memo: 'hatcher-payment:intent-123',
+    })).rejects.toThrow('confirmation expired after broadcast');
+
+    expect(memo).toBe('hatcher-payment:intent-123');
   });
 
   it('emits the SPL signature before confirmation can fail', async () => {

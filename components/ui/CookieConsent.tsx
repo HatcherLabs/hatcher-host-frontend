@@ -24,6 +24,11 @@ import { usePathname } from 'next/navigation';
 // so it must use plain next/link — the i18n Link's useLocale call would throw
 // "No intl context found" on bare routes (/privacy, /terms, /cookies, /impressum).
 import Link from 'next/link';
+import {
+  ANALYTICS_CONSENT_COOKIE,
+  ANALYTICS_CONSENT_STORAGE_KEY,
+  ANALYTICS_CONSENT_VERSION,
+} from '@/lib/analytics-consent';
 
 // Routes that take over the full viewport and shouldn't show a
 // consent banner blocking the canvas. The pathname here still has
@@ -32,8 +37,7 @@ import Link from 'next/link';
 const IMMERSIVE_RE = /\/agent\/[^/]+\/room(?:-legacy)?(?:\/|$)/;
 import { Shield, BarChart3, Cookie as CookieIcon } from 'lucide-react';
 
-const CONSENT_KEY = 'hatcher-cookie-consent';
-const CONSENT_VERSION = 2; // bump when categories change so the banner re-prompts
+const CONSENT_MAX_AGE_SECONDS = 180 * 24 * 60 * 60;
 
 export interface ConsentState {
   version: number;
@@ -44,20 +48,13 @@ export interface ConsentState {
 
 export type ConsentStatus = 'accepted-all' | 'essential-only' | 'custom' | null;
 
-const ESSENTIAL_ONLY: ConsentState = {
-  version: CONSENT_VERSION,
-  necessary: true,
-  analytics: false,
-  decidedAt: new Date(0).toISOString(),
-};
-
 function readConsent(): ConsentState | null {
   if (typeof window === 'undefined') return null;
-  const raw = localStorage.getItem(CONSENT_KEY);
+  const raw = localStorage.getItem(ANALYTICS_CONSENT_STORAGE_KEY);
   if (!raw) return null;
   try {
     const parsed = JSON.parse(raw) as ConsentState;
-    if (parsed.version !== CONSENT_VERSION) return null; // schema changed → re-prompt
+    if (parsed.version !== ANALYTICS_CONSENT_VERSION) return null; // schema changed → re-prompt
     return parsed;
   } catch {
     return null;
@@ -66,16 +63,28 @@ function readConsent(): ConsentState | null {
 
 function writeConsent(state: ConsentState) {
   try {
-    localStorage.setItem(CONSENT_KEY, JSON.stringify(state));
+    localStorage.setItem(ANALYTICS_CONSENT_STORAGE_KEY, JSON.stringify(state));
+    writeAnalyticsConsentCookie(state.analytics && !isDoNotTrackEnabled());
     // Global event so any subsystem listening (PostHog, Sentry) can react.
     window.dispatchEvent(new CustomEvent('hatcher:consent-changed', { detail: state }));
   } catch { /* storage disabled */ }
 }
 
+function isDoNotTrackEnabled(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  return navigator.doNotTrack === '1' || navigator.doNotTrack === 'yes';
+}
+
+function writeAnalyticsConsentCookie(allowed: boolean): void {
+  if (typeof document === 'undefined') return;
+  const secure = window.location.protocol === 'https:' ? '; Secure' : '';
+  document.cookie = `${ANALYTICS_CONSENT_COOKIE}=${allowed ? '1' : '0'}; Max-Age=${CONSENT_MAX_AGE_SECONDS}; Path=/; SameSite=Lax${secure}`;
+}
+
 /** Read current consent; returns false if the user never decided
  *  OR if their choice was decline-analytics. */
 export function hasAnalyticsConsent(): boolean {
-  return readConsent()?.analytics === true;
+  return !isDoNotTrackEnabled() && readConsent()?.analytics === true;
 }
 
 export function getConsentStatus(): ConsentStatus {
@@ -123,7 +132,10 @@ export function CookieConsent() {
     const current = readConsent();
     if (current) {
       // Already decided — honor the stored choice.
-      if (current.analytics) initPostHogIfConsented(current);
+      const allowed = current.analytics && !isDoNotTrackEnabled();
+      writeAnalyticsConsentCookie(allowed);
+      if (allowed) initPostHogIfConsented(current);
+      else optOutPostHog();
       return;
     }
     // Honor DNT: if the browser sends Do-Not-Track, don't show the
@@ -131,16 +143,14 @@ export function CookieConsent() {
     // consent record here — if the user previously opted IN explicitly
     // (e.g., via Settings) and we later bump the schema version, their
     // old record becomes stale and readConsent returns null, landing us
-    // here. Writing ESSENTIAL_ONLY would silently override their
+    // here. Writing an essential-only record would silently override their
     // explicit opt-in. By NOT writing, we leave the stale record on
     // disk (harmless — version mismatch means it's ignored) and let
     // the user re-opt-in via Settings if they want. Analytics stays
     // off either way because readConsent returned null → PostHog
     // default is opt-out.
-    const dnt = typeof navigator !== 'undefined'
-      && ('doNotTrack' in navigator)
-      && (navigator.doNotTrack === '1' || navigator.doNotTrack === 'yes');
-    if (dnt) {
+    if (isDoNotTrackEnabled()) {
+      writeAnalyticsConsentCookie(false);
       return; // skip banner, skip analytics, don't overwrite old consent
     }
     // Slight delay so we don't flash the banner before first paint.
@@ -150,13 +160,13 @@ export function CookieConsent() {
 
   function persist(analytics: boolean) {
     const state: ConsentState = {
-      version: CONSENT_VERSION,
+      version: ANALYTICS_CONSENT_VERSION,
       necessary: true,
       analytics,
       decidedAt: new Date().toISOString(),
     };
     writeConsent(state);
-    if (analytics) initPostHogIfConsented(state);
+    if (analytics && !isDoNotTrackEnabled()) initPostHogIfConsented(state);
     else optOutPostHog();
     setVisible(false);
   }

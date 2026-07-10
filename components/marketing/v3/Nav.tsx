@@ -43,6 +43,7 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import { formatFeatureKey } from '@/lib/feature-labels';
+import { useToast } from '@/components/ui/ToastProvider';
 
 type AffiliateMenuState = 'affiliate' | 'pending' | 'rejected' | 'none';
 
@@ -54,6 +55,7 @@ export function Nav() {
   const navRef = useRef<HTMLElement | null>(null);
   const userMenuRef = useRef<HTMLDivElement | null>(null);
   const { isAuthenticated, isLoading: authLoading, user, logout } = useAuth();
+  const { toast } = useToast();
   const router = useRouter();
   const tNav = useTranslations('nav');
   const tGroups = useTranslations('nav.groups');
@@ -139,9 +141,13 @@ export function Nav() {
     };
   }, [userMenuOpen]);
 
-  function handleLogout() {
+  async function handleLogout() {
     setUserMenuOpen(false);
-    logout();
+    try {
+      await logout();
+    } catch {
+      toast.error('Signed out locally, but the server session could not be closed.');
+    }
     router.push('/');
   }
 

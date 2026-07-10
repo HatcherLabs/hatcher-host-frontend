@@ -354,7 +354,7 @@ export default function SettingsPage() {
     setDeleting(true);
     try {
       const res = await api.deleteAccount(deletePassword);
-      if (res.success) { clearToken(); logout(); router.push('/'); }
+      if (res.success) { clearToken(); await logout().catch(() => {}); router.push('/'); }
       else { toast('error', res.error || 'Failed to delete account'); setDeleting(false); }
     } catch { toast('error', 'Failed to delete account. Please try again.'); setDeleting(false); }
   }

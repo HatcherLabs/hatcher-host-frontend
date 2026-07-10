@@ -84,7 +84,7 @@ describe('/api/solana-rpc route guards', () => {
     expect(isAuthorizedSolanaRpcProxyRequest('Bearer proxy-secret', 'proxy-secret')).toBe(true);
   });
 
-  it('routes trusted same-site browser wallet calls to paid server-side RPC when configured', () => {
+  it('keeps paid RPC restricted to callers holding the server proxy token', () => {
     const env = {
       HELIUS_API_KEY: 'helius-key',
       SOLANA_RPC_PROXY_TOKEN: 'proxy-secret',
@@ -94,7 +94,7 @@ describe('/api/solana-rpc route guards', () => {
     expect(publicSolanaRpcUrl(env)).toBe('https://api.mainnet-beta.solana.com/');
     expect(paidSolanaRpcUrl(env)).toBe('https://mainnet.helius-rpc.com/?api-key=helius-key');
     expect(shouldUsePaidSolanaRpc(null, env)).toBe(false);
-    expect(shouldUsePaidSolanaRpc(null, env, { trustedBrowserRequest: true })).toBe(true);
+    expect(shouldUsePaidSolanaRpc('Bearer forged', env)).toBe(false);
     expect(shouldUsePaidSolanaRpc('Bearer proxy-secret', env)).toBe(true);
   });
 });

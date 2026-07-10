@@ -101,6 +101,12 @@ describe('room eyes config', () => {
       status: 'live',
       lines: [],
       updatedAt: 1780060000000,
+      state: {
+        status: 'live',
+        mode: 'browser',
+        publicSafe: true,
+        updatedAt: 1780060000000,
+      },
       screenshot: {
         dataUrl: 'data:image/png;base64,iVBORw0KGgo=',
         mimeType: 'image/png',
@@ -111,7 +117,19 @@ describe('room eyes config', () => {
 
     expect(feed.screenshot?.dataUrl).toBe('data:image/png;base64,iVBORw0KGgo=');
 
+    const privateFeed = normalizeRoomEyesLiveFeed({
+      state: { status: 'live', mode: 'browser', publicSafe: false, updatedAt: 1 },
+      screenshot: {
+        dataUrl: 'data:image/png;base64,iVBORw0KGgo=',
+        mimeType: 'image/png',
+        capturedAt: 1,
+        size: 12,
+      },
+    });
+    expect(privateFeed.screenshot).toBeUndefined();
+
     const unsafe = normalizeRoomEyesLiveFeed({
+      state: { status: 'live', mode: 'browser', publicSafe: true, updatedAt: 1 },
       screenshot: {
         dataUrl: 'javascript:alert(1)',
         mimeType: 'image/svg+xml',

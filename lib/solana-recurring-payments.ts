@@ -391,11 +391,14 @@ async function sendTransactionWithWallet(params: {
     throw new Error('Wallet cannot sign Solana transactions');
   }
 
-  await connection.confirmTransaction({
+  const confirmation = await connection.confirmTransaction({
     signature,
     blockhash: blockhash.blockhash,
     lastValidBlockHeight: blockhash.lastValidBlockHeight,
   }, 'confirmed');
+  if (confirmation.value.err) {
+    throw new Error(`Solana transaction failed: ${JSON.stringify(confirmation.value.err)}`);
+  }
   return signature;
 }
 

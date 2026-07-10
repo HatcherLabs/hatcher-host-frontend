@@ -31,6 +31,7 @@ import {
   type AgentGithubTestResponse,
 } from "@/lib/api";
 import { API_URL } from "@/lib/config";
+import { trustedRedirectUrl } from "@/lib/trusted-redirect";
 import { tabContentVariants, useAgentContext } from "../AgentContext";
 import {
   buildGithubEnvWrites,
@@ -349,7 +350,7 @@ export function DevTab() {
       return;
     }
 
-    window.location.assign(res.data.authUrl);
+    window.location.assign(trustedRedirectUrl(res.data.authUrl, "github"));
   };
 
   const disconnectGithub = async () => {
