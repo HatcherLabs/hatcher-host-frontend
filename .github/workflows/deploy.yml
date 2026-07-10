@@ -144,12 +144,14 @@ jobs:
 
             echo "==> Health check..."
             HEALTH_OK=0
-            for i in $(seq 1 20); do
-              if curl -fsS http://127.0.0.1:3000/ro/city > /dev/null 2>&1; then
+            for i in $(seq 1 8); do
+              if HATCHER_SMOKE_MAX_TIME=4 timeout 8s \
+                ./scripts/smoke-production-routes.sh \
+                > /dev/null 2>&1; then
                 HEALTH_OK=1
                 break
               fi
-              echo "Health check waiting ($i/20)..."
+              echo "Health check waiting ($i/8)..."
               sleep 2
             done
 

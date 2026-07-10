@@ -73,6 +73,8 @@ function withNextIntlConfig(config) {
 const nextConfig = {
   compress: true,
   poweredByHeader: false,
+  cacheHandler: resolve(__dirname, 'cache-handler.cjs'),
+  cacheMaxMemorySize: 0,
   transpilePackages: ['@hatcher/shared'],
   env: {
     NEXT_PUBLIC_APP_VERSION: pkg.version,
