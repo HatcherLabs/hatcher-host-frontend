@@ -16,17 +16,80 @@ jobs:
   deploy:
     needs: ci
     runs-on: ubuntu-latest
+    timeout-minutes: 75
     environment: production
 
     steps:
       - name: Deploy to production
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
-          script: |
+        shell: bash
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          umask 077
+          install -d -m 0700 .deploy
+          trap 'rm -rf -- "$PWD/.deploy"' EXIT
+          key_file="$PWD/.deploy/id_ed25519"
+          known_hosts="$PWD/.deploy/known_hosts"
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$key_file"
+          chmod 0600 "$key_file"
+          unset DEPLOY_SSH_KEY
+
+          ssh-keyscan -t ed25519 "$DEPLOY_HOST" > "$known_hosts" 2>/dev/null
+          mapfile -t fingerprints < <(ssh-keygen -lf "$known_hosts" -E sha256 | awk '{print $2}' | sort -u)
+          if (( ${#fingerprints[@]} != 1 )) \
+            || [[ "${fingerprints[0]}" != 'SHA256:pvAWsqAc1lyst69XMxF3KuL0GoIvycpqP7Rf22951r4' ]]; then
+            echo "Deploy host fingerprint mismatch" >&2
+            exit 1
+          fi
+
+          ssh_args=(
+            -i "$key_file"
+            -o BatchMode=yes
+            -o IdentitiesOnly=yes
+            -o StrictHostKeyChecking=yes
+            -o UserKnownHostsFile="$known_hosts"
+            -o ConnectTimeout=20
+            -o ServerAliveInterval=30
+            -o ServerAliveCountMax=120
+          )
+          trap 'rm -rf -- "$PWD/.deploy"' EXIT
+          ssh "${ssh_args[@]}" "$DEPLOY_USER@$DEPLOY_HOST" 'bash -se' <<'REMOTE_SCRIPT'
             set -euo pipefail
+            umask 077
+
+            harden_pm2_permissions() {
+              local pm2_dir="$HOME/.pm2"
+              local dump
+              if [[ -L "$pm2_dir" ]]; then
+                echo "Refusing symlinked PM2 home: $pm2_dir" >&2
+                return 1
+              fi
+              install -d -m 0700 "$pm2_dir"
+              chmod 0700 "$pm2_dir"
+              if [[ -L "$pm2_dir" || ! -d "$pm2_dir" || ! -O "$pm2_dir" \
+                  || "$(stat -c %a -- "$pm2_dir")" != 700 ]]; then
+                echo "Invalid PM2 home permissions: $pm2_dir" >&2
+                return 1
+              fi
+              for dump in "$pm2_dir/dump.pm2" "$pm2_dir/dump.pm2.bak"; do
+                if [[ -L "$dump" || ( -e "$dump" && ! -f "$dump" ) ]]; then
+                  echo "Invalid PM2 dump path: $dump" >&2
+                  return 1
+                fi
+                if [[ -f "$dump" ]]; then
+                  chmod 0600 "$dump"
+                  if [[ -L "$dump" || ! -f "$dump" || ! -O "$dump" \
+                      || "$(stat -c %a -- "$dump")" != 600 ]]; then
+                    echo "Invalid PM2 dump permissions: $dump" >&2
+                    return 1
+                  fi
+                fi
+              done
+            }
+            harden_pm2_permissions
 
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
@@ -56,8 +119,28 @@ jobs:
             echo "==> Building frontend..."
             npx next build
 
-            echo "==> Restarting PM2..."
-            pm2 restart hatcher-web
+            uses_systemd() {
+              systemctl is-enabled --quiet hatcher-web.service 2>/dev/null
+            }
+
+            web_logs() {
+              if uses_systemd; then
+                sudo journalctl -u hatcher-web.service -n 40 --no-pager || true
+              else
+                pm2 logs hatcher-web --lines 40 --nostream || true
+              fi
+            }
+
+            if uses_systemd; then
+              echo "==> Preparing isolated frontend runtime..."
+              ./scripts/prepare-isolated-web-runtime.sh
+              echo "==> Restarting frontend through systemd..."
+              sudo systemctl restart hatcher-web.service
+            else
+              echo "==> Restarting frontend through PM2..."
+              pm2 restart hatcher-web \
+                || pm2 start npm --name hatcher-web --cwd "$PWD" -- start
+            fi
 
             echo "==> Health check..."
             HEALTH_OK=0
@@ -74,9 +157,10 @@ jobs:
               echo "Frontend health check passed"
             else
               echo "WARNING: Frontend health check failed"
-              pm2 logs hatcher-web --lines 20 --nostream
+              web_logs
               exit 1
             fi
 
             echo "==> Deploy complete at $(date '+%Y-%m-%d %H:%M:%S')"
             echo "$(date '+%Y-%m-%d %H:%M:%S') | frontend | $(git rev-parse --short HEAD) | $(git log -1 --pretty=%s)" >> /home/deploy/hatcher/logs/deploys.log
+          REMOTE_SCRIPT
