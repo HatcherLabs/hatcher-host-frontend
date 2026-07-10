@@ -8,12 +8,13 @@ Type=simple
 User=hatcher-web
 Group=hatcher-web
 WorkingDirectory=@@REPO_ROOT@@
-ExecStart=@@NODE_BIN@@ @@REPO_ROOT@@/node_modules/next/dist/bin/next start -H 127.0.0.1 -p 3000
+ExecStart=@@NODE_BIN@@ @@REPO_ROOT@@/node_modules/next/dist/bin/next start -H localhost -p 3000
 Restart=on-failure
 RestartSec=5s
 TimeoutStopSec=45s
 KillSignal=SIGTERM
 Environment=NODE_ENV=production
+Environment=NODE_OPTIONS=--dns-result-order=ipv4first
 Environment=HOME=/var/lib/hatcher-web
 Environment=NEXT_TELEMETRY_DISABLED=1
 
@@ -42,8 +43,8 @@ SystemCallArchitectures=native
 UMask=0027
 StateDirectory=hatcher-web
 CacheDirectory=hatcher-web
+CacheDirectoryMode=0770
 LogsDirectory=hatcher-web
-ReadWritePaths=@@REPO_ROOT@@/.next/cache
 
 [Install]
 WantedBy=multi-user.target

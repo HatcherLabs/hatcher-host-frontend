@@ -34,6 +34,9 @@ jobs:
       - name: Test production service isolation
         run: ./scripts/test-service-isolation-permissions.sh
 
+      - name: Test bounded incremental cache
+        run: npm test -- __tests__/cache-handler.test.ts
+
       - name: Lint
         # ESLint runs against .eslintrc.json (next/core-web-vitals).
         # Next's own build runs lint internally too but we surface it
@@ -44,3 +47,6 @@ jobs:
         run: npm run build
         env:
           NEXT_PUBLIC_API_URL: https://api.hatcher.host
+
+      - name: Test production runtime routes and caches
+        run: ./scripts/test-production-root-route.sh

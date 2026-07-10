@@ -66,6 +66,24 @@ if ! id hatcher-web >/dev/null 2>&1; then
   useradd --system --home-dir /var/lib/hatcher-web --create-home \
     --shell /usr/sbin/nologin --user-group hatcher-web
 fi
+
+runtime_cache_dir=/var/cache/hatcher-web
+if [[ -L "$runtime_cache_dir" \
+    || ( -e "$runtime_cache_dir" && ! -d "$runtime_cache_dir" ) ]]; then
+  echo "refusing unsafe frontend cache path: $runtime_cache_dir" >&2
+  exit 1
+fi
+if [[ ! -d "$runtime_cache_dir" ]]; then
+  install -d -o hatcher-web -g hatcher-web -m 0770 "$runtime_cache_dir"
+fi
+if [[ "$(stat -c %U:%G -- "$runtime_cache_dir")" != hatcher-web:hatcher-web ]]; then
+  echo "unexpected frontend cache owner: $runtime_cache_dir" >&2
+  exit 1
+fi
+chmod 0770 "$runtime_cache_dir"
+setfacl -m 'u:deploy:rwx,m::rwx' "$runtime_cache_dir"
+setfacl -d -m 'u:hatcher-web:rwx,u:deploy:rwx,m::rwx' "$runtime_cache_dir"
+
 temporary="$(mktemp /etc/systemd/system/.hatcher-web.service.XXXXXX)"
 trap 'rm -f -- "$temporary"' EXIT
 sed -e "s|@@REPO_ROOT@@|$REPO_ROOT|g" -e "s|@@NODE_BIN@@|$node_bin|g" \
@@ -99,12 +117,14 @@ save_pm2_state() {
 
 wait_for_health() {
   local attempt
-  for attempt in $(seq 1 30); do
-    if curl -fsS http://127.0.0.1:3000/ro/city >/dev/null 2>&1; then
+  for attempt in $(seq 1 8); do
+    if HATCHER_SMOKE_MAX_TIME=4 timeout 8s \
+      "$script_dir/smoke-production-routes.sh" \
+      >/dev/null 2>&1; then
       echo "Frontend health check passed"
       return 0
     fi
-    echo "Frontend health check waiting ($attempt/30)..."
+    echo "Frontend health check waiting ($attempt/8)..."
     sleep 2
   done
   echo "Frontend health check failed" >&2
@@ -207,14 +227,21 @@ restore_pm2_frontend() {
     pm2_as_deploy start "$npm_bin" --name hatcher-web --cwd "$REPO_ROOT" -- start \
       && frontend_restored=true
   fi
-  if [[ "$frontend_restored" == true ]] \
-    && wait_for_health \
-    && save_pm2_state \
-    && verify_pm2_target_present; then
-    return 0
+  if [[ "$frontend_restored" != true ]] || ! wait_for_health; then
+    if restore_systemd_frontend; then
+      echo "PM2 frontend failed health; systemd frontend restored" >&2
+    else
+      echo "PM2 frontend failed health and systemd restoration failed" >&2
+    fi
+    return 1
   fi
-  restore_systemd_frontend || true
-  return 1
+
+  if ! save_pm2_state || ! verify_pm2_target_present; then
+    echo "PM2 frontend is healthy, but startup persistence verification failed; keeping PM2 live and systemd disabled" >&2
+    return 2
+  fi
+
+  return 0
 }
 
 if [[ "$mode" == activate ]]; then
@@ -255,7 +282,16 @@ elif [[ "$mode" == rollback ]]; then
   if restore_pm2_frontend; then
     echo "PM2 frontend restored and startup dump saved."
   else
-    echo "PM2 rollback failed; systemd frontend restored" >&2
+    rollback_status=$?
+    if (( rollback_status == 2 )); then
+      echo "PM2 frontend is serving, but its startup dump was not verified" >&2
+    elif systemctl is-active --quiet hatcher-web.service \
+      && systemctl is-enabled --quiet hatcher-web.service \
+      && wait_for_health; then
+      echo "PM2 rollback failed; verified systemd frontend restoration" >&2
+    else
+      echo "PM2 rollback failed and no healthy systemd fallback was verified" >&2
+    fi
     exit 1
   fi
 else

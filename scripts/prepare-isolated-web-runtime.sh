@@ -13,7 +13,9 @@ apply_runtime_acl() {
   local repo_root="$1"
   local service_user="$2"
   local manage_ownership="$3"
+  local runtime_cache_dir="${4:-/var/cache/hatcher-web}"
   local env_file="$repo_root/.env.local"
+  local cache_handler="$repo_root/cache-handler.cjs"
   local cache_dir="$repo_root/.next/cache"
 
   # Only the web service group can read its runtime environment. The explicit
@@ -37,18 +39,36 @@ apply_runtime_acl() {
   setfacl -m "u:$service_user:r--" \
     "$repo_root/package.json" "$repo_root/next.config.mjs"
 
-  if [[ -L "$cache_dir" ]]; then
-    echo "refusing symlinked frontend cache: $cache_dir" >&2
+  if [[ -L "$cache_handler" || ! -f "$cache_handler" ]]; then
+    echo "invalid frontend cache handler: $cache_handler" >&2
     return 1
   fi
-  if [[ "$manage_ownership" == true ]]; then
-    install -d -m 0770 "$cache_dir"
-  else
-    mkdir -p "$cache_dir"
-    chmod 0770 "$cache_dir"
+  setfacl -m "u:$service_user:r--" "$cache_handler"
+
+  if [[ -L "$runtime_cache_dir" || ! -d "$runtime_cache_dir" ]]; then
+    echo "invalid systemd-managed frontend cache: $runtime_cache_dir" >&2
+    return 1
   fi
-  setfacl -R -m "u:deploy:rwX,u:$service_user:rwX,m::rwx" "$cache_dir"
-  setfacl -d -m "u:deploy:rwx,u:$service_user:rwx,m::rwx" "$cache_dir"
+  if [[ ! -w "$runtime_cache_dir" ]]; then
+    echo "frontend cache is not writable by deploy: $runtime_cache_dir" >&2
+    return 1
+  fi
+
+  if [[ -L "$cache_dir" ]]; then
+    if [[ "$(readlink -- "$cache_dir")" != "$runtime_cache_dir" ]]; then
+      echo "refusing unexpected frontend cache symlink: $cache_dir" >&2
+      return 1
+    fi
+  else
+    if [[ -e "$cache_dir" ]]; then
+      if [[ ! -d "$cache_dir" || ! -O "$cache_dir" ]]; then
+        echo "refusing unowned frontend cache path: $cache_dir" >&2
+        return 1
+      fi
+      rm -rf -- "$cache_dir"
+    fi
+    ln -s -- "$runtime_cache_dir" "$cache_dir"
+  fi
 }
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
