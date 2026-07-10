@@ -8,7 +8,6 @@ on:
 
 permissions:
   contents: write
-  actions: write
   pull-requests: read
 
 concurrency:
@@ -51,8 +50,3 @@ jobs:
 
           git commit -m "${{ steps.bump.outputs.commit_message }}"
           git push origin main
-
-      - name: Deploy version bump
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh workflow run deploy.yml --ref main
