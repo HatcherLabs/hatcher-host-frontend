@@ -11,6 +11,9 @@ import {
 } from "./chatStreamEvents";
 import type {
   Agent,
+  CreateMissionTaskBody,
+  MissionTask,
+  MissionTasksResponse,
   AgentCommCallBody,
   AgentCommCallResponse,
   AgentCommDiscoverResponse,
@@ -489,6 +492,60 @@ export const api = {
 
   /** List the current user's agents */
   getMyAgents: () => req<Agent[]>("/agents"),
+
+  /** List account-wide one-shot tasks for Mission Control. */
+  getMissionTasks: (params: {
+    status?: string;
+    agentId?: string;
+    limit?: number;
+    cursor?: string;
+  } = {}) => {
+    const qs = new URLSearchParams();
+    if (params.status) qs.set("status", params.status);
+    if (params.agentId) qs.set("agentId", params.agentId);
+    if (params.limit) qs.set("limit", String(params.limit));
+    if (params.cursor) qs.set("cursor", params.cursor);
+    const suffix = qs.toString() ? `?${qs.toString()}` : "";
+    return req<MissionTasksResponse>(`/agents/tasks${suffix}`);
+  },
+
+  /** Get a task with its latest run, approval history, and artifacts. */
+  getMissionTask: (agentId: string, taskId: string) =>
+    req<{ task: MissionTask }>(`/agents/${agentId}/tasks/${taskId}`),
+
+  /** Create a one-shot task. It is not started until the owner explicitly starts it. */
+  createMissionTask: (agentId: string, body: CreateMissionTaskBody) =>
+    req<{ task: MissionTask }>(`/agents/${agentId}/tasks`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  approveMissionTask: (agentId: string, taskId: string) =>
+    req<{ task: MissionTask }>(`/agents/${agentId}/tasks/${taskId}/approve`, {
+      method: "POST",
+    }),
+
+  rejectMissionTask: (agentId: string, taskId: string) =>
+    req<{ task: MissionTask }>(`/agents/${agentId}/tasks/${taskId}/reject`, {
+      method: "POST",
+    }),
+
+  startMissionTask: (agentId: string, taskId: string) =>
+    req<{ task: MissionTask }>(`/agents/${agentId}/tasks/${taskId}/start`, {
+      method: "POST",
+    }),
+
+  cancelMissionTaskRun: (agentId: string, taskId: string, runId: string) =>
+    req<{ task: MissionTask }>(
+      `/agents/${agentId}/tasks/${taskId}/runs/${runId}/cancel`,
+      { method: "POST" },
+    ),
+
+  /** Resume always creates a new attempt; it never mutates the previous run. */
+  resumeMissionTask: (agentId: string, taskId: string) =>
+    req<{ task: MissionTask }>(`/agents/${agentId}/tasks/${taskId}/resume`, {
+      method: "POST",
+    }),
 
   /** Get a single agent */
   getAgent: (id: string) => req<Agent>(`/agents/${id}`),

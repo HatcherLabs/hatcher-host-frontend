@@ -20,6 +20,7 @@ import {
   Users,
   BookOpen,
   Keyboard,
+  ListChecks,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
@@ -39,6 +40,7 @@ interface CommandItem {
 const STATIC_COMMANDS: CommandItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard', shortcut: 'D', section: 'Navigation' },
   { id: 'agents', label: 'My Agents', icon: Bot, href: '/dashboard/agents', shortcut: 'A', section: 'Navigation' },
+  { id: 'missions', label: 'Mission Control', icon: ListChecks, href: '/dashboard/missions', shortcut: 'M', section: 'Navigation' },
   { id: 'create', label: 'Create Agent', icon: PlusCircle, href: '/create', shortcut: 'C', section: 'Actions' },
   { id: 'billing', label: 'Billing', icon: CreditCard, href: '/dashboard/billing', shortcut: 'B', section: 'Navigation' },
   { id: 'settings', label: 'Settings', icon: Settings, href: '/settings', shortcut: 'S', section: 'Navigation' },

@@ -49,7 +49,8 @@
       "sub_affiliate": "パートナーへの紹介と報告。",
       "sub_admin": "ホームの操作。",
       "sub_signOut": "このデバイスでのセッション終了。",
-      "tierSuffix": "階層"
+      "tierSuffix": "階層",
+      "sub_missionControl": "タスク、承認、実行、成果物。"
     },
     "groups": {
       "build": "建設",
@@ -82,7 +83,8 @@
       "changelogLabel": "変更ログ",
       "changelogSub": "何がいつ変わったのか。"
     },
-    "hatchAgent": "ハッチエージェント"
+    "hatchAgent": "ハッチエージェント",
+    "missionControl": "Mission Control"
   },
   "notifications": {
     "heading": "通知",
@@ -2595,6 +2597,138 @@
           "body": "GitHubアクセス、通話、セッション、ログ、オーケストレーションを一つのCLIからA2Aしてください。"
         }
       }
+    }
+  },
+  "missionControl": {
+    "authenticating": "Checking your session...",
+    "signInTitle": "Sign in to Mission Control",
+    "signInDescription": "Mission Control shows private tasks, approvals, runs, and artifacts across your agents.",
+    "signIn": "Sign in",
+    "eyebrow": "Operations",
+    "title": "Mission Control",
+    "subtitle": "Create, approve, run, and inspect one-shot work across every agent.",
+    "refresh": "Refresh tasks",
+    "newTask": "New task",
+    "tryAgain": "Try again",
+    "loading": "Loading tasks...",
+    "unknownAgent": "Unknown agent",
+    "attempt": "Attempt {count}",
+    "noTarget": "No target",
+    "notMeasured": "Not measured",
+    "required": "Required",
+    "notRequired": "Not required",
+    "progress": "Latest run progress",
+    "progressUnknown": "Live",
+    "noOutput": "This attempt did not produce output.",
+    "waitingForOutput": "Waiting for output from this attempt.",
+    "noRuns": "No attempts yet. Start the task when it is ready.",
+    "noApprovals": "No approval events for this task.",
+    "noArtifacts": "No artifacts have been attached yet.",
+    "openArtifact": "Open {name}",
+    "taskList": "Tasks",
+    "summary": {
+      "label": "Task summary",
+      "total": "Total",
+      "active": "Active",
+      "approval": "Needs approval",
+      "completed": "Completed",
+      "failed": "Failed"
+    },
+    "filters": {
+      "label": "Task filters",
+      "agent": "Filter by agent",
+      "allAgents": "All agents",
+      "status": "Filter by status",
+      "allStatuses": "All"
+    },
+    "status": {
+      "ready": "Ready",
+      "pending_approval": "Needs approval",
+      "queued": "Queued",
+      "running": "Running",
+      "completed": "Completed",
+      "failed": "Failed",
+      "cancelled": "Cancelled",
+      "rejected": "Rejected"
+    },
+    "runStatus": {
+      "queued": "Queued",
+      "running": "Running",
+      "completed": "Completed",
+      "failed": "Failed",
+      "cancelled": "Cancelled"
+    },
+    "approvalStatus": {
+      "pending": "Approval requested",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "facts": {
+      "created": "Created",
+      "updated": "Updated",
+      "budget": "Budget target",
+      "cost": "Measured cost",
+      "approval": "Approval",
+      "source": "Source",
+      "started": "Started",
+      "finished": "Finished"
+    },
+    "sections": {
+      "objective": "Objective",
+      "latestRun": "Latest attempt",
+      "approvals": "Approvals",
+      "artifacts": "Artifacts"
+    },
+    "actions": {
+      "label": "Task actions",
+      "close": "Close",
+      "approve": "Approve",
+      "reject": "Reject",
+      "start": "Start",
+      "cancel": "Cancel run",
+      "resume": "New attempt",
+      "resumeHint": "Create a new attempt from this task. The previous attempt remains unchanged.",
+      "working": "Applying action"
+    },
+    "create": {
+      "eyebrow": "One-shot work",
+      "title": "Create task",
+      "subtitle": "Define one outcome for one agent. You choose when execution starts.",
+      "close": "Close create task dialog",
+      "agent": "Agent",
+      "agentPlaceholder": "Choose an agent",
+      "taskTitle": "Task title",
+      "titlePlaceholder": "Prepare the weekly customer brief",
+      "objective": "Objective and acceptance criteria",
+      "objectivePlaceholder": "Describe the outcome, relevant context, and what a complete result must contain.",
+      "objectiveHint": "Keep the scope to one outcome. Include concrete acceptance criteria.",
+      "budget": "Budget target (AI Credits, optional)",
+      "budgetPlaceholder": "No target",
+      "budgetHint": "Advisory target for planning and reporting. It is not a hard execution limit yet.",
+      "approval": "Require approval before start",
+      "approvalHint": "The task waits for an owner decision before it can run.",
+      "creating": "Creating...",
+      "submit": "Create task",
+      "requiredError": "Choose an agent and provide a title and objective.",
+      "budgetError": "Budget target must be a positive number."
+    },
+    "messages": {
+      "approve": "Task approved.",
+      "reject": "Task rejected.",
+      "start": "Task queued for execution.",
+      "cancel": "Cancellation requested.",
+      "resume": "New attempt created.",
+      "created": "Task created."
+    },
+    "empty": {
+      "title": "No tasks yet",
+      "description": "Create a one-shot task to track its approval, execution, output, and artifacts in one place.",
+      "action": "Create first task"
+    },
+    "filteredEmpty": {
+      "title": "No matching tasks",
+      "description": "No tasks match the selected agent and status filters.",
+      "action": "Clear filters"
     }
   }
 }
