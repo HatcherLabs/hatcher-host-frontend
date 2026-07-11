@@ -2434,96 +2434,104 @@
     "errCreateNetwork": "エージェント作成時のネットワークエラー。"
   },
   "outcomePacks": {
-    "authenticating": "Checking your session...",
-    "signInTitle": "Sign in to Outcome Packs",
-    "signInDescription": "Outcome Packs configure private tasks and integrations for agents in your account.",
-    "signIn": "Sign in",
-    "eyebrow": "Curated operations",
+    "contract": {
+      "listPlaceholder": "1行に1項目",
+      "allTasksCompleted": "すべてのタスクが完了している",
+      "artifactRequired": "{kind}形式の成果物が必要",
+      "artifact": "結果",
+      "outputMinLength": "{count}文字以上",
+      "launchedPending": "タスクを作成しました。開始前に必要なスキル{count}件をインストールしてください。"
+    },
+    "authenticating": "セッションを確認しています...",
+    "signInTitle": "Outcome Packsにサインイン",
+    "signInDescription": "Outcome Packsはアカウント内のエージェント用に非公開タスクと連携を設定します。",
+    "signIn": "サインイン",
+    "eyebrow": "厳選オペレーション",
     "title": "Outcome Packs",
-    "subtitle": "Configure a proven recipe, verify its setup, then launch it into Mission Control.",
-    "refresh": "Refresh catalog",
+    "subtitle": "実績あるレシピを設定し、準備を確認してMission Controlへ送ります。",
+    "refresh": "カタログを更新",
     "missionControl": "Mission Control",
-    "tryAgain": "Try again",
-    "loading": "Loading Outcome Packs...",
-    "detailLoading": "Loading pack details...",
-    "detailError": "This pack could not be loaded.",
+    "tryAgain": "再試行",
+    "loading": "Outcome Packsを読み込み中...",
+    "detailLoading": "パック詳細を読み込み中...",
+    "detailError": "このパックを読み込めませんでした。",
     "catalog": {
-      "label": "Outcome Pack catalog",
-      "title": "Catalog",
-      "firstParty": "Hatcher first-party",
-      "version": "Version {version}"
+      "label": "Outcome Packカタログ",
+      "title": "カタログ",
+      "firstParty": "Hatcher公式",
+      "version": "バージョン {version}"
     },
     "detail": {
-      "curated": "Curated recipe",
-      "runtimeMinutes": "{count, plural, one {# minute runtime} other {# minutes runtime}}",
-      "frameworks": "Compatible frameworks",
-      "anyFramework": "Any hosted framework",
-      "requirements": "Skills and prerequisites",
-      "noRequirements": "No extra setup",
-      "plan": "Task plan",
-      "taskCount": "{count, plural, one {# task} other {# tasks}}",
-      "tasks": "Pack tasks",
-      "acceptance": "Acceptance criteria"
+      "curated": "厳選レシピ",
+      "runtimeMinutes": "実行時間: {count}分",
+      "frameworks": "対応フレームワーク",
+      "anyFramework": "任意のホスト型フレームワーク",
+      "requirements": "スキルと前提条件",
+      "noRequirements": "追加設定なし",
+      "plan": "タスク計画",
+      "taskCount": "{count}件のタスク",
+      "tasks": "パックのタスク",
+      "acceptance": "受け入れ基準"
     },
     "configure": {
-      "title": "Configure outcome",
-      "subtitle": "Choose the agent and provide the inputs used to resolve the task plan.",
-      "agent": "Agent",
-      "agentPlaceholder": "Choose an agent",
-      "selectPlaceholder": "Choose an option",
+      "title": "成果を設定",
+      "subtitle": "エージェントを選び、タスク計画に使う入力を指定します。",
+      "agent": "エージェント",
+      "agentPlaceholder": "エージェントを選択",
+      "selectPlaceholder": "オプションを選択",
       "agentStatus": "{framework} - {status}",
-      "required": "Required"
+      "required": "必須"
     },
     "validation": {
-      "agent": "Choose an agent before preparing this pack.",
-      "required": "Complete every required input.",
-      "fieldInvalid": "Complete this input within its allowed length."
+      "agent": "パックを準備する前にエージェントを選択してください。",
+      "required": "必須入力をすべて完了してください。",
+      "fieldInvalid": "許容文字数内で入力してください。"
     },
     "preview": {
-      "label": "Launch preview",
-      "title": "Setup preview",
-      "subtitle": "Compatibility, prerequisites, budget, and inactive schedules.",
-      "empty": "Prepare the pack to verify its setup before anything is created.",
-      "compatible": "Agent is compatible",
-      "incompatible": "Agent is not compatible",
-      "blockers": "Setup blockers",
-      "warnings": "Review before launch",
-      "resolvedTasks": "Resolved tasks",
-      "budget": "Budget target",
-      "noBudget": "No budget target",
+      "label": "起動プレビュー",
+      "title": "設定プレビュー",
+      "subtitle": "互換性、前提条件、予算、無効なスケジュール。",
+      "empty": "何も作成せずに設定を確認するにはパックを準備します。",
+      "compatible": "エージェントは対応しています",
+      "incompatible": "エージェントは対応していません",
+      "blockers": "設定のブロッカー",
+      "warnings": "起動前に確認",
+      "resolvedTasks": "解決済みタスク",
+      "budget": "予算目標",
+      "noBudget": "予算目標なし",
       "credits": "{count} AI Credits",
-      "budgetAdvisory": "Advisory target for planning and reporting; it is not a hard execution limit.",
-      "maxRuntime": "Maximum runtime: {count, plural, one {# minute} other {# minutes}}.",
-      "schedules": "Proposed schedules",
-      "scheduleOff": "Off",
-      "scheduleNotice": "Schedules stay disabled at launch and require a separate confirmation.",
+      "budgetAdvisory": "計画とレポート用の目安であり、厳密な実行上限ではありません。",
+      "maxRuntime": "最大実行時間: {count}分。",
+      "schedules": "提案スケジュール",
+      "scheduleOff": "オフ",
+      "scheduleNotice": "起動時もスケジュールは無効で、別途確認が必要です。",
       "setup": {
-        "connectors": "Open Connectors",
-        "dev": "Open Developer setup",
-        "integrations": "Open Integrations"
+        "connectors": "Connectorsを開く",
+        "dev": "開発者設定を開く",
+        "integrations": "Integrationsを開く"
       }
     },
     "actions": {
-      "prepare": "Prepare preview",
-      "prepareAgain": "Prepare again",
-      "preparing": "Preparing...",
-      "launchTitle": "Create in Mission Control",
-      "ready": "Ready to launch",
-      "blocked": "Prepare the pack and resolve blockers",
-      "launch": "Launch pack",
-      "launching": "Launching..."
+      "prepare": "プレビューを準備",
+      "prepareAgain": "再度準備",
+      "preparing": "準備中...",
+      "launchTitle": "Mission Controlに作成",
+      "ready": "起動準備完了",
+      "blocked": "パックを準備してブロッカーを解決",
+      "launch": "パックを起動",
+      "launching": "起動中..."
     },
     "messages": {
-      "launched": "Outcome Pack launched."
+      "launched": "Outcome Packを起動しました。"
     },
     "noAgents": {
-      "title": "No agent available",
-      "description": "Create an agent before configuring an Outcome Pack.",
-      "action": "Create agent"
+      "title": "利用可能なエージェントがありません",
+      "description": "Outcome Packを設定する前にエージェントを作成してください。",
+      "action": "エージェントを作成"
     },
     "empty": {
-      "title": "No Outcome Packs available",
-      "description": "The curated catalog could not return any first-party packs."
+      "title": "利用可能なOutcome Packがありません",
+      "description": "厳選カタログにHatcher公式パックがありません。"
     }
   },
 
@@ -2694,6 +2702,26 @@
     }
   },
   "missionControl": {
+    "outcomePack": {
+      "title": "Outcome Pack",
+      "unknown": "不明なパック",
+      "version": "バージョン {version}",
+      "skillsReady": "必要なスキルはインストール済み",
+      "skillsPending": "必要なスキルが保留中",
+      "openPlugins": "Pluginsを開いてエージェントを再起動",
+      "acceptance": "受け入れ基準",
+      "allTasksCompleted": "すべてのタスクが完了している",
+      "artifactRequired": "{kind}形式の成果物が必要",
+      "artifact": "結果",
+      "outputMinLength": "{count}文字以上",
+      "schedulesDisabled": "{count}件のスケジュールテンプレートは無効のままで、自動実行されません。",
+      "skillStatus": {
+        "installed": "インストール済み",
+        "pending": "保留中",
+        "failed": "失敗",
+        "missing": "未導入"
+      }
+    },
     "authenticating": "Checking your session...",
     "signInTitle": "Sign in to Mission Control",
     "signInDescription": "Mission Control shows private tasks, approvals, runs, and artifacts across your agents.",

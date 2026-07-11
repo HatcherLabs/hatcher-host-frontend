@@ -2552,6 +2552,26 @@
     "errCreateNetwork": "Network error while creating the agent."
   },
   "missionControl": {
+    "outcomePack": {
+      "title": "Outcome Pack",
+      "unknown": "Unknown pack",
+      "version": "Version {version}",
+      "skillsReady": "Required skills installed",
+      "skillsPending": "Required skills pending",
+      "openPlugins": "Open Plugins and restart agent",
+      "acceptance": "Acceptance criteria",
+      "allTasksCompleted": "All tasks are completed",
+      "artifactRequired": "Requires a {kind} artifact",
+      "artifact": "result",
+      "outputMinLength": "At least {count} characters",
+      "schedulesDisabled": "{count} schedule template(s) remain disabled and will not run automatically.",
+      "skillStatus": {
+        "installed": "Installed",
+        "pending": "Pending",
+        "failed": "Failed",
+        "missing": "Missing"
+      }
+    },
     "authenticating": "Checking your session...",
     "signInTitle": "Sign in to Mission Control",
     "signInDescription": "Mission Control shows private tasks, approvals, runs, and artifacts across your agents.",
@@ -2685,6 +2705,14 @@
     }
   },
   "outcomePacks": {
+    "contract": {
+      "listPlaceholder": "One item per line",
+      "allTasksCompleted": "All tasks are completed",
+      "artifactRequired": "Requires a {kind} artifact",
+      "artifact": "result",
+      "outputMinLength": "At least {count} characters",
+      "launchedPending": "Task created. Install {count} required skill(s) before starting it."
+    },
     "authenticating": "Checking your session...",
     "signInTitle": "Sign in to Outcome Packs",
     "signInDescription": "Outcome Packs configure private tasks and integrations for agents in your account.",

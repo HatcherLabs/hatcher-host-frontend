@@ -22,6 +22,7 @@ import {
   Plus,
   RefreshCw,
   RotateCcw,
+  Settings2,
   ShieldCheck,
   Square,
   X,
@@ -43,6 +44,7 @@ import {
   normalizeMissionTaskList,
   safeMissionArtifactUrl,
 } from '@/lib/mission-control';
+import { normalizeOutcomePackAcceptanceChecks } from '@/lib/outcome-packs';
 import { useToast } from '@/components/ui/ToastProvider';
 import styles from './missions.module.css';
 
@@ -290,6 +292,25 @@ function TaskDetail({
   const progress = missionTaskProgress(task);
   const output = missionOutputText(task.latestRun?.output);
   const runningAction = actionKey?.startsWith(`${task.id}:`) ?? false;
+  const skillReadiness = task.outcomePackSkillReadiness;
+  const acceptanceChecks = normalizeOutcomePackAcceptanceChecks(task.acceptanceChecks);
+
+  const acceptanceLabel = (item: (typeof acceptanceChecks)[number]): string => {
+    if (item.type === 'all_tasks_completed') return t('outcomePack.allTasksCompleted');
+    if (item.type === 'artifact_required') {
+      return t('outcomePack.artifactRequired', { kind: item.artifactKind ?? t('outcomePack.artifact') });
+    }
+    if (item.type === 'output_min_length') {
+      return t('outcomePack.outputMinLength', { count: item.characters ?? 0 });
+    }
+    return item.label;
+  };
+  const skillStatusLabel = (status: string): string => {
+    if (status === 'installed') return t('outcomePack.skillStatus.installed');
+    if (status === 'pending' || status === 'pending_restart') return t('outcomePack.skillStatus.pending');
+    if (status === 'failed') return t('outcomePack.skillStatus.failed');
+    return t('outcomePack.skillStatus.missing');
+  };
 
   return (
     <article className={styles.detail} aria-labelledby={`task-title-${task.id}`}>
@@ -362,6 +383,57 @@ function TaskDetail({
           {runningAction ? <Loader2 size={16} className={styles.spin} aria-label={t('actions.working')} /> : null}
         </div>
       </header>
+
+      {task.source === 'outcome_pack' ? (
+        <section className={styles.outcomePackBand} data-ready={skillReadiness?.ready || undefined}>
+          <div className={styles.outcomePackHeading}>
+            <PackageCheck size={17} aria-hidden />
+            <div>
+              <strong>{t('outcomePack.title')}</strong>
+              <span>
+                {task.sourceId ?? t('outcomePack.unknown')}
+                {task.sourceVersion ? ` - ${t('outcomePack.version', { version: task.sourceVersion })}` : ''}
+              </span>
+            </div>
+          </div>
+
+          {skillReadiness?.required ? (
+            <div className={styles.outcomeSkills}>
+              <div className={styles.outcomeSkillSummary}>
+                {skillReadiness.ready ? <CheckCircle2 size={15} aria-hidden /> : <AlertTriangle size={15} aria-hidden />}
+                <strong>{skillReadiness.ready ? t('outcomePack.skillsReady') : t('outcomePack.skillsPending')}</strong>
+              </div>
+              <div className={styles.outcomeSkillList}>
+                {skillReadiness.skills.map((skill) => (
+                  <span key={skill.name} data-installed={skill.installed || undefined}>
+                    {skill.name}: {skillStatusLabel(skill.status)}
+                  </span>
+                ))}
+              </div>
+              {!skillReadiness.ready ? (
+                <Link href={`/dashboard/agent/${task.agentId}?tab=plugins`} className={styles.outcomeSetupLink}>
+                  <Settings2 size={14} aria-hidden /> {t('outcomePack.openPlugins')}
+                </Link>
+              ) : null}
+            </div>
+          ) : null}
+
+          {acceptanceChecks.length > 0 ? (
+            <div className={styles.outcomeAcceptance}>
+              <strong>{t('outcomePack.acceptance')}</strong>
+              <ul>
+                {acceptanceChecks.map((item) => <li key={item.id}>{acceptanceLabel(item)}</li>)}
+              </ul>
+            </div>
+          ) : null}
+
+          {task.scheduleTemplates.length > 0 ? (
+            <p className={styles.outcomeScheduleNotice}>
+              <Clock3 size={13} aria-hidden /> {t('outcomePack.schedulesDisabled', { count: task.scheduleTemplates.length })}
+            </p>
+          ) : null}
+        </section>
+      ) : null}
 
       <dl className={styles.facts}>
         <div><dt>{t('facts.created')}</dt><dd>{formatDate(task.createdAt, locale)}</dd></div>

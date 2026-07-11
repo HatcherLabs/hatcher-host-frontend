@@ -57,6 +57,29 @@ function finiteNumber(value: unknown): number | null {
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
 }
 
+function unknownList(value: unknown): unknown[] {
+  return Array.isArray(value) ? value : [];
+}
+
+function normalizeOutcomePackSkillReadiness(value: unknown): MissionTask['outcomePackSkillReadiness'] {
+  if (!value) return null;
+  const raw = record(value);
+  const skills = unknownList(raw.skills).map((value) => {
+    const skill = record(value);
+    const status = text(skill.status, 'missing');
+    return {
+      name: text(skill.name),
+      status,
+      installed: skill.installed === true || status === 'installed',
+    };
+  }).filter((skill) => skill.name.length > 0);
+  return {
+    required: raw.required === true || skills.length > 0,
+    ready: raw.ready === true && skills.every((skill) => skill.installed),
+    skills,
+  };
+}
+
 function timestamp(value: unknown): string {
   return typeof value === 'string' && value.length > 0 ? value : new Date(0).toISOString();
 }
@@ -151,6 +174,11 @@ export function normalizeMissionTask(value: unknown): MissionTask {
     prompt: text(raw.prompt),
     status: taskStatus(raw.status),
     source: text(raw.source, 'manual'),
+    sourceId: nullableText(raw.sourceId),
+    sourceVersion: nullableText(raw.sourceVersion),
+    acceptanceChecks: unknownList(raw.acceptanceChecks),
+    scheduleTemplates: unknownList(raw.scheduleTemplates),
+    outcomePackSkillReadiness: normalizeOutcomePackSkillReadiness(raw.outcomePackSkillReadiness),
     requiresApproval: raw.requiresApproval === true,
     budget: {
       aiCredits: finiteNumber(budget.aiCredits),
@@ -263,7 +291,7 @@ export function safeMissionArtifactUrl(value: string | null | undefined): string
 }
 
 export function canStartMissionTask(task: MissionTask): boolean {
-  return task.status === 'ready';
+  return task.status === 'ready' && task.outcomePackSkillReadiness?.ready !== false;
 }
 
 export function canApproveMissionTask(task: MissionTask): boolean {
@@ -279,5 +307,6 @@ export function canCancelMissionTask(task: MissionTask): boolean {
 }
 
 export function canResumeMissionTask(task: MissionTask): boolean {
-  return task.status === 'failed' || task.status === 'cancelled';
+  return (task.status === 'failed' || task.status === 'cancelled') &&
+    task.outcomePackSkillReadiness?.ready !== false;
 }

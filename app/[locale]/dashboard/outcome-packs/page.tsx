@@ -35,12 +35,17 @@ import { api } from '@/lib/api';
 import type { Agent } from '@/lib/api';
 import {
   createOutcomePackIdempotencyKey,
+  initializeOutcomePackInputs,
   isOutcomePackLaunchReady,
   normalizeOutcomePack,
   normalizeOutcomePackList,
   normalizeOutcomePackPreparation,
   outcomePackSetupTab,
+  serializeOutcomePackInputs,
   validateOutcomePackInputs,
+  type OutcomePackDraftInputs,
+  type OutcomePackDraftValue,
+  type OutcomePackDetailItemModel,
   type OutcomePackModel,
   type OutcomePackPreparationModel,
 } from '@/lib/outcome-packs';
@@ -56,10 +61,6 @@ const PACK_ICONS: Record<string, LucideIcon> = {
 
 function compactNumber(value: number, locale: string): string {
   return new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(value);
-}
-
-function initializeInputs(pack: OutcomePackModel): Record<string, string> {
-  return Object.fromEntries(pack.inputFields.map((field) => [field.key, '']));
 }
 
 function PackIcon({ packId, size = 18 }: { packId: string; size?: number }) {
@@ -79,7 +80,7 @@ export default function OutcomePacksPage() {
   const [selectedPackId, setSelectedPackId] = useState<string | null>(null);
   const [pack, setPack] = useState<OutcomePackModel | null>(null);
   const [selectedAgentId, setSelectedAgentId] = useState('');
-  const [inputs, setInputs] = useState<Record<string, string>>({});
+  const [inputs, setInputs] = useState<OutcomePackDraftInputs>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [preview, setPreview] = useState<OutcomePackPreparationModel | null>(null);
   const [loading, setLoading] = useState(true);
@@ -94,6 +95,17 @@ export default function OutcomePacksPage() {
     () => agents.find((agent) => agent.id === selectedAgentId) ?? null,
     [agents, selectedAgentId],
   );
+
+  const acceptanceLabel = useCallback((item: OutcomePackDetailItemModel): string => {
+    if (item.type === 'all_tasks_completed') return t('contract.allTasksCompleted');
+    if (item.type === 'artifact_required') {
+      return t('contract.artifactRequired', { kind: item.artifactKind ?? t('contract.artifact') });
+    }
+    if (item.type === 'output_min_length') {
+      return t('contract.outputMinLength', { count: item.characters ?? 0 });
+    }
+    return item.label;
+  }, [t]);
 
   const resetPreparedState = useCallback(() => {
     setPreview(null);
@@ -157,7 +169,7 @@ export default function OutcomePacksPage() {
       }
       const nextPack = normalizeOutcomePack(result.data.pack);
       setPack(nextPack);
-      setInputs(initializeInputs(nextPack));
+      setInputs(initializeOutcomePackInputs(nextPack));
       setFieldErrors({});
       setPreview(null);
       launchKeyRef.current = null;
@@ -175,7 +187,7 @@ export default function OutcomePacksPage() {
     launchKeyRef.current = null;
   }, [selectedPackId]);
 
-  const updateInput = useCallback((fieldId: string, value: string) => {
+  const updateInput = useCallback((fieldId: string, value: OutcomePackDraftValue) => {
     setInputs((current) => ({ ...current, [fieldId]: value }));
     setFieldErrors((current) => {
       if (!current[fieldId]) return current;
@@ -203,9 +215,7 @@ export default function OutcomePacksPage() {
     setActionError(null);
     const result = await api.prepareOutcomePack(pack.id, {
       agentId: selectedAgentId,
-      inputs: Object.fromEntries(
-        Object.entries(inputs).map(([key, value]) => [key, value.trim()]),
-      ),
+      inputs: serializeOutcomePackInputs(pack.inputFields, inputs),
     });
     setPreparing(false);
     if (!result.success) {
@@ -224,9 +234,7 @@ export default function OutcomePacksPage() {
     setActionError(null);
     const result = await api.launchOutcomePack(pack.id, {
       agentId: selectedAgentId,
-      inputs: Object.fromEntries(
-        Object.entries(inputs).map(([key, value]) => [key, value.trim()]),
-      ),
+      inputs: serializeOutcomePackInputs(pack.inputFields, inputs),
       idempotencyKey,
       activateSchedules: false,
     });
@@ -236,8 +244,21 @@ export default function OutcomePacksPage() {
       toast.error(result.error);
       return;
     }
-    toast.success(t('messages.launched'));
-    router.push(`/dashboard/missions?task=${encodeURIComponent(result.data.task.id)}`);
+    const pendingSkills = result.data.requiredSkills
+      .filter((skill) => skill.status !== 'installed')
+      .map((skill) => skill.name);
+    if (pendingSkills.length > 0) {
+      toast.warning(t('contract.launchedPending', { count: pendingSkills.length }));
+    } else {
+      toast.success(t('messages.launched'));
+    }
+    const query = new URLSearchParams({
+      task: result.data.task.id,
+      outcomePack: result.data.task.sourceId,
+      agent: result.data.task.agentId,
+    });
+    if (pendingSkills.length > 0) query.set('skillsPending', pendingSkills.join(','));
+    router.push(`/dashboard/missions?${query.toString()}`);
   }, [inputs, pack, preview, router, selectedAgentId, t, toast]);
 
   if (authLoading) {
@@ -431,37 +452,67 @@ export default function OutcomePacksPage() {
                         {pack.inputFields.map((field) => {
                           const hasError = Boolean(fieldErrors[field.key]);
                           const fieldId = `outcome-pack-${field.key}`;
+                          const draftValue = inputs[field.key];
+                          const textValue = typeof draftValue === 'string' ? draftValue : '';
+                          const selectedValues = Array.isArray(draftValue) ? draftValue : [];
+                          const inputMaxLength = field.type === 'string_list' && field.maxLength !== null
+                            ? field.maxLength * (field.maxItems ?? 1) + Math.max(0, (field.maxItems ?? 1) - 1)
+                            : field.maxLength ?? undefined;
+                          if (field.type === 'multi_select') {
+                            return (
+                              <div className={styles.field} data-error={hasError || undefined} key={field.key}>
+                                <span id={`${fieldId}-label`}>
+                                  {field.label}
+                                  {field.required ? <em>{t('configure.required')}</em> : null}
+                                </span>
+                                <div className={styles.multiSelect} role="group" aria-labelledby={`${fieldId}-label`}>
+                                  {field.options.map((option) => {
+                                    const checked = selectedValues.includes(option);
+                                    return (
+                                      <label className={styles.multiOption} key={option}>
+                                        <input
+                                          type="checkbox"
+                                          checked={checked}
+                                          onChange={() => updateInput(
+                                            field.key,
+                                            checked
+                                              ? selectedValues.filter((value) => value !== option)
+                                              : [...selectedValues, option],
+                                          )}
+                                        />
+                                        <span>{option}</span>
+                                      </label>
+                                    );
+                                  })}
+                                </div>
+                                {hasError ? <small className={styles.fieldError}>{t('validation.fieldInvalid')}</small> : null}
+                              </div>
+                            );
+                          }
                           return (
                             <label className={styles.field} data-error={hasError || undefined} key={field.key} htmlFor={fieldId}>
                               <span>
                                 {field.label}
                                 {field.required ? <em>{t('configure.required')}</em> : null}
                               </span>
-                              {field.type === 'textarea' ? (
+                              {field.type === 'textarea' || field.type === 'string_list' ? (
                                 <textarea
                                   id={fieldId}
-                                  value={inputs[field.key] ?? ''}
+                                  value={textValue}
                                   onChange={(event) => updateInput(field.key, event.target.value)}
-                                  rows={5}
-                                  maxLength={field.maxLength ?? undefined}
+                                  rows={field.type === 'string_list' ? 4 : 5}
+                                  maxLength={inputMaxLength}
+                                  placeholder={field.type === 'string_list' ? t('contract.listPlaceholder') : undefined}
                                   aria-invalid={hasError}
                                   required={field.required}
                                 />
-                              ) : field.type === 'select' ? (
-                                <select
-                                  id={fieldId}
-                                  value={inputs[field.key] ?? ''}
-                                  onChange={(event) => updateInput(field.key, event.target.value)}
-                                  aria-invalid={hasError}
-                                  required={field.required}
-                                >
-                                  <option value="">{t('configure.selectPlaceholder')}</option>
-                                  {field.options.map((option) => <option value={option} key={option}>{option}</option>)}
-                                </select>
                               ) : (
                                 <input
                                   id={fieldId}
-                                  value={inputs[field.key] ?? ''}
+                                  type={field.type === 'integer' ? 'number' : 'text'}
+                                  inputMode={field.type === 'integer' ? 'numeric' : undefined}
+                                  step={field.type === 'integer' ? 1 : undefined}
+                                  value={textValue}
                                   onChange={(event) => updateInput(field.key, event.target.value)}
                                   maxLength={field.maxLength ?? undefined}
                                   aria-invalid={hasError}
@@ -492,7 +543,7 @@ export default function OutcomePacksPage() {
                               <div className={styles.acceptanceItem} key={item.id}>
                                 <Check size={13} aria-hidden />
                                 <div>
-                                  <strong>{item.label}</strong>
+                                  <strong>{acceptanceLabel(item)}</strong>
                                   {item.description ? <p>{item.description}</p> : null}
                                 </div>
                               </div>

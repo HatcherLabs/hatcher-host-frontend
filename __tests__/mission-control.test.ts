@@ -88,6 +88,39 @@ describe('Mission Control DTO mapping', () => {
     expect(canStartMissionTask(failed)).toBe(false);
   });
 
+  it('preserves Outcome Pack metadata and gates start until required skills are installed', () => {
+    const pending = normalizeMissionTask({
+      id: 'task-outcome',
+      status: 'ready',
+      source: 'outcome_pack',
+      sourceId: 'research-report-v1',
+      sourceVersion: '1.0.0',
+      acceptanceChecks: [{ type: 'artifact_required', artifactKind: 'text' }],
+      scheduleTemplates: [{ id: 'daily', enabled: false }],
+      outcomePackSkillReadiness: {
+        required: true,
+        ready: false,
+        skills: [{ name: 'in-depth-research', status: 'pending', installed: false }],
+      },
+    });
+
+    expect(pending).toMatchObject({
+      sourceId: 'research-report-v1',
+      sourceVersion: '1.0.0',
+      acceptanceChecks: [{ type: 'artifact_required' }],
+      scheduleTemplates: [{ enabled: false }],
+    });
+    expect(canStartMissionTask(pending)).toBe(false);
+    expect(canStartMissionTask({
+      ...pending,
+      outcomePackSkillReadiness: {
+        required: true,
+        ready: true,
+        skills: [{ name: 'in-depth-research', status: 'installed', installed: true }],
+      },
+    })).toBe(true);
+  });
+
   it('does not offer cancel again after cancellation was requested', () => {
     const task = normalizeMissionTask({
       status: 'running',

@@ -2434,96 +2434,104 @@
     "errCreateNetwork": "Erro de rede ao criar o agente."
   },
   "outcomePacks": {
-    "authenticating": "Checking your session...",
-    "signInTitle": "Sign in to Outcome Packs",
-    "signInDescription": "Outcome Packs configure private tasks and integrations for agents in your account.",
-    "signIn": "Sign in",
-    "eyebrow": "Curated operations",
+    "contract": {
+      "listPlaceholder": "Um item por linha",
+      "allTasksCompleted": "Todas as tarefas estão concluídas",
+      "artifactRequired": "Requer um artefato do tipo {kind}",
+      "artifact": "resultado",
+      "outputMinLength": "Pelo menos {count} caracteres",
+      "launchedPending": "Tarefa criada. Instale as {count} skills obrigatórias antes de iniciá-la."
+    },
+    "authenticating": "Verificando sua sessão...",
+    "signInTitle": "Entrar no Outcome Packs",
+    "signInDescription": "Outcome Packs configura tarefas privadas e integrações para os agentes da sua conta.",
+    "signIn": "Entrar",
+    "eyebrow": "Operações selecionadas",
     "title": "Outcome Packs",
-    "subtitle": "Configure a proven recipe, verify its setup, then launch it into Mission Control.",
-    "refresh": "Refresh catalog",
+    "subtitle": "Configure uma receita comprovada, valide o preparo e envie-a ao Mission Control.",
+    "refresh": "Atualizar catálogo",
     "missionControl": "Mission Control",
-    "tryAgain": "Try again",
-    "loading": "Loading Outcome Packs...",
-    "detailLoading": "Loading pack details...",
-    "detailError": "This pack could not be loaded.",
+    "tryAgain": "Tentar novamente",
+    "loading": "Carregando Outcome Packs...",
+    "detailLoading": "Carregando detalhes do pack...",
+    "detailError": "Não foi possível carregar este pack.",
     "catalog": {
-      "label": "Outcome Pack catalog",
-      "title": "Catalog",
-      "firstParty": "Hatcher first-party",
-      "version": "Version {version}"
+      "label": "Catálogo de Outcome Packs",
+      "title": "Catálogo",
+      "firstParty": "Criado pela Hatcher",
+      "version": "Versão {version}"
     },
     "detail": {
-      "curated": "Curated recipe",
-      "runtimeMinutes": "{count, plural, one {# minute runtime} other {# minutes runtime}}",
-      "frameworks": "Compatible frameworks",
-      "anyFramework": "Any hosted framework",
-      "requirements": "Skills and prerequisites",
-      "noRequirements": "No extra setup",
-      "plan": "Task plan",
-      "taskCount": "{count, plural, one {# task} other {# tasks}}",
-      "tasks": "Pack tasks",
-      "acceptance": "Acceptance criteria"
+      "curated": "Receita selecionada",
+      "runtimeMinutes": "Duração: {count} minutos",
+      "frameworks": "Frameworks compatíveis",
+      "anyFramework": "Qualquer framework hospedado",
+      "requirements": "Skills e pré-requisitos",
+      "noRequirements": "Sem configuração extra",
+      "plan": "Plano de tarefas",
+      "taskCount": "{count} tarefas",
+      "tasks": "Tarefas do pack",
+      "acceptance": "Critérios de aceitação"
     },
     "configure": {
-      "title": "Configure outcome",
-      "subtitle": "Choose the agent and provide the inputs used to resolve the task plan.",
-      "agent": "Agent",
-      "agentPlaceholder": "Choose an agent",
-      "selectPlaceholder": "Choose an option",
+      "title": "Configurar resultado",
+      "subtitle": "Escolha o agente e forneça os dados usados no plano de tarefas.",
+      "agent": "Agente",
+      "agentPlaceholder": "Escolha um agente",
+      "selectPlaceholder": "Escolha uma opção",
       "agentStatus": "{framework} - {status}",
-      "required": "Required"
+      "required": "Obrigatório"
     },
     "validation": {
-      "agent": "Choose an agent before preparing this pack.",
-      "required": "Complete every required input.",
-      "fieldInvalid": "Complete this input within its allowed length."
+      "agent": "Escolha um agente antes de preparar este pack.",
+      "required": "Preencha todos os campos obrigatórios.",
+      "fieldInvalid": "Preencha este campo dentro do limite permitido."
     },
     "preview": {
-      "label": "Launch preview",
-      "title": "Setup preview",
-      "subtitle": "Compatibility, prerequisites, budget, and inactive schedules.",
-      "empty": "Prepare the pack to verify its setup before anything is created.",
-      "compatible": "Agent is compatible",
-      "incompatible": "Agent is not compatible",
-      "blockers": "Setup blockers",
-      "warnings": "Review before launch",
-      "resolvedTasks": "Resolved tasks",
-      "budget": "Budget target",
-      "noBudget": "No budget target",
+      "label": "Prévia de lançamento",
+      "title": "Prévia da configuração",
+      "subtitle": "Compatibilidade, pré-requisitos, orçamento e agendamentos inativos.",
+      "empty": "Prepare o pack para validar a configuração antes de criar qualquer item.",
+      "compatible": "O agente é compatível",
+      "incompatible": "O agente não é compatível",
+      "blockers": "Bloqueios de configuração",
+      "warnings": "Revise antes de lançar",
+      "resolvedTasks": "Tarefas resolvidas",
+      "budget": "Meta de orçamento",
+      "noBudget": "Sem meta de orçamento",
       "credits": "{count} AI Credits",
-      "budgetAdvisory": "Advisory target for planning and reporting; it is not a hard execution limit.",
-      "maxRuntime": "Maximum runtime: {count, plural, one {# minute} other {# minutes}}.",
-      "schedules": "Proposed schedules",
-      "scheduleOff": "Off",
-      "scheduleNotice": "Schedules stay disabled at launch and require a separate confirmation.",
+      "budgetAdvisory": "Meta indicativa para planejamento e relatórios; não é um limite rígido.",
+      "maxRuntime": "Duração máxima: {count} minutos.",
+      "schedules": "Agendamentos propostos",
+      "scheduleOff": "Desativado",
+      "scheduleNotice": "Os agendamentos permanecem desativados no lançamento e exigem confirmação separada.",
       "setup": {
-        "connectors": "Open Connectors",
-        "dev": "Open Developer setup",
-        "integrations": "Open Integrations"
+        "connectors": "Abrir Connectors",
+        "dev": "Abrir configuração de desenvolvedor",
+        "integrations": "Abrir Integrations"
       }
     },
     "actions": {
-      "prepare": "Prepare preview",
-      "prepareAgain": "Prepare again",
-      "preparing": "Preparing...",
-      "launchTitle": "Create in Mission Control",
-      "ready": "Ready to launch",
-      "blocked": "Prepare the pack and resolve blockers",
-      "launch": "Launch pack",
-      "launching": "Launching..."
+      "prepare": "Preparar prévia",
+      "prepareAgain": "Preparar novamente",
+      "preparing": "Preparando...",
+      "launchTitle": "Criar no Mission Control",
+      "ready": "Pronto para lançar",
+      "blocked": "Prepare o pack e resolva os bloqueios",
+      "launch": "Lançar pack",
+      "launching": "Lançando..."
     },
     "messages": {
-      "launched": "Outcome Pack launched."
+      "launched": "Outcome Pack lançado."
     },
     "noAgents": {
-      "title": "No agent available",
-      "description": "Create an agent before configuring an Outcome Pack.",
-      "action": "Create agent"
+      "title": "Nenhum agente disponível",
+      "description": "Crie um agente antes de configurar um Outcome Pack.",
+      "action": "Criar agente"
     },
     "empty": {
-      "title": "No Outcome Packs available",
-      "description": "The curated catalog could not return any first-party packs."
+      "title": "Nenhum Outcome Pack disponível",
+      "description": "O catálogo selecionado não retornou packs da Hatcher."
     }
   },
 
@@ -2694,6 +2702,26 @@
     }
   },
   "missionControl": {
+    "outcomePack": {
+      "title": "Outcome Pack",
+      "unknown": "Pack desconhecido",
+      "version": "Versão {version}",
+      "skillsReady": "Skills obrigatórias instaladas",
+      "skillsPending": "Skills obrigatórias pendentes",
+      "openPlugins": "Abrir Plugins e reiniciar o agente",
+      "acceptance": "Critérios de aceitação",
+      "allTasksCompleted": "Todas as tarefas estão concluídas",
+      "artifactRequired": "Requer um artefato do tipo {kind}",
+      "artifact": "resultado",
+      "outputMinLength": "Pelo menos {count} caracteres",
+      "schedulesDisabled": "{count} modelos de agendamento permanecem desativados e não serão executados automaticamente.",
+      "skillStatus": {
+        "installed": "Instalada",
+        "pending": "Pendente",
+        "failed": "Falhou",
+        "missing": "Ausente"
+      }
+    },
     "authenticating": "Checking your session...",
     "signInTitle": "Sign in to Mission Control",
     "signInDescription": "Mission Control shows private tasks, approvals, runs, and artifacts across your agents.",

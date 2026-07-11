@@ -9,10 +9,21 @@ export type FirstPartyOutcomePackId = (typeof OUTCOME_PACK_IDS)[number];
 
 type UnknownRecord = Record<string, unknown>;
 
+export type OutcomePackInputFieldType =
+  | 'text'
+  | 'textarea'
+  | 'integer'
+  | 'multi_select'
+  | 'string_list';
+
+export type OutcomePackDraftValue = string | string[];
+export type OutcomePackDraftInputs = Record<string, OutcomePackDraftValue>;
+export type OutcomePackSerializedInputs = Record<string, string | number | string[]>;
+
 export interface OutcomePackInputFieldModel {
   key: string;
   label: string;
-  type: 'text' | 'textarea' | 'select';
+  type: OutcomePackInputFieldType;
   required: boolean;
   maxLength: number | null;
   maxItems: number | null;
@@ -28,6 +39,9 @@ export interface OutcomePackDetailItemModel {
   id: string;
   label: string;
   description: string | null;
+  type: string | null;
+  artifactKind: string | null;
+  characters: number | null;
 }
 
 export interface OutcomePackScheduleModel {
@@ -107,10 +121,19 @@ function stringList(value: unknown): string[] {
 function normalizeInputField(value: unknown): OutcomePackInputFieldModel {
   const raw = record(value);
   const options = stringList(raw.options);
+  const supportedTypes = new Set<OutcomePackInputFieldType>([
+    'text',
+    'textarea',
+    'integer',
+    'multi_select',
+    'string_list',
+  ]);
   return {
     key: text(raw.key),
     label: text(raw.label, text(raw.key, 'Input')),
-    type: raw.type === 'textarea' ? 'textarea' : options.length > 0 ? 'select' : 'text',
+    type: typeof raw.type === 'string' && supportedTypes.has(raw.type as OutcomePackInputFieldType)
+      ? raw.type as OutcomePackInputFieldType
+      : 'text',
     required: raw.required === true,
     maxLength: finiteNumber(raw.maxLength),
     maxItems: finiteNumber(raw.maxItems),
@@ -132,14 +155,31 @@ function normalizeDetailItem(
   prefix: string,
 ): OutcomePackDetailItemModel {
   if (typeof value === 'string') {
-    return { id: `${prefix}-${index + 1}`, label: value, description: null };
+    return {
+      id: `${prefix}-${index + 1}`,
+      label: value,
+      description: null,
+      type: null,
+      artifactKind: null,
+      characters: null,
+    };
   }
   const raw = record(value);
+  const type = nullableText(raw.type);
   return {
-    id: text(raw.id, `${prefix}-${index + 1}`),
-    label: text(raw.title, text(raw.label, text(raw.name, `${prefix} ${index + 1}`))),
+    id: text(raw.id, type ?? `${prefix}-${index + 1}`),
+    label: text(raw.title, text(raw.label, text(raw.name, type ?? `${prefix} ${index + 1}`))),
     description: nullableText(raw.description),
+    type,
+    artifactKind: nullableText(raw.artifactKind),
+    characters: finiteNumber(raw.characters),
   };
+}
+
+export function normalizeOutcomePackAcceptanceChecks(value: unknown): OutcomePackDetailItemModel[] {
+  return Array.isArray(value)
+    ? value.map((item, index) => normalizeDetailItem(item, index, 'acceptance'))
+    : [];
 }
 
 function normalizeSchedule(value: unknown, index: number): OutcomePackScheduleModel {
@@ -181,9 +221,7 @@ export function normalizeOutcomePack(value: unknown): OutcomePackModel {
       : [],
     budgetTargetAiCredits: finiteNumber(raw.budgetTargetAiCredits),
     maxRuntimeSeconds: finiteNumber(raw.maxRuntimeSeconds),
-    acceptanceChecks: Array.isArray(raw.acceptanceChecks)
-      ? raw.acceptanceChecks.map((item, index) => normalizeDetailItem(item, index, 'acceptance'))
-      : [],
+    acceptanceChecks: normalizeOutcomePackAcceptanceChecks(raw.acceptanceChecks),
     schedules: Array.isArray(raw.schedules) ? raw.schedules.map(normalizeSchedule) : [],
     launchPolicy: raw.launchPolicy ?? null,
   };
@@ -236,9 +274,7 @@ export function normalizeOutcomePackPreparation(value: unknown): OutcomePackPrep
     requiredSkills: stringList(raw.requiredSkills),
     budgetTargetAiCredits: finiteNumber(raw.budgetTargetAiCredits),
     maxRuntimeSeconds: finiteNumber(raw.maxRuntimeSeconds),
-    acceptanceChecks: Array.isArray(raw.acceptanceChecks)
-      ? raw.acceptanceChecks.map((item, index) => normalizeDetailItem(item, index, 'acceptance'))
-      : [],
+    acceptanceChecks: normalizeOutcomePackAcceptanceChecks(raw.acceptanceChecks),
     schedules: Array.isArray(raw.schedules) ? raw.schedules.map(normalizeSchedule) : [],
     launchPolicy: raw.launchPolicy ?? null,
   };
@@ -246,15 +282,73 @@ export function normalizeOutcomePackPreparation(value: unknown): OutcomePackPrep
 
 export function validateOutcomePackInputs(
   fields: OutcomePackInputFieldModel[],
-  inputs: Record<string, string>,
+  inputs: OutcomePackDraftInputs,
 ): OutcomePackInputErrors {
   const errors: OutcomePackInputErrors = {};
   for (const field of fields) {
-    if (field.required && !inputs[field.key]?.trim()) errors[field.key] = 'required';
-    const value = inputs[field.key]?.trim() ?? '';
-    if (field.maxLength !== null && value.length > field.maxLength) errors[field.key] = 'maxLength';
+    const raw = inputs[field.key];
+    const values = field.type === 'multi_select'
+      ? (Array.isArray(raw) ? raw : [])
+      : field.type === 'string_list'
+        ? splitStringList(typeof raw === 'string' ? raw : '')
+        : [];
+    const value = typeof raw === 'string' ? raw.trim() : '';
+    const empty = field.type === 'multi_select' || field.type === 'string_list'
+      ? values.length === 0
+      : value.length === 0;
+    if (field.required && empty) errors[field.key] = 'required';
+    if (field.maxLength !== null) {
+      const tooLong = field.type === 'multi_select' || field.type === 'string_list'
+        ? values.some((item) => item.length > field.maxLength!)
+        : value.length > field.maxLength;
+      if (tooLong) errors[field.key] = 'maxLength';
+    }
+    if (field.maxItems !== null && values.length > field.maxItems) errors[field.key] = 'maxItems';
+    if (field.type === 'integer' && value && !/^-?\d+$/.test(value)) errors[field.key] = 'integer';
   }
   return errors;
+}
+
+function splitStringList(value: string): string[] {
+  return value
+    .split(/\r?\n/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+export function initializeOutcomePackInputs(pack: OutcomePackModel): OutcomePackDraftInputs {
+  return Object.fromEntries(pack.inputFields.map((field) => [
+    field.key,
+    field.type === 'multi_select' ? [] : '',
+  ]));
+}
+
+export function serializeOutcomePackInputs(
+  fields: OutcomePackInputFieldModel[],
+  inputs: OutcomePackDraftInputs,
+): OutcomePackSerializedInputs {
+  const serialized: OutcomePackSerializedInputs = {};
+  for (const field of fields) {
+    const raw = inputs[field.key];
+    if (field.type === 'multi_select') {
+      const values = (Array.isArray(raw) ? raw : [])
+        .map((item) => item.trim())
+        .filter(Boolean);
+      if (values.length > 0 || field.required) serialized[field.key] = values;
+      continue;
+    }
+
+    const value = typeof raw === 'string' ? raw.trim() : '';
+    if (!value && !field.required) continue;
+    if (field.type === 'string_list') {
+      serialized[field.key] = splitStringList(value);
+    } else if (field.type === 'integer') {
+      serialized[field.key] = Number(value);
+    } else {
+      serialized[field.key] = value;
+    }
+  }
+  return serialized;
 }
 
 export function isOutcomePackLaunchReady(preparation: OutcomePackPreparationModel | null): boolean {

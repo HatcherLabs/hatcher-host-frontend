@@ -391,6 +391,54 @@
 .status[data-status='failed'],
 .status[data-status='rejected'] { color: var(--color-destructive); border-color: var(--color-destructive-border); background: var(--color-destructive-bg); }
 
+.outcomePackBand {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.8fr) minmax(220px, 1.15fr) minmax(220px, 1.35fr);
+  gap: 18px;
+  padding: 15px 22px;
+  background: var(--color-warning-bg);
+  border-bottom: 1px solid var(--color-warning-border);
+}
+.outcomePackBand[data-ready] {
+  background: var(--bg-elevated);
+  border-bottom-color: var(--border-default);
+}
+.outcomePackHeading,
+.outcomeSkillSummary,
+.outcomeScheduleNotice { display: flex; align-items: center; gap: 8px; }
+.outcomePackHeading > svg { color: var(--accent); }
+.outcomePackHeading div { display: flex; min-width: 0; flex-direction: column; gap: 3px; }
+.outcomePackHeading strong,
+.outcomeSkills strong,
+.outcomeAcceptance > strong { color: var(--text-primary); font-size: 12px; }
+.outcomePackHeading span { color: var(--text-muted); font-size: 10px; overflow-wrap: anywhere; }
+.outcomeSkills { display: flex; min-width: 0; flex-direction: column; gap: 8px; }
+.outcomeSkillSummary { color: var(--color-warning); }
+.outcomePackBand[data-ready] .outcomeSkillSummary { color: var(--color-success); }
+.outcomeSkillList { display: flex; flex-wrap: wrap; gap: 5px; }
+.outcomeSkillList span {
+  padding: 3px 6px;
+  color: var(--color-warning);
+  background: var(--bg-card);
+  border: 1px solid var(--color-warning-border);
+  border-radius: 4px;
+  font-size: 9px;
+  overflow-wrap: anywhere;
+}
+.outcomeSkillList span[data-installed] { color: var(--color-success); border-color: var(--color-success-border); }
+.outcomeSetupLink {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-primary);
+  font-size: 11px;
+  font-weight: 650;
+}
+.outcomeAcceptance { min-width: 0; }
+.outcomeAcceptance ul { margin: 6px 0 0; padding-left: 17px; color: var(--text-secondary); font-size: 10px; line-height: 1.55; }
+.outcomeScheduleNotice { grid-column: 1 / -1; margin: -4px 0 0; color: var(--text-muted); font-size: 10px; }
+
 .facts {
   margin: 0;
   display: grid;
@@ -652,6 +700,8 @@
   .facts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .facts > div:nth-child(3) { border-right: 0; }
   .facts > div:nth-child(-n+3) { border-bottom: 1px solid var(--border-default); }
+  .outcomePackBand { grid-template-columns: minmax(180px, 0.8fr) minmax(240px, 1.2fr); }
+  .outcomeAcceptance { grid-column: 1 / -1; }
 }
 
 @media (max-width: 820px) {
@@ -683,6 +733,8 @@
   .detailSection { padding: 16px 14px; }
   .actions { width: 100%; }
   .actions button { flex: 1; }
+  .outcomePackBand { grid-template-columns: 1fr; padding: 14px; }
+  .outcomeAcceptance { grid-column: auto; }
   .facts { grid-template-columns: 1fr 1fr; }
   .artifactRow { flex-wrap: wrap; }
   .artifactPath { max-width: 100%; width: 100%; }

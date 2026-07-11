@@ -302,6 +302,38 @@
 .field[data-error] textarea { border-color: var(--color-destructive-border); }
 .field .fieldError { color: var(--color-destructive); }
 
+.multiSelect {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+.multiOption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 39px;
+  padding: 7px 10px;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.multiOption:has(input:checked) {
+  color: var(--text-primary);
+  border-color: var(--border-active);
+  background: var(--color-accent-bg);
+}
+.multiOption input {
+  width: 15px;
+  height: 15px;
+  padding: 0;
+  margin: 0;
+  accent-color: var(--accent);
+}
+.multiOption span { min-width: 0; font-size: 12px; overflow-wrap: anywhere; }
+.field[data-error] .multiSelect { outline: 1px solid var(--color-destructive-border); }
+
 .planDetails {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -564,4 +596,5 @@
   .specStrip > div:first-child { border-top: 0; }
   .launchFooter { align-items: stretch; flex-direction: column; }
   .launchFooter .primaryButton { width: 100%; }
+  .multiSelect { grid-template-columns: 1fr; }
 }

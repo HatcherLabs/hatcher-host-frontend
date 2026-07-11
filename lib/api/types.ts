@@ -427,6 +427,18 @@ export interface MissionTaskArtifact {
   createdAt: string;
 }
 
+export interface OutcomePackSkillStatus {
+  name: string;
+  status: string;
+  installed: boolean;
+}
+
+export interface OutcomePackSkillReadiness {
+  required: boolean;
+  ready: boolean;
+  skills: OutcomePackSkillStatus[];
+}
+
 export interface MissionTask {
   id: string;
   agentId: string;
@@ -436,6 +448,11 @@ export interface MissionTask {
   prompt: string;
   status: MissionTaskStatus;
   source: string;
+  sourceId: string | null;
+  sourceVersion: string | null;
+  acceptanceChecks: unknown[];
+  scheduleTemplates: unknown[];
+  outcomePackSkillReadiness: OutcomePackSkillReadiness | null;
   requiresApproval: boolean;
   budget: {
     aiCredits: number | null;
@@ -625,7 +642,7 @@ export interface OutcomePackLaunchTask {
 
 export interface PrepareOutcomePackBody {
   agentId: string;
-  inputs: Record<string, string>;
+  inputs: Record<string, string | number | string[]>;
 }
 
 export interface LaunchOutcomePackBody extends PrepareOutcomePackBody {

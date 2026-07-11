@@ -2410,96 +2410,104 @@
     "errCreateNetwork": "创建代理时出现网络错误。"
   },
   "outcomePacks": {
-    "authenticating": "Checking your session...",
-    "signInTitle": "Sign in to Outcome Packs",
-    "signInDescription": "Outcome Packs configure private tasks and integrations for agents in your account.",
-    "signIn": "Sign in",
-    "eyebrow": "Curated operations",
+    "contract": {
+      "listPlaceholder": "每行一个项目",
+      "allTasksCompleted": "所有任务均已完成",
+      "artifactRequired": "需要一个 {kind} 类型的成果",
+      "artifact": "结果",
+      "outputMinLength": "至少 {count} 个字符",
+      "launchedPending": "任务已创建。启动前请安装 {count} 个必需技能。"
+    },
+    "authenticating": "正在检查会话...",
+    "signInTitle": "登录 Outcome Packs",
+    "signInDescription": "Outcome Packs 为账户中的智能体配置私有任务和集成。",
+    "signIn": "登录",
+    "eyebrow": "精选运维方案",
     "title": "Outcome Packs",
-    "subtitle": "Configure a proven recipe, verify its setup, then launch it into Mission Control.",
-    "refresh": "Refresh catalog",
+    "subtitle": "配置成熟方案、验证设置，然后发送到 Mission Control。",
+    "refresh": "刷新目录",
     "missionControl": "Mission Control",
-    "tryAgain": "Try again",
-    "loading": "Loading Outcome Packs...",
-    "detailLoading": "Loading pack details...",
-    "detailError": "This pack could not be loaded.",
+    "tryAgain": "重试",
+    "loading": "正在加载 Outcome Packs...",
+    "detailLoading": "正在加载 Pack 详情...",
+    "detailError": "无法加载此 Pack。",
     "catalog": {
-      "label": "Outcome Pack catalog",
-      "title": "Catalog",
-      "firstParty": "Hatcher first-party",
-      "version": "Version {version}"
+      "label": "Outcome Pack 目录",
+      "title": "目录",
+      "firstParty": "Hatcher 官方",
+      "version": "版本 {version}"
     },
     "detail": {
-      "curated": "Curated recipe",
-      "runtimeMinutes": "{count, plural, one {# minute runtime} other {# minutes runtime}}",
-      "frameworks": "Compatible frameworks",
-      "anyFramework": "Any hosted framework",
-      "requirements": "Skills and prerequisites",
-      "noRequirements": "No extra setup",
-      "plan": "Task plan",
-      "taskCount": "{count, plural, one {# task} other {# tasks}}",
-      "tasks": "Pack tasks",
-      "acceptance": "Acceptance criteria"
+      "curated": "精选方案",
+      "runtimeMinutes": "运行时长：{count} 分钟",
+      "frameworks": "兼容框架",
+      "anyFramework": "任意托管框架",
+      "requirements": "技能和前置条件",
+      "noRequirements": "无需额外设置",
+      "plan": "任务计划",
+      "taskCount": "{count} 个任务",
+      "tasks": "Pack 任务",
+      "acceptance": "验收标准"
     },
     "configure": {
-      "title": "Configure outcome",
-      "subtitle": "Choose the agent and provide the inputs used to resolve the task plan.",
-      "agent": "Agent",
-      "agentPlaceholder": "Choose an agent",
-      "selectPlaceholder": "Choose an option",
+      "title": "配置结果",
+      "subtitle": "选择智能体并提供生成任务计划所需的输入。",
+      "agent": "智能体",
+      "agentPlaceholder": "选择智能体",
+      "selectPlaceholder": "选择选项",
       "agentStatus": "{framework} - {status}",
-      "required": "Required"
+      "required": "必填"
     },
     "validation": {
-      "agent": "Choose an agent before preparing this pack.",
-      "required": "Complete every required input.",
-      "fieldInvalid": "Complete this input within its allowed length."
+      "agent": "准备 Pack 前请选择智能体。",
+      "required": "请完成所有必填输入。",
+      "fieldInvalid": "请在允许的长度内完成此输入。"
     },
     "preview": {
-      "label": "Launch preview",
-      "title": "Setup preview",
-      "subtitle": "Compatibility, prerequisites, budget, and inactive schedules.",
-      "empty": "Prepare the pack to verify its setup before anything is created.",
-      "compatible": "Agent is compatible",
-      "incompatible": "Agent is not compatible",
-      "blockers": "Setup blockers",
-      "warnings": "Review before launch",
-      "resolvedTasks": "Resolved tasks",
-      "budget": "Budget target",
-      "noBudget": "No budget target",
+      "label": "启动预览",
+      "title": "设置预览",
+      "subtitle": "兼容性、前置条件、预算和未启用的计划。",
+      "empty": "先准备 Pack，以便在创建任何内容前验证设置。",
+      "compatible": "智能体兼容",
+      "incompatible": "智能体不兼容",
+      "blockers": "设置阻塞项",
+      "warnings": "启动前检查",
+      "resolvedTasks": "已生成任务",
+      "budget": "预算目标",
+      "noBudget": "无预算目标",
       "credits": "{count} AI Credits",
-      "budgetAdvisory": "Advisory target for planning and reporting; it is not a hard execution limit.",
-      "maxRuntime": "Maximum runtime: {count, plural, one {# minute} other {# minutes}}.",
-      "schedules": "Proposed schedules",
-      "scheduleOff": "Off",
-      "scheduleNotice": "Schedules stay disabled at launch and require a separate confirmation.",
+      "budgetAdvisory": "用于规划和报告的参考目标，并非严格执行上限。",
+      "maxRuntime": "最长运行时间：{count} 分钟。",
+      "schedules": "建议计划",
+      "scheduleOff": "关闭",
+      "scheduleNotice": "启动时计划保持禁用，需要单独确认。",
       "setup": {
-        "connectors": "Open Connectors",
-        "dev": "Open Developer setup",
-        "integrations": "Open Integrations"
+        "connectors": "打开 Connectors",
+        "dev": "打开开发者设置",
+        "integrations": "打开 Integrations"
       }
     },
     "actions": {
-      "prepare": "Prepare preview",
-      "prepareAgain": "Prepare again",
-      "preparing": "Preparing...",
-      "launchTitle": "Create in Mission Control",
-      "ready": "Ready to launch",
-      "blocked": "Prepare the pack and resolve blockers",
-      "launch": "Launch pack",
-      "launching": "Launching..."
+      "prepare": "准备预览",
+      "prepareAgain": "重新准备",
+      "preparing": "正在准备...",
+      "launchTitle": "在 Mission Control 中创建",
+      "ready": "可以启动",
+      "blocked": "准备 Pack 并解决阻塞项",
+      "launch": "启动 Pack",
+      "launching": "正在启动..."
     },
     "messages": {
-      "launched": "Outcome Pack launched."
+      "launched": "Outcome Pack 已启动。"
     },
     "noAgents": {
-      "title": "No agent available",
-      "description": "Create an agent before configuring an Outcome Pack.",
-      "action": "Create agent"
+      "title": "没有可用智能体",
+      "description": "配置 Outcome Pack 前请先创建智能体。",
+      "action": "创建智能体"
     },
     "empty": {
-      "title": "No Outcome Packs available",
-      "description": "The curated catalog could not return any first-party packs."
+      "title": "没有可用 Outcome Pack",
+      "description": "精选目录未返回 Hatcher 官方 Pack。"
     }
   },
 
@@ -2670,6 +2678,26 @@
     }
   },
   "missionControl": {
+    "outcomePack": {
+      "title": "Outcome Pack",
+      "unknown": "未知 Pack",
+      "version": "版本 {version}",
+      "skillsReady": "必需技能已安装",
+      "skillsPending": "必需技能待安装",
+      "openPlugins": "打开 Plugins 并重启智能体",
+      "acceptance": "验收标准",
+      "allTasksCompleted": "所有任务均已完成",
+      "artifactRequired": "需要一个 {kind} 类型的成果",
+      "artifact": "结果",
+      "outputMinLength": "至少 {count} 个字符",
+      "schedulesDisabled": "{count} 个计划模板保持禁用，不会自动运行。",
+      "skillStatus": {
+        "installed": "已安装",
+        "pending": "待处理",
+        "failed": "失败",
+        "missing": "缺失"
+      }
+    },
     "authenticating": "Checking your session...",
     "signInTitle": "Sign in to Mission Control",
     "signInDescription": "Mission Control shows private tasks, approvals, runs, and artifacts across your agents.",

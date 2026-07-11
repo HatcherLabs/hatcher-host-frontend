@@ -2434,96 +2434,104 @@
     "errCreateNetwork": "Ajan oluştururken ağ hatası."
   },
   "outcomePacks": {
-    "authenticating": "Checking your session...",
-    "signInTitle": "Sign in to Outcome Packs",
-    "signInDescription": "Outcome Packs configure private tasks and integrations for agents in your account.",
-    "signIn": "Sign in",
-    "eyebrow": "Curated operations",
+    "contract": {
+      "listPlaceholder": "Her satıra bir öğe",
+      "allTasksCompleted": "Tüm görevler tamamlandı",
+      "artifactRequired": "{kind} türünde bir çıktı gerektirir",
+      "artifact": "sonuç",
+      "outputMinLength": "En az {count} karakter",
+      "launchedPending": "Görev oluşturuldu. Başlatmadan önce gerekli {count} beceriyi yükleyin."
+    },
+    "authenticating": "Oturumunuz kontrol ediliyor...",
+    "signInTitle": "Outcome Packs için giriş yapın",
+    "signInDescription": "Outcome Packs hesabınızdaki ajanlar için özel görevleri ve entegrasyonları yapılandırır.",
+    "signIn": "Giriş yap",
+    "eyebrow": "Seçilmiş operasyonlar",
     "title": "Outcome Packs",
-    "subtitle": "Configure a proven recipe, verify its setup, then launch it into Mission Control.",
-    "refresh": "Refresh catalog",
+    "subtitle": "Kanıtlanmış bir tarifi yapılandırın, kurulumu doğrulayın ve Mission Control'e gönderin.",
+    "refresh": "Kataloğu yenile",
     "missionControl": "Mission Control",
-    "tryAgain": "Try again",
-    "loading": "Loading Outcome Packs...",
-    "detailLoading": "Loading pack details...",
-    "detailError": "This pack could not be loaded.",
+    "tryAgain": "Tekrar dene",
+    "loading": "Outcome Packs yükleniyor...",
+    "detailLoading": "Paket ayrıntıları yükleniyor...",
+    "detailError": "Bu paket yüklenemedi.",
     "catalog": {
-      "label": "Outcome Pack catalog",
-      "title": "Catalog",
-      "firstParty": "Hatcher first-party",
-      "version": "Version {version}"
+      "label": "Outcome Pack kataloğu",
+      "title": "Katalog",
+      "firstParty": "Hatcher tarafından",
+      "version": "Sürüm {version}"
     },
     "detail": {
-      "curated": "Curated recipe",
-      "runtimeMinutes": "{count, plural, one {# minute runtime} other {# minutes runtime}}",
-      "frameworks": "Compatible frameworks",
-      "anyFramework": "Any hosted framework",
-      "requirements": "Skills and prerequisites",
-      "noRequirements": "No extra setup",
-      "plan": "Task plan",
-      "taskCount": "{count, plural, one {# task} other {# tasks}}",
-      "tasks": "Pack tasks",
-      "acceptance": "Acceptance criteria"
+      "curated": "Seçilmiş tarif",
+      "runtimeMinutes": "Süre: {count} dakika",
+      "frameworks": "Uyumlu framework'ler",
+      "anyFramework": "Herhangi bir barındırılan framework",
+      "requirements": "Beceriler ve ön koşullar",
+      "noRequirements": "Ek kurulum yok",
+      "plan": "Görev planı",
+      "taskCount": "{count} görev",
+      "tasks": "Paket görevleri",
+      "acceptance": "Kabul ölçütleri"
     },
     "configure": {
-      "title": "Configure outcome",
-      "subtitle": "Choose the agent and provide the inputs used to resolve the task plan.",
-      "agent": "Agent",
-      "agentPlaceholder": "Choose an agent",
-      "selectPlaceholder": "Choose an option",
+      "title": "Sonucu yapılandır",
+      "subtitle": "Ajanı seçin ve görev planı için kullanılacak girdileri sağlayın.",
+      "agent": "Ajan",
+      "agentPlaceholder": "Ajan seçin",
+      "selectPlaceholder": "Seçenek seçin",
       "agentStatus": "{framework} - {status}",
-      "required": "Required"
+      "required": "Zorunlu"
     },
     "validation": {
-      "agent": "Choose an agent before preparing this pack.",
-      "required": "Complete every required input.",
-      "fieldInvalid": "Complete this input within its allowed length."
+      "agent": "Paketi hazırlamadan önce bir ajan seçin.",
+      "required": "Tüm zorunlu girdileri tamamlayın.",
+      "fieldInvalid": "Bu girdiyi izin verilen uzunlukta tamamlayın."
     },
     "preview": {
-      "label": "Launch preview",
-      "title": "Setup preview",
-      "subtitle": "Compatibility, prerequisites, budget, and inactive schedules.",
-      "empty": "Prepare the pack to verify its setup before anything is created.",
-      "compatible": "Agent is compatible",
-      "incompatible": "Agent is not compatible",
-      "blockers": "Setup blockers",
-      "warnings": "Review before launch",
-      "resolvedTasks": "Resolved tasks",
-      "budget": "Budget target",
-      "noBudget": "No budget target",
+      "label": "Başlatma önizlemesi",
+      "title": "Kurulum önizlemesi",
+      "subtitle": "Uyumluluk, ön koşullar, bütçe ve kapalı zamanlamalar.",
+      "empty": "Herhangi bir şey oluşturmadan önce kurulumu doğrulamak için paketi hazırlayın.",
+      "compatible": "Ajan uyumlu",
+      "incompatible": "Ajan uyumlu değil",
+      "blockers": "Kurulum engelleri",
+      "warnings": "Başlatmadan önce inceleyin",
+      "resolvedTasks": "Çözümlenmiş görevler",
+      "budget": "Bütçe hedefi",
+      "noBudget": "Bütçe hedefi yok",
       "credits": "{count} AI Credits",
-      "budgetAdvisory": "Advisory target for planning and reporting; it is not a hard execution limit.",
-      "maxRuntime": "Maximum runtime: {count, plural, one {# minute} other {# minutes}}.",
-      "schedules": "Proposed schedules",
-      "scheduleOff": "Off",
-      "scheduleNotice": "Schedules stay disabled at launch and require a separate confirmation.",
+      "budgetAdvisory": "Planlama ve raporlama için tavsiye niteliğinde hedef; katı sınır değildir.",
+      "maxRuntime": "Azami süre: {count} dakika.",
+      "schedules": "Önerilen zamanlamalar",
+      "scheduleOff": "Kapalı",
+      "scheduleNotice": "Zamanlamalar başlatmada kapalı kalır ve ayrı onay gerektirir.",
       "setup": {
-        "connectors": "Open Connectors",
-        "dev": "Open Developer setup",
-        "integrations": "Open Integrations"
+        "connectors": "Connectors'ı aç",
+        "dev": "Geliştirici kurulumunu aç",
+        "integrations": "Integrations'ı aç"
       }
     },
     "actions": {
-      "prepare": "Prepare preview",
-      "prepareAgain": "Prepare again",
-      "preparing": "Preparing...",
-      "launchTitle": "Create in Mission Control",
-      "ready": "Ready to launch",
-      "blocked": "Prepare the pack and resolve blockers",
-      "launch": "Launch pack",
-      "launching": "Launching..."
+      "prepare": "Önizlemeyi hazırla",
+      "prepareAgain": "Tekrar hazırla",
+      "preparing": "Hazırlanıyor...",
+      "launchTitle": "Mission Control'de oluştur",
+      "ready": "Başlatmaya hazır",
+      "blocked": "Paketi hazırlayın ve engelleri çözün",
+      "launch": "Paketi başlat",
+      "launching": "Başlatılıyor..."
     },
     "messages": {
-      "launched": "Outcome Pack launched."
+      "launched": "Outcome Pack başlatıldı."
     },
     "noAgents": {
-      "title": "No agent available",
-      "description": "Create an agent before configuring an Outcome Pack.",
-      "action": "Create agent"
+      "title": "Kullanılabilir ajan yok",
+      "description": "Outcome Pack yapılandırmadan önce bir ajan oluşturun.",
+      "action": "Ajan oluştur"
     },
     "empty": {
-      "title": "No Outcome Packs available",
-      "description": "The curated catalog could not return any first-party packs."
+      "title": "Kullanılabilir Outcome Pack yok",
+      "description": "Seçilmiş katalog Hatcher paketi döndürmedi."
     }
   },
 
@@ -2694,6 +2702,26 @@
     }
   },
   "missionControl": {
+    "outcomePack": {
+      "title": "Outcome Pack",
+      "unknown": "Bilinmeyen paket",
+      "version": "Sürüm {version}",
+      "skillsReady": "Gerekli beceriler yüklendi",
+      "skillsPending": "Gerekli beceriler bekliyor",
+      "openPlugins": "Plugins bölümünü aç ve ajanı yeniden başlat",
+      "acceptance": "Kabul ölçütleri",
+      "allTasksCompleted": "Tüm görevler tamamlandı",
+      "artifactRequired": "{kind} türünde bir çıktı gerektirir",
+      "artifact": "sonuç",
+      "outputMinLength": "En az {count} karakter",
+      "schedulesDisabled": "{count} zamanlama şablonu devre dışı kalır ve otomatik çalışmaz.",
+      "skillStatus": {
+        "installed": "Yüklendi",
+        "pending": "Bekliyor",
+        "failed": "Başarısız",
+        "missing": "Eksik"
+      }
+    },
     "authenticating": "Checking your session...",
     "signInTitle": "Sign in to Mission Control",
     "signInDescription": "Mission Control shows private tasks, approvals, runs, and artifacts across your agents.",

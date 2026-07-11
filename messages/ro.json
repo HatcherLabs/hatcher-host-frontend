@@ -2552,6 +2552,26 @@
     "errCreateNetwork": "Eroare de rețea la crearea agentului."
   },
   "missionControl": {
+    "outcomePack": {
+      "title": "Outcome Pack",
+      "unknown": "Pack necunoscut",
+      "version": "Versiunea {version}",
+      "skillsReady": "Skillurile necesare sunt instalate",
+      "skillsPending": "Skilluri necesare în așteptare",
+      "openPlugins": "Deschide Plugins și repornește agentul",
+      "acceptance": "Criterii de acceptare",
+      "allTasksCompleted": "Toate taskurile sunt finalizate",
+      "artifactRequired": "Necesită un artefact de tip {kind}",
+      "artifact": "rezultat",
+      "outputMinLength": "Cel puțin {count} caractere",
+      "schedulesDisabled": "{count} șabloane de programare rămân dezactivate și nu vor rula automat.",
+      "skillStatus": {
+        "installed": "Instalat",
+        "pending": "În așteptare",
+        "failed": "Eșuat",
+        "missing": "Lipsește"
+      }
+    },
     "authenticating": "Verificăm sesiunea...",
     "signInTitle": "Autentifică-te în Mission Control",
     "signInDescription": "Mission Control afișează taskurile private, aprobările, execuțiile și artefactele tuturor agenților tăi.",
@@ -2685,6 +2705,14 @@
     }
   },
   "outcomePacks": {
+    "contract": {
+      "listPlaceholder": "Câte un element pe linie",
+      "allTasksCompleted": "Toate taskurile sunt finalizate",
+      "artifactRequired": "Necesită un artefact de tip {kind}",
+      "artifact": "rezultat",
+      "outputMinLength": "Cel puțin {count} caractere",
+      "launchedPending": "Task creat. Instalează cele {count} skilluri necesare înainte de pornire."
+    },
     "authenticating": "Verificăm sesiunea...",
     "signInTitle": "Autentifică-te pentru Outcome Packs",
     "signInDescription": "Outcome Packs configurează taskuri private și integrări pentru agenții din contul tău.",

@@ -45,6 +45,8 @@ export type {
   MissionTaskSummary,
   MissionTasksResponse,
   OutcomePackLaunchTask,
+  OutcomePackSkillReadiness,
+  OutcomePackSkillStatus,
   PreparedOutcomePack,
   PreparedOutcomePackAgent,
   PreparedOutcomePackTask,

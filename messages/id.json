@@ -2434,96 +2434,104 @@
     "errCreateNetwork": "Kesalahan jaringan saat membuat agen."
   },
   "outcomePacks": {
-    "authenticating": "Checking your session...",
-    "signInTitle": "Sign in to Outcome Packs",
-    "signInDescription": "Outcome Packs configure private tasks and integrations for agents in your account.",
-    "signIn": "Sign in",
-    "eyebrow": "Curated operations",
+    "contract": {
+      "listPlaceholder": "Satu item per baris",
+      "allTasksCompleted": "Semua tugas telah selesai",
+      "artifactRequired": "Memerlukan artefak berjenis {kind}",
+      "artifact": "hasil",
+      "outputMinLength": "Minimal {count} karakter",
+      "launchedPending": "Tugas dibuat. Instal {count} skill wajib sebelum memulainya."
+    },
+    "authenticating": "Memeriksa sesi Anda...",
+    "signInTitle": "Masuk ke Outcome Packs",
+    "signInDescription": "Outcome Packs mengatur tugas privat dan integrasi untuk agen di akun Anda.",
+    "signIn": "Masuk",
+    "eyebrow": "Operasi terkurasi",
     "title": "Outcome Packs",
-    "subtitle": "Configure a proven recipe, verify its setup, then launch it into Mission Control.",
-    "refresh": "Refresh catalog",
+    "subtitle": "Atur resep teruji, periksa penyiapannya, lalu kirim ke Mission Control.",
+    "refresh": "Segarkan katalog",
     "missionControl": "Mission Control",
-    "tryAgain": "Try again",
-    "loading": "Loading Outcome Packs...",
-    "detailLoading": "Loading pack details...",
-    "detailError": "This pack could not be loaded.",
+    "tryAgain": "Coba lagi",
+    "loading": "Memuat Outcome Packs...",
+    "detailLoading": "Memuat detail pack...",
+    "detailError": "Pack ini tidak dapat dimuat.",
     "catalog": {
-      "label": "Outcome Pack catalog",
-      "title": "Catalog",
-      "firstParty": "Hatcher first-party",
-      "version": "Version {version}"
+      "label": "Katalog Outcome Pack",
+      "title": "Katalog",
+      "firstParty": "Dibuat Hatcher",
+      "version": "Versi {version}"
     },
     "detail": {
-      "curated": "Curated recipe",
-      "runtimeMinutes": "{count, plural, one {# minute runtime} other {# minutes runtime}}",
-      "frameworks": "Compatible frameworks",
-      "anyFramework": "Any hosted framework",
-      "requirements": "Skills and prerequisites",
-      "noRequirements": "No extra setup",
-      "plan": "Task plan",
-      "taskCount": "{count, plural, one {# task} other {# tasks}}",
-      "tasks": "Pack tasks",
-      "acceptance": "Acceptance criteria"
+      "curated": "Resep terkurasi",
+      "runtimeMinutes": "Durasi: {count} menit",
+      "frameworks": "Framework kompatibel",
+      "anyFramework": "Framework hosting apa pun",
+      "requirements": "Skill dan prasyarat",
+      "noRequirements": "Tanpa penyiapan tambahan",
+      "plan": "Rencana tugas",
+      "taskCount": "{count} tugas",
+      "tasks": "Tugas pack",
+      "acceptance": "Kriteria penerimaan"
     },
     "configure": {
-      "title": "Configure outcome",
-      "subtitle": "Choose the agent and provide the inputs used to resolve the task plan.",
-      "agent": "Agent",
-      "agentPlaceholder": "Choose an agent",
-      "selectPlaceholder": "Choose an option",
+      "title": "Atur hasil",
+      "subtitle": "Pilih agen dan berikan input untuk menyusun rencana tugas.",
+      "agent": "Agen",
+      "agentPlaceholder": "Pilih agen",
+      "selectPlaceholder": "Pilih opsi",
       "agentStatus": "{framework} - {status}",
-      "required": "Required"
+      "required": "Wajib"
     },
     "validation": {
-      "agent": "Choose an agent before preparing this pack.",
-      "required": "Complete every required input.",
-      "fieldInvalid": "Complete this input within its allowed length."
+      "agent": "Pilih agen sebelum menyiapkan pack ini.",
+      "required": "Lengkapi semua input wajib.",
+      "fieldInvalid": "Isi input sesuai batas panjang yang diizinkan."
     },
     "preview": {
-      "label": "Launch preview",
-      "title": "Setup preview",
-      "subtitle": "Compatibility, prerequisites, budget, and inactive schedules.",
-      "empty": "Prepare the pack to verify its setup before anything is created.",
-      "compatible": "Agent is compatible",
-      "incompatible": "Agent is not compatible",
-      "blockers": "Setup blockers",
-      "warnings": "Review before launch",
-      "resolvedTasks": "Resolved tasks",
-      "budget": "Budget target",
-      "noBudget": "No budget target",
+      "label": "Pratinjau peluncuran",
+      "title": "Pratinjau penyiapan",
+      "subtitle": "Kompatibilitas, prasyarat, anggaran, dan jadwal nonaktif.",
+      "empty": "Siapkan pack untuk memeriksa penyiapan sebelum membuat apa pun.",
+      "compatible": "Agen kompatibel",
+      "incompatible": "Agen tidak kompatibel",
+      "blockers": "Penghambat penyiapan",
+      "warnings": "Tinjau sebelum diluncurkan",
+      "resolvedTasks": "Tugas tersusun",
+      "budget": "Target anggaran",
+      "noBudget": "Tanpa target anggaran",
       "credits": "{count} AI Credits",
-      "budgetAdvisory": "Advisory target for planning and reporting; it is not a hard execution limit.",
-      "maxRuntime": "Maximum runtime: {count, plural, one {# minute} other {# minutes}}.",
-      "schedules": "Proposed schedules",
-      "scheduleOff": "Off",
-      "scheduleNotice": "Schedules stay disabled at launch and require a separate confirmation.",
+      "budgetAdvisory": "Target panduan untuk perencanaan dan laporan; bukan batas eksekusi mutlak.",
+      "maxRuntime": "Durasi maksimum: {count} menit.",
+      "schedules": "Jadwal yang diusulkan",
+      "scheduleOff": "Nonaktif",
+      "scheduleNotice": "Jadwal tetap nonaktif saat peluncuran dan memerlukan konfirmasi terpisah.",
       "setup": {
-        "connectors": "Open Connectors",
-        "dev": "Open Developer setup",
-        "integrations": "Open Integrations"
+        "connectors": "Buka Connectors",
+        "dev": "Buka penyiapan developer",
+        "integrations": "Buka Integrations"
       }
     },
     "actions": {
-      "prepare": "Prepare preview",
-      "prepareAgain": "Prepare again",
-      "preparing": "Preparing...",
-      "launchTitle": "Create in Mission Control",
-      "ready": "Ready to launch",
-      "blocked": "Prepare the pack and resolve blockers",
-      "launch": "Launch pack",
-      "launching": "Launching..."
+      "prepare": "Siapkan pratinjau",
+      "prepareAgain": "Siapkan lagi",
+      "preparing": "Menyiapkan...",
+      "launchTitle": "Buat di Mission Control",
+      "ready": "Siap diluncurkan",
+      "blocked": "Siapkan pack dan selesaikan penghambat",
+      "launch": "Luncurkan pack",
+      "launching": "Meluncurkan..."
     },
     "messages": {
-      "launched": "Outcome Pack launched."
+      "launched": "Outcome Pack diluncurkan."
     },
     "noAgents": {
-      "title": "No agent available",
-      "description": "Create an agent before configuring an Outcome Pack.",
-      "action": "Create agent"
+      "title": "Tidak ada agen",
+      "description": "Buat agen sebelum mengatur Outcome Pack.",
+      "action": "Buat agen"
     },
     "empty": {
-      "title": "No Outcome Packs available",
-      "description": "The curated catalog could not return any first-party packs."
+      "title": "Tidak ada Outcome Pack",
+      "description": "Katalog terkurasi tidak mengembalikan pack Hatcher."
     }
   },
 
@@ -2694,6 +2702,26 @@
     }
   },
   "missionControl": {
+    "outcomePack": {
+      "title": "Outcome Pack",
+      "unknown": "Pack tidak dikenal",
+      "version": "Versi {version}",
+      "skillsReady": "Skill wajib telah terinstal",
+      "skillsPending": "Skill wajib masih tertunda",
+      "openPlugins": "Buka Plugins dan mulai ulang agen",
+      "acceptance": "Kriteria penerimaan",
+      "allTasksCompleted": "Semua tugas telah selesai",
+      "artifactRequired": "Memerlukan artefak berjenis {kind}",
+      "artifact": "hasil",
+      "outputMinLength": "Minimal {count} karakter",
+      "schedulesDisabled": "{count} template jadwal tetap nonaktif dan tidak akan berjalan otomatis.",
+      "skillStatus": {
+        "installed": "Terinstal",
+        "pending": "Tertunda",
+        "failed": "Gagal",
+        "missing": "Tidak ada"
+      }
+    },
     "authenticating": "Checking your session...",
     "signInTitle": "Sign in to Mission Control",
     "signInDescription": "Mission Control shows private tasks, approvals, runs, and artifacts across your agents.",
