@@ -62,9 +62,9 @@ function virtualsCostFromPricing(pricing: VirtualsComputeModel['pricing']): Host
   return 'Low';
 }
 
-function virtualsFixedPrice(pricing: VirtualsComputeModel['pricing']): string | undefined {
+function virtualsPriceLabel(pricing: VirtualsComputeModel['pricing']): string | undefined {
   if (!pricing || !isFiniteNumber(pricing.input) || !isFiniteNumber(pricing.output)) return undefined;
-  return `${formatMoney(pricing.input)} in / ${formatMoney(pricing.output)} out per 1M`;
+  return `Provider catalog: ${formatMoney(pricing.input)} in / ${formatMoney(pricing.output)} out`;
 }
 
 export function mapVirtualsComputeModelToHostedModel(model: VirtualsComputeModel): HostedModelOption {
@@ -78,7 +78,7 @@ export function mapVirtualsComputeModelToHostedModel(model: VirtualsComputeModel
     cost: virtualsCostFromPricing(model.pricing),
     context: formatVirtualsContext(model.contextLength),
     description: model.description?.trim() || `Virtuals Compute model ${model.id}.`,
-    fixedPrice: virtualsFixedPrice(model.pricing),
+    priceLabel: virtualsPriceLabel(model.pricing),
   };
 }
 

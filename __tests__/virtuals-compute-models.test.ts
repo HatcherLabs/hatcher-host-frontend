@@ -22,7 +22,7 @@ describe('Virtuals Compute model catalog', () => {
       category: 'Coding',
       cost: 'High',
       context: '1M',
-      fixedPrice: '$3.60 in / $18.00 out per 1M',
+      priceLabel: 'Provider catalog: $3.60 in / $18.00 out',
     });
   });
 

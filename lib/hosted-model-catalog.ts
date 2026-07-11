@@ -28,6 +28,7 @@ export type HostedModelOption = {
   context: string;
   description: string;
   fixedPrice?: string;
+  priceLabel?: string;
   warning?: string;
 };
 
@@ -327,26 +328,6 @@ export const HOSTED_MODELS: HostedModelOption[] = [
     description: 'Balanced Xiaomi MiMo model routed through UsePod/OpenRouter for multi-step reasoning, writing, and longer conversations.',
   },
   {
-    id: 'xiaomi/mimo-v2-pro',
-    name: 'MiMo V2 Pro',
-    providerKey: 'xiaomi',
-    provider: 'Xiaomi MiMo',
-    category: 'Partner',
-    cost: 'Low',
-    context: '1M',
-    description: 'Previous-generation MiMo Pro model routed through UsePod/OpenRouter for long-context coding and agent tasks.',
-  },
-  {
-    id: 'xiaomi/mimo-v2-omni',
-    name: 'MiMo V2 Omni',
-    providerKey: 'xiaomi',
-    provider: 'Xiaomi MiMo',
-    category: 'Multimodal',
-    cost: 'Low',
-    context: '256K',
-    description: 'Multimodal MiMo model routed through UsePod/OpenRouter for image-aware analysis, OCR, charts, and visual context.',
-  },
-  {
     id: 'acedata/claude-opus-4-8',
     name: 'Claude Opus 4.8 (AceData)',
     providerKey: 'acedata',
@@ -388,17 +369,6 @@ export const HOSTED_MODELS: HostedModelOption[] = [
     cost: 'Low',
     context: '200K',
     description: 'Fast Claude option through AceData for extraction, classification, and lightweight chat.',
-    warning: 'Uses estimated AI Credits because AceData exposes costs in their usage console, not in chat responses.',
-  },
-  {
-    id: 'acedata/gpt-5.5',
-    name: 'GPT-5.5 (AceData)',
-    providerKey: 'acedata',
-    provider: 'AceData',
-    category: 'Partner',
-    cost: 'High',
-    context: '1.05M',
-    description: 'Partner-hosted OpenAI-compatible GPT-5.5 through AceData, with OpenRouter fallback when needed.',
     warning: 'Uses estimated AI Credits because AceData exposes costs in their usage console, not in chat responses.',
   },
   {
@@ -694,26 +664,6 @@ export const HOSTED_MODELS: HostedModelOption[] = [
     warning: 'Consumes AI Credits quickly.',
   },
   {
-    id: 'x-ai/grok-4.1-fast',
-    name: 'Grok 4.1 Fast',
-    providerKey: 'x-ai',
-    provider: 'xAI',
-    category: 'Fast',
-    cost: 'Low',
-    context: '2M',
-    description: 'Fast Grok model with very large context.',
-  },
-  {
-    id: 'x-ai/grok-code-fast-1',
-    name: 'Grok Code Fast 1',
-    providerKey: 'x-ai',
-    provider: 'xAI',
-    category: 'Coding',
-    cost: 'Medium',
-    context: '256K',
-    description: 'xAI coding model tuned for fast code generation.',
-  },
-  {
     id: 'x-ai/grok-4.3',
     name: 'Grok 4.3',
     providerKey: 'x-ai',
@@ -722,6 +672,17 @@ export const HOSTED_MODELS: HostedModelOption[] = [
     cost: 'High',
     context: '1M',
     description: 'Higher quality Grok model for reasoning-heavy tasks.',
+  },
+  {
+    id: 'x-ai/grok-4.5',
+    name: 'Grok 4.5',
+    providerKey: 'x-ai',
+    provider: 'xAI',
+    category: 'Premium',
+    cost: 'High',
+    context: '500K',
+    description: 'Current Grok model for coding, knowledge work, and STEM-heavy agent tasks.',
+    warning: 'The current UsePod marketplace route can report additional provider-side tokens. Monitor AI Credit usage.',
   },
   {
     id: 'mistralai/mistral-small-2603',
@@ -804,13 +765,103 @@ export const HOSTED_MODELS: HostedModelOption[] = [
     description: 'Low-cost NVIDIA model for lightweight workflows.',
   },
   {
+    id: 'virtuals/anthropic-claude-fable-5',
+    name: 'Claude Fable 5',
+    providerKey: 'virtuals',
+    provider: 'Virtuals',
+    category: 'Reasoning',
+    cost: 'Variable',
+    context: '1M',
+    description: 'Virtuals Compute Anthropic route for autonomous knowledge work, coding, and multimodal inputs.',
+  },
+  {
+    id: 'virtuals/e2ee-deepseek-v4-flash',
+    name: 'DeepSeek V4 Flash (E2EE)',
+    providerKey: 'virtuals',
+    provider: 'Virtuals',
+    category: 'Fast',
+    cost: 'Variable',
+    context: '1M',
+    description: 'Virtuals provider-side TEE with hardware attestation; Hatcher still processes and forwards the request.',
+  },
+  {
+    id: 'virtuals/openai-gpt-56-luna',
+    name: 'GPT-5.6 Luna',
+    providerKey: 'virtuals',
+    provider: 'Virtuals',
+    category: 'Fast',
+    cost: 'Variable',
+    context: '1M',
+    description: 'Virtuals Compute cost-efficient GPT-5.6 route for high-volume and latency-sensitive tasks.',
+  },
+  {
+    id: 'virtuals/openai-gpt-56-luna-pro',
+    name: 'GPT-5.6 Luna Pro',
+    providerKey: 'virtuals',
+    provider: 'Virtuals',
+    category: 'Reasoning',
+    cost: 'Variable',
+    context: '1M',
+    description: 'Virtuals Compute GPT-5.6 Luna route with the provider pro reasoning mode.',
+  },
+  {
+    id: 'virtuals/openai-gpt-56-sol',
+    name: 'GPT-5.6 Sol',
+    providerKey: 'virtuals',
+    provider: 'Virtuals',
+    category: 'Premium',
+    cost: 'Variable',
+    context: '1M',
+    description: 'Virtuals Compute flagship GPT-5.6 route for complex reasoning, coding, and agentic workflows.',
+  },
+  {
+    id: 'virtuals/openai-gpt-56-sol-pro',
+    name: 'GPT-5.6 Sol Pro',
+    providerKey: 'virtuals',
+    provider: 'Virtuals',
+    category: 'Premium',
+    cost: 'Variable',
+    context: '1M',
+    description: 'Virtuals Compute GPT-5.6 Sol route with the provider pro reasoning mode.',
+  },
+  {
+    id: 'virtuals/openai-gpt-56-terra',
+    name: 'GPT-5.6 Terra',
+    providerKey: 'virtuals',
+    provider: 'Virtuals',
+    category: 'Balanced',
+    cost: 'Variable',
+    context: '1M',
+    description: 'Virtuals Compute balanced GPT-5.6 route for everyday coding, reasoning, and agent tasks.',
+  },
+  {
+    id: 'virtuals/openai-gpt-56-terra-pro',
+    name: 'GPT-5.6 Terra Pro',
+    providerKey: 'virtuals',
+    provider: 'Virtuals',
+    category: 'Reasoning',
+    cost: 'Variable',
+    context: '1M',
+    description: 'Virtuals Compute GPT-5.6 Terra route with the provider pro reasoning mode.',
+  },
+  {
+    id: 'virtuals/x-ai-grok-4-5',
+    name: 'Grok 4.5',
+    providerKey: 'virtuals',
+    provider: 'Virtuals',
+    category: 'Premium',
+    cost: 'Variable',
+    context: '500K',
+    description: 'Virtuals Compute Grok route for coding, knowledge work, and STEM-heavy agent tasks.',
+  },
+  {
     id: 'virtuals/moonshotai-kimi-k2-5',
     name: 'Kimi K2 5',
     providerKey: 'virtuals',
     provider: 'Virtuals',
     category: 'Balanced',
     cost: 'Variable',
-    context: 'Provider-defined',
+    context: '256K',
     description: 'Virtuals Compute Kimi model for general agent work, routed with the platform Virtuals key.',
   },
   {
@@ -820,7 +871,7 @@ export const HOSTED_MODELS: HostedModelOption[] = [
     provider: 'Virtuals',
     category: 'Reasoning',
     cost: 'Variable',
-    context: 'Provider-defined',
+    context: '256K',
     description: 'Virtuals Compute Kimi variant for analysis-heavy prompts and longer planning loops.',
   },
   {
@@ -830,18 +881,8 @@ export const HOSTED_MODELS: HostedModelOption[] = [
     provider: 'Virtuals',
     category: 'Coding',
     cost: 'Variable',
-    context: 'Provider-defined',
+    context: '256K',
     description: 'Virtuals Compute coding-oriented Kimi route for repo analysis and implementation tasks.',
-  },
-  {
-    id: 'virtuals/llama-3-3-70b',
-    name: 'Llama 3.3 70B',
-    providerKey: 'virtuals',
-    provider: 'Virtuals',
-    category: 'Balanced',
-    cost: 'Variable',
-    context: 'Provider-defined',
-    description: 'Virtuals Compute Llama route for broad language and tool-planning workloads.',
   },
   {
     id: 'virtuals/deepseek-deepseek-v3-2',
@@ -850,7 +891,7 @@ export const HOSTED_MODELS: HostedModelOption[] = [
     provider: 'Virtuals',
     category: 'Reasoning',
     cost: 'Variable',
-    context: 'Provider-defined',
+    context: '160K',
     description: 'Virtuals Compute DeepSeek route for reasoning and structured task decomposition.',
   },
   {
@@ -860,7 +901,7 @@ export const HOSTED_MODELS: HostedModelOption[] = [
     provider: 'Virtuals',
     category: 'Fast',
     cost: 'Variable',
-    context: 'Provider-defined',
+    context: '256K',
     description: 'Virtuals Compute Gemini route for quick responses and multimodal-adjacent workflows.',
   },
   {
@@ -881,6 +922,11 @@ const HOSTED_MODEL_ALIASES = new Map<string, string>([
   ['meta-llama/llama-4-scout-17b-16e-instruct', 'qwen/qwen3.6-35b-a3b'],
   ['qwen/qwen3-32b', 'qwen/qwen3.6-35b-a3b'],
   ['qwen/qwen3-235b-a22b-2507', 'qwen/qwen3.6-35b-a3b'],
+  ['xiaomi/mimo-v2-pro', 'xiaomi/mimo-v2.5-pro'],
+  ['xiaomi/mimo-v2-omni', 'xiaomi/mimo-v2.5'],
+  ['x-ai/grok-4.1-fast', 'x-ai/grok-4.5'],
+  ['x-ai/grok-code-fast-1', 'x-ai/grok-4.5'],
+  ['virtuals/llama-3-3-70b', 'virtuals/deepseek-deepseek-v3-2'],
   ['minmax m3', 'minimax/minimax-m3'],
   ['minimax m3', 'minimax/minimax-m3'],
   ['minimax-m3', 'minimax/minimax-m3'],
@@ -948,7 +994,7 @@ export function getHostedModelOption(
 
 export function hostedModelRoute(model: HostedModelOption): string {
   if (model.providerKey === 'idle') return 'IDLE partner';
-  if (model.providerKey === 'openserv') return 'OpenServ direct / OpenRouter fallback';
+  if (model.providerKey === 'openserv') return 'OpenServ primary / OpenRouter fallback';
   if (model.providerKey === 'xiaomi') return 'UsePod primary / OpenRouter fallback';
   if (model.providerKey === 'acedata') return 'AceData primary / OpenRouter fallback';
   if (model.providerKey === 'virtuals') return 'Virtuals Compute';
@@ -956,7 +1002,7 @@ export function hostedModelRoute(model: HostedModelOption): string {
 }
 
 export function hostedModelPrivacy(model: HostedModelOption): HostedModelPrivacy {
-  return model.providerKey === 'idle' || model.providerKey === 'openserv' || model.providerKey === 'xiaomi' || model.providerKey === 'acedata' || model.providerKey === 'virtuals'
+  return model.providerKey === 'idle' || model.providerKey === 'openserv' || model.providerKey === 'acedata' || model.providerKey === 'virtuals'
     ? 'partner'
     : 'hatcher';
 }
@@ -1064,7 +1110,7 @@ export function resolveActiveModelDisplay(input: {
       route: hostedModelRoute(model),
       privacy: hostedPrivacyLabel(model),
       context: model.context,
-      cost: model.fixedPrice ?? hostedCostEstimate(model.cost),
+      cost: model.fixedPrice ?? model.priceLabel ?? hostedCostEstimate(model.cost),
       tags: hostedModelTags(model),
     };
   }
