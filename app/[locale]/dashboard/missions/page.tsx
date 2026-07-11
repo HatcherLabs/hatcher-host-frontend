@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import {
   Activity,
@@ -17,10 +17,12 @@ import {
   ListChecks,
   Loader2,
   Paperclip,
+  PackageCheck,
   Play,
   Plus,
   RefreshCw,
   RotateCcw,
+  Settings2,
   ShieldCheck,
   Square,
   X,
@@ -42,6 +44,7 @@ import {
   normalizeMissionTaskList,
   safeMissionArtifactUrl,
 } from '@/lib/mission-control';
+import { normalizeOutcomePackAcceptanceChecks, outcomePackCopySlug } from '@/lib/outcome-packs';
 import { useToast } from '@/components/ui/ToastProvider';
 import styles from './missions.module.css';
 
@@ -286,9 +289,47 @@ function TaskDetail({
   onAction: (key: string, run: () => MissionActionResponse) => void;
 }) {
   const t = useTranslations('missionControl');
+  const packT = useTranslations('outcomePacks');
   const progress = missionTaskProgress(task);
   const output = missionOutputText(task.latestRun?.output);
   const runningAction = actionKey?.startsWith(`${task.id}:`) ?? false;
+  const skillReadiness = task.outcomePackSkillReadiness;
+  const acceptanceChecks = normalizeOutcomePackAcceptanceChecks(task.acceptanceChecks);
+  const packSlug = task.sourceId ? outcomePackCopySlug(task.sourceId) : null;
+  const packBase = packSlug ? `content.packs.${packSlug}` : null;
+  const translatedPackValue = (suffix: string, fallback: string): string => {
+    const key = packBase ? `${packBase}.${suffix}` : null;
+    return key && packT.has(key) ? packT(key) : fallback;
+  };
+  const displayTitle = task.source === 'outcome_pack'
+    ? translatedPackValue('taskTitle', task.title)
+    : task.title;
+  const displayDescription = task.source === 'outcome_pack' && task.description
+    ? translatedPackValue('taskDescription', task.description)
+    : task.description;
+
+  const acceptanceLabel = (item: (typeof acceptanceChecks)[number]): string => {
+    if (item.type === 'all_tasks_completed') return t('outcomePack.allTasksCompleted');
+    if (item.type === 'artifact_required') {
+      const kindKey = item.artifactKind ? `content.artifactKinds.${item.artifactKind}` : null;
+      const kind = kindKey && packT.has(kindKey)
+        ? packT(kindKey)
+        : item.artifactKind ?? t('outcomePack.artifact');
+      return t('outcomePack.artifactRequired', { kind });
+    }
+    if (item.type === 'output_min_length') {
+      return t('outcomePack.outputMinLength', { count: item.characters ?? 0 });
+    }
+    return item.type === 'manual'
+      ? translatedPackValue('manualAcceptance', item.label)
+      : item.label;
+  };
+  const skillStatusLabel = (status: string): string => {
+    if (status === 'installed') return t('outcomePack.skillStatus.installed');
+    if (status === 'pending' || status === 'pending_restart') return t('outcomePack.skillStatus.pending');
+    if (status === 'failed') return t('outcomePack.skillStatus.failed');
+    return t('outcomePack.skillStatus.missing');
+  };
 
   return (
     <article className={styles.detail} aria-labelledby={`task-title-${task.id}`}>
@@ -299,8 +340,8 @@ function TaskDetail({
             <span>{task.agent?.name ?? t('unknownAgent')}</span>
             <span>{t('attempt', { count: task.latestRun?.attempt ?? 0 })}</span>
           </div>
-          <h2 id={`task-title-${task.id}`}>{task.title}</h2>
-          {task.description ? <p>{task.description}</p> : null}
+          <h2 id={`task-title-${task.id}`}>{displayTitle}</h2>
+          {displayDescription ? <p>{displayDescription}</p> : null}
         </div>
 
         <div className={styles.actions} aria-label={t('actions.label')}>
@@ -361,6 +402,57 @@ function TaskDetail({
           {runningAction ? <Loader2 size={16} className={styles.spin} aria-label={t('actions.working')} /> : null}
         </div>
       </header>
+
+      {task.source === 'outcome_pack' ? (
+        <section className={styles.outcomePackBand} data-ready={skillReadiness?.ready || undefined}>
+          <div className={styles.outcomePackHeading}>
+            <PackageCheck size={17} aria-hidden />
+            <div>
+              <strong>{t('outcomePack.title')}</strong>
+              <span>
+                {packBase ? translatedPackValue('title', task.sourceId ?? t('outcomePack.unknown')) : task.sourceId ?? t('outcomePack.unknown')}
+                {task.sourceVersion ? ` - ${t('outcomePack.version', { version: task.sourceVersion })}` : ''}
+              </span>
+            </div>
+          </div>
+
+          {skillReadiness?.required ? (
+            <div className={styles.outcomeSkills}>
+              <div className={styles.outcomeSkillSummary}>
+                {skillReadiness.ready ? <CheckCircle2 size={15} aria-hidden /> : <AlertTriangle size={15} aria-hidden />}
+                <strong>{skillReadiness.ready ? t('outcomePack.skillsReady') : t('outcomePack.skillsPending')}</strong>
+              </div>
+              <div className={styles.outcomeSkillList}>
+                {skillReadiness.skills.map((skill) => (
+                  <span key={skill.name} data-installed={skill.installed || undefined}>
+                    {skill.name}: {skillStatusLabel(skill.status)}
+                  </span>
+                ))}
+              </div>
+              {!skillReadiness.ready ? (
+                <Link href={`/dashboard/agent/${task.agentId}?tab=plugins`} className={styles.outcomeSetupLink}>
+                  <Settings2 size={14} aria-hidden /> {t('outcomePack.openPlugins')}
+                </Link>
+              ) : null}
+            </div>
+          ) : null}
+
+          {acceptanceChecks.length > 0 ? (
+            <div className={styles.outcomeAcceptance}>
+              <strong>{t('outcomePack.acceptance')}</strong>
+              <ul>
+                {acceptanceChecks.map((item) => <li key={item.id}>{acceptanceLabel(item)}</li>)}
+              </ul>
+            </div>
+          ) : null}
+
+          {task.scheduleTemplates.length > 0 ? (
+            <p className={styles.outcomeScheduleNotice}>
+              <Clock3 size={13} aria-hidden /> {t('outcomePack.schedulesDisabled', { count: task.scheduleTemplates.length })}
+            </p>
+          ) : null}
+        </section>
+      ) : null}
 
       <dl className={styles.facts}>
         <div><dt>{t('facts.created')}</dt><dd>{formatDate(task.createdAt, locale)}</dd></div>
@@ -471,9 +563,11 @@ function TaskDetail({
 
 export default function MissionControlPage() {
   const t = useTranslations('missionControl');
+  const packT = useTranslations('outcomePacks');
   const locale = useLocale();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
+  const requestedTaskConsumedRef = useRef(false);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [tasks, setTasks] = useState<MissionTask[]>([]);
   const [summary, setSummary] = useState<MissionTaskSummary>(EMPTY_SUMMARY);
@@ -487,6 +581,13 @@ export default function MissionControlPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState<CreateTaskForm>(EMPTY_FORM);
+
+  const taskDisplayTitle = useCallback((task: MissionTask): string => {
+    if (task.source !== 'outcome_pack' || !task.sourceId) return task.title;
+    const slug = outcomePackCopySlug(task.sourceId);
+    const key = slug ? `content.packs.${slug}.taskTitle` : null;
+    return key && packT.has(key) ? packT(key) : task.title;
+  }, [packT]);
 
   const replaceTask = useCallback((next: MissionTask) => {
     setTasks((current) => {
@@ -554,6 +655,20 @@ export default function MissionControlPage() {
     (agentFilter === 'all' || task.agentId === agentFilter) &&
     (statusFilter === 'all' || task.status === statusFilter)
   )), [agentFilter, statusFilter, tasks]);
+
+  useEffect(() => {
+    if (requestedTaskConsumedRef.current || tasks.length === 0) return;
+    const requestedTaskId = new URLSearchParams(window.location.search).get('task');
+    if (!requestedTaskId) {
+      requestedTaskConsumedRef.current = true;
+      return;
+    }
+    if (!tasks.some((task) => task.id === requestedTaskId)) return;
+    requestedTaskConsumedRef.current = true;
+    setAgentFilter('all');
+    setStatusFilter('all');
+    setSelectedId(requestedTaskId);
+  }, [tasks]);
 
   useEffect(() => {
     if (filteredTasks.length === 0) {
@@ -653,6 +768,9 @@ export default function MissionControlPage() {
             <p>{t('subtitle')}</p>
           </div>
           <div className={styles.headerActions}>
+            <Link href="/dashboard/outcome-packs" className={styles.secondaryButton}>
+              <PackageCheck size={16} aria-hidden /> {t('outcomePacks')}
+            </Link>
             <button
               type="button"
               className={styles.iconButton}
@@ -747,7 +865,7 @@ export default function MissionControlPage() {
                         <TaskStatus status={task.status} label={t(`status.${task.status}`)} />
                         <span className={styles.taskDate}>{formatDate(task.updatedAt, locale)}</span>
                       </div>
-                      <strong className={styles.taskTitle}>{task.title}</strong>
+                      <strong className={styles.taskTitle}>{taskDisplayTitle(task)}</strong>
                       <span className={styles.taskAgent}><Bot size={12} aria-hidden /> {task.agent?.name ?? t('unknownAgent')}</span>
                       {task.status === 'running' || progress.value !== null ? (
                         <span className={styles.miniProgress} aria-hidden><span style={{ width: `${progress.value ?? 35}%` }} /></span>

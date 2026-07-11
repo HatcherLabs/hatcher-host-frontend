@@ -15,8 +15,13 @@ import type {
   CommitLiftImportBody,
   CreateMissionTaskBody,
   LiftImport,
+  LaunchOutcomePackBody,
+  LaunchOutcomePackResponse,
   MissionTask,
   MissionTasksResponse,
+  PreparedOutcomePack,
+  PrepareOutcomePackBody,
+  PublicOutcomePack,
   AgentCommCallBody,
   AgentCommCallResponse,
   AgentCommDiscoverResponse,
@@ -583,6 +588,27 @@ export const api = {
     req<{ task: MissionTask }>(`/agents/${agentId}/tasks/${taskId}/resume`, {
       method: "POST",
     }),
+
+  /** List the curated, first-party task recipes available to the current user. */
+  getOutcomePacks: () => req<{ packs: PublicOutcomePack[] }>("/outcome-packs"),
+
+  /** Get the complete configuration schema for one curated recipe. */
+  getOutcomePack: (packId: string) =>
+    req<{ pack: PublicOutcomePack }>(`/outcome-packs/${encodeURIComponent(packId)}`),
+
+  /** Resolve a recipe for an agent without creating tasks or schedules. */
+  prepareOutcomePack: (packId: string, body: PrepareOutcomePackBody) =>
+    req<{ preparation: PreparedOutcomePack }>(
+      `/outcome-packs/${encodeURIComponent(packId)}/prepare`,
+      { method: "POST", body: JSON.stringify(body) },
+    ),
+
+  /** Create the prepared task. Schedules remain disabled for explicit confirmation. */
+  launchOutcomePack: (packId: string, body: LaunchOutcomePackBody) =>
+    req<LaunchOutcomePackResponse>(
+      `/outcome-packs/${encodeURIComponent(packId)}/launch`,
+      { method: "POST", body: JSON.stringify(body) },
+    ),
 
   /** Get a single agent */
   getAgent: (id: string) => req<Agent>(`/agents/${id}`),

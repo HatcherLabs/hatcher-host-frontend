@@ -833,7 +833,7 @@
   "dashboard": {
     "common": {
       "loading": "Carregando...",
-      "authenticating": "Autenticando...",
+    "authenticating": "Autenticando...",
       "signInRequired": "Login obrigatório",
       "signIn": "Entrar",
       "refresh": "Atualizar",
@@ -2433,6 +2433,209 @@
     "errCreate": "Não foi possível criar o agente. Refine a descrição e tente novamente.",
     "errCreateNetwork": "Erro de rede ao criar o agente."
   },
+  "outcomePacks": {
+    "contract": {
+      "listPlaceholder": "Um item por linha",
+      "allTasksCompleted": "Todas as tarefas estão concluídas",
+      "artifactRequired": "Requer um artefato do tipo {kind}",
+      "artifact": "resultado",
+      "outputMinLength": "Pelo menos {count} caracteres",
+      "launchedPending": "Tarefa criada. Instale as {count} skills obrigatórias antes de iniciá-la."
+    },
+    "content": {
+      "categories": {
+        "research": "Pesquisa",
+        "engineering": "Engenharia",
+        "monitoring": "Monitoramento",
+        "marketing": "Marketing"
+      },
+      "options": {
+        "x": "X",
+        "linkedin": "LinkedIn",
+        "blog": "Blog",
+        "email": "E-mail"
+      },
+      "artifactKinds": {
+        "text": "texto",
+        "code": "código",
+        "file": "arquivo"
+      },
+      "prerequisites": {
+        "github_connection": "Configure o GitHub Connect ou um token de execução do GitHub para este agente."
+      },
+      "warnings": {
+        "unsupported_framework": "O framework {framework} não é compatível com este pack.",
+        "required_skills_pending": "{count, plural, one {# skill obrigatória será colocada na fila de instalação. Reinicie o agente antes de iniciar a tarefa.} other {# skills obrigatórias serão colocadas na fila de instalação. Reinicie o agente antes de iniciar a tarefa.}}",
+        "schedules_disabled": "{count, plural, one {# modelo de agendamento está preparado, mas permanece desativado.} other {# modelos de agendamento estão preparados, mas permanecem desativados.}}"
+      },
+      "packs": {
+        "researchReport": {
+          "title": "Relatório de pesquisa",
+          "summary": "Produza um relatório de pesquisa com fontes, focado em um tema específico e pronto para apoiar decisões.",
+          "fields": {
+            "topic": "Tema",
+            "questions": "Perguntas de pesquisa",
+            "audience": "Público",
+            "outputLanguage": "Idioma de saída"
+          },
+          "deliverables": {
+            "deliverable-1": "Relatório estruturado",
+            "deliverable-2": "Lista de fontes com citações diretas"
+          },
+          "manualAcceptance": "As fontes sustentam as afirmações centrais.",
+          "taskTitle": "Relatório de pesquisa",
+          "taskDescription": "Produza um relatório de pesquisa baseado em fontes a partir do briefing fornecido."
+        },
+        "pullRequestReview": {
+          "title": "Revisão de Pull Request",
+          "summary": "Revise um Pull Request do GitHub quanto à correção, aos riscos e à prontidão para lançamento.",
+          "fields": {
+            "repository": "Repositório (proprietário/nome)",
+            "pullRequestNumber": "Número do Pull Request",
+            "focus": "Foco da revisão"
+          },
+          "deliverables": {
+            "deliverable-1": "Achados classificados por gravidade",
+            "deliverable-2": "Veredito de liberar ou bloquear"
+          },
+          "manualAcceptance": "Cada achado bloqueador inclui evidências concretas.",
+          "taskTitle": "Revisão de Pull Request",
+          "taskDescription": "Revise o Pull Request indicado quanto à correção e aos riscos de lançamento."
+        },
+        "competitorWatch": {
+          "title": "Monitoramento da concorrência",
+          "summary": "Crie um relatório de inteligência competitiva e um modelo desativado para monitoramento diário.",
+          "fields": {
+            "company": "Sua empresa ou produto",
+            "competitors": "Concorrentes",
+            "market": "Mercado",
+            "watchSignals": "Sinais a monitorar"
+          },
+          "deliverables": {
+            "deliverable-1": "Relatório-base da concorrência",
+            "deliverable-2": "Sinais de monitoramento priorizados"
+          },
+          "manualAcceptance": "As afirmações relevantes têm data e fontes.",
+          "schedules": {
+            "daily-competitor-watch": "Monitoramento diário da concorrência"
+          },
+          "taskTitle": "Monitoramento da concorrência",
+          "taskDescription": "Estabeleça uma visão-base atual da concorrência, sustentada por fontes."
+        },
+        "launchContent": {
+          "title": "Conteúdo de lançamento",
+          "summary": "Transforme o posicionamento do produto em publicações prontas para cada canal e em um plano de ação.",
+          "fields": {
+            "product": "Produto",
+            "positioning": "Posicionamento e oferta",
+            "audience": "Público",
+            "channels": "Canais",
+            "tone": "Tom"
+          },
+          "deliverables": {
+            "deliverable-1": "Resumo do posicionamento",
+            "deliverable-2": "Rascunhos de publicações prontos para cada canal",
+            "deliverable-3": "Plano de ação para o lançamento"
+          },
+          "manualAcceptance": "As afirmações correspondem à oferta fornecida pelo proprietário.",
+          "taskTitle": "Conteúdo de lançamento",
+          "taskDescription": "Prepare rascunhos de conteúdo para o lançamento e um plano de ação sujeito à revisão humana."
+        }
+      }
+    },
+    "authenticating": "Verificando sua sessão...",
+    "signInTitle": "Entrar no Outcome Packs",
+    "signInDescription": "Outcome Packs configura tarefas privadas e integrações para os agentes da sua conta.",
+    "signIn": "Entrar",
+    "eyebrow": "Operações selecionadas",
+    "title": "Outcome Packs",
+    "subtitle": "Configure uma receita comprovada, valide o preparo e envie-a ao Mission Control.",
+    "refresh": "Atualizar catálogo",
+    "missionControl": "Mission Control",
+    "tryAgain": "Tentar novamente",
+    "loading": "Carregando Outcome Packs...",
+    "detailLoading": "Carregando detalhes do pack...",
+    "detailError": "Não foi possível carregar este pack.",
+    "catalog": {
+      "label": "Catálogo de Outcome Packs",
+      "title": "Catálogo",
+      "firstParty": "Criado pela Hatcher",
+      "version": "Versão {version}"
+    },
+    "detail": {
+      "curated": "Receita selecionada",
+      "runtimeMinutes": "Duração: {count} minutos",
+      "frameworks": "Frameworks compatíveis",
+      "anyFramework": "Qualquer framework hospedado",
+      "requirements": "Skills e pré-requisitos",
+      "noRequirements": "Sem configuração extra",
+      "plan": "Plano de tarefas",
+      "taskCount": "{count} tarefas",
+      "tasks": "Tarefas do pack",
+      "acceptance": "Critérios de aceitação"
+    },
+    "configure": {
+      "title": "Configurar resultado",
+      "subtitle": "Escolha o agente e forneça os dados usados no plano de tarefas.",
+      "agent": "Agente",
+      "agentPlaceholder": "Escolha um agente",
+      "selectPlaceholder": "Escolha uma opção",
+      "agentStatus": "{framework} - {status}",
+      "required": "Obrigatório"
+    },
+    "validation": {
+      "agent": "Escolha um agente antes de preparar este pack.",
+      "required": "Preencha todos os campos obrigatórios.",
+      "fieldInvalid": "Preencha este campo dentro do limite permitido."
+    },
+    "preview": {
+      "label": "Prévia de lançamento",
+      "title": "Prévia da configuração",
+      "subtitle": "Compatibilidade, pré-requisitos, orçamento e agendamentos inativos.",
+      "empty": "Prepare o pack para validar a configuração antes de criar qualquer item.",
+      "compatible": "O agente é compatível",
+      "incompatible": "O agente não é compatível",
+      "blockers": "Bloqueios de configuração",
+      "warnings": "Revise antes de lançar",
+      "resolvedTasks": "Tarefas resolvidas",
+      "budget": "Meta de orçamento",
+      "noBudget": "Sem meta de orçamento",
+      "credits": "{count} AI Credits",
+      "budgetAdvisory": "Meta indicativa para planejamento e relatórios; não é um limite rígido.",
+      "maxRuntime": "Duração máxima: {count} minutos.",
+      "schedules": "Agendamentos propostos",
+      "scheduleOff": "Desativado",
+      "scheduleNotice": "Os agendamentos permanecem desativados no lançamento e exigem confirmação separada.",
+      "setup": {
+        "connectors": "Abrir Connectors",
+        "dev": "Abrir configuração de desenvolvedor",
+        "integrations": "Abrir Integrations"
+      }
+    },
+    "actions": {
+      "prepare": "Preparar prévia",
+      "prepareAgain": "Preparar novamente",
+      "preparing": "Preparando...",
+      "launchTitle": "Criar no Mission Control",
+      "ready": "Pronto para lançar",
+      "blocked": "Prepare o pack e resolva os bloqueios",
+      "launch": "Lançar pack",
+      "launching": "Lançando..."
+    },
+    "messages": {
+      "launched": "Outcome Pack lançado."
+    },
+    "noAgents": {
+      "title": "Nenhum agente disponível",
+      "description": "Crie um agente antes de configurar um Outcome Pack.",
+      "action": "Criar agente"
+    },
+    "empty": {
+      "title": "Nenhum Outcome Pack disponível",
+      "description": "O catálogo selecionado não retornou packs da Hatcher."
+    }
+  },
+
   "landingV3": {
     "hero": {
       "boxLabel": "Implantar",
@@ -2600,6 +2803,26 @@
     }
   },
   "missionControl": {
+    "outcomePack": {
+      "title": "Outcome Pack",
+      "unknown": "Pack desconhecido",
+      "version": "Versão {version}",
+      "skillsReady": "Skills obrigatórias instaladas",
+      "skillsPending": "Skills obrigatórias pendentes",
+      "openPlugins": "Abrir Plugins e reiniciar o agente",
+      "acceptance": "Critérios de aceitação",
+      "allTasksCompleted": "Todas as tarefas estão concluídas",
+      "artifactRequired": "Requer um artefato do tipo {kind}",
+      "artifact": "resultado",
+      "outputMinLength": "Pelo menos {count} caracteres",
+      "schedulesDisabled": "{count} modelos de agendamento permanecem desativados e não serão executados automaticamente.",
+      "skillStatus": {
+        "installed": "Instalada",
+        "pending": "Pendente",
+        "failed": "Falhou",
+        "missing": "Ausente"
+      }
+    },
     "authenticating": "Checking your session...",
     "signInTitle": "Sign in to Mission Control",
     "signInDescription": "Mission Control shows private tasks, approvals, runs, and artifacts across your agents.",
@@ -2609,6 +2832,7 @@
     "subtitle": "Create, approve, run, and inspect one-shot work across every agent.",
     "refresh": "Refresh tasks",
     "newTask": "New task",
+    "outcomePacks": "Outcome Packs",
     "tryAgain": "Try again",
     "loading": "Loading tasks...",
     "unknownAgent": "Unknown agent",

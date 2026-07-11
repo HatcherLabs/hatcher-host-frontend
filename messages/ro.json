@@ -833,7 +833,7 @@
   "dashboard": {
     "common": {
       "loading": "Se încarcă...",
-      "authenticating": "Se autentifică...",
+    "authenticating": "Se autentifică...",
       "signInRequired": "Autentificare necesară",
       "signIn": "Autentificare",
       "refresh": "Reîmprospătare",
@@ -2552,6 +2552,26 @@
     "errCreateNetwork": "Eroare de rețea la crearea agentului."
   },
   "missionControl": {
+    "outcomePack": {
+      "title": "Outcome Pack",
+      "unknown": "Pack necunoscut",
+      "version": "Versiunea {version}",
+      "skillsReady": "Skillurile necesare sunt instalate",
+      "skillsPending": "Skilluri necesare în așteptare",
+      "openPlugins": "Deschide Plugins și repornește agentul",
+      "acceptance": "Criterii de acceptare",
+      "allTasksCompleted": "Toate taskurile sunt finalizate",
+      "artifactRequired": "Necesită un artefact de tip {kind}",
+      "artifact": "rezultat",
+      "outputMinLength": "Cel puțin {count} caractere",
+      "schedulesDisabled": "{count} șabloane de programare rămân dezactivate și nu vor rula automat.",
+      "skillStatus": {
+        "installed": "Instalat",
+        "pending": "În așteptare",
+        "failed": "Eșuat",
+        "missing": "Lipsește"
+      }
+    },
     "authenticating": "Verificăm sesiunea...",
     "signInTitle": "Autentifică-te în Mission Control",
     "signInDescription": "Mission Control afișează taskurile private, aprobările, execuțiile și artefactele tuturor agenților tăi.",
@@ -2561,6 +2581,7 @@
     "subtitle": "Creează, aprobă, execută și verifică taskuri punctuale pentru toți agenții.",
     "refresh": "Reîncarcă taskurile",
     "newTask": "Task nou",
+    "outcomePacks": "Outcome Packs",
     "tryAgain": "Încearcă din nou",
     "loading": "Se încarcă taskurile...",
     "unknownAgent": "Agent necunoscut",
@@ -2681,6 +2702,208 @@
       "title": "Niciun task găsit",
       "description": "Niciun task nu corespunde filtrelor de agent și stare selectate.",
       "action": "Șterge filtrele"
+    }
+  },
+  "outcomePacks": {
+    "contract": {
+      "listPlaceholder": "Câte un element pe linie",
+      "allTasksCompleted": "Toate taskurile sunt finalizate",
+      "artifactRequired": "Necesită un artefact de tip {kind}",
+      "artifact": "rezultat",
+      "outputMinLength": "Cel puțin {count} caractere",
+      "launchedPending": "Task creat. Instalează cele {count} skilluri necesare înainte de pornire."
+    },
+    "content": {
+      "categories": {
+        "research": "Cercetare",
+        "engineering": "Inginerie",
+        "monitoring": "Monitorizare",
+        "marketing": "Marketing"
+      },
+      "options": {
+        "x": "X",
+        "linkedin": "LinkedIn",
+        "blog": "Blog",
+        "email": "E-mail"
+      },
+      "artifactKinds": {
+        "text": "text",
+        "code": "cod",
+        "file": "fișier"
+      },
+      "prerequisites": {
+        "github_connection": "Configurează GitHub Connect sau un token GitHub pentru rularea acestui agent."
+      },
+      "warnings": {
+        "unsupported_framework": "Framework-ul {framework} nu este compatibil cu acest pack.",
+        "required_skills_pending": "{count, plural, one {# skill obligatoriu va fi pus în coada de instalare. Repornește agentul înainte de a porni taskul.} other {# skilluri obligatorii vor fi puse în coada de instalare. Repornește agentul înainte de a porni taskul.}}",
+        "schedules_disabled": "{count, plural, one {# șablon de programare este pregătit, dar rămâne dezactivat.} other {# șabloane de programare sunt pregătite, dar rămân dezactivate.}}"
+      },
+      "packs": {
+        "researchReport": {
+          "title": "Raport de cercetare",
+          "summary": "Realizează un raport de cercetare documentat, concentrat pe un subiect clar și pregătit pentru luarea unei decizii.",
+          "fields": {
+            "topic": "Subiect",
+            "questions": "Întrebări de cercetare",
+            "audience": "Public",
+            "outputLanguage": "Limba rezultatului"
+          },
+          "deliverables": {
+            "deliverable-1": "Raport structurat",
+            "deliverable-2": "Listă de surse cu citări directe"
+          },
+          "manualAcceptance": "Sursele susțin afirmațiile principale.",
+          "taskTitle": "Raport de cercetare",
+          "taskDescription": "Realizează un raport de cercetare bazat pe surse, pornind de la brief-ul furnizat."
+        },
+        "pullRequestReview": {
+          "title": "Verificare Pull Request",
+          "summary": "Verifică un Pull Request GitHub din perspectiva corectitudinii, riscurilor și pregătirii pentru lansare.",
+          "fields": {
+            "repository": "Repository (proprietar/nume)",
+            "pullRequestNumber": "Numărul Pull Request-ului",
+            "focus": "Obiectivul verificării"
+          },
+          "deliverables": {
+            "deliverable-1": "Constatări ordonate după severitate",
+            "deliverable-2": "Verdict de lansare sau blocare"
+          },
+          "manualAcceptance": "Fiecare constatare blocantă include dovezi concrete.",
+          "taskTitle": "Verificare Pull Request",
+          "taskDescription": "Verifică Pull Request-ul indicat pentru corectitudine și riscuri de lansare."
+        },
+        "competitorWatch": {
+          "title": "Monitorizarea concurenței",
+          "summary": "Creează un raport de inteligență competitivă și un șablon dezactivat pentru monitorizarea zilnică.",
+          "fields": {
+            "company": "Compania sau produsul tău",
+            "competitors": "Concurenți",
+            "market": "Piață",
+            "watchSignals": "Semnale de urmărit"
+          },
+          "deliverables": {
+            "deliverable-1": "Raport de referință despre concurență",
+            "deliverable-2": "Semnale de monitorizare prioritizate"
+          },
+          "manualAcceptance": "Afirmațiile importante sunt datate și susținute de surse.",
+          "schedules": {
+            "daily-competitor-watch": "Monitorizarea zilnică a concurenței"
+          },
+          "taskTitle": "Monitorizarea concurenței",
+          "taskDescription": "Stabilește o imagine actuală a concurenței, susținută de surse."
+        },
+        "launchContent": {
+          "title": "Conținut de lansare",
+          "summary": "Transformă poziționarea produsului în postări pregătite pentru fiecare canal și într-un plan de acțiune.",
+          "fields": {
+            "product": "Produs",
+            "positioning": "Poziționare și ofertă",
+            "audience": "Public",
+            "channels": "Canale",
+            "tone": "Ton"
+          },
+          "deliverables": {
+            "deliverable-1": "Rezumatul poziționării",
+            "deliverable-2": "Schițe de postări pregătite pentru fiecare canal",
+            "deliverable-3": "Plan de acțiune pentru lansare"
+          },
+          "manualAcceptance": "Afirmațiile corespund ofertei furnizate de proprietar.",
+          "taskTitle": "Conținut de lansare",
+          "taskDescription": "Pregătește schițe de conținut pentru lansare și un plan de acțiune care va fi verificat de o persoană."
+        }
+      }
+    },
+    "authenticating": "Verificăm sesiunea...",
+    "signInTitle": "Autentifică-te pentru Outcome Packs",
+    "signInDescription": "Outcome Packs configurează taskuri private și integrări pentru agenții din contul tău.",
+    "signIn": "Autentificare",
+    "eyebrow": "Operațiuni pregătite",
+    "title": "Outcome Packs",
+    "subtitle": "Configurează o rețetă verificată, validează setup-ul și lanseaz-o în Mission Control.",
+    "refresh": "Reîncarcă catalogul",
+    "missionControl": "Mission Control",
+    "tryAgain": "Încearcă din nou",
+    "loading": "Se încarcă Outcome Packs...",
+    "detailLoading": "Se încarcă detaliile pack-ului...",
+    "detailError": "Acest pack nu a putut fi încărcat.",
+    "catalog": {
+      "label": "Catalog Outcome Packs",
+      "title": "Catalog",
+      "firstParty": "Create de Hatcher",
+      "version": "Versiunea {version}"
+    },
+    "detail": {
+      "curated": "Rețetă verificată",
+      "runtimeMinutes": "{count, plural, one {# minut durată maximă} few {# minute durată maximă} other {# de minute durată maximă}}",
+      "frameworks": "Framework-uri compatibile",
+      "anyFramework": "Orice framework hosted",
+      "requirements": "Skill-uri și prerechizite",
+      "noRequirements": "Fără setup suplimentar",
+      "plan": "Planul de taskuri",
+      "taskCount": "{count, plural, one {# task} few {# taskuri} other {# de taskuri}}",
+      "tasks": "Taskurile pack-ului",
+      "acceptance": "Criterii de acceptare"
+    },
+    "configure": {
+      "title": "Configurează rezultatul",
+      "subtitle": "Alege agentul și completează datele folosite pentru planul de taskuri.",
+      "agent": "Agent",
+      "agentPlaceholder": "Alege un agent",
+      "selectPlaceholder": "Alege o opțiune",
+      "agentStatus": "{framework} - {status}",
+      "required": "Obligatoriu"
+    },
+    "validation": {
+      "agent": "Alege un agent înainte să pregătești pack-ul.",
+      "required": "Completează toate câmpurile obligatorii.",
+      "fieldInvalid": "Completează câmpul în limita de lungime permisă."
+    },
+    "preview": {
+      "label": "Previzualizare lansare",
+      "title": "Previzualizare setup",
+      "subtitle": "Compatibilitate, prerechizite, buget și programe inactive.",
+      "empty": "Pregătește pack-ul pentru a valida setup-ul înainte să fie creat ceva.",
+      "compatible": "Agentul este compatibil",
+      "incompatible": "Agentul nu este compatibil",
+      "blockers": "Blocaje de setup",
+      "warnings": "Verifică înainte de lansare",
+      "resolvedTasks": "Taskuri rezultate",
+      "budget": "Țintă de buget",
+      "noBudget": "Fără țintă de buget",
+      "credits": "{count} AI Credits",
+      "budgetAdvisory": "Țintă orientativă pentru planificare și raportare; nu este o limită strictă de execuție.",
+      "maxRuntime": "Durată maximă: {count, plural, one {# minut} few {# minute} other {# de minute}}.",
+      "schedules": "Programe propuse",
+      "scheduleOff": "Oprit",
+      "scheduleNotice": "Programele rămân dezactivate la lansare și necesită o confirmare separată.",
+      "setup": {
+        "connectors": "Deschide Conectori",
+        "dev": "Deschide setup-ul Developer",
+        "integrations": "Deschide Integrări"
+      }
+    },
+    "actions": {
+      "prepare": "Pregătește preview",
+      "prepareAgain": "Pregătește din nou",
+      "preparing": "Se pregătește...",
+      "launchTitle": "Creează în Mission Control",
+      "ready": "Pregătit pentru lansare",
+      "blocked": "Pregătește pack-ul și rezolvă blocajele",
+      "launch": "Lansează pack-ul",
+      "launching": "Se lansează..."
+    },
+    "messages": {
+      "launched": "Outcome Pack lansat."
+    },
+    "noAgents": {
+      "title": "Nu există niciun agent",
+      "description": "Creează un agent înainte să configurezi un Outcome Pack.",
+      "action": "Creează agent"
+    },
+    "empty": {
+      "title": "Nu există Outcome Packs",
+      "description": "Catalogul nu a returnat niciun pack first-party."
     }
   },
   "landingV3": {

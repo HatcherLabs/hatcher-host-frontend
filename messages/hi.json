@@ -833,7 +833,7 @@
   "dashboard": {
     "common": {
       "loading": "लोड हो रहा है...",
-      "authenticating": "प्रमाणित करना...",
+    "authenticating": "प्रमाणित करना...",
       "signInRequired": "साइन इन आवश्यक है",
       "signIn": "साइन इन करें",
       "refresh": "ताज़ा करना",
@@ -2433,6 +2433,209 @@
     "errCreate": "एजेंट नहीं बनाया जा सका. वर्णन परिशोधित करें और पुन: प्रयास करें.",
     "errCreateNetwork": "एजेंट बनाते समय नेटवर्क त्रुटि।"
   },
+  "outcomePacks": {
+    "contract": {
+      "listPlaceholder": "हर पंक्ति में एक आइटम",
+      "allTasksCompleted": "सभी कार्य पूरे हो चुके हैं",
+      "artifactRequired": "{kind} आर्टिफैक्ट आवश्यक है",
+      "artifact": "परिणाम",
+      "outputMinLength": "कम से कम {count} अक्षर",
+      "launchedPending": "कार्य बन गया। शुरू करने से पहले {count} आवश्यक स्किल इंस्टॉल करें।"
+    },
+    "content": {
+      "categories": {
+        "research": "अनुसंधान",
+        "engineering": "इंजीनियरिंग",
+        "monitoring": "निगरानी",
+        "marketing": "मार्केटिंग"
+      },
+      "options": {
+        "x": "X",
+        "linkedin": "LinkedIn",
+        "blog": "ब्लॉग",
+        "email": "ईमेल"
+      },
+      "artifactKinds": {
+        "text": "टेक्स्ट",
+        "code": "कोड",
+        "file": "फ़ाइल"
+      },
+      "prerequisites": {
+        "github_connection": "इस एजेंट के लिए GitHub Connect या GitHub रनटाइम टोकन कॉन्फ़िगर करें।"
+      },
+      "warnings": {
+        "unsupported_framework": "यह pack {framework} framework को सपोर्ट नहीं करता।",
+        "required_skills_pending": "{count, plural, one {# आवश्यक स्किल को इंस्टॉलेशन की कतार में रखा जाएगा। टास्क शुरू करने से पहले एजेंट को रीस्टार्ट करें।} other {# आवश्यक स्किल्स को इंस्टॉलेशन की कतार में रखा जाएगा। टास्क शुरू करने से पहले एजेंट को रीस्टार्ट करें।}}",
+        "schedules_disabled": "{count, plural, one {# शेड्यूल टेम्पलेट तैयार है, लेकिन बंद रहेगा।} other {# शेड्यूल टेम्पलेट तैयार हैं, लेकिन बंद रहेंगे।}}"
+      },
+      "packs": {
+        "researchReport": {
+          "title": "अनुसंधान रिपोर्ट",
+          "summary": "किसी स्पष्ट विषय पर स्रोतों से समर्थित और निर्णय लेने के लिए तैयार अनुसंधान रिपोर्ट बनाएं।",
+          "fields": {
+            "topic": "विषय",
+            "questions": "अनुसंधान प्रश्न",
+            "audience": "लक्षित पाठक",
+            "outputLanguage": "आउटपुट की भाषा"
+          },
+          "deliverables": {
+            "deliverable-1": "सुव्यवस्थित रिपोर्ट",
+            "deliverable-2": "सीधे उद्धरणों के साथ स्रोत सूची"
+          },
+          "manualAcceptance": "स्रोत मुख्य दावों का समर्थन करते हैं।",
+          "taskTitle": "अनुसंधान रिपोर्ट",
+          "taskDescription": "दिए गए brief से स्रोत-समर्थित अनुसंधान रिपोर्ट तैयार करें।"
+        },
+        "pullRequestReview": {
+          "title": "Pull Request समीक्षा",
+          "summary": "GitHub Pull Request की शुद्धता, जोखिम और रिलीज़ के लिए तैयारी की समीक्षा करें।",
+          "fields": {
+            "repository": "Repository (मालिक/नाम)",
+            "pullRequestNumber": "Pull Request नंबर",
+            "focus": "समीक्षा का केंद्र"
+          },
+          "deliverables": {
+            "deliverable-1": "गंभीरता के अनुसार क्रमबद्ध निष्कर्ष",
+            "deliverable-2": "रिलीज़ या ब्लॉक करने का निर्णय"
+          },
+          "manualAcceptance": "हर ब्लॉक करने वाले निष्कर्ष में ठोस प्रमाण शामिल है।",
+          "taskTitle": "Pull Request समीक्षा",
+          "taskDescription": "दिए गए Pull Request की शुद्धता और रिलीज़ जोखिमों की समीक्षा करें।"
+        },
+        "competitorWatch": {
+          "title": "प्रतिस्पर्धी निगरानी",
+          "summary": "प्रतिस्पर्धी जानकारी का brief और बंद रखा गया दैनिक निगरानी टेम्पलेट बनाएं।",
+          "fields": {
+            "company": "आपकी कंपनी या उत्पाद",
+            "competitors": "प्रतिस्पर्धी",
+            "market": "बाज़ार",
+            "watchSignals": "निगरानी के संकेत"
+          },
+          "deliverables": {
+            "deliverable-1": "प्रतिस्पर्धियों की आधारभूत रिपोर्ट",
+            "deliverable-2": "प्राथमिकता वाले निगरानी संकेत"
+          },
+          "manualAcceptance": "महत्वपूर्ण दावों में तारीख और स्रोत दिए गए हैं।",
+          "schedules": {
+            "daily-competitor-watch": "दैनिक प्रतिस्पर्धी निगरानी"
+          },
+          "taskTitle": "प्रतिस्पर्धी निगरानी",
+          "taskDescription": "स्रोतों से समर्थित, प्रतिस्पर्धियों की मौजूदा आधारभूत स्थिति तैयार करें।"
+        },
+        "launchContent": {
+          "title": "लॉन्च सामग्री",
+          "summary": "उत्पाद की positioning को हर चैनल के लिए तैयार लॉन्च पोस्ट और कार्ययोजना में बदलें।",
+          "fields": {
+            "product": "उत्पाद",
+            "positioning": "Positioning और प्रस्ताव",
+            "audience": "लक्षित पाठक",
+            "channels": "चैनल",
+            "tone": "शैली"
+          },
+          "deliverables": {
+            "deliverable-1": "Positioning का सारांश",
+            "deliverable-2": "हर चैनल के लिए तैयार पोस्ट के मसौदे",
+            "deliverable-3": "लॉन्च कार्ययोजना"
+          },
+          "manualAcceptance": "दावे मालिक द्वारा दिए गए प्रस्ताव से मेल खाते हैं।",
+          "taskTitle": "लॉन्च सामग्री",
+          "taskDescription": "लॉन्च सामग्री के मसौदे और मानवीय समीक्षा वाली कार्ययोजना तैयार करें।"
+        }
+      }
+    },
+    "authenticating": "आपका सत्र जाँचा जा रहा है...",
+    "signInTitle": "Outcome Packs में साइन इन करें",
+    "signInDescription": "Outcome Packs आपके खाते के एजेंटों के लिए निजी कार्य और इंटीग्रेशन कॉन्फ़िगर करता है।",
+    "signIn": "साइन इन",
+    "eyebrow": "चुने हुए ऑपरेशन",
+    "title": "Outcome Packs",
+    "subtitle": "सिद्ध रेसिपी कॉन्फ़िगर करें, सेटअप जाँचें और Mission Control में भेजें।",
+    "refresh": "कैटलॉग रीफ़्रेश करें",
+    "missionControl": "Mission Control",
+    "tryAgain": "फिर प्रयास करें",
+    "loading": "Outcome Packs लोड हो रहे हैं...",
+    "detailLoading": "पैक विवरण लोड हो रहा है...",
+    "detailError": "यह पैक लोड नहीं हो सका।",
+    "catalog": {
+      "label": "Outcome Pack कैटलॉग",
+      "title": "कैटलॉग",
+      "firstParty": "Hatcher द्वारा",
+      "version": "संस्करण {version}"
+    },
+    "detail": {
+      "curated": "चुनी हुई रेसिपी",
+      "runtimeMinutes": "अवधि: {count} मिनट",
+      "frameworks": "संगत फ्रेमवर्क",
+      "anyFramework": "कोई भी होस्टेड फ्रेमवर्क",
+      "requirements": "स्किल और आवश्यकताएँ",
+      "noRequirements": "अतिरिक्त सेटअप नहीं",
+      "plan": "कार्य योजना",
+      "taskCount": "{count} कार्य",
+      "tasks": "पैक कार्य",
+      "acceptance": "स्वीकृति मानदंड"
+    },
+    "configure": {
+      "title": "परिणाम कॉन्फ़िगर करें",
+      "subtitle": "एजेंट चुनें और कार्य योजना के लिए इनपुट दें।",
+      "agent": "एजेंट",
+      "agentPlaceholder": "एजेंट चुनें",
+      "selectPlaceholder": "विकल्प चुनें",
+      "agentStatus": "{framework} - {status}",
+      "required": "आवश्यक"
+    },
+    "validation": {
+      "agent": "पैक तैयार करने से पहले एजेंट चुनें।",
+      "required": "सभी आवश्यक इनपुट पूरे करें।",
+      "fieldInvalid": "इनपुट को अनुमत लंबाई में रखें।"
+    },
+    "preview": {
+      "label": "लॉन्च पूर्वावलोकन",
+      "title": "सेटअप पूर्वावलोकन",
+      "subtitle": "संगतता, आवश्यकताएँ, बजट और निष्क्रिय शेड्यूल।",
+      "empty": "कुछ बनाने से पहले सेटअप जाँचने के लिए पैक तैयार करें।",
+      "compatible": "एजेंट संगत है",
+      "incompatible": "एजेंट संगत नहीं है",
+      "blockers": "सेटअप अवरोध",
+      "warnings": "लॉन्च से पहले समीक्षा",
+      "resolvedTasks": "तैयार कार्य",
+      "budget": "बजट लक्ष्य",
+      "noBudget": "कोई बजट लक्ष्य नहीं",
+      "credits": "{count} AI Credits",
+      "budgetAdvisory": "योजना और रिपोर्टिंग का अनुमान; यह कठोर सीमा नहीं है।",
+      "maxRuntime": "अधिकतम अवधि: {count} मिनट।",
+      "schedules": "प्रस्तावित शेड्यूल",
+      "scheduleOff": "बंद",
+      "scheduleNotice": "लॉन्च पर शेड्यूल बंद रहते हैं और अलग पुष्टि चाहिए।",
+      "setup": {
+        "connectors": "Connectors खोलें",
+        "dev": "डेवलपर सेटअप खोलें",
+        "integrations": "Integrations खोलें"
+      }
+    },
+    "actions": {
+      "prepare": "पूर्वावलोकन तैयार करें",
+      "prepareAgain": "फिर तैयार करें",
+      "preparing": "तैयार हो रहा है...",
+      "launchTitle": "Mission Control में बनाएँ",
+      "ready": "लॉन्च के लिए तैयार",
+      "blocked": "पैक तैयार कर अवरोध हल करें",
+      "launch": "पैक लॉन्च करें",
+      "launching": "लॉन्च हो रहा है..."
+    },
+    "messages": {
+      "launched": "Outcome Pack लॉन्च हुआ।"
+    },
+    "noAgents": {
+      "title": "कोई एजेंट उपलब्ध नहीं",
+      "description": "Outcome Pack कॉन्फ़िगर करने से पहले एजेंट बनाएँ।",
+      "action": "एजेंट बनाएँ"
+    },
+    "empty": {
+      "title": "कोई Outcome Pack उपलब्ध नहीं",
+      "description": "कैटलॉग में कोई Hatcher pack नहीं मिला।"
+    }
+  },
+
   "landingV3": {
     "hero": {
       "boxLabel": "तैनात करें",
@@ -2600,6 +2803,26 @@
     }
   },
   "missionControl": {
+    "outcomePack": {
+      "title": "Outcome Pack",
+      "unknown": "अज्ञात पैक",
+      "version": "संस्करण {version}",
+      "skillsReady": "आवश्यक स्किल इंस्टॉल हैं",
+      "skillsPending": "आवश्यक स्किल लंबित हैं",
+      "openPlugins": "Plugins खोलें और एजेंट रीस्टार्ट करें",
+      "acceptance": "स्वीकृति मानदंड",
+      "allTasksCompleted": "सभी कार्य पूरे हो चुके हैं",
+      "artifactRequired": "{kind} आर्टिफैक्ट आवश्यक है",
+      "artifact": "परिणाम",
+      "outputMinLength": "कम से कम {count} अक्षर",
+      "schedulesDisabled": "{count} शेड्यूल टेम्पलेट बंद रहेंगे और अपने आप नहीं चलेंगे।",
+      "skillStatus": {
+        "installed": "इंस्टॉल",
+        "pending": "लंबित",
+        "failed": "विफल",
+        "missing": "अनुपलब्ध"
+      }
+    },
     "authenticating": "Checking your session...",
     "signInTitle": "Sign in to Mission Control",
     "signInDescription": "Mission Control shows private tasks, approvals, runs, and artifacts across your agents.",
@@ -2609,6 +2832,7 @@
     "subtitle": "Create, approve, run, and inspect one-shot work across every agent.",
     "refresh": "Refresh tasks",
     "newTask": "New task",
+    "outcomePacks": "Outcome Packs",
     "tryAgain": "Try again",
     "loading": "Loading tasks...",
     "unknownAgent": "Unknown agent",

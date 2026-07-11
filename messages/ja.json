@@ -833,7 +833,7 @@
   "dashboard": {
     "common": {
       "loading": "読み込み中...",
-      "authenticating": "認証中...",
+    "authenticating": "認証中...",
       "signInRequired": "サインイン必須",
       "signIn": "サインイン",
       "refresh": "リフレッシュ",
@@ -2433,6 +2433,209 @@
     "errCreate": "エージェントを作ることができなかった。説明を修正してもう一度試してみてください。",
     "errCreateNetwork": "エージェント作成時のネットワークエラー。"
   },
+  "outcomePacks": {
+    "contract": {
+      "listPlaceholder": "1行に1項目",
+      "allTasksCompleted": "すべてのタスクが完了している",
+      "artifactRequired": "{kind}形式の成果物が必要",
+      "artifact": "結果",
+      "outputMinLength": "{count}文字以上",
+      "launchedPending": "タスクを作成しました。開始前に必要なスキル{count}件をインストールしてください。"
+    },
+    "content": {
+      "categories": {
+        "research": "リサーチ",
+        "engineering": "エンジニアリング",
+        "monitoring": "モニタリング",
+        "marketing": "マーケティング"
+      },
+      "options": {
+        "x": "X",
+        "linkedin": "LinkedIn",
+        "blog": "ブログ",
+        "email": "メール"
+      },
+      "artifactKinds": {
+        "text": "テキスト",
+        "code": "コード",
+        "file": "ファイル"
+      },
+      "prerequisites": {
+        "github_connection": "このエージェント用に GitHub Connect または GitHub ランタイムトークンを設定してください。"
+      },
+      "warnings": {
+        "unsupported_framework": "この pack は {framework} framework をサポートしていません。",
+        "required_skills_pending": "{count, plural, one {必須スキル#件がインストール待ちになります。タスクを開始する前にエージェントを再起動してください。} other {必須スキル#件がインストール待ちになります。タスクを開始する前にエージェントを再起動してください。}}",
+        "schedules_disabled": "{count, plural, one {#件のスケジュールテンプレートを準備しましたが、無効のままです。} other {#件のスケジュールテンプレートを準備しましたが、無効のままです。}}"
+      },
+      "packs": {
+        "researchReport": {
+          "title": "調査レポート",
+          "summary": "焦点を絞ったテーマについて、出典に基づく意思決定に使える調査レポートを作成します。",
+          "fields": {
+            "topic": "テーマ",
+            "questions": "調査項目",
+            "audience": "対象読者",
+            "outputLanguage": "出力言語"
+          },
+          "deliverables": {
+            "deliverable-1": "構造化されたレポート",
+            "deliverable-2": "直接引用を含む出典一覧"
+          },
+          "manualAcceptance": "出典が主要な主張を裏付けていること。",
+          "taskTitle": "調査レポート",
+          "taskDescription": "提供された要件に基づき、出典で裏付けた調査レポートを作成します。"
+        },
+        "pullRequestReview": {
+          "title": "Pull Request レビュー",
+          "summary": "GitHub Pull Request の正確性、リスク、リリース準備状況をレビューします。",
+          "fields": {
+            "repository": "Repository（所有者/名前）",
+            "pullRequestNumber": "Pull Request 番号",
+            "focus": "レビューの重点項目"
+          },
+          "deliverables": {
+            "deliverable-1": "重大度順の指摘事項",
+            "deliverable-2": "リリース可否の判定"
+          },
+          "manualAcceptance": "リリースを妨げる各指摘に具体的な根拠が含まれていること。",
+          "taskTitle": "Pull Request レビュー",
+          "taskDescription": "指定された Pull Request の正確性とリリースリスクをレビューします。"
+        },
+        "competitorWatch": {
+          "title": "競合モニタリング",
+          "summary": "競合情報の概要と、無効状態の日次モニタリングテンプレートを作成します。",
+          "fields": {
+            "company": "自社または製品",
+            "competitors": "競合",
+            "market": "市場",
+            "watchSignals": "監視するシグナル"
+          },
+          "deliverables": {
+            "deliverable-1": "競合のベースライン概要",
+            "deliverable-2": "優先順位付きの監視シグナル"
+          },
+          "manualAcceptance": "重要な主張に日付と出典が付いていること。",
+          "schedules": {
+            "daily-competitor-watch": "競合の日次モニタリング"
+          },
+          "taskTitle": "競合モニタリング",
+          "taskDescription": "出典に基づく最新の競合ベースラインを作成します。"
+        },
+        "launchContent": {
+          "title": "ローンチコンテンツ",
+          "summary": "製品のポジショニングを、各チャネル向けのローンチ投稿とアクションプランにまとめます。",
+          "fields": {
+            "product": "製品",
+            "positioning": "ポジショニングと提供内容",
+            "audience": "対象読者",
+            "channels": "チャネル",
+            "tone": "トーン"
+          },
+          "deliverables": {
+            "deliverable-1": "ポジショニングの概要",
+            "deliverable-2": "各チャネル向けの投稿案",
+            "deliverable-3": "ローンチのアクションプラン"
+          },
+          "manualAcceptance": "主張が所有者から提供された内容と一致していること。",
+          "taskTitle": "ローンチコンテンツ",
+          "taskDescription": "ローンチコンテンツ案と、人が確認するアクションプランを作成します。"
+        }
+      }
+    },
+    "authenticating": "セッションを確認しています...",
+    "signInTitle": "Outcome Packsにサインイン",
+    "signInDescription": "Outcome Packsはアカウント内のエージェント用に非公開タスクと連携を設定します。",
+    "signIn": "サインイン",
+    "eyebrow": "厳選オペレーション",
+    "title": "Outcome Packs",
+    "subtitle": "実績あるレシピを設定し、準備を確認してMission Controlへ送ります。",
+    "refresh": "カタログを更新",
+    "missionControl": "Mission Control",
+    "tryAgain": "再試行",
+    "loading": "Outcome Packsを読み込み中...",
+    "detailLoading": "パック詳細を読み込み中...",
+    "detailError": "このパックを読み込めませんでした。",
+    "catalog": {
+      "label": "Outcome Packカタログ",
+      "title": "カタログ",
+      "firstParty": "Hatcher公式",
+      "version": "バージョン {version}"
+    },
+    "detail": {
+      "curated": "厳選レシピ",
+      "runtimeMinutes": "実行時間: {count}分",
+      "frameworks": "対応フレームワーク",
+      "anyFramework": "任意のホスト型フレームワーク",
+      "requirements": "スキルと前提条件",
+      "noRequirements": "追加設定なし",
+      "plan": "タスク計画",
+      "taskCount": "{count}件のタスク",
+      "tasks": "パックのタスク",
+      "acceptance": "受け入れ基準"
+    },
+    "configure": {
+      "title": "成果を設定",
+      "subtitle": "エージェントを選び、タスク計画に使う入力を指定します。",
+      "agent": "エージェント",
+      "agentPlaceholder": "エージェントを選択",
+      "selectPlaceholder": "オプションを選択",
+      "agentStatus": "{framework} - {status}",
+      "required": "必須"
+    },
+    "validation": {
+      "agent": "パックを準備する前にエージェントを選択してください。",
+      "required": "必須入力をすべて完了してください。",
+      "fieldInvalid": "許容文字数内で入力してください。"
+    },
+    "preview": {
+      "label": "起動プレビュー",
+      "title": "設定プレビュー",
+      "subtitle": "互換性、前提条件、予算、無効なスケジュール。",
+      "empty": "何も作成せずに設定を確認するにはパックを準備します。",
+      "compatible": "エージェントは対応しています",
+      "incompatible": "エージェントは対応していません",
+      "blockers": "設定のブロッカー",
+      "warnings": "起動前に確認",
+      "resolvedTasks": "解決済みタスク",
+      "budget": "予算目標",
+      "noBudget": "予算目標なし",
+      "credits": "{count} AI Credits",
+      "budgetAdvisory": "計画とレポート用の目安であり、厳密な実行上限ではありません。",
+      "maxRuntime": "最大実行時間: {count}分。",
+      "schedules": "提案スケジュール",
+      "scheduleOff": "オフ",
+      "scheduleNotice": "起動時もスケジュールは無効で、別途確認が必要です。",
+      "setup": {
+        "connectors": "Connectorsを開く",
+        "dev": "開発者設定を開く",
+        "integrations": "Integrationsを開く"
+      }
+    },
+    "actions": {
+      "prepare": "プレビューを準備",
+      "prepareAgain": "再度準備",
+      "preparing": "準備中...",
+      "launchTitle": "Mission Controlに作成",
+      "ready": "起動準備完了",
+      "blocked": "パックを準備してブロッカーを解決",
+      "launch": "パックを起動",
+      "launching": "起動中..."
+    },
+    "messages": {
+      "launched": "Outcome Packを起動しました。"
+    },
+    "noAgents": {
+      "title": "利用可能なエージェントがありません",
+      "description": "Outcome Packを設定する前にエージェントを作成してください。",
+      "action": "エージェントを作成"
+    },
+    "empty": {
+      "title": "利用可能なOutcome Packがありません",
+      "description": "厳選カタログにHatcher公式パックがありません。"
+    }
+  },
+
   "landingV3": {
     "hero": {
       "boxLabel": "展開",
@@ -2600,6 +2803,26 @@
     }
   },
   "missionControl": {
+    "outcomePack": {
+      "title": "Outcome Pack",
+      "unknown": "不明なパック",
+      "version": "バージョン {version}",
+      "skillsReady": "必要なスキルはインストール済み",
+      "skillsPending": "必要なスキルが保留中",
+      "openPlugins": "Pluginsを開いてエージェントを再起動",
+      "acceptance": "受け入れ基準",
+      "allTasksCompleted": "すべてのタスクが完了している",
+      "artifactRequired": "{kind}形式の成果物が必要",
+      "artifact": "結果",
+      "outputMinLength": "{count}文字以上",
+      "schedulesDisabled": "{count}件のスケジュールテンプレートは無効のままで、自動実行されません。",
+      "skillStatus": {
+        "installed": "インストール済み",
+        "pending": "保留中",
+        "failed": "失敗",
+        "missing": "未導入"
+      }
+    },
     "authenticating": "Checking your session...",
     "signInTitle": "Sign in to Mission Control",
     "signInDescription": "Mission Control shows private tasks, approvals, runs, and artifacts across your agents.",
@@ -2609,6 +2832,7 @@
     "subtitle": "Create, approve, run, and inspect one-shot work across every agent.",
     "refresh": "Refresh tasks",
     "newTask": "New task",
+    "outcomePacks": "Outcome Packs",
     "tryAgain": "Try again",
     "loading": "Loading tasks...",
     "unknownAgent": "Unknown agent",
