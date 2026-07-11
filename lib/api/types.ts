@@ -541,6 +541,105 @@ export interface CityOperationsSummary {
   generatedAt: string;
 }
 
+export interface PublicOutcomePackInputField {
+  key: string;
+  label: string;
+  type: string;
+  required: boolean;
+  maxLength?: number;
+  maxItems?: number;
+  options?: string[];
+}
+
+export interface PublicOutcomePackPrerequisite {
+  id: string;
+  label: string;
+}
+
+export interface PublicOutcomePack {
+  id: string;
+  version: string;
+  title: string;
+  summary: string;
+  category: string;
+  compatibleFrameworks: string[];
+  requiredSkills: string[];
+  prerequisites: PublicOutcomePackPrerequisite[];
+  inputFields: PublicOutcomePackInputField[];
+  deliverables: unknown[];
+  budgetTargetAiCredits: number | null;
+  maxRuntimeSeconds: number | null;
+  acceptanceChecks: unknown[];
+  schedules: unknown[];
+  launchPolicy: unknown;
+}
+
+export interface PreparedOutcomePackTask {
+  id: string;
+  title: string;
+  description: string | null;
+  prompt: string;
+}
+
+export interface PreparedOutcomePackAgent {
+  id: string;
+  name: string;
+  framework: string;
+  status: string;
+}
+
+export interface PreparedOutcomePack {
+  pack: {
+    id: string;
+    version: string;
+    title: string;
+  };
+  agent: PreparedOutcomePackAgent;
+  compatible: boolean;
+  missingPrerequisites: PublicOutcomePackPrerequisite[];
+  warnings: string[];
+  resolvedTasks: PreparedOutcomePackTask[];
+  requiredSkills: string[];
+  budgetTargetAiCredits: number | null;
+  maxRuntimeSeconds: number | null;
+  acceptanceChecks: unknown[];
+  schedules: unknown[];
+  launchPolicy: unknown;
+}
+
+export interface OutcomePackLaunchTask {
+  id: string;
+  agentId: string;
+  title: string;
+  description: string | null;
+  prompt: string;
+  status: string;
+  source: string;
+  sourceId: string;
+  sourceVersion: string;
+  budget: unknown;
+  acceptanceChecks: unknown[];
+  scheduleTemplates: unknown[];
+  createdAt: string;
+}
+
+export interface PrepareOutcomePackBody {
+  agentId: string;
+  inputs: Record<string, string>;
+}
+
+export interface LaunchOutcomePackBody extends PrepareOutcomePackBody {
+  idempotencyKey: string;
+  activateSchedules: false;
+}
+
+export interface LaunchOutcomePackResponse {
+  task: OutcomePackLaunchTask;
+  requiredSkills: Array<{ name: string; status: string }>;
+  schedulesActivated: false;
+  start: { method: string; path: string };
+}
+
 export interface AgentCommPermission {
   id: string;
   allowedAgent: {

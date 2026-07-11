@@ -2561,6 +2561,7 @@
     "subtitle": "Creează, aprobă, execută și verifică taskuri punctuale pentru toți agenții.",
     "refresh": "Reîncarcă taskurile",
     "newTask": "Task nou",
+    "outcomePacks": "Outcome Packs",
     "tryAgain": "Încearcă din nou",
     "loading": "Se încarcă taskurile...",
     "unknownAgent": "Agent necunoscut",
@@ -2681,6 +2682,99 @@
       "title": "Niciun task găsit",
       "description": "Niciun task nu corespunde filtrelor de agent și stare selectate.",
       "action": "Șterge filtrele"
+    }
+  },
+  "outcomePacks": {
+    "authenticating": "Verificăm sesiunea...",
+    "signInTitle": "Autentifică-te pentru Outcome Packs",
+    "signInDescription": "Outcome Packs configurează taskuri private și integrări pentru agenții din contul tău.",
+    "signIn": "Autentificare",
+    "eyebrow": "Operațiuni pregătite",
+    "title": "Outcome Packs",
+    "subtitle": "Configurează o rețetă verificată, validează setup-ul și lanseaz-o în Mission Control.",
+    "refresh": "Reîncarcă catalogul",
+    "missionControl": "Mission Control",
+    "tryAgain": "Încearcă din nou",
+    "loading": "Se încarcă Outcome Packs...",
+    "detailLoading": "Se încarcă detaliile pack-ului...",
+    "detailError": "Acest pack nu a putut fi încărcat.",
+    "catalog": {
+      "label": "Catalog Outcome Packs",
+      "title": "Catalog",
+      "firstParty": "Create de Hatcher",
+      "version": "Versiunea {version}"
+    },
+    "detail": {
+      "curated": "Rețetă verificată",
+      "runtimeMinutes": "{count, plural, one {# minut durată maximă} few {# minute durată maximă} other {# de minute durată maximă}}",
+      "frameworks": "Framework-uri compatibile",
+      "anyFramework": "Orice framework hosted",
+      "requirements": "Skill-uri și prerechizite",
+      "noRequirements": "Fără setup suplimentar",
+      "plan": "Planul de taskuri",
+      "taskCount": "{count, plural, one {# task} few {# taskuri} other {# de taskuri}}",
+      "tasks": "Taskurile pack-ului",
+      "acceptance": "Criterii de acceptare"
+    },
+    "configure": {
+      "title": "Configurează rezultatul",
+      "subtitle": "Alege agentul și completează datele folosite pentru planul de taskuri.",
+      "agent": "Agent",
+      "agentPlaceholder": "Alege un agent",
+      "selectPlaceholder": "Alege o opțiune",
+      "agentStatus": "{framework} - {status}",
+      "required": "Obligatoriu"
+    },
+    "validation": {
+      "agent": "Alege un agent înainte să pregătești pack-ul.",
+      "required": "Completează toate câmpurile obligatorii.",
+      "fieldInvalid": "Completează câmpul în limita de lungime permisă."
+    },
+    "preview": {
+      "label": "Previzualizare lansare",
+      "title": "Previzualizare setup",
+      "subtitle": "Compatibilitate, prerechizite, buget și programe inactive.",
+      "empty": "Pregătește pack-ul pentru a valida setup-ul înainte să fie creat ceva.",
+      "compatible": "Agentul este compatibil",
+      "incompatible": "Agentul nu este compatibil",
+      "blockers": "Blocaje de setup",
+      "warnings": "Verifică înainte de lansare",
+      "resolvedTasks": "Taskuri rezultate",
+      "budget": "Țintă de buget",
+      "noBudget": "Fără țintă de buget",
+      "credits": "{count} AI Credits",
+      "budgetAdvisory": "Țintă orientativă pentru planificare și raportare; nu este o limită strictă de execuție.",
+      "maxRuntime": "Durată maximă: {count, plural, one {# minut} few {# minute} other {# de minute}}.",
+      "schedules": "Programe propuse",
+      "scheduleOff": "Oprit",
+      "scheduleNotice": "Programele rămân dezactivate la lansare și necesită o confirmare separată.",
+      "setup": {
+        "connectors": "Deschide Conectori",
+        "dev": "Deschide setup-ul Developer",
+        "integrations": "Deschide Integrări"
+      }
+    },
+    "actions": {
+      "prepare": "Pregătește preview",
+      "prepareAgain": "Pregătește din nou",
+      "preparing": "Se pregătește...",
+      "launchTitle": "Creează în Mission Control",
+      "ready": "Pregătit pentru lansare",
+      "blocked": "Pregătește pack-ul și rezolvă blocajele",
+      "launch": "Lansează pack-ul",
+      "launching": "Se lansează..."
+    },
+    "messages": {
+      "launched": "Outcome Pack lansat."
+    },
+    "noAgents": {
+      "title": "Nu există niciun agent",
+      "description": "Creează un agent înainte să configurezi un Outcome Pack.",
+      "action": "Creează agent"
+    },
+    "empty": {
+      "title": "Nu există Outcome Packs",
+      "description": "Catalogul nu a returnat niciun pack first-party."
     }
   },
   "landingV3": {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import {
   Activity,
@@ -17,6 +17,7 @@ import {
   ListChecks,
   Loader2,
   Paperclip,
+  PackageCheck,
   Play,
   Plus,
   RefreshCw,
@@ -474,6 +475,7 @@ export default function MissionControlPage() {
   const locale = useLocale();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
+  const requestedTaskConsumedRef = useRef(false);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [tasks, setTasks] = useState<MissionTask[]>([]);
   const [summary, setSummary] = useState<MissionTaskSummary>(EMPTY_SUMMARY);
@@ -554,6 +556,20 @@ export default function MissionControlPage() {
     (agentFilter === 'all' || task.agentId === agentFilter) &&
     (statusFilter === 'all' || task.status === statusFilter)
   )), [agentFilter, statusFilter, tasks]);
+
+  useEffect(() => {
+    if (requestedTaskConsumedRef.current || tasks.length === 0) return;
+    const requestedTaskId = new URLSearchParams(window.location.search).get('task');
+    if (!requestedTaskId) {
+      requestedTaskConsumedRef.current = true;
+      return;
+    }
+    if (!tasks.some((task) => task.id === requestedTaskId)) return;
+    requestedTaskConsumedRef.current = true;
+    setAgentFilter('all');
+    setStatusFilter('all');
+    setSelectedId(requestedTaskId);
+  }, [tasks]);
 
   useEffect(() => {
     if (filteredTasks.length === 0) {
@@ -653,6 +669,9 @@ export default function MissionControlPage() {
             <p>{t('subtitle')}</p>
           </div>
           <div className={styles.headerActions}>
+            <Link href="/dashboard/outcome-packs" className={styles.secondaryButton}>
+              <PackageCheck size={16} aria-hidden /> {t('outcomePacks')}
+            </Link>
             <button
               type="button"
               className={styles.iconButton}
