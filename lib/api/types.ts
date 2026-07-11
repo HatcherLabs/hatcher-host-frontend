@@ -412,6 +412,62 @@ export interface CreateMissionTaskBody {
   source?: string;
 }
 
+export type CityOperationalAgentStatus =
+  | "running"
+  | "sleeping"
+  | "paused"
+  | "crashed";
+
+export interface CityOperationsSummary {
+  agents: {
+    total: number;
+    running: number;
+    sleeping: number;
+    paused: number;
+    crashed: number;
+    needsAttention: number;
+    items: Array<{
+      id: string;
+      name: string;
+      framework: string;
+      status: CityOperationalAgentStatus;
+      reason: string | null;
+    }>;
+  };
+  tasks: {
+    total: number;
+    active: number;
+    awaitingApproval: number;
+    failed: number;
+    completed: number;
+    pendingApprovals: number;
+  };
+  incidents: {
+    unreadCount: number;
+    items: Array<{
+      id: string;
+      title: string;
+      body: string;
+      createdAt: string;
+    }>;
+  };
+  delegations: Array<{
+    id: string;
+    source: { id: string; name: string; owned: boolean };
+    target: { id: string; name: string; owned: boolean };
+    status: string;
+    latencyMs: number;
+    createdAt: string;
+  }>;
+  partnerEarnings: {
+    windowDays: number;
+    verifiedGrossSettlements: number;
+    byAsset: Array<{ asset: string; amount: number }>;
+    partial: boolean;
+  };
+  generatedAt: string;
+}
+
 export interface AgentCommPermission {
   id: string;
   allowedAgent: {

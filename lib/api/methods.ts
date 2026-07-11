@@ -11,6 +11,7 @@ import {
 } from "./chatStreamEvents";
 import type {
   Agent,
+  CityOperationsSummary,
   CreateMissionTaskBody,
   MissionTask,
   MissionTasksResponse,
@@ -492,6 +493,10 @@ export const api = {
 
   /** List the current user's agents */
   getMyAgents: () => req<Agent[]>("/agents"),
+
+  /** Private owner-only operational rollup used by Hatcher City. */
+  getCityOperationsSummary: () =>
+    req<{ summary: CityOperationsSummary }>("/operations/summary"),
 
   /** List account-wide one-shot tasks for Mission Control. */
   getMissionTasks: (params: {
