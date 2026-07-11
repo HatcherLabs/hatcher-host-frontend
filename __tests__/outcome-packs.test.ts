@@ -1,11 +1,17 @@
 import { describe, expect, it } from 'vitest';
+import { readdirSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import {
+  OUTCOME_PACK_COPY_SLUGS,
   createOutcomePackIdempotencyKey,
   initializeOutcomePackInputs,
   isOutcomePackLaunchReady,
+  localizeOutcomePackModel,
+  localizeOutcomePackPreparationModel,
   normalizeOutcomePack,
   normalizeOutcomePackList,
   normalizeOutcomePackPreparation,
+  outcomePackCopySlug,
   outcomePackSetupTab,
   serializeOutcomePackInputs,
   validateOutcomePackInputs,
@@ -87,7 +93,11 @@ describe('outcome packs', () => {
     expect(preparation.pack.id).toBe('pr-review-v1');
     expect(preparation.agent?.name).toBe('Atlas');
     expect(preparation.missingPrerequisites[0]).toEqual({ id: 'github', label: 'GitHub repository' });
-    expect(preparation.warnings).toEqual(['Budget is advisory.']);
+    expect(preparation.warnings).toEqual([{
+      code: 'legacy_warning_1',
+      label: 'Budget is advisory.',
+      params: {},
+    }]);
     expect(preparation.resolvedTasks[0]).toMatchObject({ title: 'Review PR', prompt: 'Review PR 42.' });
     expect(preparation.budgetTargetAiCredits).toBe(42);
     expect(preparation.maxRuntimeSeconds).toBe(900);
@@ -191,5 +201,144 @@ describe('outcome packs', () => {
 
   it('creates a namespaced idempotency key per preparation attempt', () => {
     expect(createOutcomePackIdempotencyKey('attempt-1')).toBe('outcome-pack:attempt-1');
+  });
+
+  it('normalizes stable warning codes and first-party localization slugs', () => {
+    const preparation = normalizeOutcomePackPreparation({
+      pack: { id: 'research-report-v1' },
+      warnings: [{
+        code: 'required_skills_pending',
+        label: 'Fallback warning',
+        params: { count: 2 },
+      }],
+    });
+
+    expect(preparation.warnings).toEqual([{
+      code: 'required_skills_pending',
+      label: 'Fallback warning',
+      params: { count: 2 },
+    }]);
+    expect(outcomePackCopySlug('research-report-v1')).toBe('researchReport');
+    expect(outcomePackCopySlug('unknown-pack')).toBeNull();
+    expect(Object.keys(OUTCOME_PACK_COPY_SLUGS)).toEqual([
+      'research-report-v1',
+      'pr-review-v1',
+      'competitor-watch-v1',
+      'launch-content-v1',
+    ]);
+  });
+
+  it('keeps central Outcome Pack copy and ICU placeholders in parity across all locales', () => {
+    const messagesDir = resolve(process.cwd(), 'messages');
+    const localeFiles = readdirSync(messagesDir).filter((file) => file.endsWith('.json')).sort();
+    const flatten = (value: unknown, prefix = '', output: Record<string, string> = {}) => {
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        for (const [key, child] of Object.entries(value)) {
+          flatten(child, prefix ? `${prefix}.${key}` : key, output);
+        }
+      } else {
+        output[prefix] = String(value);
+      }
+      return output;
+    };
+    const variables = (value: string) => [...value.matchAll(/\{\s*([\w]+)(?:\s*,[^}]*)?\}/g)]
+      .map((match) => match[1])
+      .sort();
+    const readContent = (file: string) => {
+      const messages = JSON.parse(readFileSync(resolve(messagesDir, file), 'utf8')) as {
+        outcomePacks?: { content?: unknown };
+      };
+      return flatten(messages.outcomePacks?.content);
+    };
+    const english = readContent('en.json');
+
+    expect(localeFiles).toEqual([
+      'de.json', 'en.json', 'es.json', 'fr.json', 'hi.json', 'id.json',
+      'ja.json', 'pt-BR.json', 'ro.json', 'tr.json', 'vi.json', 'zh.json',
+    ]);
+    for (const file of localeFiles) {
+      const localized = readContent(file);
+      const root = JSON.parse(readFileSync(resolve(messagesDir, file), 'utf8')) as {
+        dashboard?: { common?: { content?: unknown } };
+      };
+      expect(root.dashboard?.common?.content, `${file}:misplaced content`).toBeUndefined();
+      expect(Object.keys(localized).sort(), file).toEqual(Object.keys(english).sort());
+      for (const key of Object.keys(english)) {
+        expect(variables(localized[key]!), `${file}:${key}`).toEqual(variables(english[key]!));
+      }
+    }
+  });
+
+  it('uses translated central pack fixtures in Romanian, German, and Japanese', () => {
+    const messagesDir = resolve(process.cwd(), 'messages');
+    const lookup = (locale: string, path: string): string => {
+      const messages = JSON.parse(readFileSync(resolve(messagesDir, `${locale}.json`), 'utf8')) as Record<string, unknown>;
+      return path.split('.').reduce<unknown>((value, segment) => (
+        value && typeof value === 'object' ? (value as Record<string, unknown>)[segment] : undefined
+      ), messages) as string;
+    };
+    const paths = [
+      'outcomePacks.content.packs.researchReport.summary',
+      'outcomePacks.content.packs.pullRequestReview.fields.focus',
+      'outcomePacks.content.packs.competitorWatch.manualAcceptance',
+      'outcomePacks.content.packs.launchContent.taskDescription',
+    ];
+
+    const rawPack = normalizeOutcomePack({
+      id: 'research-report-v1',
+      title: 'Research Report',
+      summary: 'Produce a sourced, decision-ready research report on a focused topic.',
+      category: 'research',
+      inputFields: [{ key: 'topic', label: 'Topic', type: 'textarea', required: true }],
+      deliverables: ['Structured report'],
+      acceptanceChecks: [{ type: 'manual', label: 'Sources support the central claims.' }],
+    });
+    const rawPreparation = normalizeOutcomePackPreparation({
+      pack: { id: 'competitor-watch-v1', version: '1.0.0', title: 'Competitor Watch' },
+      missingPrerequisites: [{
+        id: 'github_connection',
+        label: 'Configure GitHub Connect or a GitHub runtime token for this agent.',
+      }],
+      warnings: [{
+        code: 'required_skills_pending',
+        label: 'Missing skills will be queued.',
+        params: { count: 2 },
+      }],
+      resolvedTasks: [{
+        id: 'competitor-baseline',
+        title: 'Competitor watch',
+        description: 'Establish a current, source-backed competitor baseline.',
+        prompt: 'Canonical execution prompt',
+      }],
+      schedules: [{
+        id: 'daily-competitor-watch',
+        label: 'Daily competitor watch',
+        cron: '0 9 * * *',
+        timezone: 'UTC',
+      }],
+    });
+
+    for (const locale of ['ro', 'de', 'ja']) {
+      for (const path of paths) {
+        expect(lookup(locale, path), `${locale}:${path}`).not.toBe(lookup('en', path));
+      }
+      const translate = (key: string, fallback: string) => (
+        lookup(locale, `outcomePacks.${key}`) ?? fallback
+      );
+      const pack = localizeOutcomePackModel(rawPack, translate);
+      const preparation = localizeOutcomePackPreparationModel(rawPreparation, translate);
+      expect(pack.summary, `${locale}:pack summary`).not.toBe(rawPack.summary);
+      expect(pack.inputFields[0]?.label, `${locale}:field label`).not.toBe(rawPack.inputFields[0]?.label);
+      expect(pack.deliverables[0]?.label, `${locale}:deliverable`).not.toBe(rawPack.deliverables[0]?.label);
+      expect(pack.acceptanceChecks[0]?.label, `${locale}:acceptance`).not.toBe(rawPack.acceptanceChecks[0]?.label);
+      expect(preparation.resolvedTasks[0]?.title, `${locale}:task title`)
+        .not.toBe(rawPreparation.resolvedTasks[0]?.title);
+      expect(preparation.missingPrerequisites[0]?.label, `${locale}:prerequisite`)
+        .not.toBe(rawPreparation.missingPrerequisites[0]?.label);
+      expect(preparation.warnings[0]?.label, `${locale}:warning`)
+        .not.toBe(rawPreparation.warnings[0]?.label);
+      expect(preparation.schedules[0]?.label, `${locale}:schedule`)
+        .not.toBe(rawPreparation.schedules[0]?.label);
+    }
   });
 });

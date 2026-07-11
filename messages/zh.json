@@ -833,7 +833,7 @@
   "dashboard": {
     "common": {
       "loading": "加载中...",
-      "authenticating": "验证身份中...",
+    "authenticating": "验证身份中...",
       "signInRequired": "需要登录",
       "signIn": "登录",
       "refresh": "刷新",
@@ -2417,6 +2417,107 @@
       "artifact": "结果",
       "outputMinLength": "至少 {count} 个字符",
       "launchedPending": "任务已创建。启动前请安装 {count} 个必需技能。"
+    },
+    "content": {
+      "categories": {
+        "research": "研究",
+        "engineering": "工程",
+        "monitoring": "监控",
+        "marketing": "营销"
+      },
+      "options": {
+        "x": "X",
+        "linkedin": "LinkedIn",
+        "blog": "博客",
+        "email": "电子邮件"
+      },
+      "artifactKinds": {
+        "text": "文本",
+        "code": "代码",
+        "file": "文件"
+      },
+      "prerequisites": {
+        "github_connection": "请为此代理配置 GitHub Connect 或 GitHub 运行时令牌。"
+      },
+      "warnings": {
+        "unsupported_framework": "此 pack 不支持 {framework} framework。",
+        "required_skills_pending": "{count, plural, one {# 个必需技能将排队等待安装。开始任务前请重启代理。} other {# 个必需技能将排队等待安装。开始任务前请重启代理。}}",
+        "schedules_disabled": "{count, plural, one {# 个计划模板已准备好，但仍处于禁用状态。} other {# 个计划模板已准备好，但仍处于禁用状态。}}"
+      },
+      "packs": {
+        "researchReport": {
+          "title": "研究报告",
+          "summary": "针对明确的主题生成有来源依据、可用于决策的研究报告。",
+          "fields": {
+            "topic": "主题",
+            "questions": "研究问题",
+            "audience": "受众",
+            "outputLanguage": "输出语言"
+          },
+          "deliverables": {
+            "deliverable-1": "结构化报告",
+            "deliverable-2": "包含直接引用的来源列表"
+          },
+          "manualAcceptance": "来源能够支持核心论点。",
+          "taskTitle": "研究报告",
+          "taskDescription": "根据提供的简报生成有来源支持的研究报告。"
+        },
+        "pullRequestReview": {
+          "title": "Pull Request 审查",
+          "summary": "审查 GitHub Pull Request 的正确性、风险和发布准备情况。",
+          "fields": {
+            "repository": "Repository（所有者/名称）",
+            "pullRequestNumber": "Pull Request 编号",
+            "focus": "审查重点"
+          },
+          "deliverables": {
+            "deliverable-1": "按严重程度排序的问题",
+            "deliverable-2": "发布或阻止发布的结论"
+          },
+          "manualAcceptance": "每个阻止发布的问题都包含具体证据。",
+          "taskTitle": "Pull Request 审查",
+          "taskDescription": "审查指定 Pull Request 的正确性和发布风险。"
+        },
+        "competitorWatch": {
+          "title": "竞争对手监控",
+          "summary": "创建竞争情报简报和一个保持禁用的每日监控模板。",
+          "fields": {
+            "company": "您的公司或产品",
+            "competitors": "竞争对手",
+            "market": "市场",
+            "watchSignals": "监控信号"
+          },
+          "deliverables": {
+            "deliverable-1": "竞争对手基准简报",
+            "deliverable-2": "按优先级排序的监控信号"
+          },
+          "manualAcceptance": "重要论点均标注日期和来源。",
+          "schedules": {
+            "daily-competitor-watch": "每日竞争对手监控"
+          },
+          "taskTitle": "竞争对手监控",
+          "taskDescription": "建立有来源支持的最新竞争对手基准。"
+        },
+        "launchContent": {
+          "title": "发布内容",
+          "summary": "将产品定位转化为适合各渠道发布的内容和行动计划。",
+          "fields": {
+            "product": "产品",
+            "positioning": "定位与方案",
+            "audience": "受众",
+            "channels": "渠道",
+            "tone": "语气"
+          },
+          "deliverables": {
+            "deliverable-1": "定位摘要",
+            "deliverable-2": "适合各渠道发布的内容草稿",
+            "deliverable-3": "发布行动计划"
+          },
+          "manualAcceptance": "相关主张与所有者提供的方案一致。",
+          "taskTitle": "发布内容",
+          "taskDescription": "准备发布内容草稿和一份需人工审查的行动计划。"
+        }
+      }
     },
     "authenticating": "正在检查会话...",
     "signInTitle": "登录 Outcome Packs",

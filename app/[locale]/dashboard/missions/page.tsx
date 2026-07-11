@@ -44,7 +44,7 @@ import {
   normalizeMissionTaskList,
   safeMissionArtifactUrl,
 } from '@/lib/mission-control';
-import { normalizeOutcomePackAcceptanceChecks } from '@/lib/outcome-packs';
+import { normalizeOutcomePackAcceptanceChecks, outcomePackCopySlug } from '@/lib/outcome-packs';
 import { useToast } from '@/components/ui/ToastProvider';
 import styles from './missions.module.css';
 
@@ -289,21 +289,40 @@ function TaskDetail({
   onAction: (key: string, run: () => MissionActionResponse) => void;
 }) {
   const t = useTranslations('missionControl');
+  const packT = useTranslations('outcomePacks');
   const progress = missionTaskProgress(task);
   const output = missionOutputText(task.latestRun?.output);
   const runningAction = actionKey?.startsWith(`${task.id}:`) ?? false;
   const skillReadiness = task.outcomePackSkillReadiness;
   const acceptanceChecks = normalizeOutcomePackAcceptanceChecks(task.acceptanceChecks);
+  const packSlug = task.sourceId ? outcomePackCopySlug(task.sourceId) : null;
+  const packBase = packSlug ? `content.packs.${packSlug}` : null;
+  const translatedPackValue = (suffix: string, fallback: string): string => {
+    const key = packBase ? `${packBase}.${suffix}` : null;
+    return key && packT.has(key) ? packT(key) : fallback;
+  };
+  const displayTitle = task.source === 'outcome_pack'
+    ? translatedPackValue('taskTitle', task.title)
+    : task.title;
+  const displayDescription = task.source === 'outcome_pack' && task.description
+    ? translatedPackValue('taskDescription', task.description)
+    : task.description;
 
   const acceptanceLabel = (item: (typeof acceptanceChecks)[number]): string => {
     if (item.type === 'all_tasks_completed') return t('outcomePack.allTasksCompleted');
     if (item.type === 'artifact_required') {
-      return t('outcomePack.artifactRequired', { kind: item.artifactKind ?? t('outcomePack.artifact') });
+      const kindKey = item.artifactKind ? `content.artifactKinds.${item.artifactKind}` : null;
+      const kind = kindKey && packT.has(kindKey)
+        ? packT(kindKey)
+        : item.artifactKind ?? t('outcomePack.artifact');
+      return t('outcomePack.artifactRequired', { kind });
     }
     if (item.type === 'output_min_length') {
       return t('outcomePack.outputMinLength', { count: item.characters ?? 0 });
     }
-    return item.label;
+    return item.type === 'manual'
+      ? translatedPackValue('manualAcceptance', item.label)
+      : item.label;
   };
   const skillStatusLabel = (status: string): string => {
     if (status === 'installed') return t('outcomePack.skillStatus.installed');
@@ -321,8 +340,8 @@ function TaskDetail({
             <span>{task.agent?.name ?? t('unknownAgent')}</span>
             <span>{t('attempt', { count: task.latestRun?.attempt ?? 0 })}</span>
           </div>
-          <h2 id={`task-title-${task.id}`}>{task.title}</h2>
-          {task.description ? <p>{task.description}</p> : null}
+          <h2 id={`task-title-${task.id}`}>{displayTitle}</h2>
+          {displayDescription ? <p>{displayDescription}</p> : null}
         </div>
 
         <div className={styles.actions} aria-label={t('actions.label')}>
@@ -391,7 +410,7 @@ function TaskDetail({
             <div>
               <strong>{t('outcomePack.title')}</strong>
               <span>
-                {task.sourceId ?? t('outcomePack.unknown')}
+                {packBase ? translatedPackValue('title', task.sourceId ?? t('outcomePack.unknown')) : task.sourceId ?? t('outcomePack.unknown')}
                 {task.sourceVersion ? ` - ${t('outcomePack.version', { version: task.sourceVersion })}` : ''}
               </span>
             </div>
@@ -544,6 +563,7 @@ function TaskDetail({
 
 export default function MissionControlPage() {
   const t = useTranslations('missionControl');
+  const packT = useTranslations('outcomePacks');
   const locale = useLocale();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
@@ -561,6 +581,13 @@ export default function MissionControlPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState<CreateTaskForm>(EMPTY_FORM);
+
+  const taskDisplayTitle = useCallback((task: MissionTask): string => {
+    if (task.source !== 'outcome_pack' || !task.sourceId) return task.title;
+    const slug = outcomePackCopySlug(task.sourceId);
+    const key = slug ? `content.packs.${slug}.taskTitle` : null;
+    return key && packT.has(key) ? packT(key) : task.title;
+  }, [packT]);
 
   const replaceTask = useCallback((next: MissionTask) => {
     setTasks((current) => {
@@ -838,7 +865,7 @@ export default function MissionControlPage() {
                         <TaskStatus status={task.status} label={t(`status.${task.status}`)} />
                         <span className={styles.taskDate}>{formatDate(task.updatedAt, locale)}</span>
                       </div>
-                      <strong className={styles.taskTitle}>{task.title}</strong>
+                      <strong className={styles.taskTitle}>{taskDisplayTitle(task)}</strong>
                       <span className={styles.taskAgent}><Bot size={12} aria-hidden /> {task.agent?.name ?? t('unknownAgent')}</span>
                       {task.status === 'running' || progress.value !== null ? (
                         <span className={styles.miniProgress} aria-hidden><span style={{ width: `${progress.value ?? 35}%` }} /></span>

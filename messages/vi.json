@@ -833,7 +833,7 @@
   "dashboard": {
     "common": {
       "loading": "Đang tải...",
-      "authenticating": "Đang xác thực...",
+    "authenticating": "Đang xác thực...",
       "signInRequired": "Yêu cầu đăng nhập",
       "signIn": "Đăng nhập",
       "refresh": "Làm mới",
@@ -2441,6 +2441,107 @@
       "artifact": "kết quả",
       "outputMinLength": "Ít nhất {count} ký tự",
       "launchedPending": "Đã tạo tác vụ. Cài đặt {count} kỹ năng bắt buộc trước khi chạy."
+    },
+    "content": {
+      "categories": {
+        "research": "Nghiên cứu",
+        "engineering": "Kỹ thuật",
+        "monitoring": "Giám sát",
+        "marketing": "Tiếp thị"
+      },
+      "options": {
+        "x": "X",
+        "linkedin": "LinkedIn",
+        "blog": "Blog",
+        "email": "Email"
+      },
+      "artifactKinds": {
+        "text": "văn bản",
+        "code": "mã",
+        "file": "tệp"
+      },
+      "prerequisites": {
+        "github_connection": "Thiết lập GitHub Connect hoặc token thời gian chạy GitHub cho agent này."
+      },
+      "warnings": {
+        "unsupported_framework": "Framework {framework} không được pack này hỗ trợ.",
+        "required_skills_pending": "{count, plural, one {# kỹ năng bắt buộc sẽ được đưa vào hàng đợi cài đặt. Hãy khởi động lại agent trước khi chạy tác vụ.} other {# kỹ năng bắt buộc sẽ được đưa vào hàng đợi cài đặt. Hãy khởi động lại agent trước khi chạy tác vụ.}}",
+        "schedules_disabled": "{count, plural, one {# mẫu lịch trình đã được chuẩn bị nhưng vẫn bị tắt.} other {# mẫu lịch trình đã được chuẩn bị nhưng vẫn bị tắt.}}"
+      },
+      "packs": {
+        "researchReport": {
+          "title": "Báo cáo nghiên cứu",
+          "summary": "Tạo báo cáo nghiên cứu có nguồn dẫn, tập trung vào một chủ đề cụ thể và sẵn sàng hỗ trợ quyết định.",
+          "fields": {
+            "topic": "Chủ đề",
+            "questions": "Câu hỏi nghiên cứu",
+            "audience": "Đối tượng",
+            "outputLanguage": "Ngôn ngữ đầu ra"
+          },
+          "deliverables": {
+            "deliverable-1": "Báo cáo có cấu trúc",
+            "deliverable-2": "Danh sách nguồn kèm trích dẫn trực tiếp"
+          },
+          "manualAcceptance": "Các nguồn củng cố những nhận định chính.",
+          "taskTitle": "Báo cáo nghiên cứu",
+          "taskDescription": "Tạo báo cáo nghiên cứu dựa trên nguồn từ bản yêu cầu đã cung cấp."
+        },
+        "pullRequestReview": {
+          "title": "Đánh giá Pull Request",
+          "summary": "Đánh giá một Pull Request trên GitHub về tính chính xác, rủi ro và mức độ sẵn sàng phát hành.",
+          "fields": {
+            "repository": "Repository (chủ sở hữu/tên)",
+            "pullRequestNumber": "Số Pull Request",
+            "focus": "Trọng tâm đánh giá"
+          },
+          "deliverables": {
+            "deliverable-1": "Các phát hiện xếp theo mức độ nghiêm trọng",
+            "deliverable-2": "Kết luận phát hành hoặc chặn"
+          },
+          "manualAcceptance": "Mỗi phát hiện có tính chặn đều kèm bằng chứng cụ thể.",
+          "taskTitle": "Đánh giá Pull Request",
+          "taskDescription": "Đánh giá Pull Request đã chỉ định về tính chính xác và rủi ro phát hành."
+        },
+        "competitorWatch": {
+          "title": "Theo dõi đối thủ",
+          "summary": "Tạo bản tin tình báo cạnh tranh và một mẫu theo dõi hằng ngày ở trạng thái tắt.",
+          "fields": {
+            "company": "Công ty hoặc sản phẩm của bạn",
+            "competitors": "Đối thủ",
+            "market": "Thị trường",
+            "watchSignals": "Tín hiệu cần theo dõi"
+          },
+          "deliverables": {
+            "deliverable-1": "Bản tin cơ sở về đối thủ",
+            "deliverable-2": "Các tín hiệu theo dõi đã được ưu tiên"
+          },
+          "manualAcceptance": "Các nhận định quan trọng đều có ngày và nguồn dẫn.",
+          "schedules": {
+            "daily-competitor-watch": "Theo dõi đối thủ hằng ngày"
+          },
+          "taskTitle": "Theo dõi đối thủ",
+          "taskDescription": "Thiết lập bức tranh cơ sở hiện tại về đối thủ, có nguồn dẫn hỗ trợ."
+        },
+        "launchContent": {
+          "title": "Nội dung ra mắt",
+          "summary": "Chuyển định vị sản phẩm thành các bài đăng sẵn sàng cho từng kênh và một kế hoạch hành động.",
+          "fields": {
+            "product": "Sản phẩm",
+            "positioning": "Định vị và đề nghị",
+            "audience": "Đối tượng",
+            "channels": "Kênh",
+            "tone": "Giọng điệu"
+          },
+          "deliverables": {
+            "deliverable-1": "Tóm tắt định vị",
+            "deliverable-2": "Bản nháp bài đăng sẵn sàng cho từng kênh",
+            "deliverable-3": "Kế hoạch hành động ra mắt"
+          },
+          "manualAcceptance": "Các nhận định khớp với đề nghị do chủ sở hữu cung cấp.",
+          "taskTitle": "Nội dung ra mắt",
+          "taskDescription": "Chuẩn bị bản nháp nội dung ra mắt và kế hoạch hành động có con người xem xét."
+        }
+      }
     },
     "authenticating": "Đang kiểm tra phiên...",
     "signInTitle": "Đăng nhập vào Outcome Packs",

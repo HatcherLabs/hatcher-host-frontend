@@ -833,7 +833,7 @@
   "dashboard": {
     "common": {
       "loading": "Se încarcă...",
-      "authenticating": "Se autentifică...",
+    "authenticating": "Se autentifică...",
       "signInRequired": "Autentificare necesară",
       "signIn": "Autentificare",
       "refresh": "Reîmprospătare",
@@ -2712,6 +2712,107 @@
       "artifact": "rezultat",
       "outputMinLength": "Cel puțin {count} caractere",
       "launchedPending": "Task creat. Instalează cele {count} skilluri necesare înainte de pornire."
+    },
+    "content": {
+      "categories": {
+        "research": "Cercetare",
+        "engineering": "Inginerie",
+        "monitoring": "Monitorizare",
+        "marketing": "Marketing"
+      },
+      "options": {
+        "x": "X",
+        "linkedin": "LinkedIn",
+        "blog": "Blog",
+        "email": "E-mail"
+      },
+      "artifactKinds": {
+        "text": "text",
+        "code": "cod",
+        "file": "fișier"
+      },
+      "prerequisites": {
+        "github_connection": "Configurează GitHub Connect sau un token GitHub pentru rularea acestui agent."
+      },
+      "warnings": {
+        "unsupported_framework": "Framework-ul {framework} nu este compatibil cu acest pack.",
+        "required_skills_pending": "{count, plural, one {# skill obligatoriu va fi pus în coada de instalare. Repornește agentul înainte de a porni taskul.} other {# skilluri obligatorii vor fi puse în coada de instalare. Repornește agentul înainte de a porni taskul.}}",
+        "schedules_disabled": "{count, plural, one {# șablon de programare este pregătit, dar rămâne dezactivat.} other {# șabloane de programare sunt pregătite, dar rămân dezactivate.}}"
+      },
+      "packs": {
+        "researchReport": {
+          "title": "Raport de cercetare",
+          "summary": "Realizează un raport de cercetare documentat, concentrat pe un subiect clar și pregătit pentru luarea unei decizii.",
+          "fields": {
+            "topic": "Subiect",
+            "questions": "Întrebări de cercetare",
+            "audience": "Public",
+            "outputLanguage": "Limba rezultatului"
+          },
+          "deliverables": {
+            "deliverable-1": "Raport structurat",
+            "deliverable-2": "Listă de surse cu citări directe"
+          },
+          "manualAcceptance": "Sursele susțin afirmațiile principale.",
+          "taskTitle": "Raport de cercetare",
+          "taskDescription": "Realizează un raport de cercetare bazat pe surse, pornind de la brief-ul furnizat."
+        },
+        "pullRequestReview": {
+          "title": "Verificare Pull Request",
+          "summary": "Verifică un Pull Request GitHub din perspectiva corectitudinii, riscurilor și pregătirii pentru lansare.",
+          "fields": {
+            "repository": "Repository (proprietar/nume)",
+            "pullRequestNumber": "Numărul Pull Request-ului",
+            "focus": "Obiectivul verificării"
+          },
+          "deliverables": {
+            "deliverable-1": "Constatări ordonate după severitate",
+            "deliverable-2": "Verdict de lansare sau blocare"
+          },
+          "manualAcceptance": "Fiecare constatare blocantă include dovezi concrete.",
+          "taskTitle": "Verificare Pull Request",
+          "taskDescription": "Verifică Pull Request-ul indicat pentru corectitudine și riscuri de lansare."
+        },
+        "competitorWatch": {
+          "title": "Monitorizarea concurenței",
+          "summary": "Creează un raport de inteligență competitivă și un șablon dezactivat pentru monitorizarea zilnică.",
+          "fields": {
+            "company": "Compania sau produsul tău",
+            "competitors": "Concurenți",
+            "market": "Piață",
+            "watchSignals": "Semnale de urmărit"
+          },
+          "deliverables": {
+            "deliverable-1": "Raport de referință despre concurență",
+            "deliverable-2": "Semnale de monitorizare prioritizate"
+          },
+          "manualAcceptance": "Afirmațiile importante sunt datate și susținute de surse.",
+          "schedules": {
+            "daily-competitor-watch": "Monitorizarea zilnică a concurenței"
+          },
+          "taskTitle": "Monitorizarea concurenței",
+          "taskDescription": "Stabilește o imagine actuală a concurenței, susținută de surse."
+        },
+        "launchContent": {
+          "title": "Conținut de lansare",
+          "summary": "Transformă poziționarea produsului în postări pregătite pentru fiecare canal și într-un plan de acțiune.",
+          "fields": {
+            "product": "Produs",
+            "positioning": "Poziționare și ofertă",
+            "audience": "Public",
+            "channels": "Canale",
+            "tone": "Ton"
+          },
+          "deliverables": {
+            "deliverable-1": "Rezumatul poziționării",
+            "deliverable-2": "Schițe de postări pregătite pentru fiecare canal",
+            "deliverable-3": "Plan de acțiune pentru lansare"
+          },
+          "manualAcceptance": "Afirmațiile corespund ofertei furnizate de proprietar.",
+          "taskTitle": "Conținut de lansare",
+          "taskDescription": "Pregătește schițe de conținut pentru lansare și un plan de acțiune care va fi verificat de o persoană."
+        }
+      }
     },
     "authenticating": "Verificăm sesiunea...",
     "signInTitle": "Autentifică-te pentru Outcome Packs",

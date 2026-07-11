@@ -833,7 +833,7 @@
   "dashboard": {
     "common": {
       "loading": "Chargement...",
-      "authenticating": "Authentification...",
+    "authenticating": "Authentification...",
       "signInRequired": "Connexion requise",
       "signIn": "Se connecter",
       "refresh": "Actualiser",
@@ -2417,6 +2417,107 @@
       "artifact": "résultat",
       "outputMinLength": "Au moins {count} caractères",
       "launchedPending": "Tâche créée. Installez les {count} compétences requises avant de la démarrer."
+    },
+    "content": {
+      "categories": {
+        "research": "Recherche",
+        "engineering": "Ingénierie",
+        "monitoring": "Suivi",
+        "marketing": "Marketing"
+      },
+      "options": {
+        "x": "X",
+        "linkedin": "LinkedIn",
+        "blog": "Blog",
+        "email": "E-mail"
+      },
+      "artifactKinds": {
+        "text": "texte",
+        "code": "code",
+        "file": "fichier"
+      },
+      "prerequisites": {
+        "github_connection": "Configurez GitHub Connect ou un jeton d'exécution GitHub pour cet agent."
+      },
+      "warnings": {
+        "unsupported_framework": "Le framework {framework} n'est pas pris en charge par ce pack.",
+        "required_skills_pending": "{count, plural, one {# compétence requise sera mise en attente d'installation. Redémarrez l'agent avant de lancer la tâche.} other {# compétences requises seront mises en attente d'installation. Redémarrez l'agent avant de lancer la tâche.}}",
+        "schedules_disabled": "{count, plural, one {# modèle de planification est préparé, mais reste désactivé.} other {# modèles de planification sont préparés, mais restent désactivés.}}"
+      },
+      "packs": {
+        "researchReport": {
+          "title": "Rapport de recherche",
+          "summary": "Produisez un rapport de recherche sourcé, ciblé et directement exploitable pour la prise de décision.",
+          "fields": {
+            "topic": "Sujet",
+            "questions": "Questions de recherche",
+            "audience": "Public",
+            "outputLanguage": "Langue de sortie"
+          },
+          "deliverables": {
+            "deliverable-1": "Rapport structuré",
+            "deliverable-2": "Liste des sources avec citations directes"
+          },
+          "manualAcceptance": "Les sources étayent les affirmations centrales.",
+          "taskTitle": "Rapport de recherche",
+          "taskDescription": "Produisez un rapport de recherche étayé par des sources à partir du brief fourni."
+        },
+        "pullRequestReview": {
+          "title": "Revue de Pull Request",
+          "summary": "Examinez une Pull Request GitHub pour évaluer sa fiabilité, ses risques et son aptitude à être publiée.",
+          "fields": {
+            "repository": "Dépôt (propriétaire/nom)",
+            "pullRequestNumber": "Numéro de la Pull Request",
+            "focus": "Axes de la revue"
+          },
+          "deliverables": {
+            "deliverable-1": "Constats classés par gravité",
+            "deliverable-2": "Verdict de publication ou de blocage"
+          },
+          "manualAcceptance": "Chaque constat bloquant comporte des preuves concrètes.",
+          "taskTitle": "Revue de Pull Request",
+          "taskDescription": "Examinez la Pull Request indiquée pour évaluer sa fiabilité et les risques liés à sa publication."
+        },
+        "competitorWatch": {
+          "title": "Veille concurrentielle",
+          "summary": "Créez une synthèse de veille concurrentielle et un modèle désactivé pour le suivi quotidien.",
+          "fields": {
+            "company": "Votre entreprise ou produit",
+            "competitors": "Concurrents",
+            "market": "Marché",
+            "watchSignals": "Signaux à surveiller"
+          },
+          "deliverables": {
+            "deliverable-1": "Synthèse concurrentielle de référence",
+            "deliverable-2": "Signaux de veille prioritaires"
+          },
+          "manualAcceptance": "Les affirmations importantes sont datées et sourcées.",
+          "schedules": {
+            "daily-competitor-watch": "Veille concurrentielle quotidienne"
+          },
+          "taskTitle": "Veille concurrentielle",
+          "taskDescription": "Établissez une référence actuelle sur la concurrence, étayée par des sources."
+        },
+        "launchContent": {
+          "title": "Contenu de lancement",
+          "summary": "Transformez le positionnement du produit en publications prêtes pour chaque canal et en plan d'action.",
+          "fields": {
+            "product": "Produit",
+            "positioning": "Positionnement et offre",
+            "audience": "Public",
+            "channels": "Canaux",
+            "tone": "Ton"
+          },
+          "deliverables": {
+            "deliverable-1": "Synthèse du positionnement",
+            "deliverable-2": "Brouillons de publications prêts pour chaque canal",
+            "deliverable-3": "Plan d'action pour le lancement"
+          },
+          "manualAcceptance": "Les affirmations correspondent à l'offre fournie par le propriétaire.",
+          "taskTitle": "Contenu de lancement",
+          "taskDescription": "Préparez des brouillons de contenu pour le lancement et un plan d'action soumis à une validation humaine."
+        }
+      }
     },
     "authenticating": "Vérification de votre session...",
     "signInTitle": "Se connecter à Outcome Packs",

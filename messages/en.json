@@ -2713,6 +2713,107 @@
       "outputMinLength": "At least {count} characters",
       "launchedPending": "Task created. Install {count} required skill(s) before starting it."
     },
+    "content": {
+      "categories": {
+        "research": "Research",
+        "engineering": "Engineering",
+        "monitoring": "Monitoring",
+        "marketing": "Marketing"
+      },
+      "options": {
+        "x": "X",
+        "linkedin": "LinkedIn",
+        "blog": "Blog",
+        "email": "Email"
+      },
+      "artifactKinds": {
+        "text": "text",
+        "code": "code",
+        "file": "file"
+      },
+      "prerequisites": {
+        "github_connection": "Configure GitHub Connect or a GitHub runtime token for this agent."
+      },
+      "warnings": {
+        "unsupported_framework": "Framework {framework} is not supported by this pack.",
+        "required_skills_pending": "{count, plural, one {# required skill will be queued for installation. Restart the agent before starting the task.} other {# required skills will be queued for installation. Restart the agent before starting the task.}}",
+        "schedules_disabled": "{count, plural, one {# schedule template is prepared but remains disabled.} other {# schedule templates are prepared but remain disabled.}}"
+      },
+      "packs": {
+        "researchReport": {
+          "title": "Research Report",
+          "summary": "Produce a sourced, decision-ready research report on a focused topic.",
+          "fields": {
+            "topic": "Topic",
+            "questions": "Research questions",
+            "audience": "Audience",
+            "outputLanguage": "Output language"
+          },
+          "deliverables": {
+            "deliverable-1": "Structured report",
+            "deliverable-2": "Source list with direct citations"
+          },
+          "manualAcceptance": "Sources support the central claims.",
+          "taskTitle": "Research report",
+          "taskDescription": "Produce a source-backed research report from the supplied brief."
+        },
+        "pullRequestReview": {
+          "title": "Pull Request Review",
+          "summary": "Review a GitHub pull request for correctness, risk, and release readiness.",
+          "fields": {
+            "repository": "Repository (owner/name)",
+            "pullRequestNumber": "Pull request number",
+            "focus": "Review focus"
+          },
+          "deliverables": {
+            "deliverable-1": "Severity-ranked findings",
+            "deliverable-2": "Ship or block verdict"
+          },
+          "manualAcceptance": "Every blocking finding includes concrete evidence.",
+          "taskTitle": "Pull request review",
+          "taskDescription": "Review the specified pull request for correctness and release risk."
+        },
+        "competitorWatch": {
+          "title": "Competitor Watch",
+          "summary": "Create a competitor intelligence brief and a disabled daily monitoring template.",
+          "fields": {
+            "company": "Your company or product",
+            "competitors": "Competitors",
+            "market": "Market",
+            "watchSignals": "Signals to watch"
+          },
+          "deliverables": {
+            "deliverable-1": "Competitor baseline brief",
+            "deliverable-2": "Prioritized watch signals"
+          },
+          "manualAcceptance": "Material claims are dated and sourced.",
+          "schedules": {
+            "daily-competitor-watch": "Daily competitor watch"
+          },
+          "taskTitle": "Competitor watch",
+          "taskDescription": "Establish a current, source-backed competitor baseline."
+        },
+        "launchContent": {
+          "title": "Launch Content",
+          "summary": "Turn product positioning into channel-ready launch posts and an action plan.",
+          "fields": {
+            "product": "Product",
+            "positioning": "Positioning and offer",
+            "audience": "Audience",
+            "channels": "Channels",
+            "tone": "Tone"
+          },
+          "deliverables": {
+            "deliverable-1": "Positioning summary",
+            "deliverable-2": "Channel-ready post drafts",
+            "deliverable-3": "Launch action plan"
+          },
+          "manualAcceptance": "Claims match the owner-provided offer.",
+          "taskTitle": "Launch content",
+          "taskDescription": "Prepare draft launch content and a human-reviewed action plan."
+        }
+      }
+    },
     "authenticating": "Checking your session...",
     "signInTitle": "Sign in to Outcome Packs",
     "signInDescription": "Outcome Packs configure private tasks and integrations for agents in your account.",

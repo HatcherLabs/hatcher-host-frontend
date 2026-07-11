@@ -37,6 +37,8 @@ import {
   createOutcomePackIdempotencyKey,
   initializeOutcomePackInputs,
   isOutcomePackLaunchReady,
+  localizeOutcomePackModel,
+  localizeOutcomePackPreparationModel,
   normalizeOutcomePack,
   normalizeOutcomePackList,
   normalizeOutcomePackPreparation,
@@ -91,6 +93,22 @@ export default function OutcomePacksPage() {
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
+  const translateOr = useCallback((
+    key: string,
+    fallback: string,
+    values?: Record<string, string | number>,
+  ): string => (t.has(key) ? t(key, values) : fallback), [t]);
+
+  const localizePack = useCallback(
+    (value: OutcomePackModel) => localizeOutcomePackModel(value, translateOr),
+    [translateOr],
+  );
+
+  const localizePreparation = useCallback(
+    (value: OutcomePackPreparationModel) => localizeOutcomePackPreparationModel(value, translateOr),
+    [translateOr],
+  );
+
   const selectedAgent = useMemo(
     () => agents.find((agent) => agent.id === selectedAgentId) ?? null,
     [agents, selectedAgentId],
@@ -99,13 +117,16 @@ export default function OutcomePacksPage() {
   const acceptanceLabel = useCallback((item: OutcomePackDetailItemModel): string => {
     if (item.type === 'all_tasks_completed') return t('contract.allTasksCompleted');
     if (item.type === 'artifact_required') {
-      return t('contract.artifactRequired', { kind: item.artifactKind ?? t('contract.artifact') });
+      const kind = item.artifactKind
+        ? translateOr(`content.artifactKinds.${item.artifactKind}`, item.artifactKind)
+        : t('contract.artifact');
+      return t('contract.artifactRequired', { kind });
     }
     if (item.type === 'output_min_length') {
       return t('contract.outputMinLength', { count: item.characters ?? 0 });
     }
     return item.label;
-  }, [t]);
+  }, [t, translateOr]);
 
   const resetPreparedState = useCallback(() => {
     setPreview(null);
@@ -131,7 +152,7 @@ export default function OutcomePacksPage() {
       return;
     }
 
-    const nextPacks = normalizeOutcomePackList(packsResult.data);
+    const nextPacks = normalizeOutcomePackList(packsResult.data).map(localizePack);
     setAgents(agentsResult.data);
     setPacks(nextPacks);
     setDetailRevision((current) => current + 1);
@@ -141,7 +162,7 @@ export default function OutcomePacksPage() {
         ? current
         : nextPacks[0]?.id ?? null,
     );
-  }, []);
+  }, [localizePack]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -167,7 +188,7 @@ export default function OutcomePacksPage() {
         setPack(null);
         return;
       }
-      const nextPack = normalizeOutcomePack(result.data.pack);
+      const nextPack = localizePack(normalizeOutcomePack(result.data.pack));
       setPack(nextPack);
       setInputs(initializeOutcomePackInputs(nextPack));
       setFieldErrors({});
@@ -175,7 +196,7 @@ export default function OutcomePacksPage() {
       launchKeyRef.current = null;
     });
     return () => { cancelled = true; };
-  }, [detailRevision, isAuthenticated, selectedPackId]);
+  }, [detailRevision, isAuthenticated, localizePack, selectedPackId]);
 
   const selectPack = useCallback((packId: string) => {
     if (packId === selectedPackId) return;
@@ -222,9 +243,9 @@ export default function OutcomePacksPage() {
       setActionError(result.error);
       return;
     }
-    setPreview(normalizeOutcomePackPreparation(result.data));
+    setPreview(localizePreparation(normalizeOutcomePackPreparation(result.data)));
     launchKeyRef.current = createOutcomePackIdempotencyKey();
-  }, [inputs, pack, selectedAgentId, t]);
+  }, [inputs, localizePreparation, pack, selectedAgentId, t]);
 
   const launch = useCallback(async () => {
     if (!pack || !selectedAgentId || !isOutcomePackLaunchReady(preview)) return;
@@ -480,7 +501,7 @@ export default function OutcomePacksPage() {
                                               : [...selectedValues, option],
                                           )}
                                         />
-                                        <span>{option}</span>
+                                        <span>{translateOr(`content.options.${option}`, option)}</span>
                                       </label>
                                     );
                                   })}
@@ -608,7 +629,7 @@ export default function OutcomePacksPage() {
                                 <h4><AlertTriangle size={15} aria-hidden /> {t('preview.warnings')}</h4>
                                 <ul className={styles.warningList}>
                                   {preview.warnings.map((warning, index) => (
-                                    <li key={`warning-${index}`}>{warning}</li>
+                                    <li key={`${warning.code}-${index}`}>{warning.label}</li>
                                   ))}
                                 </ul>
                               </section>

@@ -7,6 +7,17 @@ export const OUTCOME_PACK_IDS = [
 
 export type FirstPartyOutcomePackId = (typeof OUTCOME_PACK_IDS)[number];
 
+export const OUTCOME_PACK_COPY_SLUGS: Record<FirstPartyOutcomePackId, string> = {
+  'research-report-v1': 'researchReport',
+  'pr-review-v1': 'pullRequestReview',
+  'competitor-watch-v1': 'competitorWatch',
+  'launch-content-v1': 'launchContent',
+};
+
+export function outcomePackCopySlug(packId: string): string | null {
+  return OUTCOME_PACK_COPY_SLUGS[packId as FirstPartyOutcomePackId] ?? null;
+}
+
 type UnknownRecord = Record<string, unknown>;
 
 export type OutcomePackInputFieldType =
@@ -82,7 +93,7 @@ export interface OutcomePackPreparationModel {
   agent: { id: string; name: string; framework: string; status: string } | null;
   compatible: boolean;
   missingPrerequisites: OutcomePackPrerequisiteModel[];
-  warnings: string[];
+  warnings: OutcomePackWarningModel[];
   resolvedTasks: PreparedOutcomePackTaskModel[];
   requiredSkills: string[];
   budgetTargetAiCredits: number | null;
@@ -90,6 +101,12 @@ export interface OutcomePackPreparationModel {
   acceptanceChecks: OutcomePackDetailItemModel[];
   schedules: OutcomePackScheduleModel[];
   launchPolicy: unknown;
+}
+
+export interface OutcomePackWarningModel {
+  code: string;
+  label: string;
+  params: Record<string, string | number>;
 }
 
 export interface OutcomePackInputErrors {
@@ -116,6 +133,27 @@ function finiteNumber(value: unknown): number | null {
 
 function stringList(value: unknown): string[] {
   return Array.isArray(value) ? value.map((item) => text(item)).filter(Boolean) : [];
+}
+
+function stringNumberRecord(value: unknown): Record<string, string | number> {
+  const raw = record(value);
+  return Object.fromEntries(Object.entries(raw).filter(
+    (entry): entry is [string, string | number] => (
+      typeof entry[1] === 'string' || (typeof entry[1] === 'number' && Number.isFinite(entry[1]))
+    ),
+  ));
+}
+
+function normalizeWarning(value: unknown, index: number): OutcomePackWarningModel {
+  if (typeof value === 'string') {
+    return { code: `legacy_warning_${index + 1}`, label: value, params: {} };
+  }
+  const raw = record(value);
+  return {
+    code: text(raw.code, `warning_${index + 1}`),
+    label: text(raw.label, text(raw.message, 'Review this pack before launch.')),
+    params: stringNumberRecord(raw.params),
+  };
 }
 
 function normalizeInputField(value: unknown): OutcomePackInputFieldModel {
@@ -267,7 +305,7 @@ export function normalizeOutcomePackPreparation(value: unknown): OutcomePackPrep
     missingPrerequisites: Array.isArray(raw.missingPrerequisites)
       ? raw.missingPrerequisites.map(normalizePrerequisite)
       : [],
-    warnings: stringList(raw.warnings),
+    warnings: Array.isArray(raw.warnings) ? raw.warnings.map(normalizeWarning) : [],
     resolvedTasks: Array.isArray(raw.resolvedTasks)
       ? raw.resolvedTasks.map(normalizePreparedTask)
       : [],
@@ -277,6 +315,85 @@ export function normalizeOutcomePackPreparation(value: unknown): OutcomePackPrep
     acceptanceChecks: normalizeOutcomePackAcceptanceChecks(raw.acceptanceChecks),
     schedules: Array.isArray(raw.schedules) ? raw.schedules.map(normalizeSchedule) : [],
     launchPolicy: raw.launchPolicy ?? null,
+  };
+}
+
+export type OutcomePackCopyTranslator = (
+  key: string,
+  fallback: string,
+  values?: Record<string, string | number>,
+) => string;
+
+export function localizeOutcomePackModel(
+  value: OutcomePackModel,
+  translate: OutcomePackCopyTranslator,
+): OutcomePackModel {
+  const slug = outcomePackCopySlug(value.id);
+  if (!slug) return value;
+  const base = `content.packs.${slug}`;
+  return {
+    ...value,
+    title: translate(`${base}.title`, value.title),
+    summary: translate(`${base}.summary`, value.summary),
+    category: translate(`content.categories.${value.category}`, value.category),
+    prerequisites: value.prerequisites.map((item) => ({
+      ...item,
+      label: translate(`content.prerequisites.${item.id}`, item.label),
+    })),
+    inputFields: value.inputFields.map((field) => ({
+      ...field,
+      label: translate(`${base}.fields.${field.key}`, field.label),
+    })),
+    deliverables: value.deliverables.map((item) => ({
+      ...item,
+      label: translate(`${base}.deliverables.${item.id}`, item.label),
+    })),
+    acceptanceChecks: value.acceptanceChecks.map((item) => (
+      item.type === 'manual'
+        ? { ...item, label: translate(`${base}.manualAcceptance`, item.label) }
+        : item
+    )),
+    schedules: value.schedules.map((schedule) => ({
+      ...schedule,
+      label: translate(`${base}.schedules.${schedule.id}`, schedule.label),
+    })),
+  };
+}
+
+export function localizeOutcomePackPreparationModel(
+  value: OutcomePackPreparationModel,
+  translate: OutcomePackCopyTranslator,
+): OutcomePackPreparationModel {
+  const slug = outcomePackCopySlug(value.pack.id);
+  if (!slug) return value;
+  const base = `content.packs.${slug}`;
+  return {
+    ...value,
+    pack: { ...value.pack, title: translate(`${base}.title`, value.pack.title) },
+    missingPrerequisites: value.missingPrerequisites.map((item) => ({
+      ...item,
+      label: translate(`content.prerequisites.${item.id}`, item.label),
+    })),
+    warnings: value.warnings.map((warning) => ({
+      ...warning,
+      label: translate(`content.warnings.${warning.code}`, warning.label, warning.params),
+    })),
+    resolvedTasks: value.resolvedTasks.map((task) => ({
+      ...task,
+      title: translate(`${base}.taskTitle`, task.title),
+      description: task.description === null
+        ? null
+        : translate(`${base}.taskDescription`, task.description),
+    })),
+    acceptanceChecks: value.acceptanceChecks.map((item) => (
+      item.type === 'manual'
+        ? { ...item, label: translate(`${base}.manualAcceptance`, item.label) }
+        : item
+    )),
+    schedules: value.schedules.map((schedule) => ({
+      ...schedule,
+      label: translate(`${base}.schedules.${schedule.id}`, schedule.label),
+    })),
   };
 }
 

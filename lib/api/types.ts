@@ -605,6 +605,12 @@ export interface PreparedOutcomePackAgent {
   status: string;
 }
 
+export interface PreparedOutcomePackWarning {
+  code: string;
+  label: string;
+  params?: Record<string, string | number>;
+}
+
 export interface PreparedOutcomePack {
   pack: {
     id: string;
@@ -614,7 +620,7 @@ export interface PreparedOutcomePack {
   agent: PreparedOutcomePackAgent;
   compatible: boolean;
   missingPrerequisites: PublicOutcomePackPrerequisite[];
-  warnings: string[];
+  warnings: PreparedOutcomePackWarning[];
   resolvedTasks: PreparedOutcomePackTask[];
   requiredSkills: string[];
   budgetTargetAiCredits: number | null;

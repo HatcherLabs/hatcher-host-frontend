@@ -833,7 +833,7 @@
   "dashboard": {
     "common": {
       "loading": "Memuat...",
-      "authenticating": "Mengautentikasi...",
+    "authenticating": "Mengautentikasi...",
       "signInRequired": "Diperlukan Masuk",
       "signIn": "Masuk",
       "refresh": "Segarkan",
@@ -2441,6 +2441,107 @@
       "artifact": "hasil",
       "outputMinLength": "Minimal {count} karakter",
       "launchedPending": "Tugas dibuat. Instal {count} skill wajib sebelum memulainya."
+    },
+    "content": {
+      "categories": {
+        "research": "Riset",
+        "engineering": "Rekayasa",
+        "monitoring": "Pemantauan",
+        "marketing": "Pemasaran"
+      },
+      "options": {
+        "x": "X",
+        "linkedin": "LinkedIn",
+        "blog": "Blog",
+        "email": "Email"
+      },
+      "artifactKinds": {
+        "text": "teks",
+        "code": "kode",
+        "file": "file"
+      },
+      "prerequisites": {
+        "github_connection": "Konfigurasikan GitHub Connect atau token runtime GitHub untuk agen ini."
+      },
+      "warnings": {
+        "unsupported_framework": "Framework {framework} tidak didukung oleh pack ini.",
+        "required_skills_pending": "{count, plural, one {# skill wajib akan dimasukkan ke antrean instalasi. Mulai ulang agen sebelum menjalankan tugas.} other {# skill wajib akan dimasukkan ke antrean instalasi. Mulai ulang agen sebelum menjalankan tugas.}}",
+        "schedules_disabled": "{count, plural, one {# template jadwal telah disiapkan tetapi tetap dinonaktifkan.} other {# template jadwal telah disiapkan tetapi tetap dinonaktifkan.}}"
+      },
+      "packs": {
+        "researchReport": {
+          "title": "Laporan Riset",
+          "summary": "Buat laporan riset berbasis sumber yang berfokus pada topik tertentu dan siap digunakan untuk mengambil keputusan.",
+          "fields": {
+            "topic": "Topik",
+            "questions": "Pertanyaan riset",
+            "audience": "Audiens",
+            "outputLanguage": "Bahasa output"
+          },
+          "deliverables": {
+            "deliverable-1": "Laporan terstruktur",
+            "deliverable-2": "Daftar sumber dengan kutipan langsung"
+          },
+          "manualAcceptance": "Sumber mendukung klaim utama.",
+          "taskTitle": "Laporan riset",
+          "taskDescription": "Buat laporan riset berbasis sumber dari brief yang diberikan."
+        },
+        "pullRequestReview": {
+          "title": "Peninjauan Pull Request",
+          "summary": "Tinjau Pull Request GitHub untuk memastikan kebenaran, risiko, dan kesiapan rilisnya.",
+          "fields": {
+            "repository": "Repository (pemilik/nama)",
+            "pullRequestNumber": "Nomor Pull Request",
+            "focus": "Fokus peninjauan"
+          },
+          "deliverables": {
+            "deliverable-1": "Temuan yang diurutkan berdasarkan tingkat keparahan",
+            "deliverable-2": "Keputusan rilis atau blokir"
+          },
+          "manualAcceptance": "Setiap temuan yang memblokir menyertakan bukti konkret.",
+          "taskTitle": "Peninjauan Pull Request",
+          "taskDescription": "Tinjau Pull Request yang ditentukan untuk memastikan kebenaran dan risiko rilisnya."
+        },
+        "competitorWatch": {
+          "title": "Pemantauan Pesaing",
+          "summary": "Buat ringkasan intelijen pesaing dan template pemantauan harian yang dinonaktifkan.",
+          "fields": {
+            "company": "Perusahaan atau produk Anda",
+            "competitors": "Pesaing",
+            "market": "Pasar",
+            "watchSignals": "Sinyal yang dipantau"
+          },
+          "deliverables": {
+            "deliverable-1": "Ringkasan dasar pesaing",
+            "deliverable-2": "Sinyal pemantauan yang diprioritaskan"
+          },
+          "manualAcceptance": "Klaim penting mencantumkan tanggal dan sumber.",
+          "schedules": {
+            "daily-competitor-watch": "Pemantauan pesaing harian"
+          },
+          "taskTitle": "Pemantauan pesaing",
+          "taskDescription": "Tetapkan gambaran dasar pesaing terkini yang didukung sumber."
+        },
+        "launchContent": {
+          "title": "Konten Peluncuran",
+          "summary": "Ubah positioning produk menjadi draf postingan yang siap untuk tiap kanal dan rencana tindakan.",
+          "fields": {
+            "product": "Produk",
+            "positioning": "Positioning dan penawaran",
+            "audience": "Audiens",
+            "channels": "Kanal",
+            "tone": "Nada"
+          },
+          "deliverables": {
+            "deliverable-1": "Ringkasan positioning",
+            "deliverable-2": "Draf postingan siap pakai untuk tiap kanal",
+            "deliverable-3": "Rencana tindakan peluncuran"
+          },
+          "manualAcceptance": "Klaim sesuai dengan penawaran yang diberikan pemilik.",
+          "taskTitle": "Konten peluncuran",
+          "taskDescription": "Siapkan draf konten peluncuran dan rencana tindakan yang akan ditinjau manusia."
+        }
+      }
     },
     "authenticating": "Memeriksa sesi Anda...",
     "signInTitle": "Masuk ke Outcome Packs",

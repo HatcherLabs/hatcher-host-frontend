@@ -833,7 +833,7 @@
   "dashboard": {
     "common": {
       "loading": "लोड हो रहा है...",
-      "authenticating": "प्रमाणित करना...",
+    "authenticating": "प्रमाणित करना...",
       "signInRequired": "साइन इन आवश्यक है",
       "signIn": "साइन इन करें",
       "refresh": "ताज़ा करना",
@@ -2441,6 +2441,107 @@
       "artifact": "परिणाम",
       "outputMinLength": "कम से कम {count} अक्षर",
       "launchedPending": "कार्य बन गया। शुरू करने से पहले {count} आवश्यक स्किल इंस्टॉल करें।"
+    },
+    "content": {
+      "categories": {
+        "research": "अनुसंधान",
+        "engineering": "इंजीनियरिंग",
+        "monitoring": "निगरानी",
+        "marketing": "मार्केटिंग"
+      },
+      "options": {
+        "x": "X",
+        "linkedin": "LinkedIn",
+        "blog": "ब्लॉग",
+        "email": "ईमेल"
+      },
+      "artifactKinds": {
+        "text": "टेक्स्ट",
+        "code": "कोड",
+        "file": "फ़ाइल"
+      },
+      "prerequisites": {
+        "github_connection": "इस एजेंट के लिए GitHub Connect या GitHub रनटाइम टोकन कॉन्फ़िगर करें।"
+      },
+      "warnings": {
+        "unsupported_framework": "यह pack {framework} framework को सपोर्ट नहीं करता।",
+        "required_skills_pending": "{count, plural, one {# आवश्यक स्किल को इंस्टॉलेशन की कतार में रखा जाएगा। टास्क शुरू करने से पहले एजेंट को रीस्टार्ट करें।} other {# आवश्यक स्किल्स को इंस्टॉलेशन की कतार में रखा जाएगा। टास्क शुरू करने से पहले एजेंट को रीस्टार्ट करें।}}",
+        "schedules_disabled": "{count, plural, one {# शेड्यूल टेम्पलेट तैयार है, लेकिन बंद रहेगा।} other {# शेड्यूल टेम्पलेट तैयार हैं, लेकिन बंद रहेंगे।}}"
+      },
+      "packs": {
+        "researchReport": {
+          "title": "अनुसंधान रिपोर्ट",
+          "summary": "किसी स्पष्ट विषय पर स्रोतों से समर्थित और निर्णय लेने के लिए तैयार अनुसंधान रिपोर्ट बनाएं।",
+          "fields": {
+            "topic": "विषय",
+            "questions": "अनुसंधान प्रश्न",
+            "audience": "लक्षित पाठक",
+            "outputLanguage": "आउटपुट की भाषा"
+          },
+          "deliverables": {
+            "deliverable-1": "सुव्यवस्थित रिपोर्ट",
+            "deliverable-2": "सीधे उद्धरणों के साथ स्रोत सूची"
+          },
+          "manualAcceptance": "स्रोत मुख्य दावों का समर्थन करते हैं।",
+          "taskTitle": "अनुसंधान रिपोर्ट",
+          "taskDescription": "दिए गए brief से स्रोत-समर्थित अनुसंधान रिपोर्ट तैयार करें।"
+        },
+        "pullRequestReview": {
+          "title": "Pull Request समीक्षा",
+          "summary": "GitHub Pull Request की शुद्धता, जोखिम और रिलीज़ के लिए तैयारी की समीक्षा करें।",
+          "fields": {
+            "repository": "Repository (मालिक/नाम)",
+            "pullRequestNumber": "Pull Request नंबर",
+            "focus": "समीक्षा का केंद्र"
+          },
+          "deliverables": {
+            "deliverable-1": "गंभीरता के अनुसार क्रमबद्ध निष्कर्ष",
+            "deliverable-2": "रिलीज़ या ब्लॉक करने का निर्णय"
+          },
+          "manualAcceptance": "हर ब्लॉक करने वाले निष्कर्ष में ठोस प्रमाण शामिल है।",
+          "taskTitle": "Pull Request समीक्षा",
+          "taskDescription": "दिए गए Pull Request की शुद्धता और रिलीज़ जोखिमों की समीक्षा करें।"
+        },
+        "competitorWatch": {
+          "title": "प्रतिस्पर्धी निगरानी",
+          "summary": "प्रतिस्पर्धी जानकारी का brief और बंद रखा गया दैनिक निगरानी टेम्पलेट बनाएं।",
+          "fields": {
+            "company": "आपकी कंपनी या उत्पाद",
+            "competitors": "प्रतिस्पर्धी",
+            "market": "बाज़ार",
+            "watchSignals": "निगरानी के संकेत"
+          },
+          "deliverables": {
+            "deliverable-1": "प्रतिस्पर्धियों की आधारभूत रिपोर्ट",
+            "deliverable-2": "प्राथमिकता वाले निगरानी संकेत"
+          },
+          "manualAcceptance": "महत्वपूर्ण दावों में तारीख और स्रोत दिए गए हैं।",
+          "schedules": {
+            "daily-competitor-watch": "दैनिक प्रतिस्पर्धी निगरानी"
+          },
+          "taskTitle": "प्रतिस्पर्धी निगरानी",
+          "taskDescription": "स्रोतों से समर्थित, प्रतिस्पर्धियों की मौजूदा आधारभूत स्थिति तैयार करें।"
+        },
+        "launchContent": {
+          "title": "लॉन्च सामग्री",
+          "summary": "उत्पाद की positioning को हर चैनल के लिए तैयार लॉन्च पोस्ट और कार्ययोजना में बदलें।",
+          "fields": {
+            "product": "उत्पाद",
+            "positioning": "Positioning और प्रस्ताव",
+            "audience": "लक्षित पाठक",
+            "channels": "चैनल",
+            "tone": "शैली"
+          },
+          "deliverables": {
+            "deliverable-1": "Positioning का सारांश",
+            "deliverable-2": "हर चैनल के लिए तैयार पोस्ट के मसौदे",
+            "deliverable-3": "लॉन्च कार्ययोजना"
+          },
+          "manualAcceptance": "दावे मालिक द्वारा दिए गए प्रस्ताव से मेल खाते हैं।",
+          "taskTitle": "लॉन्च सामग्री",
+          "taskDescription": "लॉन्च सामग्री के मसौदे और मानवीय समीक्षा वाली कार्ययोजना तैयार करें।"
+        }
+      }
     },
     "authenticating": "आपका सत्र जाँचा जा रहा है...",
     "signInTitle": "Outcome Packs में साइन इन करें",

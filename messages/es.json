@@ -833,7 +833,7 @@
   "dashboard": {
     "common": {
       "loading": "Cargando...",
-      "authenticating": "Autenticando...",
+    "authenticating": "Autenticando...",
       "signInRequired": "Iniciar sesión requerido",
       "signIn": "Iniciar sesión",
       "refresh": "Actualizar",
@@ -2441,6 +2441,107 @@
       "artifact": "resultado",
       "outputMinLength": "Al menos {count} caracteres",
       "launchedPending": "Tarea creada. Instala las {count} habilidades requeridas antes de iniciarla."
+    },
+    "content": {
+      "categories": {
+        "research": "Investigación",
+        "engineering": "Ingeniería",
+        "monitoring": "Monitorización",
+        "marketing": "Marketing"
+      },
+      "options": {
+        "x": "X",
+        "linkedin": "LinkedIn",
+        "blog": "Blog",
+        "email": "Correo electrónico"
+      },
+      "artifactKinds": {
+        "text": "texto",
+        "code": "código",
+        "file": "archivo"
+      },
+      "prerequisites": {
+        "github_connection": "Configura GitHub Connect o un token de ejecución de GitHub para este agente."
+      },
+      "warnings": {
+        "unsupported_framework": "El framework {framework} no es compatible con este pack.",
+        "required_skills_pending": "{count, plural, one {# habilidad necesaria quedará en cola para su instalación. Reinicia el agente antes de iniciar la tarea.} other {# habilidades necesarias quedarán en cola para su instalación. Reinicia el agente antes de iniciar la tarea.}}",
+        "schedules_disabled": "{count, plural, one {# plantilla de programación está preparada, pero permanece desactivada.} other {# plantillas de programación están preparadas, pero permanecen desactivadas.}}"
+      },
+      "packs": {
+        "researchReport": {
+          "title": "Informe de investigación",
+          "summary": "Elabora un informe de investigación con fuentes, listo para tomar decisiones y centrado en un tema concreto.",
+          "fields": {
+            "topic": "Tema",
+            "questions": "Preguntas de investigación",
+            "audience": "Audiencia",
+            "outputLanguage": "Idioma de salida"
+          },
+          "deliverables": {
+            "deliverable-1": "Informe estructurado",
+            "deliverable-2": "Lista de fuentes con citas directas"
+          },
+          "manualAcceptance": "Las fuentes respaldan las afirmaciones principales.",
+          "taskTitle": "Informe de investigación",
+          "taskDescription": "Elabora un informe de investigación respaldado por fuentes a partir del briefing proporcionado."
+        },
+        "pullRequestReview": {
+          "title": "Revisión de Pull Request",
+          "summary": "Revisa un Pull Request de GitHub para evaluar su corrección, riesgos y preparación para el lanzamiento.",
+          "fields": {
+            "repository": "Repositorio (propietario/nombre)",
+            "pullRequestNumber": "Número del Pull Request",
+            "focus": "Enfoque de la revisión"
+          },
+          "deliverables": {
+            "deliverable-1": "Hallazgos ordenados por gravedad",
+            "deliverable-2": "Veredicto de publicar o bloquear"
+          },
+          "manualAcceptance": "Cada hallazgo bloqueante incluye pruebas concretas.",
+          "taskTitle": "Revisión de Pull Request",
+          "taskDescription": "Revisa el Pull Request indicado para evaluar su corrección y los riesgos del lanzamiento."
+        },
+        "competitorWatch": {
+          "title": "Seguimiento de la competencia",
+          "summary": "Crea un informe de inteligencia competitiva y una plantilla desactivada para el seguimiento diario.",
+          "fields": {
+            "company": "Tu empresa o producto",
+            "competitors": "Competidores",
+            "market": "Mercado",
+            "watchSignals": "Señales que vigilar"
+          },
+          "deliverables": {
+            "deliverable-1": "Informe de referencia sobre la competencia",
+            "deliverable-2": "Señales de seguimiento priorizadas"
+          },
+          "manualAcceptance": "Las afirmaciones relevantes incluyen fecha y fuentes.",
+          "schedules": {
+            "daily-competitor-watch": "Seguimiento diario de la competencia"
+          },
+          "taskTitle": "Seguimiento de la competencia",
+          "taskDescription": "Establece una referencia actual de la competencia respaldada por fuentes."
+        },
+        "launchContent": {
+          "title": "Contenido de lanzamiento",
+          "summary": "Convierte el posicionamiento del producto en publicaciones listas para cada canal y en un plan de acción.",
+          "fields": {
+            "product": "Producto",
+            "positioning": "Posicionamiento y oferta",
+            "audience": "Audiencia",
+            "channels": "Canales",
+            "tone": "Tono"
+          },
+          "deliverables": {
+            "deliverable-1": "Resumen del posicionamiento",
+            "deliverable-2": "Borradores de publicaciones listos para cada canal",
+            "deliverable-3": "Plan de acción para el lanzamiento"
+          },
+          "manualAcceptance": "Las afirmaciones coinciden con la oferta proporcionada por el propietario.",
+          "taskTitle": "Contenido de lanzamiento",
+          "taskDescription": "Prepara borradores de contenido para el lanzamiento y un plan de acción sujeto a revisión humana."
+        }
+      }
     },
     "authenticating": "Comprobando tu sesión...",
     "signInTitle": "Inicia sesión en Outcome Packs",
