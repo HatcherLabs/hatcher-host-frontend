@@ -4,6 +4,7 @@
     "tagline": "Hosting gestionat pentru agenți AI · Crypto-nativ"
   },
   "nav": {
+    "missionControl": "Mission Control",
     "pricing": "Prețuri",
     "docs": "Docs",
     "roadmap": "Roadmap",
@@ -38,6 +39,7 @@
     "affiliateRejected": "Reaplică ca afiliat",
     "affiliateBecome": "Devino afiliat",
     "userMenu": {
+      "sub_missionControl": "Taskuri, aprobări, execuții și rezultate.",
       "sub_myAgents": "Răsfoiește, editează, lansează.",
       "sub_create": "Descrie un agent pentru eclozare.",
       "sub_analytics": "AI Credits, tokeni, trenduri.",
@@ -2430,6 +2432,138 @@
     "errNetwork": "Eroare de rețea — e API-ul accesibil?",
     "errCreate": "Nu am putut crea agentul. Rafinează descrierea și reîncearcă.",
     "errCreateNetwork": "Eroare de rețea la crearea agentului."
+  },
+  "missionControl": {
+    "authenticating": "Verificăm sesiunea...",
+    "signInTitle": "Autentifică-te în Mission Control",
+    "signInDescription": "Mission Control afișează taskurile private, aprobările, execuțiile și artefactele tuturor agenților tăi.",
+    "signIn": "Autentificare",
+    "eyebrow": "Operațiuni",
+    "title": "Mission Control",
+    "subtitle": "Creează, aprobă, execută și verifică taskuri punctuale pentru toți agenții.",
+    "refresh": "Reîncarcă taskurile",
+    "newTask": "Task nou",
+    "tryAgain": "Încearcă din nou",
+    "loading": "Se încarcă taskurile...",
+    "unknownAgent": "Agent necunoscut",
+    "attempt": "Încercarea {count}",
+    "noTarget": "Fără țintă",
+    "notMeasured": "Nemăsurat",
+    "required": "Necesară",
+    "notRequired": "Nu este necesară",
+    "progress": "Progresul ultimei execuții",
+    "progressUnknown": "Live",
+    "noOutput": "Această încercare nu a produs niciun rezultat.",
+    "waitingForOutput": "Așteptăm rezultatul acestei încercări.",
+    "noRuns": "Nu există încercări. Pornește taskul când este pregătit.",
+    "noApprovals": "Nu există evenimente de aprobare pentru acest task.",
+    "noArtifacts": "Nu există încă artefacte atașate.",
+    "openArtifact": "Deschide {name}",
+    "taskList": "Taskuri",
+    "summary": {
+      "label": "Rezumatul taskurilor",
+      "total": "Total",
+      "active": "Active",
+      "approval": "Necesită aprobare",
+      "completed": "Finalizate",
+      "failed": "Eșuate"
+    },
+    "filters": {
+      "label": "Filtre taskuri",
+      "agent": "Filtrează după agent",
+      "allAgents": "Toți agenții",
+      "status": "Filtrează după stare",
+      "allStatuses": "Toate"
+    },
+    "status": {
+      "ready": "Pregătit",
+      "pending_approval": "Necesită aprobare",
+      "queued": "În coadă",
+      "running": "În execuție",
+      "completed": "Finalizat",
+      "failed": "Eșuat",
+      "cancelled": "Anulat",
+      "rejected": "Respins"
+    },
+    "runStatus": {
+      "queued": "În coadă",
+      "running": "În execuție",
+      "completed": "Finalizată",
+      "failed": "Eșuată",
+      "cancelled": "Anulată"
+    },
+    "approvalStatus": {
+      "pending": "Aprobare solicitată",
+      "approved": "Aprobat",
+      "rejected": "Respins"
+    },
+    "facts": {
+      "created": "Creat",
+      "updated": "Actualizat",
+      "budget": "Țintă de buget",
+      "cost": "Cost măsurat",
+      "approval": "Aprobare",
+      "source": "Sursă",
+      "started": "Pornit",
+      "finished": "Finalizat"
+    },
+    "sections": {
+      "objective": "Obiectiv",
+      "latestRun": "Ultima încercare",
+      "approvals": "Aprobări",
+      "artifacts": "Artefacte"
+    },
+    "actions": {
+      "label": "Acțiuni task",
+      "close": "Închide",
+      "approve": "Aprobă",
+      "reject": "Respinge",
+      "start": "Pornește",
+      "cancel": "Anulează execuția",
+      "resume": "Încercare nouă",
+      "resumeHint": "Creează o încercare nouă pentru acest task. Încercarea anterioară rămâne neschimbată.",
+      "working": "Se aplică acțiunea"
+    },
+    "create": {
+      "eyebrow": "Task punctual",
+      "title": "Creează task",
+      "subtitle": "Definește un singur rezultat pentru un agent. Tu alegi când pornește execuția.",
+      "close": "Închide dialogul de creare",
+      "agent": "Agent",
+      "agentPlaceholder": "Alege un agent",
+      "taskTitle": "Titlul taskului",
+      "titlePlaceholder": "Pregătește raportul săptămânal pentru clienți",
+      "objective": "Obiectiv și criterii de acceptare",
+      "objectivePlaceholder": "Descrie rezultatul, contextul relevant și ce trebuie să conțină un răspuns complet.",
+      "objectiveHint": "Păstrează un singur rezultat în scope și include criterii concrete de acceptare.",
+      "budget": "Țintă de buget (AI Credits, opțional)",
+      "budgetPlaceholder": "Fără țintă",
+      "budgetHint": "Țintă orientativă pentru planificare și raportare. Nu este încă o limită strictă de execuție.",
+      "approval": "Necesită aprobare înainte de pornire",
+      "approvalHint": "Taskul așteaptă decizia proprietarului înainte să poată porni.",
+      "creating": "Se creează...",
+      "submit": "Creează task",
+      "requiredError": "Alege un agent și completează titlul și obiectivul.",
+      "budgetError": "Ținta de buget trebuie să fie un număr pozitiv."
+    },
+    "messages": {
+      "approve": "Task aprobat.",
+      "reject": "Task respins.",
+      "start": "Task adăugat în coada de execuție.",
+      "cancel": "Anularea a fost solicitată.",
+      "resume": "A fost creată o încercare nouă.",
+      "created": "Task creat."
+    },
+    "empty": {
+      "title": "Nu există taskuri",
+      "description": "Creează un task punctual pentru a urmări aprobarea, execuția, rezultatul și artefactele într-un singur loc.",
+      "action": "Creează primul task"
+    },
+    "filteredEmpty": {
+      "title": "Niciun task găsit",
+      "description": "Niciun task nu corespunde filtrelor de agent și stare selectate.",
+      "action": "Șterge filtrele"
+    }
   },
   "landingV3": {
     "hero": {

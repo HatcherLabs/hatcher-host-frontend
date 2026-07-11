@@ -12,7 +12,7 @@ import { clsx } from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Shield, LogOut, Settings, ChevronDown,
-  Users, Wallet, Activity, MessageSquare, Award,
+  Users, Wallet, Activity, MessageSquare, Award, ListChecks,
 } from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
@@ -184,6 +184,7 @@ export function Header() {
 
   // ── User dropdown links ──
   const USER_EXTRA_LINKS = [
+    { href: '/dashboard/missions',  label: t('missionControl'), icon: ListChecks, description: t('userMenu.sub_missionControl') },
     { href: '/dashboard/analytics', label: t('analytics'), icon: Activity, description: t('userMenu.sub_analytics') },
     { href: '/dashboard/skale',     label: t('skale'),     icon: Wallet, description: t('userMenu.sub_wallets') },
     { href: '/dashboard/team',      label: t('team'),      icon: Users, description: t('userMenu.sub_team') },
@@ -196,6 +197,7 @@ export function Header() {
   // we intentionally don't include it here.
   const MOBILE_AUTH_LINKS = [
     { href: '/dashboard/agents',    label: t('myAgents') },
+    { href: '/dashboard/missions',  label: t('missionControl') },
     { href: '/create',              label: t('create') },
     { href: '/city',                label: t('city') },
     { href: '/frameworks',          label: t('frameworks') },

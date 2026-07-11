@@ -290,6 +290,128 @@ export interface Agent {
   updatedAt?: string;
 }
 
+export type MissionTaskStatus =
+  | "ready"
+  | "pending_approval"
+  | "queued"
+  | "running"
+  | "completed"
+  | "failed"
+  | "cancelled"
+  | "rejected";
+
+export type MissionRunStatus =
+  | "queued"
+  | "running"
+  | "completed"
+  | "failed"
+  | "cancelled";
+
+export type MissionApprovalStatus = "pending" | "approved" | "rejected";
+
+export interface MissionTaskRunEvent {
+  id?: string;
+  type?: string;
+  message?: string | null;
+  progress?: number | null;
+  createdAt?: string;
+  [key: string]: unknown;
+}
+
+export interface MissionTaskRun {
+  id: string;
+  attempt: number;
+  status: MissionRunStatus;
+  output: unknown;
+  error: string | null;
+  costAiCredits: number | null;
+  claimedAt: string | null;
+  startedAt: string | null;
+  finishedAt: string | null;
+  cancelRequestedAt: string | null;
+  createdAt: string;
+  events?: MissionTaskRunEvent[];
+}
+
+export interface MissionTaskApproval {
+  id: string;
+  status: MissionApprovalStatus;
+  note: string | null;
+  requestedAt: string;
+  decidedAt: string | null;
+  decidedById: string | null;
+}
+
+export interface MissionTaskArtifact {
+  id: string;
+  runId: string;
+  kind: string;
+  name: string;
+  mediaType: string | null;
+  url: string | null;
+  path: string | null;
+  content: unknown;
+  createdAt: string;
+}
+
+export interface MissionTask {
+  id: string;
+  agentId: string;
+  agent?: Pick<Agent, "id" | "name" | "framework" | "status">;
+  title: string;
+  description: string | null;
+  prompt: string;
+  status: MissionTaskStatus;
+  source: string;
+  requiresApproval: boolean;
+  budget: {
+    aiCredits: number | null;
+    maxRuntimeSeconds: number | null;
+  };
+  cost: {
+    status: "not_measured" | "measured";
+    aiCredits: number | null;
+  };
+  createdAt: string;
+  updatedAt: string;
+  latestRun: MissionTaskRun | null;
+  approvals: MissionTaskApproval[];
+  artifacts: MissionTaskArtifact[];
+}
+
+export interface MissionTaskSummary {
+  total: number;
+  active: number;
+  awaitingApproval: number;
+  completed: number;
+  failed: number;
+  cancelled: number;
+  needsAttention?: number;
+  byStatus?: Partial<Record<MissionTaskStatus, number>>;
+  agents?: Array<{
+    agentId: string;
+    name: string;
+    active: number;
+    needsAttention: number;
+  }>;
+}
+
+export interface MissionTasksResponse {
+  tasks: MissionTask[];
+  nextCursor: string | null;
+  summary?: MissionTaskSummary;
+}
+
+export interface CreateMissionTaskBody {
+  title: string;
+  prompt: string;
+  description?: string;
+  requiresApproval?: boolean;
+  budgetAiCredits?: number;
+  maxRuntimeSeconds?: number;
+  source?: string;
+}
+
 export interface AgentCommPermission {
   id: string;
   allowedAgent: {
