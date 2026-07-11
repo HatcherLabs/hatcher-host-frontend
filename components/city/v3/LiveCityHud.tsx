@@ -5,11 +5,16 @@ import type { CityAgent, CityResponse } from '@/components/city/types';
 import type { LiveAgentMarkerLayout } from './liveLayout';
 import { cityAgentDisplayName } from './cityDisplay';
 import { agentRoomFromBuildingHref } from './cityNavigation';
+import type { CityOperationsSummary } from '@/lib/api';
+import { CityOperationsPanel } from './CityOperationsPanel';
 
 interface Props {
   counts: CityResponse['counts'] | null;
   ownedAgents: CityAgent[];
   generatedAt?: string | null;
+  operations?: CityOperationsSummary | null;
+  operationsLoading?: boolean;
+  operationsError?: boolean;
   hasMyBuilding?: boolean;
   activeAgents?: LiveAgentMarkerLayout[];
   onMyBuildingClick?: () => void;
@@ -34,6 +39,9 @@ export function LiveCityHud({
   counts,
   ownedAgents,
   generatedAt,
+  operations,
+  operationsLoading = false,
+  operationsError = false,
   hasMyBuilding = false,
   onMyBuildingClick,
   onFindMyBuildingClick,
@@ -153,6 +161,16 @@ export function LiveCityHud({
               </Link>
             ))}
           </div>
+        </div>
+      )}
+
+      {(operations || operationsLoading || operationsError) && (
+        <div className="pointer-events-auto absolute bottom-4 left-4 max-h-[calc(100vh-260px)] w-[min(360px,calc(100vw-2rem))] overflow-y-auto">
+          <CityOperationsPanel
+            summary={operations ?? null}
+            loading={operationsLoading}
+            error={operationsError}
+          />
         </div>
       )}
     </div>

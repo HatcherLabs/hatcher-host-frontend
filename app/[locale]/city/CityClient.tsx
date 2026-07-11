@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { API_URL } from '@/lib/config';
 import { useAuth } from '@/lib/auth-context';
+import { api, type CityOperationsSummary } from '@/lib/api';
 import type { CityAgent, CityResponse } from '@/components/city/types';
 import { getGlbAvatarUrl } from '@/components/agent-room/v2/stations/avatarModelConfig';
 import {
@@ -28,6 +29,9 @@ export function CityClient({ initial }: Props) {
   const { isAuthenticated, user } = useAuth();
   const [data, setData] = useState<CityResponse | null>(initial);
   const [dataFetchSettled, setDataFetchSettled] = useState(() => initial !== null);
+  const [operations, setOperations] = useState<CityOperationsSummary | null>(null);
+  const [operationsLoading, setOperationsLoading] = useState(false);
+  const [operationsError, setOperationsError] = useState(false);
   const [runtimeReady, setRuntimeReady] = useState(false);
   const [sceneReady, setSceneReady] = useState(false);
   const [avatarPreload, setAvatarPreload] = useState({
@@ -54,6 +58,50 @@ export function CityClient({ initial }: Props) {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setOperations(null);
+      setOperationsLoading(false);
+      setOperationsError(false);
+      return;
+    }
+
+    let cancelled = false;
+    let inFlight = false;
+    const load = async () => {
+      if (inFlight || document.hidden) return;
+      inFlight = true;
+      setOperationsLoading(true);
+      try {
+        const response = await api.getCityOperationsSummary();
+        if (cancelled) return;
+        if (response.success) {
+          setOperations(response.data.summary);
+          setOperationsError(false);
+        } else {
+          setOperationsError(true);
+        }
+      } catch {
+        if (!cancelled) setOperationsError(true);
+      } finally {
+        if (!cancelled) setOperationsLoading(false);
+        inFlight = false;
+      }
+    };
+
+    void load();
+    const timer = window.setInterval(() => void load(), 30_000);
+    const onVisibilityChange = () => {
+      if (!document.hidden) void load();
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  }, [isAuthenticated]);
 
   // Refresh on mount if SSR missed it (e.g. empty initial list).
   useEffect(() => {
@@ -204,6 +252,9 @@ export function CityClient({ initial }: Props) {
         counts={data?.counts ?? null}
         generatedAt={data?.generatedAt ?? null}
         pulseAts={pulseAts}
+        operations={operations}
+        operationsLoading={operationsLoading}
+        operationsError={operationsError}
         canEnterBuilding={isAuthenticated}
         viewerUsername={user?.username ?? null}
         realAvatarsEnabled={avatarPreloadComplete}

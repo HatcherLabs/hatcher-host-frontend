@@ -21,6 +21,8 @@ export type {
   SolanaRecurringTarget,
   AgentFeature,
   Agent,
+  CityOperationalAgentStatus,
+  CityOperationsSummary,
   CreateMissionTaskBody,
   MissionApprovalStatus,
   MissionRunStatus,

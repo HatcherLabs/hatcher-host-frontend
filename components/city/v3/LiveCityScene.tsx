@@ -22,6 +22,7 @@ import * as THREE from 'three';
 import { Link } from '@/i18n/routing';
 import { useRouter } from '@/i18n/routing';
 import type { CityAgent, CityResponse, CityUser } from '@/components/city/types';
+import type { CityOperationsSummary } from '@/lib/api';
 import { MobileJoystick } from '@/components/city/v2/character/MobileJoystick';
 import {
   QualityProvider,
@@ -51,6 +52,7 @@ import { LiveAgentMarkers } from './LiveAgentMarkers';
 import { LiveActivityPulses } from './LiveActivityPulses';
 import { LiveBuildings } from './LiveBuildings';
 import { LiveCityHud } from './LiveCityHud';
+import { CityOperationsPanel } from './CityOperationsPanel';
 import { DispatchCouriers } from './dispatch/DispatchCouriers';
 import { DispatchHud } from './dispatch/DispatchHud';
 import { useAuth } from '@/lib/auth-context';
@@ -76,6 +78,9 @@ interface Props {
   counts: CityResponse['counts'] | null;
   generatedAt?: string | null;
   pulseAts: Map<string, number>;
+  operations?: CityOperationsSummary | null;
+  operationsLoading?: boolean;
+  operationsError?: boolean;
   canEnterBuilding?: boolean;
   viewerUsername?: string | null;
   realAvatarsEnabled?: boolean;
@@ -160,6 +165,9 @@ export function LiveCityScene({
   counts,
   generatedAt,
   pulseAts,
+  operations = null,
+  operationsLoading = false,
+  operationsError = false,
   canEnterBuilding = false,
   viewerUsername = null,
   realAvatarsEnabled = true,
@@ -176,6 +184,9 @@ export function LiveCityScene({
         counts={counts ?? EMPTY_COUNTS}
         generatedAt={generatedAt}
         pulseAts={pulseAts}
+        operations={operations}
+        operationsLoading={operationsLoading}
+        operationsError={operationsError}
         onDashboardClick={(agentId) => router.push(agentRoomFromBuildingHref(agentId))}
         onPublicChatClick={(href) => router.push(href)}
         canEnterBuilding={canEnterBuilding}
@@ -194,6 +205,9 @@ function LiveCitySceneBody({
   counts,
   generatedAt,
   pulseAts,
+  operations = null,
+  operationsLoading = false,
+  operationsError = false,
   canEnterBuilding = false,
   viewerUsername = null,
   realAvatarsEnabled = true,
@@ -449,6 +463,9 @@ function LiveCitySceneBody({
         ownedAgents={layout.ownedAgents}
         activeAgents={layout.markers}
         generatedAt={generatedAt}
+        operations={operations}
+        operationsLoading={operationsLoading}
+        operationsError={operationsError}
         hasMyBuilding={canEnterBuilding || myBuilding !== null}
         onMyBuildingClick={onBuildingEnterClick}
         onFindMyBuildingClick={myBuilding ? focusMyBuilding : undefined}
@@ -482,6 +499,9 @@ function LiveCitySceneBody({
         ownedAgents={layout.ownedAgents}
         activeAgents={layout.markers}
         generatedAt={generatedAt}
+        operations={operations}
+        operationsLoading={operationsLoading}
+        operationsError={operationsError}
         viewMode={viewMode}
         timeMode={timeMode}
         qualityOverride={qualityControl.override}
@@ -524,6 +544,9 @@ function LiveCityMobileMenu({
   counts,
   ownedAgents,
   generatedAt,
+  operations,
+  operationsLoading,
+  operationsError,
   viewMode,
   timeMode,
   qualityOverride,
@@ -537,6 +560,9 @@ function LiveCityMobileMenu({
   ownedAgents: CityAgent[];
   activeAgents: LiveAgentMarkerLayout[];
   generatedAt?: string | null;
+  operations?: CityOperationsSummary | null;
+  operationsLoading?: boolean;
+  operationsError?: boolean;
   viewMode: 'survey' | 'walk';
   timeMode: LiveCityTimeMode;
   qualityOverride: 'auto' | 'high' | 'low';
@@ -583,6 +609,15 @@ function LiveCityMobileMenu({
           Create agent
         </Link>
       </div>
+
+      {operations || operationsLoading || operationsError ? (
+        <CityOperationsPanel
+          summary={operations ?? null}
+          loading={operationsLoading}
+          error={operationsError}
+          embedded
+        />
+      ) : null}
 
       <div className="grid gap-2">
         {hasMyBuilding && (
