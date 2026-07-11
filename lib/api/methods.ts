@@ -12,7 +12,9 @@ import {
 import type {
   Agent,
   CityOperationsSummary,
+  CommitLiftImportBody,
   CreateMissionTaskBody,
+  LiftImport,
   MissionTask,
   MissionTasksResponse,
   AgentCommCallBody,
@@ -497,6 +499,36 @@ export const api = {
   /** Private owner-only operational rollup used by Hatcher City. */
   getCityOperationsSummary: () =>
     req<{ summary: CityOperationsSummary }>("/operations/summary"),
+
+  /** Analyze an OpenClaw or Hermes ZIP without exposing archive contents to the browser. */
+  analyzeLiftImport: (file: File) => {
+    const body = new FormData();
+    body.append("file", file);
+    return req<LiftImport>("/agents/lift/analyze", {
+      method: "POST",
+      body,
+    });
+  },
+
+  /** Reload a pending Lift review, for example after a browser refresh. */
+  getLiftImport: (id: string) =>
+    req<LiftImport>(`/agents/lift/${encodeURIComponent(id)}`),
+
+  /** Discard a pending Lift review and its server-side safe manifest. */
+  deleteLiftImport: (id: string) =>
+    req<{ deleted: boolean; id: string }>(`/agents/lift/${encodeURIComponent(id)}`, {
+      method: "DELETE",
+    }),
+
+  /** Create a paused agent from only the explicitly approved Lift candidates. */
+  commitLiftImport: (id: string, body: CommitLiftImportBody) =>
+    req<{ agent: Agent; idempotent: boolean }>(
+      `/agents/lift/${encodeURIComponent(id)}/commit`,
+      {
+        method: "POST",
+        body: JSON.stringify(body),
+      },
+    ),
 
   /** List account-wide one-shot tasks for Mission Control. */
   getMissionTasks: (params: {

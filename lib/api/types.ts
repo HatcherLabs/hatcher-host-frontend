@@ -290,6 +290,79 @@ export interface Agent {
   updatedAt?: string;
 }
 
+export type LiftFramework = "openclaw" | "hermes";
+export type LiftCandidateKind = "profile" | "memory" | "skill";
+
+export interface LiftSecretFinding {
+  path: string;
+  line: number;
+  kind: string;
+  key: string;
+  fingerprint: string;
+}
+
+export interface LiftReviewCandidate {
+  id: string;
+  sourcePath: string;
+  kind: LiftCandidateKind;
+  targetPath: string;
+  sizeBytes: number;
+  eligible: boolean;
+  blockedReason?:
+    | "secrets_detected"
+    | "sensitive_path"
+    | "unsupported_content"
+    | "target_collision";
+}
+
+export interface LiftReview {
+  framework: LiftFramework;
+  profile: {
+    name?: string;
+    description?: string;
+    systemPromptPreview?: string;
+    sources: Partial<Record<"name" | "description" | "systemPrompt", string>>;
+  };
+  environmentKeys: {
+    detected: string[];
+    allowed: string[];
+    blocked: string[];
+    valuesImported: false;
+  };
+  candidates: LiftReviewCandidate[];
+  ignoredPaths: string[];
+  requiresExplicitApproval: true;
+}
+
+export interface LiftArchiveSummary {
+  compressedBytes: number;
+  expandedBytes: number;
+  entryCount: number;
+  fileCount: number;
+  retainedTextBytes: number;
+}
+
+export interface LiftImport {
+  id: string;
+  sourceFramework: LiftFramework;
+  sourceFilename: string;
+  status: string;
+  review: LiftReview;
+  secretFindings: LiftSecretFinding[];
+  archiveSummary: LiftArchiveSummary;
+  expiresAt: string;
+  committedAt: string | null;
+  appliedAt: string | null;
+  createdAgentId: string | null;
+  createdAt: string;
+}
+
+export interface CommitLiftImportBody {
+  approvedCandidateIds: string[];
+  name?: string;
+  description?: string | null;
+}
+
 export type MissionTaskStatus =
   | "ready"
   | "pending_approval"
