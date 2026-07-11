@@ -857,6 +857,7 @@
       "heading": "My agents",
       "subtitleEmpty": "Create your first agent to get started.",
       "createCta": "Create agent",
+      "importCta": "Import existing agent",
       "searchPlaceholder": "Search agents... ( / )",
       "filterAll": "All",
       "frameworkAll": "All Frameworks",
@@ -916,6 +917,123 @@
       "actionStart": "Start",
       "actionRestart": "Restart",
       "noResultsAction": "Clear filters"
+    },
+    "lift": {
+      "eyebrow": "Hatcher Lift",
+      "title": "Import an existing agent",
+      "subtitle": "Review an OpenClaw or Hermes export before creating a private, paused Hatcher agent.",
+      "backToAgents": "Back to agents",
+      "signInTitle": "Sign in required",
+      "signInBody": "Sign in to analyze and import an agent archive.",
+      "signIn": "Sign in",
+      "steps": {
+        "label": "Import progress",
+        "upload": "Upload",
+        "review": "Review",
+        "create": "Create"
+      },
+      "upload": {
+        "title": "Upload agent export",
+        "body": "Choose the ZIP exported from your existing OpenClaw or Hermes workspace. Analysis happens on Hatcher's server; the browser does not open or parse the archive.",
+        "choose": "Choose ZIP",
+        "replace": "Choose another ZIP",
+        "hint": ".zip only, up to 25 MB",
+        "selected": "Selected archive",
+        "analyze": "Analyze safely",
+        "analyzing": "Scanning archive and preparing a safe review...",
+        "analyzingBody": "This can take a moment for larger workspaces. Nothing is imported until you approve the review.",
+        "errors": {
+          "not_zip": "Choose a .zip archive.",
+          "empty": "The selected ZIP is empty.",
+          "too_large": "The ZIP exceeds the 25 MB upload limit."
+        }
+      },
+      "loading": {
+        "title": "Loading import review",
+        "body": "Retrieving the secure review created for this archive."
+      },
+      "review": {
+        "title": "Review import",
+        "body": "Only checked, eligible items will be copied into the new agent.",
+        "expires": "Review expires {date}",
+        "archive": "Archive",
+        "framework": "Framework",
+        "files": "Files scanned",
+        "expanded": "Expanded size"
+      },
+      "profile": {
+        "title": "Detected profile",
+        "name": "Name",
+        "description": "Description",
+        "systemPrompt": "System prompt preview",
+        "notFound": "Not detected"
+      },
+      "selection": {
+        "title": "Files to import",
+        "body": "Profile and memory items start selected. Custom skills require a deliberate opt-in.",
+        "selected": "{selected} of {total} eligible selected",
+        "none": "No eligible profile, memory, or skill files were found.",
+        "profile": "Profile",
+        "memory": "Memory",
+        "skill": "Custom skill",
+        "source": "Source",
+        "target": "Destination",
+        "blockedTitle": "Blocked items",
+        "blockedBody": "These items cannot be selected and will not be imported.",
+        "blockedReasons": {
+          "secrets_detected": "Contains secret-like data",
+          "sensitive_path": "Sensitive path",
+          "unsupported_content": "Unsupported content",
+          "target_collision": "Destination conflict",
+          "unknown": "Blocked by safety review"
+        }
+      },
+      "security": {
+        "title": "Secret safety review",
+        "safe": "No secret-like values were found in retained files.",
+        "found": "{count} secret-like finding",
+        "foundPlural": "{count} secret-like findings",
+        "body": "Hatcher records only location metadata and a one-way fingerprint here. Secret values are never returned to this page and are not imported.",
+        "pathLine": "{path}, line {line}",
+        "fingerprint": "Fingerprint",
+        "valuesNotImported": "Secret values are not imported"
+      },
+      "environment": {
+        "title": "Reconnect environment",
+        "body": "Environment key names may be detected for review, but their values are never imported. Reconnect provider and platform credentials from the agent's Integrations or Config tabs after import.",
+        "detected": "Detected keys",
+        "allowed": "Recognized keys",
+        "blocked": "Blocked keys",
+        "none": "No environment keys detected",
+        "notice": "Values imported: no"
+      },
+      "ignored": {
+        "title": "Ignored archive paths",
+        "body": "Excluded files remain outside the import.",
+        "more": "+{count} more"
+      },
+      "identity": {
+        "title": "New agent identity",
+        "body": "Confirm the private agent's display details. It will be created paused and will not run until you start it.",
+        "name": "Agent name",
+        "description": "Description",
+        "descriptionOptional": "Optional",
+        "nameError": "Use 3-50 letters, numbers, spaces, or basic punctuation.",
+        "pausedNotice": "Created paused. Review integrations and secrets before starting it."
+      },
+      "confirm": {
+        "label": "I reviewed the selected files and understand that credentials must be reconnected.",
+        "create": "Create paused agent",
+        "creating": "Creating paused agent..."
+      },
+      "cancel": "Cancel import",
+      "cancelling": "Cancelling...",
+      "errors": {
+        "load": "Could not load this import review.",
+        "analyze": "Could not analyze this archive.",
+        "commit": "Could not create the imported agent.",
+        "cancel": "Could not cancel this import."
+      }
     },
     "billing": {
       "eyebrow": "Account",

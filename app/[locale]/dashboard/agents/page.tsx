@@ -18,6 +18,7 @@ import {
   CheckCircle2,
   Loader2,
   Network,
+  PackageOpen,
   Play,
   RefreshCw,
   RotateCcw,
@@ -335,9 +336,14 @@ export default function MyAgentsPage() {
                     : t('agentsCountPlural', { count: total, active: activeCount }))}
             </p>
           </div>
-          <Link href="/create" className={styles.cta}>
-            {t('createCta')} <ArrowRight size={14} aria-hidden />
-          </Link>
+          <div className={styles.headerActions}>
+            <Link href="/dashboard/agents/import" className={styles.secondaryCta}>
+              <PackageOpen size={14} aria-hidden /> {t('importCta')}
+            </Link>
+            <Link href="/create" className={styles.cta}>
+              {t('createCta')} <ArrowRight size={14} aria-hidden />
+            </Link>
+          </div>
         </header>
 
         {/* Stats strip */}

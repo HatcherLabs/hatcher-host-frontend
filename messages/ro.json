@@ -857,6 +857,7 @@
       "heading": "Agenții mei",
       "subtitleEmpty": "Creează primul tău agent pentru a începe.",
       "createCta": "Creează agent",
+      "importCta": "Importă agent existent",
       "searchPlaceholder": "Caută agenți... ( / )",
       "filterAll": "Toți",
       "frameworkAll": "Toate Frameworks",
@@ -916,6 +917,123 @@
       "actionStart": "Pornește",
       "actionRestart": "Repornește",
       "noResultsAction": "Șterge filtrele"
+    },
+    "lift": {
+      "eyebrow": "Hatcher Lift",
+      "title": "Importă un agent existent",
+      "subtitle": "Verifică un export OpenClaw sau Hermes înainte de a crea un agent Hatcher privat și oprit.",
+      "backToAgents": "Înapoi la agenți",
+      "signInTitle": "Autentificare necesară",
+      "signInBody": "Autentifică-te pentru a analiza și importa arhiva unui agent.",
+      "signIn": "Autentificare",
+      "steps": {
+        "label": "Progres import",
+        "upload": "Încarcă",
+        "review": "Verifică",
+        "create": "Creează"
+      },
+      "upload": {
+        "title": "Încarcă exportul agentului",
+        "body": "Alege arhiva ZIP exportată din workspace-ul OpenClaw sau Hermes. Analiza are loc pe serverele Hatcher; browserul nu deschide și nu parsează arhiva.",
+        "choose": "Alege ZIP",
+        "replace": "Alege alt ZIP",
+        "hint": "doar .zip, maximum 25 MB",
+        "selected": "Arhivă selectată",
+        "analyze": "Analizează în siguranță",
+        "analyzing": "Scanăm arhiva și pregătim verificarea de siguranță...",
+        "analyzingBody": "Workspace-urile mai mari pot dura puțin. Nimic nu este importat până nu aprobi verificarea.",
+        "errors": {
+          "not_zip": "Alege o arhivă .zip.",
+          "empty": "Arhiva ZIP selectată este goală.",
+          "too_large": "Arhiva ZIP depășește limita de 25 MB."
+        }
+      },
+      "loading": {
+        "title": "Se încarcă verificarea importului",
+        "body": "Preluăm verificarea securizată creată pentru această arhivă."
+      },
+      "review": {
+        "title": "Verifică importul",
+        "body": "Doar elementele eligibile și bifate vor fi copiate în noul agent.",
+        "expires": "Verificarea expiră la {date}",
+        "archive": "Arhivă",
+        "framework": "Framework",
+        "files": "Fișiere scanate",
+        "expanded": "Dimensiune extrasă"
+      },
+      "profile": {
+        "title": "Profil detectat",
+        "name": "Nume",
+        "description": "Descriere",
+        "systemPrompt": "Previzualizare system prompt",
+        "notFound": "Nedetectat"
+      },
+      "selection": {
+        "title": "Fișiere de importat",
+        "body": "Profilul și memoriile sunt selectate inițial. Skill-urile custom necesită aprobare deliberată.",
+        "selected": "{selected} din {total} eligibile selectate",
+        "none": "Nu au fost găsite fișiere eligibile de profil, memorie sau skill.",
+        "profile": "Profil",
+        "memory": "Memorie",
+        "skill": "Skill custom",
+        "source": "Sursă",
+        "target": "Destinație",
+        "blockedTitle": "Elemente blocate",
+        "blockedBody": "Aceste elemente nu pot fi selectate și nu vor fi importate.",
+        "blockedReasons": {
+          "secrets_detected": "Conține date care par secrete",
+          "sensitive_path": "Cale sensibilă",
+          "unsupported_content": "Conținut nesuportat",
+          "target_collision": "Conflict la destinație",
+          "unknown": "Blocat de verificarea de siguranță"
+        }
+      },
+      "security": {
+        "title": "Verificare de securitate pentru secrete",
+        "safe": "Nu au fost găsite valori care par secrete în fișierele reținute.",
+        "found": "{count} posibil secret găsit",
+        "foundPlural": "{count} posibile secrete găsite",
+        "body": "Hatcher afișează aici doar locația și un fingerprint one-way. Valorile secrete nu sunt trimise niciodată acestei pagini și nu sunt importate.",
+        "pathLine": "{path}, linia {line}",
+        "fingerprint": "Fingerprint",
+        "valuesNotImported": "Valorile secrete nu sunt importate"
+      },
+      "environment": {
+        "title": "Reconectează mediul",
+        "body": "Numele cheilor de mediu pot fi detectate pentru verificare, dar valorile lor nu sunt importate. Reconectează credentialele providerilor și platformelor din taburile Integrations sau Config după import.",
+        "detected": "Chei detectate",
+        "allowed": "Chei recunoscute",
+        "blocked": "Chei blocate",
+        "none": "Nu au fost detectate chei de mediu",
+        "notice": "Valori importate: nu"
+      },
+      "ignored": {
+        "title": "Căi ignorate din arhivă",
+        "body": "Fișierele excluse rămân în afara importului.",
+        "more": "+ încă {count}"
+      },
+      "identity": {
+        "title": "Identitatea noului agent",
+        "body": "Confirmă detaliile agentului privat. Va fi creat oprit și nu va rula până când îl pornești.",
+        "name": "Numele agentului",
+        "description": "Descriere",
+        "descriptionOptional": "Opțional",
+        "nameError": "Folosește 3-50 de litere, cifre, spații sau semne de punctuație simple.",
+        "pausedNotice": "Creat oprit. Verifică integrările și secretele înainte să îl pornești."
+      },
+      "confirm": {
+        "label": "Am verificat fișierele selectate și înțeleg că credentialele trebuie reconectate.",
+        "create": "Creează agentul oprit",
+        "creating": "Se creează agentul oprit..."
+      },
+      "cancel": "Anulează importul",
+      "cancelling": "Se anulează...",
+      "errors": {
+        "load": "Nu am putut încărca verificarea acestui import.",
+        "analyze": "Nu am putut analiza această arhivă.",
+        "commit": "Nu am putut crea agentul importat.",
+        "cancel": "Nu am putut anula acest import."
+      }
     },
     "billing": {
       "eyebrow": "Cont",
