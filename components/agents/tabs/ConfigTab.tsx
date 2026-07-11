@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { memo, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSearchParams } from 'next/navigation';
 import {
@@ -30,6 +30,8 @@ import {
   MessageSquare,
   Search,
   SlidersHorizontal,
+  Layers3,
+  List,
 } from 'lucide-react';
 import { BYOK_PROVIDERS } from '@hatcher/shared';
 import { api } from '@/lib/api';
@@ -95,6 +97,7 @@ type EnvVarEntry = {
 
 type ModelSortKey = 'name' | 'provider' | 'context' | 'cost' | 'privacy';
 type SortDirection = 'asc' | 'desc';
+type ModelCatalogView = 'providers' | 'models';
 type ModelPreset = {
   id: string;
   name: string;
@@ -247,6 +250,76 @@ function hostedCostClass(cost: HostedModelCost): string {
   }
 }
 
+const HostedModelRow = memo(function HostedModelRow({
+  model,
+  selected,
+  active,
+  onSelect,
+}: {
+  model: HostedModelOption;
+  selected: boolean;
+  active: boolean;
+  onSelect: (modelId: string) => void;
+}) {
+  const partnerHosted = hostedModelPrivacy(model) === 'partner';
+
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(model.id)}
+      className={`grid w-full gap-3 border-b border-[var(--border-subtle)] px-4 py-3 text-left transition-colors last:border-b-0 md:grid-cols-[1.35fr,0.72fr,1fr,0.72fr,0.9fr,auto] ${
+        selected
+          ? 'bg-[var(--accent-primary)]/10'
+          : 'hover:bg-[var(--bg-panel)]'
+      }`}
+      title={model.description}
+    >
+      <span className="min-w-0">
+        <span className="flex items-center gap-2">
+          <span className="truncate text-sm font-medium text-[var(--text-primary)]">{model.name}</span>
+          {model.fixedPrice && (
+            <span className="rounded border border-[var(--color-success-border)] bg-[var(--color-success-bg)] px-1.5 py-0.5 text-[10px] text-[var(--color-success)]">
+              fixed
+            </span>
+          )}
+        </span>
+        <span className="mt-0.5 block truncate text-xs text-[var(--text-tertiary)]">
+          {model.provider} · {hostedModelRoute(model)}
+        </span>
+      </span>
+      <span className="inline-flex h-fit w-fit items-center gap-1.5 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-panel)] px-2 py-1 text-xs text-[var(--text-secondary)]">
+        {model.context}
+      </span>
+      <span className="flex flex-wrap gap-1.5">
+        {hostedModelTags(model).slice(0, 3).map((tag) => (
+          <span key={tag} className="inline-flex items-center gap-1 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-panel)] px-1.5 py-0.5 text-[10px] text-[var(--text-secondary)]">
+            {tagIcon(tag)}
+            {tag}
+          </span>
+        ))}
+      </span>
+      <span
+        className={`inline-flex h-fit w-fit rounded-md border px-2 py-1 text-xs ${hostedCostClass(model.cost)}`}
+        title={model.priceLabel ? 'Provider catalog metadata; final AI Credit billing uses Hatcher metering and settlement.' : undefined}
+      >
+        {model.fixedPrice ?? model.priceLabel ?? model.cost}
+      </span>
+      <span
+        className="inline-flex h-fit items-center gap-1.5 text-xs text-[var(--text-secondary)]"
+        title={partnerHosted
+          ? 'Partner inference route. AceData and OpenServ can fall back to OpenRouter; IDLE and Virtuals use dedicated routes.'
+          : 'Hatcher-managed provider network with UsePod primary and OpenRouter fallback.'}
+      >
+        <Info className="h-3 w-3" />
+        {partnerHosted ? 'Partner route' : 'Hatcher network'}
+      </span>
+      <span className={`text-xs font-medium ${selected || active ? 'text-[var(--accent-primary)]' : 'text-[var(--text-tertiary)]'} md:text-right`}>
+        {active ? 'Active' : selected ? 'Selected' : 'Select'}
+      </span>
+    </button>
+  );
+});
+
 function isHostedModelOption(value: unknown): value is HostedModelOption {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
   const source = value as Record<string, unknown>;
@@ -311,6 +384,7 @@ export function ConfigTab() {
   const [modelCostRange, setModelCostRange] = useState<[number, number]>([1, 5]);
   const [modelPrivacyFilter, setModelPrivacyFilter] = useState<HostedModelPrivacy | 'all'>('all');
   const [modelSort, setModelSort] = useState<{ key: ModelSortKey; direction: SortDirection }>({ key: 'name', direction: 'asc' });
+  const [modelCatalogView, setModelCatalogView] = useState<ModelCatalogView>('providers');
   const [modelPresets, setModelPresets] = useState<ModelPreset[]>([]);
   const [presetName, setPresetName] = useState('');
   const [presetDescription, setPresetDescription] = useState('');
@@ -422,6 +496,66 @@ export function ConfigTab() {
     },
     [availableHostedModels, modelCostRange, modelPrivacyFilter, modelSearch, modelSort.direction, modelSort.key, selectedProviderFilters, selectedTagFilters],
   );
+  const hostedRouteStats = useMemo(() => {
+    const stats = new Map<HostedModelPrivacy, { models: number; providers: Set<string> }>([
+      ['hatcher', { models: 0, providers: new Set<string>() }],
+      ['partner', { models: 0, providers: new Set<string>() }],
+    ]);
+    for (const model of availableHostedModels) {
+      const route = hostedModelPrivacy(model);
+      const routeStats = stats.get(route)!;
+      routeStats.models += 1;
+      routeStats.providers.add(model.providerKey);
+    }
+    return stats;
+  }, [availableHostedModels]);
+  const groupedHostedModelRoutes = useMemo(() => {
+    const providerOrder = new Map(hostedModelProviders.map((provider, index) => [provider.key, index]));
+    const providerMetaByKey = new Map(hostedModelProviders.map((provider) => [provider.key, provider]));
+    const routeLabels: Record<HostedModelPrivacy, { title: string; description: string }> = {
+      hatcher: {
+        title: 'Hatcher network',
+        description: 'UsePod primary · OpenRouter fallback',
+      },
+      partner: {
+        title: 'Partner provider routes',
+        description: 'Partner primary · Hatcher fallback where configured',
+      },
+    };
+
+    return (['hatcher', 'partner'] as const).map((route) => {
+      const providers = new Map<string, {
+        key: string;
+        name: string;
+        description: string;
+        models: HostedModelOption[];
+      }>();
+
+      for (const model of filteredHostedModels) {
+        if (hostedModelPrivacy(model) !== route) continue;
+        const providerMeta = providerMetaByKey.get(model.providerKey);
+        const existing = providers.get(model.providerKey);
+        if (existing) {
+          existing.models.push(model);
+          continue;
+        }
+        providers.set(model.providerKey, {
+          key: model.providerKey,
+          name: providerMeta?.name ?? model.provider,
+          description: providerMeta?.description ?? model.description,
+          models: [model],
+        });
+      }
+
+      return {
+        route,
+        ...routeLabels[route],
+        providers: Array.from(providers.values()).sort(
+          (a, b) => (providerOrder.get(a.key) ?? Number.MAX_SAFE_INTEGER) - (providerOrder.get(b.key) ?? Number.MAX_SAFE_INTEGER),
+        ),
+      };
+    }).filter((group) => group.providers.length > 0);
+  }, [filteredHostedModels, hostedModelProviders]);
   const virtualsModelStatusLabel = virtualsModelStatus === 'ready'
     ? `Virtuals: ${liveVirtualsModels.length} models`
     : virtualsModelStatus === 'loading'
@@ -981,6 +1115,56 @@ export function ConfigTab() {
 
         {isHostedMode ? (
           <div className="space-y-4">
+            <div className="grid gap-3 md:grid-cols-2">
+              {([
+                {
+                  key: 'hatcher' as const,
+                  title: 'Hatcher provider network',
+                  description: 'UsePod primary · OpenRouter fallback',
+                  detail: 'The common model catalog with automatic provider failover.',
+                  icon: <Globe2 className="h-4 w-4" />,
+                },
+                {
+                  key: 'partner' as const,
+                  title: 'Partner provider routes',
+                  description: 'IDLE · AceData · OpenServ · Virtuals',
+                  detail: 'Partner-primary inference, with OpenRouter fallback where configured.',
+                  icon: <ShieldCheck className="h-4 w-4" />,
+                },
+              ]).map((route) => {
+                const stats = hostedRouteStats.get(route.key)!;
+                const active = modelPrivacyFilter === route.key;
+                return (
+                  <button
+                    key={route.key}
+                    type="button"
+                    onClick={() => setModelPrivacyFilter(active ? 'all' : route.key)}
+                    className={`rounded-xl border p-4 text-left transition-colors ${
+                      active
+                        ? 'border-[var(--accent-primary)]/50 bg-[var(--accent-primary)]/10'
+                        : 'border-[var(--border-subtle)] bg-[var(--bg-muted)] hover:border-[var(--accent-primary)]/30'
+                    }`}
+                    aria-pressed={active}
+                  >
+                    <span className="flex items-start justify-between gap-3">
+                      <span className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
+                        <span className="text-[var(--accent-primary)]">{route.icon}</span>
+                        {route.title}
+                      </span>
+                      <span className="rounded-md border border-[var(--border-subtle)] bg-[var(--bg-panel)] px-2 py-1 text-[10px] font-medium text-[var(--text-secondary)]">
+                        {stats.models} models
+                      </span>
+                    </span>
+                    <span className="mt-2 block text-xs font-medium text-[var(--text-secondary)]">{route.description}</span>
+                    <span className="mt-1 block text-xs leading-relaxed text-[var(--text-tertiary)]">{route.detail}</span>
+                    <span className="mt-2 block text-[10px] uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
+                      {stats.providers.size} {stats.providers.size === 1 ? 'provider' : 'providers'}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
             <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-4">
               <div className="grid gap-4 lg:grid-cols-[0.9fr,1.1fr]">
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
@@ -1015,19 +1199,22 @@ export function ConfigTab() {
                     >
                       {formatContextTokens(selectedHostedContextTokens)} / {formatContextTokens(maxHostedContextTokens)}
                     </span>
-                    <span className={`rounded border px-2 py-1 ${hostedCostClass(selectedHostedModel.cost)}`}>
-                      {selectedHostedModel.fixedPrice ?? hostedCostEstimate(selectedHostedModel.cost)}
+                    <span
+                      className={`rounded border px-2 py-1 ${hostedCostClass(selectedHostedModel.cost)}`}
+                      title={selectedHostedModel.priceLabel ? 'Provider catalog metadata; final AI Credit billing uses Hatcher metering and settlement.' : undefined}
+                    >
+                      {selectedHostedModel.fixedPrice ?? selectedHostedModel.priceLabel ?? hostedCostEstimate(selectedHostedModel.cost)}
                     </span>
                     <span
                       className="inline-flex items-center gap-1.5 rounded border border-[var(--border-subtle)] bg-[var(--bg-panel)] px-2 py-1"
                       title={selectedHostedModel.providerKey === 'xiaomi'
                         ? 'Inference routes through UsePod with OpenRouter fallback for Xiaomi MiMo. AI Credit billing applies.'
                         : selectedHostedModel.providerKey === 'acedata'
-                          ? 'Inference routes through AceData first with OpenRouter fallback when needed. Review partner policy before using sensitive data.'
+                          ? 'Inference routes through AceData first, with OpenRouter fallback when needed. Review partner policy before using sensitive data.'
                         : selectedHostedModel.providerKey === 'virtuals'
                           ? 'Inference routes through Virtuals Compute with the Hatcher server-side Virtuals key. Review Virtuals policy before using sensitive data.'
                         : selectedHostedModel.providerKey === 'openserv'
-                          ? 'Inference routes through OpenServ first with OpenRouter fallback when needed. Review partner policy before using sensitive data.'
+                          ? 'Inference routes through OpenServ first, with OpenRouter fallback when needed. Review partner policy before using sensitive data.'
                         : hostedModelPrivacy(selectedHostedModel) === 'partner'
                           ? 'Inference happens through an explicit partner route such as IDLE. Review partner policy before using sensitive data.'
                           : 'Inference is routed through Hatcher managed infrastructure, currently UsePod first with OpenRouter fallback.'}
@@ -1336,101 +1523,149 @@ export function ConfigTab() {
             </div>
 
             <div className="overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)]">
+              <div className="flex flex-col gap-3 border-b border-[var(--border-subtle)] bg-[var(--bg-panel)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-[var(--text-primary)]">
+                    {filteredHostedModels.length} managed {filteredHostedModels.length === 1 ? 'model' : 'models'}
+                  </p>
+                  <p className="mt-0.5 text-xs text-[var(--text-tertiary)]">
+                    Provider view separates the Hatcher network from partner-primary routes.
+                  </p>
+                </div>
+                <div className="inline-flex self-start overflow-hidden rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-muted)] text-xs sm:self-auto">
+                  <button
+                    type="button"
+                    onClick={() => setModelCatalogView('providers')}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 transition-colors ${
+                      modelCatalogView === 'providers'
+                        ? 'bg-[var(--accent-primary)]/10 text-[var(--text-primary)]'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                    }`}
+                    aria-pressed={modelCatalogView === 'providers'}
+                  >
+                    <Layers3 className="h-3.5 w-3.5" />
+                    By provider
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setModelCatalogView('models')}
+                    className={`inline-flex items-center gap-1.5 border-l border-[var(--border-subtle)] px-3 py-1.5 transition-colors ${
+                      modelCatalogView === 'models'
+                        ? 'bg-[var(--accent-primary)]/10 text-[var(--text-primary)]'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                    }`}
+                    aria-pressed={modelCatalogView === 'models'}
+                  >
+                    <List className="h-3.5 w-3.5" />
+                    All models
+                  </button>
+                </div>
+              </div>
               <div className="hidden grid-cols-[1.35fr,0.72fr,1fr,0.72fr,0.9fr,auto] gap-3 border-b border-[var(--border-subtle)] px-4 py-2 text-[11px] uppercase tracking-[0.08em] text-[var(--text-tertiary)] md:grid">
-                {([
-                  ['name', 'Provider / Model'],
-                  ['context', 'Context Window'],
-                ] as Array<[ModelSortKey, string]>).map(([key, label]) => (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => toggleModelSort(key)}
-                    className="text-left transition-colors hover:text-[var(--text-secondary)]"
-                  >
-                    {label}
-                    {modelSort.key === key && <span className="ml-1">{modelSort.direction === 'asc' ? '↑' : '↓'}</span>}
-                  </button>
-                ))}
-                <span>Strengths</span>
-                {([
-                  ['cost', 'Cost'],
-                  ['privacy', 'Privacy'],
-                ] as Array<[ModelSortKey, string]>).map(([key, label]) => (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => toggleModelSort(key)}
-                    className="text-left transition-colors hover:text-[var(--text-secondary)]"
-                  >
-                    {label}
-                    {modelSort.key === key && <span className="ml-1">{modelSort.direction === 'asc' ? '↑' : '↓'}</span>}
-                  </button>
-                ))}
-                <span className="text-right">Status</span>
+                {modelCatalogView === 'models' ? (
+                  <>
+                    {([
+                      ['name', 'Provider / Model'],
+                      ['context', 'Context Window'],
+                    ] as Array<[ModelSortKey, string]>).map(([key, label]) => (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => toggleModelSort(key)}
+                        className="text-left transition-colors hover:text-[var(--text-secondary)]"
+                      >
+                        {label}
+                        {modelSort.key === key && <span className="ml-1">{modelSort.direction === 'asc' ? '↑' : '↓'}</span>}
+                      </button>
+                    ))}
+                    <span>Strengths</span>
+                    {([
+                      ['cost', 'Cost'],
+                      ['privacy', 'Route'],
+                    ] as Array<[ModelSortKey, string]>).map(([key, label]) => (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => toggleModelSort(key)}
+                        className="text-left transition-colors hover:text-[var(--text-secondary)]"
+                      >
+                        {label}
+                        {modelSort.key === key && <span className="ml-1">{modelSort.direction === 'asc' ? '↑' : '↓'}</span>}
+                      </button>
+                    ))}
+                    <span className="text-right">Status</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Provider / Model</span>
+                    <span>Context Window</span>
+                    <span>Strengths</span>
+                    <span>Cost</span>
+                    <span>Route</span>
+                    <span className="text-right">Status</span>
+                  </>
+                )}
               </div>
               <div className="max-h-[430px] overflow-y-auto">
                 {filteredHostedModels.length === 0 ? (
                   <div className="p-4 text-sm text-[var(--text-secondary)]">
                     No hosted models match these filters.
                   </div>
-                ) : (
-                  filteredHostedModels.map((model) => {
-                    const selected = model.id === selectedHostedModel.id;
-                    const savedActive = savedHostedModel?.id === model.id;
-                    return (
-                      <button
-                        key={model.id}
-                        type="button"
-                        onClick={() => selectHostedModel(model.id)}
-                        className={`grid w-full gap-3 border-b border-[var(--border-subtle)] px-4 py-3 text-left transition-colors last:border-b-0 md:grid-cols-[1.35fr,0.72fr,1fr,0.72fr,0.9fr,auto] ${
-                          selected
-                            ? 'bg-[var(--accent-primary)]/10'
-                            : 'hover:bg-[var(--bg-panel)]'
-                        }`}
-                        title={model.description}
-                      >
+                ) : modelCatalogView === 'providers' ? (
+                  groupedHostedModelRoutes.map((routeGroup) => (
+                    <div key={routeGroup.route}>
+                      <div className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-[var(--border-subtle)] bg-[var(--bg-panel)] px-4 py-2.5 shadow-sm">
                         <span className="min-w-0">
-                          <span className="flex items-center gap-2">
-                            <span className="truncate text-sm font-medium text-[var(--text-primary)]">{model.name}</span>
-                            {model.fixedPrice && (
-                              <span className="rounded border border-[var(--color-success-border)] bg-[var(--color-success-bg)] px-1.5 py-0.5 text-[10px] text-[var(--color-success)]">
-                                fixed
+                          <span className="block text-xs font-semibold uppercase tracking-[0.08em] text-[var(--text-primary)]">
+                            {routeGroup.title}
+                          </span>
+                          <span className="mt-0.5 block truncate text-[10px] text-[var(--text-tertiary)]">
+                            {routeGroup.description}
+                          </span>
+                        </span>
+                        <span className="flex-shrink-0 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-muted)] px-2 py-1 text-[10px] text-[var(--text-secondary)]">
+                          {routeGroup.providers.reduce((total, provider) => total + provider.models.length, 0)} models
+                        </span>
+                      </div>
+                      {routeGroup.providers.map((providerGroup) => (
+                        <div key={providerGroup.key}>
+                          <div className="flex items-center justify-between gap-3 border-b border-[var(--border-subtle)] bg-[var(--bg-muted)] px-4 py-2">
+                            <span className="flex min-w-0 items-center gap-2">
+                              <span className="inline-flex h-6 min-w-6 flex-shrink-0 items-center justify-center rounded-md border border-[var(--border-subtle)] bg-[var(--bg-panel)] px-1 text-[9px] font-bold text-[var(--text-secondary)]">
+                                {PROVIDER_GLYPH[providerGroup.key] ?? providerGroup.name.slice(0, 1)}
                               </span>
-                            )}
-                          </span>
-                          <span className="mt-0.5 block truncate text-xs text-[var(--text-tertiary)]">
-                            {model.provider} · {hostedModelRoute(model)}
-                          </span>
-                        </span>
-                        <span className="inline-flex h-fit w-fit items-center gap-1.5 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-panel)] px-2 py-1 text-xs text-[var(--text-secondary)]">
-                          {model.context}
-                        </span>
-                        <span className="flex flex-wrap gap-1.5">
-                          {hostedModelTags(model).slice(0, 3).map((tag) => (
-                            <span key={tag} className="inline-flex items-center gap-1 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-panel)] px-1.5 py-0.5 text-[10px] text-[var(--text-secondary)]">
-                              {tagIcon(tag)}
-                              {tag}
+                              <span className="min-w-0">
+                                <span className="block truncate text-xs font-semibold text-[var(--text-primary)]">{providerGroup.name}</span>
+                                <span className="block truncate text-[10px] text-[var(--text-tertiary)]">{providerGroup.description}</span>
+                              </span>
                             </span>
+                            <span className="flex-shrink-0 text-[10px] text-[var(--text-tertiary)]">
+                              {providerGroup.models.length}
+                            </span>
+                          </div>
+                          {providerGroup.models.map((model) => (
+                            <HostedModelRow
+                              key={model.id}
+                              model={model}
+                              selected={model.id === selectedHostedModel.id}
+                              active={savedHostedModel?.id === model.id}
+                              onSelect={selectHostedModel}
+                            />
                           ))}
-                        </span>
-                        <span className={`inline-flex h-fit w-fit rounded-md border px-2 py-1 text-xs ${hostedCostClass(model.cost)}`}>
-                          {model.fixedPrice ?? model.cost}
-                        </span>
-                        <span
-                          className="inline-flex h-fit items-center gap-1.5 text-xs text-[var(--text-secondary)]"
-                          title={hostedModelPrivacy(model) === 'partner'
-                            ? 'Partner-hosted inference. IDLE, AceData, OpenServ, and Virtuals use explicit partner routes; Xiaomi MiMo is routed through UsePod/OpenRouter.'
-                            : 'Hatcher-managed route. UsePod primary with OpenRouter fallback where needed.'}
-                        >
-                          <Info className="h-3 w-3" />
-                          {hostedModelPrivacy(model) === 'partner' ? 'Partner-hosted' : 'Hatcher-hosted'}
-                        </span>
-                        <span className={`text-xs font-medium ${selected || savedActive ? 'text-[var(--accent-primary)]' : 'text-[var(--text-tertiary)]'} md:text-right`}>
-                          {savedActive ? 'Active' : selected ? 'Selected' : 'Select'}
-                        </span>
-                      </button>
-                    );
-                  })
+                        </div>
+                      ))}
+                    </div>
+                  ))
+                ) : (
+                  filteredHostedModels.map((model) => (
+                    <HostedModelRow
+                      key={model.id}
+                      model={model}
+                      selected={model.id === selectedHostedModel.id}
+                      active={savedHostedModel?.id === model.id}
+                      onSelect={selectHostedModel}
+                    />
+                  ))
                 )}
               </div>
             </div>
