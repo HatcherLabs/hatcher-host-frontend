@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import type { Agent, AgentCommCandidate, AgentCommLog } from '@/lib/api';
 import { timeAgo } from '@/lib/utils';
+import { agentWorkspaceHref } from '@/lib/agent-workspace';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { getAgentTaskTemplates } from '@/components/agents/tabs/developerWorkflows';
 import { AgentStatusPill } from '@/components/ui/AgentStatusPill';
@@ -17,7 +18,9 @@ import {
   BrainCircuit,
   CheckCircle2,
   Loader2,
+  ListChecks,
   Network,
+  PackageCheck,
   PackageOpen,
   Play,
   RefreshCw,
@@ -54,6 +57,8 @@ export default function MyAgentsPage() {
   const t  = useTranslations('dashboard.agents');
   const tc = useTranslations('dashboard.common');
   const tStatus = useTranslations('shared.agentStatus');
+  const tMission = useTranslations('missionControl');
+  const tOutcome = useTranslations('outcomePacks');
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
@@ -337,6 +342,12 @@ export default function MyAgentsPage() {
             </p>
           </div>
           <div className={styles.headerActions}>
+            <Link href="/dashboard/missions" className={styles.secondaryCta}>
+              <ListChecks size={14} aria-hidden /> {tMission('title')}
+            </Link>
+            <Link href="/dashboard/outcome-packs" className={styles.secondaryCta}>
+              <PackageCheck size={14} aria-hidden /> {tOutcome('title')}
+            </Link>
             <Link href="/dashboard/agents/import" className={styles.secondaryCta}>
               <PackageOpen size={14} aria-hidden /> {t('importCta')}
             </Link>
@@ -853,6 +864,18 @@ export default function MyAgentsPage() {
                 <div className={styles.inspectorActions}>
                   <Link href={`/dashboard/agent/${selectedAgent.id}`} className={`${styles.actionBtn} ${styles.primary}`}>
                     Open workspace <ArrowRight size={13} />
+                  </Link>
+                  <Link
+                    href={agentWorkspaceHref('/dashboard/missions', selectedAgent.id)}
+                    className={styles.actionBtn}
+                  >
+                    <ListChecks size={12} aria-hidden /> {tMission('title')}
+                  </Link>
+                  <Link
+                    href={agentWorkspaceHref('/dashboard/outcome-packs', selectedAgent.id)}
+                    className={styles.actionBtn}
+                  >
+                    <PackageCheck size={12} aria-hidden /> {tOutcome('title')}
                   </Link>
                   <Link
                     href={`/agent/${selectedAgent.slug ?? selectedAgent.id}/room?from=agents`}

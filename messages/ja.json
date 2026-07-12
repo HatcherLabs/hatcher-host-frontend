@@ -2486,6 +2486,7 @@
     },
     "content": {
       "categories": {
+        "markets": "市場・トレーディング",
         "research": "リサーチ",
         "engineering": "エンジニアリング",
         "monitoring": "モニタリング",
@@ -2495,7 +2496,9 @@
         "x": "X",
         "linkedin": "LinkedIn",
         "blog": "ブログ",
-        "email": "メール"
+        "email": "メール",
+        "long": "ロング",
+        "short": "ショート"
       },
       "artifactKinds": {
         "text": "テキスト",
@@ -2511,6 +2514,65 @@
         "schedules_disabled": "{count, plural, one {#件のスケジュールテンプレートを準備しましたが、無効のままです。} other {#件のスケジュールテンプレートを準備しましたが、無効のままです。}}"
       },
       "packs": {
+        "marketPulse": {
+          "title": "マーケットパルス",
+          "summary": "選択した資産について、タイムスタンプ付きの市場概要と注視すべきシグナルを作成します。",
+          "fields": {
+            "assets": "資産",
+            "horizon": "時間軸",
+            "focus": "分析の焦点",
+            "watchSignals": "注視するシグナル",
+            "outputLanguage": "出力言語"
+          },
+          "deliverables": {
+            "deliverable-1": "タイムスタンプ付きマーケットパルス",
+            "deliverable-2": "優先順位付きのシグナルとリスク"
+          },
+          "manualAcceptance": "市場所見にタイムスタンプとデータソースが含まれていること。",
+          "schedules": {
+            "daily-market-pulse": "日次マーケットパルス"
+          },
+          "taskTitle": "マーケットパルス",
+          "taskDescription": "選択した資産について、タイムスタンプ付きの市場データとリスク概要を作成します。"
+        },
+        "tradePlanReview": {
+          "title": "取引計画レビュー",
+          "summary": "ユーザーが提示した取引仮説を、取引の発注や管理を行わずにストレステストします。",
+          "fields": {
+            "asset": "資産",
+            "network": "ネットワークまたは取引所",
+            "direction": "売買方向",
+            "capitalAmount": "資金額",
+            "capitalCurrency": "資金の通貨",
+            "maxLossPercent": "最大損失（資金の%）",
+            "horizon": "時間軸",
+            "thesis": "取引仮説"
+          },
+          "deliverables": {
+            "deliverable-1": "取引計画のリスクレビュー",
+            "deliverable-2": "人による確認済みシナリオチェックリスト"
+          },
+          "manualAcceptance": "ポジションサイズの前提と無効化条件が明示されていること。",
+          "taskTitle": "取引計画レビュー",
+          "taskDescription": "ユーザーが提示した取引計画のリスク、前提、シナリオをレビューします。"
+        },
+        "portfolioRiskReview": {
+          "title": "ポートフォリオリスクレビュー",
+          "summary": "ユーザーが提示した保有資産について、集中度、流動性、下落リスクを評価します。",
+          "fields": {
+            "holdings": "保有資産と配分（資産: 25%、1行に1件）",
+            "baseCurrency": "基準通貨",
+            "objective": "ポートフォリオの目的",
+            "constraints": "制約"
+          },
+          "deliverables": {
+            "deliverable-1": "ポートフォリオリスク概要",
+            "deliverable-2": "人による確認済みリバランス案"
+          },
+          "manualAcceptance": "選択肢がユーザーの提示した目的と制約に沿っていること。",
+          "taskTitle": "ポートフォリオリスクレビュー",
+          "taskDescription": "ユーザーが提示した保有資産を評価し、人による確認を前提としたリスク対応案を提示します。"
+        },
         "researchReport": {
           "title": "調査レポート",
           "summary": "焦点を絞ったテーマについて、出典に基づく意思決定に使える調査レポートを作成します。",
@@ -2648,6 +2710,8 @@
       "schedules": "提案スケジュール",
       "scheduleOff": "オフ",
       "scheduleNotice": "起動時もスケジュールは無効で、別途確認が必要です。",
+      "manualReviewTitle": "オーナーのレビューが必要です",
+      "manualReviewDescription": "完了した結果は、オーナーが承認または却下するまでMission Controlに残ります。",
       "setup": {
         "connectors": "Connectorsを開く",
         "dev": "開発者設定を開く",
@@ -2910,6 +2974,7 @@
     "status": {
       "ready": "Ready",
       "pending_approval": "Needs approval",
+      "pending_review": "レビュー待ち",
       "queued": "Queued",
       "running": "Running",
       "completed": "Completed",

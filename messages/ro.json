@@ -2659,6 +2659,7 @@
     "status": {
       "ready": "Pregătit",
       "pending_approval": "Necesită aprobare",
+      "pending_review": "În așteptarea verificării",
       "queued": "În coadă",
       "running": "În execuție",
       "completed": "Finalizat",
@@ -2757,6 +2758,7 @@
     },
     "content": {
       "categories": {
+        "markets": "Piețe și trading",
         "research": "Cercetare",
         "engineering": "Inginerie",
         "monitoring": "Monitorizare",
@@ -2766,7 +2768,9 @@
         "x": "X",
         "linkedin": "LinkedIn",
         "blog": "Blog",
-        "email": "E-mail"
+        "email": "E-mail",
+        "long": "Long",
+        "short": "Short"
       },
       "artifactKinds": {
         "text": "text",
@@ -2782,6 +2786,65 @@
         "schedules_disabled": "{count, plural, one {# șablon de programare este pregătit, dar rămâne dezactivat.} other {# șabloane de programare sunt pregătite, dar rămân dezactivate.}}"
       },
       "packs": {
+        "marketPulse": {
+          "title": "Pulsul pieței",
+          "summary": "Generează un raport de piață cu marcaje temporale pentru activele selectate și semnalele de urmărit.",
+          "fields": {
+            "assets": "Active",
+            "horizon": "Orizont de timp",
+            "focus": "Obiectivul analizei",
+            "watchSignals": "Semnale de urmărit",
+            "outputLanguage": "Limba rezultatului"
+          },
+          "deliverables": {
+            "deliverable-1": "Puls al pieței cu marcaje temporale",
+            "deliverable-2": "Semnale și riscuri prioritizate"
+          },
+          "manualAcceptance": "Observațiile despre piață includ marcaje temporale și sursele datelor.",
+          "schedules": {
+            "daily-market-pulse": "Pulsul zilnic al pieței"
+          },
+          "taskTitle": "Pulsul pieței",
+          "taskDescription": "Generează un raport cu marcaje temporale despre datele și riscurile de piață pentru activele selectate."
+        },
+        "tradePlanReview": {
+          "title": "Evaluarea planului de tranzacționare",
+          "summary": "Testează în condiții adverse o teză de tranzacționare furnizată de utilizator, fără a plasa sau gestiona tranzacții.",
+          "fields": {
+            "asset": "Activ",
+            "network": "Rețea sau platformă",
+            "direction": "Direcție",
+            "capitalAmount": "Valoarea capitalului",
+            "capitalCurrency": "Moneda capitalului",
+            "maxLossPercent": "Pierdere maximă (% din capital)",
+            "horizon": "Orizont de timp",
+            "thesis": "Teza de tranzacționare"
+          },
+          "deliverables": {
+            "deliverable-1": "Evaluarea riscurilor planului de tranzacționare",
+            "deliverable-2": "Listă de scenarii verificată de o persoană"
+          },
+          "manualAcceptance": "Ipotezele privind dimensiunea poziției și condițiile de invalidare sunt explicite.",
+          "taskTitle": "Evaluarea planului de tranzacționare",
+          "taskDescription": "Evaluează riscurile, ipotezele și scenariile unui plan de tranzacționare furnizat de utilizator."
+        },
+        "portfolioRiskReview": {
+          "title": "Evaluarea riscului portofoliului",
+          "summary": "Evaluează deținerile furnizate de utilizator în privința concentrării, lichidității și riscului de scădere.",
+          "fields": {
+            "holdings": "Dețineri și alocări (ACTIV: 25%, una pe linie)",
+            "baseCurrency": "Monedă de bază",
+            "objective": "Obiectivul portofoliului",
+            "constraints": "Constrângeri"
+          },
+          "deliverables": {
+            "deliverable-1": "Raport privind riscul portofoliului",
+            "deliverable-2": "Opțiuni de reechilibrare verificate de o persoană"
+          },
+          "manualAcceptance": "Opțiunile respectă obiectivul și constrângerile furnizate de utilizator.",
+          "taskTitle": "Evaluarea riscului portofoliului",
+          "taskDescription": "Evaluează deținerile furnizate de utilizator și prezintă opțiuni de risc pentru verificare umană."
+        },
         "researchReport": {
           "title": "Raport de cercetare",
           "summary": "Realizează un raport de cercetare documentat, concentrat pe un subiect clar și pregătit pentru luarea unei decizii.",
@@ -2919,6 +2982,8 @@
       "schedules": "Programe propuse",
       "scheduleOff": "Oprit",
       "scheduleNotice": "Programele rămân dezactivate la lansare și necesită o confirmare separată.",
+      "manualReviewTitle": "Este necesară verificarea proprietarului",
+      "manualReviewDescription": "Rezultatul final rămâne în Mission Control până când proprietarul îl aprobă sau îl respinge.",
       "setup": {
         "connectors": "Deschide Conectori",
         "dev": "Deschide setup-ul Developer",

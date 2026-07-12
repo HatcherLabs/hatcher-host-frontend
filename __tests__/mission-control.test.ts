@@ -43,14 +43,15 @@ describe('Mission Control DTO mapping', () => {
       tasks: [
         { id: '1', agentId: 'a', title: 'A', prompt: 'A', status: 'running' },
         { id: '2', agentId: 'a', title: 'B', prompt: 'B', status: 'pending_approval' },
-        { id: '3', agentId: 'a', title: 'C', prompt: 'C', status: 'completed' },
+        { id: '3', agentId: 'a', title: 'C', prompt: 'C', status: 'pending_review' },
+        { id: '4', agentId: 'a', title: 'D', prompt: 'D', status: 'completed' },
       ],
     });
 
     expect(result.summary).toMatchObject({
-      total: 3,
+      total: 4,
       active: 1,
-      awaitingApproval: 1,
+      awaitingApproval: 2,
       completed: 1,
     });
   });
@@ -62,28 +63,32 @@ describe('Mission Control DTO mapping', () => {
         total: 19,
         active: 4,
         needsAttention: 5,
-        byStatus: { pending_approval: 3, completed: 7, failed: 2, cancelled: 1 },
+        byStatus: { pending_approval: 3, pending_review: 2, completed: 7, failed: 2, cancelled: 1 },
+        agents: [{ agentId: 'a', name: 'Atlas', active: 4, needsAttention: 5 }],
       },
     });
 
     expect(result.summary).toMatchObject({
       total: 19,
       active: 4,
-      awaitingApproval: 3,
+      awaitingApproval: 5,
       completed: 7,
       failed: 2,
       cancelled: 1,
       needsAttention: 5,
+      agents: [{ agentId: 'a', name: 'Atlas', active: 4, needsAttention: 5 }],
     });
   });
 
   it('keeps action semantics explicit, with resume creating only a new attempt', () => {
     const ready = normalizeMissionTask({ status: 'ready' });
     const approval = normalizeMissionTask({ status: 'pending_approval' });
+    const review = normalizeMissionTask({ status: 'pending_review' });
     const failed = normalizeMissionTask({ status: 'failed' });
 
     expect(canStartMissionTask(ready)).toBe(true);
     expect(canApproveMissionTask(approval)).toBe(true);
+    expect(canApproveMissionTask(review)).toBe(true);
     expect(canResumeMissionTask(failed)).toBe(true);
     expect(canStartMissionTask(failed)).toBe(false);
   });
@@ -97,6 +102,7 @@ describe('Mission Control DTO mapping', () => {
       sourceVersion: '1.0.0',
       acceptanceChecks: [{ type: 'artifact_required', artifactKind: 'text' }],
       scheduleTemplates: [{ id: 'daily', enabled: false }],
+      reviewPolicy: { mode: 'manual_required' },
       outcomePackSkillReadiness: {
         required: true,
         ready: false,
@@ -109,6 +115,7 @@ describe('Mission Control DTO mapping', () => {
       sourceVersion: '1.0.0',
       acceptanceChecks: [{ type: 'artifact_required' }],
       scheduleTemplates: [{ enabled: false }],
+      reviewPolicy: { mode: 'manual_required' },
     });
     expect(canStartMissionTask(pending)).toBe(false);
     expect(canStartMissionTask({

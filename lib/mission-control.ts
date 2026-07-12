@@ -13,6 +13,7 @@ export const MISSION_CONTROL_ROUTE = '/dashboard/missions';
 
 export const MISSION_TASK_STATUSES: MissionTaskStatus[] = [
   'pending_approval',
+  'pending_review',
   'ready',
   'queued',
   'running',
@@ -151,6 +152,11 @@ function normalizeArtifact(value: unknown): MissionTaskArtifact {
   };
 }
 
+function normalizeReviewPolicy(value: unknown): MissionTask['reviewPolicy'] {
+  const raw = record(value);
+  return raw.mode === 'manual_required' ? { mode: 'manual_required' } : null;
+}
+
 export function normalizeMissionTask(value: unknown): MissionTask {
   const raw = record(value);
   const agent = record(raw.agent);
@@ -178,6 +184,7 @@ export function normalizeMissionTask(value: unknown): MissionTask {
     sourceVersion: nullableText(raw.sourceVersion),
     acceptanceChecks: unknownList(raw.acceptanceChecks),
     scheduleTemplates: unknownList(raw.scheduleTemplates),
+    reviewPolicy: normalizeReviewPolicy(raw.reviewPolicy),
     outcomePackSkillReadiness: normalizeOutcomePackSkillReadiness(raw.outcomePackSkillReadiness),
     requiresApproval: raw.requiresApproval === true,
     budget: {
@@ -202,7 +209,7 @@ export function summarizeMissionTasks(tasks: MissionTask[]): MissionTaskSummary 
   return {
     total: tasks.length,
     active: (byStatus.queued ?? 0) + (byStatus.running ?? 0),
-    awaitingApproval: byStatus.pending_approval ?? 0,
+    awaitingApproval: (byStatus.pending_approval ?? 0) + (byStatus.pending_review ?? 0),
     completed: byStatus.completed ?? 0,
     failed: byStatus.failed ?? 0,
     cancelled: byStatus.cancelled ?? 0,
@@ -244,12 +251,12 @@ export function normalizeMissionTaskList(value: unknown): MissionTaskListModel {
       awaitingApproval:
         finiteNumber(summary.awaitingApproval) ??
         finiteNumber(summary.pendingApproval) ??
-        statusCount('pending_approval'),
+        statusCount('pending_approval') + statusCount('pending_review'),
       completed: finiteNumber(summary.completed) ?? statusCount('completed'),
       failed: finiteNumber(summary.failed) ?? statusCount('failed'),
       cancelled: finiteNumber(summary.cancelled) ?? statusCount('cancelled'),
       needsAttention: finiteNumber(summary.needsAttention) ??
-        statusCount('pending_approval') + statusCount('failed'),
+        statusCount('pending_approval') + statusCount('pending_review') + statusCount('failed'),
       byStatus: hasServerStatusCounts ? byStatus : fallback.byStatus,
       agents,
     },
@@ -295,7 +302,7 @@ export function canStartMissionTask(task: MissionTask): boolean {
 }
 
 export function canApproveMissionTask(task: MissionTask): boolean {
-  return task.status === 'pending_approval';
+  return task.status === 'pending_approval' || task.status === 'pending_review';
 }
 
 export function canCancelMissionTask(task: MissionTask): boolean {

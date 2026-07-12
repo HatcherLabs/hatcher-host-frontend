@@ -36,7 +36,7 @@ export const NAV_GROUPS: ReadonlyArray<NavGroup> = [
     labelKey: 'build',
     items: [
       { key: 'hatchAgent',  labelKey: 'hatchAgentLabel',  subKey: 'hatchAgentSub',  href: '/create',          glyph: '✦' },
-      { key: 'myAgents',    labelKey: 'myAgentsLabel',    subKey: 'myAgentsSub',    href: '/dashboard/agents', glyph: '◐' },
+      { key: 'myAgents',    labelKey: 'myAgentsLabel',    subKey: 'myAgentsSub',    href: '/dashboard',        glyph: '◐' },
     ],
   },
   {
@@ -71,7 +71,7 @@ export const FOOTER_COLUMNS = [
     headKey: 'colBuild',
     items: [
       { labelKey: 'itemHatchAgent', href: '/create' as Href },
-      { labelKey: 'itemMyAgents',   href: '/dashboard/agents' as Href },
+      { labelKey: 'itemMyAgents',   href: '/dashboard' as Href },
     ],
   },
   {

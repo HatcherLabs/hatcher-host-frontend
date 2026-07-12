@@ -299,7 +299,8 @@
 .field input:focus,
 .field textarea:focus { border-color: var(--border-active); box-shadow: 0 0 0 2px var(--color-accent-bg); }
 .field[data-error] input,
-.field[data-error] textarea { border-color: var(--color-destructive-border); }
+.field[data-error] textarea,
+.field[data-error] select { border-color: var(--color-destructive-border); }
 .field .fieldError { color: var(--color-destructive); }
 
 .multiSelect {

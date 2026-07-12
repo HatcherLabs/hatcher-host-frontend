@@ -2659,6 +2659,7 @@
     "status": {
       "ready": "Ready",
       "pending_approval": "Needs approval",
+      "pending_review": "Pending review",
       "queued": "Queued",
       "running": "Running",
       "completed": "Completed",
@@ -2757,6 +2758,7 @@
     },
     "content": {
       "categories": {
+        "markets": "Markets & Trading",
         "research": "Research",
         "engineering": "Engineering",
         "monitoring": "Monitoring",
@@ -2766,7 +2768,9 @@
         "x": "X",
         "linkedin": "LinkedIn",
         "blog": "Blog",
-        "email": "Email"
+        "email": "Email",
+        "long": "Long",
+        "short": "Short"
       },
       "artifactKinds": {
         "text": "text",
@@ -2782,6 +2786,65 @@
         "schedules_disabled": "{count, plural, one {# schedule template is prepared but remains disabled.} other {# schedule templates are prepared but remain disabled.}}"
       },
       "packs": {
+        "marketPulse": {
+          "title": "Market Pulse",
+          "summary": "Produce a timestamped market brief for selected assets and watch signals.",
+          "fields": {
+            "assets": "Assets",
+            "horizon": "Time horizon",
+            "focus": "Analysis focus",
+            "watchSignals": "Signals to watch",
+            "outputLanguage": "Output language"
+          },
+          "deliverables": {
+            "deliverable-1": "Timestamped market pulse",
+            "deliverable-2": "Prioritized watch signals and risks"
+          },
+          "manualAcceptance": "Market observations include timestamps and data sources.",
+          "schedules": {
+            "daily-market-pulse": "Daily market pulse"
+          },
+          "taskTitle": "Market pulse",
+          "taskDescription": "Produce a timestamped market-data and risk brief for the selected assets."
+        },
+        "tradePlanReview": {
+          "title": "Trade Plan Review",
+          "summary": "Stress-test an owner-provided trade thesis without placing or managing a trade.",
+          "fields": {
+            "asset": "Asset",
+            "network": "Network or venue",
+            "direction": "Direction",
+            "capitalAmount": "Capital amount",
+            "capitalCurrency": "Capital currency",
+            "maxLossPercent": "Maximum loss (% of capital)",
+            "horizon": "Time horizon",
+            "thesis": "Trade thesis"
+          },
+          "deliverables": {
+            "deliverable-1": "Trade plan risk review",
+            "deliverable-2": "Human-reviewed scenario checklist"
+          },
+          "manualAcceptance": "Sizing assumptions and invalidation conditions are explicit.",
+          "taskTitle": "Trade plan review",
+          "taskDescription": "Review an owner-provided trade plan for risk, assumptions, and scenarios."
+        },
+        "portfolioRiskReview": {
+          "title": "Portfolio Risk Review",
+          "summary": "Assess owner-provided holdings for concentration, liquidity, and downside risk.",
+          "fields": {
+            "holdings": "Holdings and allocations (ASSET: 25%, one per line)",
+            "baseCurrency": "Base currency",
+            "objective": "Portfolio objective",
+            "constraints": "Constraints"
+          },
+          "deliverables": {
+            "deliverable-1": "Portfolio risk brief",
+            "deliverable-2": "Human-reviewed rebalance options"
+          },
+          "manualAcceptance": "Options respect the owner-provided objective and constraints.",
+          "taskTitle": "Portfolio risk review",
+          "taskDescription": "Assess owner-provided holdings and outline human-reviewed risk options."
+        },
         "researchReport": {
           "title": "Research Report",
           "summary": "Produce a sourced, decision-ready research report on a focused topic.",
@@ -2919,6 +2982,8 @@
       "schedules": "Proposed schedules",
       "scheduleOff": "Off",
       "scheduleNotice": "Schedules stay disabled at launch and require a separate confirmation.",
+      "manualReviewTitle": "Owner review required",
+      "manualReviewDescription": "The completed result stays in Mission Control until the owner approves or rejects it.",
       "setup": {
         "connectors": "Open Connectors",
         "dev": "Open Developer setup",

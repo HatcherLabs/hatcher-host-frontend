@@ -19,12 +19,14 @@ import {
   Loader2,
   Megaphone,
   PackageCheck,
+  PieChart,
   Play,
   Radar,
   RefreshCw,
   Settings2,
   ShieldAlert,
   Sparkles,
+  TrendingUp,
   TimerOff,
   Wrench,
   XCircle,
@@ -52,9 +54,13 @@ import {
   type OutcomePackPreparationModel,
 } from '@/lib/outcome-packs';
 import { useToast } from '@/components/ui/ToastProvider';
+import { agentWorkspaceHref, requestedOwnedAgentId } from '@/lib/agent-workspace';
 import styles from './outcome-packs.module.css';
 
 const PACK_ICONS: Record<string, LucideIcon> = {
+  'market-pulse-v1': TrendingUp,
+  'trade-plan-review-v1': ShieldAlert,
+  'portfolio-risk-review-v1': PieChart,
   'research-report-v1': FileSearch,
   'pr-review-v1': GitPullRequest,
   'competitor-watch-v1': Radar,
@@ -153,11 +159,17 @@ export default function OutcomePacksPage() {
     }
 
     const nextPacks = normalizeOutcomePackList(packsResult.data).map(localizePack);
-    const requestedPackId = new URLSearchParams(window.location.search).get('pack');
+    const search = window.location.search;
+    const requestedPackId = new URLSearchParams(search).get('pack');
+    const requestedAgentId = requestedOwnedAgentId(search, agentsResult.data);
     setAgents(agentsResult.data);
     setPacks(nextPacks);
     setDetailRevision((current) => current + 1);
-    setSelectedAgentId((current) => current || agentsResult.data[0]?.id || '');
+    setSelectedAgentId((current) =>
+      current && agentsResult.data.some((agent) => agent.id === current)
+        ? current
+        : requestedAgentId ?? agentsResult.data[0]?.id ?? '',
+    );
     setSelectedPackId((current) =>
       current && nextPacks.some((item) => item.id === current)
         ? current
@@ -209,8 +221,21 @@ export default function OutcomePacksPage() {
     setFieldErrors({});
     setActionError(null);
     launchKeyRef.current = null;
-    router.replace(`/dashboard/outcome-packs?pack=${encodeURIComponent(packId)}`, { scroll: false });
-  }, [router, selectedPackId]);
+    const params = new URLSearchParams(window.location.search);
+    params.set('pack', packId);
+    if (selectedAgentId) params.set('agent', selectedAgentId);
+    router.replace(`/dashboard/outcome-packs?${params.toString()}`, { scroll: false });
+  }, [router, selectedAgentId, selectedPackId]);
+
+  const selectAgent = useCallback((agentId: string) => {
+    setSelectedAgentId(agentId);
+    resetPreparedState();
+    const params = new URLSearchParams(window.location.search);
+    if (selectedPackId) params.set('pack', selectedPackId);
+    if (agentId) params.set('agent', agentId);
+    else params.delete('agent');
+    router.replace(`/dashboard/outcome-packs?${params.toString()}`, { scroll: false });
+  }, [resetPreparedState, router, selectedPackId]);
 
   const updateInput = useCallback((fieldId: string, value: OutcomePackDraftValue) => {
     setInputs((current) => ({ ...current, [fieldId]: value }));
@@ -327,7 +352,9 @@ export default function OutcomePacksPage() {
               <RefreshCw size={17} className={loading ? styles.spin : ''} aria-hidden />
             </button>
             <Link
-              href="/dashboard/missions"
+              href={selectedAgentId
+                ? agentWorkspaceHref('/dashboard/missions', selectedAgentId)
+                : '/dashboard/missions'}
               className={styles.secondaryButton}
               aria-label={t('missionControl')}
               title={t('missionControl')}
@@ -460,10 +487,7 @@ export default function OutcomePacksPage() {
                           <span>{t('configure.agent')}</span>
                           <select
                             value={selectedAgentId}
-                            onChange={(event) => {
-                              setSelectedAgentId(event.target.value);
-                              resetPreparedState();
-                            }}
+                            onChange={(event) => selectAgent(event.target.value)}
                             required
                           >
                             <option value="">{t('configure.agentPlaceholder')}</option>
@@ -531,6 +555,21 @@ export default function OutcomePacksPage() {
                                   aria-invalid={hasError}
                                   required={field.required}
                                 />
+                              ) : field.type === 'select' ? (
+                                <select
+                                  id={fieldId}
+                                  value={textValue}
+                                  onChange={(event) => updateInput(field.key, event.target.value)}
+                                  aria-invalid={hasError}
+                                  required={field.required}
+                                >
+                                  <option value="">{t('configure.selectPlaceholder')}</option>
+                                  {field.options.map((option) => (
+                                    <option value={option} key={option}>
+                                      {translateOr(`content.options.${option}`, option)}
+                                    </option>
+                                  ))}
+                                </select>
                               ) : (
                                 <input
                                   id={fieldId}
@@ -636,6 +675,13 @@ export default function OutcomePacksPage() {
                                     <li key={`${warning.code}-${index}`}>{warning.label}</li>
                                   ))}
                                 </ul>
+                              </section>
+                            ) : null}
+
+                            {preview.reviewPolicy?.mode === 'manual_required' ? (
+                              <section className={styles.previewSection}>
+                                <h4><ShieldAlert size={15} aria-hidden /> {t('preview.manualReviewTitle')}</h4>
+                                <p className={styles.scheduleNotice}>{t('preview.manualReviewDescription')}</p>
                               </section>
                             ) : null}
 
