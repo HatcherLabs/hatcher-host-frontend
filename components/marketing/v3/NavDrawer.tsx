@@ -15,7 +15,9 @@ import {
   FileText,
   GitBranch,
   LayoutDashboard,
+  ListChecks,
   Newspaper,
+  PackageCheck,
   Plus,
   Sparkles,
   TerminalSquare,
@@ -71,6 +73,9 @@ export function NavDrawer({ open, onClose }: Props) {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const tNav = useTranslations('nav');
   const tGroups = useTranslations('nav.groups');
+  const tMission = useTranslations('missionControl');
+  const tOutcome = useTranslations('outcomePacks');
+  const tMenu = useTranslations('nav.userMenu');
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -102,7 +107,9 @@ export function NavDrawer({ open, onClose }: Props) {
           <section key={g.key} className={styles.section}>
             <h3 className={styles.head}>{tGroups(g.labelKey)}</h3>
             <ul className={styles.list}>
-              {g.items.map((it) => (
+              {g.items.filter((it) => !(
+                !authLoading && isAuthenticated && g.key === 'build' && it.key === 'myAgents'
+              )).map((it) => (
                 <li key={it.key}>
                   <Link href={it.href} className={styles.item} onClick={onClose}>
                     <span className={styles.glyph}>
@@ -115,6 +122,46 @@ export function NavDrawer({ open, onClose }: Props) {
                   </Link>
                 </li>
               ))}
+              {g.key === 'build' && !authLoading && isAuthenticated ? (
+                <>
+                  <li>
+                    <Link href="/dashboard" className={styles.item} onClick={onClose}>
+                      <span className={styles.glyph}><LayoutDashboard size={17} strokeWidth={1.8} aria-hidden /></span>
+                      <span>
+                        <span className={styles.itemLabel}>{tNav('dashboard')}</span>
+                        <span className={styles.itemSub}>{tMenu('sub_dashboard')}</span>
+                      </span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/dashboard/agents" className={styles.item} onClick={onClose}>
+                      <span className={styles.glyph}><Bot size={17} strokeWidth={1.8} aria-hidden /></span>
+                      <span>
+                        <span className={styles.itemLabel}>{tNav('myAgents')}</span>
+                        <span className={styles.itemSub}>{tMenu('sub_myAgents')}</span>
+                      </span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/dashboard/missions" className={styles.item} onClick={onClose}>
+                      <span className={styles.glyph}><ListChecks size={17} strokeWidth={1.8} aria-hidden /></span>
+                      <span>
+                        <span className={styles.itemLabel}>{tMission('title')}</span>
+                        <span className={styles.itemSub}>{tMenu('sub_missionControl')}</span>
+                      </span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/dashboard/outcome-packs" className={styles.item} onClick={onClose}>
+                      <span className={styles.glyph}><PackageCheck size={17} strokeWidth={1.8} aria-hidden /></span>
+                      <span>
+                        <span className={styles.itemLabel}>{tOutcome('title')}</span>
+                        <span className={styles.itemSub}>{tMenu('sub_outcomePacks')}</span>
+                      </span>
+                    </Link>
+                  </li>
+                </>
+              ) : null}
             </ul>
           </section>
         ))}

@@ -39,6 +39,8 @@
     "affiliateRejected": "Reaplică ca afiliat",
     "affiliateBecome": "Devino afiliat",
     "userMenu": {
+      "sub_dashboard": "Agenți, misiuni, aprobări și pachete.",
+      "sub_outcomePacks": "Rețete reutilizabile pentru rezultate frecvente.",
       "sub_missionControl": "Taskuri, aprobări, execuții și rezultate.",
       "sub_myAgents": "Răsfoiește, editează, lansează.",
       "sub_create": "Descrie un agent pentru eclozare.",
@@ -851,6 +853,46 @@
       "back": "Înapoi",
       "noDescription": "Fără descriere",
       "clear": "Șterge"
+    },
+    "overview": {
+      "eyebrow": "Privire de ansamblu asupra spațiului de lucru",
+      "title": "Panou",
+      "subtitle": "Urmărește agenții, misiunile, aprobările și rețetele de rezultate reutilizabile dintr-o singură perspectivă operațională.",
+      "signInDescription": "Autentifică-te pentru a vedea agenții, misiunile, aprobările și Outcome Packs.",
+      "openMissionControl": "Mission Control",
+      "useOutcomePack": "Outcome Packs",
+      "refresh": "Reîmprospătează panoul",
+      "partialError": "Unele date din spațiul de lucru nu au putut fi încărcate.",
+      "unavailable": "Datele sunt temporar indisponibile.",
+      "retry": "Încearcă din nou",
+      "stats": {
+        "label": "Rezumatul spațiului de lucru",
+        "agents": "Agenți",
+        "activeAgents": "Agenți activi",
+        "activeMissions": "Misiuni active",
+        "awaitingApproval": "În așteptarea aprobării"
+      },
+      "missions": {
+        "title": "Misiuni recente",
+        "subtitle": "Cele mai recente activități ale tuturor agenților.",
+        "viewAll": "Vezi toate",
+        "needsAttention": "{count} necesită atenție",
+        "empty": "Nu există încă misiuni.",
+        "emptyAction": "Creează prima misiune",
+        "unknownAgent": "Agent necunoscut"
+      },
+      "packs": {
+        "title": "Outcome Packs",
+        "subtitle": "Rețete selectate, gata de configurare.",
+        "browse": "Vezi toate",
+        "empty": "Nu este disponibil niciun Outcome Pack."
+      },
+      "utilities": {
+        "label": "Mai multe instrumente pentru spațiul de lucru",
+        "lift": "Importă cu Hatcher Lift",
+        "city": "Deschide Hatcher City",
+        "agents": "Gestionează agenții"
+      }
     },
     "agents": {
       "eyebrow": "Panou",

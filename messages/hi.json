@@ -38,6 +38,8 @@
     "affiliateRejected": "एफिलिएट के रूप में फिर से अप्लाई करें",
     "affiliateBecome": "एक सहयोगी बनें",
     "userMenu": {
+      "sub_dashboard": "एजेंट, मिशन, अनुमोदन और पैक।",
+      "sub_outcomePacks": "आम परिणामों के लिए पुन: उपयोग योग्य रेसिपी।",
       "sub_myAgents": "ब्राउज़ करें, संपादित करें, तैनात करें।",
       "sub_create": "हैच करने के लिए एक एजेंट का वर्णन करें।",
       "sub_analytics": "AI Credits, टोकन, रुझान।",
@@ -851,6 +853,46 @@
       "back": "शर्त लगाना",
       "noDescription": "कोई विवरण नहीं",
       "clear": "साफ़ करें"
+    },
+    "overview": {
+      "eyebrow": "कार्यस्थान का अवलोकन",
+      "title": "डैशबोर्ड",
+      "subtitle": "एक ही ऑपरेशनल व्यू से एजेंट, मिशन, अनुमोदन और दोबारा इस्तेमाल की जा सकने वाली आउटकम रेसिपी पर नज़र रखें।",
+      "signInDescription": "अपने एजेंट, मिशन, अनुमोदन और Outcome Packs देखने के लिए साइन इन करें।",
+      "openMissionControl": "Mission Control",
+      "useOutcomePack": "Outcome Packs",
+      "refresh": "डैशबोर्ड रीफ़्रेश करें",
+      "partialError": "कार्यस्थान का कुछ डेटा लोड नहीं हो सका।",
+      "unavailable": "डेटा अस्थायी रूप से उपलब्ध नहीं है।",
+      "retry": "फिर कोशिश करें",
+      "stats": {
+        "label": "कार्यस्थान सारांश",
+        "agents": "एजेंट",
+        "activeAgents": "सक्रिय एजेंट",
+        "activeMissions": "सक्रिय मिशन",
+        "awaitingApproval": "अनुमोदन की प्रतीक्षा"
+      },
+      "missions": {
+        "title": "हाल के मिशन",
+        "subtitle": "सभी एजेंटों का नवीनतम कार्य।",
+        "viewAll": "सभी देखें",
+        "needsAttention": "{count} पर ध्यान देना आवश्यक है",
+        "empty": "अभी कोई मिशन नहीं है।",
+        "emptyAction": "अपना पहला मिशन बनाएँ",
+        "unknownAgent": "अज्ञात एजेंट"
+      },
+      "packs": {
+        "title": "Outcome Packs",
+        "subtitle": "चुनी हुई रेसिपी, कॉन्फ़िगर करने के लिए तैयार।",
+        "browse": "सभी ब्राउज़ करें",
+        "empty": "कोई Outcome Pack उपलब्ध नहीं है।"
+      },
+      "utilities": {
+        "label": "कार्यस्थान के और टूल",
+        "lift": "Hatcher Lift से इम्पोर्ट करें",
+        "city": "Hatcher City खोलें",
+        "agents": "एजेंट प्रबंधित करें"
+      }
     },
     "agents": {
       "eyebrow": "डैशबोर्ड",

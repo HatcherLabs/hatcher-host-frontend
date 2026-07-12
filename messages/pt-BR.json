@@ -38,6 +38,8 @@
     "affiliateRejected": "Candidate-se novamente como afiliado",
     "affiliateBecome": "Torne-se um afiliado",
     "userMenu": {
+      "sub_dashboard": "Agentes, missões, aprovações e packs.",
+      "sub_outcomePacks": "Receitas reutilizáveis para resultados comuns.",
       "sub_myAgents": "Navegue, edite, implante.",
       "sub_create": "Descreva um agente para chocar.",
       "sub_analytics": "AI Credits, tokens, tendências.",
@@ -851,6 +853,46 @@
       "back": "Voltar",
       "noDescription": "Sem descrição",
       "clear": "Limpar"
+    },
+    "overview": {
+      "eyebrow": "Visão geral do espaço de trabalho",
+      "title": "Painel",
+      "subtitle": "Acompanhe agentes, missões, aprovações e receitas de resultados reutilizáveis em uma única visão operacional.",
+      "signInDescription": "Entre para ver seus agentes, missões, aprovações e Outcome Packs.",
+      "openMissionControl": "Mission Control",
+      "useOutcomePack": "Outcome Packs",
+      "refresh": "Atualizar painel",
+      "partialError": "Alguns dados do espaço de trabalho não puderam ser carregados.",
+      "unavailable": "Dados temporariamente indisponíveis.",
+      "retry": "Tentar novamente",
+      "stats": {
+        "label": "Resumo do espaço de trabalho",
+        "agents": "Agentes",
+        "activeAgents": "Agentes ativos",
+        "activeMissions": "Missões ativas",
+        "awaitingApproval": "Aguardando aprovação"
+      },
+      "missions": {
+        "title": "Missões recentes",
+        "subtitle": "Trabalhos mais recentes de todos os agentes.",
+        "viewAll": "Ver todas",
+        "needsAttention": "{count} precisam de atenção",
+        "empty": "Ainda não há missões.",
+        "emptyAction": "Crie sua primeira missão",
+        "unknownAgent": "Agente desconhecido"
+      },
+      "packs": {
+        "title": "Outcome Packs",
+        "subtitle": "Receitas selecionadas prontas para configurar.",
+        "browse": "Ver todos",
+        "empty": "Nenhum Outcome Pack está disponível."
+      },
+      "utilities": {
+        "label": "Mais ferramentas do espaço de trabalho",
+        "lift": "Importar com Hatcher Lift",
+        "city": "Abrir Hatcher City",
+        "agents": "Gerenciar agentes"
+      }
     },
     "agents": {
       "eyebrow": "Painel",

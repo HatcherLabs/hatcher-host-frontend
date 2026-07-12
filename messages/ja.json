@@ -38,6 +38,8 @@
     "affiliateRejected": "アフィリエイトとして再申請してください",
     "affiliateBecome": "アフィリエイトになる",
     "userMenu": {
+      "sub_dashboard": "エージェント、ミッション、承認、パック。",
+      "sub_outcomePacks": "よくある成果に使える再利用可能なレシピ。",
       "sub_myAgents": "閲覧、編集、デプロイ。",
       "sub_create": "孵化するエージェントを説明してください。",
       "sub_analytics": "AI Credits、トークン、トレンド。",
@@ -851,6 +853,46 @@
       "back": "戻る",
       "noDescription": "特徴なし",
       "clear": "クリア"
+    },
+    "overview": {
+      "eyebrow": "ワークスペース概要",
+      "title": "ダッシュボード",
+      "subtitle": "1つの運用ビューで、エージェント、ミッション、承認、再利用可能な成果レシピを確認できます。",
+      "signInDescription": "エージェント、ミッション、承認、Outcome Packsを表示するにはサインインしてください。",
+      "openMissionControl": "Mission Control",
+      "useOutcomePack": "Outcome Packs",
+      "refresh": "ダッシュボードを更新",
+      "partialError": "一部のワークスペースデータを読み込めませんでした。",
+      "unavailable": "データは一時的に利用できません。",
+      "retry": "再試行",
+      "stats": {
+        "label": "ワークスペースの概要",
+        "agents": "エージェント",
+        "activeAgents": "稼働中のエージェント",
+        "activeMissions": "進行中のミッション",
+        "awaitingApproval": "承認待ち"
+      },
+      "missions": {
+        "title": "最近のミッション",
+        "subtitle": "全エージェントの最新の作業です。",
+        "viewAll": "すべて表示",
+        "needsAttention": "要確認: {count}件",
+        "empty": "ミッションはまだありません。",
+        "emptyAction": "最初のミッションを作成",
+        "unknownAgent": "不明なエージェント"
+      },
+      "packs": {
+        "title": "Outcome Packs",
+        "subtitle": "設定可能な厳選レシピ。",
+        "browse": "すべて見る",
+        "empty": "利用可能なOutcome Packsはありません。"
+      },
+      "utilities": {
+        "label": "その他のワークスペースツール",
+        "lift": "Hatcher Liftでインポート",
+        "city": "Hatcher Cityを開く",
+        "agents": "エージェントを管理"
+      }
     },
     "agents": {
       "eyebrow": "ダッシュボード",

@@ -38,6 +38,8 @@
     "affiliateRejected": "重新申请推广",
     "affiliateBecome": "成为推广合作伙伴",
     "userMenu": {
+      "sub_dashboard": "代理、任务、审批和方案包。",
+      "sub_outcomePacks": "适用于常见成果的可复用方案。",
       "sub_myAgents": "浏览、编辑、部署。",
       "sub_create": "描述要孵化的代理。",
       "sub_analytics": "AI Credits、token 和趋势。",
@@ -851,6 +853,46 @@
       "back": "返回",
       "noDescription": "暂无描述",
       "clear": "清除"
+    },
+    "overview": {
+      "eyebrow": "工作区概览",
+      "title": "控制台",
+      "subtitle": "在一个运营视图中跟踪智能体、任务、审批和可复用的成果方案。",
+      "signInDescription": "登录后查看您的智能体、任务、审批和 Outcome Packs。",
+      "openMissionControl": "Mission Control",
+      "useOutcomePack": "Outcome Packs",
+      "refresh": "刷新控制台",
+      "partialError": "部分工作区数据无法加载。",
+      "unavailable": "数据暂时不可用。",
+      "retry": "重试",
+      "stats": {
+        "label": "工作区摘要",
+        "agents": "智能体",
+        "activeAgents": "活跃智能体",
+        "activeMissions": "进行中的任务",
+        "awaitingApproval": "等待审批"
+      },
+      "missions": {
+        "title": "最近的任务",
+        "subtitle": "所有智能体的最新工作。",
+        "viewAll": "查看全部",
+        "needsAttention": "{count} 项需要关注",
+        "empty": "暂无任务。",
+        "emptyAction": "创建第一个任务",
+        "unknownAgent": "未知智能体"
+      },
+      "packs": {
+        "title": "Outcome Packs",
+        "subtitle": "精选方案，配置后即可使用。",
+        "browse": "浏览全部",
+        "empty": "暂无可用的 Outcome Packs。"
+      },
+      "utilities": {
+        "label": "更多工作区工具",
+        "lift": "使用 Hatcher Lift 导入",
+        "city": "打开 Hatcher City",
+        "agents": "管理智能体"
+      }
     },
     "agents": {
       "eyebrow": "控制台",

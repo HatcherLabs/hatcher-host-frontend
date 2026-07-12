@@ -399,6 +399,9 @@
   right: 0;
   left: auto;
   min-width: 280px;
+  max-height: calc(100vh - 76px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   transform-origin: top right;
 }
 @media (max-width: 600px) {
