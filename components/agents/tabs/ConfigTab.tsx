@@ -30,8 +30,6 @@ import {
   MessageSquare,
   Search,
   SlidersHorizontal,
-  Layers3,
-  List,
 } from 'lucide-react';
 import { BYOK_PROVIDERS } from '@hatcher/shared';
 import { api } from '@/lib/api';
@@ -84,6 +82,13 @@ function isAiCreditBalance(value: unknown): value is AiCreditBalance {
     && typeof source.tier === 'string';
 }
 
+function savedHostedModelNetwork(config: Record<string, unknown>): HostedModelPrivacy {
+  const saved = resolveLoadedModelConfig(config);
+  return saved.provider === 'openrouter'
+    ? hostedModelPrivacy(getHostedModelOption(saved.model))
+    : 'hatcher';
+}
+
 const ENV_KEY_REGEX = /^[A-Z][A-Z0-9_]*$/;
 const MAX_ENV_VARS = 50;
 
@@ -95,9 +100,6 @@ type EnvVarEntry = {
   visible: boolean;
 };
 
-type ModelSortKey = 'name' | 'provider' | 'context' | 'cost' | 'privacy';
-type SortDirection = 'asc' | 'desc';
-type ModelCatalogView = 'providers' | 'models';
 type ModelPreset = {
   id: string;
   name: string;
@@ -375,6 +377,7 @@ export function ConfigTab() {
     hasApiKey,
   } = useAgentContext();
 
+  const hostedProvider = 'openrouter';
   const [commitMessage, setCommitMessage] = useState('');
   const [aiCreditBalance, setAiCreditBalance] = useState<AiCreditBalance | null>(null);
   const [activeConfigSubtab, setActiveConfigSubtab] = useState<ConfigSubtab>('general');
@@ -382,18 +385,19 @@ export function ConfigTab() {
   const [selectedProviderFilters, setSelectedProviderFilters] = useState<string[]>([]);
   const [selectedTagFilters, setSelectedTagFilters] = useState<HostedModelTag[]>([]);
   const [modelCostRange, setModelCostRange] = useState<[number, number]>([1, 5]);
-  const [modelPrivacyFilter, setModelPrivacyFilter] = useState<HostedModelPrivacy | 'all'>('all');
-  const [modelSort, setModelSort] = useState<{ key: ModelSortKey; direction: SortDirection }>({ key: 'name', direction: 'asc' });
-  const [modelCatalogView, setModelCatalogView] = useState<ModelCatalogView>('providers');
+  const [modelPrivacyFilter, setModelPrivacyFilter] = useState<HostedModelPrivacy>(() => (
+    savedHostedModelNetwork((agent.config ?? {}) as Record<string, unknown>)
+  ));
   const [modelPresets, setModelPresets] = useState<ModelPreset[]>([]);
+  const [modelPresetsExpanded, setModelPresetsExpanded] = useState(false);
   const [presetName, setPresetName] = useState('');
   const [presetDescription, setPresetDescription] = useState('');
   const [presetImportError, setPresetImportError] = useState<string | null>(null);
   const [liveVirtualsModels, setLiveVirtualsModels] = useState<HostedModelOption[]>([]);
   const [virtualsModelStatus, setVirtualsModelStatus] = useState<VirtualsModelCatalogStatus>('loading');
   const presetImportRef = useRef<HTMLInputElement | null>(null);
+  const modelNetworkAgentIdRef = useRef(agent.id);
 
-  const hostedProvider = 'openrouter';
   const isHostedMode = configProvider === hostedProvider;
   const normalizedHostedModel = normalizeHostedModelForUi(configModel);
   const availableHostedModels = useMemo(
@@ -438,13 +442,21 @@ export function ConfigTab() {
       : [...HOSTED_MODEL_PROVIDERS, selectedHostedProvider],
     [selectedHostedProvider],
   );
+  const contextualHostedModelProviders = useMemo(() => {
+    const providerKeys = new Set(
+      availableHostedModels
+        .filter((model) => hostedModelPrivacy(model) === modelPrivacyFilter)
+        .map((model) => model.providerKey),
+    );
+    return hostedModelProviders.filter((provider) => providerKeys.has(provider.key));
+  }, [availableHostedModels, hostedModelProviders, modelPrivacyFilter]);
   const filteredHostedModels = useMemo(
     () => {
       const needle = modelSearch.trim().toLowerCase();
       const [minCost, maxCost] = modelCostRange;
       return availableHostedModels.filter((model) => {
         if (selectedProviderFilters.length > 0 && !selectedProviderFilters.includes(model.providerKey)) return false;
-        if (modelPrivacyFilter !== 'all' && hostedModelPrivacy(model) !== modelPrivacyFilter) return false;
+        if (hostedModelPrivacy(model) !== modelPrivacyFilter) return false;
         const rank = hostedCostRank(model.cost);
         if (rank < minCost || rank > maxCost) return false;
         const tags = hostedModelTags(model);
@@ -463,105 +475,48 @@ export function ConfigTab() {
           if (!searchable.includes(needle)) return false;
         }
         return true;
-      }).sort((a, b) => {
-        let left: string | number;
-        let right: string | number;
-        switch (modelSort.key) {
-          case 'provider':
-            left = `${a.provider} ${a.name}`;
-            right = `${b.provider} ${b.name}`;
-            break;
-          case 'context':
-            left = contextToTokens(a.context);
-            right = contextToTokens(b.context);
-            break;
-          case 'cost':
-            left = hostedCostRank(a.cost);
-            right = hostedCostRank(b.cost);
-            break;
-          case 'privacy':
-            left = hostedModelPrivacy(a);
-            right = hostedModelPrivacy(b);
-            break;
-          case 'name':
-          default:
-            left = a.name;
-            right = b.name;
-            break;
-        }
-        const direction = modelSort.direction === 'asc' ? 1 : -1;
-        if (typeof left === 'number' && typeof right === 'number') return (left - right) * direction;
-        return String(left).localeCompare(String(right)) * direction;
-      });
+      }).sort((a, b) => a.name.localeCompare(b.name));
     },
-    [availableHostedModels, modelCostRange, modelPrivacyFilter, modelSearch, modelSort.direction, modelSort.key, selectedProviderFilters, selectedTagFilters],
+    [availableHostedModels, modelCostRange, modelPrivacyFilter, modelSearch, selectedProviderFilters, selectedTagFilters],
   );
-  const hostedRouteStats = useMemo(() => {
-    const stats = new Map<HostedModelPrivacy, { models: number; providers: Set<string> }>([
-      ['hatcher', { models: 0, providers: new Set<string>() }],
-      ['partner', { models: 0, providers: new Set<string>() }],
-    ]);
-    for (const model of availableHostedModels) {
-      const route = hostedModelPrivacy(model);
-      const routeStats = stats.get(route)!;
-      routeStats.models += 1;
-      routeStats.providers.add(model.providerKey);
-    }
-    return stats;
-  }, [availableHostedModels]);
-  const groupedHostedModelRoutes = useMemo(() => {
+  const groupedHostedModelsByProvider = useMemo(() => {
     const providerOrder = new Map(hostedModelProviders.map((provider, index) => [provider.key, index]));
     const providerMetaByKey = new Map(hostedModelProviders.map((provider) => [provider.key, provider]));
-    const routeLabels: Record<HostedModelPrivacy, { title: string; description: string }> = {
-      hatcher: {
-        title: 'Hatcher network',
-        description: 'UsePod primary · OpenRouter fallback',
-      },
-      partner: {
-        title: 'Partner provider routes',
-        description: 'Partner primary · Hatcher fallback where configured',
-      },
-    };
+    const providers = new Map<string, {
+      key: string;
+      name: string;
+      description: string;
+      models: HostedModelOption[];
+    }>();
 
-    return (['hatcher', 'partner'] as const).map((route) => {
-      const providers = new Map<string, {
-        key: string;
-        name: string;
-        description: string;
-        models: HostedModelOption[];
-      }>();
-
-      for (const model of filteredHostedModels) {
-        if (hostedModelPrivacy(model) !== route) continue;
-        const providerMeta = providerMetaByKey.get(model.providerKey);
-        const existing = providers.get(model.providerKey);
-        if (existing) {
-          existing.models.push(model);
-          continue;
-        }
-        providers.set(model.providerKey, {
-          key: model.providerKey,
-          name: providerMeta?.name ?? model.provider,
-          description: providerMeta?.description ?? model.description,
-          models: [model],
-        });
+    for (const model of filteredHostedModels) {
+      const providerMeta = providerMetaByKey.get(model.providerKey);
+      const existing = providers.get(model.providerKey);
+      if (existing) {
+        existing.models.push(model);
+        continue;
       }
+      providers.set(model.providerKey, {
+        key: model.providerKey,
+        name: providerMeta?.name ?? model.provider,
+        description: providerMeta?.description ?? model.description,
+        models: [model],
+      });
+    }
 
-      return {
-        route,
-        ...routeLabels[route],
-        providers: Array.from(providers.values()).sort(
-          (a, b) => (providerOrder.get(a.key) ?? Number.MAX_SAFE_INTEGER) - (providerOrder.get(b.key) ?? Number.MAX_SAFE_INTEGER),
-        ),
-      };
-    }).filter((group) => group.providers.length > 0);
+    return Array.from(providers.values()).sort(
+      (a, b) => (providerOrder.get(a.key) ?? Number.MAX_SAFE_INTEGER) - (providerOrder.get(b.key) ?? Number.MAX_SAFE_INTEGER),
+    );
   }, [filteredHostedModels, hostedModelProviders]);
   const virtualsModelStatusLabel = virtualsModelStatus === 'ready'
     ? `Virtuals: ${liveVirtualsModels.length} models`
     : virtualsModelStatus === 'loading'
       ? 'Virtuals: syncing'
       : 'Virtuals: starter list';
-  const hasPendingHostedModelChange = savedHostedModel !== null && savedHostedModel.id !== selectedHostedModel.id;
+  const draftModelValue = (useCustomModel ? customModelInput : configModel).trim();
+  const hasPendingModelChange = savedModelConfig.provider === hostedProvider && configProvider === hostedProvider
+    ? savedHostedModel?.id !== selectedHostedModel.id
+    : savedModelConfig.provider !== configProvider || savedModelConfig.model !== draftModelValue;
   const lowAiCreditBalance = isHostedMode && aiCreditBalance !== null && aiCreditBalance.balance < 100;
   const sortedModelPresets = useMemo(
     () => [...modelPresets].sort((a, b) => Number(b.favorite) - Number(a.favorite) || b.updatedAt - a.updatedAt),
@@ -612,12 +567,20 @@ export function ConfigTab() {
     : selectedByokProvider?.defaultBaseUrl ?? 'Provider default endpoint';
 
   const selectHostedModel = useCallback((modelId: string) => {
+    const model = getHostedModelOption(modelId, availableHostedModels);
     setConfigProvider(hostedProvider);
     setConfigModel(modelId);
     setUseCustomModel(false);
     setCustomModelInput('');
     setByokKeyInput('');
-  }, [setByokKeyInput, setConfigModel, setConfigProvider, setCustomModelInput, setUseCustomModel]);
+    setModelPrivacyFilter(hostedModelPrivacy(model));
+  }, [availableHostedModels, setByokKeyInput, setConfigModel, setConfigProvider, setCustomModelInput, setUseCustomModel]);
+
+  const selectModelNetwork = useCallback((network: HostedModelPrivacy) => {
+    setModelPrivacyFilter(network);
+    setSelectedProviderFilters([]);
+    setSelectedTagFilters([]);
+  }, []);
 
   const toggleProviderFilter = useCallback((providerKey: string) => {
     setSelectedProviderFilters((prev) => (
@@ -629,13 +592,6 @@ export function ConfigTab() {
     setSelectedTagFilters((prev) => (
       prev.includes(tag) ? prev.filter((item) => item !== tag) : [...prev, tag]
     ));
-  }, []);
-
-  const toggleModelSort = useCallback((key: ModelSortKey) => {
-    setModelSort((prev) => ({
-      key,
-      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
-    }));
   }, []);
 
   const persistModelPresets = useCallback((next: ModelPreset[]) => {
@@ -685,7 +641,11 @@ export function ConfigTab() {
     setUseCustomModel(preset.useCustomModel);
     setCustomModelInput(preset.customModelInput);
     setByokKeyInput('');
-  }, [setByokKeyInput, setConfigModel, setConfigProvider, setCustomModelInput, setUseCustomModel]);
+    if (preset.provider === hostedProvider) {
+      setModelPrivacyFilter(hostedModelPrivacy(getHostedModelOption(preset.model, availableHostedModels)));
+      setSelectedProviderFilters([]);
+    }
+  }, [availableHostedModels, setByokKeyInput, setConfigModel, setConfigProvider, setCustomModelInput, setUseCustomModel]);
 
   const updateModelPreset = useCallback((presetId: string, patch: Partial<ModelPreset>) => {
     persistModelPresets(modelPresets.map((preset) => (
@@ -732,6 +692,13 @@ export function ConfigTab() {
       if (presetImportRef.current) presetImportRef.current.value = '';
     }
   }, [modelPresets, persistModelPresets]);
+
+  useEffect(() => {
+    if (modelNetworkAgentIdRef.current === agent.id) return;
+    modelNetworkAgentIdRef.current = agent.id;
+    setModelPrivacyFilter(savedHostedModelNetwork((agent.config ?? {}) as Record<string, unknown>));
+    setSelectedProviderFilters([]);
+  }, [agent.config, agent.id]);
 
   useEffect(() => {
     if (!isHostedMode) return;
@@ -1063,8 +1030,19 @@ export function ConfigTab() {
           </div>
           <div className="grid gap-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-panel)] p-3 text-sm">
             <div className="flex items-center justify-between gap-3">
-              <span className="text-[var(--text-tertiary)]">Selected model</span>
-              <span className="min-w-0 truncate text-right font-semibold text-[var(--text-primary)]">{currentModelName}</span>
+              <span className="text-[var(--text-tertiary)]">Saved model</span>
+              <span className="min-w-0 truncate text-right font-semibold text-[var(--text-primary)]">{savedModelName}</span>
+            </div>
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-[var(--text-tertiary)]">Draft selection</span>
+              <span className="flex min-w-0 items-center justify-end gap-2 text-right font-semibold text-[var(--text-primary)]">
+                <span className="truncate">{currentModelName}</span>
+                {hasPendingModelChange && (
+                  <span className="flex-shrink-0 rounded border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-1.5 py-0.5 text-[10px] font-medium text-[var(--color-warning)]">
+                    Unsaved
+                  </span>
+                )}
+              </span>
             </div>
             <div className="flex items-center justify-between gap-3">
               <span className="text-[var(--text-tertiary)]">Route</span>
@@ -1115,73 +1093,8 @@ export function ConfigTab() {
 
         {isHostedMode ? (
           <div className="space-y-4">
-            <div className="grid gap-3 md:grid-cols-2">
-              {([
-                {
-                  key: 'hatcher' as const,
-                  title: 'Hatcher provider network',
-                  description: 'UsePod primary · OpenRouter fallback',
-                  detail: 'The common model catalog with automatic provider failover.',
-                  icon: <Globe2 className="h-4 w-4" />,
-                },
-                {
-                  key: 'partner' as const,
-                  title: 'Partner provider routes',
-                  description: 'IDLE · AceData · OpenServ · Virtuals',
-                  detail: 'Partner-primary inference, with OpenRouter fallback where configured.',
-                  icon: <ShieldCheck className="h-4 w-4" />,
-                },
-              ]).map((route) => {
-                const stats = hostedRouteStats.get(route.key)!;
-                const active = modelPrivacyFilter === route.key;
-                return (
-                  <button
-                    key={route.key}
-                    type="button"
-                    onClick={() => setModelPrivacyFilter(active ? 'all' : route.key)}
-                    className={`rounded-xl border p-4 text-left transition-colors ${
-                      active
-                        ? 'border-[var(--accent-primary)]/50 bg-[var(--accent-primary)]/10'
-                        : 'border-[var(--border-subtle)] bg-[var(--bg-muted)] hover:border-[var(--accent-primary)]/30'
-                    }`}
-                    aria-pressed={active}
-                  >
-                    <span className="flex items-start justify-between gap-3">
-                      <span className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
-                        <span className="text-[var(--accent-primary)]">{route.icon}</span>
-                        {route.title}
-                      </span>
-                      <span className="rounded-md border border-[var(--border-subtle)] bg-[var(--bg-panel)] px-2 py-1 text-[10px] font-medium text-[var(--text-secondary)]">
-                        {stats.models} models
-                      </span>
-                    </span>
-                    <span className="mt-2 block text-xs font-medium text-[var(--text-secondary)]">{route.description}</span>
-                    <span className="mt-1 block text-xs leading-relaxed text-[var(--text-tertiary)]">{route.detail}</span>
-                    <span className="mt-2 block text-[10px] uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
-                      {stats.providers.size} {stats.providers.size === 1 ? 'provider' : 'providers'}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
             <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-4">
-              <div className="grid gap-4 lg:grid-cols-[0.9fr,1.1fr]">
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-                  <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-panel)] p-3">
-                    <p className="text-xs font-semibold text-[var(--text-tertiary)]">Selected model</p>
-                    <p className="mt-1 truncate text-sm font-semibold text-[var(--text-primary)]">{selectedHostedModel.name}</p>
-                    <p className="mt-1 truncate text-xs text-[var(--text-secondary)]">{selectedHostedModel.provider}</p>
-                  </div>
-                  <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-panel)] p-3">
-                    <p className="text-xs font-semibold text-[var(--text-tertiary)]">Saved model</p>
-                    <p className="mt-1 truncate text-sm font-semibold text-[var(--text-primary)]">{savedModelName}</p>
-                    <p className="mt-1 text-xs text-[var(--text-secondary)]">
-                      {hasPendingHostedModelChange ? 'Save AI Models to apply the selected model.' : 'Currently active for this agent.'}
-                    </p>
-                  </div>
-                </div>
-                <div className="min-w-0">
+              <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-medium text-[var(--text-primary)]">{selectedHostedModel.name}</span>
                     <span className="rounded border border-[var(--border-subtle)] bg-[var(--bg-panel)] px-2 py-0.5 text-xs text-[var(--text-secondary)]">
@@ -1236,19 +1149,28 @@ export function ConfigTab() {
                       <span>{selectedHostedModel.warning || 'AI Credits are low for hosted model usage.'}</span>
                     </div>
                   )}
-                </div>
               </div>
             </div>
 
             <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-4">
-              <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                  <h4 className="text-sm font-semibold text-[var(--text-primary)]">Saved Model Presets</h4>
-                  <p className="mt-1 text-xs text-[var(--text-tertiary)]">
-                    Save reusable model choices. Export/import never includes API keys.
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-2">
+              <div className={`flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between ${modelPresetsExpanded ? 'mb-4' : ''}`}>
+                <button
+                  type="button"
+                  onClick={() => setModelPresetsExpanded((expanded) => !expanded)}
+                  className="flex min-w-0 flex-1 items-center justify-between gap-3 text-left"
+                  aria-expanded={modelPresetsExpanded}
+                >
+                  <span className="min-w-0">
+                    <span className="block text-sm font-semibold text-[var(--text-primary)]">Saved Model Presets</span>
+                    <span className="mt-1 block text-xs text-[var(--text-tertiary)]">
+                      {modelPresets.length} saved · Reusable choices without API keys
+                    </span>
+                  </span>
+                  {modelPresetsExpanded
+                    ? <ChevronUp className="h-4 w-4 flex-shrink-0 text-[var(--text-tertiary)]" />
+                    : <ChevronDown className="h-4 w-4 flex-shrink-0 text-[var(--text-tertiary)]" />}
+                </button>
+                {modelPresetsExpanded && <div className="flex flex-wrap gap-2">
                   <button
                     type="button"
                     onClick={exportModelPresets}
@@ -1266,9 +1188,10 @@ export function ConfigTab() {
                     <Upload className="h-3.5 w-3.5" />
                     Import
                   </button>
-                </div>
+                </div>}
               </div>
 
+              {modelPresetsExpanded && <>
               <div className="grid gap-3 lg:grid-cols-[1fr,1fr,auto]">
                 <input
                   value={presetName}
@@ -1352,6 +1275,7 @@ export function ConfigTab() {
                   })}
                 </div>
               )}
+              </>}
             </div>
 
             <div className="grid gap-4 lg:grid-cols-[1fr,0.9fr]">
@@ -1420,8 +1344,101 @@ export function ConfigTab() {
               </div>
             </div>
 
-            <div className="space-y-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-3">
-              <div>
+            <div className="space-y-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-3">
+              <div className="grid gap-4 lg:grid-cols-[auto,1fr]">
+                <div>
+                  <span className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">Inference network</span>
+                  <div className="inline-flex overflow-hidden rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-panel)] text-sm font-medium">
+                    {([
+                      ['hatcher', 'Hatcher'],
+                      ['partner', 'Partners'],
+                    ] as const).map(([value, label]) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => selectModelNetwork(value)}
+                        className={`px-4 py-2 transition-colors ${
+                          modelPrivacyFilter === value
+                            ? 'bg-[var(--accent-primary)]/10 text-[var(--text-primary)]'
+                            : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                        }`}
+                        aria-pressed={modelPrivacyFilter === value}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="mt-2 max-w-xs text-[11px] leading-relaxed text-[var(--text-tertiary)]">
+                    {modelPrivacyFilter === 'hatcher'
+                      ? 'Hatcher routes common models through UsePod with OpenRouter fallback.'
+                      : 'Partner-primary routes from IDLE, OpenServ, AceData, and Virtuals.'}
+                  </p>
+                </div>
+
+                <div>
+                  <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                    <span className="text-xs font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
+                      {modelPrivacyFilter === 'hatcher' ? 'Model families' : 'Inference partners'}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      {modelPrivacyFilter === 'partner' && (
+                        <span
+                          className={`rounded border px-2 py-0.5 text-[10px] ${
+                            virtualsModelStatus === 'ready'
+                              ? 'border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success)]'
+                              : 'border-[var(--border-subtle)] bg-[var(--bg-panel)] text-[var(--text-tertiary)]'
+                          }`}
+                        >
+                          {virtualsModelStatusLabel}
+                        </span>
+                      )}
+                      {selectedProviderFilters.length > 0 && (
+                        <button type="button" onClick={() => setSelectedProviderFilters([])} className="text-xs text-[var(--accent-primary)] hover:underline">
+                          Clear
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2" role="group" aria-label={modelPrivacyFilter === 'hatcher' ? 'Hatcher model families' : 'Inference partners'}>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedProviderFilters([])}
+                      aria-pressed={selectedProviderFilters.length === 0}
+                      className={`rounded-lg border px-2.5 py-1.5 text-xs transition-colors ${
+                        selectedProviderFilters.length === 0
+                          ? 'border-[var(--accent-primary)]/50 bg-[var(--accent-primary)]/10 text-[var(--text-primary)]'
+                          : 'border-[var(--border-subtle)] bg-[var(--bg-panel)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)]/30'
+                      }`}
+                    >
+                      All
+                    </button>
+                    {contextualHostedModelProviders.map((provider) => {
+                      const active = selectedProviderFilters.includes(provider.key);
+                      return (
+                        <button
+                          key={provider.key}
+                          type="button"
+                          onClick={() => toggleProviderFilter(provider.key)}
+                          title={provider.description}
+                          aria-pressed={active}
+                          className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs transition-colors ${
+                            active
+                              ? 'border-[var(--accent-primary)]/50 bg-[var(--accent-primary)]/10 text-[var(--text-primary)]'
+                              : 'border-[var(--border-subtle)] bg-[var(--bg-panel)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)]/30'
+                          }`}
+                        >
+                          <span className="inline-flex h-5 min-w-5 items-center justify-center rounded bg-[var(--bg-muted)] px-1 text-[9px] font-bold">
+                            {PROVIDER_GLYPH[provider.key] ?? provider.name.slice(0, 1)}
+                          </span>
+                          {provider.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t border-[var(--border-subtle)] pt-3">
                 <div className="mb-2 flex items-center justify-between gap-2">
                   <span className="text-xs font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">Strengths</span>
                   {selectedTagFilters.length > 0 && (
@@ -1430,7 +1447,7 @@ export function ConfigTab() {
                     </button>
                   )}
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2" role="group" aria-label="Model strengths">
                   {HOSTED_TAG_OPTIONS.map((tag) => {
                     const active = selectedTagFilters.includes(tag);
                     return (
@@ -1438,6 +1455,7 @@ export function ConfigTab() {
                         key={tag}
                         type="button"
                         onClick={() => toggleTagFilter(tag)}
+                        aria-pressed={active}
                         className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs capitalize transition-colors ${
                           active
                             ? 'border-[var(--accent-primary)]/50 bg-[var(--accent-primary)]/10 text-[var(--text-primary)]'
@@ -1451,220 +1469,59 @@ export function ConfigTab() {
                   })}
                 </div>
               </div>
-
-              <div>
-                <span className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">Data route</span>
-                <div className="inline-flex overflow-hidden rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-panel)] text-xs">
-                  {([
-                    ['all', 'Any route'],
-                    ['hatcher', 'Hatcher route'],
-                    ['partner', 'Partner route'],
-                  ] as const).map(([value, label]) => (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => setModelPrivacyFilter(value)}
-                      className={`px-3 py-1.5 transition-colors ${
-                        modelPrivacyFilter === value
-                          ? 'bg-[var(--accent-primary)]/10 text-[var(--text-primary)]'
-                          : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <div className="mb-2 flex items-center justify-between gap-2">
-                  <span className="text-xs font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">Providers</span>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`rounded border px-2 py-0.5 text-[10px] ${
-                        virtualsModelStatus === 'ready'
-                          ? 'border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success)]'
-                          : 'border-[var(--border-subtle)] bg-[var(--bg-panel)] text-[var(--text-tertiary)]'
-                      }`}
-                    >
-                      {virtualsModelStatusLabel}
-                    </span>
-                    {selectedProviderFilters.length > 0 && (
-                      <button type="button" onClick={() => setSelectedProviderFilters([])} className="text-xs text-[var(--accent-primary)] hover:underline">
-                        Clear
-                      </button>
-                    )}
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {hostedModelProviders.map((provider) => {
-                    const active = selectedProviderFilters.includes(provider.key);
-                    return (
-                      <button
-                        key={provider.key}
-                        type="button"
-                        onClick={() => toggleProviderFilter(provider.key)}
-                        title={provider.description}
-                        className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs transition-colors ${
-                          active
-                            ? 'border-[var(--accent-primary)]/50 bg-[var(--accent-primary)]/10 text-[var(--text-primary)]'
-                            : 'border-[var(--border-subtle)] bg-[var(--bg-panel)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)]/30'
-                        }`}
-                      >
-                        <span className="inline-flex h-5 min-w-5 items-center justify-center rounded bg-[var(--bg-muted)] px-1 text-[9px] font-bold">
-                          {PROVIDER_GLYPH[provider.key] ?? provider.name.slice(0, 1)}
-                        </span>
-                        {provider.name}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
             </div>
 
             <div className="overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)]">
-              <div className="flex flex-col gap-3 border-b border-[var(--border-subtle)] bg-[var(--bg-panel)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm font-semibold text-[var(--text-primary)]">
-                    {filteredHostedModels.length} managed {filteredHostedModels.length === 1 ? 'model' : 'models'}
-                  </p>
-                  <p className="mt-0.5 text-xs text-[var(--text-tertiary)]">
-                    Provider view separates the Hatcher network from partner-primary routes.
-                  </p>
-                </div>
-                <div className="inline-flex self-start overflow-hidden rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-muted)] text-xs sm:self-auto">
-                  <button
-                    type="button"
-                    onClick={() => setModelCatalogView('providers')}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 transition-colors ${
-                      modelCatalogView === 'providers'
-                        ? 'bg-[var(--accent-primary)]/10 text-[var(--text-primary)]'
-                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                    }`}
-                    aria-pressed={modelCatalogView === 'providers'}
-                  >
-                    <Layers3 className="h-3.5 w-3.5" />
-                    By provider
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setModelCatalogView('models')}
-                    className={`inline-flex items-center gap-1.5 border-l border-[var(--border-subtle)] px-3 py-1.5 transition-colors ${
-                      modelCatalogView === 'models'
-                        ? 'bg-[var(--accent-primary)]/10 text-[var(--text-primary)]'
-                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                    }`}
-                    aria-pressed={modelCatalogView === 'models'}
-                  >
-                    <List className="h-3.5 w-3.5" />
-                    All models
-                  </button>
-                </div>
+              <div className="border-b border-[var(--border-subtle)] bg-[var(--bg-panel)] px-4 py-3">
+                <p className="text-sm font-semibold text-[var(--text-primary)]">
+                  {filteredHostedModels.length} {modelPrivacyFilter === 'hatcher' ? 'Hatcher' : 'partner'} {filteredHostedModels.length === 1 ? 'model' : 'models'}
+                </p>
+                <p className="mt-0.5 text-xs text-[var(--text-tertiary)]">
+                  {modelPrivacyFilter === 'hatcher'
+                    ? 'Grouped by model family. Hatcher handles provider failover automatically.'
+                    : 'Grouped by the partner that receives and runs the inference request.'}
+                </p>
               </div>
               <div className="hidden grid-cols-[1.35fr,0.72fr,1fr,0.72fr,0.9fr,auto] gap-3 border-b border-[var(--border-subtle)] px-4 py-2 text-[11px] uppercase tracking-[0.08em] text-[var(--text-tertiary)] md:grid">
-                {modelCatalogView === 'models' ? (
-                  <>
-                    {([
-                      ['name', 'Provider / Model'],
-                      ['context', 'Context Window'],
-                    ] as Array<[ModelSortKey, string]>).map(([key, label]) => (
-                      <button
-                        key={key}
-                        type="button"
-                        onClick={() => toggleModelSort(key)}
-                        className="text-left transition-colors hover:text-[var(--text-secondary)]"
-                      >
-                        {label}
-                        {modelSort.key === key && <span className="ml-1">{modelSort.direction === 'asc' ? '↑' : '↓'}</span>}
-                      </button>
-                    ))}
-                    <span>Strengths</span>
-                    {([
-                      ['cost', 'Cost'],
-                      ['privacy', 'Route'],
-                    ] as Array<[ModelSortKey, string]>).map(([key, label]) => (
-                      <button
-                        key={key}
-                        type="button"
-                        onClick={() => toggleModelSort(key)}
-                        className="text-left transition-colors hover:text-[var(--text-secondary)]"
-                      >
-                        {label}
-                        {modelSort.key === key && <span className="ml-1">{modelSort.direction === 'asc' ? '↑' : '↓'}</span>}
-                      </button>
-                    ))}
-                    <span className="text-right">Status</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Provider / Model</span>
-                    <span>Context Window</span>
-                    <span>Strengths</span>
-                    <span>Cost</span>
-                    <span>Route</span>
-                    <span className="text-right">Status</span>
-                  </>
-                )}
+                <span>Provider / Model</span>
+                <span>Context Window</span>
+                <span>Strengths</span>
+                <span>Cost</span>
+                <span>Route</span>
+                <span className="text-right">Status</span>
               </div>
               <div className="max-h-[430px] overflow-y-auto">
                 {filteredHostedModels.length === 0 ? (
                   <div className="p-4 text-sm text-[var(--text-secondary)]">
                     No hosted models match these filters.
                   </div>
-                ) : modelCatalogView === 'providers' ? (
-                  groupedHostedModelRoutes.map((routeGroup) => (
-                    <div key={routeGroup.route}>
-                      <div className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-[var(--border-subtle)] bg-[var(--bg-panel)] px-4 py-2.5 shadow-sm">
-                        <span className="min-w-0">
-                          <span className="block text-xs font-semibold uppercase tracking-[0.08em] text-[var(--text-primary)]">
-                            {routeGroup.title}
+                ) : (
+                  groupedHostedModelsByProvider.map((providerGroup) => (
+                    <div key={providerGroup.key}>
+                      <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-[var(--border-subtle)] bg-[var(--bg-muted)] px-4 py-2 shadow-sm">
+                        <span className="flex min-w-0 items-center gap-2">
+                          <span className="inline-flex h-6 min-w-6 flex-shrink-0 items-center justify-center rounded-md border border-[var(--border-subtle)] bg-[var(--bg-panel)] px-1 text-[9px] font-bold text-[var(--text-secondary)]">
+                            {PROVIDER_GLYPH[providerGroup.key] ?? providerGroup.name.slice(0, 1)}
                           </span>
-                          <span className="mt-0.5 block truncate text-[10px] text-[var(--text-tertiary)]">
-                            {routeGroup.description}
+                          <span className="min-w-0">
+                            <span className="block truncate text-xs font-semibold text-[var(--text-primary)]">{providerGroup.name}</span>
+                            <span className="block truncate text-[10px] text-[var(--text-tertiary)]">{providerGroup.description}</span>
                           </span>
                         </span>
-                        <span className="flex-shrink-0 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-muted)] px-2 py-1 text-[10px] text-[var(--text-secondary)]">
-                          {routeGroup.providers.reduce((total, provider) => total + provider.models.length, 0)} models
+                        <span className="flex-shrink-0 text-[10px] text-[var(--text-tertiary)]">
+                          {providerGroup.models.length}
                         </span>
                       </div>
-                      {routeGroup.providers.map((providerGroup) => (
-                        <div key={providerGroup.key}>
-                          <div className="flex items-center justify-between gap-3 border-b border-[var(--border-subtle)] bg-[var(--bg-muted)] px-4 py-2">
-                            <span className="flex min-w-0 items-center gap-2">
-                              <span className="inline-flex h-6 min-w-6 flex-shrink-0 items-center justify-center rounded-md border border-[var(--border-subtle)] bg-[var(--bg-panel)] px-1 text-[9px] font-bold text-[var(--text-secondary)]">
-                                {PROVIDER_GLYPH[providerGroup.key] ?? providerGroup.name.slice(0, 1)}
-                              </span>
-                              <span className="min-w-0">
-                                <span className="block truncate text-xs font-semibold text-[var(--text-primary)]">{providerGroup.name}</span>
-                                <span className="block truncate text-[10px] text-[var(--text-tertiary)]">{providerGroup.description}</span>
-                              </span>
-                            </span>
-                            <span className="flex-shrink-0 text-[10px] text-[var(--text-tertiary)]">
-                              {providerGroup.models.length}
-                            </span>
-                          </div>
-                          {providerGroup.models.map((model) => (
-                            <HostedModelRow
-                              key={model.id}
-                              model={model}
-                              selected={model.id === selectedHostedModel.id}
-                              active={savedHostedModel?.id === model.id}
-                              onSelect={selectHostedModel}
-                            />
-                          ))}
-                        </div>
+                      {providerGroup.models.map((model) => (
+                        <HostedModelRow
+                          key={model.id}
+                          model={model}
+                          selected={model.id === selectedHostedModel.id}
+                          active={savedHostedModel?.id === model.id}
+                          onSelect={selectHostedModel}
+                        />
                       ))}
                     </div>
-                  ))
-                ) : (
-                  filteredHostedModels.map((model) => (
-                    <HostedModelRow
-                      key={model.id}
-                      model={model}
-                      selected={model.id === selectedHostedModel.id}
-                      active={savedHostedModel?.id === model.id}
-                      onSelect={selectHostedModel}
-                    />
                   ))
                 )}
               </div>
