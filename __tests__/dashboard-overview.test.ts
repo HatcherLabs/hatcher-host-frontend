@@ -3,14 +3,12 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {
   DASHBOARD_WORKSPACE_ROUTES,
-  buildDashboardOverviewModel,
   isDashboardWorkspaceRouteActive,
 } from '@/lib/dashboard-overview';
 
 describe('dashboard workspace navigation', () => {
-  it('keeps the four primary workspace surfaces in one ordered contract', () => {
+  it('keeps the agent workspace surfaces in one ordered contract', () => {
     expect(DASHBOARD_WORKSPACE_ROUTES).toEqual([
-      { key: 'overview', href: '/dashboard' },
       { key: 'agents', href: '/dashboard/agents' },
       { key: 'missions', href: '/dashboard/missions' },
       { key: 'outcomePacks', href: '/dashboard/outcome-packs' },
@@ -18,12 +16,12 @@ describe('dashboard workspace navigation', () => {
   });
 
   it('selects the correct workspace item for nested dashboard routes', () => {
-    expect(isDashboardWorkspaceRouteActive('/dashboard', 'overview')).toBe(true);
+    expect(isDashboardWorkspaceRouteActive('/dashboard', 'agents')).toBe(true);
     expect(isDashboardWorkspaceRouteActive('/dashboard/agents/import', 'agents')).toBe(true);
     expect(isDashboardWorkspaceRouteActive('/dashboard/agent/agent-1', 'agents')).toBe(true);
     expect(isDashboardWorkspaceRouteActive('/dashboard/missions', 'missions')).toBe(true);
     expect(isDashboardWorkspaceRouteActive('/dashboard/outcome-packs', 'outcomePacks')).toBe(true);
-    expect(isDashboardWorkspaceRouteActive('/dashboard/billing', 'overview')).toBe(false);
+    expect(isDashboardWorkspaceRouteActive('/dashboard/billing', 'agents')).toBe(false);
   });
 
   it('surfaces missions and Outcome Packs in every live navigation path', () => {
@@ -38,41 +36,6 @@ describe('dashboard workspace navigation', () => {
       expect(source, file).toContain('/dashboard/missions');
       expect(source, file).toContain('/dashboard/outcome-packs');
     }
-  });
-});
-
-describe('dashboard overview model', () => {
-  it('combines agent health with a sorted, bounded mission summary', () => {
-    const agents = [
-      { id: 'agent-1', name: 'Active', status: 'active', framework: 'hermes', description: null, avatarUrl: null, createdAt: '2026-01-01T00:00:00.000Z' },
-      { id: 'agent-2', name: 'Paused', status: 'paused', framework: 'openclaw', description: null, avatarUrl: null, createdAt: '2026-01-01T00:00:00.000Z' },
-    ];
-    const tasks = Array.from({ length: 6 }, (_, index) => ({
-      id: `task-${index + 1}`,
-      agentId: 'agent-1',
-      agent: { id: 'agent-1', name: 'Active', framework: 'hermes', status: 'active' },
-      title: `Task ${index + 1}`,
-      status: index === 0 ? 'pending_approval' : index === 1 ? 'running' : 'completed',
-      createdAt: `2026-07-${String(index + 1).padStart(2, '0')}T00:00:00.000Z`,
-      updatedAt: `2026-07-${String(index + 1).padStart(2, '0')}T00:00:00.000Z`,
-    }));
-
-    const model = buildDashboardOverviewModel(agents, { tasks, nextCursor: null });
-
-    expect(model.metrics).toEqual({
-      agents: 2,
-      activeAgents: 1,
-      activeMissions: 1,
-      awaitingApproval: 1,
-      needsAttention: 1,
-    });
-    expect(model.recentTasks.map((task) => task.id)).toEqual([
-      'task-6',
-      'task-5',
-      'task-4',
-      'task-3',
-      'task-2',
-    ]);
   });
 });
 

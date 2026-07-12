@@ -11,7 +11,6 @@ import {
   ArrowRight,
   BarChart3,
   BookOpen,
-  Bot,
   Boxes,
   Building2,
   CircleDollarSign,
@@ -67,7 +66,6 @@ export function Nav() {
 
   const WORKSPACE_MENU = useMemo(() => ([
     { key: 'dashboard', label: tNav('dashboard'), sub: tMenu('sub_dashboard'), href: '/dashboard', Icon: LayoutDashboard },
-    { key: 'agents', label: tNav('myAgents'), sub: tMenu('sub_myAgents'), href: '/dashboard/agents', Icon: Bot },
     { key: 'missions', label: tMission('title'), sub: tMenu('sub_missionControl'), href: '/dashboard/missions', Icon: ListChecks },
     { key: 'outcomePacks', label: tOutcome('title'), sub: tMenu('sub_outcomePacks'), href: '/dashboard/outcome-packs', Icon: PackageCheck },
   ] satisfies ReadonlyArray<{ key: string; label: string; sub: string; href: string; Icon: LucideIcon }>), [tMenu, tMission, tNav, tOutcome]);

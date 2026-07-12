@@ -2486,6 +2486,7 @@
     },
     "content": {
       "categories": {
+        "markets": "Mercados y trading",
         "research": "Investigación",
         "engineering": "Ingeniería",
         "monitoring": "Monitorización",
@@ -2495,7 +2496,9 @@
         "x": "X",
         "linkedin": "LinkedIn",
         "blog": "Blog",
-        "email": "Correo electrónico"
+        "email": "Correo electrónico",
+        "long": "Largo",
+        "short": "Corto"
       },
       "artifactKinds": {
         "text": "texto",
@@ -2511,6 +2514,65 @@
         "schedules_disabled": "{count, plural, one {# plantilla de programación está preparada, pero permanece desactivada.} other {# plantillas de programación están preparadas, pero permanecen desactivadas.}}"
       },
       "packs": {
+        "marketPulse": {
+          "title": "Pulso del mercado",
+          "summary": "Genera un informe de mercado con marcas de tiempo para los activos seleccionados y las señales a vigilar.",
+          "fields": {
+            "assets": "Activos",
+            "horizon": "Horizonte temporal",
+            "focus": "Enfoque del análisis",
+            "watchSignals": "Señales a vigilar",
+            "outputLanguage": "Idioma de salida"
+          },
+          "deliverables": {
+            "deliverable-1": "Pulso del mercado con marcas de tiempo",
+            "deliverable-2": "Señales y riesgos priorizados"
+          },
+          "manualAcceptance": "Las observaciones del mercado incluyen marcas de tiempo y fuentes de datos.",
+          "schedules": {
+            "daily-market-pulse": "Pulso diario del mercado"
+          },
+          "taskTitle": "Pulso del mercado",
+          "taskDescription": "Genera un informe con marcas de tiempo sobre los datos y riesgos de mercado de los activos seleccionados."
+        },
+        "tradePlanReview": {
+          "title": "Revisión del plan de trading",
+          "summary": "Somete a prueba una tesis de trading proporcionada por el usuario, sin abrir ni gestionar operaciones.",
+          "fields": {
+            "asset": "Activo",
+            "network": "Red o plataforma",
+            "direction": "Dirección",
+            "capitalAmount": "Importe de capital",
+            "capitalCurrency": "Moneda del capital",
+            "maxLossPercent": "Pérdida máxima (% del capital)",
+            "horizon": "Horizonte temporal",
+            "thesis": "Tesis de trading"
+          },
+          "deliverables": {
+            "deliverable-1": "Revisión de riesgos del plan de trading",
+            "deliverable-2": "Lista de escenarios revisada por una persona"
+          },
+          "manualAcceptance": "Los supuestos de tamaño y las condiciones de invalidación son explícitos.",
+          "taskTitle": "Revisión del plan de trading",
+          "taskDescription": "Revisa los riesgos, supuestos y escenarios de un plan de trading proporcionado por el usuario."
+        },
+        "portfolioRiskReview": {
+          "title": "Revisión de riesgos de la cartera",
+          "summary": "Evalúa las posiciones proporcionadas por el usuario en cuanto a concentración, liquidez y riesgo de pérdida.",
+          "fields": {
+            "holdings": "Posiciones y asignaciones (ACTIVO: 25 %, una por línea)",
+            "baseCurrency": "Moneda base",
+            "objective": "Objetivo de la cartera",
+            "constraints": "Restricciones"
+          },
+          "deliverables": {
+            "deliverable-1": "Informe de riesgos de la cartera",
+            "deliverable-2": "Opciones de rebalanceo revisadas por una persona"
+          },
+          "manualAcceptance": "Las opciones respetan el objetivo y las restricciones proporcionados por el usuario.",
+          "taskTitle": "Revisión de riesgos de la cartera",
+          "taskDescription": "Evalúa las posiciones proporcionadas por el usuario y plantea opciones de riesgo para revisión humana."
+        },
         "researchReport": {
           "title": "Informe de investigación",
           "summary": "Elabora un informe de investigación con fuentes, listo para tomar decisiones y centrado en un tema concreto.",
@@ -2648,6 +2710,8 @@
       "schedules": "Horarios propuestos",
       "scheduleOff": "Desactivado",
       "scheduleNotice": "Los horarios permanecen desactivados al lanzar y requieren otra confirmación.",
+      "manualReviewTitle": "Se requiere la revisión del propietario",
+      "manualReviewDescription": "El resultado final permanece en Mission Control hasta que el propietario lo apruebe o rechace.",
       "setup": {
         "connectors": "Abrir Connectors",
         "dev": "Abrir configuración de desarrollador",
@@ -2910,6 +2974,7 @@
     "status": {
       "ready": "Ready",
       "pending_approval": "Needs approval",
+      "pending_review": "Pendiente de revisión",
       "queued": "Queued",
       "running": "Running",
       "completed": "Completed",

@@ -1,9 +1,11 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useAgentContext } from '../AgentContext';
 import { GenericDashboard } from './GenericDashboard';
 import { HermesDashboard } from './HermesDashboard';
 import { OpenClawDashboard } from './OpenClawDashboard';
+import { AgentOperationsCard } from './cards/AgentOperationsCard';
 
 /**
  * Agent dashboard entry point. Routes to a per-framework dashboard
@@ -22,12 +24,22 @@ import { OpenClawDashboard } from './OpenClawDashboard';
 export function DashboardTab() {
   const { agent } = useAgentContext();
 
+  let dashboard: ReactNode;
   switch (agent.framework) {
     case 'hermes':
-      return <HermesDashboard />;
+      dashboard = <HermesDashboard />;
+      break;
     case 'openclaw':
-      return <OpenClawDashboard />;
+      dashboard = <OpenClawDashboard />;
+      break;
     default:
-      return <GenericDashboard />;
+      dashboard = <GenericDashboard />;
   }
+
+  return (
+    <div className="space-y-6">
+      <AgentOperationsCard />
+      {dashboard}
+    </div>
+  );
 }

@@ -28,7 +28,7 @@ import {
   X,
   XCircle,
 } from 'lucide-react';
-import { Link } from '@/i18n/routing';
+import { Link, useRouter } from '@/i18n/routing';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import type { Agent, MissionTask, MissionTaskStatus, MissionTaskSummary } from '@/lib/api';
@@ -46,6 +46,7 @@ import {
 } from '@/lib/mission-control';
 import { normalizeOutcomePackAcceptanceChecks, outcomePackCopySlug } from '@/lib/outcome-packs';
 import { useToast } from '@/components/ui/ToastProvider';
+import { agentWorkspaceHref, requestedOwnedAgentId } from '@/lib/agent-workspace';
 import styles from './missions.module.css';
 
 type StatusFilter = 'all' | MissionTaskStatus;
@@ -103,7 +104,7 @@ function TaskStatus({ status, label }: { status: MissionTaskStatus; label: strin
       ? XCircle
       : status === 'running'
         ? Activity
-        : status === 'pending_approval'
+        : status === 'pending_approval' || status === 'pending_review'
           ? ShieldCheck
           : status === 'cancelled'
             ? Square
@@ -459,7 +460,10 @@ function TaskDetail({
         <div><dt>{t('facts.updated')}</dt><dd>{formatDate(task.updatedAt, locale)}</dd></div>
         <div><dt>{t('facts.budget')}</dt><dd>{task.budget.aiCredits === null ? t('noTarget') : compactNumber(task.budget.aiCredits, locale)}</dd></div>
         <div><dt>{t('facts.cost')}</dt><dd>{task.cost.aiCredits === null ? t('notMeasured') : compactNumber(task.cost.aiCredits, locale)}</dd></div>
-        <div><dt>{t('facts.approval')}</dt><dd>{task.requiresApproval ? t('required') : t('notRequired')}</dd></div>
+        <div>
+          <dt>{t('facts.approval')}</dt>
+          <dd>{task.requiresApproval || task.reviewPolicy?.mode === 'manual_required' ? t('required') : t('notRequired')}</dd>
+        </div>
         <div><dt>{t('facts.source')}</dt><dd>{task.source}</dd></div>
       </dl>
 
@@ -567,6 +571,7 @@ export default function MissionControlPage() {
   const locale = useLocale();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
+  const router = useRouter();
   const requestedTaskConsumedRef = useRef(false);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [tasks, setTasks] = useState<MissionTask[]>([]);
@@ -598,9 +603,12 @@ export default function MissionControlPage() {
     });
   }, []);
 
-  const loadTasks = useCallback(async (quiet = false) => {
+  const loadTasks = useCallback(async (quiet = false, scopedAgentId = agentFilter) => {
     if (!quiet) setRefreshing(true);
-    const result = await api.getMissionTasks({ limit: 100 });
+    const result = await api.getMissionTasks({
+      limit: 100,
+      ...(scopedAgentId !== 'all' ? { agentId: scopedAgentId } : {}),
+    });
     if (!quiet) setRefreshing(false);
     if (!result.success) {
       if (!quiet) setError(result.error);
@@ -613,7 +621,7 @@ export default function MissionControlPage() {
       ? current
       : model.tasks[0]?.id ?? null);
     setError(null);
-  }, []);
+  }, [agentFilter]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -622,15 +630,27 @@ export default function MissionControlPage() {
     }
     let cancelled = false;
     setLoading(true);
-    Promise.all([api.getMyAgents(), api.getMissionTasks({ limit: 100 })]).then(([agentsResult, tasksResult]) => {
+    void (async () => {
+      const agentsResult = await api.getMyAgents();
       if (cancelled) return;
-      setLoading(false);
       if (!agentsResult.success) {
+        setLoading(false);
         setError(agentsResult.error);
         return;
       }
       setAgents(agentsResult.data);
-      setForm((current) => ({ ...current, agentId: current.agentId || agentsResult.data[0]?.id || '' }));
+      const search = window.location.search;
+      const requestedAgentId = requestedOwnedAgentId(search, agentsResult.data);
+      const initialAgentId = requestedAgentId ?? agentsResult.data[0]?.id ?? '';
+      setForm((current) => ({ ...current, agentId: current.agentId || initialAgentId }));
+      setAgentFilter(requestedAgentId ?? 'all');
+      if (new URLSearchParams(search).get('create') === '1') setCreateOpen(true);
+      const tasksResult = await api.getMissionTasks({
+        limit: 100,
+        ...(requestedAgentId ? { agentId: requestedAgentId } : {}),
+      });
+      if (cancelled) return;
+      setLoading(false);
       if (!tasksResult.success) {
         setError(tasksResult.error);
         return;
@@ -638,11 +658,37 @@ export default function MissionControlPage() {
       const model = normalizeMissionTaskList(tasksResult.data);
       setTasks(model.tasks);
       setSummary(model.summary);
-      setSelectedId(model.tasks[0]?.id ?? null);
+      const initialTasks = requestedAgentId
+        ? model.tasks.filter((task) => task.agentId === requestedAgentId)
+        : model.tasks;
+      setSelectedId(initialTasks[0]?.id ?? null);
       setError(null);
-    });
+    })();
     return () => { cancelled = true; };
   }, [isAuthenticated]);
+
+  const updateAgentFilter = useCallback((nextAgentId: string) => {
+    setAgentFilter(nextAgentId);
+    if (nextAgentId !== 'all') {
+      setForm((current) => ({ ...current, agentId: nextAgentId }));
+    }
+    const params = new URLSearchParams(window.location.search);
+    params.delete('task');
+    params.delete('create');
+    if (nextAgentId === 'all') params.delete('agent');
+    else params.set('agent', nextAgentId);
+    const search = params.toString();
+    router.replace(`/dashboard/missions${search ? `?${search}` : ''}`, { scroll: false });
+    void loadTasks(false, nextAgentId);
+  }, [loadTasks, router]);
+
+  const closeCreateDialog = useCallback(() => {
+    setCreateOpen(false);
+    const params = new URLSearchParams(window.location.search);
+    params.delete('create');
+    const search = params.toString();
+    router.replace(`/dashboard/missions${search ? `?${search}` : ''}`, { scroll: false });
+  }, [router]);
 
   const hasActiveTasks = tasks.some((task) => task.status === 'queued' || task.status === 'running');
   useEffect(() => {
@@ -663,9 +709,10 @@ export default function MissionControlPage() {
       requestedTaskConsumedRef.current = true;
       return;
     }
-    if (!tasks.some((task) => task.id === requestedTaskId)) return;
+    const requestedTask = tasks.find((task) => task.id === requestedTaskId);
+    if (!requestedTask) return;
     requestedTaskConsumedRef.current = true;
-    setAgentFilter('all');
+    setAgentFilter(requestedTask.agentId);
     setStatusFilter('all');
     setSelectedId(requestedTaskId);
   }, [tasks]);
@@ -704,7 +751,7 @@ export default function MissionControlPage() {
       return;
     }
     replaceTask(normalizeMissionTask(result.data.task));
-    void loadTasks(true);
+    void loadTasks(true, selectedTask.agentId);
     toast.success(t(`messages.${key}`));
   }, [loadTasks, replaceTask, selectedTask, t, toast]);
 
@@ -735,13 +782,18 @@ export default function MissionControlPage() {
     const task = normalizeMissionTask(result.data.task);
     replaceTask(task);
     setSelectedId(task.id);
-    setAgentFilter('all');
+    setAgentFilter(task.agentId);
     setStatusFilter('all');
     setCreateOpen(false);
     setForm({ ...EMPTY_FORM, agentId: form.agentId });
-    void loadTasks(true);
+    const params = new URLSearchParams(window.location.search);
+    params.delete('create');
+    params.set('agent', task.agentId);
+    params.set('task', task.id);
+    router.replace(`/dashboard/missions?${params.toString()}`, { scroll: false });
+    void loadTasks(true, task.agentId);
     toast.success(t('messages.created'));
-  }, [form, loadTasks, replaceTask, t, toast]);
+  }, [form, loadTasks, replaceTask, router, t, toast]);
 
   if (authLoading) {
     return <div className={styles.gate}><Loader2 className={styles.spin} aria-hidden /><p>{t('authenticating')}</p></div>;
@@ -768,7 +820,12 @@ export default function MissionControlPage() {
             <p>{t('subtitle')}</p>
           </div>
           <div className={styles.headerActions}>
-            <Link href="/dashboard/outcome-packs" className={styles.secondaryButton}>
+            <Link
+              href={agentFilter === 'all'
+                ? '/dashboard/outcome-packs'
+                : agentWorkspaceHref('/dashboard/outcome-packs', agentFilter)}
+              className={styles.secondaryButton}
+            >
               <PackageCheck size={16} aria-hidden /> {t('outcomePacks')}
             </Link>
             <button
@@ -801,7 +858,7 @@ export default function MissionControlPage() {
           <label>
             <Bot size={14} aria-hidden />
             <span className={styles.srOnly}>{t('filters.agent')}</span>
-            <select value={agentFilter} onChange={(event) => setAgentFilter(event.target.value)}>
+            <select value={agentFilter} onChange={(event) => updateAgentFilter(event.target.value)}>
               <option value="all">{t('filters.allAgents')}</option>
               {agents.map((agent) => <option value={agent.id} key={agent.id}>{agent.name}</option>)}
             </select>
@@ -837,7 +894,7 @@ export default function MissionControlPage() {
             <CircleDashed size={28} aria-hidden />
             <h2>{t('filteredEmpty.title')}</h2>
             <p>{t('filteredEmpty.description')}</p>
-            <button type="button" className={styles.secondaryButton} onClick={() => { setAgentFilter('all'); setStatusFilter('all'); }}>
+            <button type="button" className={styles.secondaryButton} onClick={() => { updateAgentFilter('all'); setStatusFilter('all'); }}>
               {t('filteredEmpty.action')}
             </button>
           </section>
@@ -893,7 +950,7 @@ export default function MissionControlPage() {
           form={form}
           saving={creating}
           onChange={setForm}
-          onClose={() => setCreateOpen(false)}
+          onClose={closeCreateDialog}
           onSubmit={handleCreate}
         />
       ) : null}

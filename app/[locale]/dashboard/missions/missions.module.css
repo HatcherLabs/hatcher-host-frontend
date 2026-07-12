@@ -387,6 +387,7 @@
 .status[data-status='running'],
 .status[data-status='completed'] { color: var(--color-success); border-color: var(--color-success-border); background: var(--color-success-bg); }
 .status[data-status='pending_approval'],
+.status[data-status='pending_review'],
 .status[data-status='queued'] { color: var(--color-warning); border-color: var(--color-warning-border); background: var(--color-warning-bg); }
 .status[data-status='failed'],
 .status[data-status='rejected'] { color: var(--color-destructive); border-color: var(--color-destructive-border); background: var(--color-destructive-bg); }

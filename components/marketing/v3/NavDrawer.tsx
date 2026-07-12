@@ -134,15 +134,6 @@ export function NavDrawer({ open, onClose }: Props) {
                     </Link>
                   </li>
                   <li>
-                    <Link href="/dashboard/agents" className={styles.item} onClick={onClose}>
-                      <span className={styles.glyph}><Bot size={17} strokeWidth={1.8} aria-hidden /></span>
-                      <span>
-                        <span className={styles.itemLabel}>{tNav('myAgents')}</span>
-                        <span className={styles.itemSub}>{tMenu('sub_myAgents')}</span>
-                      </span>
-                    </Link>
-                  </li>
-                  <li>
                     <Link href="/dashboard/missions" className={styles.item} onClick={onClose}>
                       <span className={styles.glyph}><ListChecks size={17} strokeWidth={1.8} aria-hidden /></span>
                       <span>

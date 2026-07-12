@@ -24,7 +24,9 @@ import {
   Trash2,
   Share2,
   Copy,
+  ListChecks,
   MoreHorizontal,
+  PackageCheck,
 } from 'lucide-react';
 import {
   AgentContext,
@@ -55,6 +57,7 @@ import { useAgentIntegrations } from '@/hooks/useAgentIntegrations';
 import { useAgentActions } from '@/hooks/useAgentActions';
 import { useAgentLogs } from '@/hooks/useAgentLogs';
 import { resolveActiveModelDisplay } from '@/lib/hosted-model-catalog';
+import { agentWorkspaceHref } from '@/lib/agent-workspace';
 import dynamic from 'next/dynamic';
 
 const CHAT_HISTORY_MESSAGE_LIMIT = 4000;
@@ -184,6 +187,8 @@ export default function AgentManagePage() {
   const tHeader = useTranslations('dashboard.agentDetail.header');
   const tNotFound = useTranslations('dashboard.agentDetail.notFound');
   const tStatusPoll = useTranslations('dashboard.agentDetail.statusPoll');
+  const tMission = useTranslations('missionControl');
+  const tOutcome = useTranslations('outcomePacks');
 
   // View mode (easy = operational tabs only, advanced = everything).
   // Default to advanced so the full dashboard is visible for new workspaces.
@@ -1439,6 +1444,23 @@ export default function AgentManagePage() {
               </span>
               <span className="hidden text-[var(--text-muted)] md:inline">· {activeModelDisplay.provider}</span>
             </button>
+
+            <Link
+              href={agentWorkspaceHref('/dashboard/missions', agent.id)}
+              className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 text-xs font-semibold text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--accent)]"
+              title={tMission('title')}
+            >
+              <ListChecks size={13} aria-hidden />
+              <span className="hidden md:inline">{tMission('title')}</span>
+            </Link>
+            <Link
+              href={agentWorkspaceHref('/dashboard/outcome-packs', agent.id)}
+              className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 text-xs font-semibold text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--accent)]"
+              title={tOutcome('title')}
+            >
+              <PackageCheck size={13} aria-hidden />
+              <span className="hidden md:inline">{tOutcome('title')}</span>
+            </Link>
 
             {/* Spacer */}
             <div className="flex-1" />

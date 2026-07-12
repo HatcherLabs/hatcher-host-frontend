@@ -40,7 +40,6 @@ interface CommandItem {
 
 const STATIC_COMMANDS: CommandItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard', shortcut: 'D', section: 'Navigation' },
-  { id: 'agents', label: 'My Agents', icon: Bot, href: '/dashboard/agents', shortcut: 'A', section: 'Navigation' },
   { id: 'missions', label: 'Mission Control', icon: ListChecks, href: '/dashboard/missions', shortcut: 'M', section: 'Navigation' },
   { id: 'outcome-packs', label: 'Outcome Packs', icon: PackageCheck, href: '/dashboard/outcome-packs', shortcut: 'O', section: 'Navigation' },
   { id: 'create', label: 'Create Agent', icon: PlusCircle, href: '/create', shortcut: 'C', section: 'Actions' },

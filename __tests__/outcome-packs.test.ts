@@ -19,22 +19,29 @@ import {
 } from '@/lib/outcome-packs';
 
 describe('outcome packs', () => {
-  it('normalizes and orders the four first-party packs', () => {
+  it('orders first-party packs while preserving server-provided additions', () => {
     const packs = normalizeOutcomePackList({
       packs: [
         { id: 'launch-content-v1', title: 'Launch content' },
         { id: 'unknown-pack', title: 'Unknown' },
+        { id: 'portfolio-risk-review-v1', title: 'Portfolio risk review' },
         { id: 'research-report-v1', title: 'Research report' },
+        { id: 'trade-plan-review-v1', title: 'Trade plan review' },
         { id: 'competitor-watch-v1', title: 'Competitor watch' },
+        { id: 'market-pulse-v1', title: 'Market pulse' },
         { id: 'pr-review-v1', title: 'PR review' },
       ],
     });
 
     expect(packs.map((pack) => pack.id)).toEqual([
+      'market-pulse-v1',
+      'trade-plan-review-v1',
+      'portfolio-risk-review-v1',
       'research-report-v1',
-      'pr-review-v1',
       'competitor-watch-v1',
       'launch-content-v1',
+      'pr-review-v1',
+      'unknown-pack',
     ]);
   });
 
@@ -58,6 +65,7 @@ describe('outcome packs', () => {
       acceptanceChecks: ['Every material claim is cited'],
       schedules: [{ id: 'weekly', label: 'Weekly refresh', cron: '0 9 * * 1', timezone: 'UTC' }],
       launchPolicy: { requiresApproval: false },
+      reviewPolicy: { mode: 'manual_required' },
     });
 
     expect(pack).toMatchObject({
@@ -66,6 +74,7 @@ describe('outcome packs', () => {
       requiredSkills: ['web-search'],
       budgetTargetAiCredits: 80,
       maxRuntimeSeconds: 1200,
+      reviewPolicy: { mode: 'manual_required' },
     });
     expect(pack.inputFields[0]).toMatchObject({ key: 'topic', type: 'textarea', maxLength: 500 });
     expect(pack.inputFields[1]).toMatchObject({ key: 'depth', type: 'multi_select', options: ['brief', 'deep'] });
@@ -88,6 +97,7 @@ describe('outcome packs', () => {
       acceptanceChecks: ['Every blocker references a file.'],
       schedules: [{ id: 'daily', label: 'Daily review', cron: '0 9 * * *', timezone: 'UTC' }],
       launchPolicy: { start: 'manual' },
+      reviewPolicy: { mode: 'manual_required' },
     } });
 
     expect(preparation.pack.id).toBe('pr-review-v1');
@@ -101,6 +111,7 @@ describe('outcome packs', () => {
     expect(preparation.resolvedTasks[0]).toMatchObject({ title: 'Review PR', prompt: 'Review PR 42.' });
     expect(preparation.budgetTargetAiCredits).toBe(42);
     expect(preparation.maxRuntimeSeconds).toBe(900);
+    expect(preparation.reviewPolicy).toEqual({ mode: 'manual_required' });
     expect(isOutcomePackLaunchReady(preparation)).toBe(false);
     expect(isOutcomePackLaunchReady({ ...preparation, compatible: true, missingPrerequisites: [] })).toBe(true);
   });
@@ -142,6 +153,41 @@ describe('outcome packs', () => {
       values: OutcomePackDraftInputs;
       expected: Record<string, unknown>;
     }> = [
+      {
+        fields: [
+          { key: 'assets', label: 'Assets', type: 'string_list', required: true, maxLength: 100, maxItems: 10 },
+          { key: 'horizon', label: 'Horizon', type: 'text', required: true, maxLength: 200 },
+          { key: 'focus', label: 'Focus', type: 'textarea', required: false, maxLength: 1_000 },
+          { key: 'watchSignals', label: 'Signals', type: 'string_list', required: false, maxLength: 200, maxItems: 10 },
+          { key: 'outputLanguage', label: 'Language', type: 'text', required: false, maxLength: 64 },
+        ],
+        values: { assets: 'SOL\nBTC', horizon: '7 days', focus: '', watchSignals: 'volume\nliquidity', outputLanguage: '' },
+        expected: { assets: ['SOL', 'BTC'], horizon: '7 days', watchSignals: ['volume', 'liquidity'] },
+      },
+      {
+        fields: [
+          { key: 'asset', label: 'Asset', type: 'text', required: true, maxLength: 100 },
+          { key: 'network', label: 'Network', type: 'text', required: true, maxLength: 100 },
+          { key: 'direction', label: 'Direction', type: 'select', required: true, options: ['long', 'short'] },
+          { key: 'capitalAmount', label: 'Capital amount', type: 'text', required: true, maxLength: 40 },
+          { key: 'capitalCurrency', label: 'Capital currency', type: 'text', required: true, maxLength: 12 },
+          { key: 'maxLossPercent', label: 'Max loss', type: 'text', required: true, maxLength: 6 },
+          { key: 'horizon', label: 'Horizon', type: 'text', required: true, maxLength: 200 },
+          { key: 'thesis', label: 'Thesis', type: 'textarea', required: true, maxLength: 2_000 },
+        ],
+        values: { asset: 'SOL', network: 'Solana', direction: 'long', capitalAmount: '1000', capitalCurrency: 'USDC', maxLossPercent: '5', horizon: '2 weeks', thesis: 'Liquidity and catalyst thesis.' },
+        expected: { asset: 'SOL', network: 'Solana', direction: 'long', capitalAmount: '1000', capitalCurrency: 'USDC', maxLossPercent: '5', horizon: '2 weeks', thesis: 'Liquidity and catalyst thesis.' },
+      },
+      {
+        fields: [
+          { key: 'holdings', label: 'Holdings', type: 'string_list', required: true, maxLength: 140, maxItems: 10 },
+          { key: 'baseCurrency', label: 'Base currency', type: 'text', required: true, maxLength: 12 },
+          { key: 'objective', label: 'Objective', type: 'textarea', required: true, maxLength: 1_000 },
+          { key: 'constraints', label: 'Constraints', type: 'string_list', required: false, maxLength: 300, maxItems: 10 },
+        ],
+        values: { holdings: 'SOL: 60%\nBTC: 40%', baseCurrency: 'USD', objective: 'Review downside concentration and liquidity.', constraints: '' },
+        expected: { holdings: ['SOL: 60%', 'BTC: 40%'], baseCurrency: 'USD', objective: 'Review downside concentration and liquidity.' },
+      },
       {
         fields: [
           { key: 'topic', label: 'Topic', type: 'textarea', required: true, maxLength: 500 },
@@ -221,6 +267,9 @@ describe('outcome packs', () => {
     expect(outcomePackCopySlug('research-report-v1')).toBe('researchReport');
     expect(outcomePackCopySlug('unknown-pack')).toBeNull();
     expect(Object.keys(OUTCOME_PACK_COPY_SLUGS)).toEqual([
+      'market-pulse-v1',
+      'trade-plan-review-v1',
+      'portfolio-risk-review-v1',
       'research-report-v1',
       'pr-review-v1',
       'competitor-watch-v1',
@@ -278,6 +327,9 @@ describe('outcome packs', () => {
       ), messages) as string;
     };
     const paths = [
+      'outcomePacks.content.packs.marketPulse.summary',
+      'outcomePacks.content.packs.tradePlanReview.manualAcceptance',
+      'outcomePacks.content.packs.portfolioRiskReview.taskDescription',
       'outcomePacks.content.packs.researchReport.summary',
       'outcomePacks.content.packs.pullRequestReview.fields.focus',
       'outcomePacks.content.packs.competitorWatch.manualAcceptance',

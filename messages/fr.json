@@ -2462,6 +2462,7 @@
     },
     "content": {
       "categories": {
+        "markets": "Marchés et trading",
         "research": "Recherche",
         "engineering": "Ingénierie",
         "monitoring": "Suivi",
@@ -2471,7 +2472,9 @@
         "x": "X",
         "linkedin": "LinkedIn",
         "blog": "Blog",
-        "email": "E-mail"
+        "email": "E-mail",
+        "long": "Long",
+        "short": "Court"
       },
       "artifactKinds": {
         "text": "texte",
@@ -2487,6 +2490,65 @@
         "schedules_disabled": "{count, plural, one {# modèle de planification est préparé, mais reste désactivé.} other {# modèles de planification sont préparés, mais restent désactivés.}}"
       },
       "packs": {
+        "marketPulse": {
+          "title": "Point marché",
+          "summary": "Produit une synthèse horodatée du marché pour les actifs sélectionnés et les signaux à surveiller.",
+          "fields": {
+            "assets": "Actifs",
+            "horizon": "Horizon temporel",
+            "focus": "Axe d’analyse",
+            "watchSignals": "Signaux à surveiller",
+            "outputLanguage": "Langue de sortie"
+          },
+          "deliverables": {
+            "deliverable-1": "Point marché horodaté",
+            "deliverable-2": "Signaux et risques prioritaires"
+          },
+          "manualAcceptance": "Les observations de marché incluent des horodatages et leurs sources de données.",
+          "schedules": {
+            "daily-market-pulse": "Point marché quotidien"
+          },
+          "taskTitle": "Point marché",
+          "taskDescription": "Produit une synthèse horodatée des données et risques de marché pour les actifs sélectionnés."
+        },
+        "tradePlanReview": {
+          "title": "Revue du plan de trading",
+          "summary": "Teste la robustesse d’une thèse de trading fournie par l’utilisateur, sans ouvrir ni gérer de position.",
+          "fields": {
+            "asset": "Actif",
+            "network": "Réseau ou plateforme",
+            "direction": "Direction",
+            "capitalAmount": "Montant du capital",
+            "capitalCurrency": "Devise du capital",
+            "maxLossPercent": "Perte maximale (% du capital)",
+            "horizon": "Horizon temporel",
+            "thesis": "Thèse de trading"
+          },
+          "deliverables": {
+            "deliverable-1": "Revue des risques du plan de trading",
+            "deliverable-2": "Liste de scénarios validée par un humain"
+          },
+          "manualAcceptance": "Les hypothèses de dimensionnement et les conditions d’invalidation sont explicites.",
+          "taskTitle": "Revue du plan de trading",
+          "taskDescription": "Examine les risques, hypothèses et scénarios d’un plan de trading fourni par l’utilisateur."
+        },
+        "portfolioRiskReview": {
+          "title": "Revue des risques du portefeuille",
+          "summary": "Évalue les positions fournies par l’utilisateur selon leur concentration, leur liquidité et leur risque de baisse.",
+          "fields": {
+            "holdings": "Positions et allocations (ACTIF : 25 %, une par ligne)",
+            "baseCurrency": "Devise de référence",
+            "objective": "Objectif du portefeuille",
+            "constraints": "Contraintes"
+          },
+          "deliverables": {
+            "deliverable-1": "Synthèse des risques du portefeuille",
+            "deliverable-2": "Options de rééquilibrage validées par un humain"
+          },
+          "manualAcceptance": "Les options respectent l’objectif et les contraintes fournis par l’utilisateur.",
+          "taskTitle": "Revue des risques du portefeuille",
+          "taskDescription": "Évalue les positions fournies par l’utilisateur et propose des options de risque à valider par un humain."
+        },
         "researchReport": {
           "title": "Rapport de recherche",
           "summary": "Produisez un rapport de recherche sourcé, ciblé et directement exploitable pour la prise de décision.",
@@ -2624,6 +2686,8 @@
       "schedules": "Planifications proposées",
       "scheduleOff": "Désactivé",
       "scheduleNotice": "Les planifications restent désactivées au lancement et nécessitent une confirmation séparée.",
+      "manualReviewTitle": "Validation du propriétaire requise",
+      "manualReviewDescription": "Le résultat final reste dans Mission Control jusqu’à ce que le propriétaire l’approuve ou le rejette.",
       "setup": {
         "connectors": "Ouvrir Connectors",
         "dev": "Ouvrir la configuration développeur",
@@ -2886,6 +2950,7 @@
     "status": {
       "ready": "Ready",
       "pending_approval": "Needs approval",
+      "pending_review": "En attente de revue",
       "queued": "Queued",
       "running": "Running",
       "completed": "Completed",

@@ -2486,6 +2486,7 @@
     },
     "content": {
       "categories": {
+        "markets": "Thị trường & Giao dịch",
         "research": "Nghiên cứu",
         "engineering": "Kỹ thuật",
         "monitoring": "Giám sát",
@@ -2495,7 +2496,9 @@
         "x": "X",
         "linkedin": "LinkedIn",
         "blog": "Blog",
-        "email": "Email"
+        "email": "Email",
+        "long": "Vị thế mua",
+        "short": "Vị thế bán"
       },
       "artifactKinds": {
         "text": "văn bản",
@@ -2511,6 +2514,65 @@
         "schedules_disabled": "{count, plural, one {# mẫu lịch trình đã được chuẩn bị nhưng vẫn bị tắt.} other {# mẫu lịch trình đã được chuẩn bị nhưng vẫn bị tắt.}}"
       },
       "packs": {
+        "marketPulse": {
+          "title": "Nhịp thị trường",
+          "summary": "Tạo bản tin thị trường có dấu thời gian cho các tài sản đã chọn và những tín hiệu cần theo dõi.",
+          "fields": {
+            "assets": "Tài sản",
+            "horizon": "Khung thời gian",
+            "focus": "Trọng tâm phân tích",
+            "watchSignals": "Tín hiệu cần theo dõi",
+            "outputLanguage": "Ngôn ngữ đầu ra"
+          },
+          "deliverables": {
+            "deliverable-1": "Bản tin nhịp thị trường có dấu thời gian",
+            "deliverable-2": "Tín hiệu và rủi ro được ưu tiên"
+          },
+          "manualAcceptance": "Các nhận định thị trường có dấu thời gian và nguồn dữ liệu.",
+          "schedules": {
+            "daily-market-pulse": "Nhịp thị trường hằng ngày"
+          },
+          "taskTitle": "Nhịp thị trường",
+          "taskDescription": "Tạo bản tin có dấu thời gian về dữ liệu và rủi ro thị trường cho các tài sản đã chọn."
+        },
+        "tradePlanReview": {
+          "title": "Đánh giá kế hoạch giao dịch",
+          "summary": "Kiểm thử sức chịu đựng của luận điểm giao dịch do người dùng cung cấp mà không đặt lệnh hay quản lý giao dịch.",
+          "fields": {
+            "asset": "Tài sản",
+            "network": "Mạng lưới hoặc sàn giao dịch",
+            "direction": "Hướng giao dịch",
+            "capitalAmount": "Số vốn",
+            "capitalCurrency": "Đơn vị tiền tệ",
+            "maxLossPercent": "Mức lỗ tối đa (% vốn)",
+            "horizon": "Khung thời gian",
+            "thesis": "Luận điểm giao dịch"
+          },
+          "deliverables": {
+            "deliverable-1": "Đánh giá rủi ro kế hoạch giao dịch",
+            "deliverable-2": "Danh sách kịch bản đã được con người đánh giá"
+          },
+          "manualAcceptance": "Các giả định về quy mô vị thế và điều kiện vô hiệu hóa được nêu rõ.",
+          "taskTitle": "Đánh giá kế hoạch giao dịch",
+          "taskDescription": "Đánh giá rủi ro, giả định và kịch bản của kế hoạch giao dịch do người dùng cung cấp."
+        },
+        "portfolioRiskReview": {
+          "title": "Đánh giá rủi ro danh mục",
+          "summary": "Đánh giá các khoản nắm giữ do người dùng cung cấp về mức độ tập trung, thanh khoản và rủi ro giảm giá.",
+          "fields": {
+            "holdings": "Tài sản nắm giữ và tỷ trọng (TÀI SẢN: 25%, mỗi dòng một mục)",
+            "baseCurrency": "Tiền tệ cơ sở",
+            "objective": "Mục tiêu danh mục",
+            "constraints": "Ràng buộc"
+          },
+          "deliverables": {
+            "deliverable-1": "Bản tóm tắt rủi ro danh mục",
+            "deliverable-2": "Phương án tái cân bằng đã được con người đánh giá"
+          },
+          "manualAcceptance": "Các phương án tuân thủ mục tiêu và ràng buộc do người dùng cung cấp.",
+          "taskTitle": "Đánh giá rủi ro danh mục",
+          "taskDescription": "Đánh giá các khoản nắm giữ do người dùng cung cấp và đề xuất phương án rủi ro để con người xem xét."
+        },
         "researchReport": {
           "title": "Báo cáo nghiên cứu",
           "summary": "Tạo báo cáo nghiên cứu có nguồn dẫn, tập trung vào một chủ đề cụ thể và sẵn sàng hỗ trợ quyết định.",
@@ -2648,6 +2710,8 @@
       "schedules": "Lịch đề xuất",
       "scheduleOff": "Tắt",
       "scheduleNotice": "Lịch vẫn tắt khi khởi chạy và cần xác nhận riêng.",
+      "manualReviewTitle": "Yêu cầu chủ sở hữu đánh giá",
+      "manualReviewDescription": "Kết quả hoàn tất vẫn ở Mission Control cho đến khi chủ sở hữu phê duyệt hoặc từ chối.",
       "setup": {
         "connectors": "Mở Connectors",
         "dev": "Mở thiết lập nhà phát triển",
@@ -2910,6 +2974,7 @@
     "status": {
       "ready": "Ready",
       "pending_approval": "Needs approval",
+      "pending_review": "Đang chờ đánh giá",
       "queued": "Queued",
       "running": "Running",
       "completed": "Completed",

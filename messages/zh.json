@@ -2462,6 +2462,7 @@
     },
     "content": {
       "categories": {
+        "markets": "市场与交易",
         "research": "研究",
         "engineering": "工程",
         "monitoring": "监控",
@@ -2471,7 +2472,9 @@
         "x": "X",
         "linkedin": "LinkedIn",
         "blog": "博客",
-        "email": "电子邮件"
+        "email": "电子邮件",
+        "long": "做多",
+        "short": "做空"
       },
       "artifactKinds": {
         "text": "文本",
@@ -2487,6 +2490,65 @@
         "schedules_disabled": "{count, plural, one {# 个计划模板已准备好，但仍处于禁用状态。} other {# 个计划模板已准备好，但仍处于禁用状态。}}"
       },
       "packs": {
+        "marketPulse": {
+          "title": "市场脉搏",
+          "summary": "为所选资产生成带时间戳的市场简报和重点关注信号。",
+          "fields": {
+            "assets": "资产",
+            "horizon": "时间范围",
+            "focus": "分析重点",
+            "watchSignals": "关注信号",
+            "outputLanguage": "输出语言"
+          },
+          "deliverables": {
+            "deliverable-1": "带时间戳的市场脉搏简报",
+            "deliverable-2": "按优先级排列的关注信号与风险"
+          },
+          "manualAcceptance": "市场观察包含时间戳和数据来源。",
+          "schedules": {
+            "daily-market-pulse": "每日市场脉搏"
+          },
+          "taskTitle": "市场脉搏",
+          "taskDescription": "为所选资产生成带时间戳的市场数据与风险简报。"
+        },
+        "tradePlanReview": {
+          "title": "交易计划审查",
+          "summary": "对用户提供的交易论点进行压力测试，但不下单或管理交易。",
+          "fields": {
+            "asset": "资产",
+            "network": "网络或交易场所",
+            "direction": "方向",
+            "capitalAmount": "资金金额",
+            "capitalCurrency": "资金币种",
+            "maxLossPercent": "最大损失（占资金百分比）",
+            "horizon": "时间范围",
+            "thesis": "交易论点"
+          },
+          "deliverables": {
+            "deliverable-1": "交易计划风险审查",
+            "deliverable-2": "经人工审查的情景清单"
+          },
+          "manualAcceptance": "明确说明仓位规模假设和失效条件。",
+          "taskTitle": "交易计划审查",
+          "taskDescription": "审查用户提供的交易计划中的风险、假设和情景。"
+        },
+        "portfolioRiskReview": {
+          "title": "投资组合风险审查",
+          "summary": "评估用户提供的持仓在集中度、流动性和下行风险方面的情况。",
+          "fields": {
+            "holdings": "持仓与配置（资产: 25%，每行一项）",
+            "baseCurrency": "基准货币",
+            "objective": "投资组合目标",
+            "constraints": "约束条件"
+          },
+          "deliverables": {
+            "deliverable-1": "投资组合风险简报",
+            "deliverable-2": "经人工审查的再平衡选项"
+          },
+          "manualAcceptance": "选项遵循用户提供的目标和约束条件。",
+          "taskTitle": "投资组合风险审查",
+          "taskDescription": "评估用户提供的持仓，并列出需经人工审查的风险应对选项。"
+        },
         "researchReport": {
           "title": "研究报告",
           "summary": "针对明确的主题生成有来源依据、可用于决策的研究报告。",
@@ -2624,6 +2686,8 @@
       "schedules": "建议计划",
       "scheduleOff": "关闭",
       "scheduleNotice": "启动时计划保持禁用，需要单独确认。",
+      "manualReviewTitle": "需要所有者审核",
+      "manualReviewDescription": "完成的结果会保留在 Mission Control 中，直到所有者批准或拒绝。",
       "setup": {
         "connectors": "打开 Connectors",
         "dev": "打开开发者设置",
@@ -2886,6 +2950,7 @@
     "status": {
       "ready": "Ready",
       "pending_approval": "Needs approval",
+      "pending_review": "待审核",
       "queued": "Queued",
       "running": "Running",
       "completed": "Completed",

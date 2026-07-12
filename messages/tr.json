@@ -2486,6 +2486,7 @@
     },
     "content": {
       "categories": {
+        "markets": "Piyasalar ve Alım Satım",
         "research": "Araştırma",
         "engineering": "Mühendislik",
         "monitoring": "İzleme",
@@ -2495,7 +2496,9 @@
         "x": "X",
         "linkedin": "LinkedIn",
         "blog": "Blog",
-        "email": "E-posta"
+        "email": "E-posta",
+        "long": "Uzun",
+        "short": "Kısa"
       },
       "artifactKinds": {
         "text": "metin",
@@ -2511,6 +2514,65 @@
         "schedules_disabled": "{count, plural, one {# zamanlama şablonu hazırlandı ancak devre dışı kalacak.} other {# zamanlama şablonu hazırlandı ancak devre dışı kalacak.}}"
       },
       "packs": {
+        "marketPulse": {
+          "title": "Piyasa Nabzı",
+          "summary": "Seçilen varlıklar ve izlenecek sinyaller için zaman damgalı bir piyasa özeti oluşturun.",
+          "fields": {
+            "assets": "Varlıklar",
+            "horizon": "Zaman aralığı",
+            "focus": "Analiz odağı",
+            "watchSignals": "İzlenecek sinyaller",
+            "outputLanguage": "Çıktı dili"
+          },
+          "deliverables": {
+            "deliverable-1": "Zaman damgalı piyasa nabzı",
+            "deliverable-2": "Önceliklendirilmiş sinyaller ve riskler"
+          },
+          "manualAcceptance": "Piyasa gözlemleri zaman damgalarını ve veri kaynaklarını içerir.",
+          "schedules": {
+            "daily-market-pulse": "Günlük piyasa nabzı"
+          },
+          "taskTitle": "Piyasa nabzı",
+          "taskDescription": "Seçilen varlıklar için zaman damgalı bir piyasa verisi ve risk özeti oluşturun."
+        },
+        "tradePlanReview": {
+          "title": "İşlem Planı İncelemesi",
+          "summary": "Kullanıcının sağladığı işlem tezini işlem açmadan veya yönetmeden stres testine tabi tutun.",
+          "fields": {
+            "asset": "Varlık",
+            "network": "Ağ veya işlem platformu",
+            "direction": "Yön",
+            "capitalAmount": "Sermaye tutarı",
+            "capitalCurrency": "Sermaye para birimi",
+            "maxLossPercent": "Azami kayıp (sermayenin %'si)",
+            "horizon": "Zaman aralığı",
+            "thesis": "İşlem tezi"
+          },
+          "deliverables": {
+            "deliverable-1": "İşlem planı risk incelemesi",
+            "deliverable-2": "İnsan tarafından incelenmiş senaryo kontrol listesi"
+          },
+          "manualAcceptance": "Pozisyon büyüklüğü varsayımları ve geçersiz kılma koşulları açıkça belirtilir.",
+          "taskTitle": "İşlem planı incelemesi",
+          "taskDescription": "Kullanıcının sağladığı işlem planını riskler, varsayımlar ve senaryolar açısından inceleyin."
+        },
+        "portfolioRiskReview": {
+          "title": "Portföy Risk İncelemesi",
+          "summary": "Kullanıcının sağladığı varlıkları yoğunlaşma, likidite ve düşüş riski açısından değerlendirin.",
+          "fields": {
+            "holdings": "Varlıklar ve dağılımlar (VARLIK: 25%, satır başına bir tane)",
+            "baseCurrency": "Baz para birimi",
+            "objective": "Portföy hedefi",
+            "constraints": "Kısıtlamalar"
+          },
+          "deliverables": {
+            "deliverable-1": "Portföy risk özeti",
+            "deliverable-2": "İnsan tarafından incelenmiş yeniden dengeleme seçenekleri"
+          },
+          "manualAcceptance": "Seçenekler kullanıcının belirttiği hedefe ve kısıtlamalara uyar.",
+          "taskTitle": "Portföy risk incelemesi",
+          "taskDescription": "Kullanıcının sağladığı varlıkları değerlendirin ve insan incelemesine sunulacak risk seçeneklerini belirleyin."
+        },
         "researchReport": {
           "title": "Araştırma Raporu",
           "summary": "Belirli bir konuya odaklanan, kaynaklı ve karar vermeye hazır bir araştırma raporu oluşturun.",
@@ -2648,6 +2710,8 @@
       "schedules": "Önerilen zamanlamalar",
       "scheduleOff": "Kapalı",
       "scheduleNotice": "Zamanlamalar başlatmada kapalı kalır ve ayrı onay gerektirir.",
+      "manualReviewTitle": "Sahip incelemesi gerekli",
+      "manualReviewDescription": "Tamamlanan sonuç, sahibi onaylayana veya reddedene kadar Mission Control'de kalır.",
       "setup": {
         "connectors": "Connectors'ı aç",
         "dev": "Geliştirici kurulumunu aç",
@@ -2910,6 +2974,7 @@
     "status": {
       "ready": "Ready",
       "pending_approval": "Needs approval",
+      "pending_review": "İnceleme bekliyor",
       "queued": "Queued",
       "running": "Running",
       "completed": "Completed",

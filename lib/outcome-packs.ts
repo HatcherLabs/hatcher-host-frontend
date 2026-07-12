@@ -1,13 +1,19 @@
 export const OUTCOME_PACK_IDS = [
+  'market-pulse-v1',
+  'trade-plan-review-v1',
+  'portfolio-risk-review-v1',
   'research-report-v1',
-  'pr-review-v1',
   'competitor-watch-v1',
   'launch-content-v1',
+  'pr-review-v1',
 ] as const;
 
 export type FirstPartyOutcomePackId = (typeof OUTCOME_PACK_IDS)[number];
 
 export const OUTCOME_PACK_COPY_SLUGS: Record<FirstPartyOutcomePackId, string> = {
+  'market-pulse-v1': 'marketPulse',
+  'trade-plan-review-v1': 'tradePlanReview',
+  'portfolio-risk-review-v1': 'portfolioRiskReview',
   'research-report-v1': 'researchReport',
   'pr-review-v1': 'pullRequestReview',
   'competitor-watch-v1': 'competitorWatch',
@@ -24,6 +30,7 @@ export type OutcomePackInputFieldType =
   | 'text'
   | 'textarea'
   | 'integer'
+  | 'select'
   | 'multi_select'
   | 'string_list';
 
@@ -79,6 +86,7 @@ export interface OutcomePackModel {
   acceptanceChecks: OutcomePackDetailItemModel[];
   schedules: OutcomePackScheduleModel[];
   launchPolicy: unknown;
+  reviewPolicy: { mode: 'manual_required' } | null;
 }
 
 export interface PreparedOutcomePackTaskModel {
@@ -101,6 +109,7 @@ export interface OutcomePackPreparationModel {
   acceptanceChecks: OutcomePackDetailItemModel[];
   schedules: OutcomePackScheduleModel[];
   launchPolicy: unknown;
+  reviewPolicy: { mode: 'manual_required' } | null;
 }
 
 export interface OutcomePackWarningModel {
@@ -144,6 +153,11 @@ function stringNumberRecord(value: unknown): Record<string, string | number> {
   ));
 }
 
+function normalizeReviewPolicy(value: unknown): { mode: 'manual_required' } | null {
+  const raw = record(value);
+  return raw.mode === 'manual_required' ? { mode: 'manual_required' } : null;
+}
+
 function normalizeWarning(value: unknown, index: number): OutcomePackWarningModel {
   if (typeof value === 'string') {
     return { code: `legacy_warning_${index + 1}`, label: value, params: {} };
@@ -163,6 +177,7 @@ function normalizeInputField(value: unknown): OutcomePackInputFieldModel {
     'text',
     'textarea',
     'integer',
+    'select',
     'multi_select',
     'string_list',
   ]);
@@ -262,6 +277,7 @@ export function normalizeOutcomePack(value: unknown): OutcomePackModel {
     acceptanceChecks: normalizeOutcomePackAcceptanceChecks(raw.acceptanceChecks),
     schedules: Array.isArray(raw.schedules) ? raw.schedules.map(normalizeSchedule) : [],
     launchPolicy: raw.launchPolicy ?? null,
+    reviewPolicy: normalizeReviewPolicy(raw.reviewPolicy),
   };
 }
 
@@ -269,9 +285,15 @@ export function normalizeOutcomePackList(value: unknown): OutcomePackModel[] {
   const raw = record(value);
   const packs = Array.isArray(raw.packs) ? raw.packs.map(normalizeOutcomePack) : [];
   const order = new Map<string, number>(OUTCOME_PACK_IDS.map((id, index) => [id, index]));
-  return packs
-    .filter((pack) => order.has(pack.id))
-    .sort((left, right) => (order.get(left.id) ?? 99) - (order.get(right.id) ?? 99));
+  return packs.sort((left, right) => {
+    const leftOrder = order.get(left.id);
+    const rightOrder = order.get(right.id);
+    if (leftOrder !== undefined || rightOrder !== undefined) {
+      return (leftOrder ?? Number.MAX_SAFE_INTEGER) -
+        (rightOrder ?? Number.MAX_SAFE_INTEGER);
+    }
+    return left.title.localeCompare(right.title);
+  });
 }
 
 function normalizePreparedTask(value: unknown, index: number): PreparedOutcomePackTaskModel {
@@ -315,6 +337,7 @@ export function normalizeOutcomePackPreparation(value: unknown): OutcomePackPrep
     acceptanceChecks: normalizeOutcomePackAcceptanceChecks(raw.acceptanceChecks),
     schedules: Array.isArray(raw.schedules) ? raw.schedules.map(normalizeSchedule) : [],
     launchPolicy: raw.launchPolicy ?? null,
+    reviewPolicy: normalizeReviewPolicy(raw.reviewPolicy),
   };
 }
 

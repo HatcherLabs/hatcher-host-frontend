@@ -2486,6 +2486,7 @@
     },
     "content": {
       "categories": {
+        "markets": "Pasar & Trading",
         "research": "Riset",
         "engineering": "Rekayasa",
         "monitoring": "Pemantauan",
@@ -2495,7 +2496,9 @@
         "x": "X",
         "linkedin": "LinkedIn",
         "blog": "Blog",
-        "email": "Email"
+        "email": "Email",
+        "long": "Long",
+        "short": "Short"
       },
       "artifactKinds": {
         "text": "teks",
@@ -2511,6 +2514,65 @@
         "schedules_disabled": "{count, plural, one {# template jadwal telah disiapkan tetapi tetap dinonaktifkan.} other {# template jadwal telah disiapkan tetapi tetap dinonaktifkan.}}"
       },
       "packs": {
+        "marketPulse": {
+          "title": "Ringkasan Pasar",
+          "summary": "Buat ringkasan pasar bertanda waktu untuk aset pilihan dan sinyal yang perlu dipantau.",
+          "fields": {
+            "assets": "Aset",
+            "horizon": "Jangka waktu",
+            "focus": "Fokus analisis",
+            "watchSignals": "Sinyal yang dipantau",
+            "outputLanguage": "Bahasa keluaran"
+          },
+          "deliverables": {
+            "deliverable-1": "Ringkasan pasar bertanda waktu",
+            "deliverable-2": "Sinyal dan risiko yang diprioritaskan"
+          },
+          "manualAcceptance": "Pengamatan pasar mencantumkan waktu dan sumber data.",
+          "schedules": {
+            "daily-market-pulse": "Ringkasan pasar harian"
+          },
+          "taskTitle": "Ringkasan pasar",
+          "taskDescription": "Buat ringkasan bertanda waktu tentang data dan risiko pasar untuk aset pilihan."
+        },
+        "tradePlanReview": {
+          "title": "Tinjauan Rencana Trading",
+          "summary": "Uji ketahanan tesis trading yang diberikan pengguna tanpa membuka atau mengelola transaksi.",
+          "fields": {
+            "asset": "Aset",
+            "network": "Jaringan atau platform",
+            "direction": "Arah",
+            "capitalAmount": "Jumlah modal",
+            "capitalCurrency": "Mata uang modal",
+            "maxLossPercent": "Kerugian maksimum (% dari modal)",
+            "horizon": "Jangka waktu",
+            "thesis": "Tesis trading"
+          },
+          "deliverables": {
+            "deliverable-1": "Tinjauan risiko rencana trading",
+            "deliverable-2": "Daftar skenario yang ditinjau manusia"
+          },
+          "manualAcceptance": "Asumsi ukuran posisi dan kondisi invalidasi dijelaskan secara eksplisit.",
+          "taskTitle": "Tinjauan rencana trading",
+          "taskDescription": "Tinjau risiko, asumsi, dan skenario rencana trading yang diberikan pengguna."
+        },
+        "portfolioRiskReview": {
+          "title": "Tinjauan Risiko Portofolio",
+          "summary": "Nilai kepemilikan yang diberikan pengguna berdasarkan konsentrasi, likuiditas, dan risiko penurunan.",
+          "fields": {
+            "holdings": "Kepemilikan dan alokasi (ASET: 25%, satu per baris)",
+            "baseCurrency": "Mata uang dasar",
+            "objective": "Tujuan portofolio",
+            "constraints": "Batasan"
+          },
+          "deliverables": {
+            "deliverable-1": "Ringkasan risiko portofolio",
+            "deliverable-2": "Opsi penyeimbangan ulang yang ditinjau manusia"
+          },
+          "manualAcceptance": "Opsi mematuhi tujuan dan batasan yang diberikan pengguna.",
+          "taskTitle": "Tinjauan risiko portofolio",
+          "taskDescription": "Nilai kepemilikan yang diberikan pengguna dan susun opsi risiko untuk ditinjau manusia."
+        },
         "researchReport": {
           "title": "Laporan Riset",
           "summary": "Buat laporan riset berbasis sumber yang berfokus pada topik tertentu dan siap digunakan untuk mengambil keputusan.",
@@ -2648,6 +2710,8 @@
       "schedules": "Jadwal yang diusulkan",
       "scheduleOff": "Nonaktif",
       "scheduleNotice": "Jadwal tetap nonaktif saat peluncuran dan memerlukan konfirmasi terpisah.",
+      "manualReviewTitle": "Peninjauan pemilik diperlukan",
+      "manualReviewDescription": "Hasil akhir tetap berada di Mission Control sampai pemilik menyetujui atau menolaknya.",
       "setup": {
         "connectors": "Buka Connectors",
         "dev": "Buka penyiapan developer",
@@ -2910,6 +2974,7 @@
     "status": {
       "ready": "Ready",
       "pending_approval": "Needs approval",
+      "pending_review": "Menunggu tinjauan",
       "queued": "Queued",
       "running": "Running",
       "completed": "Completed",

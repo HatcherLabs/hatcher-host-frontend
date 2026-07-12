@@ -2462,6 +2462,7 @@
     },
     "content": {
       "categories": {
+        "markets": "Märkte & Trading",
         "research": "Recherche",
         "engineering": "Entwicklung",
         "monitoring": "Monitoring",
@@ -2471,7 +2472,9 @@
         "x": "X",
         "linkedin": "LinkedIn",
         "blog": "Blog",
-        "email": "E-Mail"
+        "email": "E-Mail",
+        "long": "Long",
+        "short": "Short"
       },
       "artifactKinds": {
         "text": "Text",
@@ -2487,6 +2490,65 @@
         "schedules_disabled": "{count, plural, one {# Zeitplanvorlage ist vorbereitet, bleibt aber deaktiviert.} other {# Zeitplanvorlagen sind vorbereitet, bleiben aber deaktiviert.}}"
       },
       "packs": {
+        "marketPulse": {
+          "title": "Marktüberblick",
+          "summary": "Erstellt für ausgewählte Assets einen Marktüberblick mit Zeitstempeln und zu beobachtenden Signalen.",
+          "fields": {
+            "assets": "Assets",
+            "horizon": "Zeithorizont",
+            "focus": "Analyseschwerpunkt",
+            "watchSignals": "Zu beobachtende Signale",
+            "outputLanguage": "Ausgabesprache"
+          },
+          "deliverables": {
+            "deliverable-1": "Marktüberblick mit Zeitstempeln",
+            "deliverable-2": "Priorisierte Signale und Risiken"
+          },
+          "manualAcceptance": "Marktbeobachtungen enthalten Zeitstempel und Datenquellen.",
+          "schedules": {
+            "daily-market-pulse": "Täglicher Marktüberblick"
+          },
+          "taskTitle": "Marktüberblick",
+          "taskDescription": "Erstellt für die ausgewählten Assets einen zeitgestempelten Überblick zu Marktdaten und Risiken."
+        },
+        "tradePlanReview": {
+          "title": "Tradingplan-Prüfung",
+          "summary": "Unterzieht eine vom Nutzer bereitgestellte Tradingthese einem Stresstest, ohne einen Trade zu platzieren oder zu verwalten.",
+          "fields": {
+            "asset": "Asset",
+            "network": "Netzwerk oder Handelsplatz",
+            "direction": "Richtung",
+            "capitalAmount": "Kapitalbetrag",
+            "capitalCurrency": "Kapitalwährung",
+            "maxLossPercent": "Maximalverlust (% des Kapitals)",
+            "horizon": "Zeithorizont",
+            "thesis": "Tradingthese"
+          },
+          "deliverables": {
+            "deliverable-1": "Risikoprüfung des Tradingplans",
+            "deliverable-2": "Von einem Menschen geprüfte Szenario-Checkliste"
+          },
+          "manualAcceptance": "Annahmen zur Positionsgröße und Ungültigkeitsbedingungen sind ausdrücklich festgehalten.",
+          "taskTitle": "Tradingplan-Prüfung",
+          "taskDescription": "Prüft einen vom Nutzer bereitgestellten Tradingplan auf Risiken, Annahmen und Szenarien."
+        },
+        "portfolioRiskReview": {
+          "title": "Portfolio-Risikoprüfung",
+          "summary": "Bewertet vom Nutzer bereitgestellte Bestände im Hinblick auf Konzentration, Liquidität und Verlustrisiken.",
+          "fields": {
+            "holdings": "Bestände und Gewichtungen (ASSET: 25 %, ein Eintrag pro Zeile)",
+            "baseCurrency": "Basiswährung",
+            "objective": "Portfolioziel",
+            "constraints": "Einschränkungen"
+          },
+          "deliverables": {
+            "deliverable-1": "Portfolio-Risikoüberblick",
+            "deliverable-2": "Von einem Menschen geprüfte Umschichtungsoptionen"
+          },
+          "manualAcceptance": "Die Optionen berücksichtigen das vom Nutzer angegebene Ziel und die Einschränkungen.",
+          "taskTitle": "Portfolio-Risikoprüfung",
+          "taskDescription": "Bewertet vom Nutzer bereitgestellte Bestände und skizziert von einem Menschen zu prüfende Risikooptionen."
+        },
         "researchReport": {
           "title": "Recherchebericht",
           "summary": "Erstelle einen quellenbasierten, entscheidungsreifen Recherchebericht zu einem klar eingegrenzten Thema.",
@@ -2624,6 +2686,8 @@
       "schedules": "Vorgeschlagene Zeitpläne",
       "scheduleOff": "Aus",
       "scheduleNotice": "Zeitpläne bleiben beim Start deaktiviert und benötigen eine separate Bestätigung.",
+      "manualReviewTitle": "Prüfung durch den Eigentümer erforderlich",
+      "manualReviewDescription": "Das abgeschlossene Ergebnis bleibt in Mission Control, bis der Eigentümer es genehmigt oder ablehnt.",
       "setup": {
         "connectors": "Connectors öffnen",
         "dev": "Entwickler-Einrichtung öffnen",
@@ -2886,6 +2950,7 @@
     "status": {
       "ready": "Ready",
       "pending_approval": "Needs approval",
+      "pending_review": "Prüfung ausstehend",
       "queued": "Queued",
       "running": "Running",
       "completed": "Completed",

@@ -1,8 +1,10 @@
 'use client';
 
-import { Bot, LayoutDashboard, ListChecks, PackageCheck } from 'lucide-react';
+import { Bot, ListChecks, PackageCheck } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
+import { agentWorkspaceHref } from '@/lib/agent-workspace';
 import {
   DASHBOARD_WORKSPACE_ROUTES,
   isDashboardWorkspaceRouteActive,
@@ -11,14 +13,14 @@ import {
 import styles from './DashboardWorkspaceNavigation.module.css';
 
 const ICONS = {
-  overview: LayoutDashboard,
   agents: Bot,
   missions: ListChecks,
   outcomePacks: PackageCheck,
-} satisfies Record<DashboardWorkspaceKey, typeof LayoutDashboard>;
+} satisfies Record<DashboardWorkspaceKey, typeof Bot>;
 
 export function DashboardWorkspaceNavigation() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const tNav = useTranslations('nav');
   const tOutcome = useTranslations('outcomePacks');
   const activeRoute = DASHBOARD_WORKSPACE_ROUTES.find((route) =>
@@ -27,7 +29,6 @@ export function DashboardWorkspaceNavigation() {
   if (!activeRoute) return null;
 
   const labels: Record<DashboardWorkspaceKey, string> = {
-    overview: tNav('dashboard'),
     agents: tNav('myAgents'),
     missions: tNav('missionControl'),
     outcomePacks: tOutcome('title'),
@@ -40,10 +41,14 @@ export function DashboardWorkspaceNavigation() {
           {DASHBOARD_WORKSPACE_ROUTES.map((route) => {
             const active = route.key === activeRoute.key;
             const Icon = ICONS[route.key];
+            const agentId = searchParams.get('agent');
+            const href = agentId && (route.key === 'missions' || route.key === 'outcomePacks')
+              ? agentWorkspaceHref(route.href, agentId)
+              : route.href;
             return (
               <Link
                 key={route.key}
-                href={route.href}
+                href={href}
                 className={`${styles.link} ${active ? styles.active : ''}`}
                 aria-current={active ? 'page' : undefined}
               >

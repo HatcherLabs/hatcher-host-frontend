@@ -366,6 +366,7 @@ export interface CommitLiftImportBody {
 export type MissionTaskStatus =
   | "ready"
   | "pending_approval"
+  | "pending_review"
   | "queued"
   | "running"
   | "completed"
@@ -439,6 +440,10 @@ export interface OutcomePackSkillReadiness {
   skills: OutcomePackSkillStatus[];
 }
 
+export interface OutcomePackReviewPolicy {
+  mode: "manual_required";
+}
+
 export interface MissionTask {
   id: string;
   agentId: string;
@@ -452,6 +457,7 @@ export interface MissionTask {
   sourceVersion: string | null;
   acceptanceChecks: unknown[];
   scheduleTemplates: unknown[];
+  reviewPolicy: OutcomePackReviewPolicy | null;
   outcomePackSkillReadiness: OutcomePackSkillReadiness | null;
   requiresApproval: boolean;
   budget: {
