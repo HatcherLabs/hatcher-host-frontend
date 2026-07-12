@@ -1,14 +1,45 @@
 import type { Metadata } from 'next';
+import type { LucideIcon } from 'lucide-react';
+import {
+  ArrowUpRight,
+  BadgeCheck,
+  BookOpenText,
+  Bot,
+  Building2,
+  Check,
+  CircleGauge,
+  Coins,
+  History,
+  Inbox,
+  KeyRound,
+  Landmark,
+  ListChecks,
+  Network,
+  PackageCheck,
+  Repeat2,
+  Route,
+  ShieldCheck,
+  Upload,
+} from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
+import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 import { Link } from '@/i18n/routing';
 import { buildLanguagesMap } from '@/lib/seo';
-import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
+import {
+  buildingNext,
+  exploring,
+  latestReleases,
+  liveTracks,
+  roadmapUpdatedAt,
+  type RoadmapIcon,
+} from './roadmap-data';
+import styles from './page.module.css';
 
-export async function generateMetadata(): Promise<Metadata> {
+export function generateMetadata(): Metadata {
   return {
     title: 'Roadmap — Hatcher',
     description:
-      "Where Hatcher is headed. See what we shipped, what's launching this week, and what's coming next.",
+      'What is live on Hatcher, what we are building next, and the longer-term bets behind the agent operating system.',
     alternates: {
       canonical: '/roadmap',
       languages: buildLanguagesMap('/roadmap'),
@@ -16,235 +47,258 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-type Status = 'done' | 'launching' | 'soon' | 'planned';
-
-interface Item {
-  text: string;
-  note?: string;
-}
-
-interface Phase {
-  period: string;
-  status: Status;
-  label: string;
-  items: Item[];
-}
-
-const STATUS_CONFIG: Record<Status, { dot: string; badge: string; line: string }> = {
-  done:      { dot: 'bg-emerald-400',          badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',   line: 'bg-emerald-500/30' },
-  launching: { dot: 'bg-amber-400 animate-pulse', badge: 'bg-amber-500/10 text-amber-400 border-amber-500/20',     line: 'bg-amber-500/30' },
-  soon:      { dot: 'bg-purple-400',            badge: 'bg-purple-500/10 text-purple-400 border-purple-500/20',     line: 'bg-purple-500/20' },
-  planned:   { dot: 'bg-[var(--text-muted)]',   badge: 'bg-[var(--bg-elevated)] text-[var(--text-muted)] border-[var(--border-default)]', line: 'bg-[var(--border-default)]' },
+const ICONS: Record<RoadmapIcon, LucideIcon> = {
+  mission: ListChecks,
+  packs: PackageCheck,
+  lift: Upload,
+  models: Network,
+  operate: CircleGauge,
+  run: Bot,
+  route: Route,
+  own: Landmark,
+  metering: CircleGauge,
+  approvals: ShieldCheck,
+  recurring: Repeat2,
+  earn: Coins,
+  city: Building2,
+  verified: BadgeCheck,
 };
 
-const PHASES: Phase[] = [
-  {
-    period: 'Shipped (pre-launch)',
-    status: 'done',
-    label: 'DONE',
-    items: [
-      { text: '2 focus agent frameworks — OpenClaw and Hermes' },
-      { text: '5 integrations — Telegram, Discord, Twitter/X, WhatsApp, Slack' },
-      { text: 'BYOK - bring your own LLM key, paid directly to your provider on any tier' },
-      { text: '$HATCHER token on Solana (Token-2022)', note: 'CA: Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump' },
-      { text: 'Free tier + Starter / Pro / Business + Founding Member ($99 lifetime, 20 spots)' },
-      { text: 'SDK, CLI, Zapier app, Make module, GitHub Action' },
-      { text: 'Teams collaboration, agent versioning with diff + restore, visual workflow builder' },
-      { text: 'Referral program — earn credits for every signup you bring' },
-      { text: 'Skills + plugins ecosystem — ClawHub, Hermes tools, UsePod/OpenRouter routing, npm support' },
-      { text: 'Knowledge base, voice mode, secure terminal, managed mode (OpenClaw + Hermes)' },
-      { text: 'Full docs (35+ pages), live changelog, support tickets, admin panel' },
-    ],
-  },
-  {
-    period: '10–16 April (SHIPPED ✅)',
-    status: 'done',
-    label: 'LAUNCHED',
-    items: [
-      { text: 'Official public launch — platform live at hatcher.host' },
-      { text: '5 payment methods — SOL, USDC, $HATCHER (10% burn), $KAUSA, Stripe Card' },
-      { text: 'Annual billing — 15% off on subscription tiers and recurring extras' },
-      { text: 'AI Credits system for hosted LLM usage and web search' },
-      { text: 'Add-on stacking for agent slots and AI Credit top-ups' },
-      { text: 'Full Stripe integration — one-time checkout, webhook handling, live products' },
-      { text: 'GDPR-grade legal pages — Privacy, Terms, Cookies, Impressum' },
-      { text: 'Cookie consent v2 — granular (Necessary + Analytics), honors Do-Not-Track' },
-      { text: 'Email normalization (case-insensitive login/register)' },
-      { text: 'Agent limit enforcement — auto-pause on downgrade, block restart over limit' },
-      { text: 'File Manager and Full Logs included on every tier' },
-      { text: 'Real-time admin dashboard — online users, page views, unique visitors' },
-      { text: 'Docs billing section — payments, credits, annual billing, addons mechanics' },
-      { text: 'Legacy-to-managed migration, Docker cleanup, DB reset for clean launch' },
-    ],
-  },
-  {
-    period: 'Next 2–4 weeks',
-    status: 'launching',
-    label: 'NEXT',
-    items: [
-      { text: 'Product Hunt + Hacker News + directory listings (AlternativeTo, TAAFT, Futurepedia)' },
-      { text: 'Agent Marketplace — browse, rent, and sell pre-configured agents' },
-      { text: 'Chat-to-Hatch improvements — richer agent drafts, better file generation, and clearer launch review' },
-      { text: 'Conversation analytics — sentiment, topics, drop-off, message volume over time' },
-      { text: 'Mobile app — Android (Kotlin, feature-complete) + iOS wrapper' },
-      { text: 'More BYOK providers — Mistral, Cohere, Perplexity, DeepSeek' },
-      { text: 'Improved embed widget — custom colors, position, avatar, trigger button' },
-    ],
-  },
-  {
-    period: 'Next 1–3 months',
-    status: 'soon',
-    label: 'SOON',
-    items: [
-      { text: 'More frameworks — additional agent runtimes for different use cases' },
-      { text: 'Token staking — stake HATCHER for subscription discounts and early access' },
-      { text: 'No-code agent builder — deploy from a prompt, no config required' },
-      { text: 'Voice-first agents — native voice via Twilio / ElevenLabs' },
-      { text: 'Signal integration — QR code pairing, encrypted messaging' },
-      { text: 'WhatsApp Business API — higher volume, no QR code required' },
-      { text: 'Public agent profiles — shareable pages with live chat embed' },
-      { text: 'Affiliate dashboard — track referral revenue in HATCHER tokens' },
-    ],
-  },
-  {
-    period: 'Next 3–6 months',
-    status: 'planned',
-    label: 'FUTURE',
-    items: [
-      { text: 'Multi-agent orchestration — pipelines where N agents collaborate with defined roles' },
-      { text: 'Token governance — HATCHER holders vote on features and treasury allocation' },
-      { text: 'Enterprise / White-label — run Hatcher on your own infra, under your own brand' },
-      { text: 'Hatcher for Teams (B2B) — SSO, audit logs, granular roles, centralized billing' },
-      { text: 'Agent App Store — community-certified skills and plugins with revenue sharing' },
-      { text: 'API v2 — improved REST API with native webhooks, streaming, and batch operations' },
-    ],
-  },
-];
+const PROOF_ICONS: Record<(typeof buildingNext)[number]['id'], readonly LucideIcon[]> = {
+  'measured-verified-missions': [CircleGauge, ShieldCheck, BadgeCheck],
+  'trusted-action-approvals': [Inbox, KeyRound, History],
+  'outcome-packs-v2': [PackageCheck, Repeat2, ShieldCheck],
+};
 
-function CheckIcon() {
+function SectionHeading({
+  title,
+  description,
+  id,
+}: {
+  title: string;
+  description: string;
+  id: string;
+}) {
   return (
-    <svg className="w-3.5 h-3.5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-    </svg>
+    <header className={styles.sectionHeading}>
+      <span className={styles.headingRail} aria-hidden="true">
+        <span />
+      </span>
+      <div>
+        <h2 id={id}>{title}</h2>
+        <p>{description}</p>
+      </div>
+    </header>
   );
 }
-
-function CircleIcon() {
-  return (
-    <svg className="w-3.5 h-3.5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <circle cx="12" cy="12" r="8" />
-    </svg>
-  );
-}
-
 export default async function RoadmapPage() {
   const t = await getTranslations('roadmap');
 
   return (
     <MarketingShell>
-      <div className="mx-auto max-w-2xl px-4 sm:px-6 py-16 sm:py-20">
+      <div className={styles.page}>
+        <section className={styles.hero} aria-labelledby="roadmap-title">
+          <div className={styles.heroCopy}>
+            <h1 id="roadmap-title">{t('heading')}</h1>
+            <p className={styles.heroText}>
+              {t('subheading')}{' '}
+              <Link
+                href="https://x.com/hatcherlabs"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.heroInlineLink}
+              >
+                {t('followHandle')}
+              </Link>
+              .
+            </p>
 
-        {/* Header — editorial eyebrow matches the rest of the site */}
-        <div className="mb-14">
-          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-400 inline-flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            {t('liveLabel')}
-          </p>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-[var(--text-primary)] mb-4 tracking-tight leading-[1.05]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-            {t('heading')}
-          </h1>
-          <p className="text-[var(--text-secondary)] text-base leading-relaxed">
-            {t('subheading')}{' '}
-            <Link href="https://x.com/hatcherlabs" target="_blank" rel="noopener noreferrer" className="text-[var(--text-primary)] underline underline-offset-2 hover:text-[var(--color-accent)] transition-colors">
-              {t('followHandle')}
-            </Link>
-            {' '}or check the{' '}
-            <Link href="/changelog" className="text-[var(--text-primary)] underline underline-offset-2 hover:text-[var(--color-accent)] transition-colors">
-              {t('checkChangelog')}
-            </Link>
-            .
-          </p>
-        </div>
+            <div className={styles.heroActions}>
+              <Link href="/changelog" className={styles.primaryAction}>
+                <BookOpenText aria-hidden="true" />
+                View changelog
+              </Link>
+              <Link href="/dashboard/missions" className={styles.secondaryAction}>
+                Open Mission Control
+                <ArrowUpRight aria-hidden="true" />
+              </Link>
+            </div>
 
-        {/* Timeline */}
-        <div className="space-y-12">
-          {PHASES.map((phase, i) => {
-            const cfg = STATUS_CONFIG[phase.status];
-            const isDone = phase.status === 'done';
-            const isLaunching = phase.status === 'launching';
+            <p className={styles.updateLine}>
+              <span className={styles.liveDot} aria-hidden="true" />
+              Updated <time dateTime={roadmapUpdatedAt.dateTime}>{roadmapUpdatedAt.label}</time>
+              <span aria-hidden="true">·</span>
+              Shipping continuously
+            </p>
+          </div>
 
-            return (
-              <div key={i} className="relative flex gap-5">
-                {/* Left column: dot + line */}
-                <div className="flex flex-col items-center">
-                  <div className={`w-2.5 h-2.5 rounded-full mt-1 shrink-0 ${cfg.dot}`} />
-                  {i < PHASES.length - 1 && (
-                    <div className={`w-px flex-1 mt-2 min-h-[2rem] ${cfg.line}`} />
-                  )}
-                </div>
+          <aside className={styles.releasePanel} aria-labelledby="latest-releases-title">
+            <div className={styles.releaseHeader}>
+              <h2 id="latest-releases-title">Latest releases</h2>
+              <span>{t('liveLabel')}</span>
+            </div>
+            <ol className={styles.releaseRail}>
+              {latestReleases.map((release) => {
+                const Icon = ICONS[release.icon];
 
-                {/* Right column: content */}
-                <div className="flex-1 pb-2">
-                  {/* Period + badge */}
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-[11px] font-semibold tracking-[0.10em] uppercase text-[var(--text-muted)]">
-                      {phase.period}
+                return (
+                  <li key={release.id}>
+                    <span className={styles.releaseNode} aria-hidden="true">
+                      <Icon />
                     </span>
-                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold border ${cfg.badge}`}>
-                      {isLaunching && <span className="w-1 h-1 rounded-full bg-amber-400 animate-pulse" />}
-                      {phase.label}
-                    </span>
-                  </div>
+                    <div>
+                      <h3>{release.title}</h3>
+                      <p>{release.description}</p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          </aside>
+        </section>
 
-                  {/* Items */}
-                  <ul className="space-y-2.5">
-                    {phase.items.map((item, j) => (
-                      <li key={j} className="flex items-start gap-2.5">
-                        <span className={isDone ? 'text-emerald-400' : 'text-[var(--text-muted)]'}>
-                          {isDone ? <CheckIcon /> : <CircleIcon />}
-                        </span>
-                        <div className="min-w-0">
-                          <p className={`text-sm leading-snug ${isDone ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}>
-                            {item.text}
-                          </p>
-                          {item.note && (
-                            <p className="text-[11px] text-[var(--text-muted)] mt-0.5 font-mono">
-                              {item.note}
-                            </p>
-                          )}
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+        <section className={styles.liveSection} aria-labelledby="live-now-title">
+          <div className={styles.sectionInner}>
+            <SectionHeading
+              id="live-now-title"
+              title="Live now"
+              description="A current view of the product—not a list of promises from launch week."
+            />
+
+            <div className={styles.liveTimeline}>
+              {liveTracks.map((track, index) => {
+                const Icon = ICONS[track.icon];
+
+                return (
+                  <article className={styles.liveRow} key={track.id}>
+                    <div className={styles.liveMarker} aria-hidden="true">
+                      <span>{String(index + 1).padStart(2, '0')}</span>
+                      <i />
+                    </div>
+
+                    <div className={styles.liveCopy}>
+                      <div className={styles.trackLabel}>
+                        <Icon aria-hidden="true" />
+                        <span>{track.label}</span>
+                      </div>
+                      <h3>{track.title}</h3>
+                      <p>{track.summary}</p>
+                      <Link href={track.href} className={styles.inlineLink}>
+                        {track.linkLabel}
+                        <ArrowUpRight aria-hidden="true" />
+                      </Link>
+                    </div>
+
+                    <ul className={styles.evidenceList}>
+                      {track.evidence.map((item) => (
+                        <li key={item}>
+                          <Check aria-hidden="true" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section className={styles.buildSection} aria-labelledby="building-next-title">
+          <div className={styles.sectionInner}>
+            <SectionHeading
+              id="building-next-title"
+              title="Building next"
+              description="Directional targets, shipped when the product evidence is ready—not on arbitrary dates."
+            />
+
+            <div className={styles.targetTimeline}>
+              {buildingNext.map((target, index) => {
+                const Icon = ICONS[target.icon];
+
+                return (
+                  <article className={styles.targetRow} key={target.id}>
+                    <div className={styles.targetMarker} aria-hidden="true">
+                      <span>{String(index + 1).padStart(2, '0')}</span>
+                    </div>
+
+                    <div className={styles.targetCopy}>
+                      <Icon aria-hidden="true" />
+                      <div>
+                        <h3>{target.title}</h3>
+                        <p>{target.description}</p>
+                      </div>
+                    </div>
+
+                    <div className={styles.proofColumn}>
+                      <p className={styles.proofLabel}>Proof targets</p>
+                      <ul>
+                        {target.proofTargets.map((proof, proofIndex) => {
+                          const ProofIcon = PROOF_ICONS[target.id][proofIndex] ?? Check;
+
+                          return (
+                            <li key={proof}>
+                              <ProofIcon aria-hidden="true" />
+                              <span>{proof}</span>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+
+            <div className={styles.exploringBand}>
+              <div className={styles.exploringTitle}>
+                <h2>Exploring</h2>
+                <span aria-hidden="true" />
               </div>
-            );
-          })}
-        </div>
+              <div className={styles.exploringGrid}>
+                {exploring.map((item) => {
+                  const Icon = ICONS[item.icon];
 
-        {/* Footer CTA */}
-        <div className="mt-14 pt-8 border-t border-[var(--border-default)]">
-          <p className="text-sm text-[var(--text-secondary)] mb-4">
-            {t('featureRequest')}
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/support"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-sm font-medium text-[var(--text-primary)] hover:border-[var(--border-hover)] transition-colors"
-            >
+                  return (
+                    <article key={item.id}>
+                      <Icon aria-hidden="true" />
+                      <div>
+                        <h3>{item.title}</h3>
+                        <p>{item.description}</p>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className={styles.cta} aria-labelledby="roadmap-cta-title">
+          <div>
+            <h2 id="roadmap-cta-title">Help shape what ships next.</h2>
+            <p>{t('featureRequest')}</p>
+          </div>
+          <div className={styles.ctaActions}>
+            <Link href="/support" className={styles.primaryAction}>
               {t('submitRequest')}
+              <ArrowUpRight aria-hidden="true" />
             </Link>
             <Link
               href="https://x.com/hatcherlabs"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-sm font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)] transition-colors"
+              className={styles.secondaryAction}
             >
               {t('followOnX')}
+              <ArrowUpRight aria-hidden="true" />
             </Link>
           </div>
-        </div>
-
+          <p className={styles.disclaimer}>
+            Roadmap items are directional and may change with user demand, technical
+            constraints, partner readiness, and legal review.
+          </p>
+        </section>
       </div>
     </MarketingShell>
   );
