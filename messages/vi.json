@@ -38,6 +38,8 @@
     "affiliateRejected": "Đăng ký lại với tư cách là chi nhánh",
     "affiliateBecome": "Trở thành một chi nhánh",
     "userMenu": {
+      "sub_dashboard": "Tác nhân, nhiệm vụ, phê duyệt và gói.",
+      "sub_outcomePacks": "Công thức tái sử dụng cho các kết quả phổ biến.",
       "sub_myAgents": "Duyệt, chỉnh sửa, triển khai.",
       "sub_create": "Mô tả một tác nhân để nở.",
       "sub_analytics": "AI Credits, mã thông báo, xu hướng.",
@@ -851,6 +853,46 @@
       "back": "Quay lại",
       "noDescription": "Không có mô tả",
       "clear": "Xóa"
+    },
+    "overview": {
+      "eyebrow": "Tổng quan không gian làm việc",
+      "title": "Trang tổng quan",
+      "subtitle": "Theo dõi tác nhân, nhiệm vụ, phê duyệt và các công thức kết quả có thể tái sử dụng trong một chế độ xem vận hành duy nhất.",
+      "signInDescription": "Đăng nhập để xem tác nhân, nhiệm vụ, phê duyệt và Outcome Packs của bạn.",
+      "openMissionControl": "Mission Control",
+      "useOutcomePack": "Outcome Packs",
+      "refresh": "Làm mới trang tổng quan",
+      "partialError": "Không thể tải một số dữ liệu trong không gian làm việc.",
+      "unavailable": "Dữ liệu tạm thời không khả dụng.",
+      "retry": "Thử lại",
+      "stats": {
+        "label": "Tóm tắt không gian làm việc",
+        "agents": "Tác nhân",
+        "activeAgents": "Tác nhân đang hoạt động",
+        "activeMissions": "Nhiệm vụ đang hoạt động",
+        "awaitingApproval": "Đang chờ phê duyệt"
+      },
+      "missions": {
+        "title": "Nhiệm vụ gần đây",
+        "subtitle": "Công việc mới nhất của tất cả tác nhân.",
+        "viewAll": "Xem tất cả",
+        "needsAttention": "{count} mục cần chú ý",
+        "empty": "Chưa có nhiệm vụ.",
+        "emptyAction": "Tạo nhiệm vụ đầu tiên",
+        "unknownAgent": "Tác nhân không xác định"
+      },
+      "packs": {
+        "title": "Outcome Packs",
+        "subtitle": "Các công thức tuyển chọn đã sẵn sàng để cấu hình.",
+        "browse": "Duyệt tất cả",
+        "empty": "Không có Outcome Pack nào."
+      },
+      "utilities": {
+        "label": "Các công cụ khác trong không gian làm việc",
+        "lift": "Nhập bằng Hatcher Lift",
+        "city": "Mở Hatcher City",
+        "agents": "Quản lý tác nhân"
+      }
     },
     "agents": {
       "eyebrow": "Trang tổng quan",

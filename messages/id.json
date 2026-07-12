@@ -38,6 +38,8 @@
     "affiliateRejected": "Ajukan permohonan kembali sebagai afiliasi",
     "affiliateBecome": "Menjadi afiliasi",
     "userMenu": {
+      "sub_dashboard": "Agen, misi, persetujuan, dan paket.",
+      "sub_outcomePacks": "Resep yang dapat digunakan ulang untuk hasil umum.",
       "sub_myAgents": "Telusuri, edit, sebarkan.",
       "sub_create": "Jelaskan agen yang akan ditetaskan.",
       "sub_analytics": "AI Credits, token, tren.",
@@ -851,6 +853,46 @@
       "back": "Kembali",
       "noDescription": "Tidak ada deskripsi",
       "clear": "Jelas"
+    },
+    "overview": {
+      "eyebrow": "Ringkasan ruang kerja",
+      "title": "Dasbor",
+      "subtitle": "Pantau agen, misi, persetujuan, dan resep hasil yang dapat digunakan kembali dari satu tampilan operasional.",
+      "signInDescription": "Masuk untuk melihat agen, misi, persetujuan, dan Outcome Packs Anda.",
+      "openMissionControl": "Mission Control",
+      "useOutcomePack": "Outcome Packs",
+      "refresh": "Segarkan dasbor",
+      "partialError": "Sebagian data ruang kerja tidak dapat dimuat.",
+      "unavailable": "Data untuk sementara tidak tersedia.",
+      "retry": "Coba lagi",
+      "stats": {
+        "label": "Ringkasan ruang kerja",
+        "agents": "Agen",
+        "activeAgents": "Agen aktif",
+        "activeMissions": "Misi aktif",
+        "awaitingApproval": "Menunggu persetujuan"
+      },
+      "missions": {
+        "title": "Misi terbaru",
+        "subtitle": "Pekerjaan terbaru dari semua agen.",
+        "viewAll": "Lihat semua",
+        "needsAttention": "{count} perlu diperhatikan",
+        "empty": "Belum ada misi.",
+        "emptyAction": "Buat misi pertama Anda",
+        "unknownAgent": "Agen tidak dikenal"
+      },
+      "packs": {
+        "title": "Outcome Packs",
+        "subtitle": "Resep pilihan yang siap dikonfigurasi.",
+        "browse": "Jelajahi semua",
+        "empty": "Tidak ada Outcome Packs yang tersedia."
+      },
+      "utilities": {
+        "label": "Alat ruang kerja lainnya",
+        "lift": "Impor dengan Hatcher Lift",
+        "city": "Buka Hatcher City",
+        "agents": "Kelola agen"
+      }
     },
     "agents": {
       "eyebrow": "Dasbor",

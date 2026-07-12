@@ -38,6 +38,8 @@
     "affiliateRejected": "Volver a aplicar como afiliado",
     "affiliateBecome": "Conviértete en afiliado",
     "userMenu": {
+      "sub_dashboard": "Agentes, misiones, aprobaciones y packs.",
+      "sub_outcomePacks": "Recetas reutilizables para resultados habituales.",
       "sub_myAgents": "Explorar, editar, implementar.",
       "sub_create": "Describe un agente para nacer.",
       "sub_analytics": "AI Credits, tokens, tendencias.",
@@ -851,6 +853,46 @@
       "back": "Atrás",
       "noDescription": "Sin descripción",
       "clear": "Borrar"
+    },
+    "overview": {
+      "eyebrow": "Resumen del espacio de trabajo",
+      "title": "Panel de control",
+      "subtitle": "Supervisa agentes, misiones, aprobaciones y recetas de resultados reutilizables desde una única vista operativa.",
+      "signInDescription": "Inicia sesión para ver tus agentes, misiones, aprobaciones y Outcome Packs.",
+      "openMissionControl": "Mission Control",
+      "useOutcomePack": "Outcome Packs",
+      "refresh": "Actualizar panel de control",
+      "partialError": "No se pudieron cargar algunos datos del espacio de trabajo.",
+      "unavailable": "Datos temporalmente no disponibles.",
+      "retry": "Reintentar",
+      "stats": {
+        "label": "Resumen del espacio de trabajo",
+        "agents": "Agentes",
+        "activeAgents": "Agentes activos",
+        "activeMissions": "Misiones activas",
+        "awaitingApproval": "Pendientes de aprobación"
+      },
+      "missions": {
+        "title": "Misiones recientes",
+        "subtitle": "El trabajo más reciente de todos los agentes.",
+        "viewAll": "Ver todas",
+        "needsAttention": "{count} requieren atención",
+        "empty": "Aún no hay misiones.",
+        "emptyAction": "Crea tu primera misión",
+        "unknownAgent": "Agente desconocido"
+      },
+      "packs": {
+        "title": "Outcome Packs",
+        "subtitle": "Recetas seleccionadas listas para configurar.",
+        "browse": "Explorar todos",
+        "empty": "No hay Outcome Packs disponibles."
+      },
+      "utilities": {
+        "label": "Más herramientas del espacio de trabajo",
+        "lift": "Importar con Hatcher Lift",
+        "city": "Abrir Hatcher City",
+        "agents": "Gestionar agentes"
+      }
     },
     "agents": {
       "eyebrow": "Panel de control",

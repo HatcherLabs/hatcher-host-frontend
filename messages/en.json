@@ -39,7 +39,9 @@
     "affiliateRejected": "Reapply as affiliate",
     "affiliateBecome": "Become an affiliate",
     "userMenu": {
+      "sub_dashboard": "Agents, missions, approvals, and packs.",
       "sub_missionControl": "Tasks, approvals, runs, and outputs.",
+      "sub_outcomePacks": "Reusable recipes for common outcomes.",
       "sub_myAgents": "Browse, edit, deploy.",
       "sub_create": "Describe an agent to hatch.",
       "sub_analytics": "AI Credits, tokens, trends.",
@@ -851,6 +853,46 @@
       "back": "Back",
       "noDescription": "No description",
       "clear": "Clear"
+    },
+    "overview": {
+      "eyebrow": "Workspace overview",
+      "title": "Dashboard",
+      "subtitle": "Track agents, missions, approvals, and reusable outcome recipes from one operational view.",
+      "signInDescription": "Sign in to view your agents, missions, approvals, and Outcome Packs.",
+      "openMissionControl": "Mission Control",
+      "useOutcomePack": "Outcome Packs",
+      "refresh": "Refresh dashboard",
+      "partialError": "Some workspace data could not be loaded.",
+      "unavailable": "Data temporarily unavailable.",
+      "retry": "Try again",
+      "stats": {
+        "label": "Workspace summary",
+        "agents": "Agents",
+        "activeAgents": "Active agents",
+        "activeMissions": "Active missions",
+        "awaitingApproval": "Awaiting approval"
+      },
+      "missions": {
+        "title": "Recent missions",
+        "subtitle": "Latest work across all agents.",
+        "viewAll": "View all",
+        "needsAttention": "{count} need attention",
+        "empty": "No missions yet.",
+        "emptyAction": "Create your first mission",
+        "unknownAgent": "Unknown agent"
+      },
+      "packs": {
+        "title": "Outcome Packs",
+        "subtitle": "Curated recipes ready to configure.",
+        "browse": "Browse all",
+        "empty": "No Outcome Packs are available."
+      },
+      "utilities": {
+        "label": "More workspace tools",
+        "lift": "Import with Hatcher Lift",
+        "city": "Open Hatcher City",
+        "agents": "Manage agents"
+      }
     },
     "agents": {
       "eyebrow": "Dashboard",

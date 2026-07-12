@@ -38,6 +38,8 @@
     "affiliateRejected": "Bağlı kuruluş olarak yeniden başvurun",
     "affiliateBecome": "Bağlı kuruluş olun",
     "userMenu": {
+      "sub_dashboard": "Agentlar, görevler, onaylar ve paketler.",
+      "sub_outcomePacks": "Yaygın sonuçlar için yeniden kullanılabilir tarifler.",
       "sub_myAgents": "Bak, düzenle, dağıt.",
       "sub_create": "Bir ajanı yumurtadan çıkarmayı tarif edin.",
       "sub_analytics": "AI Credits, jetonlar, trendler.",
@@ -851,6 +853,46 @@
       "back": "Geri",
       "noDescription": "Açıklama yok",
       "clear": "Temiz"
+    },
+    "overview": {
+      "eyebrow": "Çalışma alanına genel bakış",
+      "title": "Panel",
+      "subtitle": "Ajanları, görevleri, onayları ve yeniden kullanılabilir sonuç tariflerini tek bir operasyon görünümünden takip edin.",
+      "signInDescription": "Ajanlarınızı, görevlerinizi, onayları ve Outcome Packs'i görmek için giriş yapın.",
+      "openMissionControl": "Mission Control",
+      "useOutcomePack": "Outcome Packs",
+      "refresh": "Paneli yenile",
+      "partialError": "Bazı çalışma alanı verileri yüklenemedi.",
+      "unavailable": "Veriler geçici olarak kullanılamıyor.",
+      "retry": "Tekrar dene",
+      "stats": {
+        "label": "Çalışma alanı özeti",
+        "agents": "Ajanlar",
+        "activeAgents": "Aktif ajanlar",
+        "activeMissions": "Aktif görevler",
+        "awaitingApproval": "Onay bekliyor"
+      },
+      "missions": {
+        "title": "Son görevler",
+        "subtitle": "Tüm ajanlardaki en son çalışmalar.",
+        "viewAll": "Tümünü görüntüle",
+        "needsAttention": "{count} görev ilgi bekliyor",
+        "empty": "Henüz görev yok.",
+        "emptyAction": "İlk görevinizi oluşturun",
+        "unknownAgent": "Bilinmeyen ajan"
+      },
+      "packs": {
+        "title": "Outcome Packs",
+        "subtitle": "Yapılandırılmaya hazır, seçilmiş tarifler.",
+        "browse": "Tümüne göz at",
+        "empty": "Kullanılabilir Outcome Pack yok."
+      },
+      "utilities": {
+        "label": "Diğer çalışma alanı araçları",
+        "lift": "Hatcher Lift ile içe aktar",
+        "city": "Hatcher City'yi aç",
+        "agents": "Ajanları yönet"
+      }
     },
     "agents": {
       "eyebrow": "Dashboard",

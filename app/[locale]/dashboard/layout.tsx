@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { DashboardWorkspaceNavigation } from '@/components/dashboard/DashboardWorkspaceNavigation';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { buildLanguagesMap } from '@/lib/seo';
 
@@ -20,6 +21,7 @@ export const metadata: Metadata = {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <ErrorBoundary>
+      <DashboardWorkspaceNavigation />
       {children}
     </ErrorBoundary>
   );

@@ -153,6 +153,7 @@ export default function OutcomePacksPage() {
     }
 
     const nextPacks = normalizeOutcomePackList(packsResult.data).map(localizePack);
+    const requestedPackId = new URLSearchParams(window.location.search).get('pack');
     setAgents(agentsResult.data);
     setPacks(nextPacks);
     setDetailRevision((current) => current + 1);
@@ -160,6 +161,8 @@ export default function OutcomePacksPage() {
     setSelectedPackId((current) =>
       current && nextPacks.some((item) => item.id === current)
         ? current
+        : requestedPackId && nextPacks.some((item) => item.id === requestedPackId)
+          ? requestedPackId
         : nextPacks[0]?.id ?? null,
     );
   }, [localizePack]);
@@ -206,7 +209,8 @@ export default function OutcomePacksPage() {
     setFieldErrors({});
     setActionError(null);
     launchKeyRef.current = null;
-  }, [selectedPackId]);
+    router.replace(`/dashboard/outcome-packs?pack=${encodeURIComponent(packId)}`, { scroll: false });
+  }, [router, selectedPackId]);
 
   const updateInput = useCallback((fieldId: string, value: OutcomePackDraftValue) => {
     setInputs((current) => ({ ...current, [fieldId]: value }));

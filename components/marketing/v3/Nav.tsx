@@ -22,8 +22,10 @@ import {
   HelpCircle,
   Handshake,
   LayoutDashboard,
+  ListChecks,
   LogOut,
   Newspaper,
+  PackageCheck,
   Plus,
   Rocket,
   Search,
@@ -60,15 +62,24 @@ export function Nav() {
   const tNav = useTranslations('nav');
   const tGroups = useTranslations('nav.groups');
   const tMenu = useTranslations('nav.userMenu');
+  const tMission = useTranslations('missionControl');
+  const tOutcome = useTranslations('outcomePacks');
+
+  const WORKSPACE_MENU = useMemo(() => ([
+    { key: 'dashboard', label: tNav('dashboard'), sub: tMenu('sub_dashboard'), href: '/dashboard', Icon: LayoutDashboard },
+    { key: 'agents', label: tNav('myAgents'), sub: tMenu('sub_myAgents'), href: '/dashboard/agents', Icon: Bot },
+    { key: 'missions', label: tMission('title'), sub: tMenu('sub_missionControl'), href: '/dashboard/missions', Icon: ListChecks },
+    { key: 'outcomePacks', label: tOutcome('title'), sub: tMenu('sub_outcomePacks'), href: '/dashboard/outcome-packs', Icon: PackageCheck },
+  ] satisfies ReadonlyArray<{ key: string; label: string; sub: string; href: string; Icon: LucideIcon }>), [tMenu, tMission, tNav, tOutcome]);
 
   const USER_MENU = useMemo(() => ([
-    { key: 'agents', label: tNav('myAgents'), sub: tMenu('sub_myAgents'), href: '/dashboard/agents', Icon: Bot },
+    ...WORKSPACE_MENU,
     { key: 'analytics', label: tNav('analytics'), sub: tMenu('sub_analytics'), href: '/dashboard/analytics', Icon: BarChart3 },
     { key: 'create', label: tNav('create'), sub: tMenu('sub_create'), href: '/create', Icon: Plus },
     { key: 'billing', label: tNav('billing'), sub: tMenu('sub_billing'), href: '/dashboard/billing', Icon: CreditCard },
     { key: 'settings', label: tNav('settings'), sub: tMenu('sub_settings'), href: '/dashboard/settings', Icon: Settings },
     { key: 'support', label: tNav('support'), sub: tMenu('sub_support'), href: '/support', Icon: HelpCircle },
-  ] satisfies ReadonlyArray<{ key: string; label: string; sub: string; href: string; Icon: LucideIcon }>), [tNav, tMenu]);
+  ] satisfies ReadonlyArray<{ key: string; label: string; sub: string; href: string; Icon: LucideIcon }>), [WORKSPACE_MENU, tNav, tMenu]);
 
   const affiliateItem = useMemo(() => {
     switch (affiliateState) {
@@ -187,7 +198,9 @@ export function Nav() {
                 </button>
                 {openGroup === group.key && (
                   <div className={styles.dropdown} role="menu" aria-label={tGroups(group.labelKey)}>
-                    {group.items.map((it) => (
+                    {group.items.filter((it) => !(
+                      isAuthenticated && group.key === 'build' && it.key === 'myAgents'
+                    )).map((it) => (
                       <Link
                         key={it.key}
                         href={it.href}
@@ -204,6 +217,23 @@ export function Nav() {
                         </span>
                       </Link>
                     ))}
+                    {group.key === 'build' && isAuthenticated ? WORKSPACE_MENU.map((it) => (
+                      <Link
+                        key={it.key}
+                        href={it.href}
+                        className={styles.item}
+                        role="menuitem"
+                        onClick={() => setOpenGroup(null)}
+                      >
+                        <span className={styles.glyph} aria-hidden>
+                          <it.Icon size={15} strokeWidth={1.8} />
+                        </span>
+                        <span className={styles.itemBody}>
+                          <span className={styles.itemLabel}>{it.label}</span>
+                          <span className={styles.itemSub}>{it.sub}</span>
+                        </span>
+                      </Link>
+                    )) : null}
                   </div>
                 )}
               </div>

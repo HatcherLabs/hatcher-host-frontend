@@ -38,6 +38,8 @@
     "affiliateRejected": "Erneut als Affiliate bewerben",
     "affiliateBecome": "Affiliate werden",
     "userMenu": {
+      "sub_dashboard": "Agenten, Missionen, Freigaben und Packs.",
+      "sub_outcomePacks": "Wiederverwendbare Rezepte für häufige Ergebnisse.",
       "sub_myAgents": "Durchsuchen, bearbeiten, bereitstellen.",
       "sub_create": "Agent beschreiben und ausbrüten.",
       "sub_analytics": "AI Credits, Tokens, Trends.",
@@ -851,6 +853,46 @@
       "back": "Zurück",
       "noDescription": "Keine Beschreibung",
       "clear": "Löschen"
+    },
+    "overview": {
+      "eyebrow": "Arbeitsbereich im Überblick",
+      "title": "Dashboard",
+      "subtitle": "Behalten Sie Agenten, Missionen, Freigaben und wiederverwendbare Outcome-Rezepte in einer zentralen Ansicht im Blick.",
+      "signInDescription": "Melden Sie sich an, um Ihre Agenten, Missionen, Freigaben und Outcome Packs anzuzeigen.",
+      "openMissionControl": "Mission Control",
+      "useOutcomePack": "Outcome Packs",
+      "refresh": "Dashboard aktualisieren",
+      "partialError": "Einige Arbeitsbereichsdaten konnten nicht geladen werden.",
+      "unavailable": "Daten sind vorübergehend nicht verfügbar.",
+      "retry": "Erneut versuchen",
+      "stats": {
+        "label": "Zusammenfassung des Arbeitsbereichs",
+        "agents": "Agenten",
+        "activeAgents": "Aktive Agenten",
+        "activeMissions": "Aktive Missionen",
+        "awaitingApproval": "Ausstehende Freigaben"
+      },
+      "missions": {
+        "title": "Neueste Missionen",
+        "subtitle": "Die neuesten Aktivitäten aller Agenten.",
+        "viewAll": "Alle anzeigen",
+        "needsAttention": "{count} erfordern Aufmerksamkeit",
+        "empty": "Noch keine Missionen.",
+        "emptyAction": "Erste Mission erstellen",
+        "unknownAgent": "Unbekannter Agent"
+      },
+      "packs": {
+        "title": "Outcome Packs",
+        "subtitle": "Kuratierte Rezepte, die zur Konfiguration bereitstehen.",
+        "browse": "Alle durchsuchen",
+        "empty": "Keine Outcome Packs verfügbar."
+      },
+      "utilities": {
+        "label": "Weitere Tools im Arbeitsbereich",
+        "lift": "Mit Hatcher Lift importieren",
+        "city": "Hatcher City öffnen",
+        "agents": "Agenten verwalten"
+      }
     },
     "agents": {
       "eyebrow": "Dashboard",

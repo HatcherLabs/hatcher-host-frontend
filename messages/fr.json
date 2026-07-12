@@ -38,6 +38,8 @@
     "affiliateRejected": "Recandidater en tant qu'affilié",
     "affiliateBecome": "Devenir affilié",
     "userMenu": {
+      "sub_dashboard": "Agents, missions, approbations et packs.",
+      "sub_outcomePacks": "Recettes réutilisables pour les résultats courants.",
       "sub_myAgents": "Parcourir, modifier, déployer.",
       "sub_create": "Décrire un agent à faire éclore.",
       "sub_analytics": "AI Credits, tokens, tendances.",
@@ -851,6 +853,46 @@
       "back": "Retour",
       "noDescription": "Aucune description",
       "clear": "Effacer"
+    },
+    "overview": {
+      "eyebrow": "Vue d'ensemble de l'espace de travail",
+      "title": "Tableau de bord",
+      "subtitle": "Suivez les agents, les missions, les approbations et les recettes de résultats réutilisables depuis une vue opérationnelle unique.",
+      "signInDescription": "Connectez-vous pour voir vos agents, missions, approbations et Outcome Packs.",
+      "openMissionControl": "Mission Control",
+      "useOutcomePack": "Outcome Packs",
+      "refresh": "Actualiser le tableau de bord",
+      "partialError": "Certaines données de l'espace de travail n'ont pas pu être chargées.",
+      "unavailable": "Données temporairement indisponibles.",
+      "retry": "Réessayer",
+      "stats": {
+        "label": "Synthèse de l'espace de travail",
+        "agents": "Agents",
+        "activeAgents": "Agents actifs",
+        "activeMissions": "Missions actives",
+        "awaitingApproval": "En attente d'approbation"
+      },
+      "missions": {
+        "title": "Missions récentes",
+        "subtitle": "Derniers travaux de tous les agents.",
+        "viewAll": "Tout afficher",
+        "needsAttention": "{count} nécessitent votre attention",
+        "empty": "Aucune mission pour le moment.",
+        "emptyAction": "Créer votre première mission",
+        "unknownAgent": "Agent inconnu"
+      },
+      "packs": {
+        "title": "Outcome Packs",
+        "subtitle": "Recettes sélectionnées prêtes à être configurées.",
+        "browse": "Tout parcourir",
+        "empty": "Aucun Outcome Pack n'est disponible."
+      },
+      "utilities": {
+        "label": "Autres outils de l'espace de travail",
+        "lift": "Importer avec Hatcher Lift",
+        "city": "Ouvrir Hatcher City",
+        "agents": "Gérer les agents"
+      }
     },
     "agents": {
       "eyebrow": "Tableau de bord",

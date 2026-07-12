@@ -1,0 +1,109 @@
+.shell {
+  width: 100%;
+  border-bottom: 1px solid var(--border-default);
+  background: color-mix(in srgb, var(--bg-base) 94%, var(--bg-elevated));
+}
+
+.inner {
+  max-width: 1280px;
+  min-height: 48px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: stretch;
+  gap: 20px;
+}
+
+.links {
+  min-width: 0;
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.links::-webkit-scrollbar {
+  display: none;
+}
+
+.link {
+  position: relative;
+  min-height: 48px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: 0 0 auto;
+  color: var(--text-muted);
+  font-family: var(--font-inter), var(--font-body);
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-decoration: none;
+  transition: color 150ms ease, background 150ms ease;
+}
+
+.link::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  bottom: -1px;
+  left: 12px;
+  height: 2px;
+  background: transparent;
+}
+
+.link:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+.active {
+  color: var(--text-primary);
+}
+
+.active::after {
+  background: var(--action);
+}
+
+@media (max-width: 640px) {
+  .inner {
+    min-height: 62px;
+    padding: 0 12px;
+    gap: 0;
+  }
+
+  .links {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    overflow: visible;
+  }
+
+  .link {
+    min-width: 0;
+    min-height: 62px;
+    padding: 6px 3px;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    font-size: 10px;
+    line-height: 1.15;
+    text-align: center;
+  }
+
+  .link span {
+    white-space: normal;
+  }
+
+  .link::after {
+    right: 4px;
+    left: 4px;
+  }
+}
