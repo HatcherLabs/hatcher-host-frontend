@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
   HOSTED_MODELS,
+  HOSTED_MODEL_PROVIDERS,
   getHostedModelOption,
   normalizeHostedModelForUi,
   resolveActiveModelDisplay,
   filterHostedModels,
+  hostedModelPrivacy,
 } from '@/lib/hosted-model-catalog';
 
 describe('hosted model catalog', () => {
@@ -101,6 +103,7 @@ describe('hosted model catalog', () => {
 
     const virtualsFallback = [
       ['virtuals/anthropic-claude-fable-5', '1M'],
+      ['virtuals/anthropic-claude-sonnet-5', '1M'],
       ['virtuals/e2ee-deepseek-v4-flash', '1M'],
       ['virtuals/openai-gpt-56-luna', '1M'],
       ['virtuals/openai-gpt-56-luna-pro', '1M'],
@@ -109,6 +112,8 @@ describe('hosted model catalog', () => {
       ['virtuals/openai-gpt-56-terra', '1M'],
       ['virtuals/openai-gpt-56-terra-pro', '1M'],
       ['virtuals/x-ai-grok-4-5', '500K'],
+      ['virtuals/google-gemini-3-5-flash', '1M'],
+      ['virtuals/z-ai-glm-5-2', '1M'],
     ] as const;
 
     for (const [id, context] of virtualsFallback) {
@@ -127,6 +132,44 @@ describe('hosted model catalog', () => {
       getHostedModelOption('virtuals/google-gemini-3-flash-preview').context,
     ]).toEqual(['256K', '256K', '256K', '256K']);
     expect(getHostedModelOption('virtuals/deepseek-deepseek-v3-2').context).toBe('160K');
+  });
+
+  it('exposes the latest verified common models on the Hatcher network', () => {
+    const expected = new Map([
+      ['openai/gpt-5.6-luna', '1.05M'],
+      ['openai/gpt-5.6-terra', '1.05M'],
+      ['openai/gpt-5.6-sol', '1.05M'],
+      ['anthropic/claude-sonnet-5', '1M'],
+      ['anthropic/claude-fable-5', '1M'],
+      ['google/gemini-3.5-flash', '1.05M'],
+      ['z-ai/glm-5.2', '1.05M'],
+      ['qwen/qwen3.7-plus', '1M'],
+    ]);
+
+    for (const [id, context] of expected) {
+      expect(getHostedModelOption(id)).toMatchObject({ id, context });
+      expect(hostedModelPrivacy(getHostedModelOption(id))).toBe('hatcher');
+    }
+  });
+
+  it('partitions provider filters into Hatcher model families and inference partners', () => {
+    const routesByProvider = new Map(
+      HOSTED_MODEL_PROVIDERS.map((provider) => [
+        provider.key,
+        new Set(
+          HOSTED_MODELS
+            .filter((model) => model.providerKey === provider.key)
+            .map((model) => hostedModelPrivacy(model)),
+        ),
+      ]),
+    );
+
+    for (const provider of ['idle', 'openserv', 'acedata', 'virtuals']) {
+      expect(routesByProvider.get(provider)).toEqual(new Set(['partner']));
+    }
+    for (const provider of ['openai', 'anthropic', 'google', 'qwen', 'z-ai']) {
+      expect(routesByProvider.get(provider)).toEqual(new Set(['hatcher']));
+    }
   });
 
   it('shows partner-primary routes and keeps Xiaomi on the Hatcher-hosted route', () => {
