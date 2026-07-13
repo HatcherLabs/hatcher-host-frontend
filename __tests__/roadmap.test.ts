@@ -17,13 +17,14 @@ const pageSource = readFileSync(
 describe('roadmap content', () => {
   it('publishes a current, machine-readable update date', () => {
     expect(roadmapUpdatedAt).toEqual({
-      dateTime: '2026-07-12',
+      dateTime: '2026-07-13',
       label: 'July 2026',
     });
   });
 
   it('surfaces the latest operating-system releases', () => {
     expect(latestReleases.map((release) => release.id)).toEqual([
+      'measured-verified-missions',
       'mission-control',
       'outcome-packs',
       'hatcher-lift',
@@ -41,7 +42,6 @@ describe('roadmap content', () => {
 
   it('keeps near-term targets evidence-led and free of invented delivery dates', () => {
     expect(buildingNext.map((target) => target.id)).toEqual([
-      'measured-verified-missions',
       'trusted-action-approvals',
       'outcome-packs-v2',
     ]);

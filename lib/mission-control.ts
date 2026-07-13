@@ -40,6 +40,26 @@ export interface MissionTaskProgress {
   message: string | null;
 }
 
+export interface MissionAcceptanceResult {
+  type: string;
+  status: 'passed' | 'failed' | 'manual_review' | 'unknown';
+  message: string;
+}
+
+export interface MissionTaskEvidence {
+  budget: {
+    limit: number | null;
+    spent: number;
+    remaining: number | null;
+    percent: number | null;
+    reached: boolean;
+  };
+  acceptance: {
+    status: 'not_checked' | 'passed' | 'failed' | 'manual_review';
+    results: MissionAcceptanceResult[];
+  };
+}
+
 function record(value: unknown): UnknownRecord {
   return value && typeof value === 'object' && !Array.isArray(value)
     ? value as UnknownRecord
@@ -116,6 +136,9 @@ function normalizeRun(value: unknown): MissionTaskRun | null {
     output: raw.output ?? null,
     error: nullableText(raw.error),
     costAiCredits: finiteNumber(raw.costAiCredits),
+    providerCostUsd: finiteNumber(raw.providerCostUsd) ?? 0,
+    inputTokens: finiteNumber(raw.inputTokens) ?? 0,
+    outputTokens: finiteNumber(raw.outputTokens) ?? 0,
     claimedAt: nullableText(raw.claimedAt),
     startedAt: nullableText(raw.startedAt),
     finishedAt: nullableText(raw.finishedAt),
@@ -190,9 +213,13 @@ export function normalizeMissionTask(value: unknown): MissionTask {
     budget: {
       aiCredits: finiteNumber(budget.aiCredits),
       maxRuntimeSeconds: finiteNumber(budget.maxRuntimeSeconds),
+      remainingAiCredits: finiteNumber(budget.remainingAiCredits),
+      exceeded: budget.exceeded === true,
     },
     cost: {
-      status: cost.status === 'measured' ? 'measured' : 'not_measured',
+      status: cost.status === 'measured' || cost.status === 'measuring'
+        ? cost.status
+        : 'not_measured',
       aiCredits: finiteNumber(cost.aiCredits),
     },
     createdAt: timestamp(raw.createdAt),
@@ -275,6 +302,50 @@ export function missionTaskProgress(task: MissionTask): MissionTaskProgress {
     if (value !== null || message !== null) return { value, message };
   }
   return { value: task.status === 'completed' ? 100 : null, message: null };
+}
+
+export function missionTaskEvidence(task: MissionTask): MissionTaskEvidence {
+  const limit = task.budget.aiCredits;
+  const spent = Math.max(0, task.cost.aiCredits ?? 0);
+  const remaining = limit === null
+    ? null
+    : task.budget.remainingAiCredits ?? Math.max(0, limit - spent);
+  const budgetReached = limit !== null && (task.budget.exceeded || remaining === 0);
+  const percent = limit === null || limit <= 0
+    ? null
+    : Math.max(0, Math.min(100, (spent / limit) * 100));
+
+  const events = task.latestRun?.events ?? [];
+  let results: MissionAcceptanceResult[] = [];
+  let acceptanceStatus: MissionTaskEvidence['acceptance']['status'] = 'not_checked';
+  for (let index = events.length - 1; index >= 0; index -= 1) {
+    const metadata = record(record(events[index]).metadata);
+    const acceptance = record(metadata.acceptance);
+    if (!Array.isArray(acceptance.results)) continue;
+    results = acceptance.results.map((entry) => {
+      const result = record(entry);
+      const rawStatus = text(result.status, 'unknown');
+      const status = rawStatus === 'passed' || rawStatus === 'failed' || rawStatus === 'manual_review'
+        ? rawStatus
+        : 'unknown';
+      return {
+        type: text(result.type, 'check'),
+        status,
+        message: text(result.message, text(result.label, text(result.type, 'Acceptance check'))),
+      };
+    });
+    acceptanceStatus = acceptance.passed === false
+      ? 'failed'
+      : acceptance.requiresManualReview === true
+        ? 'manual_review'
+        : acceptance.passed === true ? 'passed' : 'not_checked';
+    break;
+  }
+
+  return {
+    budget: { limit, spent, remaining, percent, reached: budgetReached },
+    acceptance: { status: acceptanceStatus, results },
+  };
 }
 
 export function missionOutputText(value: unknown): string | null {

@@ -6,6 +6,7 @@ import {
   canStartMissionTask,
   missionOutputText,
   missionTaskProgress,
+  missionTaskEvidence,
   normalizeMissionTask,
   normalizeMissionTaskList,
   safeMissionArtifactUrl,
@@ -148,6 +149,35 @@ describe('Mission Control DTO mapping', () => {
       '{\n  "result": "done",\n  "count": 2\n}',
     );
     expect(missionOutputText(null)).toBeNull();
+  });
+
+  it('normalizes measured run usage and derives budget and acceptance evidence', () => {
+    const task = normalizeMissionTask({
+      budget: { aiCredits: 100, remainingAiCredits: 35, exceeded: false },
+      cost: { status: 'measured', aiCredits: 65 },
+      latestRun: {
+        id: 'run-1', attempt: 1, status: 'completed', createdAt: '2026-07-13T00:00:00.000Z',
+        costAiCredits: 65, providerCostUsd: 0.043, inputTokens: 1200, outputTokens: 800,
+        events: [{
+          metadata: {
+            acceptance: {
+              passed: true,
+              requiresManualReview: false,
+              results: [{ type: 'artifact_required', status: 'passed', message: 'Report attached' }],
+            },
+          },
+        }],
+      },
+    });
+
+    expect(task.latestRun).toMatchObject({ providerCostUsd: 0.043, inputTokens: 1200, outputTokens: 800 });
+    expect(missionTaskEvidence(task)).toEqual({
+      budget: { limit: 100, spent: 65, remaining: 35, percent: 65, reached: false },
+      acceptance: {
+        status: 'passed',
+        results: [{ type: 'artifact_required', status: 'passed', message: 'Report attached' }],
+      },
+    });
   });
 
   it('allows only HTTP(S) artifact links', () => {

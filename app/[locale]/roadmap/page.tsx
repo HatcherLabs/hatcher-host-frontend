@@ -65,7 +65,6 @@ const ICONS: Record<RoadmapIcon, LucideIcon> = {
 };
 
 const PROOF_ICONS: Record<(typeof buildingNext)[number]['id'], readonly LucideIcon[]> = {
-  'measured-verified-missions': [CircleGauge, ShieldCheck, BadgeCheck],
   'trusted-action-approvals': [Inbox, KeyRound, History],
   'outcome-packs-v2': [PackageCheck, Repeat2, ShieldCheck],
 };
