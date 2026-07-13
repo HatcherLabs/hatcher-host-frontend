@@ -48,11 +48,17 @@ export interface RoadmapExploration {
 }
 
 export const roadmapUpdatedAt = {
-  dateTime: '2026-07-12',
+  dateTime: '2026-07-13',
   label: 'July 2026',
 } as const;
 
 export const latestReleases = [
+  {
+    id: 'measured-verified-missions',
+    icon: 'metering',
+    title: 'Measured & verified missions',
+    description: 'Hard AI Credit budgets, real run metering, and acceptance evidence inside Mission Control.',
+  },
   {
     id: 'mission-control',
     icon: 'mission',
@@ -89,6 +95,7 @@ export const liveTracks = [
       'Plan work, review consequential actions, inspect every run, and reuse proven workflows without leaving Hatcher.',
     evidence: [
       'Mission Control for tasks, approvals, runs, and artifacts',
+      'Hard mission budgets with run-level AI Credit, token, provider-cost, and acceptance evidence',
       'Outcome Packs for repeatable research, review, monitoring, and launch work',
       'Hatcher Lift for secure OpenClaw and Hermes imports',
       'Trusted MCP connectors configured per agent',
@@ -147,18 +154,6 @@ export const liveTracks = [
 ] as const satisfies readonly RoadmapLiveTrack[];
 
 export const buildingNext = [
-  {
-    id: 'measured-verified-missions',
-    icon: 'metering',
-    title: 'Measured & verified missions',
-    description:
-      'Measure real run cost, enforce owner-set budgets, and attach evidence to every completed mission.',
-    proofTargets: [
-      'Run-level AI Credit metering',
-      'Enforceable budget ceilings',
-      'Automated acceptance checks',
-    ],
-  },
   {
     id: 'trusted-action-approvals',
     icon: 'approvals',

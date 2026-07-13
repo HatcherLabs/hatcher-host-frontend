@@ -399,6 +399,9 @@ export interface MissionTaskRun {
   output: unknown;
   error: string | null;
   costAiCredits: number | null;
+  providerCostUsd: number;
+  inputTokens: number;
+  outputTokens: number;
   claimedAt: string | null;
   startedAt: string | null;
   finishedAt: string | null;
@@ -463,9 +466,11 @@ export interface MissionTask {
   budget: {
     aiCredits: number | null;
     maxRuntimeSeconds: number | null;
+    remainingAiCredits: number | null;
+    exceeded: boolean;
   };
   cost: {
-    status: "not_measured" | "measured";
+    status: "not_measured" | "measuring" | "measured";
     aiCredits: number | null;
   };
   createdAt: string;

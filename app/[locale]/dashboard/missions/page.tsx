@@ -14,6 +14,7 @@ import {
   Coins,
   ExternalLink,
   FileText,
+  Gauge,
   ListChecks,
   Loader2,
   Paperclip,
@@ -39,6 +40,7 @@ import {
   canResumeMissionTask,
   canStartMissionTask,
   missionOutputText,
+  missionTaskEvidence,
   missionTaskProgress,
   normalizeMissionTask,
   normalizeMissionTaskList,
@@ -292,9 +294,13 @@ function TaskDetail({
   const t = useTranslations('missionControl');
   const packT = useTranslations('outcomePacks');
   const progress = missionTaskProgress(task);
+  const evidence = missionTaskEvidence(task);
   const output = missionOutputText(task.latestRun?.output);
   const runningAction = actionKey?.startsWith(`${task.id}:`) ?? false;
   const skillReadiness = task.outcomePackSkillReadiness;
+  const evidenceText = (key: string, fallback: string): string => (
+    t.has(`evidence.${key}`) ? t(`evidence.${key}`) : fallback
+  );
   const acceptanceChecks = normalizeOutcomePackAcceptanceChecks(task.acceptanceChecks);
   const packSlug = task.sourceId ? outcomePackCopySlug(task.sourceId) : null;
   const packBase = packSlug ? `content.packs.${packSlug}` : null;
@@ -473,6 +479,81 @@ function TaskDetail({
           <h3>{t('sections.objective')}</h3>
         </div>
         <p className={styles.objective}>{task.prompt}</p>
+      </section>
+
+      <section className={styles.detailSection}>
+        <div className={styles.sectionHeading}>
+          <Gauge size={15} aria-hidden />
+          <h3>{t.has('sections.evidence') ? t('sections.evidence') : 'Execution evidence'}</h3>
+          <span>{evidenceText(task.cost.status, task.cost.status.replace('_', ' '))}</span>
+        </div>
+        <div className={styles.evidenceMetrics}>
+          <div>
+            <span>{evidenceText('budgetUsed', 'AI Credit budget used')}</span>
+            <strong>
+              {evidence.budget.limit === null
+                ? evidenceText('noBudget', 'No hard limit')
+                : `${compactNumber(evidence.budget.spent, locale)} / ${compactNumber(evidence.budget.limit, locale)}`}
+            </strong>
+          </div>
+          <div>
+            <span>{evidenceText('remaining', 'Credits remaining')}</span>
+            <strong>{evidence.budget.remaining === null ? '-' : compactNumber(evidence.budget.remaining, locale)}</strong>
+          </div>
+          <div>
+            <span>{evidenceText('tokens', 'Tokens')}</span>
+            <strong>{compactNumber((task.latestRun?.inputTokens ?? 0) + (task.latestRun?.outputTokens ?? 0), locale)}</strong>
+            <small>
+              {t.has('evidence.inputOutput')
+                ? t('evidence.inputOutput', {
+                    input: compactNumber(task.latestRun?.inputTokens ?? 0, locale),
+                    output: compactNumber(task.latestRun?.outputTokens ?? 0, locale),
+                  })
+                : `${compactNumber(task.latestRun?.inputTokens ?? 0, locale)} input / ${compactNumber(task.latestRun?.outputTokens ?? 0, locale)} output`}
+            </small>
+          </div>
+          <div>
+            <span>{evidenceText('providerCost', 'Provider cost')}</span>
+            <strong>${(task.latestRun?.providerCostUsd ?? 0).toFixed(6)}</strong>
+          </div>
+        </div>
+        {evidence.budget.percent !== null ? (
+          <div className={styles.budgetEvidence} data-reached={evidence.budget.reached || undefined}>
+            <div>
+              <span>{evidence.budget.reached
+                ? evidenceText('budgetReached', 'Budget reached - paid execution stopped')
+                : evidenceText('withinBudget', 'Within budget')}</span>
+              <strong>{Math.round(evidence.budget.percent)}%</strong>
+            </div>
+            <div
+              className={styles.budgetTrack}
+              role="progressbar"
+              aria-label={evidenceText('budgetUsed', 'AI Credit budget used')}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(evidence.budget.percent)}
+            >
+              <span style={{ width: `${evidence.budget.percent}%` }} />
+            </div>
+          </div>
+        ) : null}
+        <div className={styles.acceptanceEvidence} data-status={evidence.acceptance.status}>
+          <div>
+            <ShieldCheck size={15} aria-hidden />
+            <strong>{evidenceText('acceptance', 'Acceptance checks')}</strong>
+            <span>{evidenceText(evidence.acceptance.status, evidence.acceptance.status.replace('_', ' '))}</span>
+          </div>
+          {evidence.acceptance.results.length > 0 ? (
+            <ul>
+              {evidence.acceptance.results.map((result, index) => (
+                <li key={`${result.type}-${index}`} data-status={result.status}>
+                  {result.status === 'passed' ? <CheckCircle2 size={14} aria-hidden /> : result.status === 'failed' ? <XCircle size={14} aria-hidden /> : <Clock3 size={14} aria-hidden />}
+                  <span>{result.message}</span>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
       </section>
 
       <section className={styles.detailSection}>
@@ -929,7 +1010,11 @@ export default function MissionControlPage() {
                       ) : null}
                       <div className={styles.taskRowBottom}>
                         <span>{t('attempt', { count: task.latestRun?.attempt ?? 0 })}</span>
-                        {task.budget.aiCredits !== null ? <span><Coins size={11} aria-hidden /> {compactNumber(task.budget.aiCredits, locale)}</span> : null}
+                        {task.budget.aiCredits !== null ? (
+                          <span>
+                            <Coins size={11} aria-hidden /> {compactNumber(task.cost.aiCredits ?? 0, locale)} / {compactNumber(task.budget.aiCredits, locale)}
+                          </span>
+                        ) : null}
                         <ChevronRight size={14} aria-hidden />
                       </div>
                     </button>
