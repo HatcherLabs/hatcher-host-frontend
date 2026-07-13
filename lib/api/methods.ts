@@ -39,6 +39,8 @@ import type {
   CreateCovenantConnectorResponse,
   CreateMcpConnectorResponse,
   McpConnector,
+  McpActionInboxResponse,
+  McpActionRequest,
   AgentPassport,
   AgentPassportNetworkId,
   AgentWalletActivityResponse,
@@ -3538,6 +3540,31 @@ export const api = {
       `/agents/${agentId}/mcp/connectors/${connectorId}`,
       { method: "DELETE" },
     ),
+
+  getMcpActionInbox: (params: { agentId?: string; status?: string; limit?: number } = {}) => {
+    const query = new URLSearchParams();
+    if (params.agentId) query.set("agentId", params.agentId);
+    if (params.status) query.set("status", params.status);
+    if (params.limit) query.set("limit", String(params.limit));
+    const suffix = query.toString();
+    return req<McpActionInboxResponse>(`/agents/mcp/actions${suffix ? `?${suffix}` : ""}`);
+  },
+
+  approveMcpAction: (actionId: string, body: { scope: "once" | "tool"; expiresInMinutes?: number }) =>
+    req<{ action: McpActionRequest }>(`/agents/mcp/actions/${actionId}/approve`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  rejectMcpAction: (actionId: string) =>
+    req<{ action: McpActionRequest }>(`/agents/mcp/actions/${actionId}/reject`, {
+      method: "POST",
+    }),
+
+  revokeMcpActionGrant: (grantId: string) =>
+    req<{ grant: { id: string; status: "revoked" } }>(`/agents/mcp/grants/${grantId}`, {
+      method: "DELETE",
+    }),
 
   testAgentGithubAccess: (agentId: string, repo?: string) =>
     req<AgentGithubTestResponse>(`/agents/${agentId}/dev/github/test`, {

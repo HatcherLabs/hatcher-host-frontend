@@ -27,6 +27,7 @@ import {
   RotateCcw,
   Search,
   Send,
+  ShieldCheck,
   Square,
   Trash2,
   X,
@@ -347,6 +348,9 @@ export default function MyAgentsPage() {
             </Link>
             <Link href="/dashboard/outcome-packs" className={styles.secondaryCta}>
               <PackageCheck size={14} aria-hidden /> {tOutcome('title')}
+            </Link>
+            <Link href="/dashboard/approvals" className={styles.secondaryCta}>
+              <ShieldCheck size={14} aria-hidden /> Approvals
             </Link>
             <Link href="/dashboard/agents/import" className={styles.secondaryCta}>
               <PackageOpen size={14} aria-hidden /> {t('importCta')}
@@ -876,6 +880,12 @@ export default function MyAgentsPage() {
                     className={styles.actionBtn}
                   >
                     <PackageCheck size={12} aria-hidden /> {tOutcome('title')}
+                  </Link>
+                  <Link
+                    href={agentWorkspaceHref('/dashboard/approvals', selectedAgent.id)}
+                    className={styles.actionBtn}
+                  >
+                    <ShieldCheck size={12} aria-hidden /> Approvals
                   </Link>
                   <Link
                     href={`/agent/${selectedAgent.slug ?? selectedAgent.id}/room?from=agents`}

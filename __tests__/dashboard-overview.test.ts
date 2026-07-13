@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { agentWorkspaceHref } from '@/lib/agent-workspace';
 import {
   DASHBOARD_WORKSPACE_ROUTES,
   isDashboardWorkspaceRouteActive,
@@ -12,6 +13,7 @@ describe('dashboard workspace navigation', () => {
       { key: 'agents', href: '/dashboard/agents' },
       { key: 'missions', href: '/dashboard/missions' },
       { key: 'outcomePacks', href: '/dashboard/outcome-packs' },
+      { key: 'approvals', href: '/dashboard/approvals' },
     ]);
   });
 
@@ -21,10 +23,11 @@ describe('dashboard workspace navigation', () => {
     expect(isDashboardWorkspaceRouteActive('/dashboard/agent/agent-1', 'agents')).toBe(true);
     expect(isDashboardWorkspaceRouteActive('/dashboard/missions', 'missions')).toBe(true);
     expect(isDashboardWorkspaceRouteActive('/dashboard/outcome-packs', 'outcomePacks')).toBe(true);
+    expect(isDashboardWorkspaceRouteActive('/dashboard/approvals', 'approvals')).toBe(true);
     expect(isDashboardWorkspaceRouteActive('/dashboard/billing', 'agents')).toBe(false);
   });
 
-  it('surfaces missions and Outcome Packs in every live navigation path', () => {
+  it('surfaces missions, Outcome Packs, and approvals in every live navigation path', () => {
     const files = [
       'components/marketing/v3/Nav.tsx',
       'components/marketing/v3/NavDrawer.tsx',
@@ -35,7 +38,14 @@ describe('dashboard workspace navigation', () => {
       const source = readFileSync(resolve(process.cwd(), file), 'utf8');
       expect(source, file).toContain('/dashboard/missions');
       expect(source, file).toContain('/dashboard/outcome-packs');
+      expect(source, file).toContain('/dashboard/approvals');
     }
+  });
+
+  it('preserves the selected agent when opening its approval inbox', () => {
+    expect(agentWorkspaceHref('/dashboard/approvals', 'agent-1')).toBe(
+      '/dashboard/approvals?agent=agent-1',
+    );
   });
 });
 

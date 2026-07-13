@@ -836,6 +836,66 @@ export interface CreateMcpConnectorResponse {
   connector: McpConnector;
 }
 
+export type McpActionStatus =
+  | "pending"
+  | "approved"
+  | "executing"
+  | "executed"
+  | "failed"
+  | "rejected"
+  | "expired";
+
+export interface McpActionActor {
+  id: string;
+  name: string;
+  framework?: string;
+  status: string;
+}
+
+export interface McpActionRequest {
+  id: string;
+  userId: string;
+  agentId: string;
+  connectorId: string;
+  grantId: string | null;
+  tool: string;
+  argumentsHash: string;
+  argumentsPreview: unknown;
+  approvalMode: McpConnectorApprovalMode;
+  authorization: "pending" | "once" | "tool" | "grant" | "auto" | "rejected" | string;
+  status: McpActionStatus;
+  failureMessage: string | null;
+  expiresAt: string | null;
+  resolvedAt: string | null;
+  executedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  agent: McpActionActor;
+  connector: { id: string; name: string; status: string };
+  grant: { id: string; status: string; expiresAt: string } | null;
+}
+
+export interface McpActionGrant {
+  id: string;
+  userId: string;
+  agentId: string;
+  connectorId: string;
+  tool: string;
+  status: "active" | "revoked" | string;
+  expiresAt: string;
+  revokedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  agent: McpActionActor;
+  connector: { id: string; name: string; status: string };
+}
+
+export interface McpActionInboxResponse {
+  actions: McpActionRequest[];
+  grants: McpActionGrant[];
+  summary: { pending: number; activeGrants: number };
+}
+
 export interface CovenantDispatchBody {
   connectorId?: string;
   text: string;

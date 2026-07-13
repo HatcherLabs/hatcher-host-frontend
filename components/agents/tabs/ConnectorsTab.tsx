@@ -10,6 +10,8 @@ import {
   useAgentContext,
 } from '../AgentContext';
 import { api } from '@/lib/api';
+import { Link } from '@/i18n/routing';
+import { agentWorkspaceHref } from '@/lib/agent-workspace';
 import type {
   CreateMcpConnectorBody,
   McpConnector,
@@ -142,11 +144,19 @@ export function ConnectorsTab() {
       exit="exit"
       className="space-y-6"
     >
-      <div>
-        <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-1">Connectors</h2>
-        <p className="text-sm text-[var(--text-secondary)]">
-          Attach trusted remote MCP servers to this agent with owner-managed tool permissions.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-1">Connectors</h2>
+          <p className="text-sm text-[var(--text-secondary)]">
+            Attach trusted remote MCP servers to this agent with owner-managed tool permissions.
+          </p>
+        </div>
+        <Link
+          href={agentWorkspaceHref('/dashboard/approvals', agent.id)}
+          className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 text-xs font-semibold text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]"
+        >
+          <Shield size={14} aria-hidden /> Review action approvals
+        </Link>
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_420px]">

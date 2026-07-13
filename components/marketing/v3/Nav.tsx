@@ -68,6 +68,7 @@ export function Nav() {
     { key: 'dashboard', label: tNav('dashboard'), sub: tMenu('sub_dashboard'), href: '/dashboard', Icon: LayoutDashboard },
     { key: 'missions', label: tMission('title'), sub: tMenu('sub_missionControl'), href: '/dashboard/missions', Icon: ListChecks },
     { key: 'outcomePacks', label: tOutcome('title'), sub: tMenu('sub_outcomePacks'), href: '/dashboard/outcome-packs', Icon: PackageCheck },
+    { key: 'approvals', label: 'Action approvals', sub: 'Review effectful agent actions', href: '/dashboard/approvals', Icon: ShieldCheck },
   ] satisfies ReadonlyArray<{ key: string; label: string; sub: string; href: string; Icon: LucideIcon }>), [tMenu, tMission, tNav, tOutcome]);
 
   const USER_MENU = useMemo(() => ([

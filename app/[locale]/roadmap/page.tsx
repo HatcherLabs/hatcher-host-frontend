@@ -9,9 +9,6 @@ import {
   Check,
   CircleGauge,
   Coins,
-  History,
-  Inbox,
-  KeyRound,
   Landmark,
   ListChecks,
   Network,
@@ -65,7 +62,6 @@ const ICONS: Record<RoadmapIcon, LucideIcon> = {
 };
 
 const PROOF_ICONS: Record<(typeof buildingNext)[number]['id'], readonly LucideIcon[]> = {
-  'trusted-action-approvals': [Inbox, KeyRound, History],
   'outcome-packs-v2': [PackageCheck, Repeat2, ShieldCheck],
 };
 
