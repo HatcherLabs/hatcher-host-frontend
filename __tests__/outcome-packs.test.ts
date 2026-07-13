@@ -3,6 +3,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {
   OUTCOME_PACK_COPY_SLUGS,
+  buildOutcomePackRecurrence,
   createOutcomePackIdempotencyKey,
   initializeOutcomePackInputs,
   isOutcomePackLaunchReady,
@@ -19,6 +20,53 @@ import {
 } from '@/lib/outcome-packs';
 
 describe('outcome packs', () => {
+  it('requires explicit consent and bounded controls before serializing recurrence', () => {
+    const schedule = {
+      id: 'daily-market-pulse',
+      label: 'Daily market pulse',
+      cadence: 'daily',
+      cron: '0 8 * * *',
+      timezone: 'UTC',
+      enabled: false,
+      description: '',
+    };
+
+    expect(buildOutcomePackRecurrence({
+      enabled: true,
+      consent: false,
+      templateId: schedule.id,
+      maxRuns: '7',
+      budgetAiCreditsPerRun: '45',
+    }, [schedule], 60)).toEqual({
+      recurrence: null,
+      error: 'consent_required',
+    });
+
+    expect(buildOutcomePackRecurrence({
+      enabled: true,
+      consent: true,
+      templateId: schedule.id,
+      maxRuns: '7',
+      budgetAiCreditsPerRun: '45',
+    }, [schedule], 60)).toEqual({
+      recurrence: {
+        consent: true,
+        templateId: 'daily-market-pulse',
+        maxRuns: 7,
+        budgetAiCreditsPerRun: 45,
+      },
+      error: null,
+    });
+
+    expect(buildOutcomePackRecurrence({
+      enabled: true,
+      consent: true,
+      templateId: schedule.id,
+      maxRuns: '31',
+      budgetAiCreditsPerRun: '61',
+    }, [schedule], 60).error).toBe('limits_invalid');
+  });
+
   it('orders first-party packs while preserving server-provided additions', () => {
     const packs = normalizeOutcomePackList({
       packs: [
