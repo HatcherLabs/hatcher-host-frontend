@@ -70,6 +70,52 @@ export interface OutcomePackScheduleModel {
   timezone: string | null;
 }
 
+export interface OutcomePackRecurrenceDraft {
+  enabled: boolean;
+  consent: boolean;
+  templateId: string;
+  maxRuns: string;
+  budgetAiCreditsPerRun: string;
+}
+
+export interface OutcomePackRecurrenceInput {
+  consent: true;
+  templateId: string;
+  maxRuns: number;
+  budgetAiCreditsPerRun: number;
+}
+
+export type OutcomePackRecurrenceError = 'consent_required' | 'limits_invalid' | null;
+
+export function buildOutcomePackRecurrence(
+  draft: OutcomePackRecurrenceDraft,
+  schedules: OutcomePackScheduleModel[],
+  budgetTargetAiCredits: number | null,
+): { recurrence: OutcomePackRecurrenceInput | null; error: OutcomePackRecurrenceError } {
+  if (!draft.enabled) return { recurrence: null, error: null };
+  if (!draft.consent) return { recurrence: null, error: 'consent_required' };
+  const maxRuns = Number(draft.maxRuns);
+  const budgetAiCreditsPerRun = Number(draft.budgetAiCreditsPerRun);
+  const templateExists = schedules.some((schedule) => schedule.id === draft.templateId);
+  const validLimits = Number.isInteger(maxRuns)
+    && maxRuns >= 1
+    && maxRuns <= 30
+    && Number.isInteger(budgetAiCreditsPerRun)
+    && budgetAiCreditsPerRun >= 1
+    && budgetTargetAiCredits !== null
+    && budgetAiCreditsPerRun <= budgetTargetAiCredits;
+  if (!templateExists || !validLimits) return { recurrence: null, error: 'limits_invalid' };
+  return {
+    recurrence: {
+      consent: true,
+      templateId: draft.templateId,
+      maxRuns,
+      budgetAiCreditsPerRun,
+    },
+    error: null,
+  };
+}
+
 export interface OutcomePackModel {
   id: string;
   version: string;

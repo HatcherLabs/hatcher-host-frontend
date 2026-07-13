@@ -665,12 +665,37 @@ export interface PrepareOutcomePackBody {
 export interface LaunchOutcomePackBody extends PrepareOutcomePackBody {
   idempotencyKey: string;
   activateSchedules: false;
+  recurrence?: {
+    consent: true;
+    templateId: string;
+    maxRuns: number;
+    budgetAiCreditsPerRun: number;
+  };
+}
+
+export interface OutcomePackRecurrence {
+  id: string;
+  agent: { id: string; name: string };
+  pack: { id: string | null; version: string | null; title: string };
+  templateId: string | null;
+  label: string;
+  schedule: string;
+  timezone: string;
+  enabled: boolean;
+  runCount: number;
+  maxRuns: number | null;
+  budgetAiCreditsPerRun: number | null;
+  consentedAt: string | null;
+  nextRunAt: string | null;
+  lastRunAt: string | null;
+  lastTaskId: string | null;
 }
 
 export interface LaunchOutcomePackResponse {
   task: OutcomePackLaunchTask;
   requiredSkills: Array<{ name: string; status: string }>;
-  schedulesActivated: false;
+  schedulesActivated: boolean;
+  recurrence: Omit<OutcomePackRecurrence, 'agent' | 'pack'> | null;
   start: { method: string; path: string };
 }
 

@@ -61,9 +61,7 @@ const ICONS: Record<RoadmapIcon, LucideIcon> = {
   verified: BadgeCheck,
 };
 
-const PROOF_ICONS: Record<(typeof buildingNext)[number]['id'], readonly LucideIcon[]> = {
-  'outcome-packs-v2': [PackageCheck, Repeat2, ShieldCheck],
-};
+const PROOF_ICONS: Record<string, readonly LucideIcon[]> = {};
 
 function SectionHeading({
   title,
@@ -207,7 +205,7 @@ export default async function RoadmapPage() {
               description="Directional targets, shipped when the product evidence is ready—not on arbitrary dates."
             />
 
-            <div className={styles.targetTimeline}>
+            {buildingNext.length > 0 ? <div className={styles.targetTimeline}>
               {buildingNext.map((target, index) => {
                 const Icon = ICONS[target.icon];
 
@@ -243,7 +241,15 @@ export default async function RoadmapPage() {
                   </article>
                 );
               })}
-            </div>
+            </div> : (
+              <div className={styles.targetEmpty}>
+                <PackageCheck aria-hidden="true" />
+                <div>
+                  <h3>Outcome Packs V2 shipped</h3>
+                  <p>The next build target will move here once its product scope and proof targets are concrete.</p>
+                </div>
+              </div>
+            )}
 
             <div className={styles.exploringBand}>
               <div className={styles.exploringTitle}>

@@ -19,23 +19,26 @@ import {
   Loader2,
   Megaphone,
   PackageCheck,
+  Pause,
   PieChart,
   Play,
   Radar,
   RefreshCw,
+  Repeat2,
   Settings2,
   ShieldAlert,
   Sparkles,
   TrendingUp,
-  TimerOff,
+  Trash2,
   Wrench,
   XCircle,
 } from 'lucide-react';
 import { Link, useRouter } from '@/i18n/routing';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
-import type { Agent } from '@/lib/api';
+import type { Agent, OutcomePackRecurrence } from '@/lib/api';
 import {
+  buildOutcomePackRecurrence,
   createOutcomePackIdempotencyKey,
   initializeOutcomePackInputs,
   isOutcomePackLaunchReady,
@@ -52,6 +55,7 @@ import {
   type OutcomePackDetailItemModel,
   type OutcomePackModel,
   type OutcomePackPreparationModel,
+  type OutcomePackRecurrenceDraft,
 } from '@/lib/outcome-packs';
 import { useToast } from '@/components/ui/ToastProvider';
 import { agentWorkspaceHref, requestedOwnedAgentId } from '@/lib/agent-workspace';
@@ -91,6 +95,15 @@ export default function OutcomePacksPage() {
   const [inputs, setInputs] = useState<OutcomePackDraftInputs>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [preview, setPreview] = useState<OutcomePackPreparationModel | null>(null);
+  const [recurrences, setRecurrences] = useState<OutcomePackRecurrence[]>([]);
+  const [recurrenceDraft, setRecurrenceDraft] = useState<OutcomePackRecurrenceDraft>({
+    enabled: false,
+    consent: false,
+    templateId: '',
+    maxRuns: '7',
+    budgetAiCreditsPerRun: '',
+  });
+  const [recurrenceAction, setRecurrenceAction] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailRevision, setDetailRevision] = useState(0);
@@ -143,9 +156,10 @@ export default function OutcomePacksPage() {
   const loadCatalog = useCallback(async () => {
     setLoading(true);
     setError(null);
-    const [agentsResult, packsResult] = await Promise.all([
+    const [agentsResult, packsResult, recurrencesResult] = await Promise.all([
       api.getMyAgents(),
       api.getOutcomePacks(),
+      api.getOutcomePackRecurrences(),
     ]);
     setLoading(false);
 
@@ -157,6 +171,7 @@ export default function OutcomePacksPage() {
       setError(packsResult.error);
       return;
     }
+    if (recurrencesResult.success) setRecurrences(recurrencesResult.data.recurrences);
 
     const nextPacks = normalizeOutcomePackList(packsResult.data).map(localizePack);
     const search = window.location.search;
@@ -208,6 +223,13 @@ export default function OutcomePacksPage() {
       setInputs(initializeOutcomePackInputs(nextPack));
       setFieldErrors({});
       setPreview(null);
+      setRecurrenceDraft({
+        enabled: false,
+        consent: false,
+        templateId: nextPack.schedules[0]?.id ?? '',
+        maxRuns: '7',
+        budgetAiCreditsPerRun: nextPack.budgetTargetAiCredits?.toString() ?? '',
+      });
       launchKeyRef.current = null;
     });
     return () => { cancelled = true; };
@@ -218,6 +240,7 @@ export default function OutcomePacksPage() {
     setSelectedPackId(packId);
     setPack(null);
     setPreview(null);
+    setRecurrenceDraft((current) => ({ ...current, enabled: false, consent: false }));
     setFieldErrors({});
     setActionError(null);
     launchKeyRef.current = null;
@@ -272,13 +295,32 @@ export default function OutcomePacksPage() {
       setActionError(result.error);
       return;
     }
-    setPreview(localizePreparation(normalizeOutcomePackPreparation(result.data)));
+    const prepared = localizePreparation(normalizeOutcomePackPreparation(result.data));
+    setPreview(prepared);
+    setRecurrenceDraft({
+      enabled: false,
+      consent: false,
+      templateId: prepared.schedules[0]?.id ?? '',
+      maxRuns: '7',
+      budgetAiCreditsPerRun: prepared.budgetTargetAiCredits?.toString() ?? '',
+    });
     launchKeyRef.current = createOutcomePackIdempotencyKey();
   }, [inputs, localizePreparation, pack, selectedAgentId, t]);
 
   const launch = useCallback(async () => {
-    if (!pack || !selectedAgentId || !isOutcomePackLaunchReady(preview)) return;
+    if (!pack || !selectedAgentId || !preview || !isOutcomePackLaunchReady(preview)) return;
     const idempotencyKey = launchKeyRef.current ?? createOutcomePackIdempotencyKey();
+    const recurring = buildOutcomePackRecurrence(
+      recurrenceDraft,
+      preview.schedules,
+      preview.budgetTargetAiCredits,
+    );
+    if (recurring.error) {
+      setActionError(recurring.error === 'consent_required'
+        ? translateOr('recurring.consentError', 'Confirm the recurring-run authorization before launch.')
+        : translateOr('recurring.limitsError', 'Use 1-30 runs and a per-run budget within the pack limit.'));
+      return;
+    }
     launchKeyRef.current = idempotencyKey;
     setLaunching(true);
     setActionError(null);
@@ -287,6 +329,7 @@ export default function OutcomePacksPage() {
       inputs: serializeOutcomePackInputs(pack.inputFields, inputs),
       idempotencyKey,
       activateSchedules: false,
+      ...(recurring.recurrence ? { recurrence: recurring.recurrence } : {}),
     });
     setLaunching(false);
     if (!result.success) {
@@ -300,7 +343,9 @@ export default function OutcomePacksPage() {
     if (pendingSkills.length > 0) {
       toast.warning(t('contract.launchedPending', { count: pendingSkills.length }));
     } else {
-      toast.success(t('messages.launched'));
+      toast.success(result.data.recurrence
+        ? translateOr('recurring.created', 'Mission created and recurring runs authorized.')
+        : t('messages.launched'));
     }
     const query = new URLSearchParams({
       task: result.data.task.id,
@@ -309,7 +354,40 @@ export default function OutcomePacksPage() {
     });
     if (pendingSkills.length > 0) query.set('skillsPending', pendingSkills.join(','));
     router.push(`/dashboard/missions?${query.toString()}`);
-  }, [inputs, pack, preview, router, selectedAgentId, t, toast]);
+  }, [inputs, pack, preview, recurrenceDraft, router, selectedAgentId, t, toast, translateOr]);
+
+  const updateRecurrence = useCallback(async (
+    recurrence: OutcomePackRecurrence,
+    action: 'pause' | 'resume' | 'delete',
+  ) => {
+    if (action === 'delete' && !window.confirm(
+      translateOr('recurring.deleteConfirm', 'Remove this recurring run? Existing missions stay in Mission Control.'),
+    )) return;
+    setRecurrenceAction(recurrence.id);
+    const result = action === 'pause'
+      ? await api.pauseOutcomePackRecurrence(recurrence.id)
+      : action === 'resume'
+        ? await api.resumeOutcomePackRecurrence(recurrence.id)
+        : await api.deleteOutcomePackRecurrence(recurrence.id);
+    setRecurrenceAction(null);
+    if (!result.success) {
+      toast.error(result.error);
+      return;
+    }
+    if (action === 'delete') {
+      setRecurrences((current) => current.filter((item) => item.id !== recurrence.id));
+    } else {
+      setRecurrences((current) => current.map((item) => item.id === recurrence.id
+        ? {
+            ...item,
+            enabled: action === 'resume',
+            nextRunAt: action === 'resume' && 'nextRunAt' in result.data
+              ? result.data.nextRunAt
+              : null,
+          }
+        : item));
+    }
+  }, [toast, translateOr]);
 
   if (authLoading) {
     return (
@@ -370,6 +448,69 @@ export default function OutcomePacksPage() {
             <span>{error}</span>
             <button type="button" onClick={() => void loadCatalog()}>{t('tryAgain')}</button>
           </div>
+        ) : null}
+
+        {!loading && recurrences.length > 0 ? (
+          <section className={styles.recurrenceBar} aria-label={translateOr('recurring.activeTitle', 'Recurring runs')}>
+            <div className={styles.recurrenceHeading}>
+              <Repeat2 size={16} aria-hidden />
+              <div>
+                <strong>{translateOr('recurring.activeTitle', 'Recurring runs')}</strong>
+                <span>{translateOr('recurring.activeSubtitle', 'Owner-authorized Outcome Packs across your agents')}</span>
+              </div>
+            </div>
+            <div className={styles.recurrenceRows}>
+              {recurrences.map((recurrence) => (
+                <div className={styles.recurrenceRow} key={recurrence.id}>
+                  <div>
+                    <strong>{recurrence.pack.title}</strong>
+                    <span>{recurrence.agent.name} - {recurrence.label}</span>
+                  </div>
+                  <div className={styles.recurrenceStats}>
+                    <span>{recurrence.runCount}/{recurrence.maxRuns ?? '-'} {translateOr('recurring.runs', 'runs')}</span>
+                    <span>{recurrence.budgetAiCreditsPerRun ?? '-'} {translateOr('recurring.creditsPerRun', 'credits/run')}</span>
+                    <span>{recurrence.enabled && recurrence.nextRunAt
+                      ? new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(recurrence.nextRunAt))
+                      : translateOr('recurring.paused', 'Paused')}</span>
+                  </div>
+                  <div className={styles.recurrenceActions}>
+                    {recurrence.lastTaskId ? (
+                      <Link
+                        href={`/dashboard/missions?task=${encodeURIComponent(recurrence.lastTaskId)}&agent=${encodeURIComponent(recurrence.agent.id)}`}
+                        className={styles.iconButton}
+                        title={translateOr('recurring.lastMission', 'Open latest mission')}
+                        aria-label={translateOr('recurring.lastMission', 'Open latest mission')}
+                      >
+                        <ListChecks size={15} aria-hidden />
+                      </Link>
+                    ) : null}
+                    <button
+                      type="button"
+                      className={styles.iconButton}
+                      onClick={() => void updateRecurrence(recurrence, recurrence.enabled ? 'pause' : 'resume')}
+                      disabled={recurrenceAction === recurrence.id}
+                      title={recurrence.enabled ? translateOr('recurring.pause', 'Pause') : translateOr('recurring.resume', 'Resume')}
+                      aria-label={recurrence.enabled ? translateOr('recurring.pause', 'Pause') : translateOr('recurring.resume', 'Resume')}
+                    >
+                      {recurrenceAction === recurrence.id
+                        ? <Loader2 size={15} className={styles.spin} aria-hidden />
+                        : recurrence.enabled ? <Pause size={15} aria-hidden /> : <Play size={15} aria-hidden />}
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.iconButton}
+                      onClick={() => void updateRecurrence(recurrence, 'delete')}
+                      disabled={recurrenceAction === recurrence.id}
+                      title={translateOr('recurring.remove', 'Remove')}
+                      aria-label={translateOr('recurring.remove', 'Remove')}
+                    >
+                      <Trash2 size={15} aria-hidden />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
         ) : null}
 
         {loading ? (
@@ -717,21 +858,70 @@ export default function OutcomePacksPage() {
 
                             {preview.schedules.length > 0 ? (
                               <section className={styles.previewSection}>
-                                <h4><TimerOff size={15} aria-hidden /> {t('preview.schedules')}</h4>
+                                <h4><Repeat2 size={15} aria-hidden /> {translateOr('recurring.title', 'Recurring runs')}</h4>
                                 <div className={styles.scheduleList}>
                                   {preview.schedules.map((schedule) => (
                                     <label key={schedule.id}>
-                                      <input type="checkbox" checked={false} disabled readOnly />
+                                      <input
+                                        type="checkbox"
+                                        checked={recurrenceDraft.enabled && recurrenceDraft.templateId === schedule.id}
+                                        onChange={(event) => setRecurrenceDraft((current) => ({
+                                          ...current,
+                                          enabled: event.target.checked,
+                                          consent: event.target.checked ? current.consent : false,
+                                          templateId: schedule.id,
+                                        }))}
+                                      />
                                       <span className={styles.switch} aria-hidden><span /></span>
                                       <span>
                                         <strong>{schedule.label}</strong>
                                         <small>{[schedule.cron, schedule.timezone].filter(Boolean).join(' - ') || schedule.description}</small>
                                       </span>
-                                      <em>{t('preview.scheduleOff')}</em>
+                                      <em>{recurrenceDraft.enabled && recurrenceDraft.templateId === schedule.id
+                                        ? translateOr('recurring.on', 'On')
+                                        : translateOr('recurring.off', 'Off')}</em>
                                     </label>
                                   ))}
                                 </div>
-                                <p className={styles.scheduleNotice}>{t('preview.scheduleNotice')}</p>
+                                {recurrenceDraft.enabled ? (
+                                  <div className={styles.recurrenceControls}>
+                                    <label>
+                                      <span>{translateOr('recurring.maxRuns', 'Maximum runs')}</span>
+                                      <input
+                                        type="number"
+                                        min={1}
+                                        max={30}
+                                        value={recurrenceDraft.maxRuns}
+                                        onChange={(event) => setRecurrenceDraft((current) => ({ ...current, maxRuns: event.target.value }))}
+                                      />
+                                    </label>
+                                    <label>
+                                      <span>{translateOr('recurring.budgetPerRun', 'AI Credits per run')}</span>
+                                      <input
+                                        type="number"
+                                        min={1}
+                                        max={preview.budgetTargetAiCredits ?? undefined}
+                                        value={recurrenceDraft.budgetAiCreditsPerRun}
+                                        onChange={(event) => setRecurrenceDraft((current) => ({ ...current, budgetAiCreditsPerRun: event.target.value }))}
+                                      />
+                                    </label>
+                                    <label className={styles.consentRow}>
+                                      <input
+                                        type="checkbox"
+                                        checked={recurrenceDraft.consent}
+                                        onChange={(event) => setRecurrenceDraft((current) => ({ ...current, consent: event.target.checked }))}
+                                      />
+                                      <span>{translateOr(
+                                        'recurring.consent',
+                                        'I authorize Hatcher to create and start these recurring missions within the limits above.',
+                                      )}</span>
+                                    </label>
+                                  </div>
+                                ) : null}
+                                <p className={styles.scheduleNotice}>{translateOr(
+                                  'recurring.guardrail',
+                                  'Off by default. Hatcher rechecks the agent, prerequisites, and skills before every run and stops at the selected limit.',
+                                )}</p>
                               </section>
                             ) : null}
                           </div>

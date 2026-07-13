@@ -17,6 +17,7 @@ import type {
   LiftImport,
   LaunchOutcomePackBody,
   LaunchOutcomePackResponse,
+  OutcomePackRecurrence,
   MissionTask,
   MissionTasksResponse,
   PreparedOutcomePack,
@@ -610,6 +611,30 @@ export const api = {
     req<LaunchOutcomePackResponse>(
       `/outcome-packs/${encodeURIComponent(packId)}/launch`,
       { method: "POST", body: JSON.stringify(body) },
+    ),
+
+  /** List owner-authorized Outcome Pack recurrences across agents. */
+  getOutcomePackRecurrences: (agentId?: string) =>
+    req<{ recurrences: OutcomePackRecurrence[] }>(
+      `/outcome-packs/recurrences${agentId ? `?agentId=${encodeURIComponent(agentId)}` : ''}`,
+    ),
+
+  pauseOutcomePackRecurrence: (recurrenceId: string) =>
+    req<{ id: string; enabled: false }>(
+      `/outcome-packs/recurrences/${encodeURIComponent(recurrenceId)}/pause`,
+      { method: "POST" },
+    ),
+
+  resumeOutcomePackRecurrence: (recurrenceId: string) =>
+    req<{ id: string; enabled: true; nextRunAt: string }>(
+      `/outcome-packs/recurrences/${encodeURIComponent(recurrenceId)}/resume`,
+      { method: "POST" },
+    ),
+
+  deleteOutcomePackRecurrence: (recurrenceId: string) =>
+    req<{ id: string; deleted: true }>(
+      `/outcome-packs/recurrences/${encodeURIComponent(recurrenceId)}`,
+      { method: "DELETE" },
     ),
 
   /** Get a single agent */

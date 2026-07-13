@@ -119,6 +119,52 @@
   background: var(--bg-card);
 }
 
+.recurrenceBar {
+  display: grid;
+  grid-template-columns: minmax(210px, 0.7fr) minmax(0, 2fr);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius);
+  background: var(--bg-elevated);
+  overflow: hidden;
+}
+
+.recurrenceHeading {
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  border-right: 1px solid var(--border-default);
+  color: var(--accent);
+}
+
+.recurrenceHeading > div,
+.recurrenceRow > div:first-child {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.recurrenceHeading strong,
+.recurrenceRow strong { color: var(--text-primary); font-size: 12px; }
+.recurrenceHeading span,
+.recurrenceRow span { color: var(--text-muted); font-size: 10px; line-height: 1.4; }
+.recurrenceRows { min-width: 0; }
+.recurrenceRow {
+  min-height: 62px;
+  padding: 10px 12px;
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) minmax(250px, auto) auto;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px solid var(--border-default);
+}
+.recurrenceRow:last-child { border-bottom: 0; }
+.recurrenceStats { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
+.recurrenceStats span { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.recurrenceActions { display: flex; align-items: center; gap: 5px; }
+.recurrenceActions .iconButton { background: var(--bg-card); }
+
 .catalog {
   min-width: 0;
   background: var(--bg-elevated);
@@ -477,7 +523,7 @@
   align-items: center;
   gap: 8px;
 }
-.scheduleList input { position: absolute; opacity: 0; pointer-events: none; }
+.scheduleList input { position: absolute; opacity: 0; }
 .switch {
   width: 30px;
   height: 17px;
@@ -489,11 +535,53 @@
   background: var(--bg-card);
 }
 .switch span { width: 11px; height: 11px; border-radius: 50%; background: var(--text-dim); }
+.scheduleList input:checked + .switch { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 18%, var(--bg-card)); }
+.scheduleList input:checked + .switch span { margin-left: 11px; background: var(--accent); }
 .scheduleList label > span:nth-of-type(2) { display: flex; flex-direction: column; min-width: 0; }
 .scheduleList strong { font-size: 10px; }
 .scheduleList small { overflow: hidden; color: var(--text-muted); font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
 .scheduleList em { color: var(--text-dim); font-size: 9px; font-style: normal; }
 .scheduleNotice { margin: 8px 0 0; color: var(--text-muted); font-size: 10px; line-height: 1.45; }
+
+.recurrenceControls {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+}
+
+.recurrenceControls > label:not(.consentRow) {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: var(--text-muted);
+  font-size: 9px;
+}
+
+.recurrenceControls input[type='number'] {
+  width: 100%;
+  min-height: 34px;
+  padding: 0 9px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font: 600 11px/1 var(--font-inter), var(--font-body);
+}
+
+.consentRow {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 10px;
+  line-height: 1.45;
+  cursor: pointer;
+}
+
+.consentRow input { width: 14px; height: 14px; margin: 1px 0 0; accent-color: var(--accent); }
 
 .actionError,
 .errorBanner {
@@ -559,6 +647,8 @@
 @keyframes spin { to { transform: rotate(360deg); } }
 
 @media (max-width: 1080px) {
+  .recurrenceBar { grid-template-columns: 1fr; }
+  .recurrenceHeading { border-right: 0; border-bottom: 1px solid var(--border-default); }
   .workspace { grid-template-columns: 250px minmax(0, 1fr); }
   .configuration { grid-template-columns: minmax(0, 1fr); }
   .formPane { border-right: 0; border-bottom: 1px solid var(--border-default); }
@@ -572,6 +662,9 @@
   .pageHeader p { font-size: 12px; }
   .headerActions .secondaryButton { width: 36px; padding: 0; font-size: 0; }
   .workspace { display: block; min-height: 0; }
+  .recurrenceRow { grid-template-columns: minmax(0, 1fr) auto; gap: 9px; }
+  .recurrenceStats { grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; flex-wrap: wrap; }
+  .recurrenceActions { grid-column: 2; grid-row: 1; }
   .catalog { border-right: 0; border-bottom: 1px solid var(--border-default); }
   .packList { flex-direction: row; overflow-x: auto; scrollbar-width: none; }
   .packList::-webkit-scrollbar { display: none; }
@@ -598,4 +691,6 @@
   .launchFooter { align-items: stretch; flex-direction: column; }
   .launchFooter .primaryButton { width: 100%; }
   .multiSelect { grid-template-columns: 1fr; }
+  .recurrenceControls { grid-template-columns: 1fr; }
+  .consentRow { grid-column: 1; }
 }

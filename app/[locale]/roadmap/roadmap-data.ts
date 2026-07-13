@@ -54,6 +54,12 @@ export const roadmapUpdatedAt = {
 
 export const latestReleases = [
   {
+    id: 'outcome-packs-v2',
+    icon: 'recurring',
+    title: 'Outcome Packs V2',
+    description: 'Seven curated packs plus owner-authorized recurring missions with budgets and stop controls.',
+  },
+  {
     id: 'trusted-action-approvals',
     icon: 'approvals',
     title: 'Trusted action approvals',
@@ -70,12 +76,6 @@ export const latestReleases = [
     icon: 'mission',
     title: 'Mission Control',
     description: 'Private tasks, approvals, run history, and artifacts in one operating surface.',
-  },
-  {
-    id: 'outcome-packs',
-    icon: 'packs',
-    title: 'Outcome Packs',
-    description: 'Repeatable research, review, monitoring, and launch workflows.',
   },
   {
     id: 'hatcher-lift',
@@ -102,7 +102,8 @@ export const liveTracks = [
     evidence: [
       'Mission Control for tasks, approvals, runs, and artifacts',
       'Hard mission budgets with run-level AI Credit, token, provider-cost, and acceptance evidence',
-      'Outcome Packs for repeatable research, review, monitoring, and launch work',
+      'Seven Outcome Packs for markets, research, review, monitoring, and launch work',
+      'Owner-authorized recurring missions with per-run budgets, run limits, and pause controls',
       'Hatcher Lift for secure OpenClaw and Hermes imports',
       'Trusted MCP connectors configured per agent',
       'Effectful MCP calls gated by one-time approvals or expiring tool grants',
@@ -160,20 +161,7 @@ export const liveTracks = [
   },
 ] as const satisfies readonly RoadmapLiveTrack[];
 
-export const buildingNext = [
-  {
-    id: 'outcome-packs-v2',
-    icon: 'recurring',
-    title: 'Outcome Packs V2',
-    description:
-      'Add more curated workflows and allow recurring runs only with explicit owner consent.',
-    proofTargets: [
-      'More first-party packs',
-      'Opt-in recurring runs',
-      'Clear prerequisites and guardrails',
-    ],
-  },
-] as const satisfies readonly RoadmapBuildTarget[];
+export const buildingNext: readonly RoadmapBuildTarget[] = [];
 
 export const exploring = [
   {
