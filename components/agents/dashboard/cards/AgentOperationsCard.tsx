@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { ArrowRight, ListChecks, Loader2, PackageCheck, Plus, RefreshCw } from 'lucide-react';
+import { ArrowRight, ListChecks, Loader2, PackageCheck, Plus, RefreshCw, ShieldCheck } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { api } from '@/lib/api';
@@ -15,24 +15,28 @@ export function AgentOperationsCard() {
   const tMission = useTranslations('missionControl');
   const tOutcome = useTranslations('outcomePacks');
   const [tasks, setTasks] = useState<MissionTask[]>([]);
-  const [counts, setCounts] = useState({ active: 0, approval: 0 });
+  const [counts, setCounts] = useState({ active: 0, approval: 0, actions: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const result = await api.getMissionTasks({ agentId: agent.id, limit: 5 });
+    const [result, approvals] = await Promise.all([
+      api.getMissionTasks({ agentId: agent.id, limit: 5 }),
+      api.getMcpActionInbox({ agentId: agent.id, status: 'pending', limit: 5 }),
+    ]);
     if (result.success) {
       const model = normalizeMissionTaskList(result.data);
       setTasks(model.tasks);
       setCounts({
         active: model.summary.active,
         approval: model.summary.awaitingApproval,
+        actions: approvals.success ? approvals.data.summary.pending : 0,
       });
       setError(false);
     } else {
       setTasks([]);
-      setCounts({ active: 0, approval: 0 });
+      setCounts({ active: 0, approval: 0, actions: 0 });
       setError(true);
     }
     setLoading(false);
@@ -70,12 +74,24 @@ export function AgentOperationsCard() {
           >
             <PackageCheck size={13} aria-hidden /> {tOutcome('title')}
           </Link>
+          <Link
+            href={agentWorkspaceHref('/dashboard/approvals', agent.id)}
+            className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 text-xs font-semibold text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]"
+          >
+            <ShieldCheck size={13} aria-hidden /> Approvals
+          </Link>
         </div>
       </div>
 
       <div className="mt-4 flex items-center gap-5 border-y border-[var(--border-line)] py-3 text-xs text-[var(--text-muted)]">
         <span>{tMission('summary.active')} <strong className="ml-1 text-[var(--text-primary)]">{counts.active}</strong></span>
         <span>{tMission('summary.approval')} <strong className="ml-1 text-[var(--text-primary)]">{counts.approval}</strong></span>
+        <Link
+          href={agentWorkspaceHref('/dashboard/approvals', agent.id)}
+          className="inline-flex items-center gap-1 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+        >
+          Pending actions <strong className="ml-1 text-[var(--text-primary)]">{counts.actions}</strong>
+        </Link>
         <Link
           href={agentWorkspaceHref('/dashboard/missions', agent.id)}
           className="ml-auto inline-flex items-center gap-1 font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)]"

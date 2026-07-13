@@ -54,6 +54,12 @@ export const roadmapUpdatedAt = {
 
 export const latestReleases = [
   {
+    id: 'trusted-action-approvals',
+    icon: 'approvals',
+    title: 'Trusted action approvals',
+    description: 'Owner approval inbox, exact one-time decisions, scoped grants, and MCP execution history.',
+  },
+  {
     id: 'measured-verified-missions',
     icon: 'metering',
     title: 'Measured & verified missions',
@@ -99,6 +105,7 @@ export const liveTracks = [
       'Outcome Packs for repeatable research, review, monitoring, and launch work',
       'Hatcher Lift for secure OpenClaw and Hermes imports',
       'Trusted MCP connectors configured per agent',
+      'Effectful MCP calls gated by one-time approvals or expiring tool grants',
     ],
     href: '/dashboard/missions',
     linkLabel: 'Open Mission Control',
@@ -154,18 +161,6 @@ export const liveTracks = [
 ] as const satisfies readonly RoadmapLiveTrack[];
 
 export const buildingNext = [
-  {
-    id: 'trusted-action-approvals',
-    icon: 'approvals',
-    title: 'Trusted action approvals',
-    description:
-      'Approve effectful MCP actions before execution and keep complete, owner-visible history.',
-    proofTargets: [
-      'Approval inbox',
-      'One-time or reusable grants',
-      'Owner-visible audit trail',
-    ],
-  },
   {
     id: 'outcome-packs-v2',
     icon: 'recurring',

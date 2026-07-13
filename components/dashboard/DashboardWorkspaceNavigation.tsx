@@ -1,6 +1,6 @@
 'use client';
 
-import { Bot, ListChecks, PackageCheck } from 'lucide-react';
+import { Bot, ListChecks, PackageCheck, ShieldCheck } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
@@ -16,6 +16,7 @@ const ICONS = {
   agents: Bot,
   missions: ListChecks,
   outcomePacks: PackageCheck,
+  approvals: ShieldCheck,
 } satisfies Record<DashboardWorkspaceKey, typeof Bot>;
 
 export function DashboardWorkspaceNavigation() {
@@ -32,6 +33,7 @@ export function DashboardWorkspaceNavigation() {
     agents: tNav('myAgents'),
     missions: tNav('missionControl'),
     outcomePacks: tOutcome('title'),
+    approvals: 'Approvals',
   };
 
   return (
@@ -42,7 +44,7 @@ export function DashboardWorkspaceNavigation() {
             const active = route.key === activeRoute.key;
             const Icon = ICONS[route.key];
             const agentId = searchParams.get('agent');
-            const href = agentId && (route.key === 'missions' || route.key === 'outcomePacks')
+            const href = agentId && (route.key === 'missions' || route.key === 'outcomePacks' || route.key === 'approvals')
               ? agentWorkspaceHref(route.href, agentId)
               : route.href;
             return (

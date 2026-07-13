@@ -19,6 +19,7 @@ import {
   Newspaper,
   PackageCheck,
   Plus,
+  ShieldCheck,
   Sparkles,
   TerminalSquare,
 } from 'lucide-react';
@@ -148,6 +149,15 @@ export function NavDrawer({ open, onClose }: Props) {
                       <span>
                         <span className={styles.itemLabel}>{tOutcome('title')}</span>
                         <span className={styles.itemSub}>{tMenu('sub_outcomePacks')}</span>
+                      </span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/dashboard/approvals" className={styles.item} onClick={onClose}>
+                      <span className={styles.glyph}><ShieldCheck size={17} strokeWidth={1.8} aria-hidden /></span>
+                      <span>
+                        <span className={styles.itemLabel}>Action approvals</span>
+                        <span className={styles.itemSub}>Review effectful agent actions</span>
                       </span>
                     </Link>
                   </li>

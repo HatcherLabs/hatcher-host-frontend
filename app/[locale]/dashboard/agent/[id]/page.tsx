@@ -27,6 +27,7 @@ import {
   ListChecks,
   MoreHorizontal,
   PackageCheck,
+  ShieldCheck,
 } from 'lucide-react';
 import {
   AgentContext,
@@ -1460,6 +1461,14 @@ export default function AgentManagePage() {
             >
               <PackageCheck size={13} aria-hidden />
               <span className="hidden md:inline">{tOutcome('title')}</span>
+            </Link>
+            <Link
+              href={agentWorkspaceHref('/dashboard/approvals', agent.id)}
+              className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 text-xs font-semibold text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--accent)]"
+              title="Action approvals"
+            >
+              <ShieldCheck size={13} aria-hidden />
+              <span className="hidden md:inline">Approvals</span>
             </Link>
 
             {/* Spacer */}
