@@ -2792,3 +2792,48 @@ export interface AdminOobeOverviewResponse {
   }>;
   networkStatus: unknown;
 }
+
+export type AdminHealthResponse = {
+  api: { status: string; uptime: number; memory: { used: number; total: number } };
+  database: { status: string; connectionCount: number };
+  redis: { status: string; usedMemory: string; connectedClients: number };
+  docker: { status: string; containersRunning: number; containersTotal: number };
+  services: Array<{ name: string; status: string; uptime: string; restarts: number }>;
+  disk: { used: string; total: string; percent: number };
+  ram: { total: string; used: string; available: string; percent: number };
+  cpu: { cores: number; model: string; load1m: string; load5m: string; load15m: string; percent: number };
+  emailOutbox: {
+    pending: number;
+    processing: number;
+    sent: number;
+    deadLetter: number;
+    oldestPendingAt: string | null;
+  };
+  externalServices: {
+    status: "healthy" | "degraded" | "unknown";
+    checkedAt: string | null;
+    probes: Array<{
+      name: "helius" | "smtp" | "llm_gateway" | "stripe" | "solana_rpc";
+      status: "healthy" | "unhealthy" | "not_configured" | "unknown";
+      latencyMs: number;
+      checkedAt: string;
+      error?: string;
+    }>;
+  };
+  runtimeReleases: {
+    checkedAt: string;
+    latestCheckError: string | null;
+    runtimes: Array<{
+      framework: "openclaw" | "hermes";
+      currentVersion: string;
+      currentSourceRef: string;
+      latestVersion: string | null;
+      latestSourceRef: string | null;
+      releaseUrl: string;
+      updateAvailable: boolean | null;
+      imageId: string | null;
+      imageCreatedAt: string | null;
+      containers: { total: number; current: number; stale: number };
+    }>;
+  };
+};

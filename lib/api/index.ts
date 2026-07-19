@@ -252,5 +252,6 @@ export type {
   AdminEgressEventsResponse,
   AgentEgressEventsResponse,
   AdminIdleOverviewResponse,
+  AdminHealthResponse,
 } from "./types";
 export { api } from "./methods";

@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
-import type { Agent, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse, AdminEgressEventsResponse } from '@/lib/api';
+import type { Agent, AdminPayment, AdminHealthResponse, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse, AdminEgressEventsResponse } from '@/lib/api';
 import { shortenAddress, timeAgo } from '@/lib/utils';
 import { formatFeatureKey } from '@/lib/feature-labels';
 import { motion } from 'framer-motion';
@@ -54,6 +54,7 @@ import type { AdminOverviewExtras } from '@hatcher/shared';
 import AffiliateTab from './_components/AffiliateTab';
 import IdleTab from './_components/IdleTab';
 import OobeTab from './_components/OobeTab';
+import RuntimeReliabilityPanel from '@/components/admin/RuntimeReliabilityPanel';
 
 
 // ── Status filters ───────────────────────────────────────────
@@ -1185,16 +1186,7 @@ export default function AdminPage() {
   const [actionInProgress, setActionInProgress] = useState<Record<string, string>>({});
 
   // Health monitoring state
-  const [health, setHealth] = useState<{
-    api: { status: string; uptime: number; memory: { used: number; total: number } };
-    database: { status: string; connectionCount: number };
-    redis: { status: string; usedMemory: string; connectedClients: number };
-    docker: { status: string; containersRunning: number; containersTotal: number };
-    services: Array<{ name: string; status: string; uptime: string; restarts: number }>;
-    disk: { used: string; total: string; percent: number };
-    ram: { total: string; used: string; available: string; percent: number };
-    cpu: { cores: number; model: string; load1m: string; load5m: string; load15m: string; percent: number };
-  } | null>(null);
+  const [health, setHealth] = useState<AdminHealthResponse | null>(null);
   const [healthLoading, setHealthLoading] = useState(false);
 
   // ── User detail slide-over ─────────────────────────────────
@@ -3031,6 +3023,12 @@ export default function AdminPage() {
                     </div>
                   </div>
                 </div>
+
+                <RuntimeReliabilityPanel
+                  emailOutbox={health.emailOutbox}
+                  externalServices={health.externalServices}
+                  runtimeReleases={health.runtimeReleases}
+                />
 
                 {/* Disk usage bar */}
                 <div className="rounded-xl border border-[var(--border-default)] p-4 bg-[var(--bg-elevated)]">
