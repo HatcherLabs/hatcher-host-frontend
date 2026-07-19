@@ -74,6 +74,7 @@ import type {
   AdminEgressEventsResponse,
   AgentEgressEventsResponse,
   AdminIdleOverviewResponse,
+  AdminHealthResponse,
   GetAgentMailboxResponse,
   GetAgentMailMessagesResponse,
   SendAgentMailBody,
@@ -2378,36 +2379,7 @@ export const api = {
 
   /** Admin: get system health */
   adminGetHealth: () =>
-    req<{
-      api: {
-        status: string;
-        uptime: number;
-        memory: { used: number; total: number };
-      };
-      database: { status: string; connectionCount: number };
-      redis: { status: string; usedMemory: string; connectedClients: number };
-      docker: {
-        status: string;
-        containersRunning: number;
-        containersTotal: number;
-      };
-      services: Array<{
-        name: string;
-        status: string;
-        uptime: string;
-        restarts: number;
-      }>;
-      disk: { used: string; total: string; percent: number };
-      ram: { total: string; used: string; available: string; percent: number };
-      cpu: {
-        cores: number;
-        model: string;
-        load1m: string;
-        load5m: string;
-        load15m: string;
-        percent: number;
-      };
-    }>("/admin/health"),
+    req<AdminHealthResponse>("/admin/health"),
 
   /**
    * Admin: 10 most recent Stripe disputes (C17).
