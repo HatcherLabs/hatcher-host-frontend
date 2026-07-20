@@ -1,4 +1,6 @@
 const MIRARI_HOST = 'https://entermirari.cloud';
+const QWERTI_WIDGET_HOST = 'https://widget.qwerti.ai';
+const QWERTI_API_HOST = 'https://api.qwerti.ai';
 const DEFAULT_LOCAL_API_URL = 'http://localhost:3001';
 
 function isLocalApiUrl(url: URL): boolean {
@@ -18,7 +20,11 @@ function configuredApiConnectSource(): string {
   }
 }
 
-export function buildCsp(nonce: string, isEmbedRoute: boolean): string {
+export function buildCsp(
+  nonce: string,
+  isEmbedRoute: boolean,
+  isQwertiWidgetRoute = false,
+): string {
   const isDev = process.env.NODE_ENV === 'development';
   const apiConnect = configuredApiConnectSource();
   const devConnect = isDev
@@ -28,20 +34,25 @@ export function buildCsp(nonce: string, isEmbedRoute: boolean): string {
   const styleSrc = isDev
     ? "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com"
     : `style-src 'self' 'nonce-${nonce}' https://fonts.googleapis.com`;
-  const styleSrcElem = isDev
+  const styleSrcElem = isDev || isQwertiWidgetRoute
     ? "style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com"
     : `style-src-elem 'self' 'nonce-${nonce}' https://fonts.googleapis.com`;
+  const qwertiScript = isQwertiWidgetRoute ? ` ${QWERTI_WIDGET_HOST}` : '';
+  const qwertiConnect = isQwertiWidgetRoute
+    ? ` ${QWERTI_WIDGET_HOST} ${QWERTI_API_HOST}`
+    : '';
+  const qwertiFont = isQwertiWidgetRoute ? ` ${QWERTI_WIDGET_HOST}` : '';
   const parts = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'wasm-unsafe-eval' https://s3.tradingview.com${scriptDev}`,
+    `script-src 'self' 'nonce-${nonce}' 'wasm-unsafe-eval' https://s3.tradingview.com${qwertiScript}${scriptDev}`,
     "worker-src 'self' blob:",
     styleSrc,
     styleSrcElem,
     "style-src-attr 'unsafe-inline'",
-    "font-src 'self' https://fonts.gstatic.com",
+    `font-src 'self' https://fonts.gstatic.com${qwertiFont}`,
     `img-src 'self' data: blob: https: ${MIRARI_HOST}`,
     "media-src 'self' data: blob: https:",
-    `connect-src 'self' blob: https://api.hatcher.host wss://api.hatcher.host ${MIRARI_HOST} https://*.solana.com wss://*.solana.com https://*.helius-rpc.com wss://*.helius-rpc.com https://api.dexscreener.com https://threejs.org${apiConnect}${devConnect}`,
+    `connect-src 'self' blob: https://api.hatcher.host wss://api.hatcher.host ${MIRARI_HOST} https://*.solana.com wss://*.solana.com https://*.helius-rpc.com wss://*.helius-rpc.com https://api.dexscreener.com https://threejs.org${qwertiConnect}${apiConnect}${devConnect}`,
     `frame-src 'self' ${MIRARI_HOST} https://www.tradingview.com https://s.tradingview.com https://tradingview.com https://www.tradingview-widget.com https://www.geckoterminal.com https://geckoterminal.com https://dexscreener.com https://www.dexscreener.com`,
     "base-uri 'self'",
     "form-action 'self'",

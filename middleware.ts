@@ -98,8 +98,15 @@ function isTrackablePath(pathname: string): boolean {
 export default function middleware(req: NextRequest): NextResponse {
   const { pathname } = req.nextUrl;
   const nonce = createNonce();
-  const isEmbedRoute = stripLocalePrefix(pathname).startsWith('/embed');
-  const requestHeaders = withCspRequestHeaders(req, nonce, isEmbedRoute);
+  const unprefixedPathname = stripLocalePrefix(pathname);
+  const isEmbedRoute = unprefixedPathname.startsWith('/embed');
+  const isQwertiWidgetRoute = unprefixedPathname === '/';
+  const requestHeaders = withCspRequestHeaders(
+    req,
+    nonce,
+    isEmbedRoute,
+    isQwertiWidgetRoute,
+  );
   requestHeaders.set(
     HATCHER_LOCALE_HEADER,
     isNonLocalePath(pathname)
@@ -117,7 +124,7 @@ export default function middleware(req: NextRequest): NextResponse {
   if (authTokenRedirect) {
     const response = NextResponse.redirect(authTokenRedirect, 303);
     response.headers.set('Cache-Control', 'no-store');
-    return withSecurityHeaders(response, nonce, isEmbedRoute);
+    return withSecurityHeaders(response, nonce, isEmbedRoute, isQwertiWidgetRoute);
   }
 
   // Non-locale paths (admin, legal pages, og, skill) bypass the intl middleware.
@@ -127,12 +134,18 @@ export default function middleware(req: NextRequest): NextResponse {
       NextResponse.next({ request: { headers: requestHeaders } }),
       nonce,
       isEmbedRoute,
+      isQwertiWidgetRoute,
     );
   }
 
   const defaultLocaleRedirect = redirectDefaultLocalePath(req);
   if (defaultLocaleRedirect) {
-    return withSecurityHeaders(defaultLocaleRedirect, nonce, isEmbedRoute);
+    return withSecurityHeaders(
+      defaultLocaleRedirect,
+      nonce,
+      isEmbedRoute,
+      isQwertiWidgetRoute,
+    );
   }
 
   // Step 1: Run next-intl first so it can handle locale detection/rewrites/redirects
@@ -174,7 +187,7 @@ export default function middleware(req: NextRequest): NextResponse {
     });
   }
 
-  return withSecurityHeaders(response, nonce, isEmbedRoute);
+  return withSecurityHeaders(response, nonce, isEmbedRoute, isQwertiWidgetRoute);
 }
 
 function createNonce(): string {
@@ -183,10 +196,18 @@ function createNonce(): string {
   return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
-function withCspRequestHeaders(req: NextRequest, nonce: string, isEmbedRoute: boolean): Headers {
+function withCspRequestHeaders(
+  req: NextRequest,
+  nonce: string,
+  isEmbedRoute: boolean,
+  isQwertiWidgetRoute: boolean,
+): Headers {
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-nonce', nonce);
-  requestHeaders.set('Content-Security-Policy', buildCsp(nonce, isEmbedRoute));
+  requestHeaders.set(
+    'Content-Security-Policy',
+    buildCsp(nonce, isEmbedRoute, isQwertiWidgetRoute),
+  );
   return requestHeaders;
 }
 
@@ -199,8 +220,16 @@ function applyRequestHeaderOverrides(response: NextResponse, requestHeaders: Hea
   });
 }
 
-function withSecurityHeaders(response: NextResponse, nonce: string, isEmbedRoute: boolean): NextResponse {
-  response.headers.set('Content-Security-Policy', buildCsp(nonce, isEmbedRoute));
+function withSecurityHeaders(
+  response: NextResponse,
+  nonce: string,
+  isEmbedRoute: boolean,
+  isQwertiWidgetRoute: boolean,
+): NextResponse {
+  response.headers.set(
+    'Content-Security-Policy',
+    buildCsp(nonce, isEmbedRoute, isQwertiWidgetRoute),
+  );
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.headers.set('Permissions-Policy', 'camera=(), microphone=(self), geolocation=()');

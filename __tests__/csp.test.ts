@@ -40,13 +40,21 @@ describe('CSP', () => {
     expect(getDirective(csp, 'style-src-elem')).not.toContain("'nonce-testnonce'");
   });
 
-  it('does not allow blob scripts or the removed Qwerti widget origins', () => {
+  it('allows the Qwerti widget only on the landing route without allowing blob scripts', () => {
     vi.stubEnv('NODE_ENV', 'production');
-    const csp = buildCsp('testnonce', false);
+    const landingCsp = buildCsp('testnonce', false, true);
+    const otherRouteCsp = buildCsp('testnonce', false);
 
-    expect(getDirective(csp, 'script-src')).not.toContain('blob:');
-    expect(csp).not.toContain('widget.qwerti.ai');
-    expect(csp).not.toContain('api.qwerti.ai');
+    expect(getDirective(landingCsp, 'script-src')).not.toContain('blob:');
+    expect(getDirective(landingCsp, 'script-src')).toContain('https://widget.qwerti.ai');
+    expect(getDirective(landingCsp, 'connect-src')).toContain('https://widget.qwerti.ai');
+    expect(getDirective(landingCsp, 'connect-src')).toContain('https://api.qwerti.ai');
+    expect(getDirective(landingCsp, 'font-src')).toContain('https://widget.qwerti.ai');
+    expect(getDirective(landingCsp, 'style-src-elem')).toContain("'unsafe-inline'");
+
+    expect(otherRouteCsp).not.toContain('widget.qwerti.ai');
+    expect(otherRouteCsp).not.toContain('api.qwerti.ai');
+    expect(getDirective(otherRouteCsp, 'style-src-elem')).not.toContain("'unsafe-inline'");
   });
 
   it('does not allow removed Google advertising runtimes', () => {
