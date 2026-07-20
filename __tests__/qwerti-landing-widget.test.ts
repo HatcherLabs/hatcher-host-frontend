@@ -19,7 +19,7 @@ describe('Qwerti landing widget', () => {
     expect(landingPage).toContain('crossOrigin="anonymous"');
     expect(landingPage).toContain('data-widget="qwerti-widget"');
     expect(landingPage).toContain('data-campaign="hatcher-792703809-48487"');
-    expect(landingPage).toContain('data-auto-open="true"');
+    expect(landingPage).toContain('data-auto-open="false"');
     expect(landingPage).toContain('data-loader-version="1.0.0"');
     expect(landingPage).toContain('strategy="afterInteractive"');
     expect(landingPage).not.toContain('/widget/v1/buy.js');
