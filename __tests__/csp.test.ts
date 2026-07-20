@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { buildCsp } from '../lib/csp';
+import {
+  QWERTI_WIDGET_ORIGIN,
+  QWERTI_WIDGET_SCRIPT_CSP_HASH,
+} from '../lib/qwerti-widget';
 
 function getDirective(csp: string, name: string): string {
   return csp
@@ -40,19 +44,21 @@ describe('CSP', () => {
     expect(getDirective(csp, 'style-src-elem')).not.toContain("'nonce-testnonce'");
   });
 
-  it('allows the Qwerti widget only on the landing route without allowing blob scripts', () => {
+  it('allows only the integrity-pinned Qwerti core on the landing route', () => {
     vi.stubEnv('NODE_ENV', 'production');
     const landingCsp = buildCsp('testnonce', false, true);
     const otherRouteCsp = buildCsp('testnonce', false);
 
     expect(getDirective(landingCsp, 'script-src')).not.toContain('blob:');
-    expect(getDirective(landingCsp, 'script-src')).toContain('https://widget.qwerti.ai');
-    expect(getDirective(landingCsp, 'connect-src')).toContain('https://widget.qwerti.ai');
+    expect(getDirective(landingCsp, 'script-src')).toContain(QWERTI_WIDGET_SCRIPT_CSP_HASH);
+    expect(getDirective(landingCsp, 'script-src')).not.toContain(QWERTI_WIDGET_ORIGIN);
+    expect(getDirective(landingCsp, 'connect-src')).not.toContain(QWERTI_WIDGET_ORIGIN);
     expect(getDirective(landingCsp, 'connect-src')).toContain('https://api.qwerti.ai');
-    expect(getDirective(landingCsp, 'font-src')).toContain('https://widget.qwerti.ai');
+    expect(getDirective(landingCsp, 'font-src')).toContain(QWERTI_WIDGET_ORIGIN);
     expect(getDirective(landingCsp, 'style-src-elem')).toContain("'unsafe-inline'");
 
-    expect(otherRouteCsp).not.toContain('widget.qwerti.ai');
+    expect(otherRouteCsp).not.toContain(QWERTI_WIDGET_SCRIPT_CSP_HASH);
+    expect(otherRouteCsp).not.toContain(QWERTI_WIDGET_ORIGIN);
     expect(otherRouteCsp).not.toContain('api.qwerti.ai');
     expect(getDirective(otherRouteCsp, 'style-src-elem')).not.toContain("'unsafe-inline'");
   });

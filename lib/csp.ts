@@ -1,5 +1,9 @@
+import {
+  QWERTI_WIDGET_ORIGIN,
+  QWERTI_WIDGET_SCRIPT_CSP_HASH,
+} from './qwerti-widget';
+
 const MIRARI_HOST = 'https://entermirari.cloud';
-const QWERTI_WIDGET_HOST = 'https://widget.qwerti.ai';
 const QWERTI_API_HOST = 'https://api.qwerti.ai';
 const DEFAULT_LOCAL_API_URL = 'http://localhost:3001';
 
@@ -37,11 +41,11 @@ export function buildCsp(
   const styleSrcElem = isDev || isQwertiWidgetRoute
     ? "style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com"
     : `style-src-elem 'self' 'nonce-${nonce}' https://fonts.googleapis.com`;
-  const qwertiScript = isQwertiWidgetRoute ? ` ${QWERTI_WIDGET_HOST}` : '';
+  const qwertiScript = isQwertiWidgetRoute ? ` ${QWERTI_WIDGET_SCRIPT_CSP_HASH}` : '';
   const qwertiConnect = isQwertiWidgetRoute
-    ? ` ${QWERTI_WIDGET_HOST} ${QWERTI_API_HOST}`
+    ? ` ${QWERTI_API_HOST}`
     : '';
-  const qwertiFont = isQwertiWidgetRoute ? ` ${QWERTI_WIDGET_HOST}` : '';
+  const qwertiFont = isQwertiWidgetRoute ? ` ${QWERTI_WIDGET_ORIGIN}` : '';
   const parts = [
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}' 'wasm-unsafe-eval' https://s3.tradingview.com${qwertiScript}${scriptDev}`,
