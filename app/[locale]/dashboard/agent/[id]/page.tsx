@@ -177,6 +177,11 @@ const WalletTab = dynamic(
   { loading: () => <TabSkeleton /> },
 );
 
+const RobinhoodTab = dynamic(
+  () => import('@/components/agents/tabs/RobinhoodTab').then(mod => ({ default: mod.RobinhoodTab })),
+  { loading: () => <TabSkeleton /> },
+);
+
 // ─── Main Component ─────────────────────────────────────────
 
 export default function AgentManagePage() {
@@ -1637,6 +1642,7 @@ export default function AgentManagePage() {
               {tab === 'dev' && <DevTab />}
               {tab === 'knowledge' && <KnowledgeTab />}
               {tab === 'wallet' && <WalletTab />}
+              {tab === 'robinhood' && <RobinhoodTab />}
               {tab === 'stats' && <StatsTab />}
               {tab === 'schedules' && <SchedulesTab />}
               {tab === 'workflows' && <WorkflowsTab />}

@@ -26,6 +26,7 @@ import {
   Box,
   Bot,
   BrainCircuit,
+  Landmark,
 } from 'lucide-react';
 import type { Tab } from './AgentContext';
 import { STATUS_STYLES, useAgentContext } from './AgentContext';
@@ -71,6 +72,7 @@ function iconForTab(tab: Tab): React.ReactNode {
     sessions: <MessageSquare size={16} />,
     knowledge: <BookOpen size={16} />,
     wallet: <Wallet size={16} />,
+    robinhood: <Landmark size={16} />,
     files: <FolderOpen size={16} />,
     schedules: <Clock size={16} />,
     workflows: <GitMerge size={16} />,

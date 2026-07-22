@@ -42,6 +42,9 @@ import type {
   McpConnector,
   McpActionInboxResponse,
   McpActionRequest,
+  RobinhoodHub,
+  PrepareEquifoldTokenizationBody,
+  ConfirmEquifoldTokenizationBody,
   AgentPassport,
   AgentPassportNetworkId,
   AgentWalletActivityResponse,
@@ -3536,6 +3539,28 @@ export const api = {
     req<{ connector: McpConnector }>(
       `/agents/${agentId}/mcp/connectors/${connectorId}`,
       { method: "DELETE" },
+    ),
+
+  // ─── Robinhood Agent Hub ──────────────────────────────────
+  getRobinhoodHub: (agentId: string) =>
+    req<RobinhoodHub>(`/agents/${agentId}/robinhood`),
+
+  prepareEquifoldTokenization: (agentId: string, body: PrepareEquifoldTokenizationBody) =>
+    req<{ launchUrl: string; status: string }>(`/agents/${agentId}/robinhood/tokenize/prepare`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  confirmEquifoldTokenization: (agentId: string, body: ConfirmEquifoldTokenizationBody) =>
+    req<{ tokenization: unknown }>(`/agents/${agentId}/robinhood/tokenize/confirm`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  connectRobinhoodTrading: (agentId: string, returnPath: string) =>
+    req<{ connectorId: string; authorizationUrl: string; expiresAt: string }>(
+      `/agents/${agentId}/robinhood/trading/connect`,
+      { method: "POST", body: JSON.stringify({ returnPath }) },
     ),
 
   getMcpActionInbox: (params: { agentId?: string; status?: string; limit?: number } = {}) => {

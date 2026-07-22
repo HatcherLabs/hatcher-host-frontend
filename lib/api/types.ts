@@ -811,7 +811,7 @@ export interface CreateCovenantConnectorResponse {
 }
 
 export type McpConnectorTransport = "streamable_http" | "sse";
-export type McpConnectorAuthType = "none" | "bearer";
+export type McpConnectorAuthType = "none" | "bearer" | "oauth";
 export type McpConnectorApprovalMode = "auto" | "prompt" | "approve";
 
 export interface McpConnectorTool {
@@ -859,6 +859,49 @@ export interface CreateMcpConnectorBody {
 
 export interface CreateMcpConnectorResponse {
   connector: McpConnector;
+}
+
+export interface RobinhoodHub {
+  chain: {
+    name: string;
+    chainId: number;
+    caip2: string;
+    walletAddress: string | null;
+    status: string;
+    explorerUrl: string;
+    assets: { weth: string; usdg: string };
+    balances: { eth: string | null; weth: string | null; usdg: string | null };
+  };
+  tokenization: {
+    status: string;
+    projectId: string | null;
+    tokenAddress: string | null;
+    transactionHash: string | null;
+    launchUrl: string | null;
+    launchedAt: string | null;
+  };
+  trading: {
+    connectorId: string | null;
+    status: string;
+    toolCount: number;
+    toolPolicy: McpConnectorToolPolicy;
+    lastCheckedAt: string | null;
+    lastError: string | null;
+  };
+  equifold: { webUrl: string };
+}
+
+export interface PrepareEquifoldTokenizationBody {
+  name?: string;
+  symbol?: string;
+  description?: string;
+  returnPath?: string;
+}
+
+export interface ConfirmEquifoldTokenizationBody {
+  projectId: string;
+  tokenAddress: string;
+  transactionHash: string;
 }
 
 export type McpActionStatus =
