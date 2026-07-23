@@ -54,7 +54,6 @@ export const NAV_GROUPS: ReadonlyArray<NavGroup> = [
     key: 'resources',
     labelKey: 'resources',
     items: [
-      { key: 'pricing',     labelKey: 'pricingLabel',     subKey: 'pricingSub',     href: '/pricing',       glyph: '★' },
       { key: 'token',       labelKey: 'tokenLabel',       subKey: 'tokenSub',       href: '/token',         glyph: '◉' },
       { key: 'whitepaper',  labelKey: 'whitepaperLabel',  subKey: 'whitepaperSub',  href: '/whitepaper',    glyph: '▤' },
       { key: 'blog',        labelKey: 'blogLabel',        subKey: 'blogSub',        href: '/blog',          glyph: '✎' },
@@ -62,6 +61,11 @@ export const NAV_GROUPS: ReadonlyArray<NavGroup> = [
       { key: 'changelog',   labelKey: 'changelogLabel',   subKey: 'changelogSub',   href: '/changelog',     glyph: '⌖' },
     ],
   },
+] as const;
+
+/** Links promoted directly into the primary navigation on desktop and mobile. */
+export const PRIMARY_NAV_LINKS = [
+  { key: 'pricing', labelKey: 'pricing', href: '/pricing' as Href },
 ] as const;
 
 /** Footer columns. `headKey` resolves under namespace `footer`; each

@@ -13,7 +13,6 @@ import {
   BookOpen,
   Boxes,
   Building2,
-  CircleDollarSign,
   Clock,
   CreditCard,
   FileText,
@@ -33,7 +32,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import styles from './Nav.module.css';
-import { NAV_GROUPS, PRIMARY_CTA, SECONDARY_CTA } from './links';
+import { NAV_GROUPS, PRIMARY_CTA, PRIMARY_NAV_LINKS, SECONDARY_CTA } from './links';
 import { NavDrawer } from './NavDrawer';
 import { LocaleSwitcher } from '@/components/layout/LocaleSwitcher';
 import { AiCreditStatus } from '@/components/layout/AiCreditStatus';
@@ -236,6 +235,16 @@ export function Nav() {
                   </div>
                 )}
               </div>
+            ))}
+            {PRIMARY_NAV_LINKS.map((link) => (
+              <Link
+                key={link.key}
+                href={link.href}
+                className={styles.navLink}
+                onClick={() => setOpenGroup(null)}
+              >
+                {tNav(link.labelKey)}
+              </Link>
             ))}
             <Link href="/docs" className={styles.navLink} onClick={() => setOpenGroup(null)}>
               {tNav('docs')}
@@ -440,8 +449,6 @@ function NavItemIcon({ itemKey }: { itemKey: string }) {
       return <Building2 {...iconProps} />;
     case 'frameworks':
       return <Boxes {...iconProps} />;
-    case 'pricing':
-      return <CircleDollarSign {...iconProps} />;
     case 'token':
       return <CreditCard {...iconProps} />;
     case 'staking':

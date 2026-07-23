@@ -23,6 +23,7 @@
 }
 
 .list { list-style: none; padding: 0; margin: 0; }
+.primaryList { margin: 0 0 28px; }
 .item {
   display: flex;
   align-items: flex-start;
@@ -31,6 +32,7 @@
   text-decoration: none;
   border-bottom: 1px solid var(--border-line);
 }
+.primaryItem { align-items: center; }
 .glyph {
   display: inline-flex;
   align-items: center;

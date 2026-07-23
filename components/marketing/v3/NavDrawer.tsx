@@ -24,7 +24,13 @@ import {
   TerminalSquare,
 } from 'lucide-react';
 import styles from './NavDrawer.module.css';
-import { NAV_GROUPS, PRIMARY_CTA, SECONDARY_CTA, SIGN_UP_CTA } from './links';
+import {
+  NAV_GROUPS,
+  PRIMARY_CTA,
+  PRIMARY_NAV_LINKS,
+  SECONDARY_CTA,
+  SIGN_UP_CTA,
+} from './links';
 import { LocaleSwitcher } from '@/components/layout/LocaleSwitcher';
 import { AiCreditStatus } from '@/components/layout/AiCreditStatus';
 import { HatcherMarketStatus } from '@/components/layout/HatcherMarketStatus';
@@ -103,6 +109,23 @@ export function NavDrawer({ open, onClose }: Props) {
             <AiCreditStatus variant="drawer" onNavigate={onClose} />
           </div>
         )}
+
+        <ul className={`${styles.list} ${styles.primaryList}`} aria-label="Primary navigation">
+          {PRIMARY_NAV_LINKS.map((link) => (
+            <li key={link.key}>
+              <Link
+                href={link.href}
+                className={`${styles.item} ${styles.primaryItem}`}
+                onClick={onClose}
+              >
+                <span className={styles.glyph}>
+                  <DrawerIcon itemKey={link.key} />
+                </span>
+                <span className={styles.itemLabel}>{tNav(link.labelKey)}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
 
         {NAV_GROUPS.map((g) => (
           <section key={g.key} className={styles.section}>
