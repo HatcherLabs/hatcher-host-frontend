@@ -50,7 +50,12 @@ export type SolanaPaymentToken = "sol" | "hatch" | "usdc" | "kausa" | "ansem";
 
 export type SolanaPaymentTarget =
   | { kind: "tier"; key: string; billingPeriod?: "monthly" | "annual" }
-  | { kind: "addon"; key: string; billingPeriod?: "monthly" | "annual"; agentId?: string };
+  | {
+      kind: "addon";
+      key: string;
+      billingPeriod?: "monthly" | "annual";
+      agentId?: string;
+    };
 
 export type SolanaPaymentIntentRequest = SolanaPaymentTarget & {
   paymentToken: SolanaPaymentToken;
@@ -375,11 +380,7 @@ export type MissionTaskStatus =
   | "rejected";
 
 export type MissionRunStatus =
-  | "queued"
-  | "running"
-  | "completed"
-  | "failed"
-  | "cancelled";
+  "queued" | "running" | "completed" | "failed" | "cancelled";
 
 export type MissionApprovalStatus = "pending" | "approved" | "rejected";
 
@@ -514,10 +515,7 @@ export interface CreateMissionTaskBody {
 }
 
 export type CityOperationalAgentStatus =
-  | "running"
-  | "sleeping"
-  | "paused"
-  | "crashed";
+  "running" | "sleeping" | "paused" | "crashed";
 
 export interface CityOperationsSummary {
   agents: {
@@ -695,7 +693,7 @@ export interface LaunchOutcomePackResponse {
   task: OutcomePackLaunchTask;
   requiredSkills: Array<{ name: string; status: string }>;
   schedulesActivated: boolean;
-  recurrence: Omit<OutcomePackRecurrence, 'agent' | 'pack'> | null;
+  recurrence: Omit<OutcomePackRecurrence, "agent" | "pack"> | null;
   start: { method: string; path: string };
 }
 
@@ -868,6 +866,19 @@ export interface RobinhoodHub {
     caip2: string;
     walletAddress: string | null;
     status: string;
+    accountType: string;
+    ownerAddress: string | null;
+    sessionKeyAddress: string | null;
+    sessionInstalled: boolean;
+    policy: RobinhoodPolicy;
+    policyVersion: number;
+    accountAbstraction: {
+      enabled: boolean;
+      bundlerConfigured: boolean;
+      gasSponsored: boolean;
+      canExecute: boolean;
+      blocker: string | null;
+    };
     explorerUrl: string;
     assets: { weth: string; usdg: string };
     balances: { eth: string | null; weth: string | null; usdg: string | null };
@@ -876,8 +887,14 @@ export interface RobinhoodHub {
     status: string;
     projectId: string | null;
     tokenAddress: string | null;
+    creatorAddress: string | null;
     transactionHash: string | null;
     launchUrl: string | null;
+    launchVenue: string | null;
+    feeMode: "WALLET" | "BURN" | "COMPOUND";
+    creatorFeeSplit: Array<{ address: string; bps: number }>;
+    ownerApprovedAt: string | null;
+    creatorVerifiedAt: string | null;
     launchedAt: string | null;
   };
   trading: {
@@ -888,7 +905,31 @@ export interface RobinhoodHub {
     lastCheckedAt: string | null;
     lastError: string | null;
   };
+  actions: Array<{
+    id: string;
+    action: string;
+    status: string;
+    asset: string | null;
+    amount: string | null;
+    amountUsd: string | null;
+    transactionHash: string | null;
+    userOperationHash: string | null;
+    errorMessage: string | null;
+    createdAt: string;
+  }>;
   equifold: { webUrl: string };
+}
+
+export interface RobinhoodPolicy {
+  tradingEnabled: boolean;
+  transfersEnabled: boolean;
+  maxTradeUsd: number;
+  dailyLimitUsd: number;
+  maxSlippageBps: number;
+  requireOwnerApprovalAboveUsd: number;
+  allowedActions: Array<"equifold_buy" | "equifold_sell">;
+  allowedTokens: string[];
+  creatorFeeManagement: "owner_only" | "agent_within_policy";
 }
 
 export interface PrepareEquifoldTokenizationBody {
@@ -902,6 +943,16 @@ export interface ConfirmEquifoldTokenizationBody {
   projectId: string;
   tokenAddress: string;
   transactionHash: string;
+}
+
+export interface LaunchEquifoldAgentTokenBody {
+  name: string;
+  symbol: string;
+  description: string;
+  venue: "weth" | "sushi";
+  feeMode: "WALLET" | "BURN" | "COMPOUND";
+  initialBuyEth?: string;
+  ownerApproved: true;
 }
 
 export type McpActionStatus =
@@ -930,7 +981,8 @@ export interface McpActionRequest {
   argumentsHash: string;
   argumentsPreview: unknown;
   approvalMode: McpConnectorApprovalMode;
-  authorization: "pending" | "once" | "tool" | "grant" | "auto" | "rejected" | string;
+  authorization:
+    "pending" | "once" | "tool" | "grant" | "auto" | "rejected" | string;
   status: McpActionStatus;
   failureMessage: string | null;
   expiresAt: string | null;
@@ -1224,13 +1276,14 @@ export interface VirtualsHatcherService {
   id: string;
   title: string;
   summary: string;
-  category: 'execution' | 'review' | 'launch' | 'data' | 'integration' | 'evaluation';
-  providerName: 'HatcherLabs';
+  category:
+    "execution" | "review" | "launch" | "data" | "integration" | "evaluation";
+  providerName: "HatcherLabs";
   providerWalletAddress: string | null;
   providerConsoleAgentId: string | null;
   offeringName: string;
   priceValue: number;
-  priceType: 'fixed';
+  priceType: "fixed";
   slaMinutes: number;
   publishable: boolean;
   idealFor: string[];
@@ -1245,7 +1298,7 @@ export interface VirtualsHatcherService {
     name: string;
     description: string;
     priceValue: number;
-    priceType: 'fixed';
+    priceType: "fixed";
     slaMinutes: number;
     requirement: Record<string, unknown>;
     deliverable: Record<string, unknown>;
@@ -1436,7 +1489,7 @@ export interface VirtualsAcpProviderResponseBody {
 export interface VirtualsAcpProviderResponseResult {
   dryRun: boolean;
   results: Array<{
-    action: 'set-budget' | 'submit';
+    action: "set-budget" | "submit";
     executed: boolean;
     command?: VirtualsAcpCliCommand;
     stdout?: string;
@@ -1491,9 +1544,19 @@ export interface VantaraCapabilityRegistration {
     vantaraBps: number;
   };
   callbackUrl: string;
-  status: "draft" | "pending_registration" | "pending_update" | "live" | "paused" | "deleted" | "suspended" | "failed" | string;
+  status:
+    | "draft"
+    | "pending_registration"
+    | "pending_update"
+    | "live"
+    | "paused"
+    | "deleted"
+    | "suspended"
+    | "failed"
+    | string;
   mode: "escrow" | "pay_then_serve" | "free" | string;
-  acceptanceStatus: "not_started" | "pending_acceptance" | "accepted" | "failed" | string;
+  acceptanceStatus:
+    "not_started" | "pending_acceptance" | "accepted" | "failed" | string;
   acceptanceRequestId: string | null;
   selfServeManaged?: boolean;
   metadata: Record<string, unknown>;
@@ -1600,7 +1663,8 @@ export interface VantaraHermesInvokeResponse {
   };
 }
 
-export type MetaplexConfigStatusValue = "disabled" | "wallet-missing" | "metadata-ready" | "registered";
+export type MetaplexConfigStatusValue =
+  "disabled" | "wallet-missing" | "metadata-ready" | "registered";
 
 export interface MetaplexAgentService {
   name: "web" | "A2A" | "MCP" | "Hatcher API" | string;
@@ -1896,10 +1960,12 @@ export interface MetaplexRegistrationResponse {
 }
 
 export type MirariRuntime = "hermes";
-export type MirariSignalKind = "drift" | "contradiction" | "skill_misfire" | "focus_hit" | "judge_score";
+export type MirariSignalKind =
+  "drift" | "contradiction" | "skill_misfire" | "focus_hit" | "judge_score";
 export type MirariDreamMode = "stress_test" | "replay" | "consolidate";
 export type MirariDreamTrigger = "manual" | "idle" | "scheduled";
-export type MirariDreamFindingKind = "weakness" | "insight" | "contradiction" | "proposal";
+export type MirariDreamFindingKind =
+  "weakness" | "insight" | "contradiction" | "proposal";
 export type MirariDreamFindingSeverity = "low" | "medium" | "high";
 
 export interface MirariConfigStatus {
@@ -2379,9 +2445,7 @@ export interface KausalayerResourcesResponse {
 export type AgentPassportNetworkId = "skale" | "base" | "solana";
 export type AgentPassportChainType = "evm" | "solana";
 export type AgentPassportSignerMode =
-  | "receive-only"
-  | "runtime-signing"
-  | "planned";
+  "receive-only" | "runtime-signing" | "planned";
 export type AgentPassportTradingStatus = "enabled" | "disabled";
 export type AgentPassportStatus =
   | "registered"
@@ -2837,14 +2901,34 @@ export interface AdminOobeOverviewResponse {
 }
 
 export type AdminHealthResponse = {
-  api: { status: string; uptime: number; memory: { used: number; total: number } };
+  api: {
+    status: string;
+    uptime: number;
+    memory: { used: number; total: number };
+  };
   database: { status: string; connectionCount: number };
   redis: { status: string; usedMemory: string; connectedClients: number };
-  docker: { status: string; containersRunning: number; containersTotal: number };
-  services: Array<{ name: string; status: string; uptime: string; restarts: number }>;
+  docker: {
+    status: string;
+    containersRunning: number;
+    containersTotal: number;
+  };
+  services: Array<{
+    name: string;
+    status: string;
+    uptime: string;
+    restarts: number;
+  }>;
   disk: { used: string; total: string; percent: number };
   ram: { total: string; used: string; available: string; percent: number };
-  cpu: { cores: number; model: string; load1m: string; load5m: string; load15m: string; percent: number };
+  cpu: {
+    cores: number;
+    model: string;
+    load1m: string;
+    load5m: string;
+    load15m: string;
+    percent: number;
+  };
   emailOutbox: {
     pending: number;
     processing: number;
