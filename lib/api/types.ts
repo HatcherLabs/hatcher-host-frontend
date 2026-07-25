@@ -917,7 +917,24 @@ export interface RobinhoodHub {
     errorMessage: string | null;
     createdAt: string;
   }>;
-  equifold: { webUrl: string };
+  equifold: {
+    webUrl: string;
+    schemaVersion: number;
+    generation: number;
+    venues: Array<{
+      id: "weth" | "sushi" | "stock";
+      label: string;
+      enabled: boolean;
+    }>;
+    stockAssets: Array<{
+      address: string;
+      symbol: string;
+      name: string;
+      decimals: number;
+      enabled: boolean;
+      priceUsd18: string | null;
+    }>;
+  };
 }
 
 export interface RobinhoodPolicy {
@@ -949,7 +966,8 @@ export interface LaunchEquifoldAgentTokenBody {
   name: string;
   symbol: string;
   description: string;
-  venue: "weth" | "sushi";
+  venue: "weth" | "sushi" | "stock";
+  stockAsset?: string;
   feeMode: "WALLET" | "BURN" | "COMPOUND";
   initialBuyEth?: string;
   ownerApproved: true;

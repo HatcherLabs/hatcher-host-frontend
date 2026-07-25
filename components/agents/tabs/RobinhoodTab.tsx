@@ -49,6 +49,14 @@ function formatBalance(value: string | null): string {
     : value;
 }
 
+function formatUsd18(value: string | null): string {
+  if (!value) return "Price unavailable";
+  const parsed = Number(value) / 1e18;
+  return Number.isFinite(parsed)
+    ? `$${parsed.toLocaleString(undefined, { maximumFractionDigits: 2 })}`
+    : "Price unavailable";
+}
+
 function statusTone(status: string): string {
   if (
     [
@@ -124,7 +132,8 @@ export function RobinhoodTab() {
   const [tokenDescription, setTokenDescription] = useState(
     agent.description || `Tokenized Hatcher agent ${agent.name}.`,
   );
-  const [venue, setVenue] = useState<"weth" | "sushi">("weth");
+  const [venue, setVenue] = useState<"weth" | "sushi" | "stock">("weth");
+  const [stockAsset, setStockAsset] = useState("");
   const [feeMode, setFeeMode] = useState<"WALLET" | "BURN" | "COMPOUND">(
     "WALLET",
   );
@@ -149,10 +158,21 @@ export function RobinhoodTab() {
         setFeeMode(response.data.tokenization.feeMode);
         if (
           response.data.tokenization.launchVenue === "weth" ||
-          response.data.tokenization.launchVenue === "sushi"
+          response.data.tokenization.launchVenue === "sushi" ||
+          response.data.tokenization.launchVenue === "stock"
         ) {
           setVenue(response.data.tokenization.launchVenue);
         }
+        setStockAsset((current) => {
+          const available = response.data.equifold.stockAssets.filter(
+            (asset) => asset.enabled,
+          );
+          return available.some(
+            (asset) => asset.address.toLowerCase() === current.toLowerCase(),
+          )
+            ? current
+            : (available[0]?.address ?? "");
+        });
         setFeeRecipients(
           response.data.tokenization.creatorFeeSplit.length
             ? response.data.tokenization.creatorFeeSplit
@@ -197,6 +217,7 @@ export function RobinhoodTab() {
         symbol: tokenSymbol.trim(),
         description: tokenDescription.trim(),
         venue,
+        ...(venue === "stock" ? { stockAsset } : {}),
         feeMode,
         ...(initialBuyEth.trim()
           ? { initialBuyEth: initialBuyEth.trim() }
@@ -643,7 +664,7 @@ export function RobinhoodTab() {
                 </h3>
                 <p className="text-xs text-[var(--text-muted)]">
                   The ERC-4337 account signs and becomes Equifold&apos;s onchain
-                  creator.
+                  creator across all live Gen4 venues.
                 </p>
               </div>
             </div>
@@ -673,14 +694,54 @@ export function RobinhoodTab() {
                 <select
                   value={venue}
                   onChange={(event) =>
-                    setVenue(event.target.value as "weth" | "sushi")
+                    setVenue(
+                      event.target.value as "weth" | "sushi" | "stock",
+                    )
                   }
                   className={fieldClass}
                 >
-                  <option value="weth">Uniswap v4 · WETH</option>
-                  <option value="sushi">SushiSwap v3</option>
+                  {(hub?.equifold.venues ?? [
+                    {
+                      id: "weth" as const,
+                      label: "Uniswap v4 · WETH",
+                      enabled: true,
+                    },
+                    {
+                      id: "sushi" as const,
+                      label: "SushiSwap v3",
+                      enabled: true,
+                    },
+                  ]).map((option) => (
+                    <option
+                      key={option.id}
+                      value={option.id}
+                      disabled={!option.enabled}
+                    >
+                      {option.label}
+                      {!option.enabled ? " · unavailable" : ""}
+                    </option>
+                  ))}
                 </select>
               </label>
+              {venue === "stock" ? (
+                <label className="text-xs font-medium text-[var(--text-secondary)]">
+                  Backing stock
+                  <select
+                    value={stockAsset}
+                    onChange={(event) => setStockAsset(event.target.value)}
+                    className={fieldClass}
+                  >
+                    {hub?.equifold.stockAssets
+                      .filter((asset) => asset.enabled)
+                      .map((asset) => (
+                        <option key={asset.address} value={asset.address}>
+                          {asset.symbol} · {asset.name} ·{" "}
+                          {formatUsd18(asset.priceUsd18)}
+                        </option>
+                      ))}
+                  </select>
+                </label>
+              ) : null}
               <label className="text-xs font-medium text-[var(--text-secondary)]">
                 Initial agent buy (ETH)
                 <input
@@ -728,7 +789,8 @@ export function RobinhoodTab() {
                   busy === "launch" ||
                   !executable ||
                   !tokenName.trim() ||
-                  !tokenSymbol.trim()
+                  !tokenSymbol.trim() ||
+                  (venue === "stock" && !stockAsset)
                 }
                 className={`mt-5 ${primaryButton}`}
               >
@@ -945,7 +1007,9 @@ export function RobinhoodTab() {
                 busy === "trade" ||
                 !executable ||
                 !launched ||
-                hub?.tokenization.launchVenue !== "weth" ||
+                !["weth", "sushi", "stock"].includes(
+                  hub?.tokenization.launchVenue ?? "",
+                ) ||
                 !tradeAmount.trim() ||
                 !policy?.tradingEnabled
               }
