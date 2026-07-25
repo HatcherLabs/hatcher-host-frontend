@@ -34,6 +34,7 @@ type Busy =
   | "prepare"
   | "policy"
   | "fees"
+  | "collect"
   | "trade"
   | "brokerage"
   | null;
@@ -129,6 +130,17 @@ const fieldClass =
   "mt-1.5 w-full rounded-lg border border-[var(--border-default)] bg-[var(--bg-input)] px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent)]";
 const primaryButton =
   "inline-flex h-10 items-center gap-2 rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--accent-foreground)] disabled:opacity-50";
+const COMPLETE_POSITIVE_DECIMAL = /^(?:0|[1-9]\d*)(?:\.\d{1,18})?$/;
+const EDITABLE_DECIMAL = /^(?:0|[1-9]\d*)?(?:\.\d{0,18})?$/;
+
+function decimalInput(value: string): string | null {
+  const normalized = value.replace(",", ".");
+  return EDITABLE_DECIMAL.test(normalized) ? normalized : null;
+}
+
+function isPositiveDecimal(value: string): boolean {
+  return COMPLETE_POSITIVE_DECIMAL.test(value) && Number(value) > 0;
+}
 
 export function RobinhoodTab() {
   const { agent } = useAgentContext();
@@ -340,6 +352,14 @@ export function RobinhoodTab() {
         : `Creator fee mode changed to ${feeMode}.`;
     });
 
+  const collectCreatorFees = () =>
+    run("collect", async () => {
+      const response = await api.collectRobinhoodAgentFees(agent.id);
+      if (!response.success)
+        throw new Error(response.error || "Could not collect creator fees");
+      return "Equifold fees collected and routed using the active fee mode.";
+    });
+
   const trade = () =>
     run("trade", async () => {
       const response = await api.tradeRobinhoodAgentToken(agent.id, {
@@ -376,6 +396,9 @@ export function RobinhoodTab() {
   const executable = hub?.chain.accountAbstraction.canExecute === true;
   const funded = Number(hub?.chain.balances.eth ?? "0") > 0;
   const launched = hub?.tokenization.status === "launched";
+  const initialBuyValid =
+    initialBuyEth.trim() === "" || isPositiveDecimal(initialBuyEth.trim());
+  const tradeAmountValid = isPositiveDecimal(tradeAmount.trim());
   const feeSplitTotal = feeRecipients.reduce(
     (sum, recipient) => sum + recipient.bps,
     0,
@@ -855,10 +878,19 @@ export function RobinhoodTab() {
                 Initial agent buy (ETH)
                 <input
                   value={initialBuyEth}
+                  inputMode="decimal"
+                  autoComplete="off"
+                  spellCheck={false}
                   placeholder="Optional"
-                  onChange={(event) => setInitialBuyEth(event.target.value)}
+                  onChange={(event) => {
+                    const value = decimalInput(event.target.value);
+                    if (value !== null) setInitialBuyEth(value);
+                  }}
                   className={fieldClass}
                 />
+                <span className="mt-1 block text-[11px] text-[var(--text-muted)]">
+                  Positive ETH amount, up to 18 decimal places.
+                </span>
               </label>
               <label className="text-xs font-medium text-[var(--text-secondary)] sm:col-span-2">
                 Description
@@ -884,7 +916,7 @@ export function RobinhoodTab() {
                     }}
                     className={`rounded-xl border p-3 text-left text-xs ${
                       tokenImageSource === "agent"
-                        ? "border-[var(--accent)] bg-[var(--control-active)] text-[var(--text-primary)]"
+                        ? "border-[var(--accent)] bg-[var(--control-active)] text-[var(--control-active-text)]"
                         : "border-[var(--border-default)] text-[var(--text-secondary)]"
                     }`}
                   >
@@ -897,7 +929,7 @@ export function RobinhoodTab() {
                   <label
                     className={`cursor-pointer rounded-xl border p-3 text-left text-xs ${
                       tokenImageSource === "custom"
-                        ? "border-[var(--accent)] bg-[var(--control-active)] text-[var(--text-primary)]"
+                        ? "border-[var(--accent)] bg-[var(--control-active)] text-[var(--control-active-text)]"
                         : "border-[var(--border-default)] text-[var(--text-secondary)]"
                     }`}
                   >
@@ -933,7 +965,7 @@ export function RobinhoodTab() {
                   key={mode}
                   type="button"
                   onClick={() => setFeeMode(mode)}
-                  className={`rounded-xl border p-3 text-left text-xs ${feeMode === mode ? "border-[var(--accent)] bg-[var(--control-active)] text-[var(--text-primary)]" : "border-[var(--border-default)] text-[var(--text-secondary)]"}`}
+                  className={`rounded-xl border p-3 text-left text-xs ${feeMode === mode ? "border-[var(--accent)] bg-[var(--control-active)] text-[var(--control-active-text)]" : "border-[var(--border-default)] text-[var(--text-secondary)]"}`}
                 >
                   <span className="font-semibold">{mode}</span>
                   <span className="mt-1 block">
@@ -956,6 +988,7 @@ export function RobinhoodTab() {
                   !funded ||
                   !tokenName.trim() ||
                   !tokenSymbol.trim() ||
+                  !initialBuyValid ||
                   (tokenImageSource === "custom" && !tokenImageUri) ||
                   (venue === "stock" && !stockAsset)
                 }
@@ -1125,6 +1158,26 @@ export function RobinhoodTab() {
                     Open on Equifold <ExternalLink size={13} />
                   </a>
                 ) : null}
+                <button
+                  type="button"
+                  onClick={() => void collectCreatorFees()}
+                  disabled={
+                    busy === "collect" || !executable || !policy?.tradingEnabled
+                  }
+                  className="mt-3 inline-flex h-9 items-center gap-2 rounded-lg border border-[var(--border-default)] px-3 text-xs font-semibold text-[var(--text-secondary)] disabled:opacity-50"
+                >
+                  {busy === "collect" ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <CircleDollarSign size={14} />
+                  )}
+                  Collect & route token fees
+                </button>
+                <p className="mt-2 text-[11px] leading-4 text-[var(--text-muted)]">
+                  Agents can run the same permissionless fee crank without
+                  Robinhood MCP. WALLET pays the configured split; BURN and
+                  COMPOUND route fees on-chain automatically.
+                </p>
               </>
             ) : (
               <p className="mt-4 text-xs leading-5 text-[var(--text-secondary)]">
@@ -1158,7 +1211,7 @@ export function RobinhoodTab() {
                   key={side}
                   type="button"
                   onClick={() => setTradeSide(side)}
-                  className={`rounded-lg border px-3 py-2 text-sm font-semibold ${tradeSide === side ? "border-[var(--accent)] bg-[var(--control-active)] text-[var(--text-primary)]" : "border-[var(--border-default)] text-[var(--text-muted)]"}`}
+                  className={`rounded-lg border px-3 py-2 text-sm font-semibold ${tradeSide === side ? "border-[var(--accent)] bg-[var(--control-active)] text-[var(--control-active-text)]" : "border-[var(--border-default)] text-[var(--text-muted)]"}`}
                 >
                   {side === "buy" ? "Buy with ETH" : "Sell token"}
                 </button>
@@ -1168,7 +1221,13 @@ export function RobinhoodTab() {
               {tradeSide === "buy" ? "ETH amount" : "Token amount"}
               <input
                 value={tradeAmount}
-                onChange={(event) => setTradeAmount(event.target.value)}
+                inputMode="decimal"
+                autoComplete="off"
+                spellCheck={false}
+                onChange={(event) => {
+                  const value = decimalInput(event.target.value);
+                  if (value !== null) setTradeAmount(value);
+                }}
                 placeholder={tradeSide === "buy" ? "0.01" : "1000"}
                 className={fieldClass}
               />
@@ -1176,8 +1235,9 @@ export function RobinhoodTab() {
             <p className="mt-3 text-xs leading-5 text-[var(--text-muted)]">
               Max ${policy?.maxTradeUsd ?? 0}/trade · $
               {policy?.dailyLimitUsd ?? 0}/day ·{" "}
-              {(policy?.maxSlippageBps ?? 0) / 100}% slippage. This click is
-              explicit owner approval.
+              {(policy?.maxSlippageBps ?? 0) / 100}% slippage. Agents use the
+              same policy-gated onchain relay autonomously; Robinhood MCP is not
+              required. This button is the owner&apos;s manual execution path.
             </p>
             <button
               type="button"
@@ -1189,7 +1249,7 @@ export function RobinhoodTab() {
                 !["weth", "sushi", "stock"].includes(
                   hub?.tokenization.launchVenue ?? "",
                 ) ||
-                !tradeAmount.trim() ||
+                !tradeAmountValid ||
                 !policy?.tradingEnabled
               }
               className={`mt-4 ${primaryButton}`}

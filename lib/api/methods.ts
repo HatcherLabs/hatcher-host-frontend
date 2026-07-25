@@ -3797,6 +3797,17 @@ export const api = {
       body: JSON.stringify(body),
     }),
 
+  collectRobinhoodAgentFees: (agentId: string) =>
+    req<{
+      transactionHash: string;
+      userOperationHash: string;
+      launchModule: string;
+      quoteOut: string;
+      tokenOut: string;
+    }>(`/agents/${agentId}/robinhood/fees/collect`, {
+      method: "POST",
+    }),
+
   tradeRobinhoodAgentToken: (
     agentId: string,
     body: { side: "buy" | "sell"; amount: string; ownerApproved: boolean },
