@@ -3731,6 +3731,7 @@ export const api = {
       projectId: string;
       tokenAddress: string;
       creator: string;
+      launchGeneration: number;
       feeMode: "WALLET" | "BURN" | "COMPOUND";
       warning: string | null;
       transactionHash: string;

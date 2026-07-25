@@ -228,7 +228,7 @@ export function RobinhoodTab() {
         throw new Error(response.error || "Equifold agent launch failed");
       return (
         response.data.warning ??
-        `${response.data.projectId} launched by the agent smart account.`
+        `${response.data.projectId} launched by the agent smart account on Equifold Gen ${response.data.launchGeneration}.`
       );
     });
 
@@ -404,7 +404,11 @@ export function RobinhoodTab() {
             value={hub?.tokenization.projectId ?? "Not launched"}
             detail={
               hub?.tokenization.creatorVerifiedAt
-                ? "Creator verified onchain"
+                ? `Creator verified onchain${
+                    hub.tokenization.launchGeneration
+                      ? ` · Gen ${hub.tokenization.launchGeneration}`
+                      : ""
+                  }`
                 : "Launch from the Tokenize section"
             }
           />
@@ -530,10 +534,20 @@ export function RobinhoodTab() {
                 value={
                   hub?.chain.accountAbstraction.gasSponsored
                     ? "Active"
-                    : "Inactive"
+                    : "Self-funded"
                 }
-                detail="Owner gas policy"
+                detail={
+                  hub?.chain.accountAbstraction.gasSponsored
+                    ? "Hatcher paymaster policy"
+                    : "Paid from agent ETH balance"
+                }
               />
+            </div>
+            <div className="mt-4 rounded-xl border border-[var(--color-accent-border)] bg-[var(--color-accent-bg)] px-4 py-3 text-xs leading-5 text-[var(--text-secondary)]">
+              Fund this smart-account address with native ETH. It can receive
+              funds before its first onchain deployment; the ETH pays for
+              account deployment, token launch, the initial buy, and agent
+              trading. Do not fund the root owner or session signer addresses.
             </div>
           </GlassCard>
           {policy ? (
@@ -694,24 +708,24 @@ export function RobinhoodTab() {
                 <select
                   value={venue}
                   onChange={(event) =>
-                    setVenue(
-                      event.target.value as "weth" | "sushi" | "stock",
-                    )
+                    setVenue(event.target.value as "weth" | "sushi" | "stock")
                   }
                   className={fieldClass}
                 >
-                  {(hub?.equifold.venues ?? [
-                    {
-                      id: "weth" as const,
-                      label: "Uniswap v4 · WETH",
-                      enabled: true,
-                    },
-                    {
-                      id: "sushi" as const,
-                      label: "SushiSwap v3",
-                      enabled: true,
-                    },
-                  ]).map((option) => (
+                  {(
+                    hub?.equifold.venues ?? [
+                      {
+                        id: "weth" as const,
+                        label: "Uniswap v4 · WETH",
+                        enabled: true,
+                      },
+                      {
+                        id: "sushi" as const,
+                        label: "SushiSwap v3",
+                        enabled: true,
+                      },
+                    ]
+                  ).map((option) => (
                     <option
                       key={option.id}
                       value={option.id}

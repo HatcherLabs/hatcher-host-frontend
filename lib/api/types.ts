@@ -891,6 +891,7 @@ export interface RobinhoodHub {
     transactionHash: string | null;
     launchUrl: string | null;
     launchVenue: string | null;
+    launchGeneration: number | null;
     feeMode: "WALLET" | "BURN" | "COMPOUND";
     creatorFeeSplit: Array<{ address: string; bps: number }>;
     ownerApprovedAt: string | null;
