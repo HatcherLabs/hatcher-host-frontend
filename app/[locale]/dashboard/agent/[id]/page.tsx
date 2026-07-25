@@ -177,6 +177,11 @@ const WalletTab = dynamic(
   { loading: () => <TabSkeleton /> },
 );
 
+const RobinhoodTab = dynamic(
+  () => import('@/components/agents/tabs/RobinhoodTab').then(mod => ({ default: mod.RobinhoodTab })),
+  { loading: () => <TabSkeleton /> },
+);
+
 // ─── Main Component ─────────────────────────────────────────
 
 export default function AgentManagePage() {
@@ -214,7 +219,7 @@ export default function AgentManagePage() {
   const [ownedAgentsLoading, setOwnedAgentsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const statusPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const validTabs: Tab[] = ['overview','config','integrations','connectors','skills','plugins','files','logs','terminal','dev','memory','sessions','knowledge','schedules','workflows','chat','mail','stats','wallet'];
+  const validTabs: Tab[] = ['overview','config','integrations','connectors','skills','plugins','files','logs','terminal','dev','memory','sessions','knowledge','schedules','workflows','chat','mail','stats','wallet','robinhood'];
   // 'skills' kept in validTabs for backwards compat (deep links), but redirects to plugins tab
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
   const rawTab = searchParams.get('tab');
@@ -1427,7 +1432,7 @@ export default function AgentManagePage() {
         <div className="flex-1 min-w-0 flex flex-col bg-[var(--bg-base)]">
           {/* Top action bar */}
           <div
-            className="flex flex-wrap items-center gap-3 border-b border-[var(--border-default)] bg-[color-mix(in_srgb,var(--bg-surface)_92%,transparent)] px-4 py-3.5 backdrop-blur-md sm:px-6"
+            className="relative z-40 flex flex-wrap items-center gap-3 overflow-visible border-b border-[var(--border-default)] bg-[color-mix(in_srgb,var(--bg-surface)_92%,transparent)] px-4 py-3.5 backdrop-blur-md sm:px-6"
             style={{ fontFamily: 'var(--font-inter)' }}
           >
             {/* Status pill */}
@@ -1539,7 +1544,7 @@ export default function AgentManagePage() {
                   <MoreHorizontal size={13} />
                   <span className="hidden sm:inline">More</span>
                 </summary>
-                <div className="absolute right-0 top-[calc(100%+8px)] z-30 w-64 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] p-2 shadow-[var(--shadow-card)]">
+                <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-64 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] p-2 shadow-[var(--shadow-card)]">
                   <button
                     onClick={() => {
                       const fw = agent?.framework || 'openclaw';
@@ -1637,6 +1642,7 @@ export default function AgentManagePage() {
               {tab === 'dev' && <DevTab />}
               {tab === 'knowledge' && <KnowledgeTab />}
               {tab === 'wallet' && <WalletTab />}
+              {tab === 'robinhood' && <RobinhoodTab />}
               {tab === 'stats' && <StatsTab />}
               {tab === 'schedules' && <SchedulesTab />}
               {tab === 'workflows' && <WorkflowsTab />}

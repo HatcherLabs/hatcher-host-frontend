@@ -23,7 +23,14 @@ describe('agent navigation model', () => {
   });
 
   it('keeps easy mode focused on primary operator tasks', () => {
-    expect(EASY_AGENT_TABS).toEqual(['overview', 'chat', 'logs', 'integrations', 'wallet']);
+    expect(EASY_AGENT_TABS).toEqual([
+      'overview',
+      'chat',
+      'logs',
+      'integrations',
+      'wallet',
+      'robinhood',
+    ]);
   });
 
   it('keeps advanced-only tabs out of easy mode', () => {
@@ -48,5 +55,18 @@ describe('agent navigation model', () => {
 
     const easyTabs = buildAgentNavigationTabs('openclaw', labelFor, 'easy').map((tab) => tab.id);
     expect(easyTabs).not.toContain('connectors');
+  });
+
+  it('exposes Robinhood as an asset workspace in both modes', () => {
+    for (const mode of ['easy', 'advanced'] as const) {
+      const robinhoodTab = buildAgentNavigationTabs('hermes', labelFor, mode)
+        .find((tab) => tab.id === 'robinhood');
+
+      expect(robinhoodTab).toMatchObject({
+        id: 'robinhood',
+        label: 'robinhood',
+        group: 'assets',
+      });
+    }
   });
 });

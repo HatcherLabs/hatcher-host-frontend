@@ -861,6 +861,163 @@ export interface CreateMcpConnectorResponse {
   connector: McpConnector;
 }
 
+export interface RobinhoodHub {
+  chain: {
+    name: string;
+    chainId: number;
+    caip2: string;
+    walletAddress: string | null;
+    status: string;
+    accountType: string;
+    ownerAddress: string | null;
+    sessionKeyAddress: string | null;
+    sessionInstalled: boolean;
+    policy: RobinhoodPolicy;
+    policyVersion: number;
+    accountAbstraction: {
+      enabled: boolean;
+      bundlerConfigured: boolean;
+      gasSponsored: boolean;
+      canExecute: boolean;
+      blocker: string | null;
+    };
+    explorerUrl: string;
+    assets: { weth: string; usdg: string };
+    balances: { eth: string | null; weth: string | null; usdg: string | null };
+  };
+  tokenization: {
+    status: string;
+    projectId: string | null;
+    tokenAddress: string | null;
+    creatorAddress: string | null;
+    transactionHash: string | null;
+    launchUrl: string | null;
+    launchVenue: string | null;
+    launchGeneration: number | null;
+    feeMode: "WALLET" | "BURN" | "COMPOUND";
+    creatorFeeSplit: Array<{ address: string; bps: number }>;
+    creatorConfigLocked: boolean;
+    ownerApprovedAt: string | null;
+    creatorVerifiedAt: string | null;
+    launchedAt: string | null;
+  };
+  trading: {
+    connectorId: string | null;
+    status: string;
+    toolCount: number;
+    toolPolicy: McpConnectorToolPolicy;
+    lastCheckedAt: string | null;
+    lastError: string | null;
+  };
+  dex: {
+    available: boolean;
+    provider: string;
+    routeProcessor: string;
+    tokenSelection: "arbitrary";
+    supportedLiquidity: string[];
+    mainnetOnly: boolean;
+  };
+  actions: Array<{
+    id: string;
+    action: string;
+    status: string;
+    asset: string | null;
+    amount: string | null;
+    amountUsd: string | null;
+    transactionHash: string | null;
+    userOperationHash: string | null;
+    errorMessage: string | null;
+    createdAt: string;
+  }>;
+  equifold: {
+    webUrl: string;
+    schemaVersion: number;
+    generation: number;
+    venues: Array<{
+      id: "weth" | "sushi" | "stock";
+      label: string;
+      enabled: boolean;
+    }>;
+    stockAssets: Array<{
+      address: string;
+      symbol: string;
+      name: string;
+      decimals: number;
+      enabled: boolean;
+      priceUsd18: string | null;
+    }>;
+  };
+}
+
+export interface RobinhoodPolicy {
+  tradingEnabled: boolean;
+  transfersEnabled: boolean;
+  maxTradeUsd: number;
+  dailyLimitUsd: number;
+  maxSlippageBps: number;
+  maxPriceImpactBps: number;
+  requireOwnerApprovalAboveUsd: number;
+  allowedActions: Array<"equifold_buy" | "equifold_sell" | "dex_swap">;
+  allowedTokens: string[];
+  creatorFeeManagement: "owner_only" | "agent_within_policy";
+}
+
+export interface RobinhoodDexToken {
+  address: string;
+  apiAddress: string;
+  symbol: string;
+  name: string;
+  decimals: number;
+  native: boolean;
+}
+
+export interface RobinhoodDexQuote {
+  provider: "sushi-route-processor";
+  routeProcessor: string;
+  tokenIn: RobinhoodDexToken;
+  tokenOut: RobinhoodDexToken;
+  amountIn: string;
+  amountOut: string;
+  amountInRaw: string;
+  amountOutRaw: string;
+  amountUsd: number;
+  swapPrice: number;
+  priceImpactBps: number;
+  maxSlippageBps: number;
+  maxPriceImpactBps: number;
+  liquidityProviders: string[];
+  ownerApprovalRequired: boolean;
+  canExecuteAutonomously: boolean;
+  canExecuteWithOwnerApproval: boolean;
+  blockers: string[];
+}
+
+export interface PrepareEquifoldTokenizationBody {
+  name?: string;
+  symbol?: string;
+  description?: string;
+  returnPath?: string;
+}
+
+export interface ConfirmEquifoldTokenizationBody {
+  projectId: string;
+  tokenAddress: string;
+  transactionHash: string;
+}
+
+export interface LaunchEquifoldAgentTokenBody {
+  name: string;
+  symbol: string;
+  description: string;
+  venue: "weth" | "sushi" | "stock";
+  stockAsset?: string;
+  feeMode: "WALLET" | "BURN" | "COMPOUND";
+  initialBuyEth?: string;
+  imageUri?: string;
+  idempotencyKey: string;
+  ownerApproved: true;
+}
+
 export type McpActionStatus =
   | "pending"
   | "approved"

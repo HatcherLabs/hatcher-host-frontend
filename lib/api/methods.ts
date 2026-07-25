@@ -42,6 +42,12 @@ import type {
   McpConnector,
   McpActionInboxResponse,
   McpActionRequest,
+  RobinhoodHub,
+  RobinhoodPolicy,
+  RobinhoodDexQuote,
+  LaunchEquifoldAgentTokenBody,
+  PrepareEquifoldTokenizationBody,
+  ConfirmEquifoldTokenizationBody,
   AgentPassport,
   AgentPassportNetworkId,
   AgentWalletActivityResponse,
@@ -3536,6 +3542,175 @@ export const api = {
     req<{ connector: McpConnector }>(
       `/agents/${agentId}/mcp/connectors/${connectorId}`,
       { method: "DELETE" },
+    ),
+
+  // ─── Robinhood Agent Hub ──────────────────────────────────
+  getRobinhoodHub: (agentId: string) =>
+    req<RobinhoodHub>(`/agents/${agentId}/robinhood`),
+
+  prepareEquifoldTokenization: (
+    agentId: string,
+    body: PrepareEquifoldTokenizationBody,
+  ) =>
+    req<{ launchUrl: string; status: string }>(
+      `/agents/${agentId}/robinhood/tokenize/prepare`,
+      {
+        method: "POST",
+        body: JSON.stringify(body),
+      },
+    ),
+
+  confirmEquifoldTokenization: (
+    agentId: string,
+    body: ConfirmEquifoldTokenizationBody,
+  ) =>
+    req<{ tokenization: unknown }>(
+      `/agents/${agentId}/robinhood/tokenize/confirm`,
+      {
+        method: "POST",
+        body: JSON.stringify(body),
+      },
+    ),
+
+  uploadEquifoldAgentMedia: async (agentId: string, file: File) => {
+    const token = getToken();
+    const headers: Record<string, string> = { "Content-Type": file.type };
+    if (token) headers.Authorization = `Bearer ${token}`;
+    try {
+      const response = await fetch(
+        `${API_URL}/agents/${agentId}/robinhood/media`,
+        {
+          method: "POST",
+          headers,
+          body: file,
+          credentials: "include",
+        },
+      );
+      const payload = (await response.json().catch(() => null)) as
+        | { success: true; data: { uri: string; contentType: string } }
+        | { success: false; error: string }
+        | null;
+      if (!response.ok || !payload) {
+        return {
+          success: false as const,
+          error: `Image upload failed (${response.status})`,
+        };
+      }
+      return payload;
+    } catch {
+      return { success: false as const, error: "Image upload failed" };
+    }
+  },
+
+  launchEquifoldAgentToken: (
+    agentId: string,
+    body: LaunchEquifoldAgentTokenBody,
+  ) =>
+    req<{
+      projectId: string;
+      tokenAddress: string;
+      creator: string;
+      launchGeneration: number;
+      feeMode: "WALLET" | "BURN" | "COMPOUND";
+      warning: string | null;
+      transactionHash: string;
+      userOperationHash: string;
+    }>(`/agents/${agentId}/robinhood/tokenize/launch`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  updateRobinhoodPolicy: (agentId: string, policy: RobinhoodPolicy) =>
+    req<{
+      policy: RobinhoodPolicy;
+      policyVersion: number;
+      enforcement: string;
+    }>(`/agents/${agentId}/robinhood/policy`, {
+      method: "PUT",
+      body: JSON.stringify(policy),
+    }),
+
+  updateRobinhoodCreatorFees: (
+    agentId: string,
+    body: {
+      feeMode: "WALLET" | "BURN" | "COMPOUND";
+      recipients: Array<{ address: string; bps: number }>;
+    },
+  ) =>
+    req<{
+      transactionHash: string;
+      userOperationHash: string;
+      warning: string | null;
+    }>(`/agents/${agentId}/robinhood/creator-fees`, {
+      method: "PUT",
+      body: JSON.stringify(body),
+    }),
+
+  collectRobinhoodAgentFees: (agentId: string) =>
+    req<{
+      transactionHash: string;
+      userOperationHash: string;
+      launchModule: string;
+      quoteOut: string;
+      tokenOut: string;
+    }>(`/agents/${agentId}/robinhood/fees/collect`, {
+      method: "POST",
+    }),
+
+  tradeRobinhoodAgentToken: (
+    agentId: string,
+    body: {
+      side: "buy" | "sell";
+      amount: string;
+      ownerApproved: boolean;
+      idempotencyKey: string;
+    },
+  ) =>
+    req<{
+      transactionHash: string;
+      userOperationHash: string;
+      quotedOut: string;
+      minOut: string;
+      amountUsd: number;
+      idempotentReplay: boolean;
+    }>(`/agents/${agentId}/robinhood/trade`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  quoteRobinhoodDexSwap: (
+    agentId: string,
+    body: { tokenIn: string; tokenOut: string; amount: string },
+  ) =>
+    req<RobinhoodDexQuote>(`/agents/${agentId}/robinhood/dex/quote`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  executeRobinhoodDexSwap: (
+    agentId: string,
+    body: {
+      tokenIn: string;
+      tokenOut: string;
+      amount: string;
+      idempotencyKey: string;
+      ownerApproved: true;
+    },
+  ) =>
+    req<{
+      transactionHash: string;
+      userOperationHash: string;
+      quote: RobinhoodDexQuote;
+      idempotentReplay: boolean;
+    }>(`/agents/${agentId}/robinhood/dex/swap`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  connectRobinhoodTrading: (agentId: string, returnPath: string) =>
+    req<{ connectorId: string; authorizationUrl: string; expiresAt: string }>(
+      `/agents/${agentId}/robinhood/trading/connect`,
+      { method: "POST", body: JSON.stringify({ returnPath }) },
     ),
 
   getMcpActionInbox: (params: { agentId?: string; status?: string; limit?: number } = {}) => {
