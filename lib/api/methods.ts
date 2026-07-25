@@ -3659,7 +3659,12 @@ export const api = {
 
   tradeRobinhoodAgentToken: (
     agentId: string,
-    body: { side: "buy" | "sell"; amount: string; ownerApproved: boolean },
+    body: {
+      side: "buy" | "sell";
+      amount: string;
+      ownerApproved: boolean;
+      idempotencyKey: string;
+    },
   ) =>
     req<{
       transactionHash: string;
@@ -3667,6 +3672,7 @@ export const api = {
       quotedOut: string;
       minOut: string;
       amountUsd: number;
+      idempotentReplay: boolean;
     }>(`/agents/${agentId}/robinhood/trade`, {
       method: "POST",
       body: JSON.stringify(body),

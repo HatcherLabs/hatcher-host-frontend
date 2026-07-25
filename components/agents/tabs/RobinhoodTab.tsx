@@ -197,6 +197,9 @@ export function RobinhoodTab() {
   >([]);
   const [tradeSide, setTradeSide] = useState<"buy" | "sell">("buy");
   const [tradeAmount, setTradeAmount] = useState("");
+  const [tradeIdempotencyKey, setTradeIdempotencyKey] = useState(
+    newLaunchIdempotencyKey,
+  );
   const [dexTokenIn, setDexTokenIn] = useState("ETH");
   const [dexTokenOut, setDexTokenOut] = useState("");
   const [dexAmount, setDexAmount] = useState("");
@@ -395,9 +398,11 @@ export function RobinhoodTab() {
         side: tradeSide,
         amount: tradeAmount.trim(),
         ownerApproved: true,
+        idempotencyKey: tradeIdempotencyKey,
       });
       if (!response.success)
         throw new Error(response.error || "Onchain trade failed");
+      setTradeIdempotencyKey(newLaunchIdempotencyKey());
       return `${tradeSide === "buy" ? "Buy" : "Sell"} confirmed for approximately $${response.data.amountUsd.toFixed(2)}.`;
     });
 
