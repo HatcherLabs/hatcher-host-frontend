@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Activity,
@@ -11,6 +11,7 @@ import {
   ExternalLink,
   Landmark,
   Loader2,
+  ImageUp,
   Plus,
   RefreshCw,
   ShieldCheck,
@@ -27,7 +28,15 @@ import {
 
 type Section = "overview" | "wallet" | "tokenize" | "trading" | "activity";
 type Busy =
-  "refresh" | "launch" | "policy" | "fees" | "trade" | "brokerage" | null;
+  | "refresh"
+  | "launch"
+  | "media"
+  | "prepare"
+  | "policy"
+  | "fees"
+  | "trade"
+  | "brokerage"
+  | null;
 
 const SECTIONS: Array<{ id: Section; label: string }> = [
   { id: "overview", label: "Overview" },
@@ -36,6 +45,14 @@ const SECTIONS: Array<{ id: Section; label: string }> = [
   { id: "trading", label: "Trading" },
   { id: "activity", label: "Activity" },
 ];
+
+function newLaunchIdempotencyKey() {
+  if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (digit) => {
+    const random = Math.floor(Math.random() * 16);
+    return (digit === "x" ? random : (random & 0x3) | 0x8).toString(16);
+  });
+}
 
 function shortAddress(value: string | null): string {
   return value ? `${value.slice(0, 7)}…${value.slice(-5)}` : "Not provisioned";
@@ -138,6 +155,15 @@ export function RobinhoodTab() {
     "WALLET",
   );
   const [initialBuyEth, setInitialBuyEth] = useState("");
+  const [tokenImageSource, setTokenImageSource] = useState<"agent" | "custom">(
+    "agent",
+  );
+  const [tokenImageUri, setTokenImageUri] = useState("");
+  const [tokenImageName, setTokenImageName] = useState("");
+  const [launchIdempotencyKey, setLaunchIdempotencyKey] = useState(
+    newLaunchIdempotencyKey,
+  );
+  const callbackHandled = useRef(false);
   const [policy, setPolicy] = useState<RobinhoodPolicy | null>(null);
   const [feeRecipients, setFeeRecipients] = useState<
     Array<{ address: string; bps: number }>
@@ -194,6 +220,40 @@ export function RobinhoodTab() {
     void load();
   }, [load]);
 
+  useEffect(() => {
+    if (callbackHandled.current) return;
+    const params = new URLSearchParams(window.location.search);
+    const projectId = params.get("equifoldProjectId");
+    const tokenAddress = params.get("tokenAddress");
+    const transactionHash = params.get("txHash");
+    if (!projectId || !tokenAddress || !transactionHash) return;
+    callbackHandled.current = true;
+    void (async () => {
+      setBusy("prepare");
+      setError(null);
+      const response = await api.confirmEquifoldTokenization(agent.id, {
+        projectId,
+        tokenAddress,
+        transactionHash,
+      });
+      if (response.success) {
+        setNotice(`${projectId} connected to this Hatcher agent.`);
+        params.delete("equifoldProjectId");
+        params.delete("tokenAddress");
+        params.delete("txHash");
+        window.history.replaceState(
+          null,
+          "",
+          `${window.location.pathname}${params.size ? `?${params.toString()}` : ""}`,
+        );
+        await load(false);
+      } else {
+        setError(response.error || "Could not confirm Equifold launch");
+        setBusy(null);
+      }
+    })();
+  }, [agent.id, load]);
+
   const run = async (
     kind: Exclude<Busy, "refresh" | null>,
     action: () => Promise<string>,
@@ -222,15 +282,37 @@ export function RobinhoodTab() {
         ...(initialBuyEth.trim()
           ? { initialBuyEth: initialBuyEth.trim() }
           : {}),
+        ...(tokenImageSource === "custom" && tokenImageUri
+          ? { imageUri: tokenImageUri }
+          : {}),
+        idempotencyKey: launchIdempotencyKey,
         ownerApproved: true,
       });
       if (!response.success)
         throw new Error(response.error || "Equifold agent launch failed");
+      setLaunchIdempotencyKey(newLaunchIdempotencyKey());
       return (
         response.data.warning ??
         `${response.data.projectId} launched by the agent smart account on Equifold Gen ${response.data.launchGeneration}.`
       );
     });
+
+  const uploadTokenImage = async (file: File) => {
+    setBusy("media");
+    setError(null);
+    setNotice(null);
+    const response = await api.uploadEquifoldAgentMedia(agent.id, file);
+    if (!response.success) {
+      setError(response.error || "Could not upload token image");
+      setBusy(null);
+      return;
+    }
+    setTokenImageSource("custom");
+    setTokenImageUri(response.data.uri);
+    setTokenImageName(file.name);
+    setNotice("Image uploaded through Equifold and ready for token metadata.");
+    setBusy(null);
+  };
 
   const savePolicy = () => {
     if (!policy) return;
@@ -253,7 +335,9 @@ export function RobinhoodTab() {
       });
       if (!response.success)
         throw new Error(response.error || "Could not update creator fees");
-      return `Creator fee mode changed to ${feeMode}.`;
+      return response.data.warning
+        ? `Creator fee mode changed to ${feeMode}. ${response.data.warning}`
+        : `Creator fee mode changed to ${feeMode}.`;
     });
 
   const trade = () =>
@@ -290,6 +374,7 @@ export function RobinhoodTab() {
   }
 
   const executable = hub?.chain.accountAbstraction.canExecute === true;
+  const funded = Number(hub?.chain.balances.eth ?? "0") > 0;
   const launched = hub?.tokenization.status === "launched";
   const feeSplitTotal = feeRecipients.reduce(
     (sum, recipient) => sum + recipient.bps,
@@ -349,8 +434,12 @@ export function RobinhoodTab() {
               status={hub?.chain.status ?? "planned"}
             />
             <StatusPill
-              label={executable ? "Execution ready" : "Setup required"}
+              label={executable ? "Relay ready" : "Relay setup required"}
               status={executable ? "ready" : "pending"}
+            />
+            <StatusPill
+              label={funded ? "Wallet funded" : "Funding required"}
+              status={funded ? "ready" : "pending"}
             />
             <StatusPill
               label={
@@ -389,6 +478,12 @@ export function RobinhoodTab() {
       {!executable && hub?.chain.accountAbstraction.blocker ? (
         <div className="rounded-xl border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-4 py-3 text-sm text-[var(--color-warning)]">
           {hub.chain.accountAbstraction.blocker}
+        </div>
+      ) : null}
+      {executable && !funded ? (
+        <div className="rounded-xl border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-4 py-3 text-sm text-[var(--color-warning)]">
+          The relay is available, but the agent wallet has no native ETH for the
+          launch fee, initial buy, or self-funded gas.
         </div>
       ) : null}
 
@@ -538,7 +633,7 @@ export function RobinhoodTab() {
                 }
                 detail={
                   hub?.chain.accountAbstraction.gasSponsored
-                    ? "Hatcher paymaster policy"
+                    ? "Hatcher covers eligible gas only"
                     : "Paid from agent ETH balance"
                 }
               />
@@ -775,6 +870,62 @@ export function RobinhoodTab() {
                   className={`${fieldClass} resize-y`}
                 />
               </label>
+              <div className="sm:col-span-2">
+                <p className="text-xs font-medium text-[var(--text-secondary)]">
+                  Token image
+                </p>
+                <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTokenImageSource("agent");
+                      setTokenImageUri("");
+                      setTokenImageName("");
+                    }}
+                    className={`rounded-xl border p-3 text-left text-xs ${
+                      tokenImageSource === "agent"
+                        ? "border-[var(--accent)] bg-[var(--control-active)] text-[var(--text-primary)]"
+                        : "border-[var(--border-default)] text-[var(--text-secondary)]"
+                    }`}
+                  >
+                    <span className="font-semibold">Use agent avatar</span>
+                    <span className="mt-1 block">
+                      Hatcher downloads it safely and uploads it through
+                      Equifold&apos;s media/IPFS pipeline.
+                    </span>
+                  </button>
+                  <label
+                    className={`cursor-pointer rounded-xl border p-3 text-left text-xs ${
+                      tokenImageSource === "custom"
+                        ? "border-[var(--accent)] bg-[var(--control-active)] text-[var(--text-primary)]"
+                        : "border-[var(--border-default)] text-[var(--text-secondary)]"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2 font-semibold">
+                      {busy === "media" ? (
+                        <Loader2 size={14} className="animate-spin" />
+                      ) : (
+                        <ImageUp size={14} />
+                      )}
+                      Upload custom image
+                    </span>
+                    <span className="mt-1 block truncate">
+                      {tokenImageName || "PNG, JPEG, WebP, or GIF · up to 8 MB"}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp,image/gif"
+                      className="sr-only"
+                      disabled={busy === "media"}
+                      onChange={(event) => {
+                        const file = event.target.files?.[0];
+                        if (file) void uploadTokenImage(file);
+                        event.currentTarget.value = "";
+                      }}
+                    />
+                  </label>
+                </div>
+              </div>
             </div>
             <div className="mt-4 grid gap-2 sm:grid-cols-3">
               {(["WALLET", "BURN", "COMPOUND"] as const).map((mode) => (
@@ -802,8 +953,10 @@ export function RobinhoodTab() {
                 disabled={
                   busy === "launch" ||
                   !executable ||
+                  !funded ||
                   !tokenName.trim() ||
                   !tokenSymbol.trim() ||
+                  (tokenImageSource === "custom" && !tokenImageUri) ||
                   (venue === "stock" && !stockAsset)
                 }
                 className={`mt-5 ${primaryButton}`}
@@ -935,6 +1088,7 @@ export function RobinhoodTab() {
                   disabled={
                     busy === "fees" ||
                     !executable ||
+                    hub?.tokenization.creatorConfigLocked ||
                     (feeMode === "WALLET" &&
                       (feeSplitTotal !== 10_000 ||
                         feeRecipients.some(
@@ -950,6 +1104,17 @@ export function RobinhoodTab() {
                   )}{" "}
                   Apply onchain
                 </button>
+                {hub?.tokenization.creatorConfigLocked ? (
+                  <p className="mt-3 text-xs text-[var(--text-muted)]">
+                    The creator&apos;s one configuration change has been used.
+                    Equifold admins retain the protocol override.
+                  </p>
+                ) : (
+                  <p className="mt-3 text-xs text-[var(--text-muted)]">
+                    Equifold allows the creator one post-launch fee
+                    configuration change.
+                  </p>
+                )}
                 {hub?.tokenization.launchUrl ? (
                   <a
                     href={hub.tokenization.launchUrl}

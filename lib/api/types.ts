@@ -894,6 +894,7 @@ export interface RobinhoodHub {
     launchGeneration: number | null;
     feeMode: "WALLET" | "BURN" | "COMPOUND";
     creatorFeeSplit: Array<{ address: string; bps: number }>;
+    creatorConfigLocked: boolean;
     ownerApprovedAt: string | null;
     creatorVerifiedAt: string | null;
     launchedAt: string | null;
@@ -971,6 +972,8 @@ export interface LaunchEquifoldAgentTokenBody {
   stockAsset?: string;
   feeMode: "WALLET" | "BURN" | "COMPOUND";
   initialBuyEth?: string;
+  imageUri?: string;
+  idempotencyKey: string;
   ownerApproved: true;
 }
 

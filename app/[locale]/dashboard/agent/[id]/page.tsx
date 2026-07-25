@@ -219,7 +219,7 @@ export default function AgentManagePage() {
   const [ownedAgentsLoading, setOwnedAgentsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const statusPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const validTabs: Tab[] = ['overview','config','integrations','connectors','skills','plugins','files','logs','terminal','dev','memory','sessions','knowledge','schedules','workflows','chat','mail','stats','wallet'];
+  const validTabs: Tab[] = ['overview','config','integrations','connectors','skills','plugins','files','logs','terminal','dev','memory','sessions','knowledge','schedules','workflows','chat','mail','stats','wallet','robinhood'];
   // 'skills' kept in validTabs for backwards compat (deep links), but redirects to plugins tab
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
   const rawTab = searchParams.get('tab');

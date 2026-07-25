@@ -3723,6 +3723,36 @@ export const api = {
       },
     ),
 
+  uploadEquifoldAgentMedia: async (agentId: string, file: File) => {
+    const token = getToken();
+    const headers: Record<string, string> = { "Content-Type": file.type };
+    if (token) headers.Authorization = `Bearer ${token}`;
+    try {
+      const response = await fetch(
+        `${API_URL}/agents/${agentId}/robinhood/media`,
+        {
+          method: "POST",
+          headers,
+          body: file,
+          credentials: "include",
+        },
+      );
+      const payload = (await response.json().catch(() => null)) as
+        | { success: true; data: { uri: string; contentType: string } }
+        | { success: false; error: string }
+        | null;
+      if (!response.ok || !payload) {
+        return {
+          success: false as const,
+          error: `Image upload failed (${response.status})`,
+        };
+      }
+      return payload;
+    } catch {
+      return { success: false as const, error: "Image upload failed" };
+    }
+  },
+
   launchEquifoldAgentToken: (
     agentId: string,
     body: LaunchEquifoldAgentTokenBody,
@@ -3758,10 +3788,14 @@ export const api = {
       recipients: Array<{ address: string; bps: number }>;
     },
   ) =>
-    req<{ transactionHash: string; userOperationHash: string }>(
-      `/agents/${agentId}/robinhood/creator-fees`,
-      { method: "PUT", body: JSON.stringify(body) },
-    ),
+    req<{
+      transactionHash: string;
+      userOperationHash: string;
+      warning: string | null;
+    }>(`/agents/${agentId}/robinhood/creator-fees`, {
+      method: "PUT",
+      body: JSON.stringify(body),
+    }),
 
   tradeRobinhoodAgentToken: (
     agentId: string,
