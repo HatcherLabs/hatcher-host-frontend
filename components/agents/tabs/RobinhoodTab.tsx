@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Activity,
+  ArrowDownUp,
   Bot,
   Check,
   CircleDollarSign,
@@ -18,7 +19,12 @@ import {
   Trash2,
   Wallet,
 } from "lucide-react";
-import { api, type RobinhoodHub, type RobinhoodPolicy } from "@/lib/api";
+import {
+  api,
+  type RobinhoodDexQuote,
+  type RobinhoodHub,
+  type RobinhoodPolicy,
+} from "@/lib/api";
 import {
   GlassCard,
   Skeleton,
@@ -36,6 +42,8 @@ type Busy =
   | "fees"
   | "collect"
   | "trade"
+  | "dexQuote"
+  | "dexSwap"
   | "brokerage"
   | null;
 
@@ -132,6 +140,7 @@ const primaryButton =
   "inline-flex h-10 items-center gap-2 rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--accent-foreground)] disabled:opacity-50";
 const COMPLETE_POSITIVE_DECIMAL = /^(?:0|[1-9]\d*)(?:\.\d{1,18})?$/;
 const EDITABLE_DECIMAL = /^(?:0|[1-9]\d*)?(?:\.\d{0,18})?$/;
+const EVM_ADDRESS = /^0x[0-9a-fA-F]{40}$/;
 
 function decimalInput(value: string): string | null {
   const normalized = value.replace(",", ".");
@@ -140,6 +149,11 @@ function decimalInput(value: string): string | null {
 
 function isPositiveDecimal(value: string): boolean {
   return COMPLETE_POSITIVE_DECIMAL.test(value) && Number(value) > 0;
+}
+
+function isDexToken(value: string): boolean {
+  const trimmed = value.trim();
+  return trimmed.toUpperCase() === "ETH" || EVM_ADDRESS.test(trimmed);
 }
 
 export function RobinhoodTab() {
@@ -176,12 +190,20 @@ export function RobinhoodTab() {
     newLaunchIdempotencyKey,
   );
   const callbackHandled = useRef(false);
+  const dexDefaultsSet = useRef(false);
   const [policy, setPolicy] = useState<RobinhoodPolicy | null>(null);
   const [feeRecipients, setFeeRecipients] = useState<
     Array<{ address: string; bps: number }>
   >([]);
   const [tradeSide, setTradeSide] = useState<"buy" | "sell">("buy");
   const [tradeAmount, setTradeAmount] = useState("");
+  const [dexTokenIn, setDexTokenIn] = useState("ETH");
+  const [dexTokenOut, setDexTokenOut] = useState("");
+  const [dexAmount, setDexAmount] = useState("");
+  const [dexQuote, setDexQuote] = useState<RobinhoodDexQuote | null>(null);
+  const [dexIdempotencyKey, setDexIdempotencyKey] = useState(
+    newLaunchIdempotencyKey,
+  );
 
   const load = useCallback(
     async (showLoader = true) => {
@@ -193,6 +215,13 @@ export function RobinhoodTab() {
           throw new Error(response.error || "Failed to load Robinhood hub");
         setHub(response.data);
         setPolicy(response.data.chain.policy);
+        if (!dexDefaultsSet.current) {
+          setDexTokenOut(
+            response.data.tokenization.tokenAddress ??
+              response.data.chain.assets.usdg,
+          );
+          dexDefaultsSet.current = true;
+        }
         setFeeMode(response.data.tokenization.feeMode);
         if (
           response.data.tokenization.launchVenue === "weth" ||
@@ -372,6 +401,55 @@ export function RobinhoodTab() {
       return `${tradeSide === "buy" ? "Buy" : "Sell"} confirmed for approximately $${response.data.amountUsd.toFixed(2)}.`;
     });
 
+  const quoteDexSwap = async () => {
+    setBusy("dexQuote");
+    setError(null);
+    setNotice(null);
+    setDexQuote(null);
+    try {
+      const response = await api.quoteRobinhoodDexSwap(agent.id, {
+        tokenIn: dexTokenIn.trim(),
+        tokenOut: dexTokenOut.trim(),
+        amount: dexAmount.trim(),
+      });
+      if (!response.success)
+        throw new Error(response.error || "Could not quote this route");
+      setDexQuote(response.data);
+      setDexIdempotencyKey(newLaunchIdempotencyKey());
+    } catch (quoteError) {
+      setError((quoteError as Error).message);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const executeDexSwap = async () => {
+    if (!dexQuote) return;
+    setBusy("dexSwap");
+    setError(null);
+    setNotice(null);
+    try {
+      const response = await api.executeRobinhoodDexSwap(agent.id, {
+        tokenIn: dexTokenIn.trim(),
+        tokenOut: dexTokenOut.trim(),
+        amount: dexAmount.trim(),
+        idempotencyKey: dexIdempotencyKey,
+        ownerApproved: true,
+      });
+      if (!response.success)
+        throw new Error(response.error || "Onchain swap failed");
+      setNotice(
+        `Swap confirmed: ${response.data.quote.amountIn} ${response.data.quote.tokenIn.symbol} → approximately ${response.data.quote.amountOut} ${response.data.quote.tokenOut.symbol}.`,
+      );
+      setDexQuote(null);
+      setDexIdempotencyKey(newLaunchIdempotencyKey());
+      await load(false);
+    } catch (swapError) {
+      setError((swapError as Error).message);
+      setBusy(null);
+    }
+  };
+
   const connectBrokerage = () =>
     run("brokerage", async () => {
       const returnPath = `${window.location.pathname}?tab=robinhood`;
@@ -399,6 +477,11 @@ export function RobinhoodTab() {
   const initialBuyValid =
     initialBuyEth.trim() === "" || isPositiveDecimal(initialBuyEth.trim());
   const tradeAmountValid = isPositiveDecimal(tradeAmount.trim());
+  const dexFormValid =
+    isDexToken(dexTokenIn) &&
+    isDexToken(dexTokenOut) &&
+    dexTokenIn.trim().toLowerCase() !== dexTokenOut.trim().toLowerCase() &&
+    isPositiveDecimal(dexAmount.trim());
   const feeSplitTotal = feeRecipients.reduce(
     (sum, recipient) => sum + recipient.bps,
     0,
@@ -694,6 +777,25 @@ export function RobinhoodTab() {
                   }
                 />
               </label>
+              <label className="mt-3 flex items-center justify-between gap-4 text-sm text-[var(--text-secondary)]">
+                Allow routed DEX swaps
+                <input
+                  type="checkbox"
+                  checked={policy.allowedActions.includes("dex_swap")}
+                  onChange={(event) =>
+                    setPolicy({
+                      ...policy,
+                      allowedActions: event.target.checked
+                        ? Array.from(
+                            new Set([...policy.allowedActions, "dex_swap"]),
+                          )
+                        : policy.allowedActions.filter(
+                            (action) => action !== "dex_swap",
+                          ),
+                    })
+                  }
+                />
+              </label>
               <div className="mt-3 grid grid-cols-2 gap-3">
                 <label className="text-xs text-[var(--text-secondary)]">
                   Max trade USD
@@ -742,6 +844,22 @@ export function RobinhoodTab() {
                   />
                 </label>
                 <label className="text-xs text-[var(--text-secondary)]">
+                  Max price impact bps
+                  <input
+                    type="number"
+                    min="1"
+                    max="10000"
+                    value={policy.maxPriceImpactBps}
+                    onChange={(event) =>
+                      setPolicy({
+                        ...policy,
+                        maxPriceImpactBps: Number(event.target.value),
+                      })
+                    }
+                    className={fieldClass}
+                  />
+                </label>
+                <label className="text-xs text-[var(--text-secondary)]">
                   Approval above USD
                   <input
                     type="number"
@@ -759,6 +877,11 @@ export function RobinhoodTab() {
                   />
                 </label>
               </div>
+              <p className="mt-3 text-[11px] leading-4 text-[var(--text-muted)]">
+                An empty token allowlist permits any contract address selected
+                by the owner or agent. Every route is still bounded by trade,
+                daily, slippage, and price-impact limits.
+              </p>
               <div className="mt-3 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-2.5">
                 <p className="text-xs font-medium text-[var(--text-secondary)]">
                   Creator-fee control
@@ -1192,6 +1315,195 @@ export function RobinhoodTab() {
 
       {section === "trading" ? (
         <div className="grid gap-4 lg:grid-cols-2">
+          <GlassCard className="lg:col-span-2">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <ArrowDownUp size={18} className="text-[var(--accent)]" />
+                <div>
+                  <h3 className="text-sm font-semibold text-[var(--text-primary)]">
+                    Open DEX swap
+                  </h3>
+                  <p className="text-xs text-[var(--text-muted)]">
+                    Enter any Robinhood Chain token contract. Hatcher routes
+                    executable SushiSwap and Uniswap liquidity.
+                  </p>
+                </div>
+              </div>
+              <StatusPill
+                label={
+                  hub?.dex.available
+                    ? "Arbitrary tokens enabled"
+                    : "Mainnet unavailable"
+                }
+                status={hub?.dex.available ? "ready" : "pending"}
+              />
+            </div>
+            <div className="mt-5 grid gap-3 md:grid-cols-[minmax(0,1fr)_44px_minmax(0,1fr)] md:items-end">
+              <label className="text-xs font-medium text-[var(--text-secondary)]">
+                Pay token
+                <input
+                  value={dexTokenIn}
+                  autoComplete="off"
+                  spellCheck={false}
+                  placeholder="ETH or 0x…"
+                  onChange={(event) => {
+                    setDexTokenIn(event.target.value);
+                    setDexQuote(null);
+                  }}
+                  className={`${fieldClass} font-mono`}
+                />
+              </label>
+              <button
+                type="button"
+                aria-label="Swap input and output tokens"
+                onClick={() => {
+                  setDexTokenIn(dexTokenOut);
+                  setDexTokenOut(dexTokenIn);
+                  setDexQuote(null);
+                }}
+                className="mb-0.5 flex h-10 items-center justify-center rounded-lg border border-[var(--border-default)] text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"
+              >
+                <ArrowDownUp size={15} />
+              </button>
+              <label className="text-xs font-medium text-[var(--text-secondary)]">
+                Receive token
+                <input
+                  value={dexTokenOut}
+                  autoComplete="off"
+                  spellCheck={false}
+                  placeholder="0x token contract"
+                  onChange={(event) => {
+                    setDexTokenOut(event.target.value);
+                    setDexQuote(null);
+                  }}
+                  className={`${fieldClass} font-mono`}
+                />
+              </label>
+            </div>
+            <div className="mt-3 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+              <label className="text-xs font-medium text-[var(--text-secondary)]">
+                Exact input amount
+                <input
+                  value={dexAmount}
+                  inputMode="decimal"
+                  autoComplete="off"
+                  spellCheck={false}
+                  placeholder="0.01"
+                  onChange={(event) => {
+                    const value = decimalInput(event.target.value);
+                    if (value !== null) {
+                      setDexAmount(value);
+                      setDexQuote(null);
+                    }
+                  }}
+                  className={fieldClass}
+                />
+              </label>
+              <button
+                type="button"
+                onClick={() => void quoteDexSwap()}
+                disabled={
+                  busy === "dexQuote" ||
+                  busy === "dexSwap" ||
+                  !hub?.dex.available ||
+                  !dexFormValid
+                }
+                className={primaryButton}
+              >
+                {busy === "dexQuote" ? (
+                  <Loader2 size={15} className="animate-spin" />
+                ) : (
+                  <RefreshCw size={15} />
+                )}
+                Get executable quote
+              </button>
+            </div>
+            <p className="mt-3 text-[11px] leading-4 text-[var(--text-muted)]">
+              No curated token list is used. Confirm contract addresses
+              independently—symbols and names are display metadata, not token
+              identity.
+            </p>
+            {dexQuote ? (
+              <div className="mt-5 rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)] p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-medium text-[var(--text-muted)]">
+                      Fresh route
+                    </p>
+                    <p className="mt-1 text-lg font-semibold text-[var(--text-primary)]">
+                      {dexQuote.amountIn} {dexQuote.tokenIn.symbol} →{" "}
+                      {Number(dexQuote.amountOut).toLocaleString(undefined, {
+                        maximumFractionDigits: 8,
+                      })}{" "}
+                      {dexQuote.tokenOut.symbol}
+                    </p>
+                  </div>
+                  <StatusPill
+                    label={
+                      dexQuote.canExecuteWithOwnerApproval
+                        ? "Executable"
+                        : "Blocked by policy"
+                    }
+                    status={
+                      dexQuote.canExecuteWithOwnerApproval ? "ready" : "pending"
+                    }
+                  />
+                </div>
+                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                  <MetricCard
+                    label="Input value"
+                    value={`$${dexQuote.amountUsd.toLocaleString(undefined, { maximumFractionDigits: 2 })}`}
+                    detail="Policy accounting value"
+                  />
+                  <MetricCard
+                    label="Price impact"
+                    value={`${(dexQuote.priceImpactBps / 100).toFixed(2)}%`}
+                    detail={`Owner max ${(dexQuote.maxPriceImpactBps / 100).toFixed(2)}%`}
+                  />
+                  <MetricCard
+                    label="Liquidity"
+                    value={
+                      dexQuote.liquidityProviders.length
+                        ? dexQuote.liquidityProviders.join(" + ")
+                        : "Aggregated"
+                    }
+                    detail={`Max slippage ${dexQuote.maxSlippageBps / 100}%`}
+                  />
+                </div>
+                {dexQuote.blockers.length ? (
+                  <div className="mt-4 rounded-lg border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-3 py-2 text-xs text-[var(--color-warning)]">
+                    {dexQuote.blockers.join(" · ")}
+                  </div>
+                ) : null}
+                <div className="mt-4 flex flex-wrap items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => void executeDexSwap()}
+                    disabled={
+                      busy === "dexSwap" ||
+                      !executable ||
+                      !dexQuote.canExecuteWithOwnerApproval
+                    }
+                    className={primaryButton}
+                  >
+                    {busy === "dexSwap" ? (
+                      <Loader2 size={15} className="animate-spin" />
+                    ) : (
+                      <Activity size={15} />
+                    )}
+                    Approve & execute swap
+                  </button>
+                  <p className="text-xs text-[var(--text-muted)]">
+                    {dexQuote.ownerApprovalRequired
+                      ? "Above the autonomous threshold; this owner action supplies explicit approval."
+                      : dexQuote.canExecuteAutonomously
+                        ? "The agent can execute the same route autonomously under this policy."
+                        : "Owner policy must permit the route before execution."}
+                  </p>
+                </div>
+              </div>
+            ) : null}
+          </GlassCard>
           <GlassCard>
             <div className="flex items-center gap-3">
               <Bot size={18} className="text-[var(--accent)]" />

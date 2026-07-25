@@ -78,6 +78,8 @@ export type {
   McpConnectorTransport,
   RobinhoodHub,
   RobinhoodPolicy,
+  RobinhoodDexQuote,
+  RobinhoodDexToken,
   LaunchEquifoldAgentTokenBody,
   PrepareEquifoldTokenizationBody,
   ConfirmEquifoldTokenizationBody,

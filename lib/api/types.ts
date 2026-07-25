@@ -907,6 +907,14 @@ export interface RobinhoodHub {
     lastCheckedAt: string | null;
     lastError: string | null;
   };
+  dex: {
+    available: boolean;
+    provider: string;
+    routeProcessor: string;
+    tokenSelection: "arbitrary";
+    supportedLiquidity: string[];
+    mainnetOnly: boolean;
+  };
   actions: Array<{
     id: string;
     action: string;
@@ -945,10 +953,41 @@ export interface RobinhoodPolicy {
   maxTradeUsd: number;
   dailyLimitUsd: number;
   maxSlippageBps: number;
+  maxPriceImpactBps: number;
   requireOwnerApprovalAboveUsd: number;
-  allowedActions: Array<"equifold_buy" | "equifold_sell">;
+  allowedActions: Array<"equifold_buy" | "equifold_sell" | "dex_swap">;
   allowedTokens: string[];
   creatorFeeManagement: "owner_only" | "agent_within_policy";
+}
+
+export interface RobinhoodDexToken {
+  address: string;
+  apiAddress: string;
+  symbol: string;
+  name: string;
+  decimals: number;
+  native: boolean;
+}
+
+export interface RobinhoodDexQuote {
+  provider: "sushi-route-processor";
+  routeProcessor: string;
+  tokenIn: RobinhoodDexToken;
+  tokenOut: RobinhoodDexToken;
+  amountIn: string;
+  amountOut: string;
+  amountInRaw: string;
+  amountOutRaw: string;
+  amountUsd: number;
+  swapPrice: number;
+  priceImpactBps: number;
+  maxSlippageBps: number;
+  maxPriceImpactBps: number;
+  liquidityProviders: string[];
+  ownerApprovalRequired: boolean;
+  canExecuteAutonomously: boolean;
+  canExecuteWithOwnerApproval: boolean;
+  blockers: string[];
 }
 
 export interface PrepareEquifoldTokenizationBody {

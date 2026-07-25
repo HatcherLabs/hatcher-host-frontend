@@ -44,6 +44,7 @@ import type {
   McpActionRequest,
   RobinhoodHub,
   RobinhoodPolicy,
+  RobinhoodDexQuote,
   LaunchEquifoldAgentTokenBody,
   PrepareEquifoldTokenizationBody,
   ConfirmEquifoldTokenizationBody,
@@ -3819,6 +3820,35 @@ export const api = {
       minOut: string;
       amountUsd: number;
     }>(`/agents/${agentId}/robinhood/trade`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  quoteRobinhoodDexSwap: (
+    agentId: string,
+    body: { tokenIn: string; tokenOut: string; amount: string },
+  ) =>
+    req<RobinhoodDexQuote>(`/agents/${agentId}/robinhood/dex/quote`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  executeRobinhoodDexSwap: (
+    agentId: string,
+    body: {
+      tokenIn: string;
+      tokenOut: string;
+      amount: string;
+      idempotencyKey: string;
+      ownerApproved: true;
+    },
+  ) =>
+    req<{
+      transactionHash: string;
+      userOperationHash: string;
+      quote: RobinhoodDexQuote;
+      idempotentReplay: boolean;
+    }>(`/agents/${agentId}/robinhood/dex/swap`, {
       method: "POST",
       body: JSON.stringify(body),
     }),
