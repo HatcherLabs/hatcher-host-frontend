@@ -50,12 +50,7 @@ export type SolanaPaymentToken = "sol" | "hatch" | "usdc" | "kausa" | "ansem";
 
 export type SolanaPaymentTarget =
   | { kind: "tier"; key: string; billingPeriod?: "monthly" | "annual" }
-  | {
-      kind: "addon";
-      key: string;
-      billingPeriod?: "monthly" | "annual";
-      agentId?: string;
-    };
+  | { kind: "addon"; key: string; billingPeriod?: "monthly" | "annual"; agentId?: string };
 
 export type SolanaPaymentIntentRequest = SolanaPaymentTarget & {
   paymentToken: SolanaPaymentToken;
@@ -380,7 +375,11 @@ export type MissionTaskStatus =
   | "rejected";
 
 export type MissionRunStatus =
-  "queued" | "running" | "completed" | "failed" | "cancelled";
+  | "queued"
+  | "running"
+  | "completed"
+  | "failed"
+  | "cancelled";
 
 export type MissionApprovalStatus = "pending" | "approved" | "rejected";
 
@@ -515,7 +514,10 @@ export interface CreateMissionTaskBody {
 }
 
 export type CityOperationalAgentStatus =
-  "running" | "sleeping" | "paused" | "crashed";
+  | "running"
+  | "sleeping"
+  | "paused"
+  | "crashed";
 
 export interface CityOperationsSummary {
   agents: {
@@ -693,7 +695,7 @@ export interface LaunchOutcomePackResponse {
   task: OutcomePackLaunchTask;
   requiredSkills: Array<{ name: string; status: string }>;
   schedulesActivated: boolean;
-  recurrence: Omit<OutcomePackRecurrence, "agent" | "pack"> | null;
+  recurrence: Omit<OutcomePackRecurrence, 'agent' | 'pack'> | null;
   start: { method: string; path: string };
 }
 
@@ -809,7 +811,7 @@ export interface CreateCovenantConnectorResponse {
 }
 
 export type McpConnectorTransport = "streamable_http" | "sse";
-export type McpConnectorAuthType = "none" | "bearer" | "oauth";
+export type McpConnectorAuthType = "none" | "bearer";
 export type McpConnectorApprovalMode = "auto" | "prompt" | "approve";
 
 export interface McpConnectorTool {
@@ -1042,8 +1044,7 @@ export interface McpActionRequest {
   argumentsHash: string;
   argumentsPreview: unknown;
   approvalMode: McpConnectorApprovalMode;
-  authorization:
-    "pending" | "once" | "tool" | "grant" | "auto" | "rejected" | string;
+  authorization: "pending" | "once" | "tool" | "grant" | "auto" | "rejected" | string;
   status: McpActionStatus;
   failureMessage: string | null;
   expiresAt: string | null;
@@ -1337,14 +1338,13 @@ export interface VirtualsHatcherService {
   id: string;
   title: string;
   summary: string;
-  category:
-    "execution" | "review" | "launch" | "data" | "integration" | "evaluation";
-  providerName: "HatcherLabs";
+  category: 'execution' | 'review' | 'launch' | 'data' | 'integration' | 'evaluation';
+  providerName: 'HatcherLabs';
   providerWalletAddress: string | null;
   providerConsoleAgentId: string | null;
   offeringName: string;
   priceValue: number;
-  priceType: "fixed";
+  priceType: 'fixed';
   slaMinutes: number;
   publishable: boolean;
   idealFor: string[];
@@ -1359,7 +1359,7 @@ export interface VirtualsHatcherService {
     name: string;
     description: string;
     priceValue: number;
-    priceType: "fixed";
+    priceType: 'fixed';
     slaMinutes: number;
     requirement: Record<string, unknown>;
     deliverable: Record<string, unknown>;
@@ -1550,7 +1550,7 @@ export interface VirtualsAcpProviderResponseBody {
 export interface VirtualsAcpProviderResponseResult {
   dryRun: boolean;
   results: Array<{
-    action: "set-budget" | "submit";
+    action: 'set-budget' | 'submit';
     executed: boolean;
     command?: VirtualsAcpCliCommand;
     stdout?: string;
@@ -1605,19 +1605,9 @@ export interface VantaraCapabilityRegistration {
     vantaraBps: number;
   };
   callbackUrl: string;
-  status:
-    | "draft"
-    | "pending_registration"
-    | "pending_update"
-    | "live"
-    | "paused"
-    | "deleted"
-    | "suspended"
-    | "failed"
-    | string;
+  status: "draft" | "pending_registration" | "pending_update" | "live" | "paused" | "deleted" | "suspended" | "failed" | string;
   mode: "escrow" | "pay_then_serve" | "free" | string;
-  acceptanceStatus:
-    "not_started" | "pending_acceptance" | "accepted" | "failed" | string;
+  acceptanceStatus: "not_started" | "pending_acceptance" | "accepted" | "failed" | string;
   acceptanceRequestId: string | null;
   selfServeManaged?: boolean;
   metadata: Record<string, unknown>;
@@ -1724,8 +1714,7 @@ export interface VantaraHermesInvokeResponse {
   };
 }
 
-export type MetaplexConfigStatusValue =
-  "disabled" | "wallet-missing" | "metadata-ready" | "registered";
+export type MetaplexConfigStatusValue = "disabled" | "wallet-missing" | "metadata-ready" | "registered";
 
 export interface MetaplexAgentService {
   name: "web" | "A2A" | "MCP" | "Hatcher API" | string;
@@ -2021,12 +2010,10 @@ export interface MetaplexRegistrationResponse {
 }
 
 export type MirariRuntime = "hermes";
-export type MirariSignalKind =
-  "drift" | "contradiction" | "skill_misfire" | "focus_hit" | "judge_score";
+export type MirariSignalKind = "drift" | "contradiction" | "skill_misfire" | "focus_hit" | "judge_score";
 export type MirariDreamMode = "stress_test" | "replay" | "consolidate";
 export type MirariDreamTrigger = "manual" | "idle" | "scheduled";
-export type MirariDreamFindingKind =
-  "weakness" | "insight" | "contradiction" | "proposal";
+export type MirariDreamFindingKind = "weakness" | "insight" | "contradiction" | "proposal";
 export type MirariDreamFindingSeverity = "low" | "medium" | "high";
 
 export interface MirariConfigStatus {
@@ -2506,7 +2493,9 @@ export interface KausalayerResourcesResponse {
 export type AgentPassportNetworkId = "skale" | "base" | "solana";
 export type AgentPassportChainType = "evm" | "solana";
 export type AgentPassportSignerMode =
-  "receive-only" | "runtime-signing" | "planned";
+  | "receive-only"
+  | "runtime-signing"
+  | "planned";
 export type AgentPassportTradingStatus = "enabled" | "disabled";
 export type AgentPassportStatus =
   | "registered"
@@ -2962,34 +2951,14 @@ export interface AdminOobeOverviewResponse {
 }
 
 export type AdminHealthResponse = {
-  api: {
-    status: string;
-    uptime: number;
-    memory: { used: number; total: number };
-  };
+  api: { status: string; uptime: number; memory: { used: number; total: number } };
   database: { status: string; connectionCount: number };
   redis: { status: string; usedMemory: string; connectedClients: number };
-  docker: {
-    status: string;
-    containersRunning: number;
-    containersTotal: number;
-  };
-  services: Array<{
-    name: string;
-    status: string;
-    uptime: string;
-    restarts: number;
-  }>;
+  docker: { status: string; containersRunning: number; containersTotal: number };
+  services: Array<{ name: string; status: string; uptime: string; restarts: number }>;
   disk: { used: string; total: string; percent: number };
   ram: { total: string; used: string; available: string; percent: number };
-  cpu: {
-    cores: number;
-    model: string;
-    load1m: string;
-    load5m: string;
-    load15m: string;
-    percent: number;
-  };
+  cpu: { cores: number; model: string; load1m: string; load5m: string; load15m: string; percent: number };
   emailOutbox: {
     pending: number;
     processing: number;
