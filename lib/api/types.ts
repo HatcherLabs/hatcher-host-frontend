@@ -975,6 +975,8 @@ export interface PublicTraderData {
       balance: string | null;
       decimals: number;
       kind: "native" | "weth" | "stable" | "agent-token" | "tracked";
+      priceUsd: string | null;
+      priceSource: "live" | "stable" | "last-trade" | "unpriced";
       usdValue: string | null;
     }>;
   };
@@ -1038,6 +1040,56 @@ export interface PublicTraderData {
     timestamp: string;
     source: "curve" | "pool";
   }>;
+  trading: {
+    summary: {
+      portfolioValueUsd: string | null;
+      volume24hUsd: string | null;
+      volumeAllTimeUsd: string | null;
+      trades24h: number;
+      tradesAllTime: number;
+      realizedPnlUsd: string | null;
+      unrealizedPnlUsd: string | null;
+      totalPnlUsd: string | null;
+    };
+    positions: Array<{
+      address: string | null;
+      symbol: string;
+      name: string | null;
+      balance: string;
+      trackedQuantity: string | null;
+      priceUsd: string | null;
+      priceSource: "live" | "stable" | "last-trade" | "unpriced";
+      marketValueUsd: string | null;
+      costBasisUsd: string | null;
+      realizedPnlUsd: string | null;
+      unrealizedPnlUsd: string | null;
+      totalPnlUsd: string | null;
+      tradeCount: number;
+    }>;
+    trades: Array<{
+      id: string;
+      action: string;
+      side: "BUY" | "SELL" | "SWAP";
+      pair: string;
+      tokenIn: {
+        address: string | null;
+        symbol: string;
+        name: string | null;
+        amount: string;
+      };
+      tokenOut: {
+        address: string | null;
+        symbol: string;
+        name: string | null;
+        amount: string;
+      };
+      volumeUsd: string | null;
+      priceImpactBps: number | null;
+      transactionHash: string | null;
+      publicThesis: string | null;
+      createdAt: string;
+    }>;
+  };
   activity: Array<{
     id: string;
     action: string;
