@@ -899,6 +899,7 @@ export interface RobinhoodHub {
     creatorConfigLocked: boolean;
     ownerApprovedAt: string | null;
     creatorVerifiedAt: string | null;
+    publicTraderPageEnabled: boolean;
     launchedAt: string | null;
   };
   trading: {
@@ -947,6 +948,110 @@ export interface RobinhoodHub {
       priceUsd18: string | null;
     }>;
   };
+}
+
+export interface PublicTraderData {
+  agent: {
+    id: string;
+    slug: string;
+    name: string;
+    description: string | null;
+    avatarUrl: string | null;
+    framework: string;
+    status: string;
+    ownerUsername: string | null;
+    createdAt: string;
+  };
+  chain: {
+    name: string;
+    chainId: number;
+    explorerUrl: string;
+    walletAddress: string | null;
+    accountStatus: string;
+    accountType: string;
+    autonomousTradingEnabled: boolean;
+    balances: Array<{
+      address: string | null;
+      symbol: string;
+      name: string | null;
+      balance: string | null;
+      decimals: number;
+      kind: "native" | "weth" | "stable" | "agent-token" | "tracked";
+      usdValue: string | null;
+    }>;
+  };
+  tokenization: {
+    projectId: string;
+    tokenAddress: string;
+    creatorAddress: string | null;
+    transactionHash: string | null;
+    launchUrl: string;
+    launchVenue: string | null;
+    launchGeneration: number | null;
+    feeMode: "WALLET" | "BURN" | "COMPOUND";
+    launchedAt: string | null;
+    creatorVerifiedAt: string;
+  };
+  token: {
+    projectId: string;
+    tokenAddress: string;
+    name: string;
+    symbol: string;
+    status: string;
+    launchKind: string;
+    dexVenue: string | null;
+    totalSupply: string;
+    realEthReserve: string;
+    pairedPrincipal: string;
+    marketCapEth: string;
+    volume24hEth: string;
+    totalVolumeEth: string;
+    holderCount: number;
+    buyCount: number;
+    sellCount: number;
+    updatedAt: string | null;
+  } | null;
+  market: {
+    available: boolean;
+    priceUsd: string | null;
+    marketCapUsd: string | null;
+    volume24hUsd: string | null;
+    totalVolumeUsd?: string | null;
+    liquidityUsd: string | null;
+    marketCapEth?: string | null;
+    volume24hEth?: string | null;
+    liquidityEth?: string | null;
+    holderCount?: number;
+    buyCount?: number;
+    sellCount?: number;
+    status?: string;
+    updatedAt?: string | null;
+  };
+  liveTrades: Array<{
+    side: "BUY" | "SELL";
+    traderAddress: string | null;
+    ethAmount: string;
+    tokenAmount: string;
+    ethValue: string | null;
+    tokenValue: string | null;
+    valueUsd: string | null;
+    priceUsd: string | null;
+    transactionHash: string;
+    timestamp: string;
+    source: "curve" | "pool";
+  }>;
+  activity: Array<{
+    id: string;
+    action: string;
+    pair: string;
+    asset: string | null;
+    amount: string | null;
+    amountUsd: string | null;
+    transactionHash: string | null;
+    publicThesis: string | null;
+    createdAt: string;
+  }>;
+  refreshedAt: string;
 }
 
 export interface RobinhoodPolicy {

@@ -43,6 +43,7 @@ import type {
   McpActionInboxResponse,
   McpActionRequest,
   RobinhoodHub,
+  PublicTraderData,
   RobinhoodPolicy,
   RobinhoodDexQuote,
   LaunchEquifoldAgentTokenBody,
@@ -1226,9 +1227,14 @@ export const api = {
       uptimePercent: number;
       status: string;
       featureCount: number;
+      publicTraderPageEnabled: boolean;
       createdAt: string;
       lastActiveAt: string;
     }>(`/agents/${id}/public-stats`),
+
+  /** Get the opt-in public Robinhood Chain trader page (no auth required) */
+  getAgentPublicTrader: (id: string) =>
+    req<PublicTraderData>(`/agents/${id}/public-trader`),
 
   /** Get public chat availability for a public agent (no auth required) */
   getAgentPublicChat: (id: string) =>
@@ -3547,6 +3553,15 @@ export const api = {
   // ─── Robinhood Agent Hub ──────────────────────────────────
   getRobinhoodHub: (agentId: string) =>
     req<RobinhoodHub>(`/agents/${agentId}/robinhood`),
+
+  updateRobinhoodPublicTrader: (agentId: string, enabled: boolean) =>
+    req<{ enabled: boolean; publicUrl: string }>(
+      `/agents/${agentId}/robinhood/public-trader`,
+      {
+        method: "PUT",
+        body: JSON.stringify({ enabled }),
+      },
+    ),
 
   prepareEquifoldTokenization: (
     agentId: string,

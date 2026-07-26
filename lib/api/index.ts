@@ -77,6 +77,7 @@ export type {
   McpConnectorToolPolicy,
   McpConnectorTransport,
   RobinhoodHub,
+  PublicTraderData,
   RobinhoodPolicy,
   RobinhoodDexQuote,
   RobinhoodDexToken,

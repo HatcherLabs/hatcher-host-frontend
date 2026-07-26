@@ -9,6 +9,8 @@ import {
   Check,
   CircleDollarSign,
   Copy,
+  Eye,
+  EyeOff,
   ExternalLink,
   Landmark,
   Loader2,
@@ -45,6 +47,7 @@ type Busy =
   | "dexQuote"
   | "dexSwap"
   | "brokerage"
+  | "publicTrader"
   | null;
 
 const SECTIONS: Array<{ id: Section; label: string }> = [
@@ -467,6 +470,20 @@ export function RobinhoodTab() {
       return "Opening Robinhood…";
     });
 
+  const togglePublicTrader = () => {
+    if (!hub) return;
+    const enabled = !hub.tokenization.publicTraderPageEnabled;
+    void run("publicTrader", async () => {
+      const response = await api.updateRobinhoodPublicTrader(agent.id, enabled);
+      if (!response.success) {
+        throw new Error(response.error || "Could not update the public trader page");
+      }
+      return enabled
+        ? `Public trader page enabled at ${response.data.publicUrl}.`
+        : "Public trader page disabled.";
+    });
+  };
+
   if (loading) {
     return (
       <div className="space-y-4">
@@ -627,6 +644,79 @@ export function RobinhoodTab() {
                 : "Autonomous trading disabled"
             }
           />
+          <GlassCard className="lg:col-span-3">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--accent)]">
+                  {hub?.tokenization.publicTraderPageEnabled ? (
+                    <Eye size={18} />
+                  ) : (
+                    <EyeOff size={18} />
+                  )}
+                </span>
+                <div>
+                  <h3 className="text-sm font-semibold text-[var(--text-primary)]">
+                    Public trader page
+                  </h3>
+                  <p className="mt-1 max-w-2xl text-xs leading-5 text-[var(--text-secondary)]">
+                    Publish this agent&apos;s Equifold token metrics, Robinhood Chain
+                    balances and confirmed onchain activity. Policies, pending jobs
+                    and private execution details remain hidden.
+                  </p>
+                  {!agent.isPublic ? (
+                    <p className="mt-2 text-xs font-medium text-[var(--color-warning)]">
+                      Make the agent public before enabling this page.
+                    </p>
+                  ) : !launched ? (
+                    <p className="mt-2 text-xs font-medium text-[var(--color-warning)]">
+                      Launch and verify the agent token first.
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+              <div className="flex shrink-0 items-center gap-2">
+                {hub?.tokenization.publicTraderPageEnabled ? (
+                  <a
+                    href={`/agent/${encodeURIComponent(agent.slug ?? agent.id)}/trader`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex h-10 items-center gap-2 rounded-lg border border-[var(--border-default)] px-3 text-xs font-semibold text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)]"
+                  >
+                    View page <ExternalLink size={13} />
+                  </a>
+                ) : null}
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={hub?.tokenization.publicTraderPageEnabled === true}
+                  onClick={togglePublicTrader}
+                  disabled={
+                    busy === "publicTrader" ||
+                    (!hub?.tokenization.publicTraderPageEnabled &&
+                      (!agent.isPublic || !launched))
+                  }
+                  className={`relative h-7 w-12 rounded-full border transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                    hub?.tokenization.publicTraderPageEnabled
+                      ? "border-[var(--status-live-border)] bg-[var(--status-live)]"
+                      : "border-[var(--border-default)] bg-[var(--bg-elevated)]"
+                  }`}
+                >
+                  <span
+                    className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${
+                      hub?.tokenization.publicTraderPageEnabled
+                        ? "translate-x-5"
+                        : "translate-x-0.5"
+                    }`}
+                  />
+                  <span className="sr-only">
+                    {hub?.tokenization.publicTraderPageEnabled
+                      ? "Disable public trader page"
+                      : "Enable public trader page"}
+                  </span>
+                </button>
+              </div>
+            </div>
+          </GlassCard>
           <GlassCard className="lg:col-span-2">
             <div className="flex items-center gap-3">
               <Wallet size={17} className="text-[var(--accent)]" />
