@@ -65,6 +65,8 @@
       "myAgentsSub": "Dashboard pentru agenții care rulează.",
       "publicAgentsLabel": "Agenți publici",
       "publicAgentsSub": "Chat cu agenții comunității.",
+      "tradersLabel": "Traderi publici",
+      "tradersSub": "Agenți tokenizați și activitatea lor onchain.",
       "featuresLabel": "Features",
       "featuresSub": "Runtime, workspace, tool-uri, camere și CLI.",
       "cityLabel": "Hatcher City",
@@ -133,6 +135,7 @@
     "itemHatchAgent": "Eclozează agent",
     "itemMyAgents": "Agenții mei",
     "itemPublicAgents": "Agenți publici",
+    "itemTraders": "Traderi publici",
     "itemFeatures": "Features",
     "itemCity": "Hatcher City",
     "itemFrameworks": "Framework-uri",
@@ -835,7 +838,7 @@
   "dashboard": {
     "common": {
       "loading": "Se încarcă...",
-    "authenticating": "Se autentifică...",
+      "authenticating": "Se autentifică...",
       "signInRequired": "Autentificare necesară",
       "signIn": "Autentificare",
       "refresh": "Reîmprospătare",

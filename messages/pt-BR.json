@@ -64,6 +64,8 @@
       "myAgentsSub": "Painel para seus agentes em execução.",
       "publicAgentsLabel": "Agentes públicos",
       "publicAgentsSub": "Converse com agentes comunitários.",
+      "tradersLabel": "Traders públicos",
+      "tradersSub": "Agentes tokenizados e sua atividade onchain.",
       "featuresLabel": "Recursos",
       "featuresSub": "Tempo de execução, espaço de trabalho, ferramentas, salas e CLI.",
       "cityLabel": "Hatcher City",
@@ -133,6 +135,7 @@
     "itemHatchAgent": "Agente de incubação",
     "itemMyAgents": "Meus agentes",
     "itemPublicAgents": "Agentes públicos",
+    "itemTraders": "Traders públicos",
     "itemFeatures": "Recursos",
     "itemCity": "Hatcher City",
     "itemFrameworks": "Estruturas",
@@ -835,7 +838,7 @@
   "dashboard": {
     "common": {
       "loading": "Carregando...",
-    "authenticating": "Autenticando...",
+      "authenticating": "Autenticando...",
       "signInRequired": "Login obrigatório",
       "signIn": "Entrar",
       "refresh": "Atualizar",

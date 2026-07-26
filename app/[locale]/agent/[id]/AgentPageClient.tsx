@@ -79,6 +79,7 @@ import {
   Calendar,
   Cpu,
   Activity,
+  Landmark,
   Camera,
   Clock,
   BarChart3,
@@ -692,6 +693,7 @@ export function AgentPageClient() {
     messagesProcessed: number;
     daysActive: number;
     uptimePercent: number;
+    publicTraderPageEnabled: boolean;
     template: string | null;
     createdAt: string;
     lastActiveAt: string;
@@ -890,7 +892,7 @@ export function AgentPageClient() {
         )}
 
         {/* Meta row */}
-        <div className="flex items-center justify-between text-xs pt-4 border-t border-[var(--border-default)] text-[var(--text-muted)]">
+        <div className="flex flex-wrap items-center justify-between gap-3 text-xs pt-4 border-t border-[var(--border-default)] text-[var(--text-muted)]">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1">
               <Cpu className="w-3.5 h-3.5" />
@@ -901,22 +903,33 @@ export function AgentPageClient() {
               {timeAgo(agent.createdAt)}
             </span>
           </div>
-          <button
-            onClick={handleShare}
-            className="inline-flex items-center gap-1.5 text-[var(--text-muted)] hover:text-[var(--color-accent)] transition-colors duration-200 border border-[var(--border-default)] rounded-lg px-3 py-1.5 hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/5"
-          >
-            {copied ? (
-              <>
-                <Check className="w-3.5 h-3.5 text-green-400" />
-                <span className="text-green-400">{t('share.copied')}</span>
-              </>
-            ) : (
-              <>
-                <Share2 className="w-3.5 h-3.5" />
-                {t('share.button')}
-              </>
-            )}
-          </button>
+          <div className="flex items-center gap-2">
+            {publicStats?.publicTraderPageEnabled ? (
+              <Link
+                href={`/agent/${encodeURIComponent(agent.slug ?? agent.id)}/trader`}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--status-live-border)] bg-[var(--status-live-bg)] px-3 py-1.5 font-semibold text-[var(--status-live)] transition-opacity hover:opacity-80"
+              >
+                <Landmark className="h-3.5 w-3.5" />
+                Trader page
+              </Link>
+            ) : null}
+            <button
+              onClick={handleShare}
+              className="inline-flex items-center gap-1.5 text-[var(--text-muted)] hover:text-[var(--color-accent)] transition-colors duration-200 border border-[var(--border-default)] rounded-lg px-3 py-1.5 hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/5"
+            >
+              {copied ? (
+                <>
+                  <Check className="w-3.5 h-3.5 text-green-400" />
+                  <span className="text-green-400">{t('share.copied')}</span>
+                </>
+              ) : (
+                <>
+                  <Share2 className="w-3.5 h-3.5" />
+                  {t('share.button')}
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </motion.div>
 

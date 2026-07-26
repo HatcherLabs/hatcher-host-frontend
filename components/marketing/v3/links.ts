@@ -16,7 +16,7 @@ export type InternalHref = `/${string}`;
 export type Href = InternalHref | ExternalHref;
 
 export interface NavGroup {
-  key: 'build' | 'explore' | 'resources';
+  key: "build" | "explore" | "resources";
   /** Translation key under namespace `nav.groups` */
   labelKey: string;
   items: ReadonlyArray<{
@@ -32,107 +32,187 @@ export interface NavGroup {
 
 export const NAV_GROUPS: ReadonlyArray<NavGroup> = [
   {
-    key: 'build',
-    labelKey: 'build',
+    key: "build",
+    labelKey: "build",
     items: [
-      { key: 'hatchAgent',  labelKey: 'hatchAgentLabel',  subKey: 'hatchAgentSub',  href: '/create',          glyph: '✦' },
-      { key: 'myAgents',    labelKey: 'myAgentsLabel',    subKey: 'myAgentsSub',    href: '/dashboard',        glyph: '◐' },
+      {
+        key: "hatchAgent",
+        labelKey: "hatchAgentLabel",
+        subKey: "hatchAgentSub",
+        href: "/create",
+        glyph: "✦",
+      },
+      {
+        key: "myAgents",
+        labelKey: "myAgentsLabel",
+        subKey: "myAgentsSub",
+        href: "/dashboard",
+        glyph: "◐",
+      },
     ],
   },
   {
-    key: 'explore',
-    labelKey: 'explore',
+    key: "explore",
+    labelKey: "explore",
     items: [
-      { key: 'publicAgents', labelKey: 'publicAgentsLabel', subKey: 'publicAgentsSub', href: '/explore', glyph: '◈' },
-      { key: 'features',     labelKey: 'featuresLabel',     subKey: 'featuresSub',     href: '/features',      glyph: '✶' },
-      { key: 'staking',     labelKey: 'stakingLabel',     subKey: 'stakingSub',     href: '/staking',       glyph: '◌' },
-      { key: 'city',        labelKey: 'cityLabel',        subKey: 'citySub',        href: '/city',          glyph: '◇' },
-      { key: 'frameworks',  labelKey: 'frameworksLabel',  subKey: 'frameworksSub',  href: '/frameworks',    glyph: '◆' },
+      {
+        key: "publicAgents",
+        labelKey: "publicAgentsLabel",
+        subKey: "publicAgentsSub",
+        href: "/explore",
+        glyph: "◈",
+      },
+      {
+        key: "traders",
+        labelKey: "tradersLabel",
+        subKey: "tradersSub",
+        href: "/traders",
+        glyph: "↗",
+      },
+      {
+        key: "features",
+        labelKey: "featuresLabel",
+        subKey: "featuresSub",
+        href: "/features",
+        glyph: "✶",
+      },
+      {
+        key: "staking",
+        labelKey: "stakingLabel",
+        subKey: "stakingSub",
+        href: "/staking",
+        glyph: "◌",
+      },
+      {
+        key: "city",
+        labelKey: "cityLabel",
+        subKey: "citySub",
+        href: "/city",
+        glyph: "◇",
+      },
+      {
+        key: "frameworks",
+        labelKey: "frameworksLabel",
+        subKey: "frameworksSub",
+        href: "/frameworks",
+        glyph: "◆",
+      },
     ],
   },
   {
-    key: 'resources',
-    labelKey: 'resources',
+    key: "resources",
+    labelKey: "resources",
     items: [
-      { key: 'token',       labelKey: 'tokenLabel',       subKey: 'tokenSub',       href: '/token',         glyph: '◉' },
-      { key: 'whitepaper',  labelKey: 'whitepaperLabel',  subKey: 'whitepaperSub',  href: '/whitepaper',    glyph: '▤' },
-      { key: 'blog',        labelKey: 'blogLabel',        subKey: 'blogSub',        href: '/blog',          glyph: '✎' },
-      { key: 'roadmap',     labelKey: 'roadmapLabel',     subKey: 'roadmapSub',     href: '/roadmap',       glyph: '𝍌' },
-      { key: 'changelog',   labelKey: 'changelogLabel',   subKey: 'changelogSub',   href: '/changelog',     glyph: '⌖' },
+      {
+        key: "token",
+        labelKey: "tokenLabel",
+        subKey: "tokenSub",
+        href: "/token",
+        glyph: "◉",
+      },
+      {
+        key: "whitepaper",
+        labelKey: "whitepaperLabel",
+        subKey: "whitepaperSub",
+        href: "/whitepaper",
+        glyph: "▤",
+      },
+      {
+        key: "blog",
+        labelKey: "blogLabel",
+        subKey: "blogSub",
+        href: "/blog",
+        glyph: "✎",
+      },
+      {
+        key: "roadmap",
+        labelKey: "roadmapLabel",
+        subKey: "roadmapSub",
+        href: "/roadmap",
+        glyph: "𝍌",
+      },
+      {
+        key: "changelog",
+        labelKey: "changelogLabel",
+        subKey: "changelogSub",
+        href: "/changelog",
+        glyph: "⌖",
+      },
     ],
   },
 ] as const;
 
 /** Links promoted directly into the primary navigation on desktop and mobile. */
 export const PRIMARY_NAV_LINKS = [
-  { key: 'pricing', labelKey: 'pricing', href: '/pricing' as Href },
+  { key: "pricing", labelKey: "pricing", href: "/pricing" as Href },
 ] as const;
 
 /** Footer columns. `headKey` resolves under namespace `footer`; each
  *  item's `labelKey` under the same namespace. */
 export const FOOTER_COLUMNS = [
   {
-    headKey: 'colBuild',
+    headKey: "colBuild",
     items: [
-      { labelKey: 'itemHatchAgent', href: '/create' as Href },
-      { labelKey: 'itemMyAgents',   href: '/dashboard' as Href },
+      { labelKey: "itemHatchAgent", href: "/create" as Href },
+      { labelKey: "itemMyAgents", href: "/dashboard" as Href },
     ],
   },
   {
-    headKey: 'colExplore',
+    headKey: "colExplore",
     items: [
-      { labelKey: 'itemPublicAgents', href: '/explore' as Href },
-      { labelKey: 'itemFeatures',   href: '/features' as Href },
-      { labelKey: 'itemCity',       href: '/city' as Href },
-      { labelKey: 'itemFrameworks', href: '/frameworks' as Href },
+      { labelKey: "itemPublicAgents", href: "/explore" as Href },
+      { labelKey: "itemTraders", href: "/traders" as Href },
+      { labelKey: "itemFeatures", href: "/features" as Href },
+      { labelKey: "itemCity", href: "/city" as Href },
+      { labelKey: "itemFrameworks", href: "/frameworks" as Href },
     ],
   },
   {
-    headKey: 'colResources',
+    headKey: "colResources",
     items: [
-      { labelKey: 'itemPricing',   href: '/pricing' as Href },
-      { labelKey: 'itemToken',     href: '/token' as Href },
-      { labelKey: 'itemStaking',   href: '/staking' as Href },
-      { labelKey: 'itemWhitepaper', href: '/whitepaper' as Href },
-      { labelKey: 'itemBlog',      href: '/blog' as Href },
-      { labelKey: 'itemRoadmap',   href: '/roadmap' as Href },
-      { labelKey: 'itemChangelog', href: '/changelog' as Href },
-      { labelKey: 'itemSecurity',  href: '/security' as Href },
+      { labelKey: "itemPricing", href: "/pricing" as Href },
+      { labelKey: "itemToken", href: "/token" as Href },
+      { labelKey: "itemStaking", href: "/staking" as Href },
+      { labelKey: "itemWhitepaper", href: "/whitepaper" as Href },
+      { labelKey: "itemBlog", href: "/blog" as Href },
+      { labelKey: "itemRoadmap", href: "/roadmap" as Href },
+      { labelKey: "itemChangelog", href: "/changelog" as Href },
+      { labelKey: "itemSecurity", href: "/security" as Href },
     ],
   },
   {
-    headKey: 'colLegal',
+    headKey: "colLegal",
     items: [
-      { labelKey: 'itemPrivacy',   href: '/privacy' as Href },
-      { labelKey: 'itemTerms',     href: '/terms' as Href },
-      { labelKey: 'itemCookies',   href: '/cookies' as Href },
-      { labelKey: 'itemImpressum', href: '/impressum' as Href },
+      { labelKey: "itemPrivacy", href: "/privacy" as Href },
+      { labelKey: "itemTerms", href: "/terms" as Href },
+      { labelKey: "itemCookies", href: "/cookies" as Href },
+      { labelKey: "itemImpressum", href: "/impressum" as Href },
     ],
   },
 ] as const;
 
 export const SOCIAL_LINKS = {
-  x:       'https://x.com/HatcherLabs',
-  telegram:'https://t.me/HatcherLabs',
-  discord: 'https://discord.gg/7tY3HjKjMc',
-  github:  'https://github.com/HatcherLabs',
+  x: "https://x.com/HatcherLabs",
+  telegram: "https://t.me/HatcherLabs",
+  discord: "https://discord.gg/7tY3HjKjMc",
+  github: "https://github.com/HatcherLabs",
 } as const;
 
 export const PRIMARY_CTA = {
-  href: '/create' as Href,
+  href: "/create" as Href,
   /** Translation key under namespace `nav`. Brand-distinct verb that
    *  lands on the Chat-to-Hatch creation flow. */
-  labelKey: 'hatchAgent',
+  labelKey: "hatchAgent",
 } as const;
 
 export const SECONDARY_CTA = {
-  href: '/login' as Href,
+  href: "/login" as Href,
   /** Translation key under namespace `nav`. */
-  labelKey: 'signIn',
+  labelKey: "signIn",
 } as const;
 
 export const SIGN_UP_CTA = {
-  href: '/register' as Href,
+  href: "/register" as Href,
   /** Translation key under namespace `nav`. */
-  labelKey: 'signUp',
+  labelKey: "signUp",
 } as const;

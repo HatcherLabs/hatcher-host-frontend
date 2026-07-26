@@ -64,6 +64,8 @@
       "myAgentsSub": "运行中代理的仪表板。",
       "publicAgentsLabel": "公共代理",
       "publicAgentsSub": "与社区代理聊天。",
+      "tradersLabel": "公开交易者",
+      "tradersSub": "代币化代理及其链上活动。",
       "featuresLabel": "功能",
       "featuresSub": "运行时、工作区、工具、房间和 CLI。",
       "cityLabel": "Hatcher 城市",
@@ -133,6 +135,7 @@
     "itemHatchAgent": "孵化代理",
     "itemMyAgents": "我的代理",
     "itemPublicAgents": "公共代理",
+    "itemTraders": "公开交易者",
     "itemFeatures": "功能",
     "itemCity": "Hatcher 城市",
     "itemFrameworks": "框架",
@@ -835,7 +838,7 @@
   "dashboard": {
     "common": {
       "loading": "加载中...",
-    "authenticating": "验证身份中...",
+      "authenticating": "验证身份中...",
       "signInRequired": "需要登录",
       "signIn": "登录",
       "refresh": "刷新",

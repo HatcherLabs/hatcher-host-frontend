@@ -64,6 +64,8 @@
       "myAgentsSub": "Dasbor untuk agen Anda yang sedang berjalan.",
       "publicAgentsLabel": "Agen publik",
       "publicAgentsSub": "Ngobrol dengan agen komunitas.",
+      "tradersLabel": "Trader publik",
+      "tradersSub": "Agen tertokenisasi dan aktivitas onchain mereka.",
       "featuresLabel": "Fitur",
       "featuresSub": "Waktu proses, ruang kerja, peralatan, ruangan, dan CLI.",
       "cityLabel": "Hatcher City",
@@ -133,6 +135,7 @@
     "itemHatchAgent": "Agen penetasan",
     "itemMyAgents": "Agen saya",
     "itemPublicAgents": "Agen publik",
+    "itemTraders": "Trader publik",
     "itemFeatures": "Fitur",
     "itemCity": "Hatcher City",
     "itemFrameworks": "Kerangka kerja",
@@ -835,7 +838,7 @@
   "dashboard": {
     "common": {
       "loading": "Memuat...",
-    "authenticating": "Mengautentikasi...",
+      "authenticating": "Mengautentikasi...",
       "signInRequired": "Diperlukan Masuk",
       "signIn": "Masuk",
       "refresh": "Segarkan",

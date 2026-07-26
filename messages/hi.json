@@ -64,6 +64,8 @@
       "myAgentsSub": "आपके चल रहे एजेंटों के लिए डैशबोर्ड।",
       "publicAgentsLabel": "सार्वजनिक एजेंट",
       "publicAgentsSub": "सामुदायिक एजेंटों के साथ चैट करें।",
+      "tradersLabel": "सार्वजनिक ट्रेडर",
+      "tradersSub": "टोकनयुक्त एजेंट और उनकी ऑनचेन गतिविधि।",
       "featuresLabel": "सुविधाऐं",
       "featuresSub": "रनटाइम, कार्यक्षेत्र, उपकरण, कमरे और CLI।",
       "cityLabel": "Hatcher City",
@@ -133,6 +135,7 @@
     "itemHatchAgent": "हैच एजेंट",
     "itemMyAgents": "मेरे एजेंट",
     "itemPublicAgents": "सार्वजनिक एजेंट",
+    "itemTraders": "सार्वजनिक ट्रेडर",
     "itemFeatures": "सुविधाऐं",
     "itemCity": "Hatcher City",
     "itemFrameworks": "फ्रेमवर्क",
@@ -835,7 +838,7 @@
   "dashboard": {
     "common": {
       "loading": "लोड हो रहा है...",
-    "authenticating": "प्रमाणित करना...",
+      "authenticating": "प्रमाणित करना...",
       "signInRequired": "साइन इन आवश्यक है",
       "signIn": "साइन इन करें",
       "refresh": "ताज़ा करना",

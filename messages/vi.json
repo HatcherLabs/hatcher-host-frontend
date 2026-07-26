@@ -64,6 +64,8 @@
       "myAgentsSub": "Bảng điều khiển cho các tác nhân đang điều hành của bạn.",
       "publicAgentsLabel": "Tác nhân công",
       "publicAgentsSub": "Trò chuyện với các tác nhân cộng đồng.",
+      "tradersLabel": "Trader công khai",
+      "tradersSub": "Tác nhân được token hóa và hoạt động onchain.",
       "featuresLabel": "Tính năng",
       "featuresSub": "Thời gian chạy, không gian làm việc, công cụ, phòng và CLI.",
       "cityLabel": "Hatcher City",
@@ -133,6 +135,7 @@
     "itemHatchAgent": "tác nhân nở",
     "itemMyAgents": "Tác nhân của tôi",
     "itemPublicAgents": "Tác nhân công",
+    "itemTraders": "Trader công khai",
     "itemFeatures": "Tính năng",
     "itemCity": "Hatcher City",
     "itemFrameworks": "Khung",
@@ -835,7 +838,7 @@
   "dashboard": {
     "common": {
       "loading": "Đang tải...",
-    "authenticating": "Đang xác thực...",
+      "authenticating": "Đang xác thực...",
       "signInRequired": "Yêu cầu đăng nhập",
       "signIn": "Đăng nhập",
       "refresh": "Làm mới",
