@@ -25,6 +25,11 @@ import {
 } from "recharts";
 import { Link } from "@/i18n/routing";
 import { api, type PublicTraderData } from "@/lib/api";
+import {
+  buildPublicActivity,
+  type PublicActivityRow,
+  type PublicActivityScope,
+} from "@/components/traders/publicActivity";
 
 function shortAddress(value: string | null, start = 7, end = 5) {
   return value
@@ -90,15 +95,25 @@ function actionLabel(action: string) {
     dex_swap: "SWAP",
     equifold_collect_fees: "CLAIM FEES",
     equifold_launch: "LAUNCH",
+    token_market_buy: "BUY",
+    token_market_sell: "SELL",
   };
   return labels[action] ?? action.replaceAll("_", " ").toUpperCase();
 }
 
 function actionTone(action: string) {
-  if (action === "equifold_buy") return "text-[var(--status-live)]";
-  if (action === "equifold_sell") return "text-[var(--color-destructive)]";
+  if (action === "equifold_buy" || action === "token_market_buy")
+    return "text-[var(--status-live)]";
+  if (action === "equifold_sell" || action === "token_market_sell")
+    return "text-[var(--color-destructive)]";
   if (action === "equifold_collect_fees") return "text-[var(--color-warning)]";
   return "text-[var(--color-info)]";
+}
+
+function activitySource(activity: PublicActivityRow) {
+  if (activity.source === "agent") return "Agent action";
+  if (activity.source === "agent-wallet") return "Agent wallet";
+  return "Token market";
 }
 
 function Metric({
@@ -142,6 +157,9 @@ export function PublicTraderPageClient() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [activityScope, setActivityScope] =
+    useState<PublicActivityScope>("all");
+  const [activityLimit, setActivityLimit] = useState(20);
   const activeRequest = useRef(false);
 
   const load = useCallback(
@@ -199,6 +217,24 @@ export function PublicTraderPageClient() {
       ) ?? 0,
     [trader?.chain.balances],
   );
+
+  const publicActivity = useMemo(
+    () =>
+      buildPublicActivity({
+        activity: trader?.activity ?? [],
+        liveTrades: trader?.liveTrades ?? [],
+        chain: { walletAddress: trader?.chain.walletAddress ?? null },
+        token: trader?.token ? { symbol: trader.token.symbol } : null,
+      }),
+    [
+      trader?.activity,
+      trader?.chain.walletAddress,
+      trader?.liveTrades,
+      trader?.token,
+    ],
+  );
+  const scopedActivity = publicActivity[activityScope];
+  const visibleActivity = scopedActivity.slice(0, activityLimit);
 
   if (loading) {
     return (
@@ -741,88 +777,132 @@ export function PublicTraderPageClient() {
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border-default)] px-4 py-3">
             <div className="flex items-center gap-2">
               <Activity className="h-4 w-4 text-[var(--color-accent)]" />
-              <h2 className="text-sm font-semibold">Confirmed activity</h2>
+              <h2 className="text-sm font-semibold">Onchain activity</h2>
             </div>
             <span className="text-[11px] text-[var(--text-muted)]">
-              Agent executions only · market trades are shown above
+              Confirmed agent actions and indexed token trades
             </span>
           </div>
-          {trader.activity.length ? (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[1040px] text-left text-xs">
-                <thead className="text-[10px] text-[var(--text-muted)]">
-                  <tr className="border-b border-[var(--border-default)]">
-                    <th className="px-4 py-2.5 font-medium">Time</th>
-                    <th className="px-3 py-2.5 font-medium">Type</th>
-                    <th className="px-3 py-2.5 font-medium">Asset / pair</th>
-                    <th className="px-3 py-2.5 text-right font-medium">
-                      Amount
-                    </th>
-                    <th className="px-3 py-2.5 text-right font-medium">
-                      USD value
-                    </th>
-                    <th className="px-3 py-2.5 font-medium">Status</th>
-                    <th className="px-4 py-2.5 font-medium">
-                      Public trade thesis
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[var(--border-default)]">
-                  {trader.activity.map((activity) => (
-                    <tr
-                      key={activity.id}
-                      className="hover:bg-[var(--bg-hover)]"
-                    >
-                      <td className="whitespace-nowrap px-4 py-3 text-[11px] text-[var(--text-muted)]">
-                        {formatDateTime(activity.createdAt)}
-                      </td>
-                      <td
-                        className={`px-3 py-3 font-semibold ${actionTone(activity.action)}`}
-                      >
-                        {actionLabel(activity.action)}
-                      </td>
-                      <td className="px-3 py-3 font-mono text-[11px]">
-                        {activity.pair}
-                      </td>
-                      <td className="px-3 py-3 text-right font-mono text-[11px]">
-                        {formatTokenAmount(activity.amount, 6)}
-                      </td>
-                      <td className="px-3 py-3 text-right font-mono text-[11px]">
-                        {formatUsd(activity.amountUsd)}
-                      </td>
-                      <td className="px-3 py-3">
-                        <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[var(--status-live)]">
-                          <Check className="h-3.5 w-3.5" />
-                          Confirmed
-                        </span>
-                      </td>
-                      <td className="max-w-sm px-4 py-3 text-[11px] leading-5 text-[var(--text-secondary)]">
-                        <div className="flex items-start justify-between gap-3">
-                          <span>
-                            {activity.publicThesis ??
-                              "No public thesis was recorded."}
-                          </span>
-                          {activity.transactionHash ? (
-                            <a
-                              href={`${trader.chain.explorerUrl}/tx/${activity.transactionHash}`}
-                              target="_blank"
-                              rel="noreferrer"
-                              aria-label="Open transaction"
-                              className="shrink-0 text-[var(--text-muted)] hover:text-[var(--color-accent)]"
-                            >
-                              <ExternalLink className="h-3.5 w-3.5" />
-                            </a>
-                          ) : null}
-                        </div>
-                      </td>
+          <div className="flex flex-wrap items-center gap-2 border-b border-[var(--border-default)] px-4 py-3">
+            {(
+              [
+                ["all", "All activity", publicActivity.all.length],
+                ["agent", "Agent actions", publicActivity.agent.length],
+                ["market", "Token trades", publicActivity.market.length],
+              ] as const
+            ).map(([scope, label, count]) => (
+              <button
+                key={scope}
+                type="button"
+                onClick={() => {
+                  setActivityScope(scope);
+                  setActivityLimit(20);
+                }}
+                className={`inline-flex h-8 items-center gap-2 rounded-md border px-2.5 text-xs font-semibold transition-colors ${
+                  activityScope === scope
+                    ? "border-[var(--color-accent)] bg-[var(--status-live-bg)] text-[var(--text-primary)]"
+                    : "border-[var(--border-default)] text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                }`}
+              >
+                {label}
+                <span className="font-mono text-[10px] opacity-70">
+                  {count}
+                </span>
+              </button>
+            ))}
+          </div>
+          {scopedActivity.length ? (
+            <>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[1120px] text-left text-xs">
+                  <thead className="text-[10px] text-[var(--text-muted)]">
+                    <tr className="border-b border-[var(--border-default)]">
+                      <th className="px-4 py-2.5 font-medium">Time</th>
+                      <th className="px-3 py-2.5 font-medium">Source</th>
+                      <th className="px-3 py-2.5 font-medium">Type</th>
+                      <th className="px-3 py-2.5 font-medium">Asset / pair</th>
+                      <th className="px-3 py-2.5 text-right font-medium">
+                        Amount
+                      </th>
+                      <th className="px-3 py-2.5 text-right font-medium">
+                        USD value
+                      </th>
+                      <th className="px-4 py-2.5 font-medium">Details</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-[var(--border-default)]">
+                    {visibleActivity.map((activity) => (
+                      <tr
+                        key={activity.id}
+                        className="hover:bg-[var(--bg-hover)]"
+                      >
+                        <td className="whitespace-nowrap px-4 py-3 text-[11px] text-[var(--text-muted)]">
+                          {formatDateTime(activity.createdAt)}
+                        </td>
+                        <td className="px-3 py-3">
+                          <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-[11px] font-medium text-[var(--text-secondary)]">
+                            <Check className="h-3.5 w-3.5 text-[var(--status-live)]" />
+                            {activitySource(activity)}
+                          </span>
+                        </td>
+                        <td
+                          className={`px-3 py-3 font-semibold ${actionTone(activity.action)}`}
+                        >
+                          {actionLabel(activity.action)}
+                        </td>
+                        <td className="px-3 py-3 font-mono text-[11px]">
+                          {activity.pair}
+                        </td>
+                        <td className="px-3 py-3 text-right font-mono text-[11px]">
+                          {formatTokenAmount(activity.amount, 6)}
+                        </td>
+                        <td className="px-3 py-3 text-right font-mono text-[11px]">
+                          {formatUsd(activity.amountUsd)}
+                        </td>
+                        <td className="max-w-sm px-4 py-3 text-[11px] leading-5 text-[var(--text-secondary)]">
+                          <div className="flex items-start justify-between gap-3">
+                            <span>
+                              {activity.publicThesis ??
+                                (activity.traderAddress
+                                  ? `Trader ${shortAddress(activity.traderAddress)}`
+                                  : "Indexed Equifold token trade")}
+                            </span>
+                            {activity.transactionHash ? (
+                              <a
+                                href={`${trader.chain.explorerUrl}/tx/${activity.transactionHash}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                aria-label="Open transaction"
+                                className="shrink-0 text-[var(--text-muted)] hover:text-[var(--color-accent)]"
+                              >
+                                <ExternalLink className="h-3.5 w-3.5" />
+                              </a>
+                            ) : null}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {visibleActivity.length < scopedActivity.length ? (
+                <div className="border-t border-[var(--border-default)] p-3 text-center">
+                  <button
+                    type="button"
+                    onClick={() => setActivityLimit((limit) => limit + 20)}
+                    className="inline-flex h-9 items-center rounded-md border border-[var(--border-default)] px-3 text-xs font-semibold text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)]"
+                  >
+                    Show 20 more ·{" "}
+                    {scopedActivity.length - visibleActivity.length} remaining
+                  </button>
+                </div>
+              ) : null}
+            </>
           ) : (
             <EmptyState>
-              No confirmed agent executions have been published yet.
+              {activityScope === "agent"
+                ? "No confirmed agent actions have been published yet."
+                : "No indexed token trades have been published yet."}
             </EmptyState>
           )}
         </section>
