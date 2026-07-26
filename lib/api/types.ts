@@ -1219,6 +1219,16 @@ export interface RobinhoodDexQuote {
     verdict: "pass" | "caution" | "block";
     tokenAddress: string;
     isEquifoldToken: boolean;
+    approvedLaunchpad:
+      | "equifold"
+      | "pons"
+      | "flap"
+      | "launchhood"
+      | "leavehood"
+      | "robinhood-canonical"
+      | null;
+    launchpadFactory: string | null;
+    launchpadVerified: boolean;
     explorerVerified: boolean | null;
     proxyType: string | null;
     reputation: string | null;

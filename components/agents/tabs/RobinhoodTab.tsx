@@ -1606,9 +1606,22 @@ export function RobinhoodTab() {
                     label="Token safety"
                     value={dexQuote.safety.verdict.toUpperCase()}
                     detail={
+                      dexQuote.safety.approvedLaunchpad
+                        ? `Verified ${dexQuote.safety.approvedLaunchpad} origin`
+                        : "Unapproved launch origin"
+                    }
+                  />
+                  <MetricCard
+                    label="Round trip"
+                    value={
                       dexQuote.safety.roundTripLossBps === null
-                        ? "Sell-path result unavailable"
-                        : `${(dexQuote.safety.roundTripLossBps / 100).toFixed(2)}% quoted round-trip loss`
+                        ? "Unavailable"
+                        : `${(dexQuote.safety.roundTripLossBps / 100).toFixed(2)}%`
+                    }
+                    detail={
+                      dexQuote.safety.explorerVerified
+                        ? "Contract verified on explorer"
+                        : "Contract verification missing"
                     }
                   />
                 </div>
