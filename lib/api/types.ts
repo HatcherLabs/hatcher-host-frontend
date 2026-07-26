@@ -1184,8 +1184,14 @@ export interface RobinhoodPolicy {
   maxSlippageBps: number;
   maxPriceImpactBps: number;
   requireOwnerApprovalAboveUsd: number;
+  minNativeReserveEth: number;
   allowedActions: Array<
-    "equifold_buy" | "equifold_sell" | "dex_swap" | "equifold_burn"
+    | "equifold_buy"
+    | "equifold_sell"
+    | "dex_swap"
+    | "equifold_burn"
+    | "equifold_lp_add"
+    | "equifold_lp_compound"
   >;
   allowedTokens: string[];
   creatorFeeManagement: "owner_only" | "agent_within_policy";
