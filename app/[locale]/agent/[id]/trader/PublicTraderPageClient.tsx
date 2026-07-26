@@ -14,6 +14,15 @@ import {
   ShieldCheck,
   Wallet,
 } from "lucide-react";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { Link } from "@/i18n/routing";
 import { api, type PublicTraderData } from "@/lib/api";
 
@@ -170,6 +179,19 @@ export function PublicTraderPageClient() {
     return () => window.clearInterval(timer);
   }, [load]);
 
+  const chartData = useMemo(
+    () =>
+      [...(trader?.liveTrades ?? [])]
+        .reverse()
+        .filter((trade) => numeric(trade.priceUsd) !== null)
+        .map((trade) => ({
+          time: trade.timestamp,
+          label: formatTime(trade.timestamp),
+          price: numeric(trade.priceUsd),
+        })),
+    [trader?.liveTrades],
+  );
+
   const treasuryValue = useMemo(
     () =>
       trader?.chain.balances.reduce(
@@ -321,7 +343,237 @@ export function PublicTraderPageClient() {
           </a>
         </header>
 
-        <section className="mt-5 overflow-hidden rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)]">
+        <div className="mt-8 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--color-accent)]">
+              Agent token
+            </p>
+            <h2 className="mt-1 text-xl font-semibold">
+              {trader.token?.name ?? trader.agent.name} market
+            </h2>
+          </div>
+          <span className="text-xs text-[var(--text-muted)]">
+            All indexed ${tokenSymbol} market activity
+          </span>
+        </div>
+
+        <section className="mt-3 overflow-hidden rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)]">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-5">
+            <Metric
+              label="Token price"
+              value={formatUsd(trader.market.priceUsd)}
+            />
+            <Metric
+              label="Market cap"
+              value={formatUsd(trader.market.marketCapUsd, true)}
+            />
+            <Metric
+              label="Token volume · 24h"
+              value={formatUsd(trader.market.volume24hUsd, true)}
+              detail="All wallets trading this token"
+            />
+            <Metric
+              label="Estimated liquidity"
+              value={formatUsd(trader.market.liquidityUsd, true)}
+              detail={
+                trader.market.liquidityUsd
+                  ? "Quote-side estimate"
+                  : "Unavailable for this venue"
+              }
+            />
+            <Metric
+              label="Holders"
+              value={(trader.market.holderCount ?? 0).toLocaleString()}
+              detail={`${trader.market.buyCount ?? 0} buys · ${trader.market.sellCount ?? 0} sells`}
+            />
+          </div>
+        </section>
+
+        <section className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1.9fr)_minmax(340px,0.85fr)]">
+          <div className="overflow-hidden rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)]">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border-default)] px-4 py-3">
+              <div>
+                <h2 className="text-sm font-semibold">${tokenSymbol} price</h2>
+                <p className="mt-0.5 text-xs text-[var(--text-muted)]">
+                  Indexed Equifold market executions
+                </p>
+              </div>
+              <p className="font-mono text-sm font-semibold text-[var(--status-live)]">
+                {formatUsd(trader.market.priceUsd)}
+              </p>
+            </div>
+            <div className="h-[340px] p-3 sm:h-[410px] sm:p-4">
+              {chartData.length > 1 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart
+                    data={chartData}
+                    margin={{ top: 10, right: 8, left: 4, bottom: 0 }}
+                  >
+                    <defs>
+                      <linearGradient
+                        id="publicTraderPriceFill"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                      >
+                        <stop
+                          offset="0%"
+                          stopColor="var(--color-accent)"
+                          stopOpacity={0.25}
+                        />
+                        <stop
+                          offset="100%"
+                          stopColor="var(--color-accent)"
+                          stopOpacity={0}
+                        />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid
+                      stroke="var(--border-default)"
+                      strokeDasharray="3 3"
+                      vertical={false}
+                    />
+                    <XAxis
+                      dataKey="label"
+                      minTickGap={34}
+                      tick={{ fill: "var(--text-muted)", fontSize: 10 }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis
+                      dataKey="price"
+                      orientation="right"
+                      domain={["auto", "auto"]}
+                      tickFormatter={(value) =>
+                        Number(value).toLocaleString("en-US", {
+                          style: "currency",
+                          currency: "USD",
+                          maximumSignificantDigits: 4,
+                        })
+                      }
+                      tick={{ fill: "var(--text-muted)", fontSize: 10 }}
+                      axisLine={false}
+                      tickLine={false}
+                      width={72}
+                    />
+                    <Tooltip
+                      formatter={(value) => [formatUsd(String(value)), "Price"]}
+                      labelFormatter={(_, payload) =>
+                        payload?.[0]?.payload?.time
+                          ? formatDateTime(String(payload[0].payload.time))
+                          : ""
+                      }
+                      contentStyle={{
+                        background: "var(--bg-elevated)",
+                        border: "1px solid var(--border-default)",
+                        borderRadius: 8,
+                        color: "var(--text-primary)",
+                        fontSize: 12,
+                      }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="price"
+                      stroke="var(--color-accent)"
+                      strokeWidth={2}
+                      fill="url(#publicTraderPriceFill)"
+                      activeDot={{ r: 4, fill: "var(--color-accent)" }}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              ) : (
+                <EmptyState>
+                  Price history appears after at least two indexed market
+                  trades.
+                </EmptyState>
+              )}
+            </div>
+          </div>
+
+          <div className="overflow-hidden rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)]">
+            <div className="flex items-center justify-between border-b border-[var(--border-default)] px-4 py-3">
+              <div className="flex items-center gap-2">
+                <h2 className="text-sm font-semibold">Token market trades</h2>
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--status-live)]" />
+              </div>
+              <span className="text-[11px] text-[var(--text-muted)]">
+                All wallets · 5s refresh
+              </span>
+            </div>
+            {trader.liveTrades.length ? (
+              <div className="max-h-[410px] overflow-y-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="sticky top-0 z-10 bg-[var(--bg-surface)] text-[10px] text-[var(--text-muted)]">
+                    <tr className="border-b border-[var(--border-default)]">
+                      <th className="px-4 py-2.5 font-medium">Time</th>
+                      <th className="px-2 py-2.5 font-medium">Side</th>
+                      <th className="px-2 py-2.5 text-right font-medium">
+                        Price
+                      </th>
+                      <th className="px-4 py-2.5 text-right font-medium">
+                        Value
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[var(--border-default)]">
+                    {trader.liveTrades.map((trade, index) => (
+                      <tr
+                        key={`${trade.transactionHash}-${index}`}
+                        className="hover:bg-[var(--bg-hover)]"
+                      >
+                        <td className="whitespace-nowrap px-4 py-2.5 font-mono text-[10px] text-[var(--text-muted)]">
+                          {formatTime(trade.timestamp)}
+                        </td>
+                        <td
+                          className={`px-2 py-2.5 font-semibold ${
+                            trade.side === "BUY"
+                              ? "text-[var(--status-live)]"
+                              : "text-[var(--color-destructive)]"
+                          }`}
+                        >
+                          {trade.side}
+                        </td>
+                        <td className="px-2 py-2.5 text-right font-mono text-[11px]">
+                          {formatUsd(trade.priceUsd)}
+                        </td>
+                        <td className="px-4 py-2.5 text-right">
+                          <a
+                            href={`${trader.chain.explorerUrl}/tx/${trade.transactionHash}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1 font-mono text-[11px] text-[var(--text-secondary)] hover:text-[var(--color-accent)]"
+                          >
+                            {formatUsd(trade.valueUsd)}
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <EmptyState>No indexed token market trades yet.</EmptyState>
+            )}
+          </div>
+        </section>
+
+        <div className="mt-10 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--color-accent)]">
+              Agent portfolio
+            </p>
+            <h2 className="mt-1 text-xl font-semibold">
+              Wallet, performance &amp; autonomous activity
+            </h2>
+          </div>
+          <span className="text-xs text-[var(--text-muted)]">
+            Smart account {shortAddress(trader.chain.walletAddress)}
+          </span>
+        </div>
+
+        <section className="mt-3 overflow-hidden rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)]">
           <div className="grid sm:grid-cols-2 lg:grid-cols-5">
             <Metric
               label="Portfolio value"
@@ -712,19 +964,6 @@ export function PublicTraderPageClient() {
                 ],
                 ["Fee mode", trader.tokenization.feeMode],
                 ["Account", trader.chain.accountType],
-                ["Token price", formatUsd(trader.market.priceUsd)],
-                [
-                  "Token market cap",
-                  formatUsd(trader.market.marketCapUsd, true),
-                ],
-                [
-                  "Token volume · 24h",
-                  formatUsd(trader.market.volume24hUsd, true),
-                ],
-                [
-                  "Token liquidity",
-                  formatUsd(trader.market.liquidityUsd, true),
-                ],
               ].map(([label, value]) => (
                 <div
                   key={label}
