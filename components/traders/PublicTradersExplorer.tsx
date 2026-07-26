@@ -96,11 +96,14 @@ function activityLabel(action: string): string {
   if (action === "equifold_sell") return "SELL";
   if (action === "equifold_collect_fees") return "CLAIM FEES";
   if (action === "dex_swap") return "SWAP";
+  if (action === "onchain_swap") return "SWAP";
+  if (action === "equifold_burn") return "BURN";
   return action.replaceAll("_", " ").toUpperCase();
 }
 
 function activityTone(action: string): string {
   if (action === "equifold_sell") return "text-[var(--status-error)]";
+  if (action === "equifold_burn") return "text-[var(--status-error)]";
   if (action === "dex_swap") return "text-[var(--color-info)]";
   if (action === "equifold_collect_fees") return "text-[var(--color-warning)]";
   return "text-[var(--status-live)]";

@@ -88,7 +88,9 @@ function actionLabel(action: string) {
     equifold_buy: "BUY",
     equifold_sell: "SELL",
     dex_swap: "SWAP",
+    onchain_swap: "SWAP",
     equifold_collect_fees: "CLAIM FEES",
+    equifold_burn: "BURN",
     equifold_launch: "LAUNCH",
   };
   return labels[action] ?? action.replaceAll("_", " ").toUpperCase();
@@ -97,6 +99,7 @@ function actionLabel(action: string) {
 function actionTone(action: string) {
   if (action === "equifold_buy") return "text-[var(--status-live)]";
   if (action === "equifold_sell") return "text-[var(--color-destructive)]";
+  if (action === "equifold_burn") return "text-[var(--color-destructive)]";
   if (action === "equifold_collect_fees") return "text-[var(--color-warning)]";
   return "text-[var(--color-info)]";
 }

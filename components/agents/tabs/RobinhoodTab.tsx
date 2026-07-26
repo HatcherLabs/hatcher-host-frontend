@@ -891,6 +891,28 @@ export function RobinhoodTab() {
                   }
                 />
               </label>
+              <label className="mt-3 flex items-center justify-between gap-4 text-sm text-[var(--text-secondary)]">
+                Allow own-token burns
+                <input
+                  type="checkbox"
+                  checked={policy.allowedActions.includes("equifold_burn")}
+                  onChange={(event) =>
+                    setPolicy({
+                      ...policy,
+                      allowedActions: event.target.checked
+                        ? Array.from(
+                            new Set([
+                              ...policy.allowedActions,
+                              "equifold_burn" as const,
+                            ]),
+                          )
+                        : policy.allowedActions.filter(
+                            (action) => action !== "equifold_burn",
+                          ),
+                    })
+                  }
+                />
+              </label>
               <div className="mt-3 grid grid-cols-2 gap-3">
                 <label className="text-xs text-[var(--text-secondary)]">
                   Max trade USD
@@ -978,11 +1000,27 @@ export function RobinhoodTab() {
                 daily, slippage, and price-impact limits.
               </p>
               <div className="mt-3 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-2.5">
-                <p className="text-xs font-medium text-[var(--text-secondary)]">
-                  Creator-fee control
-                </p>
-                <p className="mt-1 text-sm font-semibold text-[var(--text-primary)]">
-                  Owner only
+                <label className="flex items-center justify-between gap-4 text-xs font-medium text-[var(--text-secondary)]">
+                  Autonomous fee claims
+                  <input
+                    type="checkbox"
+                    checked={
+                      policy.creatorFeeManagement === "agent_within_policy"
+                    }
+                    onChange={(event) =>
+                      setPolicy({
+                        ...policy,
+                        creatorFeeManagement: event.target.checked
+                          ? "agent_within_policy"
+                          : "owner_only",
+                      })
+                    }
+                  />
+                </label>
+                <p className="mt-2 text-[11px] leading-4 text-[var(--text-muted)]">
+                  In COMPOUND fee mode, an authorized claim adds fees to the
+                  canonical locked LP on this token&apos;s Sushi v3 or Uniswap
+                  v4 venue.
                 </p>
               </div>
               <button
@@ -1544,7 +1582,7 @@ export function RobinhoodTab() {
                     }
                   />
                 </div>
-                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                   <MetricCard
                     label="Input value"
                     value={`$${dexQuote.amountUsd.toLocaleString(undefined, { maximumFractionDigits: 2 })}`}
@@ -1564,7 +1602,21 @@ export function RobinhoodTab() {
                     }
                     detail={`Max slippage ${dexQuote.maxSlippageBps / 100}%`}
                   />
+                  <MetricCard
+                    label="Token safety"
+                    value={dexQuote.safety.verdict.toUpperCase()}
+                    detail={
+                      dexQuote.safety.roundTripLossBps === null
+                        ? "Sell-path result unavailable"
+                        : `${(dexQuote.safety.roundTripLossBps / 100).toFixed(2)}% quoted round-trip loss`
+                    }
+                  />
                 </div>
+                {dexQuote.safety.warnings.length ? (
+                  <div className="mt-4 rounded-lg border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-3 py-2 text-xs text-[var(--color-warning)]">
+                    Safety review: {dexQuote.safety.warnings.join(" · ")}
+                  </div>
+                ) : null}
                 {dexQuote.blockers.length ? (
                   <div className="mt-4 rounded-lg border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-3 py-2 text-xs text-[var(--color-warning)]">
                     {dexQuote.blockers.join(" · ")}

@@ -1184,7 +1184,9 @@ export interface RobinhoodPolicy {
   maxSlippageBps: number;
   maxPriceImpactBps: number;
   requireOwnerApprovalAboveUsd: number;
-  allowedActions: Array<"equifold_buy" | "equifold_sell" | "dex_swap">;
+  allowedActions: Array<
+    "equifold_buy" | "equifold_sell" | "dex_swap" | "equifold_burn"
+  >;
   allowedTokens: string[];
   creatorFeeManagement: "owner_only" | "agent_within_policy";
 }
@@ -1213,6 +1215,19 @@ export interface RobinhoodDexQuote {
   maxSlippageBps: number;
   maxPriceImpactBps: number;
   liquidityProviders: string[];
+  safety: {
+    verdict: "pass" | "caution" | "block";
+    tokenAddress: string;
+    isEquifoldToken: boolean;
+    explorerVerified: boolean | null;
+    proxyType: string | null;
+    reputation: string | null;
+    holdersCount: number | null;
+    sellRouteAvailable: boolean;
+    roundTripLossBps: number | null;
+    warnings: string[];
+    blockers: string[];
+  };
   ownerApprovalRequired: boolean;
   canExecuteAutonomously: boolean;
   canExecuteWithOwnerApproval: boolean;
