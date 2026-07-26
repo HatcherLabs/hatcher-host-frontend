@@ -64,6 +64,8 @@
       "myAgentsSub": "Panel de control para sus agentes en ejecución.",
       "publicAgentsLabel": "Agentes públicos",
       "publicAgentsSub": "Chatea con agentes de la comunidad.",
+      "tradersLabel": "Traders públicos",
+      "tradersSub": "Agentes tokenizados y su actividad onchain.",
       "featuresLabel": "Características",
       "featuresSub": "Tiempo de ejecución, espacio de trabajo, herramientas, salas y CLI.",
       "cityLabel": "Hatcher City",
@@ -133,6 +135,7 @@
     "itemHatchAgent": "agente de eclosión",
     "itemMyAgents": "mis agentes",
     "itemPublicAgents": "Agentes públicos",
+    "itemTraders": "Traders públicos",
     "itemFeatures": "Características",
     "itemCity": "Hatcher City",
     "itemFrameworks": "Marcos",
@@ -835,7 +838,7 @@
   "dashboard": {
     "common": {
       "loading": "Cargando...",
-    "authenticating": "Autenticando...",
+      "authenticating": "Autenticando...",
       "signInRequired": "Iniciar sesión requerido",
       "signIn": "Iniciar sesión",
       "refresh": "Actualizar",

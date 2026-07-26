@@ -64,6 +64,8 @@
       "myAgentsSub": "ランニングエージェントのためのダッシュボード。",
       "publicAgentsLabel": "公的代理人",
       "publicAgentsSub": "コミュニティの担当者と話してみてください。",
+      "tradersLabel": "公開トレーダー",
+      "tradersSub": "トークン化されたエージェントとオンチェーン活動。",
       "featuresLabel": "特徴",
       "featuresSub": "実行時間、ワークスペース、ツール、ルーム、CLI。",
       "cityLabel": "Hatcher City",
@@ -133,6 +135,7 @@
     "itemHatchAgent": "ハッチエージェント",
     "itemMyAgents": "私のエージェントたち",
     "itemPublicAgents": "公的代理人",
+    "itemTraders": "公開トレーダー",
     "itemFeatures": "特徴",
     "itemCity": "Hatcher City",
     "itemFrameworks": "フレームワーク",
@@ -835,7 +838,7 @@
   "dashboard": {
     "common": {
       "loading": "読み込み中...",
-    "authenticating": "認証中...",
+      "authenticating": "認証中...",
       "signInRequired": "サインイン必須",
       "signIn": "サインイン",
       "refresh": "リフレッシュ",

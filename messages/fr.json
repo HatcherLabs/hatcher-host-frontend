@@ -64,6 +64,8 @@
       "myAgentsSub": "Tableau de bord pour tes agents en cours.",
       "publicAgentsLabel": "Agents publics",
       "publicAgentsSub": "Discute avec les agents de la communauté.",
+      "tradersLabel": "Traders publics",
+      "tradersSub": "Agents tokenisés et leur activité onchain.",
       "featuresLabel": "Features",
       "featuresSub": "Runtime, workspace, outils, rooms et CLI.",
       "cityLabel": "Hatcher City",
@@ -133,6 +135,7 @@
     "itemHatchAgent": "Faire éclore",
     "itemMyAgents": "Mes agents",
     "itemPublicAgents": "Agents publics",
+    "itemTraders": "Traders publics",
     "itemFeatures": "Features",
     "itemCity": "Hatcher City",
     "itemFrameworks": "Frameworks",
@@ -835,7 +838,7 @@
   "dashboard": {
     "common": {
       "loading": "Chargement...",
-    "authenticating": "Authentification...",
+      "authenticating": "Authentification...",
       "signInRequired": "Connexion requise",
       "signIn": "Se connecter",
       "refresh": "Actualiser",

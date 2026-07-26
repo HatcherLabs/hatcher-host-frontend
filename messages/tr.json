@@ -64,6 +64,8 @@
       "myAgentsSub": "Koşan ajanlarınız için bir gösterge paneli.",
       "publicAgentsLabel": "Kamu temsilcileri",
       "publicAgentsSub": "Topluluk temsilcileriyle sohbet edin.",
+      "tradersLabel": "Herkese açık traderlar",
+      "tradersSub": "Tokenleştirilmiş ajanlar ve onchain aktiviteleri.",
       "featuresLabel": "Özellikler",
       "featuresSub": "Çalışma zamanı, çalışma alanı, araçlar, odalar ve CLI.",
       "cityLabel": "Hatcher City",
@@ -133,6 +135,7 @@
     "itemHatchAgent": "Hatch ajanı",
     "itemMyAgents": "Ajanlarım",
     "itemPublicAgents": "Kamu temsilcileri",
+    "itemTraders": "Herkese açık traderlar",
     "itemFeatures": "Özellikler",
     "itemCity": "Hatcher City",
     "itemFrameworks": "Çerçeveler",
@@ -835,7 +838,7 @@
   "dashboard": {
     "common": {
       "loading": "Yükleniyor...",
-    "authenticating": "Doğrulama...",
+      "authenticating": "Doğrulama...",
       "signInRequired": "Giriş Zorunlu",
       "signIn": "Giriş Yapın",
       "refresh": "Yenileme",

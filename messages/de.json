@@ -64,6 +64,8 @@
       "myAgentsSub": "Dashboard für laufende Agenten.",
       "publicAgentsLabel": "Öffentliche Agenten",
       "publicAgentsSub": "Mit Community-Agenten chatten.",
+      "tradersLabel": "Öffentliche Trader",
+      "tradersSub": "Tokenisierte Agenten und ihre Onchain-Aktivität.",
       "featuresLabel": "Features",
       "featuresSub": "Runtime, Workspace, Tools, Räume und CLI.",
       "cityLabel": "Hatcher City",
@@ -133,6 +135,7 @@
     "itemHatchAgent": "Agent ausbrüten",
     "itemMyAgents": "Meine Agenten",
     "itemPublicAgents": "Öffentliche Agenten",
+    "itemTraders": "Öffentliche Trader",
     "itemFeatures": "Features",
     "itemCity": "Hatcher City",
     "itemFrameworks": "Frameworks",
@@ -835,7 +838,7 @@
   "dashboard": {
     "common": {
       "loading": "Lädt...",
-    "authenticating": "Authentifizierung...",
+      "authenticating": "Authentifizierung...",
       "signInRequired": "Anmeldung erforderlich",
       "signIn": "Anmelden",
       "refresh": "Aktualisieren",

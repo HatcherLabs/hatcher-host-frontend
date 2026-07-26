@@ -1,12 +1,12 @@
-import { MetadataRoute } from 'next';
-import { BLOG_POSTS } from '@/lib/blog';
-import { API_URL } from '@/lib/config';
-import { shouldSkipStaticApiFetch } from '@/lib/static-api-fetch';
-import { routing } from '@/i18n/routing';
+import { MetadataRoute } from "next";
+import { BLOG_POSTS } from "@/lib/blog";
+import { API_URL } from "@/lib/config";
+import { shouldSkipStaticApiFetch } from "@/lib/static-api-fetch";
+import { routing } from "@/i18n/routing";
 
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://hatcher.host';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://hatcher.host";
 
 interface ExploreAgent {
   id: string;
@@ -16,34 +16,35 @@ interface ExploreAgent {
 // Public routes that get localized sitemap entries
 const LOCALIZED_ROUTES: Array<{
   path: string;
-  changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'];
+  changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"];
   priority: number;
 }> = [
-  { path: '/', changeFrequency: 'daily', priority: 1.0 },
-  { path: '/pricing', changeFrequency: 'weekly', priority: 0.9 },
-  { path: '/explore', changeFrequency: 'daily', priority: 0.85 },
-  { path: '/features', changeFrequency: 'weekly', priority: 0.85 },
-  { path: '/frameworks', changeFrequency: 'weekly', priority: 0.8 },
-  { path: '/create', changeFrequency: 'monthly', priority: 0.8 },
-  { path: '/token', changeFrequency: 'weekly', priority: 0.7 },
-  { path: '/whitepaper', changeFrequency: 'monthly', priority: 0.65 },
-  { path: '/roadmap', changeFrequency: 'weekly', priority: 0.6 },
-  { path: '/blog', changeFrequency: 'weekly', priority: 0.7 },
-  { path: '/changelog', changeFrequency: 'weekly', priority: 0.6 },
-  { path: '/help', changeFrequency: 'monthly', priority: 0.5 },
-  { path: '/security', changeFrequency: 'monthly', priority: 0.5 },
-  { path: '/docs', changeFrequency: 'weekly', priority: 0.6 },
-  { path: '/support', changeFrequency: 'monthly', priority: 0.5 },
-  { path: '/city', changeFrequency: 'daily', priority: 0.9 },
-  { path: '/affiliate', changeFrequency: 'monthly', priority: 0.6 },
+  { path: "/", changeFrequency: "daily", priority: 1.0 },
+  { path: "/pricing", changeFrequency: "weekly", priority: 0.9 },
+  { path: "/explore", changeFrequency: "daily", priority: 0.85 },
+  { path: "/traders", changeFrequency: "daily", priority: 0.85 },
+  { path: "/features", changeFrequency: "weekly", priority: 0.85 },
+  { path: "/frameworks", changeFrequency: "weekly", priority: 0.8 },
+  { path: "/create", changeFrequency: "monthly", priority: 0.8 },
+  { path: "/token", changeFrequency: "weekly", priority: 0.7 },
+  { path: "/whitepaper", changeFrequency: "monthly", priority: 0.65 },
+  { path: "/roadmap", changeFrequency: "weekly", priority: 0.6 },
+  { path: "/blog", changeFrequency: "weekly", priority: 0.7 },
+  { path: "/changelog", changeFrequency: "weekly", priority: 0.6 },
+  { path: "/help", changeFrequency: "monthly", priority: 0.5 },
+  { path: "/security", changeFrequency: "monthly", priority: 0.5 },
+  { path: "/docs", changeFrequency: "weekly", priority: 0.6 },
+  { path: "/support", changeFrequency: "monthly", priority: 0.5 },
+  { path: "/city", changeFrequency: "daily", priority: 0.9 },
+  { path: "/affiliate", changeFrequency: "monthly", priority: 0.6 },
 ];
 
 // Legal pages are English-only (not in i18n scope)
-const LEGAL_ROUTES = ['/privacy', '/terms', '/impressum', '/cookies'];
+const LEGAL_ROUTES = ["/privacy", "/terms", "/impressum", "/cookies"];
 
 function absUrl(locale: string, path: string): string {
-  const prefix = locale === routing.defaultLocale ? '' : `/${locale}`;
-  const suffix = path === '/' ? '' : path;
+  const prefix = locale === routing.defaultLocale ? "" : `/${locale}`;
+  const suffix = path === "/" ? "" : path;
   return `${SITE_URL}${prefix}${suffix}`;
 }
 
@@ -52,7 +53,7 @@ function buildLanguagesMap(path: string): Record<string, string> {
   for (const locale of routing.locales) {
     languages[locale] = absUrl(locale, path);
   }
-  languages['x-default'] = absUrl(routing.defaultLocale, path);
+  languages["x-default"] = absUrl(routing.defaultLocale, path);
   return languages;
 }
 
@@ -78,7 +79,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const blogPostEntries: MetadataRoute.Sitemap = BLOG_POSTS.map((post) => ({
     url: `${SITE_URL}/blog/${post.slug}`,
     lastModified: new Date(post.date),
-    changeFrequency: 'monthly' as const,
+    changeFrequency: "monthly" as const,
     priority: 0.6,
   }));
 
@@ -86,7 +87,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const legalEntries: MetadataRoute.Sitemap = LEGAL_ROUTES.map((path) => ({
     url: `${SITE_URL}${path}`,
     lastModified: now,
-    changeFrequency: 'monthly' as const,
+    changeFrequency: "monthly" as const,
     priority: 0.3,
   }));
 
@@ -94,14 +95,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let agentEntries: MetadataRoute.Sitemap = [];
   if (!shouldSkipStaticApiFetch(API_URL)) {
     try {
-      const res = await fetch(`${API_URL}/agents/explore`, { next: { revalidate: 3600 } });
+      const res = await fetch(`${API_URL}/agents/explore`, {
+        next: { revalidate: 3600 },
+      });
       if (res.ok) {
         const json = (await res.json()) as { agents: ExploreAgent[] };
         if (json.agents?.length) {
           agentEntries = json.agents.map((agent) => ({
             url: `${SITE_URL}/agent/${agent.id}`,
             lastModified: agent.updatedAt ? new Date(agent.updatedAt) : now,
-            changeFrequency: 'daily' as const,
+            changeFrequency: "daily" as const,
             priority: 0.5,
           }));
         }

@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useParams } from "next/navigation";
 import {
   Activity,
   ArrowLeft,
@@ -13,7 +13,7 @@ import {
   RefreshCw,
   ShieldCheck,
   Wallet,
-} from 'lucide-react';
+} from "lucide-react";
 import {
   Area,
   AreaChart,
@@ -22,12 +22,14 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-} from 'recharts';
-import { Link } from '@/i18n/routing';
-import { api, type PublicTraderData } from '@/lib/api';
+} from "recharts";
+import { Link } from "@/i18n/routing";
+import { api, type PublicTraderData } from "@/lib/api";
 
 function shortAddress(value: string | null, start = 7, end = 5) {
-  return value ? `${value.slice(0, start)}…${value.slice(-end)}` : 'Unavailable';
+  return value
+    ? `${value.slice(0, start)}…${value.slice(-end)}`
+    : "Unavailable";
 }
 
 function numeric(value: string | null | undefined) {
@@ -37,20 +39,23 @@ function numeric(value: string | null | undefined) {
 
 function formatUsd(value: string | null | undefined, compact = false) {
   const amount = numeric(value);
-  if (amount === null) return '—';
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    notation: compact ? 'compact' : 'standard',
+  if (amount === null) return "—";
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    notation: compact ? "compact" : "standard",
     maximumFractionDigits: compact ? 2 : amount < 1 ? 8 : 2,
   }).format(amount);
 }
 
-function formatTokenAmount(value: string | null | undefined, maximumFractionDigits = 4) {
+function formatTokenAmount(
+  value: string | null | undefined,
+  maximumFractionDigits = 4,
+) {
   const amount = numeric(value);
-  if (amount === null) return '—';
-  return new Intl.NumberFormat('en-US', {
-    notation: Math.abs(amount) >= 1_000_000 ? 'compact' : 'standard',
+  if (amount === null) return "—";
+  return new Intl.NumberFormat("en-US", {
+    notation: Math.abs(amount) >= 1_000_000 ? "compact" : "standard",
     maximumFractionDigits,
   }).format(amount);
 }
@@ -58,38 +63,42 @@ function formatTokenAmount(value: string | null | undefined, maximumFractionDigi
 function formatTime(value: string) {
   const date = new Date(value);
   return Number.isNaN(date.getTime())
-    ? '—'
-    : date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    ? "—"
+    : date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
 }
 
 function formatDateTime(value: string) {
   const date = new Date(value);
   return Number.isNaN(date.getTime())
-    ? '—'
+    ? "—"
     : date.toLocaleString([], {
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
       });
 }
 
 function actionLabel(action: string) {
   const labels: Record<string, string> = {
-    equifold_buy: 'BUY',
-    equifold_sell: 'SELL',
-    dex_swap: 'SWAP',
-    equifold_collect_fees: 'CLAIM FEES',
-    equifold_launch: 'LAUNCH',
+    equifold_buy: "BUY",
+    equifold_sell: "SELL",
+    dex_swap: "SWAP",
+    equifold_collect_fees: "CLAIM FEES",
+    equifold_launch: "LAUNCH",
   };
-  return labels[action] ?? action.replaceAll('_', ' ').toUpperCase();
+  return labels[action] ?? action.replaceAll("_", " ").toUpperCase();
 }
 
 function actionTone(action: string) {
-  if (action === 'equifold_buy') return 'text-[var(--status-live)]';
-  if (action === 'equifold_sell') return 'text-[var(--color-destructive)]';
-  if (action === 'equifold_collect_fees') return 'text-[var(--color-warning)]';
-  return 'text-[var(--color-info)]';
+  if (action === "equifold_buy") return "text-[var(--status-live)]";
+  if (action === "equifold_sell") return "text-[var(--color-destructive)]";
+  if (action === "equifold_collect_fees") return "text-[var(--color-warning)]";
+  return "text-[var(--color-info)]";
 }
 
 function Metric({
@@ -103,12 +112,16 @@ function Metric({
 }) {
   return (
     <div className="min-w-0 border-b border-[var(--border-default)] px-4 py-4 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0">
-      <p className="text-[11px] font-medium text-[var(--text-muted)]">{label}</p>
+      <p className="text-[11px] font-medium text-[var(--text-muted)]">
+        {label}
+      </p>
       <p className="mt-1.5 truncate text-lg font-semibold tracking-[-0.025em] text-[var(--text-primary)]">
         {value}
       </p>
       {detail ? (
-        <p className="mt-1 truncate text-[11px] text-[var(--text-secondary)]">{detail}</p>
+        <p className="mt-1 truncate text-[11px] text-[var(--text-secondary)]">
+          {detail}
+        </p>
       ) : null}
     </div>
   );
@@ -139,7 +152,7 @@ export function PublicTraderPageClient() {
       try {
         const response = await api.getAgentPublicTrader(id);
         if (!response.success) {
-          throw new Error(response.error || 'This trader page is unavailable.');
+          throw new Error(response.error || "This trader page is unavailable.");
         }
         setTrader(response.data);
         setError(null);
@@ -147,7 +160,7 @@ export function PublicTraderPageClient() {
         setError(
           loadError instanceof Error
             ? loadError.message
-            : 'This trader page is unavailable.',
+            : "This trader page is unavailable.",
         );
       } finally {
         activeRequest.current = false;
@@ -213,21 +226,22 @@ export function PublicTraderPageClient() {
             Trader page unavailable
           </h1>
           <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
-            This agent has not published a public trader page, or the page was disabled.
+            This agent has not published a public trader page, or the page was
+            disabled.
           </p>
           <Link
-            href={`/agent/${encodeURIComponent(id)}`}
+            href="/traders"
             className="mt-6 inline-flex h-10 items-center gap-2 rounded-lg border border-[var(--border-default)] px-4 text-sm font-semibold text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)]"
           >
             <ArrowLeft className="h-4 w-4" />
-            Agent profile
+            Explore traders
           </Link>
         </div>
       </div>
     );
   }
 
-  const tokenSymbol = trader.token?.symbol ?? 'AGENT';
+  const tokenSymbol = trader.token?.symbol ?? "AGENT";
   const marketUpdatedAt = trader.market.updatedAt ?? trader.refreshedAt;
 
   return (
@@ -235,21 +249,25 @@ export function PublicTraderPageClient() {
       <div className="mx-auto w-full max-w-[1500px] px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
         <div className="mb-6 flex items-center justify-between gap-4">
           <Link
-            href={`/agent/${encodeURIComponent(trader.agent.slug)}`}
+            href="/traders"
             className="inline-flex items-center gap-2 text-sm font-medium text-[var(--text-muted)] transition-colors hover:text-[var(--text-primary)]"
           >
             <ArrowLeft className="h-4 w-4" />
-            Agent profile
+            Explore traders
           </Link>
           <div className="flex items-center gap-3 text-xs text-[var(--text-muted)]">
-            <span className="hidden sm:inline">Updated {formatTime(marketUpdatedAt)}</span>
+            <span className="hidden sm:inline">
+              Updated {formatTime(marketUpdatedAt)}
+            </span>
             <button
               type="button"
               onClick={() => void load(false)}
               disabled={refreshing}
               className="inline-flex h-9 items-center gap-2 rounded-lg border border-[var(--border-default)] px-3 font-semibold transition-colors hover:text-[var(--text-primary)] disabled:opacity-50"
             >
-              <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`}
+              />
               Refresh
             </button>
           </div>
@@ -277,8 +295,8 @@ export function PublicTraderPageClient() {
                 <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--status-live)]">
                   <span className="h-1.5 w-1.5 rounded-full bg-current" />
                   {trader.chain.autonomousTradingEnabled
-                    ? 'Autonomous trader'
-                    : 'Public onchain portfolio'}
+                    ? "Autonomous trader"
+                    : "Public onchain portfolio"}
                 </span>
               </div>
               <p className="mt-1 font-mono text-sm text-[var(--text-secondary)]">
@@ -293,13 +311,19 @@ export function PublicTraderPageClient() {
                   type="button"
                   onClick={async () => {
                     if (!trader.chain.walletAddress) return;
-                    await navigator.clipboard.writeText(trader.chain.walletAddress);
+                    await navigator.clipboard.writeText(
+                      trader.chain.walletAddress,
+                    );
                     setCopied(true);
                     window.setTimeout(() => setCopied(false), 1_500);
                   }}
                   className="inline-flex h-7 items-center gap-1.5 rounded-md border border-[var(--border-default)] px-2.5 font-mono text-[11px] text-[var(--text-muted)] transition-colors hover:text-[var(--text-primary)]"
                 >
-                  {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                  {copied ? (
+                    <Check className="h-3 w-3" />
+                  ) : (
+                    <Copy className="h-3 w-3" />
+                  )}
                   {shortAddress(trader.chain.walletAddress)}
                 </button>
               </div>
@@ -318,13 +342,26 @@ export function PublicTraderPageClient() {
 
         <section className="mt-5 overflow-hidden rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)]">
           <div className="grid sm:grid-cols-2 lg:grid-cols-5">
-            <Metric label="Token price" value={formatUsd(trader.market.priceUsd)} />
-            <Metric label="Market cap" value={formatUsd(trader.market.marketCapUsd, true)} />
-            <Metric label="24h volume" value={formatUsd(trader.market.volume24hUsd, true)} />
+            <Metric
+              label="Token price"
+              value={formatUsd(trader.market.priceUsd)}
+            />
+            <Metric
+              label="Market cap"
+              value={formatUsd(trader.market.marketCapUsd, true)}
+            />
+            <Metric
+              label="24h volume"
+              value={formatUsd(trader.market.volume24hUsd, true)}
+            />
             <Metric
               label="Estimated liquidity"
               value={formatUsd(trader.market.liquidityUsd, true)}
-              detail={trader.market.liquidityUsd ? 'Quote-side estimate' : 'Unavailable for this venue'}
+              detail={
+                trader.market.liquidityUsd
+                  ? "Quote-side estimate"
+                  : "Unavailable for this venue"
+              }
             />
             <Metric
               label="Holders"
@@ -350,11 +387,28 @@ export function PublicTraderPageClient() {
             <div className="h-[340px] p-3 sm:h-[410px] sm:p-4">
               {chartData.length > 1 ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData} margin={{ top: 10, right: 8, left: 4, bottom: 0 }}>
+                  <AreaChart
+                    data={chartData}
+                    margin={{ top: 10, right: 8, left: 4, bottom: 0 }}
+                  >
                     <defs>
-                      <linearGradient id="publicTraderPriceFill" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="var(--color-accent)" stopOpacity={0.25} />
-                        <stop offset="100%" stopColor="var(--color-accent)" stopOpacity={0} />
+                      <linearGradient
+                        id="publicTraderPriceFill"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                      >
+                        <stop
+                          offset="0%"
+                          stopColor="var(--color-accent)"
+                          stopOpacity={0.25}
+                        />
+                        <stop
+                          offset="100%"
+                          stopColor="var(--color-accent)"
+                          stopOpacity={0}
+                        />
                       </linearGradient>
                     </defs>
                     <CartesianGrid
@@ -365,41 +419,38 @@ export function PublicTraderPageClient() {
                     <XAxis
                       dataKey="label"
                       minTickGap={34}
-                      tick={{ fill: 'var(--text-muted)', fontSize: 10 }}
+                      tick={{ fill: "var(--text-muted)", fontSize: 10 }}
                       axisLine={false}
                       tickLine={false}
                     />
                     <YAxis
                       dataKey="price"
                       orientation="right"
-                      domain={['auto', 'auto']}
+                      domain={["auto", "auto"]}
                       tickFormatter={(value) =>
-                        Number(value).toLocaleString('en-US', {
-                          style: 'currency',
-                          currency: 'USD',
+                        Number(value).toLocaleString("en-US", {
+                          style: "currency",
+                          currency: "USD",
                           maximumSignificantDigits: 4,
                         })
                       }
-                      tick={{ fill: 'var(--text-muted)', fontSize: 10 }}
+                      tick={{ fill: "var(--text-muted)", fontSize: 10 }}
                       axisLine={false}
                       tickLine={false}
                       width={72}
                     />
                     <Tooltip
-                      formatter={(value) => [
-                        formatUsd(String(value)),
-                        'Price',
-                      ]}
+                      formatter={(value) => [formatUsd(String(value)), "Price"]}
                       labelFormatter={(_, payload) =>
                         payload?.[0]?.payload?.time
                           ? formatDateTime(String(payload[0].payload.time))
-                          : ''
+                          : ""
                       }
                       contentStyle={{
-                        background: 'var(--bg-elevated)',
-                        border: '1px solid var(--border-default)',
+                        background: "var(--bg-elevated)",
+                        border: "1px solid var(--border-default)",
                         borderRadius: 8,
-                        color: 'var(--text-primary)',
+                        color: "var(--text-primary)",
                         fontSize: 12,
                       }}
                     />
@@ -409,12 +460,14 @@ export function PublicTraderPageClient() {
                       stroke="var(--color-accent)"
                       strokeWidth={2}
                       fill="url(#publicTraderPriceFill)"
-                      activeDot={{ r: 4, fill: 'var(--color-accent)' }}
+                      activeDot={{ r: 4, fill: "var(--color-accent)" }}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
               ) : (
-                <EmptyState>Price history appears after at least two indexed trades.</EmptyState>
+                <EmptyState>
+                  Price history appears after at least two indexed trades.
+                </EmptyState>
               )}
             </div>
           </div>
@@ -425,7 +478,9 @@ export function PublicTraderPageClient() {
                 <h2 className="text-sm font-semibold">Live trades</h2>
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--status-live)]" />
               </div>
-              <span className="text-[11px] text-[var(--text-muted)]">5s refresh</span>
+              <span className="text-[11px] text-[var(--text-muted)]">
+                5s refresh
+              </span>
             </div>
             {trader.liveTrades.length ? (
               <div className="max-h-[410px] overflow-y-auto">
@@ -434,21 +489,28 @@ export function PublicTraderPageClient() {
                     <tr className="border-b border-[var(--border-default)]">
                       <th className="px-4 py-2.5 font-medium">Time</th>
                       <th className="px-2 py-2.5 font-medium">Type</th>
-                      <th className="px-2 py-2.5 text-right font-medium">Price</th>
-                      <th className="px-4 py-2.5 text-right font-medium">Value</th>
+                      <th className="px-2 py-2.5 text-right font-medium">
+                        Price
+                      </th>
+                      <th className="px-4 py-2.5 text-right font-medium">
+                        Value
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[var(--border-default)]">
                     {trader.liveTrades.map((trade, index) => (
-                      <tr key={`${trade.transactionHash}-${index}`} className="hover:bg-[var(--bg-hover)]">
+                      <tr
+                        key={`${trade.transactionHash}-${index}`}
+                        className="hover:bg-[var(--bg-hover)]"
+                      >
                         <td className="whitespace-nowrap px-4 py-2.5 font-mono text-[10px] text-[var(--text-muted)]">
                           {formatTime(trade.timestamp)}
                         </td>
                         <td
                           className={`px-2 py-2.5 font-semibold ${
-                            trade.side === 'BUY'
-                              ? 'text-[var(--status-live)]'
-                              : 'text-[var(--color-destructive)]'
+                            trade.side === "BUY"
+                              ? "text-[var(--status-live)]"
+                              : "text-[var(--color-destructive)]"
                           }`}
                         >
                           {trade.side}
@@ -496,7 +558,7 @@ export function PublicTraderPageClient() {
                   treasuryValue > 0 ? (usdValue / treasuryValue) * 100 : 0;
                 return (
                   <div
-                    key={balance.address ?? 'native'}
+                    key={balance.address ?? "native"}
                     className="space-y-2.5 px-4 py-3"
                   >
                     <div className="flex items-center justify-between gap-3">
@@ -509,9 +571,9 @@ export function PublicTraderPageClient() {
                             {balance.symbol}
                           </p>
                           <p className="mt-0.5 truncate text-[10px] text-[var(--text-muted)]">
-                            {balance.kind === 'agent-token'
-                              ? 'Agent token'
-                              : balance.name ?? 'Tracked asset'}
+                            {balance.kind === "agent-token"
+                              ? "Agent token"
+                              : (balance.name ?? "Tracked asset")}
                           </p>
                         </div>
                       </div>
@@ -544,9 +606,15 @@ export function PublicTraderPageClient() {
                 <thead className="text-[10px] text-[var(--text-muted)]">
                   <tr className="border-b border-[var(--border-default)]">
                     <th className="px-4 py-2.5 font-medium">Asset</th>
-                    <th className="px-3 py-2.5 text-right font-medium">Balance</th>
-                    <th className="px-3 py-2.5 text-right font-medium">USD value</th>
-                    <th className="px-4 py-2.5 text-right font-medium">Allocation</th>
+                    <th className="px-3 py-2.5 text-right font-medium">
+                      Balance
+                    </th>
+                    <th className="px-3 py-2.5 text-right font-medium">
+                      USD value
+                    </th>
+                    <th className="px-4 py-2.5 text-right font-medium">
+                      Allocation
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[var(--border-default)]">
@@ -556,7 +624,7 @@ export function PublicTraderPageClient() {
                       treasuryValue > 0 ? (usdValue / treasuryValue) * 100 : 0;
                     return (
                       <tr
-                        key={balance.address ?? 'native'}
+                        key={balance.address ?? "native"}
                         className="hover:bg-[var(--bg-hover)]"
                       >
                         <td className="px-4 py-3">
@@ -569,9 +637,9 @@ export function PublicTraderPageClient() {
                                 {balance.symbol}
                               </p>
                               <p className="mt-0.5 max-w-40 truncate text-[10px] text-[var(--text-muted)]">
-                                {balance.kind === 'agent-token'
-                                  ? 'Agent token'
-                                  : balance.name ?? 'Tracked asset'}
+                                {balance.kind === "agent-token"
+                                  ? "Agent token"
+                                  : (balance.name ?? "Tracked asset")}
                               </p>
                             </div>
                           </div>
@@ -587,7 +655,9 @@ export function PublicTraderPageClient() {
                             <div className="h-1.5 w-14 overflow-hidden rounded-full bg-[var(--bg-elevated)]">
                               <div
                                 className="h-full rounded-full bg-[var(--color-accent)]"
-                                style={{ width: `${Math.min(100, allocation)}%` }}
+                                style={{
+                                  width: `${Math.min(100, allocation)}%`,
+                                }}
                               />
                             </div>
                             <span className="w-9 text-right text-[10px] text-[var(--text-muted)]">
@@ -610,17 +680,20 @@ export function PublicTraderPageClient() {
             </div>
             <dl className="grid sm:grid-cols-2">
               {[
-                ['Token', `${trader.token?.name ?? trader.agent.name} ($${tokenSymbol})`],
-                ['Equifold project', trader.tokenization.projectId],
-                ['Launch venue', trader.tokenization.launchVenue ?? 'Unknown'],
                 [
-                  'Generation',
+                  "Token",
+                  `${trader.token?.name ?? trader.agent.name} ($${tokenSymbol})`,
+                ],
+                ["Equifold project", trader.tokenization.projectId],
+                ["Launch venue", trader.tokenization.launchVenue ?? "Unknown"],
+                [
+                  "Generation",
                   trader.tokenization.launchGeneration
                     ? `Gen ${trader.tokenization.launchGeneration}`
-                    : 'Unknown',
+                    : "Unknown",
                 ],
-                ['Fee mode', trader.tokenization.feeMode],
-                ['Account', trader.chain.accountType],
+                ["Fee mode", trader.tokenization.feeMode],
+                ["Account", trader.chain.accountType],
               ].map(([label, value]) => (
                 <div
                   key={label}
@@ -646,16 +719,18 @@ export function PublicTraderPageClient() {
                   rel="noreferrer"
                   className="mt-1.5 inline-flex max-w-full items-center gap-1.5 font-mono text-xs text-[var(--text-secondary)] hover:text-[var(--color-accent)]"
                 >
-                  <span className="truncate">{trader.tokenization.tokenAddress}</span>
+                  <span className="truncate">
+                    {trader.tokenization.tokenAddress}
+                  </span>
                   <ExternalLink className="h-3 w-3 shrink-0" />
                 </a>
               </div>
               <div className="flex items-start gap-2 rounded-lg border border-[var(--status-live-border)] bg-[var(--status-live-bg)] p-3">
                 <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[var(--status-live)]" />
                 <p className="text-xs leading-5 text-[var(--text-secondary)]">
-                  The creator is the agent&apos;s ERC-4337 account. Only confirmed
-                  onchain activity is shown; private keys, policies and pending jobs
-                  are never published.
+                  The creator is the agent&apos;s ERC-4337 account. Only
+                  confirmed onchain activity is shown; private keys, policies
+                  and pending jobs are never published.
                 </p>
               </div>
             </div>
@@ -680,22 +755,35 @@ export function PublicTraderPageClient() {
                     <th className="px-4 py-2.5 font-medium">Time</th>
                     <th className="px-3 py-2.5 font-medium">Type</th>
                     <th className="px-3 py-2.5 font-medium">Asset / pair</th>
-                    <th className="px-3 py-2.5 text-right font-medium">Amount</th>
-                    <th className="px-3 py-2.5 text-right font-medium">USD value</th>
+                    <th className="px-3 py-2.5 text-right font-medium">
+                      Amount
+                    </th>
+                    <th className="px-3 py-2.5 text-right font-medium">
+                      USD value
+                    </th>
                     <th className="px-3 py-2.5 font-medium">Status</th>
-                    <th className="px-4 py-2.5 font-medium">Public trade thesis</th>
+                    <th className="px-4 py-2.5 font-medium">
+                      Public trade thesis
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[var(--border-default)]">
                   {trader.activity.map((activity) => (
-                    <tr key={activity.id} className="hover:bg-[var(--bg-hover)]">
+                    <tr
+                      key={activity.id}
+                      className="hover:bg-[var(--bg-hover)]"
+                    >
                       <td className="whitespace-nowrap px-4 py-3 text-[11px] text-[var(--text-muted)]">
                         {formatDateTime(activity.createdAt)}
                       </td>
-                      <td className={`px-3 py-3 font-semibold ${actionTone(activity.action)}`}>
+                      <td
+                        className={`px-3 py-3 font-semibold ${actionTone(activity.action)}`}
+                      >
                         {actionLabel(activity.action)}
                       </td>
-                      <td className="px-3 py-3 font-mono text-[11px]">{activity.pair}</td>
+                      <td className="px-3 py-3 font-mono text-[11px]">
+                        {activity.pair}
+                      </td>
                       <td className="px-3 py-3 text-right font-mono text-[11px]">
                         {formatTokenAmount(activity.amount, 6)}
                       </td>
@@ -711,7 +799,8 @@ export function PublicTraderPageClient() {
                       <td className="max-w-sm px-4 py-3 text-[11px] leading-5 text-[var(--text-secondary)]">
                         <div className="flex items-start justify-between gap-3">
                           <span>
-                            {activity.publicThesis ?? 'No public thesis was recorded.'}
+                            {activity.publicThesis ??
+                              "No public thesis was recorded."}
                           </span>
                           {activity.transactionHash ? (
                             <a
@@ -732,14 +821,16 @@ export function PublicTraderPageClient() {
               </table>
             </div>
           ) : (
-            <EmptyState>No confirmed agent executions have been published yet.</EmptyState>
+            <EmptyState>
+              No confirmed agent executions have been published yet.
+            </EmptyState>
           )}
         </section>
 
         <footer className="mt-6 flex flex-col gap-2 border-t border-[var(--border-default)] pt-5 text-xs leading-5 text-[var(--text-muted)] sm:flex-row sm:items-center sm:justify-between">
           <p>
-            Onchain data can be delayed by indexing. Values are informational and are not
-            financial advice.
+            Onchain data can be delayed by indexing. Values are informational
+            and are not financial advice.
           </p>
           <p className="font-mono">Chain ID {trader.chain.chainId}</p>
         </footer>

@@ -1,14 +1,14 @@
 // components/marketing/v3/MarketingShell.tsx
-import type { ReactNode } from 'react';
-import { Nav } from './Nav';
-import { Footer } from './Footer';
+import type { ReactNode } from "react";
+import { Nav } from "./Nav";
+import { Footer } from "./Footer";
 
 interface Props {
   children: ReactNode;
 }
 
 /**
- * Wraps marketing pages (/pricing, /frameworks, /token, /blog, /roadmap,
+ * Wraps marketing pages (/pricing, /explore, /traders, /frameworks, /token, /blog, /roadmap,
  * /changelog, /help, /support hub, /affiliate, /privacy, /terms,
  * /cookies, /impressum) with the v3 Nav + Footer.
  *

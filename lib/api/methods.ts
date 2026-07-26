@@ -44,6 +44,7 @@ import type {
   McpActionRequest,
   RobinhoodHub,
   PublicTraderData,
+  PublicTraderDirectoryData,
   RobinhoodPolicy,
   RobinhoodDexQuote,
   LaunchEquifoldAgentTokenBody,
@@ -386,10 +387,18 @@ export const api = {
     }),
 
   /** Link or replace the Solana wallet attached to the current account. */
-  linkWallet: (walletAddress: string, signature: string, signedMessage?: string) =>
+  linkWallet: (
+    walletAddress: string,
+    signature: string,
+    signedMessage?: string,
+  ) =>
     req<{ walletAddress: string }>("/auth/link-wallet", {
       method: "POST",
-      body: JSON.stringify({ walletAddress, signature, ...(signedMessage ? { signedMessage } : {}) }),
+      body: JSON.stringify({
+        walletAddress,
+        signature,
+        ...(signedMessage ? { signedMessage } : {}),
+      }),
     }),
 
   /** GDPR data export — downloads all user data as JSON */
@@ -532,9 +541,12 @@ export const api = {
 
   /** Discard a pending Lift review and its server-side safe manifest. */
   deleteLiftImport: (id: string) =>
-    req<{ deleted: boolean; id: string }>(`/agents/lift/${encodeURIComponent(id)}`, {
-      method: "DELETE",
-    }),
+    req<{ deleted: boolean; id: string }>(
+      `/agents/lift/${encodeURIComponent(id)}`,
+      {
+        method: "DELETE",
+      },
+    ),
 
   /** Create a paused agent from only the explicitly approved Lift candidates. */
   commitLiftImport: (id: string, body: CommitLiftImportBody) =>
@@ -547,12 +559,14 @@ export const api = {
     ),
 
   /** List account-wide one-shot tasks for Mission Control. */
-  getMissionTasks: (params: {
-    status?: string;
-    agentId?: string;
-    limit?: number;
-    cursor?: string;
-  } = {}) => {
+  getMissionTasks: (
+    params: {
+      status?: string;
+      agentId?: string;
+      limit?: number;
+      cursor?: string;
+    } = {},
+  ) => {
     const qs = new URLSearchParams();
     if (params.status) qs.set("status", params.status);
     if (params.agentId) qs.set("agentId", params.agentId);
@@ -605,7 +619,9 @@ export const api = {
 
   /** Get the complete configuration schema for one curated recipe. */
   getOutcomePack: (packId: string) =>
-    req<{ pack: PublicOutcomePack }>(`/outcome-packs/${encodeURIComponent(packId)}`),
+    req<{ pack: PublicOutcomePack }>(
+      `/outcome-packs/${encodeURIComponent(packId)}`,
+    ),
 
   /** Resolve a recipe for an agent without creating tasks or schedules. */
   prepareOutcomePack: (packId: string, body: PrepareOutcomePackBody) =>
@@ -624,7 +640,7 @@ export const api = {
   /** List owner-authorized Outcome Pack recurrences across agents. */
   getOutcomePackRecurrences: (agentId?: string) =>
     req<{ recurrences: OutcomePackRecurrence[] }>(
-      `/outcome-packs/recurrences${agentId ? `?agentId=${encodeURIComponent(agentId)}` : ''}`,
+      `/outcome-packs/recurrences${agentId ? `?agentId=${encodeURIComponent(agentId)}` : ""}`,
     ),
 
   pauseOutcomePackRecurrence: (recurrenceId: string) =>
@@ -658,7 +674,9 @@ export const api = {
 
   /** Get owner-visible recent transaction activity for managed agent wallets. */
   getAgentWalletActivity: (id: string, limit = 10) =>
-    req<AgentWalletActivityResponse>(`/agents/${id}/wallets/activity?limit=${limit}`),
+    req<AgentWalletActivityResponse>(
+      `/agents/${id}/wallets/activity?limit=${limit}`,
+    ),
 
   /** Export an owner-only managed wallet private key after account password confirmation. */
   exportAgentWalletPrivateKey: (
@@ -798,9 +816,15 @@ export const api = {
   getAgentXonaConfig: (id: string) =>
     req<XonaConfigStatus>(`/agents/${id}/xona/config`),
 
-  discoverAgentXonaResources: (id: string, query = "xona agent resources", limit = 8) => {
+  discoverAgentXonaResources: (
+    id: string,
+    query = "xona agent resources",
+    limit = 8,
+  ) => {
     const params = new URLSearchParams({ query, limit: String(limit) });
-    return req<XonaDiscoverResponse>(`/agents/${id}/xona/discover?${params.toString()}`);
+    return req<XonaDiscoverResponse>(
+      `/agents/${id}/xona/discover?${params.toString()}`,
+    );
   },
 
   callAgentXonaTool: (id: string, body: XonaCallBody) =>
@@ -819,14 +843,20 @@ export const api = {
       body: JSON.stringify(body),
     }),
 
-  searchAgentVirtualsAcp: (id: string, params: VirtualsAcpSearchParams = {}) => {
+  searchAgentVirtualsAcp: (
+    id: string,
+    params: VirtualsAcpSearchParams = {},
+  ) => {
     const query = new URLSearchParams();
     if (params.q) query.set("q", params.q);
     if (params.topK !== undefined) query.set("topK", String(params.topK));
     if (params.agentVersions) query.set("agentVersions", params.agentVersions);
-    if (params.includeHidden !== undefined) query.set("includeHidden", String(params.includeHidden));
+    if (params.includeHidden !== undefined)
+      query.set("includeHidden", String(params.includeHidden));
     const suffix = query.toString() ? `?${query.toString()}` : "";
-    return req<VirtualsAgentSummary[]>(`/agents/${id}/virtuals/acp/search${suffix}`);
+    return req<VirtualsAgentSummary[]>(
+      `/agents/${id}/virtuals/acp/search${suffix}`,
+    );
   },
 
   scoutAgentVirtualsAcp: (id: string, body: VirtualsScoutBody = {}) =>
@@ -844,25 +874,46 @@ export const api = {
   getAgentVirtualsAcpOperator: (id: string) =>
     req<VirtualsAcpOperatorStatus>(`/agents/${id}/virtuals/acp/operator`),
 
-  publishAgentVirtualsHatcherServices: (id: string, body: VirtualsAcpPublishServicesBody) =>
-    req<VirtualsAcpPublishServicesResponse>(`/agents/${id}/virtuals/acp/hatcher-services/publish`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
+  publishAgentVirtualsHatcherServices: (
+    id: string,
+    body: VirtualsAcpPublishServicesBody,
+  ) =>
+    req<VirtualsAcpPublishServicesResponse>(
+      `/agents/${id}/virtuals/acp/hatcher-services/publish`,
+      {
+        method: "POST",
+        body: JSON.stringify(body),
+      },
+    ),
 
-  drainAgentVirtualsAcpEvents: (id: string, body: VirtualsAcpDrainEventsBody = {}) =>
-    req<VirtualsAcpCliExecutionResponse>(`/agents/${id}/virtuals/acp/events/drain`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
+  drainAgentVirtualsAcpEvents: (
+    id: string,
+    body: VirtualsAcpDrainEventsBody = {},
+  ) =>
+    req<VirtualsAcpCliExecutionResponse>(
+      `/agents/${id}/virtuals/acp/events/drain`,
+      {
+        method: "POST",
+        body: JSON.stringify(body),
+      },
+    ),
 
-  respondAgentVirtualsAcpJob: (id: string, body: VirtualsAcpProviderResponseBody) =>
-    req<VirtualsAcpProviderResponseResult>(`/agents/${id}/virtuals/acp/jobs/respond`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
+  respondAgentVirtualsAcpJob: (
+    id: string,
+    body: VirtualsAcpProviderResponseBody,
+  ) =>
+    req<VirtualsAcpProviderResponseResult>(
+      `/agents/${id}/virtuals/acp/jobs/respond`,
+      {
+        method: "POST",
+        body: JSON.stringify(body),
+      },
+    ),
 
-  probeAgentVirtualsCompute: (id: string, body: VirtualsComputeProbeBody = {}) =>
+  probeAgentVirtualsCompute: (
+    id: string,
+    body: VirtualsComputeProbeBody = {},
+  ) =>
     req<VirtualsComputeProbeResponse>(`/agents/${id}/virtuals/compute/probe`, {
       method: "POST",
       body: JSON.stringify(body),
@@ -894,11 +945,17 @@ export const api = {
       body: JSON.stringify(body),
     }),
 
-  updateAgentVantaraProviderStatus: (id: string, body: VantaraCapabilityStatusBody) =>
-    req<VantaraCapabilityRegistration>(`/agents/${id}/vantara/provider/status`, {
-      method: "PATCH",
-      body: JSON.stringify(body),
-    }),
+  updateAgentVantaraProviderStatus: (
+    id: string,
+    body: VantaraCapabilityStatusBody,
+  ) =>
+    req<VantaraCapabilityRegistration>(
+      `/agents/${id}/vantara/provider/status`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(body),
+      },
+    ),
 
   deleteAgentVantaraProvider: (id: string) =>
     req<VantaraCapabilityRegistration>(`/agents/${id}/vantara/provider`, {
@@ -926,19 +983,34 @@ export const api = {
       method: "POST",
     }),
 
-  prepareAgentMetaplexRegistration: (id: string, body: MetaplexRegistrationPrepareInput) =>
-    req<MetaplexRegistrationPrepareResponse>(`/agents/${id}/metaplex/register/prepare`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
+  prepareAgentMetaplexRegistration: (
+    id: string,
+    body: MetaplexRegistrationPrepareInput,
+  ) =>
+    req<MetaplexRegistrationPrepareResponse>(
+      `/agents/${id}/metaplex/register/prepare`,
+      {
+        method: "POST",
+        body: JSON.stringify(body),
+      },
+    ),
 
-  completeAgentMetaplexRegistration: (id: string, body: MetaplexRegistrationCompleteInput) =>
-    req<MetaplexRegistrationResponse>(`/agents/${id}/metaplex/register/complete`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
+  completeAgentMetaplexRegistration: (
+    id: string,
+    body: MetaplexRegistrationCompleteInput,
+  ) =>
+    req<MetaplexRegistrationResponse>(
+      `/agents/${id}/metaplex/register/complete`,
+      {
+        method: "POST",
+        body: JSON.stringify(body),
+      },
+    ),
 
-  prepareAgentMetaplexTokenLaunch: (id: string, body: MetaplexTokenLaunchInput & { wallet?: string }) =>
+  prepareAgentMetaplexTokenLaunch: (
+    id: string,
+    body: MetaplexTokenLaunchInput & { wallet?: string },
+  ) =>
     req<MetaplexTokenLaunchPlan>(`/agents/${id}/metaplex/token/prepare`, {
       method: "POST",
       body: JSON.stringify(body),
@@ -947,10 +1019,13 @@ export const api = {
   uploadAgentMetaplexTokenImage: (id: string, file: File) => {
     const body = new FormData();
     body.append("image", file);
-    return req<MetaplexTokenImageUploadResponse>(`/agents/${id}/metaplex/token/image`, {
-      method: "POST",
-      body,
-    });
+    return req<MetaplexTokenImageUploadResponse>(
+      `/agents/${id}/metaplex/token/image`,
+      {
+        method: "POST",
+        body,
+      },
+    );
   },
 
   uploadAgentMetaplexAvatar: (id: string, file: File) => {
@@ -968,29 +1043,53 @@ export const api = {
       body: JSON.stringify(body),
     }),
 
-  prepareAgentMetaplexTokenLaunchDelegation: (id: string, body: MetaplexTokenLaunchDelegationPrepareInput) =>
-    req<MetaplexTokenLaunchDelegationPrepareResponse>(`/agents/${id}/metaplex/token/launch/delegate/prepare`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
+  prepareAgentMetaplexTokenLaunchDelegation: (
+    id: string,
+    body: MetaplexTokenLaunchDelegationPrepareInput,
+  ) =>
+    req<MetaplexTokenLaunchDelegationPrepareResponse>(
+      `/agents/${id}/metaplex/token/launch/delegate/prepare`,
+      {
+        method: "POST",
+        body: JSON.stringify(body),
+      },
+    ),
 
-  prepareAgentMetaplexTokenLaunchTransaction: (id: string, body: MetaplexTokenLaunchPrepareInput) =>
-    req<MetaplexTokenLaunchPrepareResponse>(`/agents/${id}/metaplex/token/launch/prepare`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
+  prepareAgentMetaplexTokenLaunchTransaction: (
+    id: string,
+    body: MetaplexTokenLaunchPrepareInput,
+  ) =>
+    req<MetaplexTokenLaunchPrepareResponse>(
+      `/agents/${id}/metaplex/token/launch/prepare`,
+      {
+        method: "POST",
+        body: JSON.stringify(body),
+      },
+    ),
 
-  completeAgentMetaplexTokenLaunch: (id: string, body: MetaplexTokenLaunchCompleteInput) =>
-    req<MetaplexTokenLaunchResponse>(`/agents/${id}/metaplex/token/launch/complete`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
+  completeAgentMetaplexTokenLaunch: (
+    id: string,
+    body: MetaplexTokenLaunchCompleteInput,
+  ) =>
+    req<MetaplexTokenLaunchResponse>(
+      `/agents/${id}/metaplex/token/launch/complete`,
+      {
+        method: "POST",
+        body: JSON.stringify(body),
+      },
+    ),
 
-  logAgentMetaplexTokenLaunchEvent: (id: string, body: MetaplexTokenLaunchClientEvent) =>
-    req<{ recorded: boolean }>(`/agents/${id}/metaplex/token/launch/client-event`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
+  logAgentMetaplexTokenLaunchEvent: (
+    id: string,
+    body: MetaplexTokenLaunchClientEvent,
+  ) =>
+    req<{ recorded: boolean }>(
+      `/agents/${id}/metaplex/token/launch/client-event`,
+      {
+        method: "POST",
+        body: JSON.stringify(body),
+      },
+    ),
 
   /** Mirari live mirror signals and dashboard grant. */
   getAgentMirariConfig: (id: string) =>
@@ -1113,31 +1212,55 @@ export const api = {
     }),
 
   getAgentEarnFiJob: (id: string, jobId: string) =>
-    req<EarnFiPollResponse>(`/agents/${id}/earnfi/jobs/${encodeURIComponent(jobId)}`),
+    req<EarnFiPollResponse>(
+      `/agents/${id}/earnfi/jobs/${encodeURIComponent(jobId)}`,
+    ),
 
   getAgentEarnFiJobSubmissions: (id: string, jobId: string) =>
-    req<EarnFiPollResponse>(`/agents/${id}/earnfi/jobs/${encodeURIComponent(jobId)}/submissions`),
+    req<EarnFiPollResponse>(
+      `/agents/${id}/earnfi/jobs/${encodeURIComponent(jobId)}/submissions`,
+    ),
 
   getAgentEarnFiJobCompletions: (id: string, jobId: string) =>
-    req<EarnFiPollResponse>(`/agents/${id}/earnfi/jobs/${encodeURIComponent(jobId)}/completions`),
+    req<EarnFiPollResponse>(
+      `/agents/${id}/earnfi/jobs/${encodeURIComponent(jobId)}/completions`,
+    ),
 
   getAgentEarnFiJobVerifications: (id: string, jobId: string) =>
-    req<EarnFiPollResponse>(`/agents/${id}/earnfi/jobs/${encodeURIComponent(jobId)}/verifications`),
+    req<EarnFiPollResponse>(
+      `/agents/${id}/earnfi/jobs/${encodeURIComponent(jobId)}/verifications`,
+    ),
 
   getAgentEarnFiInterrupt: (id: string, interruptId: string) =>
-    req<EarnFiPollResponse>(`/agents/${id}/earnfi/interrupt/${encodeURIComponent(interruptId)}`),
+    req<EarnFiPollResponse>(
+      `/agents/${id}/earnfi/interrupt/${encodeURIComponent(interruptId)}`,
+    ),
 
-  approveAgentEarnFiVerification: (id: string, verificationId: string, body: Record<string, unknown> = {}) =>
-    req<EarnFiPollResponse>(`/agents/${id}/earnfi/verifications/${encodeURIComponent(verificationId)}/approve`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
+  approveAgentEarnFiVerification: (
+    id: string,
+    verificationId: string,
+    body: Record<string, unknown> = {},
+  ) =>
+    req<EarnFiPollResponse>(
+      `/agents/${id}/earnfi/verifications/${encodeURIComponent(verificationId)}/approve`,
+      {
+        method: "POST",
+        body: JSON.stringify(body),
+      },
+    ),
 
-  rejectAgentEarnFiVerification: (id: string, verificationId: string, body: Record<string, unknown> = {}) =>
-    req<EarnFiPollResponse>(`/agents/${id}/earnfi/verifications/${encodeURIComponent(verificationId)}/reject`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
+  rejectAgentEarnFiVerification: (
+    id: string,
+    verificationId: string,
+    body: Record<string, unknown> = {},
+  ) =>
+    req<EarnFiPollResponse>(
+      `/agents/${id}/earnfi/verifications/${encodeURIComponent(verificationId)}/reject`,
+      {
+        method: "POST",
+        body: JSON.stringify(body),
+      },
+    ),
 
   /** OOBE Synapse RPC + SAP identity/discovery controls. */
   getAgentOobeConfig: (id: string) =>
@@ -1148,7 +1271,12 @@ export const api = {
 
   discoverAgentOobeSap: (
     id: string,
-    opts: { capability?: string; protocol?: string; wallet?: string; limit?: number } = {},
+    opts: {
+      capability?: string;
+      protocol?: string;
+      wallet?: string;
+      limit?: number;
+    } = {},
   ) => {
     const params = new URLSearchParams();
     if (opts.capability) params.set("capability", opts.capability);
@@ -1235,6 +1363,28 @@ export const api = {
   /** Get the opt-in public Robinhood Chain trader page (no auth required) */
   getAgentPublicTrader: (id: string) =>
     req<PublicTraderData>(`/agents/${id}/public-trader`),
+
+  /** Discover opt-in public Robinhood Chain traders (no auth required) */
+  getPublicTraders: (
+    params: {
+      q?: string;
+      sort?: "marketCap" | "volume24h" | "newest" | "activity";
+      venue?: "all" | "weth" | "sushi" | "stock";
+      status?: string;
+      page?: number;
+      limit?: number;
+    } = {},
+  ) => {
+    const query = new URLSearchParams();
+    if (params.q) query.set("q", params.q);
+    if (params.sort) query.set("sort", params.sort);
+    if (params.venue) query.set("venue", params.venue);
+    if (params.status) query.set("status", params.status);
+    if (params.page) query.set("page", String(params.page));
+    if (params.limit) query.set("limit", String(params.limit));
+    const suffix = query.size > 0 ? `?${query.toString()}` : "";
+    return req<PublicTraderDirectoryData>(`/agents/public-traders${suffix}`);
+  },
 
   /** Get public chat availability for a public agent (no auth required) */
   getAgentPublicChat: (id: string) =>
@@ -1422,7 +1572,9 @@ export const api = {
     ),
 
   getSolanaRecurringAuthorizations: () =>
-    req<{ authorizations: SolanaRecurringAuthorization[] }>("/payments/recurring"),
+    req<{ authorizations: SolanaRecurringAuthorization[] }>(
+      "/payments/recurring",
+    ),
 
   getSolanaRecurringQuote: (payload: SolanaRecurringQuoteRequest) =>
     req<SolanaRecurringQuote>("/payments/recurring/quote", {
@@ -1431,22 +1583,25 @@ export const api = {
     }),
 
   recordSolanaRecurringSetup: (payload: SolanaRecurringSetupRecordInput) =>
-    req<{ authorization: SolanaRecurringAuthorization }>("/payments/recurring/record", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    }),
+    req<{ authorization: SolanaRecurringAuthorization }>(
+      "/payments/recurring/record",
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+    ),
 
-  cancelSolanaRecurringAuthorization: (id: string, payload?: SolanaRecurringCancelRequest) =>
+  cancelSolanaRecurringAuthorization: (
+    id: string,
+    payload?: SolanaRecurringCancelRequest,
+  ) =>
     req<{
       authorization: SolanaRecurringAuthorization;
       cancelledAuthorizations?: SolanaRecurringAuthorization[];
-    }>(
-      `/payments/recurring/${encodeURIComponent(id)}/cancel`,
-      {
-        method: "POST",
-        ...(payload ? { body: JSON.stringify(payload) } : {}),
-      },
-    ),
+    }>(`/payments/recurring/${encodeURIComponent(id)}/cancel`, {
+      method: "POST",
+      ...(payload ? { body: JSON.stringify(payload) } : {}),
+    }),
 
   /** Get active features for an agent */
   getAgentFeatures: (agentId: string) =>
@@ -1517,7 +1672,13 @@ export const api = {
       monthlyAiCreditsGranted?: number;
     }>("/features/subscribe", {
       method: "POST",
-      body: JSON.stringify({ tier, txSignature, paymentToken, billingPeriod, paymentIntentId }),
+      body: JSON.stringify({
+        tier,
+        txSignature,
+        paymentToken,
+        billingPeriod,
+        paymentIntentId,
+      }),
     }),
 
   /** Purchase an add-on (optionally per-agent). Subscription-type addons
@@ -1598,11 +1759,11 @@ export const api = {
 
   /** Start a CryptoNow hosted checkout for SOL/USDC on Solana. */
   cryptnowCheckout: (payload: {
-    kind: 'tier' | 'addon';
+    kind: "tier" | "addon";
     key: string;
-    billingPeriod?: 'monthly' | 'annual';
+    billingPeriod?: "monthly" | "annual";
     agentId?: string;
-    coin?: 'SOL' | 'USDC' | 'ALL';
+    coin?: "SOL" | "USDC" | "ALL";
     returnUrl?: string;
   }) =>
     req<{
@@ -1612,10 +1773,10 @@ export const api = {
       amountUsd: number;
       merchantReceivesUsd?: number | null;
       feeUsd?: number | null;
-      coin: 'SOL' | 'USDC' | 'ALL';
+      coin: "SOL" | "USDC" | "ALL";
       orderId: string;
-    }>('/payments/cryptnow/checkout', {
-      method: 'POST',
+    }>("/payments/cryptnow/checkout", {
+      method: "POST",
       body: JSON.stringify(payload),
     }),
 
@@ -2089,12 +2250,19 @@ export const api = {
         path: string;
         size: number;
       };
-    }>(`/agents/${id}/public-chat/eyes/live?pipId=${encodeURIComponent(pipId)}`),
+    }>(
+      `/agents/${id}/public-chat/eyes/live?pipId=${encodeURIComponent(pipId)}`,
+    ),
 
   /** Start an Agent Room Eyes browser capture loop inside the runtime container. */
   startAgentEyesLive: (
     id: string,
-    body?: { url?: string; pipId?: string; intervalMs?: number; durationMs?: number },
+    body?: {
+      url?: string;
+      pipId?: string;
+      intervalMs?: number;
+      durationMs?: number;
+    },
   ) =>
     req<{
       status: "started";
@@ -2390,8 +2558,7 @@ export const api = {
     }),
 
   /** Admin: get system health */
-  adminGetHealth: () =>
-    req<AdminHealthResponse>("/admin/health"),
+  adminGetHealth: () => req<AdminHealthResponse>("/admin/health"),
 
   /**
    * Admin: 10 most recent Stripe disputes (C17).
@@ -2511,8 +2678,7 @@ export const api = {
   adminGetIdleOverview: () => req<AdminIdleOverviewResponse>("/admin/idle"),
 
   /** Admin: OOBE Synapse RPC and SAP registration overview */
-  adminGetOobeOverview: () =>
-    req<AdminOobeOverviewResponse>("/admin/oobe"),
+  adminGetOobeOverview: () => req<AdminOobeOverviewResponse>("/admin/oobe"),
 
   /** List files in agent's running container */
   listContainerFiles: (agentId: string, path?: string) =>
@@ -2864,7 +3030,12 @@ export const api = {
   /** Load chat history */
   getChatHistory: (agentId: string, sessionId?: string) =>
     req<{
-      messages: Array<{ role: string; content: string; ts: number; metadata?: unknown }>;
+      messages: Array<{
+        role: string;
+        content: string;
+        ts: number;
+        metadata?: unknown;
+      }>;
       nextCursor?: string | null;
     }>(
       `/agents/${agentId}/chat/history${sessionId ? `?sessionId=${encodeURIComponent(sessionId)}` : ""}`,
@@ -2873,7 +3044,12 @@ export const api = {
   /** Save chat messages to history */
   saveChatHistory: (
     agentId: string,
-    messages: Array<{ role: string; content: string; ts?: number; metadata?: unknown }>,
+    messages: Array<{
+      role: string;
+      content: string;
+      ts?: number;
+      metadata?: unknown;
+    }>,
     sessionId?: string | null,
   ) =>
     req<{ saved: number }>(`/agents/${agentId}/chat/history`, {
@@ -2896,7 +3072,9 @@ export const api = {
 
   /** Get webhook URL status for an agent */
   getWebhookUrl: (agentId: string) =>
-    req<{ url: string; tokenConfigured: boolean }>(`/agents/${agentId}/webhook-url`),
+    req<{ url: string; tokenConfigured: boolean }>(
+      `/agents/${agentId}/webhook-url`,
+    ),
 
   /** Get outbound webhook configuration for an agent */
   getAgentWebhookConfig: (agentId: string) =>
@@ -3490,10 +3668,7 @@ export const api = {
       `/agents/${agentId}/covenant/connectors`,
     ),
 
-  createCovenantConnector: (
-    agentId: string,
-    body: { name?: string } = {},
-  ) =>
+  createCovenantConnector: (agentId: string, body: { name?: string } = {}) =>
     req<CreateCovenantConnectorResponse>(
       `/agents/${agentId}/covenant/connectors`,
       {
@@ -3728,30 +3903,46 @@ export const api = {
       { method: "POST", body: JSON.stringify({ returnPath }) },
     ),
 
-  getMcpActionInbox: (params: { agentId?: string; status?: string; limit?: number } = {}) => {
+  getMcpActionInbox: (
+    params: { agentId?: string; status?: string; limit?: number } = {},
+  ) => {
     const query = new URLSearchParams();
     if (params.agentId) query.set("agentId", params.agentId);
     if (params.status) query.set("status", params.status);
     if (params.limit) query.set("limit", String(params.limit));
     const suffix = query.toString();
-    return req<McpActionInboxResponse>(`/agents/mcp/actions${suffix ? `?${suffix}` : ""}`);
+    return req<McpActionInboxResponse>(
+      `/agents/mcp/actions${suffix ? `?${suffix}` : ""}`,
+    );
   },
 
-  approveMcpAction: (actionId: string, body: { scope: "once" | "tool"; expiresInMinutes?: number }) =>
-    req<{ action: McpActionRequest }>(`/agents/mcp/actions/${actionId}/approve`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
+  approveMcpAction: (
+    actionId: string,
+    body: { scope: "once" | "tool"; expiresInMinutes?: number },
+  ) =>
+    req<{ action: McpActionRequest }>(
+      `/agents/mcp/actions/${actionId}/approve`,
+      {
+        method: "POST",
+        body: JSON.stringify(body),
+      },
+    ),
 
   rejectMcpAction: (actionId: string) =>
-    req<{ action: McpActionRequest }>(`/agents/mcp/actions/${actionId}/reject`, {
-      method: "POST",
-    }),
+    req<{ action: McpActionRequest }>(
+      `/agents/mcp/actions/${actionId}/reject`,
+      {
+        method: "POST",
+      },
+    ),
 
   revokeMcpActionGrant: (grantId: string) =>
-    req<{ grant: { id: string; status: "revoked" } }>(`/agents/mcp/grants/${grantId}`, {
-      method: "DELETE",
-    }),
+    req<{ grant: { id: string; status: "revoked" } }>(
+      `/agents/mcp/grants/${grantId}`,
+      {
+        method: "DELETE",
+      },
+    ),
 
   testAgentGithubAccess: (agentId: string, repo?: string) =>
     req<AgentGithubTestResponse>(`/agents/${agentId}/dev/github/test`, {
@@ -3813,11 +4004,9 @@ export const api = {
       }>;
     }>(`/ai-credits/history?limit=${limit}`),
 
-  getStakingConfig: () =>
-    req<StakingConfigResponse>("/staking/config"),
+  getStakingConfig: () => req<StakingConfigResponse>("/staking/config"),
 
-  getMyStaking: () =>
-    req<UserStakingSummary>("/staking/me"),
+  getMyStaking: () => req<UserStakingSummary>("/staking/me"),
 
   claimStakingAiCredits: () =>
     req<StakingClaimResponse>("/staking/claim-ai-credits", {
@@ -3858,7 +4047,11 @@ export const api = {
       totalFiles: number;
     }>(`/agents/${agentId}/knowledge`),
 
-  uploadKnowledge: (agentId: string, filename: string, payload: KnowledgeUploadPayload) => {
+  uploadKnowledge: (
+    agentId: string,
+    filename: string,
+    payload: KnowledgeUploadPayload,
+  ) => {
     const body =
       typeof payload === "string"
         ? { filename, content: payload }
