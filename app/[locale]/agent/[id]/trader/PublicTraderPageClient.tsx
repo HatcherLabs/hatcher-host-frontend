@@ -26,6 +26,8 @@ import {
 import { Link } from "@/i18n/routing";
 import { api, type PublicTraderData } from "@/lib/api";
 
+type PublicWalletBalance = PublicTraderData["chain"]["balances"][number];
+
 function shortAddress(value: string | null, start = 7, end = 5) {
   return value
     ? `${value.slice(0, start)}…${value.slice(-end)}`
@@ -58,6 +60,12 @@ function formatTokenAmount(
     notation: Math.abs(amount) >= 1_000_000 ? "compact" : "standard",
     maximumFractionDigits,
   }).format(amount);
+}
+
+function reliableWalletUsd(balance: PublicWalletBalance) {
+  return balance.priceSource === "live" || balance.priceSource === "stable"
+    ? numeric(balance.usdValue)
+    : null;
 }
 
 function formatTime(value: string) {
@@ -195,16 +203,22 @@ export function PublicTraderPageClient() {
     [trader?.liveTrades],
   );
 
-  const treasuryValue = useMemo(
+  const treasuryValue =
+    numeric(trader?.trading.summary.portfolioValueUsd) ?? 0;
+  const walletBalances = useMemo(
     () =>
-      trader?.chain.balances.reduce(
-        (sum, balance) => sum + (numeric(balance.usdValue) ?? 0),
-        0,
-      ) ?? 0,
+      trader?.chain.balances.filter(
+        (balance) => (numeric(balance.balance) ?? 0) > 0,
+      ) ?? [],
     [trader?.chain.balances],
   );
   const visibleTrades = trader?.trading.trades.slice(0, tradeLimit) ?? [];
   const visibleActivity = trader?.activity.slice(0, activityLimit) ?? [];
+  const openPositionsPnl =
+    trader?.trading.positions.reduce(
+      (sum, position) => sum + (numeric(position.totalPnlUsd) ?? 0),
+      0,
+    ) ?? null;
 
   if (loading) {
     return (
@@ -579,9 +593,9 @@ export function PublicTraderPageClient() {
         <section className="mt-3 overflow-hidden rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)]">
           <div className="grid sm:grid-cols-2 lg:grid-cols-5">
             <Metric
-              label="Portfolio value"
+              label="Reliable portfolio value"
               value={formatUsd(trader.trading.summary.portfolioValueUsd, true)}
-              detail="Current smart-account balances"
+              detail="Live-priced wallet and open positions"
             />
             <Metric
               label="Agent volume · 24h"
@@ -621,20 +635,22 @@ export function PublicTraderPageClient() {
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border-default)] px-4 py-3">
               <div>
                 <h2 className="text-sm font-semibold">
-                  Positions &amp; P&amp;L
+                  Open positions &amp; P&amp;L
                 </h2>
                 <p className="mt-0.5 text-xs text-[var(--text-muted)]">
-                  Average-cost accounting from confirmed agent trades
+                  Live-priced, non-dust exposure from confirmed agent trades
                 </p>
               </div>
               <p
                 className={`font-mono text-sm font-semibold ${
-                  (numeric(trader.trading.summary.totalPnlUsd) ?? 0) >= 0
+                  (openPositionsPnl ?? 0) >= 0
                     ? "text-[var(--status-live)]"
                     : "text-[var(--color-destructive)]"
                 }`}
               >
-                {formatUsd(trader.trading.summary.totalPnlUsd)}
+                {formatUsd(
+                  openPositionsPnl === null ? null : String(openPositionsPnl),
+                )}
               </p>
             </div>
             {trader.trading.positions.length ? (
@@ -644,7 +660,7 @@ export function PublicTraderPageClient() {
                     <tr className="border-b border-[var(--border-default)]">
                       <th className="px-4 py-2.5 font-medium">Position</th>
                       <th className="px-3 py-2.5 text-right font-medium">
-                        Wallet balance
+                        Open quantity
                       </th>
                       <th className="px-3 py-2.5 text-right font-medium">
                         Market value
@@ -680,7 +696,7 @@ export function PublicTraderPageClient() {
                           </p>
                         </td>
                         <td className="px-3 py-3 text-right font-mono text-[11px]">
-                          {formatTokenAmount(position.balance, 6)}
+                          {formatTokenAmount(position.trackedQuantity, 6)}
                         </td>
                         <td className="px-3 py-3 text-right font-mono text-[11px]">
                           {formatUsd(position.marketValueUsd)}
@@ -713,7 +729,7 @@ export function PublicTraderPageClient() {
               </div>
             ) : (
               <EmptyState>
-                Positions appear after the agent completes its first trade.
+                No live-priced, non-dust open positions.
               </EmptyState>
             )}
           </div>
@@ -825,8 +841,9 @@ export function PublicTraderPageClient() {
               </span>
             </div>
             <div className="divide-y divide-[var(--border-default)] sm:hidden">
-              {trader.chain.balances.map((balance) => {
-                const usdValue = numeric(balance.usdValue) ?? 0;
+              {walletBalances.map((balance) => {
+                const reliableUsd = reliableWalletUsd(balance);
+                const usdValue = reliableUsd ?? 0;
                 const allocation =
                   treasuryValue > 0 ? (usdValue / treasuryValue) * 100 : 0;
                 return (
@@ -855,7 +872,11 @@ export function PublicTraderPageClient() {
                           {formatTokenAmount(balance.balance, 6)}
                         </p>
                         <p className="mt-0.5 font-mono text-[10px] text-[var(--text-muted)]">
-                          {formatUsd(balance.usdValue)}
+                          {reliableUsd === null
+                            ? balance.priceSource === "last-trade"
+                              ? `${formatUsd(balance.usdValue)} last trade`
+                              : "Unpriced"
+                            : formatUsd(balance.usdValue)}
                         </p>
                       </div>
                     </div>
@@ -866,8 +887,10 @@ export function PublicTraderPageClient() {
                           style={{ width: `${Math.min(100, allocation)}%` }}
                         />
                       </div>
-                      <span className="w-9 text-right text-[10px] text-[var(--text-muted)]">
-                        {allocation.toFixed(0)}%
+                      <span className="w-12 text-right text-[10px] text-[var(--text-muted)]">
+                        {reliableUsd === null
+                          ? "—"
+                          : `${allocation.toFixed(0)}%`}
                       </span>
                     </div>
                   </div>
@@ -891,8 +914,9 @@ export function PublicTraderPageClient() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[var(--border-default)]">
-                  {trader.chain.balances.map((balance) => {
-                    const usdValue = numeric(balance.usdValue) ?? 0;
+                  {walletBalances.map((balance) => {
+                    const reliableUsd = reliableWalletUsd(balance);
+                    const usdValue = reliableUsd ?? 0;
                     const allocation =
                       treasuryValue > 0 ? (usdValue / treasuryValue) * 100 : 0;
                     return (
@@ -921,7 +945,11 @@ export function PublicTraderPageClient() {
                           {formatTokenAmount(balance.balance, 6)}
                         </td>
                         <td className="px-3 py-3 text-right font-mono text-[11px]">
-                          {formatUsd(balance.usdValue)}
+                          {reliableUsd === null
+                            ? balance.priceSource === "last-trade"
+                              ? `${formatUsd(balance.usdValue)} last trade`
+                              : "Unpriced"
+                            : formatUsd(balance.usdValue)}
                         </td>
                         <td className="px-4 py-3 text-right">
                           <div className="ml-auto flex w-24 items-center justify-end gap-2">
@@ -933,8 +961,10 @@ export function PublicTraderPageClient() {
                                 }}
                               />
                             </div>
-                            <span className="w-9 text-right text-[10px] text-[var(--text-muted)]">
-                              {allocation.toFixed(0)}%
+                            <span className="w-12 text-right text-[10px] text-[var(--text-muted)]">
+                              {reliableUsd === null
+                                ? "—"
+                                : `${allocation.toFixed(0)}%`}
                             </span>
                           </div>
                         </td>
