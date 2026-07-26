@@ -476,7 +476,9 @@ export function RobinhoodTab() {
     void run("publicTrader", async () => {
       const response = await api.updateRobinhoodPublicTrader(agent.id, enabled);
       if (!response.success) {
-        throw new Error(response.error || "Could not update the public trader page");
+        throw new Error(
+          response.error || "Could not update the public trader page",
+        );
       }
       return enabled
         ? `Public trader page enabled at ${response.data.publicUrl}.`
@@ -659,9 +661,9 @@ export function RobinhoodTab() {
                     Public trader page
                   </h3>
                   <p className="mt-1 max-w-2xl text-xs leading-5 text-[var(--text-secondary)]">
-                    Publish this agent&apos;s Equifold token metrics, Robinhood Chain
-                    balances and confirmed onchain activity. Policies, pending jobs
-                    and private execution details remain hidden.
+                    Publish this agent&apos;s Equifold token metrics, Robinhood
+                    Chain balances and confirmed onchain activity. Policies,
+                    pending jobs and private execution details remain hidden.
                   </p>
                   {!agent.isPublic ? (
                     <p className="mt-2 text-xs font-medium text-[var(--color-warning)]">
@@ -688,7 +690,9 @@ export function RobinhoodTab() {
                 <button
                   type="button"
                   role="switch"
-                  aria-checked={hub?.tokenization.publicTraderPageEnabled === true}
+                  aria-checked={
+                    hub?.tokenization.publicTraderPageEnabled === true
+                  }
                   onClick={togglePublicTrader}
                   disabled={
                     busy === "publicTrader" ||
@@ -913,6 +917,34 @@ export function RobinhoodTab() {
                   }
                 />
               </label>
+              <label className="mt-3 flex items-center justify-between gap-4 text-sm text-[var(--text-secondary)]">
+                Allow wallet-funded LP
+                <input
+                  type="checkbox"
+                  checked={
+                    policy.allowedActions.includes("equifold_lp_add") &&
+                    policy.allowedActions.includes("equifold_lp_compound")
+                  }
+                  onChange={(event) =>
+                    setPolicy({
+                      ...policy,
+                      allowedActions: event.target.checked
+                        ? Array.from(
+                            new Set([
+                              ...policy.allowedActions,
+                              "equifold_lp_add" as const,
+                              "equifold_lp_compound" as const,
+                            ]),
+                          )
+                        : policy.allowedActions.filter(
+                            (action) =>
+                              action !== "equifold_lp_add" &&
+                              action !== "equifold_lp_compound",
+                          ),
+                    })
+                  }
+                />
+              </label>
               <div className="mt-3 grid grid-cols-2 gap-3">
                 <label className="text-xs text-[var(--text-secondary)]">
                   Max trade USD
@@ -993,6 +1025,22 @@ export function RobinhoodTab() {
                     className={fieldClass}
                   />
                 </label>
+                <label className="text-xs text-[var(--text-secondary)]">
+                  Native reserve ETH
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.001"
+                    value={policy.minNativeReserveEth}
+                    onChange={(event) =>
+                      setPolicy({
+                        ...policy,
+                        minNativeReserveEth: Number(event.target.value),
+                      })
+                    }
+                    className={fieldClass}
+                  />
+                </label>
               </div>
               <p className="mt-3 text-[11px] leading-4 text-[var(--text-muted)]">
                 An empty token allowlist permits any contract address selected
@@ -1020,7 +1068,8 @@ export function RobinhoodTab() {
                 <p className="mt-2 text-[11px] leading-4 text-[var(--text-muted)]">
                   In COMPOUND fee mode, an authorized claim adds fees to the
                   canonical locked LP on this token&apos;s Sushi v3 or Uniswap
-                  v4 venue.
+                  v4 venue. Wallet-funded LP is separate and stays owned by the
+                  agent smart account.
                 </p>
               </div>
               <button
