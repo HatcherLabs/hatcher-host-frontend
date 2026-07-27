@@ -1190,6 +1190,8 @@ export interface RobinhoodPolicy {
   autoStopLossEnabled: boolean;
   autoStopLossRatio: number;
   autoTakeProfitEnabled: boolean;
+  takeProfits: Array<{ ratio: number; sellFraction: number }>;
+  maxOpenPositions: number;
   watchedWallets: string[];
   allowEstablishedTokens: boolean;
   scanMinLiquidityUsd: number;
@@ -1197,6 +1199,8 @@ export interface RobinhoodPolicy {
   scanMaxAgeHours: number;
   scanMinPoolWethDepthEth: number;
   scanMinTxns24h: number;
+  scanMinMarketCapUsd: number;
+  scanMaxMarketCapUsd: number;
   allowedActions: Array<
     | "equifold_buy"
     | "equifold_sell"

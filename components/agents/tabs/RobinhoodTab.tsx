@@ -1165,7 +1165,8 @@ export function RobinhoodTab() {
                   <span>
                     Automatic take-profit
                     <span className="mt-0.5 block text-xs text-[var(--text-muted)]">
-                      Sells half at 2x cost, the rest at 3x.
+                      Level 1 banks part of the position; level 2 closes the
+                      rest.
                     </span>
                   </span>
                   <input
@@ -1179,6 +1180,99 @@ export function RobinhoodTab() {
                     }
                   />
                 </label>
+                <div className="mt-2 grid grid-cols-3 gap-3">
+                  <label className="text-xs text-[var(--text-secondary)]">
+                    TP1 gain %
+                    <input
+                      type="number"
+                      min="5"
+                      max="900"
+                      value={Math.round(
+                        ((policy.takeProfits?.[0]?.ratio ?? 2) - 1) * 100,
+                      )}
+                      onChange={(event) => {
+                        const gain = Math.min(
+                          900,
+                          Math.max(5, Number(event.target.value) || 100),
+                        );
+                        const tp1 = policy.takeProfits?.[0] ?? {
+                          ratio: 2,
+                          sellFraction: 0.5,
+                        };
+                        const tp2 = policy.takeProfits?.[1] ?? {
+                          ratio: 3,
+                          sellFraction: 1,
+                        };
+                        setPolicy({
+                          ...policy,
+                          takeProfits: [
+                            { ...tp1, ratio: 1 + gain / 100 },
+                            tp2,
+                          ],
+                        });
+                      }}
+                      className={fieldClass}
+                    />
+                  </label>
+                  <label className="text-xs text-[var(--text-secondary)]">
+                    TP1 sell %
+                    <input
+                      type="number"
+                      min="10"
+                      max="100"
+                      value={Math.round(
+                        (policy.takeProfits?.[0]?.sellFraction ?? 0.5) * 100,
+                      )}
+                      onChange={(event) => {
+                        const pct = Math.min(
+                          100,
+                          Math.max(10, Number(event.target.value) || 50),
+                        );
+                        const tp1 = policy.takeProfits?.[0] ?? {
+                          ratio: 2,
+                          sellFraction: 0.5,
+                        };
+                        const tp2 = policy.takeProfits?.[1] ?? {
+                          ratio: 3,
+                          sellFraction: 1,
+                        };
+                        setPolicy({
+                          ...policy,
+                          takeProfits: [
+                            { ...tp1, sellFraction: pct / 100 },
+                            tp2,
+                          ],
+                        });
+                      }}
+                      className={fieldClass}
+                    />
+                  </label>
+                  <label className="text-xs text-[var(--text-secondary)]">
+                    TP2 multiple (x)
+                    <input
+                      type="number"
+                      min="1.1"
+                      max="100"
+                      step="0.1"
+                      value={policy.takeProfits?.[1]?.ratio ?? 3}
+                      onChange={(event) => {
+                        const ratio = Math.min(
+                          100,
+                          Math.max(1.1, Number(event.target.value) || 3),
+                        );
+                        const tp1 = policy.takeProfits?.[0] ?? {
+                          ratio: 2,
+                          sellFraction: 0.5,
+                        };
+                        setPolicy({
+                          ...policy,
+                          takeProfits: [tp1, { ratio, sellFraction: 1 }],
+                        });
+                      }}
+                      className={fieldClass}
+                    />
+                  </label>
+                </div>
               </div>
               <label className="mt-3 flex items-center justify-between gap-4 text-sm text-[var(--text-secondary)]">
                 <span>
@@ -1286,7 +1380,58 @@ export function RobinhoodTab() {
                       className={fieldClass}
                     />
                   </label>
+                  <label className="text-xs text-[var(--text-secondary)]">
+                    Min market cap USD
+                    <input
+                      type="number"
+                      min="0"
+                      value={policy.scanMinMarketCapUsd ?? 5000}
+                      onChange={(event) =>
+                        setPolicy({
+                          ...policy,
+                          scanMinMarketCapUsd: Number(event.target.value),
+                        })
+                      }
+                      className={fieldClass}
+                    />
+                  </label>
+                  <label className="text-xs text-[var(--text-secondary)]">
+                    Max market cap USD
+                    <input
+                      type="number"
+                      min="1"
+                      value={policy.scanMaxMarketCapUsd ?? 30000}
+                      onChange={(event) =>
+                        setPolicy({
+                          ...policy,
+                          scanMaxMarketCapUsd: Number(event.target.value),
+                        })
+                      }
+                      className={fieldClass}
+                    />
+                  </label>
+                  <label className="text-xs text-[var(--text-secondary)]">
+                    Max open positions
+                    <input
+                      type="number"
+                      min="1"
+                      max="20"
+                      value={policy.maxOpenPositions ?? 5}
+                      onChange={(event) =>
+                        setPolicy({
+                          ...policy,
+                          maxOpenPositions: Number(event.target.value),
+                        })
+                      }
+                      className={fieldClass}
+                    />
+                  </label>
                 </div>
+                <p className="mt-2 text-[11px] leading-4 text-[var(--text-muted)]">
+                  Tokenized stocks and ETFs are always excluded from the scan
+                  universe; the market-cap band steers the agent to the
+                  small-cap plays you want it hunting.
+                </p>
               </div>
               <div className="mt-3 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-2.5">
                 <p className="text-xs font-medium text-[var(--text-secondary)]">
