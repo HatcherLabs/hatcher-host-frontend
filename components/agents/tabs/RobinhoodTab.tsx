@@ -195,6 +195,8 @@ export function RobinhoodTab() {
   const callbackHandled = useRef(false);
   const dexDefaultsSet = useRef(false);
   const [policy, setPolicy] = useState<RobinhoodPolicy | null>(null);
+  const [watchedWalletsText, setWatchedWalletsText] = useState("");
+  const watchedWalletsInitialized = useRef(false);
   const [feeRecipients, setFeeRecipients] = useState<
     Array<{ address: string; bps: number }>
   >([]);
@@ -221,6 +223,12 @@ export function RobinhoodTab() {
           throw new Error(response.error || "Failed to load Robinhood hub");
         setHub(response.data);
         setPolicy(response.data.chain.policy);
+        if (!watchedWalletsInitialized.current) {
+          setWatchedWalletsText(
+            (response.data.chain.policy.watchedWallets ?? []).join("\n"),
+          );
+          watchedWalletsInitialized.current = true;
+        }
         if (!dexDefaultsSet.current) {
           setDexTokenOut(
             response.data.tokenization.tokenAddress ??
@@ -1105,6 +1113,193 @@ export function RobinhoodTab() {
                   canonical locked LP on this token&apos;s Sushi v3 or Uniswap
                   v4 venue. Wallet-funded LP is separate and stays owned by the
                   agent smart account.
+                </p>
+              </div>
+              <div className="mt-3 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-2.5">
+                <p className="text-xs font-medium text-[var(--text-secondary)]">
+                  Risk guard
+                </p>
+                <p className="mt-1 text-[11px] leading-4 text-[var(--text-muted)]">
+                  The server re-quotes open positions every ~2 minutes and
+                  executes exits through the same policy limits. The
+                  agent&apos;s own token is never auto-sold.
+                </p>
+                <label className="mt-3 flex items-center justify-between gap-4 text-sm text-[var(--text-secondary)]">
+                  Automatic stop-loss
+                  <input
+                    type="checkbox"
+                    checked={policy.autoStopLossEnabled !== false}
+                    onChange={(event) =>
+                      setPolicy({
+                        ...policy,
+                        autoStopLossEnabled: event.target.checked,
+                      })
+                    }
+                  />
+                </label>
+                <label className="mt-2 flex items-center justify-between gap-4 text-xs text-[var(--text-secondary)]">
+                  Stop-loss trigger (% below cost)
+                  <input
+                    type="number"
+                    min="5"
+                    max="95"
+                    step="1"
+                    value={Math.round(
+                      (1 - (policy.autoStopLossRatio ?? 0.75)) * 100,
+                    )}
+                    onChange={(event) => {
+                      const pct = Math.min(
+                        95,
+                        Math.max(5, Number(event.target.value) || 25),
+                      );
+                      setPolicy({
+                        ...policy,
+                        autoStopLossRatio:
+                          Math.round((1 - pct / 100) * 100) / 100,
+                      });
+                    }}
+                    className={`${fieldClass} max-w-24`}
+                  />
+                </label>
+                <label className="mt-2 flex items-center justify-between gap-4 text-sm text-[var(--text-secondary)]">
+                  <span>
+                    Automatic take-profit
+                    <span className="mt-0.5 block text-xs text-[var(--text-muted)]">
+                      Sells half at 2x cost, the rest at 3x.
+                    </span>
+                  </span>
+                  <input
+                    type="checkbox"
+                    checked={policy.autoTakeProfitEnabled !== false}
+                    onChange={(event) =>
+                      setPolicy({
+                        ...policy,
+                        autoTakeProfitEnabled: event.target.checked,
+                      })
+                    }
+                  />
+                </label>
+              </div>
+              <div className="mt-3 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-2.5">
+                <p className="text-xs font-medium text-[var(--text-secondary)]">
+                  Market scan thresholds
+                </p>
+                <p className="mt-1 text-[11px] leading-4 text-[var(--text-muted)]">
+                  Candidates must clear every gate; near-misses are still
+                  reported with the exact reason they failed.
+                </p>
+                <div className="mt-3 grid grid-cols-2 gap-3">
+                  <label className="text-xs text-[var(--text-secondary)]">
+                    Min 24h volume USD
+                    <input
+                      type="number"
+                      min="0"
+                      value={policy.scanMinVolume24hUsd ?? 3000}
+                      onChange={(event) =>
+                        setPolicy({
+                          ...policy,
+                          scanMinVolume24hUsd: Number(event.target.value),
+                        })
+                      }
+                      className={fieldClass}
+                    />
+                  </label>
+                  <label className="text-xs text-[var(--text-secondary)]">
+                    Min liquidity USD
+                    <input
+                      type="number"
+                      min="0"
+                      value={policy.scanMinLiquidityUsd ?? 2000}
+                      onChange={(event) =>
+                        setPolicy({
+                          ...policy,
+                          scanMinLiquidityUsd: Number(event.target.value),
+                        })
+                      }
+                      className={fieldClass}
+                    />
+                  </label>
+                  <label className="text-xs text-[var(--text-secondary)]">
+                    Max token age (hours)
+                    <input
+                      type="number"
+                      min="1"
+                      max="168"
+                      value={policy.scanMaxAgeHours ?? 48}
+                      onChange={(event) =>
+                        setPolicy({
+                          ...policy,
+                          scanMaxAgeHours: Number(event.target.value),
+                        })
+                      }
+                      className={fieldClass}
+                    />
+                  </label>
+                  <label className="text-xs text-[var(--text-secondary)]">
+                    Min pool depth ETH
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={policy.scanMinPoolWethDepthEth ?? 0.05}
+                      onChange={(event) =>
+                        setPolicy({
+                          ...policy,
+                          scanMinPoolWethDepthEth: Number(event.target.value),
+                        })
+                      }
+                      className={fieldClass}
+                    />
+                  </label>
+                  <label className="text-xs text-[var(--text-secondary)]">
+                    Min 24h transactions
+                    <input
+                      type="number"
+                      min="0"
+                      value={policy.scanMinTxns24h ?? 20}
+                      onChange={(event) =>
+                        setPolicy({
+                          ...policy,
+                          scanMinTxns24h: Number(event.target.value),
+                        })
+                      }
+                      className={fieldClass}
+                    />
+                  </label>
+                </div>
+              </div>
+              <div className="mt-3 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-2.5">
+                <p className="text-xs font-medium text-[var(--text-secondary)]">
+                  Watched wallets
+                </p>
+                <p className="mt-1 text-[11px] leading-4 text-[var(--text-muted)]">
+                  Your own conviction sources, one address per line (max 10).
+                  When two or more buy the same token, the scan flags it as
+                  high conviction. Signals only — every trade still passes
+                  safety and policy gates.
+                </p>
+                <textarea
+                  value={watchedWalletsText}
+                  onChange={(event) => {
+                    setWatchedWalletsText(event.target.value);
+                    const wallets = event.target.value
+                      .split(/[\s,;]+/u)
+                      .map((wallet) => wallet.trim())
+                      .filter((wallet) => /^0x[0-9a-fA-F]{40}$/u.test(wallet))
+                      .slice(0, 10);
+                    setPolicy({
+                      ...policy,
+                      watchedWallets: Array.from(new Set(wallets)),
+                    });
+                  }}
+                  rows={4}
+                  placeholder={"0x…\n0x…"}
+                  className={`${fieldClass} mt-2 w-full font-mono text-[11px]`}
+                />
+                <p className="mt-1 text-[11px] text-[var(--text-muted)]">
+                  {(policy.watchedWallets ?? []).length} valid wallet
+                  {(policy.watchedWallets ?? []).length === 1 ? "" : "s"} will
+                  be saved.
                 </p>
               </div>
               <button
