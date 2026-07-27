@@ -1187,6 +1187,15 @@ export interface RobinhoodPolicy {
   minNativeReserveEth: number;
   minPoolLiquidityEth: number;
   allowOwnTokenSell: boolean;
+  autoStopLossEnabled: boolean;
+  autoStopLossRatio: number;
+  autoTakeProfitEnabled: boolean;
+  watchedWallets: string[];
+  scanMinLiquidityUsd: number;
+  scanMinVolume24hUsd: number;
+  scanMaxAgeHours: number;
+  scanMinPoolWethDepthEth: number;
+  scanMinTxns24h: number;
   allowedActions: Array<
     | "equifold_buy"
     | "equifold_sell"
