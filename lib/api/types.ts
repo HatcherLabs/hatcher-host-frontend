@@ -1193,6 +1193,7 @@ export interface RobinhoodPolicy {
   takeProfits: Array<{ ratio: number; sellFraction: number }>;
   maxOpenPositions: number;
   watchedWallets: string[];
+  hiddenTokens: string[];
   allowEstablishedTokens: boolean;
   scanMinLiquidityUsd: number;
   scanMinVolume24hUsd: number;
