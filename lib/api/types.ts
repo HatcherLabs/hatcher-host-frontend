@@ -1185,6 +1185,8 @@ export interface RobinhoodPolicy {
   maxPriceImpactBps: number;
   requireOwnerApprovalAboveUsd: number;
   minNativeReserveEth: number;
+  minPoolLiquidityEth: number;
+  allowOwnTokenSell: boolean;
   allowedActions: Array<
     | "equifold_buy"
     | "equifold_sell"

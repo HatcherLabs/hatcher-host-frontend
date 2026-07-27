@@ -896,6 +896,25 @@ export function RobinhoodTab() {
                 />
               </label>
               <label className="mt-3 flex items-center justify-between gap-4 text-sm text-[var(--text-secondary)]">
+                <span>
+                  Allow selling the agent&apos;s own token
+                  <span className="mt-0.5 block text-xs text-[var(--text-muted)]">
+                    Off by default. The agent can still buy, burn and add liquidity for its own
+                    token.
+                  </span>
+                </span>
+                <input
+                  type="checkbox"
+                  checked={policy.allowOwnTokenSell}
+                  onChange={(event) =>
+                    setPolicy({
+                      ...policy,
+                      allowOwnTokenSell: event.target.checked,
+                    })
+                  }
+                />
+              </label>
+              <label className="mt-3 flex items-center justify-between gap-4 text-sm text-[var(--text-secondary)]">
                 Allow own-token burns
                 <input
                   type="checkbox"
@@ -1036,6 +1055,22 @@ export function RobinhoodTab() {
                       setPolicy({
                         ...policy,
                         minNativeReserveEth: Number(event.target.value),
+                      })
+                    }
+                    className={fieldClass}
+                  />
+                </label>
+                <label className="text-xs text-[var(--text-secondary)]">
+                  Min pool liquidity ETH
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.001"
+                    value={policy.minPoolLiquidityEth}
+                    onChange={(event) =>
+                      setPolicy({
+                        ...policy,
+                        minPoolLiquidityEth: Number(event.target.value),
                       })
                     }
                     className={fieldClass}
