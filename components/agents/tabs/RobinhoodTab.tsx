@@ -1180,6 +1180,26 @@ export function RobinhoodTab() {
                   />
                 </label>
               </div>
+              <label className="mt-3 flex items-center justify-between gap-4 text-sm text-[var(--text-secondary)]">
+                <span>
+                  Allow established-market tokens
+                  <span className="mt-0.5 block text-xs text-[var(--text-muted)]">
+                    Verified tokens with 1,000+ holders, $50k+ liquidity and 3+
+                    days of trading are tradeable without an approved launch
+                    factory.
+                  </span>
+                </span>
+                <input
+                  type="checkbox"
+                  checked={policy.allowEstablishedTokens !== false}
+                  onChange={(event) =>
+                    setPolicy({
+                      ...policy,
+                      allowEstablishedTokens: event.target.checked,
+                    })
+                  }
+                />
+              </label>
               <div className="mt-3 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-2.5">
                 <p className="text-xs font-medium text-[var(--text-secondary)]">
                   Market scan thresholds

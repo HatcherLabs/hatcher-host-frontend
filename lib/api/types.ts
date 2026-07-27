@@ -1191,6 +1191,7 @@ export interface RobinhoodPolicy {
   autoStopLossRatio: number;
   autoTakeProfitEnabled: boolean;
   watchedWallets: string[];
+  allowEstablishedTokens: boolean;
   scanMinLiquidityUsd: number;
   scanMinVolume24hUsd: number;
   scanMaxAgeHours: number;
