@@ -197,6 +197,8 @@ export function RobinhoodTab() {
   const [policy, setPolicy] = useState<RobinhoodPolicy | null>(null);
   const [watchedWalletsText, setWatchedWalletsText] = useState("");
   const watchedWalletsInitialized = useRef(false);
+  const [hiddenTokensText, setHiddenTokensText] = useState("");
+  const hiddenTokensInitialized = useRef(false);
   const [feeRecipients, setFeeRecipients] = useState<
     Array<{ address: string; bps: number }>
   >([]);
@@ -228,6 +230,12 @@ export function RobinhoodTab() {
             (response.data.chain.policy.watchedWallets ?? []).join("\n"),
           );
           watchedWalletsInitialized.current = true;
+        }
+        if (!hiddenTokensInitialized.current) {
+          setHiddenTokensText(
+            (response.data.chain.policy.hiddenTokens ?? []).join("\n"),
+          );
+          hiddenTokensInitialized.current = true;
         }
         if (!dexDefaultsSet.current) {
           setDexTokenOut(
@@ -1465,6 +1473,39 @@ export function RobinhoodTab() {
                   {(policy.watchedWallets ?? []).length} valid wallet
                   {(policy.watchedWallets ?? []).length === 1 ? "" : "s"} will
                   be saved.
+                </p>
+              </div>
+              <div className="mt-3 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-2.5">
+                <p className="text-xs font-medium text-[var(--text-secondary)]">
+                  Hidden tokens
+                </p>
+                <p className="mt-1 text-[11px] leading-4 text-[var(--text-muted)]">
+                  Unsellable dust and known rugs, one contract per line (max
+                  50). Hidden tokens disappear from the agent&apos;s state and
+                  positions, the market scan and the public trader balances.
+                </p>
+                <textarea
+                  value={hiddenTokensText}
+                  onChange={(event) => {
+                    setHiddenTokensText(event.target.value);
+                    const tokens = event.target.value
+                      .split(/[\s,;]+/u)
+                      .map((token) => token.trim())
+                      .filter((token) => /^0x[0-9a-fA-F]{40}$/u.test(token))
+                      .slice(0, 50);
+                    setPolicy({
+                      ...policy,
+                      hiddenTokens: Array.from(new Set(tokens)),
+                    });
+                  }}
+                  rows={4}
+                  placeholder={"0x…\n0x…"}
+                  className={`${fieldClass} mt-2 w-full font-mono text-[11px]`}
+                />
+                <p className="mt-1 text-[11px] text-[var(--text-muted)]">
+                  {(policy.hiddenTokens ?? []).length} token
+                  {(policy.hiddenTokens ?? []).length === 1 ? "" : "s"} will be
+                  hidden.
                 </p>
               </div>
               <button
