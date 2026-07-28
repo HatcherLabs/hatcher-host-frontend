@@ -3984,11 +3984,11 @@ export const api = {
     }>(`/credits/history?limit=${limit}`),
 
   getAiCreditBalance: () =>
-    req<{ balance: number; monthlyGrant: number; tier: string }>(
+    req<{ balance: number; monthlyGrant: number; tier: string; nextGrantAt?: string | null }>(
       "/ai-credits/balance",
     ),
 
-  getAiCreditHistory: (limit = 20) =>
+  getAiCreditHistory: (limit = 20, before?: string) =>
     req<{
       usage: Array<{
         id: string;
@@ -4004,7 +4004,7 @@ export const api = {
         outputTokens?: number;
         createdAt: string;
       }>;
-    }>(`/ai-credits/history?limit=${limit}`),
+    }>(`/ai-credits/history?limit=${limit}${before ? `&before=${encodeURIComponent(before)}` : ''}`),
 
   getStakingConfig: () => req<StakingConfigResponse>("/staking/config"),
 

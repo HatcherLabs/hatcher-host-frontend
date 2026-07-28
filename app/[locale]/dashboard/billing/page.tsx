@@ -466,6 +466,8 @@ export default function BillingPage() {
   // out the expiry or delete the account via Settings.
   const [openingPortal, setOpeningPortal] = useState(false);
   const [aiCreditHistory, setAiCreditHistory] = useState<AiCreditHistoryItem[]>([]);
+  const [loadingMoreHistory, setLoadingMoreHistory] = useState(false);
+  const [historyExhausted, setHistoryExhausted] = useState(false);
   const [userAgents, setUserAgents] = useState<Array<{ id: string; name: string }>>([]);
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
   const [recurringAuthorizations, setRecurringAuthorizations] = useState<SolanaRecurringAuthorization[]>([]);
@@ -600,6 +602,25 @@ export default function BillingPage() {
       setUserAgents(agents.map(a => ({ id: a.id, name: a.name })));
     }
   }, []);
+
+  const loadMoreHistory = useCallback(async () => {
+    const oldest = aiCreditHistory[aiCreditHistory.length - 1];
+    if (!oldest) return;
+    setLoadingMoreHistory(true);
+    try {
+      const res = await api.getAiCreditHistory(25, oldest.createdAt);
+      if (res.success) {
+        const fresh = res.data.usage;
+        if (fresh.length === 0) setHistoryExhausted(true);
+        setAiCreditHistory((prev) => {
+          const seen = new Set(prev.map((row) => row.id));
+          return [...prev, ...fresh.filter((row) => !seen.has(row.id))];
+        });
+      }
+    } finally {
+      setLoadingMoreHistory(false);
+    }
+  }, [aiCreditHistory]);
 
   const registerPendingCryptoPayment = (
     rail: PendingPaymentRail,
@@ -1717,7 +1738,7 @@ export default function BillingPage() {
 	            </div>
 	            {aiCreditHistory.length > 0 ? (
 	              <div className="space-y-2">
-	                {aiCreditHistory.slice(0, 10).map((tx) => (
+	                {aiCreditHistory.map((tx) => (
 	                  <div key={tx.id} className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-2">
 	                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
 	                      <div className="min-w-0">
@@ -1752,6 +1773,16 @@ export default function BillingPage() {
 	                    </div>
 	                  </div>
 	                ))}
+	                {!historyExhausted && (
+	                  <button
+	                    type="button"
+	                    onClick={() => void loadMoreHistory()}
+	                    disabled={loadingMoreHistory}
+	                    className="w-full rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-2 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] disabled:opacity-50"
+	                  >
+	                    {loadingMoreHistory ? 'Loading…' : 'Load more'}
+	                  </button>
+	                )}
 	              </div>
 	            ) : (
 	              <div className="rounded-lg border border-dashed border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-4 text-sm text-[var(--text-muted)]">
