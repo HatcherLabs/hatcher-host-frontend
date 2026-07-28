@@ -774,6 +774,48 @@ export function ConfigTab() {
     setCommitMessage('');
   };
 
+  // ── Custom 2D avatar (agent cards / Explore) ──
+  // Saved immediately as a data URL — the backend validates and stores it on
+  // agents.avatar_url (isAllowedAvatarUrl already accepts data:image/*).
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(agent?.avatarUrl ?? null);
+  const [avatarSaving, setAvatarSaving] = useState(false);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setAvatarPreview(agent?.avatarUrl ?? null);
+  }, [agent?.avatarUrl]);
+
+  const saveAvatar = useCallback(async (url: string | null) => {
+    if (!agent?.id) return;
+    setAvatarSaving(true);
+    setAvatarError(null);
+    try {
+      const res = await api.updateAgent(agent.id, { avatarUrl: url });
+      if (res.success) {
+        setAvatarPreview(url);
+      } else {
+        setAvatarError(res.error ?? 'Failed to update avatar');
+      }
+    } catch (err) {
+      setAvatarError(err instanceof Error ? err.message : 'Failed to update avatar');
+    } finally {
+      setAvatarSaving(false);
+    }
+  }, [agent?.id]);
+
+  const handleAvatarFile = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      setAvatarError('Image must be under 2 MB');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => void saveAvatar(reader.result as string);
+    reader.readAsDataURL(file);
+  }, [saveAvatar]);
+
   useEffect(() => {
     setActiveConfigSubtab(normalizeConfigSubtab(searchParams.get('configTab')));
   }, [searchParams]);
@@ -893,6 +935,47 @@ export function ConfigTab() {
               placeholder="What this agent does"
             />
           </label>
+          <div>
+            <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Avatar</span>
+            <div className="flex items-center gap-3">
+              {avatarPreview ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={avatarPreview}
+                  alt="Agent avatar"
+                  className="h-12 w-12 rounded-full object-cover border border-[var(--border-subtle)]"
+                />
+              ) : (
+                <div className="flex h-12 w-12 items-center justify-center rounded-full border border-dashed border-[var(--border-subtle)] text-[10px] text-[var(--text-muted)]">
+                  auto
+                </div>
+              )}
+              <label className="cursor-pointer rounded-lg border border-[var(--border-subtle)] px-3 py-2 text-sm text-[var(--text-secondary)] transition-colors hover:border-[var(--accent-primary)]/50 hover:text-[var(--accent-primary)]">
+                {avatarSaving ? 'Saving…' : 'Upload image'}
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/gif"
+                  className="hidden"
+                  onChange={handleAvatarFile}
+                  disabled={avatarSaving}
+                />
+              </label>
+              {avatarPreview && (
+                <button
+                  type="button"
+                  onClick={() => void saveAvatar(null)}
+                  disabled={avatarSaving}
+                  className="text-sm text-[var(--text-muted)] transition-colors hover:text-[var(--color-destructive)]"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+            {avatarError && <p className="mt-2 text-xs text-[var(--color-destructive)]">{avatarError}</p>}
+            <p className="mt-2 text-xs text-[var(--text-muted)]">
+              PNG, JPG, WebP or GIF up to 2 MB. Saved immediately; shown on agent cards and in Explore. Without a custom image the agent keeps its generated identicon.
+            </p>
+          </div>
         </div>
       </GlassCard>
           {savePanel('Save General')}
