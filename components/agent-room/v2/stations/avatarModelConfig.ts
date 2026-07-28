@@ -73,7 +73,7 @@ const AVATAR_VARIANT_ALIASES: Record<string, AvatarVariant> = {
   explorer: 'openclaw-scout',
   spirit: 'hermes-oracle',
   blob: 'animated-robot',
-  fox: 'openclaw-scout',
+  fox: 'fox-companion',
   crab: 'scout-drone',
   cat: 'street-scout',
   human: 'hatcher-hatchling-operator',
