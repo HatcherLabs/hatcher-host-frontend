@@ -4000,6 +4000,8 @@ export const api = {
         model: string | null;
         credits: number;
         providerCostUsd: string | number;
+        inputTokens?: number;
+        outputTokens?: number;
         createdAt: string;
       }>;
     }>(`/ai-credits/history?limit=${limit}`),
