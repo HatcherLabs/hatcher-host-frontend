@@ -30,6 +30,8 @@ type AiCreditUsage = {
   model: string | null;
   credits: number;
   providerCostUsd: string | number;
+  inputTokens?: number;
+  outputTokens?: number;
   createdAt: string;
 };
 
@@ -44,6 +46,12 @@ function formatCredits(value: number): string {
   if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(value >= 10_000_000 ? 0 : 1)}M`;
   if (value >= 10_000) return `${Math.round(value / 1_000)}K`;
   return Math.round(value).toLocaleString();
+}
+
+function formatTokenCount(value: number): string {
+  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+  if (value >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
+  return value.toLocaleString();
 }
 
 function formatDate(value: string): string {
@@ -263,6 +271,11 @@ export function AiCreditStatus({ variant = 'nav', onNavigate }: Props) {
                         <small>
                           {[item.agentName, item.provider, item.model].filter(Boolean).join(' · ')}
                         </small>
+                        {(item.inputTokens || item.outputTokens) ? (
+                          <small>
+                            {formatTokenCount(item.inputTokens ?? 0)} in · {formatTokenCount(item.outputTokens ?? 0)} out tokens
+                          </small>
+                        ) : null}
                       </div>
                       <div className={styles.usageValue}>
                         <strong>{item.credits.toLocaleString()}</strong>

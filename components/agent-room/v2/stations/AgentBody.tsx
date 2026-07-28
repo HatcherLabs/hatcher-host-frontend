@@ -333,6 +333,7 @@ export const SELECTABLE_AVATAR_VARIANT_IDS = new Set<AvatarVariant>([
   'space-operator',
   'field-operator',
   'studio-operator',
+  'fox-companion',
 ]);
 
 export const GLB_AVATAR_VARIANT_IDS = new Set<AvatarVariant>([
@@ -440,7 +441,7 @@ const AVATAR_VARIANT_ALIASES: Record<string, AvatarVariant> = {
   explorer: 'openclaw-scout',
   spirit: 'hermes-oracle',
   blob: 'animated-robot',
-  fox: 'openclaw-scout',
+  fox: 'fox-companion',
   crab: 'scout-drone',
   cat: 'street-scout',
   human: 'hatcher-hatchling-operator',

@@ -76,7 +76,7 @@
 
 .modal {
   position: relative;
-  width: min(440px, calc(100vw - 24px));
+  width: min(520px, calc(100vw - 24px));
   max-height: calc(100dvh - 90px);
   overflow: auto;
   border: 1px solid var(--border-default);
@@ -144,7 +144,9 @@
 }
 
 .balanceRow {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* auto-fit keeps each metric wide enough for its label/value; cells wrap
+     to a second row instead of squashing when the modal narrows */
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   margin-bottom: 10px;
 }
 

@@ -118,6 +118,7 @@ const AVATAR_OPTIONS = [
   { id: 'field-operator', name: 'Field Operator' },
   { id: 'studio-operator', name: 'Lab Analyst' },
   { id: 'shadow-operator', name: 'Shadow Operator' },
+  { id: 'fox-companion', name: 'Fox Companion' },
 ];
 
 function avatarOptionName(id: string): string {
@@ -132,7 +133,6 @@ const AVATAR_LEGACY_ALIASES: Record<string, string> = {
   'openclaw-drone': 'scout-drone',
   'hermes-oracle': 'freepixel-robot',
   'hermes-scribe': 'studio-operator',
-  'fox-companion': 'street-scout',
   blob: 'buzz-droid',
   cat: 'street-scout',
   crab: 'scout-drone',

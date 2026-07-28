@@ -742,6 +742,10 @@ export default function AgentManagePage() {
 
   useEffect(() => {
     if (!shouldRunChatWorkloads(tab)) return;
+    // Returning to the chat tab mid-stream must not hard-replace local
+    // messages with server history — the reply being streamed is not
+    // persisted yet and would vanish. The post-completion poll reconciles.
+    if ((sendingRef.current || wsStreamingMsgRef.current) && historyLoadedRef.current) return;
     lastHistorySignatureRef.current = '';
     void loadChatSessions();
     void loadChatHistory('initial');
@@ -918,7 +922,11 @@ export default function AgentManagePage() {
 
   const wsChat = useWebSocketChat({
     agentId: id,
-    enabled: isAuthenticated && !!id && shouldRunChatWorkloads(tab),
+    // Keep the socket alive while a response is in flight even if the user
+    // switches to another tab — closing it mid-stream used to lose the
+    // (already billed) answer. It closes on the next render after onDone/
+    // onError flips `sending` back to false.
+    enabled: isAuthenticated && !!id && (shouldRunChatWorkloads(tab) || sending),
     onToken: (token) => {
       setChatError(null);
       setChatErrorType(null);
