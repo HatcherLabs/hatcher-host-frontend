@@ -295,8 +295,8 @@ export function KnowledgeTab() {
             No knowledge files yet
           </h3>
           <p className="text-sm max-w-md mx-auto" style={{ color: 'var(--text-muted)' }}>
-            Upload documents (TXT, MD, or PDF text) to give your agent a RAG knowledge base.
-            The agent will use these as context for its responses.
+            Upload documents (TXT or MD) to your agent&apos;s knowledge folder.
+            The agent reads them before answering questions about your domain or documents.
           </p>
         </GlassCard>
       )}

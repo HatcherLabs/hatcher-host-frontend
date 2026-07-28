@@ -11,6 +11,7 @@ type AiCreditBalance = {
   balance: number;
   monthlyGrant: number;
   tier: string;
+  nextGrantAt?: string | null;
 };
 
 type AiCreditOverview = {
@@ -214,6 +215,13 @@ export function AiCreditStatus({ variant = 'nav', onNavigate }: Props) {
               <div>
                 <span className={styles.metricLabel}>Monthly grant</span>
                 <strong>{(balance?.monthlyGrant ?? 0).toLocaleString()}</strong>
+                {balance?.nextGrantAt && (
+                  <small>
+                    {new Date(balance.nextGrantAt).getTime() <= Date.now()
+                      ? 'refresh due now'
+                      : `refreshes ${formatDate(balance.nextGrantAt)}`}
+                  </small>
+                )}
               </div>
               <div>
                 <span className={styles.metricLabel}>Plan</span>
