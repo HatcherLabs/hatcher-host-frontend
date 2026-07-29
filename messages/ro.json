@@ -1459,20 +1459,6 @@
       "saveBtn": "Salvează",
       "cancelBtn": "Anulează"
     },
-    "quickStats": {
-      "totalAgents": "Total Agenți",
-      "dailyMessages": "AI Credits",
-      "unlimited": "∞",
-      "accountWide": "account balance",
-      "activeNow": "Activi acum",
-      "noAgentsRunning": "Niciun agent rulează",
-      "agentsOnline": "{count} agent online",
-      "agentsOnlinePlural": "{count} agenți online",
-      "accountTier": "Plan cont",
-      "lifetimeAccess": "Acces pe viață",
-      "prioritySupport": "Suport prioritar",
-      "upgradePlan": "Extinde planul"
-    },
     "agentDetail": {
       "tourNavTitle": "Navighează prin agentul tău",
       "tourNavDescription": "Toate zonele acestui agent — chat, loguri, configurare și altele — sunt la un clic distanță din această navigare.",

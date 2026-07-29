@@ -1341,20 +1341,6 @@
       "saveBtn": "Guardar",
       "cancelBtn": "Cancelar"
     },
-    "quickStats": {
-      "totalAgents": "Agentes totales",
-      "dailyMessages": "AI Credits",
-      "unlimited": "∞",
-      "accountWide": "saldo de cuenta",
-      "activeNow": "Activo ahora",
-      "noAgentsRunning": "No hay agentes en ejecución",
-      "agentsOnline": "Agente {count} en línea",
-      "agentsOnlinePlural": "Agentes {count} en línea",
-      "accountTier": "Nivel de cuenta",
-      "lifetimeAccess": "Acceso de por vida",
-      "prioritySupport": "Apoyo prioritario",
-      "upgradePlan": "Plan de actualización"
-    },
     "agentDetail": {
       "tourNavTitle": "Navega por tu agente",
       "tourNavDescription": "Todas las áreas de este agente — chat, logs, configuración y más — están a un clic desde esta navegación.",

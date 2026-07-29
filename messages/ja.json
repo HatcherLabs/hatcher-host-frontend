@@ -1341,20 +1341,6 @@
       "saveBtn": "セーブ",
       "cancelBtn": "キャンセル"
     },
-    "quickStats": {
-      "totalAgents": "総エージェント数",
-      "dailyMessages": "AI Credits",
-      "unlimited": "∞",
-      "accountWide": "口座残高",
-      "activeNow": "現在活動中",
-      "noAgentsRunning": "エージェントは逃げていません",
-      "agentsOnline": "{count}オンライン代理店",
-      "agentsOnlinePlural": "{count}オンラインエージェント",
-      "accountTier": "アカウントティア",
-      "lifetimeAccess": "生涯アクセス",
-      "prioritySupport": "優先支援",
-      "upgradePlan": "アップグレード計画"
-    },
     "agentDetail": {
       "tourNavTitle": "エージェント内を移動",
       "tourNavDescription": "チャット、ログ、設定など、このエージェントの各エリアへはこのナビゲーションからワンクリックで移動できます。",

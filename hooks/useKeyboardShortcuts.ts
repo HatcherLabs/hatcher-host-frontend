@@ -10,14 +10,6 @@ interface ShortcutHandlers {
   onAgentSelect?: (index: number) => void;
 }
 
-export const SHORTCUTS = [
-  { key: 'n', label: 'New agent', category: 'Navigation' },
-  { key: '/', label: 'Focus search', category: 'Navigation' },
-  { key: '?', label: 'Show shortcuts', category: 'General' },
-  { key: '1-9', label: 'Select agent by index', category: 'Agents' },
-  { key: 'Escape', label: 'Close modal', category: 'General' },
-] as const;
-
 export function useKeyboardShortcuts(handlers: ShortcutHandlers = {}) {
   const router = useRouter();
 
