@@ -923,12 +923,12 @@
       "details": "Détails",
       "tourCreateTitle": "Créez votre premier agent",
       "tourCreateDescription": "Cliquez ici pour créer votre premier agent IA. Choisissez entre OpenClaw et Hermes.",
-      "tourFilterTitle": "Filtrer par framework",
-      "tourFilterDescription": "OpenClaw ou Hermes — chacun a ses points forts.",
-      "tourSearchTitle": "Rechercher & explorer",
-      "tourSearchDescription": "Recherchez des agents ou lancez Chat-to-Hatch pour démarrer rapidement.",
-      "tourPlanTitle": "Votre forfait",
-      "tourPlanDescription": "Commencez gratuitement avec 1 agent, des AI Credits et les outils inclus. Évoluez à tout moment.",
+      "tourWorkspaceTitle": "Votre espace de travail",
+      "tourWorkspaceDescription": "Passez d'une zone à l'autre depuis cette barre : Agents, Mission Control, Outcome Packs et Approvals.",
+      "tourImportTitle": "Importer un agent existant",
+      "tourImportDescription": "Vous avez déjà un agent ? Importez sa configuration au lieu de repartir de zéro.",
+      "tourPlanTitle": "Forfait & AI Credits",
+      "tourPlanDescription": "Votre forfait et votre solde d'AI Credits se trouvent dans ce menu. Consultez votre utilisation ou évoluez à tout moment.",
       "statTotal": "Total",
       "statActive": "Actifs",
       "statSleeping": "En veille",
@@ -3041,5 +3041,12 @@
       "description": "No tasks match the selected agent and status filters.",
       "action": "Clear filters"
     }
+  },
+  "guidedTour": {
+    "stepCounter": "Étape {current} sur {total}",
+    "back": "Retour",
+    "next": "Suivant",
+    "done": "Terminé",
+    "skip": "Passer la visite"
   }
 }

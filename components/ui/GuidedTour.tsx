@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations } from 'next-intl';
+import { findResolvableStep } from './guidedTourSteps';
 
 export interface TourStep {
   target: string;
@@ -14,6 +16,10 @@ export interface GuidedTourProps {
   steps: TourStep[];
   storageKey?: string;
   onComplete?: () => void;
+  onSkip?: () => void;
+  onStart?: () => void;
+  /** When provided, the tour is controlled: true runs it regardless of the storage flag. */
+  open?: boolean;
 }
 
 interface Rect {
@@ -24,31 +30,112 @@ interface Rect {
 }
 
 const PAD = 8;
+const TARGET_WAIT_TIMEOUT = 10_000;
+
+function canResolve(target: string): boolean {
+  try {
+    return !!document.querySelector(target);
+  } catch {
+    return false;
+  }
+}
 
 export function GuidedTour({
   steps,
   storageKey = 'hatcher_tour_complete',
   onComplete,
+  onSkip,
+  onStart,
+  open,
 }: GuidedTourProps) {
+  const t = useTranslations('guidedTour');
   const [current, setCurrent] = useState(0);
   const [visible, setVisible] = useState(false);
   const [targetRect, setTargetRect] = useState<Rect | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
   const rafRef = useRef(0);
+  const startedRef = useRef(false);
+  const onStartRef = useRef(onStart);
+  onStartRef.current = onStart;
 
-  // Check localStorage on mount
+  const controlled = open !== undefined;
+
+  // Wait for the first resolvable target before starting; a fixed timer would
+  // often fire while the page is still showing loading skeletons.
+  const startWhenTargetAvailable = useCallback(() => {
+    const tryStart = () => {
+      const idx = findResolvableStep(steps, 0, 1, canResolve);
+      if (idx === -1) return false;
+      setCurrent(idx);
+      setVisible(true);
+      if (!startedRef.current) {
+        startedRef.current = true;
+        onStartRef.current?.();
+      }
+      return true;
+    };
+    if (tryStart()) return () => {};
+    const observer = new MutationObserver(() => {
+      if (tryStart()) {
+        observer.disconnect();
+        clearTimeout(timer);
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    const timer = setTimeout(() => observer.disconnect(), TARGET_WAIT_TIMEOUT);
+    return () => {
+      observer.disconnect();
+      clearTimeout(timer);
+    };
+  }, [steps]);
+
+  // Self-start on first run (uncontrolled) unless already completed
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (controlled) return;
     if (localStorage.getItem(storageKey) === 'true') return;
-    // Small delay so DOM elements render first
-    const t = setTimeout(() => setVisible(true), 600);
-    return () => clearTimeout(t);
-  }, [storageKey]);
+    return startWhenTargetAvailable();
+  }, [controlled, storageKey, startWhenTargetAvailable]);
 
-  // Measure target element and keep it in sync on scroll/resize
+  // Controlled mode: run whenever `open` is true, regardless of the flag
+  useEffect(() => {
+    if (!controlled) return;
+    if (!open) {
+      setVisible(false);
+      return;
+    }
+    return startWhenTargetAvailable();
+  }, [controlled, open, startWhenTargetAvailable]);
+
+  // Track viewport size without touching window during render
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 639px)');
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+
+  // Measure target element and keep it in sync on scroll/resize.
+  // If the current target vanished, skip ahead; if nothing resolves, hide
+  // WITHOUT persisting completion so the tour can run on the next visit.
   const measure = useCallback(() => {
     if (!visible || current >= steps.length) return;
-    const el = document.querySelector(steps[current].target);
-    if (!el) return;
+    let el: Element | null = null;
+    try {
+      el = document.querySelector(steps[current].target);
+    } catch {
+      el = null;
+    }
+    if (!el) {
+      const idx = findResolvableStep(steps, current + 1, 1, canResolve);
+      if (idx !== -1) {
+        setCurrent(idx);
+      } else {
+        setVisible(false);
+        setTargetRect(null);
+      }
+      return;
+    }
     const r = el.getBoundingClientRect();
     setTargetRect({
       top: r.top + window.scrollY,
@@ -77,41 +164,50 @@ export function GuidedTour({
   // Scroll target into view
   useEffect(() => {
     if (!visible || current >= steps.length) return;
-    const el = document.querySelector(steps[current].target);
+    let el: Element | null = null;
+    try {
+      el = document.querySelector(steps[current].target);
+    } catch {
+      el = null;
+    }
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, [visible, current, steps]);
 
-  const finish = useCallback(() => {
+  const finish = useCallback((reason: 'complete' | 'skip') => {
     setVisible(false);
     localStorage.setItem(storageKey, 'true');
-    onComplete?.();
-  }, [storageKey, onComplete]);
+    if (reason === 'skip') onSkip?.();
+    else onComplete?.();
+  }, [storageKey, onComplete, onSkip]);
 
   const next = useCallback(() => {
-    if (current + 1 >= steps.length) {
-      finish();
-    } else {
-      setCurrent((c) => c + 1);
-    }
-  }, [current, steps.length, finish]);
+    const idx = findResolvableStep(steps, current + 1, 1, canResolve);
+    if (idx === -1) finish('complete');
+    else setCurrent(idx);
+  }, [current, steps, finish]);
+
+  const back = useCallback(() => {
+    const idx = findResolvableStep(steps, current - 1, -1, canResolve);
+    if (idx !== -1) setCurrent(idx);
+  }, [current, steps]);
 
   // Keyboard navigation
   useEffect(() => {
     if (!visible) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') finish();
+      if (e.key === 'Escape') finish('skip');
       if (e.key === 'ArrowRight' || e.key === 'Enter') next();
-      if (e.key === 'ArrowLeft' && current > 0) setCurrent((c) => c - 1);
+      if (e.key === 'ArrowLeft') back();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [visible, finish, next, current]);
+  }, [visible, finish, next, back]);
 
   if (!visible || !targetRect) return null;
 
   const step = steps[current];
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
   const pos = isMobile ? 'bottom' : (step.position ?? 'bottom');
+  const isLast = findResolvableStep(steps, current + 1, 1, canResolve) === -1;
 
   // Tooltip positioning
   const tooltip = { top: 0, left: 0 };
@@ -132,24 +228,11 @@ export function GuidedTour({
     tooltip.left = targetRect.left + targetRect.width + PAD + 12;
   }
 
-  // Spotlight clip path (rectangle cutout)
+  // Spotlight rect
   const sTop = viewTop - PAD;
   const sLeft = targetRect.left - PAD;
   const sW = targetRect.width + PAD * 2;
   const sH = targetRect.height + PAD * 2;
-  const r = 12;
-  const clip = `polygon(
-    0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%,
-    ${sLeft}px ${sTop + r}px,
-    ${sLeft + r}px ${sTop}px,
-    ${sLeft + sW - r}px ${sTop}px,
-    ${sLeft + sW}px ${sTop + r}px,
-    ${sLeft + sW}px ${sTop + sH - r}px,
-    ${sLeft + sW - r}px ${sTop + sH}px,
-    ${sLeft + r}px ${sTop + sH}px,
-    ${sLeft}px ${sTop + sH - r}px,
-    ${sLeft}px ${sTop + r}px
-  )`;
 
   const transformOrigin =
     pos === 'top' ? 'bottom center' :
@@ -159,28 +242,21 @@ export function GuidedTour({
 
   return (
     <>
-      {/* Overlay with spotlight cutout */}
+      {/* Click shield: swallows stray backdrop clicks without ending the tour */}
+      <div className="fixed inset-0 z-[9997]" aria-hidden />
+
+      {/* Spotlight: the giant box-shadow dims everything around the target */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[9998]"
-        style={{
-          background: 'rgba(0,0,0,0.65)',
-          clipPath: clip,
-        }}
-        onClick={finish}
-      />
-
-      {/* Spotlight ring */}
-      <div
         className="fixed z-[9998] pointer-events-none rounded-xl"
         style={{
           top: sTop,
           left: sLeft,
           width: sW,
           height: sH,
-          boxShadow: '0 0 0 2px var(--color-accent), 0 0 24px 4px rgba(115,164,185,0.28)',
+          boxShadow: '0 0 0 2px var(--accent), 0 0 0 9999px rgba(0,0,0,0.65)',
         }}
       />
 
@@ -205,17 +281,16 @@ export function GuidedTour({
           }}
         >
           <div
-            className="rounded-2xl border border-white/10 p-5 shadow-2xl"
+            className="rounded-2xl border p-5 shadow-2xl"
             style={{
-              background: 'rgba(var(--bg-card-rgb, 30,30,40), 0.85)',
-              backdropFilter: 'blur(20px) saturate(1.4)',
-              WebkitBackdropFilter: 'blur(20px) saturate(1.4)',
+              background: 'var(--bg-card)',
+              borderColor: 'var(--border-default)',
             }}
           >
             {/* Step counter */}
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[11px] font-semibold text-[var(--color-accent)] tracking-wide uppercase">
-                Step {current + 1} of {steps.length}
+              <span className="text-[11px] font-semibold text-[var(--accent)] tracking-wide uppercase">
+                {t('stepCounter', { current: current + 1, total: steps.length })}
               </span>
               <div className="flex gap-1">
                 {steps.map((_, i) => (
@@ -223,7 +298,7 @@ export function GuidedTour({
                     key={i}
                     className="block w-1.5 h-1.5 rounded-full transition-colors duration-300"
                     style={{
-                      background: i <= current ? 'var(--color-accent)' : 'rgba(255,255,255,0.15)',
+                      background: i <= current ? 'var(--accent)' : 'var(--border-default)',
                     }}
                   />
                 ))}
@@ -237,22 +312,33 @@ export function GuidedTour({
               {step.description}
             </p>
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <button
-                onClick={finish}
+                onClick={() => finish('skip')}
                 className="text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors cursor-pointer"
               >
-                Skip tour
+                {t('skip')}
               </button>
-              <button
-                onClick={next}
-                className="px-4 py-1.5 rounded-lg text-xs font-semibold text-white transition-all cursor-pointer hover:brightness-110"
-                style={{
-                  background: 'linear-gradient(135deg, var(--color-accent), #06b6d4)',
-                }}
-              >
-                {current + 1 >= steps.length ? 'Done' : 'Next'}
-              </button>
+              <div className="flex items-center gap-2">
+                {current > 0 && (
+                  <button
+                    onClick={back}
+                    className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-[var(--border-default)] text-[var(--text-secondary)] transition-colors cursor-pointer hover:text-[var(--text-primary)]"
+                  >
+                    {t('back')}
+                  </button>
+                )}
+                <button
+                  onClick={next}
+                  className="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer hover:brightness-110"
+                  style={{
+                    background: 'var(--accent)',
+                    color: 'var(--bg-base)',
+                  }}
+                >
+                  {isLast ? t('done') : t('next')}
+                </button>
+              </div>
             </div>
           </div>
         </motion.div>

@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   Bot,
   PlusCircle,
+  Compass,
   CreditCard,
   Settings,
   Coins,
@@ -24,6 +25,11 @@ import {
   PackageCheck,
   ShieldCheck,
 } from 'lucide-react';
+import {
+  AGENTS_DASHBOARD_PATH,
+  PENDING_RESTART_KEY,
+  RESTART_TOUR_EVENT,
+} from '@/components/onboarding/dashboardTourTrigger';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import type { Agent } from '@/lib/api';
@@ -115,6 +121,24 @@ export function CommandPalette() {
   // Build full command list
   const allCommands: CommandItem[] = [
     ...STATIC_COMMANDS,
+    {
+      id: 'restart-tour',
+      label: 'Restart product tour',
+      icon: Compass,
+      action: () => {
+        try {
+          // Marker survives the navigation when the tour isn't mounted yet
+          sessionStorage.setItem(PENDING_RESTART_KEY, '1');
+        } catch {
+          // ignore
+        }
+        window.dispatchEvent(new CustomEvent(RESTART_TOUR_EVENT));
+        if (!pathname.startsWith('/dashboard')) {
+          router.push(AGENTS_DASHBOARD_PATH);
+        }
+      },
+      section: 'Actions',
+    },
     ...agents.map((a) => ({
       id: `agent-${a.id}`,
       label: a.name,

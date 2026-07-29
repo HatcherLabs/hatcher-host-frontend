@@ -14,6 +14,10 @@ interface UserProfile {
   isAdmin: boolean;
   tier: string;
   avatarUrl: string | null;
+  // Present when the profile came from /auth/me or /auth/session; the login
+  // fallback path doesn't know them, so consumers must handle undefined.
+  agentCount?: number;
+  createdAt?: string;
 }
 
 interface AuthContextValue {
@@ -49,6 +53,8 @@ function mapProfile(profile: AuthProfileData): UserProfile {
     isAdmin: profile.isAdmin ?? false,
     tier: profile.tier ?? 'free',
     avatarUrl: profile.avatarUrl ?? null,
+    agentCount: profile.agentCount ?? 0,
+    createdAt: profile.createdAt,
   };
 }
 

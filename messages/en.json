@@ -924,12 +924,12 @@
       "details": "Details",
       "tourCreateTitle": "Create Your First Agent",
       "tourCreateDescription": "Click here to hatch your first AI agent with OpenClaw or Hermes.",
-      "tourFilterTitle": "Filter by Framework",
-      "tourFilterDescription": "OpenClaw is best for automation; Hermes is best for adaptive memory workflows.",
-      "tourSearchTitle": "Search & Explore",
-      "tourSearchDescription": "Search agents or launch Chat-to-Hatch to get started quickly.",
-      "tourPlanTitle": "Your Plan",
-      "tourPlanDescription": "Start free with 1 agent, 500 AI Credits/month, and included tools. Upgrade anytime.",
+      "tourWorkspaceTitle": "Your Workspace",
+      "tourWorkspaceDescription": "Move between Agents, Mission Control, Outcome Packs, and Approvals from this bar.",
+      "tourImportTitle": "Import an Existing Agent",
+      "tourImportDescription": "Already running an agent elsewhere? Bring its configuration over instead of starting from scratch.",
+      "tourPlanTitle": "Plan & AI Credits",
+      "tourPlanDescription": "Your plan and AI credit balance live under this menu. Review usage or upgrade anytime.",
       "statTotal": "Total",
       "statActive": "Active",
       "statSleeping": "Sleeping",
@@ -3202,5 +3202,12 @@
         }
       }
     }
+  },
+  "guidedTour": {
+    "stepCounter": "Step {current} of {total}",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "skip": "Skip tour"
   }
 }

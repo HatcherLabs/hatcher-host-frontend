@@ -923,12 +923,12 @@
       "details": "Detail",
       "tourCreateTitle": "Buat Agen Pertama Anda",
       "tourCreateDescription": "Klik di sini untuk menetaskan agen AI pertama Anda dengan OpenClaw atau Hermes.",
-      "tourFilterTitle": "Filter berdasarkan Kerangka",
-      "tourFilterDescription": "OpenClaw adalah yang terbaik untuk otomatisasi; Hermes adalah yang terbaik untuk alur kerja memori adaptif.",
-      "tourSearchTitle": "Cari & Jelajahi",
-      "tourSearchDescription": "Cari agen atau luncurkan Chat-to-Hatch untuk memulai dengan cepat.",
-      "tourPlanTitle": "Rencana Anda",
-      "tourPlanDescription": "Mulai gratis dengan 1 agen, 500 AI Credits/bulan, dan alat yang disertakan. Tingkatkan versi kapan saja.",
+      "tourWorkspaceTitle": "Ruang Kerja Anda",
+      "tourWorkspaceDescription": "Berpindah antara Agen, Mission Control, Outcome Packs, dan Approvals dari bilah ini.",
+      "tourImportTitle": "Impor Agen yang Sudah Ada",
+      "tourImportDescription": "Sudah punya agen? Impor konfigurasinya alih-alih memulai dari awal.",
+      "tourPlanTitle": "Paket & AI Credits",
+      "tourPlanDescription": "Paket dan saldo AI Credits Anda ada di menu ini. Pantau penggunaan atau tingkatkan kapan saja.",
       "statTotal": "Jumlah",
       "statActive": "Aktif",
       "statSleeping": "Sedang tidur",
@@ -3065,5 +3065,12 @@
       "description": "No tasks match the selected agent and status filters.",
       "action": "Clear filters"
     }
+  },
+  "guidedTour": {
+    "stepCounter": "Langkah {current} dari {total}",
+    "back": "Kembali",
+    "next": "Berikutnya",
+    "done": "Selesai",
+    "skip": "Lewati tur"
   }
 }

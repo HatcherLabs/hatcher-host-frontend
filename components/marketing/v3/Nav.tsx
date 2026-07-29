@@ -272,6 +272,7 @@ export function Nav() {
                   <button
                     className={styles.userPill}
                     type="button"
+                    data-tour="user-menu"
                     aria-expanded={userMenuOpen}
                     aria-haspopup="menu"
                     aria-label={`${user.username} — ${tNav('settings')}`}
