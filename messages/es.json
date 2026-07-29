@@ -1341,20 +1341,6 @@
       "saveBtn": "Guardar",
       "cancelBtn": "Cancelar"
     },
-    "quickStats": {
-      "totalAgents": "Agentes totales",
-      "dailyMessages": "AI Credits",
-      "unlimited": "∞",
-      "accountWide": "saldo de cuenta",
-      "activeNow": "Activo ahora",
-      "noAgentsRunning": "No hay agentes en ejecución",
-      "agentsOnline": "Agente {count} en línea",
-      "agentsOnlinePlural": "Agentes {count} en línea",
-      "accountTier": "Nivel de cuenta",
-      "lifetimeAccess": "Acceso de por vida",
-      "prioritySupport": "Apoyo prioritario",
-      "upgradePlan": "Plan de actualización"
-    },
     "agentDetail": {
       "tabs": {
         "dashboard": "Panel de control",

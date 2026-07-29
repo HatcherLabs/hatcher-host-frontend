@@ -1341,20 +1341,6 @@
       "saveBtn": "Simpan",
       "cancelBtn": "Batalkan"
     },
-    "quickStats": {
-      "totalAgents": "Jumlah Agen",
-      "dailyMessages": "AI Credits",
-      "unlimited": "∞",
-      "accountWide": "saldo akun",
-      "activeNow": "Aktif Sekarang",
-      "noAgentsRunning": "Tidak ada agen yang berjalan",
-      "agentsOnline": "Agen {count} online",
-      "agentsOnlinePlural": "Agen {count} online",
-      "accountTier": "Tingkat Akun",
-      "lifetimeAccess": "Akses seumur hidup",
-      "prioritySupport": "Dukungan prioritas",
-      "upgradePlan": "Paket peningkatan"
-    },
     "agentDetail": {
       "tabs": {
         "dashboard": "Dasbor",

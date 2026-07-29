@@ -1341,20 +1341,6 @@
       "saveBtn": "Kayd et",
       "cancelBtn": "İptal et"
     },
-    "quickStats": {
-      "totalAgents": "Toplam Ajanlar",
-      "dailyMessages": "AI Credits",
-      "unlimited": "∞",
-      "accountWide": "Hesap bakiyesi",
-      "activeNow": "Aktif Şimdi",
-      "noAgentsRunning": "Ajan koşmuyor",
-      "agentsOnline": "{count} acente online",
-      "agentsOnlinePlural": "{count} acenteler çevrimiçi",
-      "accountTier": "Hesap Katmanı",
-      "lifetimeAccess": "Ömür boyu erişim",
-      "prioritySupport": "Öncelikli destek",
-      "upgradePlan": "Yükseltme planı"
-    },
     "agentDetail": {
       "tabs": {
         "dashboard": "Dashboard",

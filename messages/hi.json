@@ -1341,20 +1341,6 @@
       "saveBtn": "सहेजें",
       "cancelBtn": "रद्द करना"
     },
-    "quickStats": {
-      "totalAgents": "कुल एजेंट",
-      "dailyMessages": "AI Credits",
-      "unlimited": "∞",
-      "accountWide": "खाते की शेष राशि",
-      "activeNow": "अब सक्रिय",
-      "noAgentsRunning": "कोई एजेंट नहीं चल रहा है",
-      "agentsOnline": "{count} एजेंट ऑनलाइन",
-      "agentsOnlinePlural": "{count} एजेंट ऑनलाइन",
-      "accountTier": "खाता स्तर",
-      "lifetimeAccess": "लाइफटाइम एक्सेस",
-      "prioritySupport": "प्राथमिकता समर्थन",
-      "upgradePlan": "अपग्रेड योजना"
-    },
     "agentDetail": {
       "tabs": {
         "dashboard": "डैशबोर्ड",

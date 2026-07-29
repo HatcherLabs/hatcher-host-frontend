@@ -1459,20 +1459,6 @@
       "saveBtn": "Salvează",
       "cancelBtn": "Anulează"
     },
-    "quickStats": {
-      "totalAgents": "Total Agenți",
-      "dailyMessages": "AI Credits",
-      "unlimited": "∞",
-      "accountWide": "account balance",
-      "activeNow": "Activi acum",
-      "noAgentsRunning": "Niciun agent rulează",
-      "agentsOnline": "{count} agent online",
-      "agentsOnlinePlural": "{count} agenți online",
-      "accountTier": "Plan cont",
-      "lifetimeAccess": "Acces pe viață",
-      "prioritySupport": "Suport prioritar",
-      "upgradePlan": "Extinde planul"
-    },
     "agentDetail": {
       "tabs": {
         "dashboard": "Panou de control",

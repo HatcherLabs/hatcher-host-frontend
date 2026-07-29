@@ -1459,20 +1459,6 @@
       "saveBtn": "Save",
       "cancelBtn": "Cancel"
     },
-    "quickStats": {
-      "totalAgents": "Total Agents",
-      "dailyMessages": "AI Credits",
-      "unlimited": "∞",
-      "accountWide": "account balance",
-      "activeNow": "Active Now",
-      "noAgentsRunning": "No agents running",
-      "agentsOnline": "{count} agent online",
-      "agentsOnlinePlural": "{count} agents online",
-      "accountTier": "Account Tier",
-      "lifetimeAccess": "Lifetime access",
-      "prioritySupport": "Priority support",
-      "upgradePlan": "Upgrade plan"
-    },
     "agentDetail": {
       "tabs": {
         "dashboard": "Dashboard",

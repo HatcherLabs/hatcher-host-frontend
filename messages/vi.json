@@ -1341,20 +1341,6 @@
       "saveBtn": "Lưu",
       "cancelBtn": "Hủy bỏ"
     },
-    "quickStats": {
-      "totalAgents": "Tổng tác nhân",
-      "dailyMessages": "AI Credits",
-      "unlimited": "∞",
-      "accountWide": "số dư tài khoản",
-      "activeNow": "Đang hoạt động",
-      "noAgentsRunning": "Không có tác nhân nào đang chạy",
-      "agentsOnline": "Tác nhân {count} trực tuyến",
-      "agentsOnlinePlural": "Tác nhân {count} trực tuyến",
-      "accountTier": "Cấp tài khoản",
-      "lifetimeAccess": "Truy cập trọn đời",
-      "prioritySupport": "Hỗ trợ ưu tiên",
-      "upgradePlan": "kế hoạch nâng cấp"
-    },
     "agentDetail": {
       "tabs": {
         "dashboard": "Trang tổng quan",

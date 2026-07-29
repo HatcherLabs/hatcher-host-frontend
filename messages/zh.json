@@ -1319,20 +1319,6 @@
       "saveBtn": "保存",
       "cancelBtn": "取消"
     },
-    "quickStats": {
-      "totalAgents": "智能体总数",
-      "dailyMessages": "AI Credits",
-      "unlimited": "∞",
-      "accountWide": "account balance",
-      "activeNow": "当前活跃",
-      "noAgentsRunning": "无运行中的智能体",
-      "agentsOnline": "{count} 个智能体在线",
-      "agentsOnlinePlural": "{count} 个智能体在线",
-      "accountTier": "账户套餐",
-      "lifetimeAccess": "终身访问",
-      "prioritySupport": "优先支持",
-      "upgradePlan": "升级套餐"
-    },
     "agentDetail": {
       "tabs": {
         "dashboard": "仪表板",
