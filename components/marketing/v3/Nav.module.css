@@ -477,17 +477,34 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.userMetaBadges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  align-self: flex-start;
+  gap: 6px;
+}
 .userMetaTier {
   font-family: var(--font-inter), var(--font-body);
   font-size: 11px;
   color: var(--accent);
   text-transform: none;
   letter-spacing: 0;
-  align-self: flex-start;
   padding: 3px 6px;
   border: 1px solid color-mix(in srgb, var(--accent) 24%, transparent);
   border-radius: calc(var(--radius) - 2px);
   background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+.userMetaStaker {
+  font-family: var(--font-inter), var(--font-body);
+  font-size: 11px;
+  color: var(--success);
+  text-transform: none;
+  letter-spacing: 0;
+  padding: 3px 6px;
+  border: 1px solid color-mix(in srgb, var(--success) 32%, transparent);
+  border-radius: calc(var(--radius) - 2px);
+  background: color-mix(in srgb, var(--success) 10%, transparent);
 }
 
 .userCredits {

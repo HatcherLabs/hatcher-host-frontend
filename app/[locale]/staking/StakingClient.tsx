@@ -31,6 +31,7 @@ import {
   estimateStakingRewards,
 } from '@/lib/staking-reward-estimator';
 import { groupActiveStakesByPool, stakesInExpandedPoolGroups } from '@/lib/staking-active-stakes';
+import { StakingBenefitsCard } from './StakingBenefitsCard';
 import { isWalletTrustRevokedError, isWalletUserCancellationError } from '@/lib/wallet-errors';
 import { buildPhantomBrowseUrl } from '@/lib/wallet-links';
 import {
@@ -1266,6 +1267,8 @@ export function StakingClient() {
             )}
           </form>
         </section>
+
+        <StakingBenefitsCard />
 
         <section className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.7fr)]">
           <div className="min-w-0 overflow-hidden rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)]">

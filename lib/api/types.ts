@@ -260,6 +260,48 @@ export interface StakingClaimResponse {
   cappedByGlobal: boolean;
 }
 
+/** Boost benefits that require designating an owned agent. */
+export type StakingBoostBenefitKey = "boost_s" | "boost_l";
+
+export interface StakingBenefitsEntitlement {
+  /** HATCHER locked in the qualifying 30d/90d pools (active locks only). */
+  qualifyingStakedHatcher: number;
+  /** Inclusive tier reached: 0 none, 1 >=500k, 2 >=1M, 3 >=5M. */
+  tier: 0 | 1 | 2 | 3;
+  thresholds: {
+    extraAgentSlot: number;
+    boostS: number;
+    boostL: number;
+  };
+  /** False when served from a degraded read of staking data. */
+  dataFresh: boolean;
+}
+
+export interface StakingBoostBenefitStatus {
+  entitled: boolean;
+  /**
+   * Persists even when `entitled` is false so a re-stake reactivates the boost
+   * on the same agent (render lapsed designations greyed out).
+   */
+  designatedAgentId: string | null;
+}
+
+export interface StakingBenefitsResponse {
+  entitlement: StakingBenefitsEntitlement;
+  benefits: {
+    extraAgentSlot: boolean;
+    boostS: StakingBoostBenefitStatus;
+    boostL: StakingBoostBenefitStatus;
+    stakerBadge: boolean;
+  };
+}
+
+export interface StakingBenefitDesignationResponse {
+  benefit: StakingBoostBenefitKey;
+  agentId: string;
+  previousAgentId: string | null;
+}
+
 /**
  * Agent as returned by the API (serialized dates, optional joined relations).
  * Differs from shared Agent which is the full DB model with Date fields and AgentConfig.

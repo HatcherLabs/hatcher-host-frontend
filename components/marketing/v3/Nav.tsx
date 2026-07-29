@@ -321,7 +321,12 @@ export function Nav() {
                             <span className={styles.userMetaEmail}>{user.email}</span>
                           </div>
                         </div>
-                        <span className={styles.userMetaTier}>{formatFeatureKey(user.tier)} {tMenu('tierSuffix')}</span>
+                        <div className={styles.userMetaBadges}>
+                          <span className={styles.userMetaTier}>{formatFeatureKey(user.tier)} {tMenu('tierSuffix')}</span>
+                          {user.stakerBadge && (
+                            <span className={styles.userMetaStaker}>{tMenu('stakerBadge')}</span>
+                          )}
+                        </div>
                       </div>
                       <div className={styles.userCredits}>
                         <AiCreditStatus

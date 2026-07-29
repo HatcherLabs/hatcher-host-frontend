@@ -18,6 +18,7 @@ interface UserProfile {
   // fallback path doesn't know them, so consumers must handle undefined.
   agentCount?: number;
   createdAt?: string;
+  stakerBadge?: boolean;
 }
 
 interface AuthContextValue {
@@ -55,6 +56,7 @@ function mapProfile(profile: AuthProfileData): UserProfile {
     avatarUrl: profile.avatarUrl ?? null,
     agentCount: profile.agentCount ?? 0,
     createdAt: profile.createdAt,
+    stakerBadge: profile.stakerBadge ?? false,
   };
 }
 
