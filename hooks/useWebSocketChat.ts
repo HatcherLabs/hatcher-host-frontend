@@ -215,12 +215,20 @@ export function useWebSocketChat({
             const credits = msg.payload.credits;
             const inputTokens = msg.payload.inputTokens;
             const outputTokens = msg.payload.outputTokens;
+            const model = typeof msg.payload.model === 'string'
+              ? msg.payload.model.trim().slice(0, 128)
+              : '';
             if (
               typeof credits === 'number' &&
               typeof inputTokens === 'number' &&
               typeof outputTokens === 'number'
             ) {
-              onUsageRef.current({ credits, inputTokens, outputTokens });
+              onUsageRef.current({
+                credits,
+                inputTokens,
+                outputTokens,
+                ...(model ? { model } : {}),
+              });
             }
           }
           break;

@@ -21,6 +21,8 @@ export interface ChatUsagePayload {
   credits: number;
   inputTokens: number;
   outputTokens: number;
+  /** Model id that produced the turn (max 128 chars); absent when unknown. */
+  model?: string;
 }
 
 export type ParsedAgentChatStreamEvent =
@@ -97,7 +99,13 @@ export function parseAgentChatStreamEvent(
     if (credits === undefined || inputTokens === undefined || outputTokens === undefined) {
       return { kind: 'skip' };
     }
-    return { kind: 'usage', usage: { credits, inputTokens, outputTokens } };
+    // Optional model id: a malformed value omits just the field, the
+    // usage event itself stays valid.
+    const usageModel = stringValue(json.model)?.trim().slice(0, 128);
+    return {
+      kind: 'usage',
+      usage: { credits, inputTokens, outputTokens, ...(usageModel ? { model: usageModel } : {}) },
+    };
   }
 
   const token = stringValue(json.token);

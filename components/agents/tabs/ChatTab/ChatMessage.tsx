@@ -118,10 +118,21 @@ const ChatMessage = memo(function ChatMessage({
           {msg.role === 'assistant' && !msg.streaming && msg.usage && msg.usage.credits > 0 && (
             <span
               className="inline-flex items-center gap-0.5 text-[10px] text-[var(--text-muted)] select-none"
-              title={`${msg.usage.inputTokens.toLocaleString()} in / ${msg.usage.outputTokens.toLocaleString()} out tokens`}
+              title={`${msg.usage.inputTokens.toLocaleString()} in / ${msg.usage.outputTokens.toLocaleString()} out tokens${msg.usage.model ? ` · ${msg.usage.model}` : ''}`}
             >
               <Zap size={12} />
               {t('creditsSpent', { count: msg.usage.credits })}
+            </span>
+          )}
+          {msg.role === 'assistant' && !msg.streaming && msg.usage?.model && (
+            // Model id, not user copy — intentionally not translated.
+            // Hidden on mobile to keep the footer uncrowded; the credits
+            // chip tooltip still carries it there.
+            <span
+              className="hidden sm:inline-block max-w-[24ch] truncate text-[10px] text-[var(--text-muted)] select-none"
+              title={msg.usage.model}
+            >
+              {msg.usage.model}
             </span>
           )}
           {msg.role === 'assistant' && !msg.streaming && msg.content && ttsSupported && (
