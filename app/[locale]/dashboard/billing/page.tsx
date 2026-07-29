@@ -80,11 +80,15 @@ const AI_CREDITS_BY_TIER: Record<UserTierKey, number> = {
   founding_member: 25000,
 };
 
+// Displayed resource numbers per tier. Kept local (not read from @hatcher/shared
+// TIERS) because the shared package can lag behind runtime capacity changes —
+// e.g. business is 4 CPU / 6144 MB since 2026-07, while the published package
+// still says 2 / 3072 until its next release.
 const TIER_RESOURCE_OVERRIDES: Record<UserTierKey, { includedAgents: number; cpuLimit: number; memoryMb: number; storageMb: number; autoSleep: boolean; autoSleepMinutes: number; fileManager: boolean; fullLogs: boolean }> = {
   free: { includedAgents: 1, cpuLimit: 1, memoryMb: 1024, storageMb: 2048, autoSleep: true, autoSleepMinutes: 720, fileManager: true, fullLogs: true },
   starter: { includedAgents: 1, cpuLimit: 1, memoryMb: 1536, storageMb: 10240, autoSleep: false, autoSleepMinutes: 0, fileManager: true, fullLogs: true },
   pro: { includedAgents: 3, cpuLimit: 1.5, memoryMb: 2048, storageMb: 25600, autoSleep: false, autoSleepMinutes: 0, fileManager: true, fullLogs: true },
-  business: { includedAgents: 5, cpuLimit: 2, memoryMb: 3072, storageMb: 51200, autoSleep: false, autoSleepMinutes: 0, fileManager: true, fullLogs: true },
+  business: { includedAgents: 5, cpuLimit: 4, memoryMb: 6144, storageMb: 51200, autoSleep: false, autoSleepMinutes: 0, fileManager: true, fullLogs: true },
   founding_member: { includedAgents: 10, cpuLimit: 2, memoryMb: 4096, storageMb: 40960, autoSleep: false, autoSleepMinutes: 0, fileManager: true, fullLogs: true },
 };
 

@@ -647,8 +647,8 @@
       "business": {
         "agents": "5 agen disertakan",
         "messages": "40.000 AI Credits/bulan",
-        "cpu": "2 CPU",
-        "ram": "RAM 3 GB",
+        "cpu": "4 CPU",
+        "ram": "RAM 6 GB",
         "storage": "Ruang kerja 50 GB",
         "sleep": "Selalu aktif",
         "features": [

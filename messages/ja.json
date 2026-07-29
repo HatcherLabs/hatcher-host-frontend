@@ -647,8 +647,8 @@
       "business": {
         "agents": "5人のエージェントを含む",
         "messages": "月AI Credits 40,000",
-        "cpu": "2 CPU",
-        "ram": "3GB RAM",
+        "cpu": "4 CPU",
+        "ram": "6GB RAM",
         "storage": "50 GBワークスペース",
         "sleep": "常に活発に",
         "features": [

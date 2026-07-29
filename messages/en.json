@@ -647,8 +647,8 @@
       "business": {
         "agents": "5 agents included",
         "messages": "40,000 AI Credits/month",
-        "cpu": "2 CPU",
-        "ram": "3 GB RAM",
+        "cpu": "4 CPU",
+        "ram": "6 GB RAM",
         "storage": "50 GB workspace",
         "sleep": "Always active",
         "features": [
