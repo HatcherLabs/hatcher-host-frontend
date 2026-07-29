@@ -195,7 +195,7 @@ export function ChatInput({
   const inputDisabled = !!agentStarting;
 
   return (
-    <div>
+    <div data-tour="chat-input">
       {agentStarting && (
         <div className="flex items-center justify-center gap-2 px-3 py-2 mb-2 rounded-xl bg-[var(--color-accent)]/5 border border-[var(--color-accent)]/15">
           <div className="w-3 h-3 rounded-full border-2 border-[var(--color-accent)]/40 border-t-[var(--color-accent)] animate-spin flex-shrink-0" />

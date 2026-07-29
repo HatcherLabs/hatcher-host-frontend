@@ -1356,6 +1356,16 @@
       "upgradePlan": "Yükseltme planı"
     },
     "agentDetail": {
+      "tourNavTitle": "Ajanınızda Gezinin",
+      "tourNavDescription": "Bu ajanın tüm alanlarına — sohbet, loglar, yapılandırma ve daha fazlası — bu gezinme çubuğundan tek tıkla ulaşırsınız.",
+      "tourChatTitle": "Ajanınızla Sohbet Edin",
+      "tourChatDescription": "Ajanınızla tam burada konuşun. Her yanıt, harcanan AI Credits miktarını gösterir.",
+      "tourConfigTitle": "Her Şeyi Yapılandırın",
+      "tourConfigDescription": "Model, avatar, entegrasyonlar ve ücret ayarlarının tümü burada.",
+      "tourKnowledgeTitle": "Ajanınıza Öğretin",
+      "tourKnowledgeDescription": "Buraya dosya yükleyin; ajanınız yanıt verirken onları okur.",
+      "tourCreditsTitle": "Credits Hep Göz Önünde",
+      "tourCreditsDescription": "AI Credits bakiyeniz, sohbet ederken mesaj kutusunun hemen altında görünür kalır.",
       "tabs": {
         "dashboard": "Dashboard",
         "chat": "Sohbet",

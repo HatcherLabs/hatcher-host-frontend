@@ -2,77 +2,63 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { usePathname, useRouter } from '@/i18n/routing';
+import { usePathname } from '@/i18n/routing';
 import { useAuth } from '@/lib/auth-context';
 import { track } from '@/lib/analytics';
 import { GuidedTour, type TourStep } from '@/components/ui/GuidedTour';
 import {
-  AGENTS_DASHBOARD_PATH,
   PENDING_RESTART_KEY,
   RESTART_TOUR_EVENT,
   TOUR_STORAGE_KEY,
-  shouldStartDashboardTour,
 } from './dashboardTourTrigger';
-import { restartTourTarget } from './agentDetailTourTrigger';
+import {
+  AGENT_DETAIL_TOUR_STEPS,
+  AGENT_TOUR_STORAGE_KEY,
+  isAgentDetailPath,
+  restartTourTarget,
+  shouldStartAgentDetailTour,
+} from './agentDetailTourTrigger';
 
-export function DashboardTour() {
-  const t = useTranslations('dashboard.agents');
+export function AgentDetailTour() {
+  const t = useTranslations('dashboard.agentDetail');
   const pathname = usePathname();
-  const router = useRouter();
   const { isAuthenticated, isLoading, user } = useAuth();
   const [eligible, setEligible] = useState(false);
   const [forceOpen, setForceOpen] = useState(false);
   const [runId, setRunId] = useState(0);
 
-  const steps: TourStep[] = useMemo(() => [
-    {
-      target: '[data-tour="create-agent"]',
-      title: t('tourCreateTitle'),
-      description: t('tourCreateDescription'),
-    },
-    {
-      target: '[data-dashboard-workspace-nav]',
-      title: t('tourWorkspaceTitle'),
-      description: t('tourWorkspaceDescription'),
-    },
-    {
-      target: '[data-tour="import-agent"]',
-      title: t('tourImportTitle'),
-      description: t('tourImportDescription'),
-    },
-    {
-      target: '[data-tour="user-menu"]',
-      title: t('tourPlanTitle'),
-      description: t('tourPlanDescription'),
-    },
-  ], [t]);
+  const onAgentPage = isAgentDetailPath(pathname);
+
+  const steps: TourStep[] = useMemo(() => AGENT_DETAIL_TOUR_STEPS.map((step) => ({
+    target: step.target,
+    title: t(step.titleKey),
+    description: t(step.descriptionKey),
+  })), [t]);
 
   // First-run trigger (evaluated in an effect: localStorage is client-only)
   useEffect(() => {
-    setEligible(shouldStartDashboardTour({
+    setEligible(shouldStartAgentDetailTour({
       isAuthenticated,
       isLoading,
-      agentCount: user?.agentCount,
+      profileLoaded: !!user,
       pathname,
-      completed: localStorage.getItem(TOUR_STORAGE_KEY) === 'true',
+      completed: localStorage.getItem(AGENT_TOUR_STORAGE_KEY) === 'true',
     }));
-  }, [isAuthenticated, isLoading, user?.agentCount, pathname]);
+  }, [isAuthenticated, isLoading, user, pathname]);
 
   const restart = useCallback(() => {
-    // On an agent detail page the restart belongs to AgentDetailTour.
-    if (restartTourTarget(pathname) !== 'dashboard') return;
+    // Off agent pages the restart belongs to the dashboard tour.
+    if (restartTourTarget(pathname) !== 'agent') return;
     try {
       sessionStorage.removeItem(PENDING_RESTART_KEY);
     } catch {
       // ignore
     }
+    localStorage.removeItem(AGENT_TOUR_STORAGE_KEY);
     localStorage.removeItem(TOUR_STORAGE_KEY);
-    if (!pathname.endsWith(AGENTS_DASHBOARD_PATH)) {
-      router.push(AGENTS_DASHBOARD_PATH);
-    }
     setForceOpen(true);
     setRunId((id) => id + 1);
-  }, [pathname, router]);
+  }, [pathname]);
 
   // Manual restart via the command palette (or anything else dispatching the event)
   useEffect(() => {
@@ -80,7 +66,7 @@ export function DashboardTour() {
     return () => window.removeEventListener(RESTART_TOUR_EVENT, restart);
   }, [restart]);
 
-  // A restart requested outside the dashboard arrives here as a pending marker
+  // A restart requested before this mounted arrives here as a pending marker
   useEffect(() => {
     try {
       if (sessionStorage.getItem(PENDING_RESTART_KEY) === '1') restart();
@@ -91,22 +77,28 @@ export function DashboardTour() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // A forced run must not survive navigating away from the agent page.
+  useEffect(() => {
+    if (!onAgentPage) setForceOpen(false);
+  }, [onAgentPage]);
+
+  if (!onAgentPage) return null;
   if (!forceOpen && !eligible) return null;
 
   return (
     <GuidedTour
       key={runId}
       steps={steps}
-      storageKey={TOUR_STORAGE_KEY}
+      storageKey={AGENT_TOUR_STORAGE_KEY}
       open={forceOpen ? true : undefined}
-      onStart={() => track.tourStarted()}
+      onStart={() => track.tourStarted('agent-detail')}
       onComplete={() => {
         setForceOpen(false);
-        track.tourCompleted();
+        track.tourCompleted('agent-detail');
       }}
       onSkip={() => {
         setForceOpen(false);
-        track.tourSkipped();
+        track.tourSkipped('agent-detail');
       }}
     />
   );

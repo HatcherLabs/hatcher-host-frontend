@@ -1356,6 +1356,16 @@
       "upgradePlan": "kế hoạch nâng cấp"
     },
     "agentDetail": {
+      "tourNavTitle": "Điều hướng tác nhân của bạn",
+      "tourNavDescription": "Mọi khu vực của tác nhân này — trò chuyện, log, cấu hình và hơn thế nữa — chỉ cách một cú nhấp từ thanh điều hướng này.",
+      "tourChatTitle": "Trò chuyện với tác nhân của bạn",
+      "tourChatDescription": "Trò chuyện với tác nhân ngay tại đây. Mỗi câu trả lời hiển thị số AI Credits đã dùng.",
+      "tourConfigTitle": "Cấu hình mọi thứ",
+      "tourConfigDescription": "Model, ảnh đại diện, tích hợp và cài đặt phí đều nằm ở đây.",
+      "tourKnowledgeTitle": "Dạy tác nhân của bạn",
+      "tourKnowledgeDescription": "Tải tệp lên đây và tác nhân của bạn sẽ đọc chúng khi trả lời.",
+      "tourCreditsTitle": "Credits luôn trong tầm mắt",
+      "tourCreditsDescription": "Số dư AI Credits của bạn luôn hiển thị ngay dưới ô nhập tin nhắn trong khi trò chuyện.",
       "tabs": {
         "dashboard": "Trang tổng quan",
         "chat": "Trò chuyện",

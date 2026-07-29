@@ -32,12 +32,25 @@ interface Rect {
 const PAD = 8;
 const TARGET_WAIT_TIMEOUT = 10_000;
 
-function canResolve(target: string): boolean {
+/**
+ * Resolve a target selector to the first VISIBLE match. Responsive layouts
+ * render some anchors twice (a mobile and a desktop variant, one of them
+ * display:none), and a plain querySelector could hand back the hidden copy.
+ */
+function resolveTarget(target: string): Element | null {
   try {
-    return !!document.querySelector(target);
+    const matches = document.querySelectorAll(target);
+    for (let i = 0; i < matches.length; i++) {
+      if (matches[i].getClientRects().length > 0) return matches[i];
+    }
   } catch {
-    return false;
+    // invalid selector
   }
+  return null;
+}
+
+function canResolve(target: string): boolean {
+  return !!resolveTarget(target);
 }
 
 export function GuidedTour({
@@ -120,12 +133,7 @@ export function GuidedTour({
   // WITHOUT persisting completion so the tour can run on the next visit.
   const measure = useCallback(() => {
     if (!visible || current >= steps.length) return;
-    let el: Element | null = null;
-    try {
-      el = document.querySelector(steps[current].target);
-    } catch {
-      el = null;
-    }
+    const el = resolveTarget(steps[current].target);
     if (!el) {
       const idx = findResolvableStep(steps, current + 1, 1, canResolve);
       if (idx !== -1) {
@@ -164,12 +172,7 @@ export function GuidedTour({
   // Scroll target into view
   useEffect(() => {
     if (!visible || current >= steps.length) return;
-    let el: Element | null = null;
-    try {
-      el = document.querySelector(steps[current].target);
-    } catch {
-      el = null;
-    }
+    const el = resolveTarget(steps[current].target);
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, [visible, current, steps]);
 

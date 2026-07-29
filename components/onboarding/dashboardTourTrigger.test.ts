@@ -39,4 +39,9 @@ describe('shouldStartDashboardTour', () => {
     expect(shouldStartDashboardTour({ ...base, pathname: '/dashboard/agents/import' })).toBe(false);
     expect(shouldStartDashboardTour({ ...base, pathname: '/es/dashboard/agents' })).toBe(true);
   });
+
+  it('never triggers on an agent detail page (AgentDetailTour territory)', () => {
+    expect(shouldStartDashboardTour({ ...base, pathname: '/dashboard/agent/abc' })).toBe(false);
+    expect(shouldStartDashboardTour({ ...base, pathname: '/es/dashboard/agent/abc' })).toBe(false);
+  });
 });

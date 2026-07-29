@@ -1334,6 +1334,16 @@
       "upgradePlan": "Plan upgraden"
     },
     "agentDetail": {
+      "tourNavTitle": "Durch Ihren Agenten navigieren",
+      "tourNavDescription": "Jeder Bereich dieses Agenten — Chat, Logs, Konfiguration und mehr — ist über diese Navigation nur einen Klick entfernt.",
+      "tourChatTitle": "Mit Ihrem Agenten chatten",
+      "tourChatDescription": "Sprechen Sie hier direkt mit Ihrem Agenten. Jede Antwort zeigt die verbrauchten AI Credits an.",
+      "tourConfigTitle": "Alles konfigurieren",
+      "tourConfigDescription": "Modell, Avatar, Integrationen und Gebühreneinstellungen finden Sie alle hier.",
+      "tourKnowledgeTitle": "Bringen Sie Ihrem Agenten etwas bei",
+      "tourKnowledgeDescription": "Laden Sie hier Dateien hoch — Ihr Agent liest sie beim Antworten.",
+      "tourCreditsTitle": "Credits im Blick",
+      "tourCreditsDescription": "Ihr AI-Credit-Guthaben bleibt beim Chatten direkt unter dem Eingabefeld sichtbar.",
       "tabs": {
         "dashboard": "Dashboard",
         "chat": "Chat",

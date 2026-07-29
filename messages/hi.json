@@ -1356,6 +1356,16 @@
       "upgradePlan": "अपग्रेड योजना"
     },
     "agentDetail": {
+      "tourNavTitle": "अपने एजेंट में नेविगेट करें",
+      "tourNavDescription": "इस एजेंट के सभी हिस्से — चैट, लॉग्स, कॉन्फ़िगरेशन और बहुत कुछ — इस नेविगेशन से एक क्लिक में उपलब्ध हैं।",
+      "tourChatTitle": "अपने एजेंट से चैट करें",
+      "tourChatDescription": "यहीं अपने एजेंट से बात करें। हर जवाब में उस पर लगे AI Credits दिखते हैं।",
+      "tourConfigTitle": "सब कुछ कॉन्फ़िगर करें",
+      "tourConfigDescription": "मॉडल, अवतार, इंटीग्रेशन और फ़ीस सेटिंग्स सब यहीं मिलती हैं।",
+      "tourKnowledgeTitle": "अपने एजेंट को सिखाएँ",
+      "tourKnowledgeDescription": "यहाँ फ़ाइलें अपलोड करें और आपका एजेंट जवाब देते समय उन्हें पढ़ेगा।",
+      "tourCreditsTitle": "Credits हमेशा नज़र में",
+      "tourCreditsDescription": "चैट करते समय आपका AI Credits बैलेंस मैसेज बॉक्स के ठीक नीचे दिखता रहता है।",
       "tabs": {
         "dashboard": "डैशबोर्ड",
         "chat": "गपशप",

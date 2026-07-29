@@ -1356,6 +1356,16 @@
       "upgradePlan": "アップグレード計画"
     },
     "agentDetail": {
+      "tourNavTitle": "エージェント内を移動",
+      "tourNavDescription": "チャット、ログ、設定など、このエージェントの各エリアへはこのナビゲーションからワンクリックで移動できます。",
+      "tourChatTitle": "エージェントとチャット",
+      "tourChatDescription": "ここでエージェントと直接会話できます。各返信には消費したAI Creditsが表示されます。",
+      "tourConfigTitle": "すべての設定はここに",
+      "tourConfigDescription": "モデル、アバター、連携、手数料の設定はすべてここにあります。",
+      "tourKnowledgeTitle": "エージェントに知識を",
+      "tourKnowledgeDescription": "ここにファイルをアップロードすると、エージェントが回答時に読み取ります。",
+      "tourCreditsTitle": "Creditsをいつでも確認",
+      "tourCreditsDescription": "チャット中もAI Creditsの残高はメッセージ欄のすぐ下に常に表示されます。",
       "tabs": {
         "dashboard": "ダッシュボード",
         "chat": "チャット",
