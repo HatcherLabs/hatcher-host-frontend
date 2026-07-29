@@ -7,7 +7,19 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { api, req } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { getLegacyHostedProxyProviderPrefix } from '@/lib/legacy-hosted-model';
+import {
+  DEFAULT_HOSTED_MODEL,
+  HOSTED_MODELS as HOSTED_MODEL_CATALOG,
+  HOSTED_MODEL_PROVIDERS,
+  createSavedHostedModelOption,
+  normalizeHostedModelForUi,
+} from '@/lib/hosted-model-catalog';
+import {
+  mergeHostedModelsWithLivePricing,
+  modelPricingById,
+  parseModelPricingPayload,
+  type ModelPricingPayload,
+} from '@/lib/model-pricing';
 import styles from './ChatToHatch.module.css';
 
 type Framework = 'openclaw' | 'hermes';
@@ -26,24 +38,6 @@ type AvatarTraits = {
   emblem?: string;
   accessory?: string;
   mood?: string;
-};
-
-type ModelCost = 'Low' | 'Medium' | 'High' | 'Premium' | 'Variable';
-
-type HostedModelProvider = {
-  key: string;
-  name: string;
-};
-
-type HostedModel = {
-  id: string;
-  name: string;
-  providerKey: string;
-  provider: string;
-  category: string;
-  cost: ModelCost;
-  context: string;
-  fixedPrice?: string;
 };
 
 interface ParsedConfig {
@@ -147,666 +141,15 @@ function sanitizeAvatarVariant(value: string | undefined): string {
   return AVATAR_LEGACY_ALIASES[trimmed] ?? '';
 }
 
-const MODEL_PROVIDERS: HostedModelProvider[] = [
-  { key: 'deepseek', name: 'DeepSeek' },
-  { key: 'openai', name: 'OpenAI' },
-  { key: 'anthropic', name: 'Anthropic' },
-  { key: 'idle', name: 'IDLE' },
-  { key: 'openserv', name: 'OpenServ' },
-  { key: 'xiaomi', name: 'Xiaomi MiMo' },
-  { key: 'acedata', name: 'AceData' },
-  { key: 'minimax', name: 'MiniMax' },
-  { key: 'google', name: 'Google' },
-  { key: 'qwen', name: 'Qwen' },
-  { key: 'x-ai', name: 'xAI' },
-  { key: 'mistralai', name: 'Mistral' },
-  { key: 'moonshotai', name: 'Moonshot AI' },
-  { key: 'z-ai', name: 'Z.ai' },
-  { key: 'nvidia', name: 'NVIDIA' },
-  { key: 'openrouter', name: 'OpenRouter' },
-];
-
-const HOSTED_MODELS: HostedModel[] = [
-  [
-    'deepseek/deepseek-v4-flash',
-    'DeepSeek V4 Flash',
-    'deepseek',
-    'DeepSeek',
-    'Default',
-    'Low',
-    '1M',
-  ],
-  [
-    'deepseek/deepseek-v4-pro',
-    'DeepSeek V4 Pro',
-    'deepseek',
-    'DeepSeek',
-    'Balanced',
-    'Medium',
-    '1M',
-  ],
-  [
-    'deepseek/deepseek-v3.2',
-    'DeepSeek V3.2',
-    'deepseek',
-    'DeepSeek',
-    'Fast',
-    'Low',
-    '128K',
-  ],
-  [
-    'openai/gpt-5-nano',
-    'GPT-5 Nano',
-    'openai',
-    'OpenAI',
-    'Fast',
-    'Low',
-    '400K',
-  ],
-  [
-    'openai/gpt-5-mini',
-    'GPT-5 Mini',
-    'openai',
-    'OpenAI',
-    'Balanced',
-    'Medium',
-    '400K',
-  ],
-  [
-    'openai/gpt-5.1-codex-mini',
-    'GPT-5.1 Codex Mini',
-    'openai',
-    'OpenAI',
-    'Coding',
-    'Medium',
-    '400K',
-  ],
-  [
-    'openai/gpt-5.3-codex',
-    'GPT-5.3 Codex',
-    'openai',
-    'OpenAI',
-    'Coding',
-    'High',
-    '400K',
-  ],
-  [
-    'openai/gpt-5.4-nano',
-    'GPT-5.4 Nano',
-    'openai',
-    'OpenAI',
-    'Fast',
-    'Low',
-    '400K',
-  ],
-  [
-    'openai/gpt-5.4-mini',
-    'GPT-5.4 Mini',
-    'openai',
-    'OpenAI',
-    'Balanced',
-    'Medium',
-    '400K',
-  ],
-  ['openai/gpt-5.4', 'GPT-5.4', 'openai', 'OpenAI', 'Premium', 'High', '1.05M'],
-  [
-    'openai/gpt-5.5',
-    'GPT-5.5',
-    'openai',
-    'OpenAI',
-    'Premium',
-    'Premium',
-    '1.05M',
-  ],
-  [
-    'openai/gpt-5.5-pro',
-    'GPT-5.5 Pro',
-    'openai',
-    'OpenAI',
-    'Premium',
-    'Premium',
-    '1.05M',
-  ],
-  [
-    'anthropic/claude-haiku-4.5',
-    'Claude Haiku 4.5',
-    'anthropic',
-    'Anthropic',
-    'Balanced',
-    'Medium',
-    '200K',
-  ],
-  [
-    'idle/claude-haiku-4-5',
-    'Claude Haiku 4.5 (IDLE)',
-    'idle',
-    'IDLE',
-    'Partner',
-    'Low',
-    '200K',
-    '1 AI Credit/request',
-  ],
-  [
-    'idle/claude-sonnet-4-6',
-    'Claude Sonnet 4.6 (IDLE)',
-    'idle',
-    'IDLE',
-    'Partner',
-    'Medium',
-    '1M',
-    '3 AI Credits/request',
-  ],
-  [
-    'openserv/serv-nano',
-    'SERV Nano',
-    'openserv',
-    'OpenServ',
-    'Fast',
-    'Low',
-    '128K',
-  ],
-  [
-    'openserv/serv-mini',
-    'SERV Mini',
-    'openserv',
-    'OpenServ',
-    'Balanced',
-    'Medium',
-    '1M',
-  ],
-  [
-    'openserv/serv-swift',
-    'SERV Swift',
-    'openserv',
-    'OpenServ',
-    'Fast',
-    'Medium',
-    '200K',
-  ],
-  [
-    'openserv/serv-standard',
-    'SERV Standard',
-    'openserv',
-    'OpenServ',
-    'Balanced',
-    'High',
-    '200K',
-  ],
-  [
-    'openserv/serv-pro',
-    'SERV Pro',
-    'openserv',
-    'OpenServ',
-    'Advanced',
-    'High',
-    '1M',
-  ],
-  [
-    'openserv/serv-ultra',
-    'SERV Ultra',
-    'openserv',
-    'OpenServ',
-    'Premium',
-    'Premium',
-    '200K',
-  ],
-  [
-    'minimax/minimax-m3',
-    'MiniMax M3',
-    'minimax',
-    'MiniMax',
-    'Coding',
-    'Medium',
-    '1M',
-  ],
-  [
-    'minimax/minimax-m2.7',
-    'MiniMax M2.7',
-    'minimax',
-    'MiniMax',
-    'Balanced',
-    'Medium',
-    '200K',
-  ],
-  [
-    'xiaomi/mimo-v2.5-pro',
-    'MiMo V2.5 Pro',
-    'xiaomi',
-    'Xiaomi MiMo',
-    'Partner',
-    'Low',
-    '1M',
-    'AI Credits',
-  ],
-  [
-    'xiaomi/mimo-v2.5',
-    'MiMo V2.5',
-    'xiaomi',
-    'Xiaomi MiMo',
-    'Balanced',
-    'Low',
-    '1M',
-    'AI Credits',
-  ],
-  [
-    'xiaomi/mimo-v2-pro',
-    'MiMo V2 Pro',
-    'xiaomi',
-    'Xiaomi MiMo',
-    'Partner',
-    'Low',
-    '1M',
-    'AI Credits',
-  ],
-  [
-    'xiaomi/mimo-v2-omni',
-    'MiMo V2 Omni',
-    'xiaomi',
-    'Xiaomi MiMo',
-    'Multimodal',
-    'Low',
-    '256K',
-    'AI Credits',
-  ],
-  [
-    'acedata/claude-opus-4-8',
-    'Claude Opus 4.8 (AceData)',
-    'acedata',
-    'AceData',
-    'Partner',
-    'Premium',
-    '1M',
-  ],
-  [
-    'acedata/claude-opus-4-7',
-    'Claude Opus 4.7 (AceData)',
-    'acedata',
-    'AceData',
-    'Partner',
-    'Premium',
-    '1M',
-  ],
-  [
-    'acedata/claude-sonnet-4-6',
-    'Claude Sonnet 4.6 (AceData)',
-    'acedata',
-    'AceData',
-    'Balanced',
-    'High',
-    '1M',
-  ],
-  [
-    'acedata/claude-haiku-4-5-20251001',
-    'Claude Haiku 4.5 (AceData)',
-    'acedata',
-    'AceData',
-    'Fast',
-    'Low',
-    '200K',
-  ],
-  [
-    'acedata/gpt-5.5',
-    'GPT-5.5 (AceData)',
-    'acedata',
-    'AceData',
-    'Partner',
-    'High',
-    '1.05M',
-  ],
-  [
-    'acedata/gpt-5.4-pro',
-    'GPT-5.4 Pro (AceData)',
-    'acedata',
-    'AceData',
-    'Premium',
-    'High',
-    '1.05M',
-  ],
-  [
-    'acedata/gpt-5.4',
-    'GPT-5.4 (AceData)',
-    'acedata',
-    'AceData',
-    'Balanced',
-    'High',
-    '1.05M',
-  ],
-  [
-    'acedata/gpt-5.2',
-    'GPT-5.2 (AceData)',
-    'acedata',
-    'AceData',
-    'Balanced',
-    'High',
-    '1.05M',
-  ],
-  [
-    'acedata/gpt-5.1',
-    'GPT-5.1 (AceData)',
-    'acedata',
-    'AceData',
-    'Balanced',
-    'Medium',
-    '400K',
-  ],
-  [
-    'acedata/gpt-5-mini',
-    'GPT-5 Mini (AceData)',
-    'acedata',
-    'AceData',
-    'Fast',
-    'Low',
-    '400K',
-  ],
-  [
-    'acedata/gemini-3.1-pro',
-    'Gemini 3.1 Pro (AceData)',
-    'acedata',
-    'AceData',
-    'Premium',
-    'High',
-    '1M',
-  ],
-  [
-    'acedata/gemini-2.5-pro',
-    'Gemini 2.5 Pro (AceData)',
-    'acedata',
-    'AceData',
-    'Balanced',
-    'Medium',
-    '1M',
-  ],
-  [
-    'acedata/gemini-2.5-flash',
-    'Gemini 2.5 Flash (AceData)',
-    'acedata',
-    'AceData',
-    'Fast',
-    'Low',
-    '1M',
-  ],
-  [
-    'acedata/deepseek-v3.2-exp',
-    'DeepSeek V3.2 Exp (AceData)',
-    'acedata',
-    'AceData',
-    'Fast',
-    'Low',
-    '128K',
-  ],
-  [
-    'acedata/deepseek-r1',
-    'DeepSeek R1 (AceData)',
-    'acedata',
-    'AceData',
-    'Reasoning',
-    'Medium',
-    '128K',
-  ],
-  [
-    'anthropic/claude-sonnet-4.5',
-    'Claude Sonnet 4.5',
-    'anthropic',
-    'Anthropic',
-    'Premium',
-    'High',
-    '1M',
-  ],
-  [
-    'anthropic/claude-sonnet-4.6',
-    'Claude Sonnet 4.6',
-    'anthropic',
-    'Anthropic',
-    'Premium',
-    'High',
-    '1M',
-  ],
-  [
-    'anthropic/claude-opus-4.7',
-    'Claude Opus 4.7',
-    'anthropic',
-    'Anthropic',
-    'Premium',
-    'Premium',
-    '1M',
-  ],
-  [
-    'google/gemini-3.1-flash-lite',
-    'Gemini 3.1 Flash Lite',
-    'google',
-    'Google',
-    'Fast',
-    'Low',
-    '1M',
-  ],
-  [
-    'google/gemini-2.5-flash',
-    'Gemini 2.5 Flash',
-    'google',
-    'Google',
-    'Balanced',
-    'Medium',
-    '1M',
-  ],
-  [
-    'google/gemini-3-flash-preview',
-    'Gemini 3 Flash Preview',
-    'google',
-    'Google',
-    'Balanced',
-    'Medium',
-    '1M',
-  ],
-  [
-    'google/gemini-3.1-pro-preview',
-    'Gemini 3.1 Pro Preview',
-    'google',
-    'Google',
-    'Premium',
-    'High',
-    '1M',
-  ],
-  [
-    'qwen/qwen3.5-flash-02-23',
-    'Qwen3.5 Flash',
-    'qwen',
-    'Qwen',
-    'Fast',
-    'Low',
-    '1M',
-  ],
-  [
-    'qwen/qwen3-coder-flash',
-    'Qwen3 Coder Flash',
-    'qwen',
-    'Qwen',
-    'Coding',
-    'Low',
-    '1M',
-  ],
-  [
-    'qwen/qwen3.6-flash',
-    'Qwen3.6 Flash',
-    'qwen',
-    'Qwen',
-    'Fast',
-    'Medium',
-    '1M',
-  ],
-  [
-    'qwen/qwen3.6-35b-a3b',
-    'Qwen3.6 35B A3B',
-    'qwen',
-    'Qwen',
-    'Balanced',
-    'Medium',
-    '256K',
-  ],
-  [
-    'qwen/qwen3.5-35b-a3b',
-    'Qwen3.5 35B A3B',
-    'qwen',
-    'Qwen',
-    'Balanced',
-    'Medium',
-    '256K',
-  ],
-  [
-    'qwen/qwen3-coder',
-    'Qwen3 Coder',
-    'qwen',
-    'Qwen',
-    'Coding',
-    'Medium',
-    '256K',
-  ],
-  [
-    'qwen/qwen3-coder-next',
-    'Qwen3 Coder Next',
-    'qwen',
-    'Qwen',
-    'Coding',
-    'Medium',
-    '1M',
-  ],
-  [
-    'qwen/qwen3-coder-plus',
-    'Qwen3 Coder Plus',
-    'qwen',
-    'Qwen',
-    'Coding',
-    'High',
-    '1M',
-  ],
-  [
-    'qwen/qwen3.6-plus',
-    'Qwen3.6 Plus',
-    'qwen',
-    'Qwen',
-    'Premium',
-    'High',
-    '1M',
-  ],
-  ['qwen/qwen3-max', 'Qwen3 Max', 'qwen', 'Qwen', 'Premium', 'High', '1M'],
-  [
-    'qwen/qwen3-max-thinking',
-    'Qwen3 Max Thinking',
-    'qwen',
-    'Qwen',
-    'Reasoning',
-    'Premium',
-    '1M',
-  ],
-  ['x-ai/grok-4.1-fast', 'Grok 4.1 Fast', 'x-ai', 'xAI', 'Fast', 'Low', '2M'],
-  [
-    'x-ai/grok-code-fast-1',
-    'Grok Code Fast 1',
-    'x-ai',
-    'xAI',
-    'Coding',
-    'Medium',
-    '256K',
-  ],
-  ['x-ai/grok-4.3', 'Grok 4.3', 'x-ai', 'xAI', 'Premium', 'High', '1M'],
-  [
-    'mistralai/mistral-small-2603',
-    'Mistral Small 4',
-    'mistralai',
-    'Mistral',
-    'Fast',
-    'Low',
-    '256K',
-  ],
-  [
-    'mistralai/codestral-2508',
-    'Codestral 2508',
-    'mistralai',
-    'Mistral',
-    'Coding',
-    'Medium',
-    '256K',
-  ],
-  [
-    'mistralai/mistral-large-2512',
-    'Mistral Large 3',
-    'mistralai',
-    'Mistral',
-    'Premium',
-    'Medium',
-    '256K',
-  ],
-  [
-    'moonshotai/kimi-k2-thinking',
-    'Kimi K2 Thinking',
-    'moonshotai',
-    'Moonshot AI',
-    'Reasoning',
-    'Medium',
-    '256K',
-  ],
-  [
-    'moonshotai/kimi-k2.6',
-    'Kimi K2.6',
-    'moonshotai',
-    'Moonshot AI',
-    'Balanced',
-    'High',
-    '256K',
-  ],
-  [
-    'z-ai/glm-4.7-flash',
-    'GLM 4.7 Flash',
-    'z-ai',
-    'Z.ai',
-    'Fast',
-    'Low',
-    '200K',
-  ],
-  ['z-ai/glm-5.1', 'GLM 5.1', 'z-ai', 'Z.ai', 'Balanced', 'High', '200K'],
-  [
-    'nvidia/nemotron-3-nano-30b-a3b',
-    'Nemotron 3 Nano',
-    'nvidia',
-    'NVIDIA',
-    'Fast',
-    'Low',
-    '256K',
-  ],
-  [
-    'openrouter/auto',
-    'OpenRouter Auto',
-    'openrouter',
-    'OpenRouter',
-    'Advanced',
-    'Variable',
-    '2M',
-  ],
-].map(
-  ([id, name, providerKey, provider, category, cost, context, fixedPrice]) => ({
-    id,
-    name,
-    providerKey,
-    provider,
-    category,
-    cost: cost as ModelCost,
-    context,
-    fixedPrice,
-  }),
+// ChatToHatch keeps a static picker: Virtuals models are only offered in
+// the agent config tab, where the live Virtuals catalog merge provides them.
+const MODEL_PROVIDERS = HOSTED_MODEL_PROVIDERS.filter(
+  (provider) => provider.key !== 'virtuals',
 );
 
-const DEFAULT_HOSTED_MODEL = 'deepseek/deepseek-v4-flash';
-const HOSTED_PROXY_PROVIDER_PREFIX = getLegacyHostedProxyProviderPrefix();
-const HOSTED_MODEL_ALIASES = new Map<string, string>([
-  ['meta-llama/llama-4-scout-17b-16e-instruct', 'qwen/qwen3.6-35b-a3b'],
-  ['qwen/qwen3-32b', 'qwen/qwen3.6-35b-a3b'],
-  ['qwen/qwen3-235b-a22b-2507', 'qwen/qwen3.6-35b-a3b'],
-  ['minmax m3', 'minimax/minimax-m3'],
-  ['minimax m3', 'minimax/minimax-m3'],
-  ['minimax-m3', 'minimax/minimax-m3'],
-  ['minmax m2.7', 'minimax/minimax-m2.7'],
-  ['minimax m2.7', 'minimax/minimax-m2.7'],
-  ['minimax-m2.7', 'minimax/minimax-m2.7'],
-]);
+const HOSTED_MODELS = HOSTED_MODEL_CATALOG.filter(
+  (model) => model.providerKey !== 'virtuals',
+);
 
 const NAME_REGEX = /^[a-zA-Z0-9 \-:'.()&]+$/;
 const MAX_PARSE_INPUT = 16000;
@@ -896,44 +239,6 @@ function syncInstallPlan(
   return out.slice(0, 12);
 }
 
-function normalizeHostedModelForUi(model: string | undefined): string {
-  let trimmed = model?.trim();
-  if (!trimmed) return DEFAULT_HOSTED_MODEL;
-  if (trimmed.startsWith(HOSTED_PROXY_PROVIDER_PREFIX)) {
-    trimmed = trimmed.slice(HOSTED_PROXY_PROVIDER_PREFIX.length);
-  }
-  return HOSTED_MODEL_ALIASES.get(trimmed) ?? HOSTED_MODEL_ALIASES.get(trimmed.toLowerCase()) ?? trimmed;
-}
-
-function providerKeyFromModel(modelId: string): string {
-  const [providerKey] = modelId.split('/');
-  return providerKey?.trim() || 'openrouter';
-}
-
-function providerNameFromKey(providerKey: string): string {
-  return (
-    MODEL_PROVIDERS.find((provider) => provider.key === providerKey)?.name ??
-    providerKey
-      .split('-')
-      .map((part) => (part ? part[0]!.toUpperCase() + part.slice(1) : part))
-      .join(' ')
-  );
-}
-
-function createSavedHostedModelOption(modelId: string): HostedModel {
-  const providerKey = providerKeyFromModel(modelId);
-  const provider = providerNameFromKey(providerKey);
-  return {
-    id: modelId,
-    name: modelId,
-    providerKey,
-    provider,
-    category: 'Saved',
-    cost: 'Variable',
-    context: 'Provider-defined',
-  };
-}
-
 function sanitizeAvatarTraits(
   value: AvatarTraits | undefined,
   fallbackSeed: string,
@@ -1019,6 +324,8 @@ export function ChatToHatch() {
   const [showPersonality, setShowPersonality] = useState(false);
   const [skillInput, setSkillInput] = useState('');
   const [pluginInput, setPluginInput] = useState('');
+  /** Live per-model AI Credit pricing; null falls back to tier badges. */
+  const [modelPricing, setModelPricing] = useState<ModelPricingPayload | null>(null);
   /** Monotonic request counter — every send bumps it; only the latest
    *  in-flight response wins setOriginal/setDraft. Prevents stale parse
    *  responses from clobbering newer ones. */
@@ -1040,6 +347,28 @@ export function ChatToHatch() {
       behavior: 'smooth',
     });
   }, [messages, thinking]);
+
+  // Live hosted-model pricing (public endpoint), merged into the shared
+  // catalog. Any failure degrades silently to the static tier badges.
+  useEffect(() => {
+    let cancelled = false;
+    api.getModelPricing()
+      .then((res) => {
+        if (cancelled || !res.success) return;
+        setModelPricing(parseModelPricingPayload(res.data));
+      })
+      .catch(() => {
+        if (!cancelled) setModelPricing(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const hostedModels = useMemo(
+    () => mergeHostedModelsWithLivePricing(HOSTED_MODELS, modelPricingById(modelPricing)),
+    [modelPricing],
+  );
 
   async function handleSend() {
     const description = input.trim();
@@ -1287,7 +616,7 @@ export function ChatToHatch() {
     ? normalizeHostedModelForUi(draft.model)
     : DEFAULT_HOSTED_MODEL;
   const selectedModel =
-    HOSTED_MODELS.find((model) => model.id === selectedModelId) ??
+    hostedModels.find((model) => model.id === selectedModelId) ??
     createSavedHostedModelOption(selectedModelId);
   const selectedProvider = MODEL_PROVIDERS.find(
     (provider) => provider.key === selectedModel.providerKey,
@@ -1297,7 +626,7 @@ export function ChatToHatch() {
   )
     ? MODEL_PROVIDERS
     : [...MODEL_PROVIDERS, selectedProvider];
-  const modelsForProvider = HOSTED_MODELS.filter(
+  const modelsForProvider = hostedModels.filter(
     (model) => model.providerKey === selectedProvider.key,
   );
   const hostedModelsForProvider = modelsForProvider.some(
@@ -1509,7 +838,7 @@ export function ChatToHatch() {
                           className={styles.selectInput}
                           value={selectedProvider.key}
                           onChange={(e) => {
-                            const firstModel = HOSTED_MODELS.find(
+                            const firstModel = hostedModels.find(
                               (model) => model.providerKey === e.target.value,
                             );
                             if (firstModel)
