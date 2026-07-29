@@ -16,6 +16,7 @@
     "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
+    "@codemirror/language-data": "^6.5.2",
     "@hatcher/shared": "npm:@hatcherlabs/shared@1.4.11",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.0",
@@ -41,6 +42,7 @@
     "buffer": "^6.0.3",
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
+    "codemirror": "^6.0.2",
     "framer-motion": "^12.38.0",
     "lucide-react": "^0.468.0",
     "next": "15.5.20",

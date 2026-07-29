@@ -4,6 +4,8 @@ import { useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { AgentContext, FRAMEWORK_ROOT_PATH, FRAMEWORK_BADGE, GlassCard } from '../AgentContext';
 import { api } from '@/lib/api';
+import { CodeEditor } from '@/components/ui/CodeEditor';
+import { shouldUseCodeEditor } from '@/components/ui/code-editor-utils';
 import { motion } from 'framer-motion';
 import {
   File,
@@ -292,6 +294,9 @@ export function FilesTab() {
   if (editingFile) {
     const isModified = editContent !== editingFile.content;
     const isEnvFile = /^\.env/i.test(editingFile.name);
+    // Very large or binary-looking files fall back to the plain textarea —
+    // CodeMirror degrades badly on both.
+    const useRichEditor = shouldUseCodeEditor(editingFile.content);
     return (
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         {/* Editor header */}
@@ -337,13 +342,29 @@ export function FilesTab() {
         </div>
 
         {error && <div className="mb-3 text-xs text-[var(--color-destructive)] bg-[var(--color-destructive-bg)] border border-[var(--color-destructive-border)] rounded-lg px-3 py-2">{error}</div>}
-        <textarea
-          value={editContent}
-          onChange={(e) => setEditContent(e.target.value)}
-          className="w-full h-[500px] px-4 py-3 rounded-xl text-xs font-mono text-[var(--text-primary)] bg-[var(--bg-base)]/90 border border-[var(--border-default)] focus:outline-none resize-none leading-relaxed"
-          style={{ borderColor: isModified ? `color-mix(in srgb, ${accent.color} 45%, transparent)` : undefined }}
-          spellCheck={false}
-        />
+        {useRichEditor ? (
+          <div
+            className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-base)]/90 overflow-hidden"
+            style={{ borderColor: isModified ? `color-mix(in srgb, ${accent.color} 45%, transparent)` : undefined }}
+          >
+            <CodeEditor
+              value={editContent}
+              onChange={setEditContent}
+              filename={editingFile.name}
+              minHeight="500px"
+              maxHeight="500px"
+              onSave={() => { if (isModified && !saving) void handleSave(); }}
+            />
+          </div>
+        ) : (
+          <textarea
+            value={editContent}
+            onChange={(e) => setEditContent(e.target.value)}
+            className="w-full h-[500px] px-4 py-3 rounded-xl text-xs font-mono text-[var(--text-primary)] bg-[var(--bg-base)]/90 border border-[var(--border-default)] focus:outline-none resize-none leading-relaxed"
+            style={{ borderColor: isModified ? `color-mix(in srgb, ${accent.color} 45%, transparent)` : undefined }}
+            spellCheck={false}
+          />
+        )}
       </motion.div>
     );
   }
