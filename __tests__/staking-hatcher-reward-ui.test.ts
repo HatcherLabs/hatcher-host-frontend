@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   canClaimHatcherReward,
+  canInitializeHatcherRewardEntry,
   hatcherRewardClaimReason,
+  hatcherRewardEntryRentDisclosure,
   hatcherRewardStatusLabel,
   type HatcherRewardUiStatus,
 } from '@/lib/streamflow-staking';
@@ -73,5 +75,38 @@ describe('canClaimHatcherReward', () => {
     expect(canClaimHatcherReward(status({ kind: 'no_rewards' }))).toBe(false);
     expect(canClaimHatcherReward(status({ kind: 'simulation_error' }))).toBe(false);
     expect(canClaimHatcherReward(status({ kind: 'pool_missing', rewardEntryExists: false }))).toBe(false);
+  });
+});
+
+describe('canInitializeHatcherRewardEntry', () => {
+  it('only offers initialization for a resolved entry_missing status', () => {
+    expect(canInitializeHatcherRewardEntry(undefined)).toBe(false);
+    expect(canInitializeHatcherRewardEntry(status({ kind: 'entry_missing', rewardEntryExists: false }))).toBe(true);
+    expect(canInitializeHatcherRewardEntry(status({ kind: 'claimable', canClaim: true }))).toBe(false);
+    expect(canInitializeHatcherRewardEntry(status({ kind: 'no_rewards' }))).toBe(false);
+    expect(canInitializeHatcherRewardEntry(status({ kind: 'pool_missing', rewardEntryExists: false }))).toBe(false);
+    expect(canInitializeHatcherRewardEntry(status({ kind: 'simulation_error' }))).toBe(false);
+    expect(canInitializeHatcherRewardEntry(status({ kind: 'rpc_error' }))).toBe(false);
+  });
+
+  it('hides initialization while loading or after an error', () => {
+    expect(canInitializeHatcherRewardEntry(status({ kind: 'entry_missing', rewardEntryExists: false, loading: true })))
+      .toBe(false);
+    expect(canInitializeHatcherRewardEntry(status({ kind: 'entry_missing', rewardEntryExists: false, error: 'boom' })))
+      .toBe(false);
+  });
+});
+
+describe('hatcherRewardEntryRentDisclosure', () => {
+  it('uses the fetched rent-exempt amount when available', () => {
+    expect(hatcherRewardEntryRentDisclosure(1_559_040))
+      .toBe('Creating the reward tracking account costs a small one-time rent deposit of ~0.0016 SOL.');
+  });
+
+  it('falls back to approximate copy when rent could not be fetched', () => {
+    const fallback = 'Creating the reward tracking account costs a small one-time SOL rent deposit (~0.002 SOL).';
+    expect(hatcherRewardEntryRentDisclosure(null)).toBe(fallback);
+    expect(hatcherRewardEntryRentDisclosure(0)).toBe(fallback);
+    expect(hatcherRewardEntryRentDisclosure(Number.NaN)).toBe(fallback);
   });
 });

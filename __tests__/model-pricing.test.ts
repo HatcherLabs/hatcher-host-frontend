@@ -71,6 +71,22 @@ describe('formatCreditsPer1M', () => {
     expect(formatCreditsPer1M(fixed({ creditsPerRequest: 2000, usdPerRequest: 2 })))
       .toBe('2k credits per request');
   });
+
+  it('prefixes estimated per-token pricing with a tilde', () => {
+    expect(formatCreditsPer1M(perToken({ source: 'estimate', creditsPer1MInput: 250, creditsPer1MOutput: 1000 })))
+      .toBe('~250 in / 1k out credits per 1M');
+    expect(formatCreditsPer1M(perToken({ estimated: true })))
+      .toBe('~2k in / 10k out credits per 1M');
+  });
+
+  it('keeps catalog and openrouter per-token pricing unprefixed', () => {
+    expect(formatCreditsPer1M(perToken({ source: 'catalog' }))).toBe('2k in / 10k out credits per 1M');
+    expect(formatCreditsPer1M(perToken({ source: 'openrouter' }))).toBe('2k in / 10k out credits per 1M');
+  });
+
+  it('leaves fixed pricing unprefixed regardless of source', () => {
+    expect(formatCreditsPer1M(fixed({ source: 'estimate' }))).toBe('1 credit per request');
+  });
 });
 
 describe('costTierFromPricing', () => {
@@ -199,6 +215,14 @@ describe('mergeHostedModelsWithLivePricing', () => {
       fixedPrice: '1 credit per request',
       cost: 'Low',
     });
+  });
+
+  it('carries the estimate marker into the merged price label', () => {
+    const byId = new Map<string, ModelPricing>([
+      ['openai/gpt-5.5', perToken({ source: 'estimate' })],
+    ]);
+    const [merged] = mergeHostedModelsWithLivePricing([gpt], byId);
+    expect(merged?.priceLabel).toBe('~2k in / 10k out credits per 1M');
   });
 
   it('leaves models without live pricing untouched, including the Virtuals live merge', () => {
