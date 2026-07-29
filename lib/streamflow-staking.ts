@@ -70,6 +70,7 @@ const ENTRY_MISSING_REASON = 'Reward tracking account is missing for this stake.
 const POOL_MISSING_REASON = 'Rewards for this stake are tracked under a different reward pool. Refresh to re-sync reward data.';
 const SIMULATION_ERROR_REASON = 'HATCHER reward check failed. Refresh and try again.';
 const RPC_ERROR_REASON = 'Could not verify HATCHER rewards right now. Refresh and try again.';
+const REWARD_ENTRY_ALREADY_INITIALIZED_REASON = 'Reward tracking is already initialized for this stake.';
 // Streamflow fetches a governor when this is undefined; Hatcher dynamic reward pools are permissionless.
 const HATCHER_DYNAMIC_REWARD_GOVERNOR = null as unknown as PublicKey;
 const STAKING_PREFLIGHT_ERROR_MESSAGE = 'Staking transaction failed preflight simulation. Refresh staking data and try again.';
@@ -841,6 +842,88 @@ export async function claimHatcherRewardsWithStreamflow(params: {
   return { txIds: [txId] };
 }
 
+/**
+ * Opt-in creation of the missing reward tracking account for a stake. This is
+ * the ONLY place that creates a reward entry: the claim path intentionally
+ * never auto-creates one because creation costs the user a rent-exempt SOL
+ * deposit. The user explicitly requests it from the staking UI.
+ */
+export async function initializeHatcherRewardEntry(params: {
+  wallet: WalletContextState;
+  stakePoolAddress: string;
+  stakeEntryAddress: string;
+  depositNonce: number;
+  onTransactionSubmitted?: (txId: string) => void;
+}): Promise<{ txId: string }> {
+  if (!params.wallet.publicKey || (!params.wallet.sendTransaction && !params.wallet.signTransaction)) {
+    throw new Error('Connect a wallet that supports Solana transaction signing.');
+  }
+
+  const client = new SolanaStakingClient({
+    clusterUrl: SOLANA_RPC_BROWSER_ENDPOINT,
+    cluster: cluster(),
+    commitment: 'confirmed',
+  });
+  const rewardStatus = await fetchHatcherRewardStatusFromClient({
+    client,
+    walletAddress: params.wallet.publicKey.toBase58(),
+    stakePoolAddress: params.stakePoolAddress,
+    stakeEntryAddress: params.stakeEntryAddress,
+    depositNonce: params.depositNonce,
+  });
+  if (rewardStatus.kind !== 'entry_missing') {
+    // Anything else means the entry exists (possibly under a drifted reward
+    // pool): creating another one would fail on-chain or waste rent.
+    throw new Error(rewardStatus.rewardEntryExists
+      ? REWARD_ENTRY_ALREADY_INITIALIZED_REASON
+      : rewardStatus.reason ?? REWARD_ENTRY_ALREADY_INITIALIZED_REASON);
+  }
+
+  const tokenProgramId = await getHatcherTokenProgramId(client.connection);
+  const invoker = params.wallet as unknown as SignerWalletAdapter;
+  const stakePool = new PublicKey(params.stakePoolAddress);
+  const { nonce: rewardPoolNonce } = await resolveHatcherRewardPool(client, stakePool);
+
+  const { ixs } = await client.prepareCreateRewardEntryInstructions({
+    stakePool,
+    stakePoolMint: HATCHER_MINT,
+    tokenProgramId,
+    depositNonce: params.depositNonce,
+    rewardPoolNonce,
+    rewardMint: HATCHER_MINT,
+    rewardPoolType: 'dynamic',
+  }, { invoker });
+
+  const prepared = await preparePreflightedWalletTransaction({
+    connection: client.connection,
+    payer: params.wallet.publicKey,
+    instructions: ixs,
+  });
+  const txId = await sendPreparedWalletTransaction({
+    wallet: params.wallet,
+    connection: client.connection,
+    prepared,
+    onTransactionSubmitted: params.onTransactionSubmitted,
+  });
+
+  return { txId };
+}
+
+/**
+ * Exact rent-exempt deposit (in lamports) a reward entry creation costs the
+ * user. Anchor exposes the IDL-derived account size (discriminator included)
+ * on the account client, so this is a single cheap RPC call.
+ */
+export async function fetchHatcherRewardEntryRentLamports(): Promise<number> {
+  const client = new SolanaStakingClient({
+    clusterUrl: SOLANA_RPC_BROWSER_ENDPOINT,
+    cluster: cluster(),
+    commitment: 'confirmed',
+  });
+  const rewardEntrySize = client.programs.rewardPoolDynamicProgram.account.rewardEntry.size;
+  return client.connection.getMinimumBalanceForRentExemption(rewardEntrySize);
+}
+
 const HATCHER_REWARD_REASON_FALLBACKS: Record<HatcherRewardStatusKind, string> = {
   claimable: 'Claim HATCHER rewards',
   no_rewards: NO_REWARDS_REASON,
@@ -886,4 +969,30 @@ export function canClaimHatcherReward(status: HatcherRewardUiStatus | undefined)
     && status.rewardEntryExists
     && status.canClaim,
   );
+}
+
+/** Offer the opt-in "Initialize reward tracking" action only for a resolved entry_missing status. */
+export function canInitializeHatcherRewardEntry(status: HatcherRewardUiStatus | undefined): boolean {
+  return Boolean(
+    status
+    && !status.loading
+    && !status.error
+    && status.kind === 'entry_missing'
+    && !status.rewardEntryExists,
+  );
+}
+
+const REWARD_ENTRY_RENT_FALLBACK_DISCLOSURE = 'Creating the reward tracking account costs a small one-time SOL rent deposit (~0.002 SOL).';
+
+/**
+ * One-line disclosure shown next to the "Initialize reward tracking" button.
+ * Uses the fetched rent-exempt amount when available, otherwise approximate copy.
+ */
+export function hatcherRewardEntryRentDisclosure(rentLamports: number | null): string {
+  if (typeof rentLamports !== 'number' || !Number.isFinite(rentLamports) || rentLamports <= 0) {
+    return REWARD_ENTRY_RENT_FALLBACK_DISCLOSURE;
+  }
+  const sol = Number((rentLamports / 1_000_000_000).toFixed(4));
+  if (sol <= 0) return REWARD_ENTRY_RENT_FALLBACK_DISCLOSURE;
+  return `Creating the reward tracking account costs a small one-time rent deposit of ~${sol} SOL.`;
 }

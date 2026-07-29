@@ -36,11 +36,15 @@ import { buildPhantomBrowseUrl } from '@/lib/wallet-links';
 import {
   baseUnitsToHatcherString,
   canClaimHatcherReward,
+  canInitializeHatcherRewardEntry,
   claimHatcherRewardsWithStreamflow,
+  fetchHatcherRewardEntryRentLamports,
   fetchHatcherWalletBalance,
   fetchHatcherRewardStatusWithStreamflow,
   hatcherRewardClaimReason,
+  hatcherRewardEntryRentDisclosure,
   hatcherRewardStatusLabel,
+  initializeHatcherRewardEntry,
   isStakeUnlocked,
   MIN_HATCHER_STAKE_BASE_UNITS,
   parseHatcherAmountToBaseUnits,
@@ -227,6 +231,9 @@ export function StakingClient() {
   const [unstakeTxId, setUnstakeTxId] = useState<string | null>(null);
   const [hatcherRewardTxId, setHatcherRewardTxId] = useState<string | null>(null);
   const [claimingHatcherStake, setClaimingHatcherStake] = useState<string | null>(null);
+  const [initializingHatcherStake, setInitializingHatcherStake] = useState<string | null>(null);
+  const [rewardEntryRentLamports, setRewardEntryRentLamports] = useState<number | null>(null);
+  const rewardEntryRentRequestedRef = useRef(false);
   const [unstakingStake, setUnstakingStake] = useState<string | null>(null);
   const [expandedStakePoolKeys, setExpandedStakePoolKeys] = useState<Set<StakingPoolKey>>(() => new Set());
   const [hatcherRewardStatuses, setHatcherRewardStatuses] = useState<Record<string, HatcherRewardUiStatus>>({});
@@ -501,6 +508,31 @@ export function StakingClient() {
       cancelled = true;
     };
   }, [visibleRewardStatusStakes]);
+
+  const hasInitializableRewardEntry = useMemo(
+    () => Object.values(hatcherRewardStatuses).some((rewardStatus) => canInitializeHatcherRewardEntry(rewardStatus)),
+    [hatcherRewardStatuses],
+  );
+
+  useEffect(() => {
+    // The rent-exempt deposit is the same for every reward entry: fetch it once,
+    // lazily, the first time an initializable stake shows up. On failure the
+    // disclosure falls back to approximate copy.
+    if (!hasInitializableRewardEntry || rewardEntryRentRequestedRef.current) return;
+    rewardEntryRentRequestedRef.current = true;
+
+    let cancelled = false;
+    fetchHatcherRewardEntryRentLamports()
+      .then((lamports) => {
+        if (!cancelled) setRewardEntryRentLamports(lamports);
+      })
+      .catch((err) => {
+        console.warn('[staking] Could not fetch the reward entry rent deposit.', err);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [hasInitializableRewardEntry]);
 
   const connectWalletOnly = useCallback(async (): Promise<string> => {
     const current = walletRef.current;
@@ -794,7 +826,7 @@ export function StakingClient() {
     setNotice(null);
     setClaimResult(null);
     setHatcherRewardTxId(null);
-    if (claimingHatcherStake || unstakingStake) return;
+    if (claimingHatcherStake || initializingHatcherStake || unstakingStake) return;
 
     setClaimingHatcherStake(stake.stakeEntryAddress);
     try {
@@ -824,7 +856,46 @@ export function StakingClient() {
     } finally {
       setClaimingHatcherStake(null);
     }
-  }, [claimingHatcherStake, connectWalletOnly, load, loadWalletBalance, unstakingStake]);
+  }, [claimingHatcherStake, connectWalletOnly, initializingHatcherStake, load, loadWalletBalance, unstakingStake]);
+
+  const initializeHatcherRewardTracking = useCallback(async (stake: StakingStakeEntry) => {
+    setError(null);
+    setNotice(null);
+    setClaimResult(null);
+    setHatcherRewardTxId(null);
+    if (claimingHatcherStake || initializingHatcherStake || unstakingStake) return;
+
+    setInitializingHatcherStake(stake.stakeEntryAddress);
+    try {
+      const wasConnected = Boolean(walletRef.current.connected && walletRef.current.publicKey);
+      const walletAddress = await connectWalletOnly();
+      if (walletAddress !== stake.walletAddress) {
+        throw new Error('Connect the wallet that owns this stake before initializing reward tracking.');
+      }
+      if (!wasConnected) {
+        await loadWalletBalance();
+        setNotice('Wallet connected. Tap Initialize reward tracking again to submit the transaction.');
+        return;
+      }
+
+      const result = await initializeHatcherRewardEntry({
+        wallet: walletRef.current,
+        stakePoolAddress: stake.poolAddress,
+        stakeEntryAddress: stake.stakeEntryAddress,
+        depositNonce: stake.depositNonce,
+      });
+
+      setNotice(`Reward tracking initialized: ${shortAddress(result.txId)}`);
+      // Reload staking data: the reward-status effect re-checks the visible
+      // stakes, so a successful init flows straight into claimable/no_rewards.
+      await Promise.all([load(), loadWalletBalance()]);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Could not initialize reward tracking';
+      if (message !== 'Cancelled') setError(message);
+    } finally {
+      setInitializingHatcherStake(null);
+    }
+  }, [claimingHatcherStake, connectWalletOnly, initializingHatcherStake, load, loadWalletBalance, unstakingStake]);
 
   const unstakeHatcherStake = useCallback(async (stake: StakingStakeEntry) => {
     setError(null);
@@ -832,7 +903,7 @@ export function StakingClient() {
     setClaimResult(null);
     setStakeTxId(null);
     setUnstakeTxId(null);
-    if (claimingHatcherStake || unstakingStake) return;
+    if (claimingHatcherStake || initializingHatcherStake || unstakingStake) return;
 
     if (!isStakeUnlocked(stake.unlockAt)) {
       setError(`This stake unlocks on ${formatDate(stake.unlockAt)}.`);
@@ -871,7 +942,7 @@ export function StakingClient() {
     } finally {
       setUnstakingStake(null);
     }
-  }, [claimingHatcherStake, connectWalletOnly, load, loadWalletBalance, unstakingStake]);
+  }, [claimingHatcherStake, connectWalletOnly, initializingHatcherStake, load, loadWalletBalance, unstakingStake]);
 
   const claim = async () => {
     setClaiming(true);
@@ -1339,9 +1410,11 @@ export function StakingClient() {
                           {group.stakes.map((stake) => {
                             const hatcherStatus = hatcherRewardStatuses[stake.stakeEntryAddress];
                             const hatcherClaimable = canClaimHatcherReward(hatcherStatus);
+                            const hatcherInitAvailable = canInitializeHatcherRewardEntry(hatcherStatus);
                             const stakeUnlocked = isStakeUnlocked(stake.unlockAt);
-                            const hatcherClaimDisabled = Boolean(claimingHatcherStake || unstakingStake) || !hatcherClaimable;
-                            const unstakeDisabled = Boolean(claimingHatcherStake || unstakingStake) || !stakeUnlocked;
+                            const stakeActionBusy = Boolean(claimingHatcherStake || initializingHatcherStake || unstakingStake);
+                            const hatcherClaimDisabled = stakeActionBusy || !hatcherClaimable;
+                            const unstakeDisabled = stakeActionBusy || !stakeUnlocked;
                             const activeStakeEstimate = estimateActiveStakeRewards(group.pool, stake.stakedHatcher);
 
                             return (
@@ -1405,6 +1478,25 @@ export function StakingClient() {
                                             ? 'No rewards'
                                             : 'Unavailable'}
                                   </button>
+                                  {hatcherInitAvailable && (
+                                    <>
+                                      <button
+                                        type="button"
+                                        onClick={() => void initializeHatcherRewardTracking(stake)}
+                                        disabled={stakeActionBusy}
+                                        title={hatcherRewardEntryRentDisclosure(rewardEntryRentLamports)}
+                                        className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-2 text-xs font-semibold text-[var(--text-primary)] hover:bg-[var(--bg-base)] disabled:cursor-not-allowed disabled:opacity-50 md:w-auto"
+                                      >
+                                        <Sparkles size={14} aria-hidden />
+                                        {initializingHatcherStake === stake.stakeEntryAddress
+                                          ? 'Initializing'
+                                          : 'Initialize reward tracking'}
+                                      </button>
+                                      <p className="max-w-56 text-xs text-[var(--text-muted)] md:text-right">
+                                        {hatcherRewardEntryRentDisclosure(rewardEntryRentLamports)}
+                                      </p>
+                                    </>
+                                  )}
                                   <button
                                     type="button"
                                     onClick={() => void unstakeHatcherStake(stake)}

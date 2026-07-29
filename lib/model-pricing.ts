@@ -52,13 +52,18 @@ function formatCompactCredits(value: number): string {
   return `${Number(value.toFixed(1))}`;
 }
 
-/** Compact AI-Credit display string for a live model price. */
+/**
+ * Compact AI-Credit display string for a live model price. Estimated per-token
+ * prices (source `estimate`, or the explicit `estimated` flag) are prefixed
+ * with `~`; the billing note tooltip explains what an estimate means.
+ */
 export function formatCreditsPer1M(pricing: ModelPricing): string {
   if (pricing.kind === 'fixed') {
     const unit = pricing.creditsPerRequest === 1 ? 'credit' : 'credits';
     return `${formatCompactCredits(pricing.creditsPerRequest)} ${unit} per request`;
   }
-  return `${formatCompactCredits(pricing.creditsPer1MInput)} in / ${formatCompactCredits(pricing.creditsPer1MOutput)} out credits per 1M`;
+  const label = `${formatCompactCredits(pricing.creditsPer1MInput)} in / ${formatCompactCredits(pricing.creditsPer1MOutput)} out credits per 1M`;
+  return pricing.source === 'estimate' || pricing.estimated ? `~${label}` : label;
 }
 
 /**
