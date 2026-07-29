@@ -378,6 +378,7 @@ export const AgentSidebar = memo(function AgentSidebar({ agent, agents, agentsLo
                 return (
                   <button
                     key={t.id}
+                    data-tour={`agent-tab-${t.id}`}
                     onClick={() => onTabChange(t.id)}
                     aria-current={isActive ? 'page' : undefined}
                     className={`relative flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2.5 text-[13px] transition-colors duration-150 ${
@@ -483,6 +484,7 @@ export const AgentSidebar = memo(function AgentSidebar({ agent, agents, agentsLo
           </button>
           <div
             ref={mobileTabsRef}
+            data-tour="agent-nav"
             className="flex min-w-0 gap-1 overflow-x-auto overscroll-x-contain rounded-lg px-1"
             role="tablist"
             aria-label="Agent navigation"
@@ -502,6 +504,7 @@ export const AgentSidebar = memo(function AgentSidebar({ agent, agents, agentsLo
                         role="tab"
                         aria-selected={isActive}
                         data-active={isActive}
+                        data-tour={`agent-tab-${t.id}`}
                         onClick={() => onTabChange(t.id)}
                         className={`relative flex min-w-[76px] flex-shrink-0 snap-start cursor-pointer flex-col items-center gap-0.5 rounded-lg border px-3 py-2 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50 focus-visible:ring-inset ${
                           isActive
@@ -530,7 +533,7 @@ export const AgentSidebar = memo(function AgentSidebar({ agent, agents, agentsLo
       </div>
 
       {/* Desktop sidebar */}
-      <aside className="sticky top-[var(--app-nav-height,64px)] hidden h-[calc(100dvh-var(--app-nav-height,64px))] min-h-0 w-60 flex-shrink-0 flex-col overflow-hidden border-r border-[var(--border-default)] bg-[var(--bg-sidebar)] shadow-[16px_0_42px_rgba(0,0,0,0.05)] xl:flex xl:w-64">
+      <aside data-tour="agent-nav" className="sticky top-[var(--app-nav-height,64px)] hidden h-[calc(100dvh-var(--app-nav-height,64px))] min-h-0 w-60 flex-shrink-0 flex-col overflow-hidden border-r border-[var(--border-default)] bg-[var(--bg-sidebar)] shadow-[16px_0_42px_rgba(0,0,0,0.05)] xl:flex xl:w-64">
         {navContent}
       </aside>
     </>

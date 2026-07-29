@@ -1474,6 +1474,16 @@
       "upgradePlan": "Upgrade plan"
     },
     "agentDetail": {
+      "tourNavTitle": "Navigate Your Agent",
+      "tourNavDescription": "Every area of this agent — chat, logs, configuration, and more — is one click away in this navigation.",
+      "tourChatTitle": "Chat With Your Agent",
+      "tourChatDescription": "Talk to your agent right here. Every reply shows the AI credits it cost.",
+      "tourConfigTitle": "Configure Everything",
+      "tourConfigDescription": "Model, avatar, integrations, and fee settings all live here.",
+      "tourKnowledgeTitle": "Teach Your Agent",
+      "tourKnowledgeDescription": "Upload files here and your agent reads them when it answers.",
+      "tourCreditsTitle": "Credits at a Glance",
+      "tourCreditsDescription": "Your AI-credit balance stays visible right under the message box while you chat.",
       "tabs": {
         "dashboard": "Dashboard",
         "chat": "Chat",

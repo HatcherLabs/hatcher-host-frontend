@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { DashboardWorkspaceNavigation } from '@/components/dashboard/DashboardWorkspaceNavigation';
+import { AgentDetailTour } from '@/components/onboarding/AgentDetailTour';
 import { DashboardTour } from '@/components/onboarding/DashboardTour';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { buildLanguagesMap } from '@/lib/seo';
@@ -24,6 +25,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <ErrorBoundary>
       <DashboardWorkspaceNavigation />
       <DashboardTour />
+      <AgentDetailTour />
       {children}
     </ErrorBoundary>
   );

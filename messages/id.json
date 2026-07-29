@@ -1356,6 +1356,16 @@
       "upgradePlan": "Paket peningkatan"
     },
     "agentDetail": {
+      "tourNavTitle": "Jelajahi Agen Anda",
+      "tourNavDescription": "Semua area agen ini — obrolan, log, konfigurasi, dan lainnya — hanya satu klik lewat navigasi ini.",
+      "tourChatTitle": "Mengobrol dengan Agen Anda",
+      "tourChatDescription": "Bicaralah dengan agen Anda di sini. Setiap balasan menampilkan AI Credits yang terpakai.",
+      "tourConfigTitle": "Konfigurasikan Semuanya",
+      "tourConfigDescription": "Model, avatar, integrasi, dan pengaturan biaya semuanya ada di sini.",
+      "tourKnowledgeTitle": "Ajari Agen Anda",
+      "tourKnowledgeDescription": "Unggah file di sini dan agen Anda akan membacanya saat menjawab.",
+      "tourCreditsTitle": "Credits Selalu Terlihat",
+      "tourCreditsDescription": "Saldo AI Credits Anda tetap terlihat tepat di bawah kotak pesan selama Anda mengobrol.",
       "tabs": {
         "dashboard": "Dasbor",
         "chat": "Obrolan",

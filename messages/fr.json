@@ -1334,6 +1334,16 @@
       "upgradePlan": "Améliorer le forfait"
     },
     "agentDetail": {
+      "tourNavTitle": "Naviguez dans votre agent",
+      "tourNavDescription": "Chaque espace de cet agent — discussion, logs, configuration et plus — est à un clic depuis cette navigation.",
+      "tourChatTitle": "Discutez avec votre agent",
+      "tourChatDescription": "Parlez à votre agent ici même. Chaque réponse affiche les AI Credits consommés.",
+      "tourConfigTitle": "Configurez tout",
+      "tourConfigDescription": "Modèle, avatar, intégrations et paramètres de frais se trouvent tous ici.",
+      "tourKnowledgeTitle": "Formez votre agent",
+      "tourKnowledgeDescription": "Déposez des fichiers ici et votre agent les lira pour répondre.",
+      "tourCreditsTitle": "Credits toujours visibles",
+      "tourCreditsDescription": "Votre solde d'AI Credits reste visible juste sous la zone de message pendant que vous discutez.",
       "tabs": {
         "dashboard": "Tableau de bord",
         "chat": "Discussion",

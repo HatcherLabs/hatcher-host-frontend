@@ -1334,6 +1334,16 @@
       "upgradePlan": "升级套餐"
     },
     "agentDetail": {
+      "tourNavTitle": "浏览您的智能体",
+      "tourNavDescription": "这个智能体的所有区域——聊天、日志、配置等——都可以通过此导航一键到达。",
+      "tourChatTitle": "与您的智能体聊天",
+      "tourChatDescription": "在这里直接与智能体对话。每条回复都会显示所消耗的 AI Credits。",
+      "tourConfigTitle": "配置一切",
+      "tourConfigDescription": "模型、头像、集成和费用设置都在这里。",
+      "tourKnowledgeTitle": "教您的智能体",
+      "tourKnowledgeDescription": "在这里上传文件，智能体回答时会读取它们。",
+      "tourCreditsTitle": "Credits 一目了然",
+      "tourCreditsDescription": "聊天时，您的 AI Credits 余额始终显示在消息框正下方。",
       "tabs": {
         "dashboard": "仪表板",
         "chat": "聊天",

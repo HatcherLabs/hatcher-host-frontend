@@ -1474,6 +1474,16 @@
       "upgradePlan": "Extinde planul"
     },
     "agentDetail": {
+      "tourNavTitle": "Navighează prin agentul tău",
+      "tourNavDescription": "Toate zonele acestui agent — chat, loguri, configurare și altele — sunt la un clic distanță din această navigare.",
+      "tourChatTitle": "Discută cu agentul tău",
+      "tourChatDescription": "Vorbește cu agentul tău chiar aici. Fiecare răspuns arată câte AI Credits a costat.",
+      "tourConfigTitle": "Configurează totul",
+      "tourConfigDescription": "Modelul, avatarul, integrările și setările de comisioane sunt toate aici.",
+      "tourKnowledgeTitle": "Învață-ți agentul",
+      "tourKnowledgeDescription": "Încarcă fișiere aici, iar agentul tău le va citi când răspunde.",
+      "tourCreditsTitle": "Credits mereu la vedere",
+      "tourCreditsDescription": "Soldul tău de AI Credits rămâne vizibil chiar sub caseta de mesaj în timp ce discuți.",
       "tabs": {
         "dashboard": "Panou de control",
         "chat": "Chat",
