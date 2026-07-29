@@ -183,7 +183,7 @@ const softwareApplicationJsonLd = {
       price: '49.99',
       priceCurrency: 'USD',
       billingIncrement: 'P1M',
-      description: '5 agents, 40,000 AI Credits/month, 2 CPU/3GB RAM, 50GB workspace, always active, team collaboration.',
+      description: '5 agents, 40,000 AI Credits/month, 4 CPU/6GB RAM, 50GB workspace, always active, team collaboration.',
     },
     {
       '@type': 'Offer',

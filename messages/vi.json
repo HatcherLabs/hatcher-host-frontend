@@ -647,8 +647,8 @@
       "business": {
         "agents": "Bao gồm 5 tác nhân",
         "messages": "40.000 AI Credits/tháng",
-        "cpu": "2 CPU",
-        "ram": "RAM 3GB",
+        "cpu": "4 CPU",
+        "ram": "RAM 6GB",
         "storage": "Không gian làm việc 50 GB",
         "sleep": "Luôn hoạt động",
         "features": [

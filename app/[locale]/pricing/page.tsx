@@ -513,7 +513,7 @@ export default function PricingPage() {
                       { rowKey: 'models', label: 'Hosted models', free: 'UsePod/OpenRouter + IDLE + MiMo + AceData', starter: 'UsePod/OpenRouter + IDLE + MiMo + AceData', pro: 'UsePod/OpenRouter + IDLE + MiMo + AceData', business: 'UsePod/OpenRouter + IDLE + MiMo + AceData', founding: 'UsePod/OpenRouter + IDLE + MiMo + AceData' },
                       { rowKey: 'webSearch', label: 'Web search', free: 'Uses AI Credits', starter: 'Uses AI Credits', pro: 'Uses AI Credits', business: 'Uses AI Credits', founding: 'Uses AI Credits' },
                       { rowKey: 'byok',            free: 'Provider-paid', starter: 'Provider-paid', pro: 'Provider-paid', business: 'Provider-paid', founding: 'Provider-paid' },
-                      { rowKey: 'cpuRam',          free: '1 / 1GB', starter: '1 / 1.5GB', pro: '1.5 / 2GB', business: '2 / 3GB', founding: '2 / 4GB' },
+                      { rowKey: 'cpuRam',          free: '1 / 1GB', starter: '1 / 1.5GB', pro: '1.5 / 2GB', business: '4 / 6GB', founding: '2 / 4GB' },
                       { rowKey: 'storage',         free: '2 GB',     starter: '10 GB',    pro: '25 GB', business: '50 GB', founding: '40 GB' },
                       { rowKey: 'autoSleep',       free: '12h',      starter: 'alwaysOn', pro: 'alwaysOn',  business: 'alwaysOn', founding: 'alwaysOn' },
                       { rowKey: 'fileManager',     free: true,       starter: true,       pro: true, business: true, founding: true },

@@ -647,8 +647,8 @@
       "business": {
         "agents": "5 agenți incluși",
         "messages": "40.000 AI Credits/lună",
-        "cpu": "2 CPU",
-        "ram": "3 GB RAM",
+        "cpu": "4 CPU",
+        "ram": "6 GB RAM",
         "storage": "50 GB spațiu de lucru",
         "sleep": "Mereu activ",
         "features": [
