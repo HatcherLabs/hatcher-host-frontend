@@ -406,7 +406,7 @@
         "Sempre ligado (sem dormir)",
         "25.000 AI Credits/mês",
         "A pesquisa na Web usa AI Credits",
-        "2 CPU · 4 GB de RAM por agente",
+        "4 CPU · 6 GB de RAM por agente",
         "Espaço de trabalho de 40 GB",
         "Gerenciador de arquivos + registros completos",
         "Suporte prioritário",
@@ -666,8 +666,8 @@
       "founding_member": {
         "agents": "10 agentes incluídos",
         "messages": "25.000 AI Credits/mês",
-        "cpu": "2 CPUs",
-        "ram": "4 GB de RAM",
+        "cpu": "4 CPUs",
+        "ram": "6 GB de RAM",
         "storage": "Espaço de trabalho de 40 GB",
         "sleep": "Sempre ativo",
         "features": [
@@ -818,7 +818,7 @@
         },
         {
           "q": "Qual é o nível de Membro Fundador?",
-          "a": "Membro Fundador é um pagamento único do $99 que lhe dá acesso vitalício ao Hatcher: 10 agentes, 25.000 AI Credits/mês, 2 CPU / 4 GB de RAM, 40 GB de espaço de trabalho, agentes sempre ativos, gerenciador de arquivos, logs completos, suporte prioritário e função fundadora do Discord + tag Telegram. Sem taxas mensais, nunca. Limitado a 20 vagas – quando elas acabarem, este nível desaparecerá."
+          "a": "Membro Fundador é um pagamento único do $99 que lhe dá acesso vitalício ao Hatcher: 10 agentes, 25.000 AI Credits/mês, 4 CPU / 6 GB de RAM, 40 GB de espaço de trabalho, agentes sempre ativos, gerenciador de arquivos, logs completos, suporte prioritário e função fundadora do Discord + tag Telegram. Sem taxas mensais, nunca. Limitado a 20 vagas – quando elas acabarem, este nível desaparecerá."
         }
       ]
     },

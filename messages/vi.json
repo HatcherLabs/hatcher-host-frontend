@@ -406,7 +406,7 @@
         "Luôn bật (không ngủ)",
         "25.000 AI Credits/tháng",
         "Tìm kiếm trên web sử dụng AI Credits",
-        "2 CPU · RAM 4 GB cho mỗi tác nhân",
+        "4 CPU · RAM 6 GB cho mỗi tác nhân",
         "Không gian làm việc 40 GB",
         "Trình quản lý tệp + Nhật ký đầy đủ",
         "Hỗ trợ ưu tiên",
@@ -666,8 +666,8 @@
       "founding_member": {
         "agents": "Bao gồm 10 tác nhân",
         "messages": "25.000 AI Credits/tháng",
-        "cpu": "2 CPU",
-        "ram": "RAM 4GB",
+        "cpu": "4 CPU",
+        "ram": "RAM 6GB",
         "storage": "Không gian làm việc 40 GB",
         "sleep": "Luôn hoạt động",
         "features": [
@@ -818,7 +818,7 @@
         },
         {
           "q": "Cấp Thành viên sáng lập là gì?",
-          "a": "Thành viên sáng lập là khoản thanh toán $99 một lần cho phép bạn truy cập trọn đời vào Hatcher: 10 tác nhân, 25.000 AI Credits/tháng, 2 CPU / RAM 4 GB, không gian làm việc 40 GB, tác nhân luôn hoạt động, Trình quản lý tệp, Nhật ký đầy đủ, hỗ trợ ưu tiên và vai trò Sáng lập Discord + thẻ Telegram. Không có phí hàng tháng, bao giờ hết. Giới hạn ở 20 điểm - khi hết chỗ, cấp độ này sẽ biến mất."
+          "a": "Thành viên sáng lập là khoản thanh toán $99 một lần cho phép bạn truy cập trọn đời vào Hatcher: 10 tác nhân, 25.000 AI Credits/tháng, 4 CPU / RAM 6 GB, không gian làm việc 40 GB, tác nhân luôn hoạt động, Trình quản lý tệp, Nhật ký đầy đủ, hỗ trợ ưu tiên và vai trò Sáng lập Discord + thẻ Telegram. Không có phí hàng tháng, bao giờ hết. Giới hạn ở 20 điểm - khi hết chỗ, cấp độ này sẽ biến mất."
         }
       ]
     },

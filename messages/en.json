@@ -406,7 +406,7 @@
         "Always-on (no sleep)",
         "25,000 AI Credits/month",
         "Web search uses AI Credits",
-        "2 CPU · 4 GB RAM per agent",
+        "4 CPU · 6 GB RAM per agent",
         "40 GB workspace",
         "File Manager + Full Logs",
         "Priority support",
@@ -666,8 +666,8 @@
       "founding_member": {
         "agents": "10 agents included",
         "messages": "25,000 AI Credits/month",
-        "cpu": "2 CPU",
-        "ram": "4 GB RAM",
+        "cpu": "4 CPU",
+        "ram": "6 GB RAM",
         "storage": "40 GB workspace",
         "sleep": "Always active",
         "features": [
@@ -818,7 +818,7 @@
         },
         {
           "q": "What is the Founding Member tier?",
-          "a": "Founding Member is a one-time $99 payment that gives you lifetime access to Hatcher: 10 agents, 25,000 AI Credits/month, 2 CPU / 4 GB RAM, 40 GB workspace, always active agents, File Manager, Full Logs, priority support, and Founding Discord role + Telegram tag. No monthly fees, ever. Limited to 20 spots — once they are gone, this tier is gone."
+          "a": "Founding Member is a one-time $99 payment that gives you lifetime access to Hatcher: 10 agents, 25,000 AI Credits/month, 4 CPU / 6 GB RAM, 40 GB workspace, always active agents, File Manager, Full Logs, priority support, and Founding Discord role + Telegram tag. No monthly fees, ever. Limited to 20 spots — once they are gone, this tier is gone."
         }
       ]
     },
