@@ -1571,3 +1571,13 @@ button, a, [role="tab"] {
   from { transform: translateY(0); opacity: 1; }
   to { transform: translateY(-30px); opacity: 0; }
 }
+
+/* Qwerti widget — landing page only. QwertiWidgetGate stamps this attribute
+   on every non-landing route; the widget's floating DOM survives client-side
+   navigation, so it is hidden by CSS instead of destroyed (reversible when
+   the user navigates back). */
+body[data-qwerti-hidden] [class*='qwerti-'],
+body[data-qwerti-hidden] [id*='qwerti'],
+body[data-qwerti-hidden] iframe[src*='qwerti'] {
+  display: none !important;
+}
