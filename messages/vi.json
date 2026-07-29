@@ -1052,6 +1052,14 @@
       "foundingSlots": "{remaining} trong số các khe {max} còn lại",
       "foundingSoldOut": "Bán hết",
       "oneTimeSuffix": "một lần",
+      "capacityGroup": "Công suất theo từng tác nhân",
+      "capacityGroupNote": "Gói boost trả trước 30 ngày cho một tác nhân — có thể cộng dồn, không tự động gia hạn; gia hạn bằng cách mua lại. Công suất mới được áp dụng trong khoảng một phút.",
+      "capacityActiveTitle": "Tiện ích bổ sung công suất đang hoạt động",
+      "capacityMonthlyTotal": "${amount}/tháng",
+      "capacityNone": "Chưa có tiện ích bổ sung công suất nào đang hoạt động. Tăng sức mạnh cho một tác nhân từ các tiện ích ở trên hoặc từ tab Stats của tác nhân.",
+      "capacityDaysLeft": "{days, plural, other {còn # ngày}}",
+      "capacityStakingBadge": "Phần thưởng staking",
+      "capacityCanceledBadge": "Đã hủy",
       "oneTimeAgent": "một lần/tác nhân",
       "annualAgent": "/năm/tác nhân",
       "monthAgent": "/ 30 ngày/ tác nhân",
@@ -1739,6 +1747,26 @@
         "expires": "Hết hạn {date}",
         "lifetime": "Trọn đời"
       },
+      "capacity": {
+        "title": "Tiện ích bổ sung công suất",
+        "prepaidNote": "Các đơn vị trả trước 30 ngày, theo từng tác nhân và có thể cộng dồn — không bao giờ tự động gia hạn; gia hạn bằng cách mua lại. Công suất mới được áp dụng trong khoảng một phút khi container được tạo lại.",
+        "composedCapacity": "Công suất tổng hợp",
+        "storageLine": "Dung lượng workspace: {amount}",
+        "ceiling": "Giới hạn kỹ thuật: {capacity} mỗi tác nhân",
+        "stakingBadge": "Phần thưởng staking",
+        "canceledBadge": "Đã hủy",
+        "daysLeft": "{days, plural, other {còn # ngày}}",
+        "cancel": "Hủy",
+        "cancelConfirm": "Hủy đơn vị {name} này? Nó vẫn hoạt động cho đến hết 30 ngày trả trước và chỉ đơn giản là không được gia hạn.",
+        "canceledUntil": "Đã hủy {name}. Vẫn có hiệu lực đến {date}.",
+        "canceledNow": "Đã hủy {name}.",
+        "per30Days": "/ 30 ngày",
+        "quantity": "Số lượng",
+        "buy": "Mua — ${price}",
+        "checkoutFailed": "Thanh toán thất bại. Vui lòng thử lại.",
+        "cryptoHint": "Muốn thanh toán bằng SOL, USDC hay $HATCHER?",
+        "cryptoHintLink": "Mua từ trang Thanh toán"
+      },
       "schedules": {
         "new": "Lịch trình mới",
         "noSchedules": "Chưa có lịch trình nào.",
@@ -2379,6 +2407,18 @@
       "ai_credits_50000": {
         "name": "50.000 AI Credits",
         "description": "Nạp tiền một lần để sử dụng trên máy chủ với số lượng lớn"
+      },
+      "boost_s": {
+        "name": "Boost S",
+        "description": "+1 vCPU, +1 GB RAM cho một tác nhân"
+      },
+      "boost_l": {
+        "name": "Boost L",
+        "description": "+2 vCPU, +3 GB RAM cho một tác nhân"
+      },
+      "storage_plus": {
+        "name": "Storage+",
+        "description": "+10 GB dung lượng workspace cho một tác nhân"
       }
     },
     "frameworks": {

@@ -1052,6 +1052,14 @@
       "foundingSlots": "{remaining} dari {max} slot tersisa",
       "foundingSoldOut": "Terjual habis",
       "oneTimeSuffix": "satu kali",
+      "capacityGroup": "Kapasitas per agen",
+      "capacityGroupNote": "Boost prabayar 30 hari untuk satu agen — dapat ditumpuk, tanpa perpanjangan otomatis; perpanjang dengan membeli lagi. Kapasitas baru berlaku dalam waktu sekitar satu menit.",
+      "capacityActiveTitle": "Add-on kapasitas aktif",
+      "capacityMonthlyTotal": "${amount}/bulan",
+      "capacityNone": "Belum ada add-on kapasitas yang aktif. Tingkatkan agen dari add-on di atas atau dari tab Stats agen.",
+      "capacityDaysLeft": "{days, plural, other {tersisa # hari}}",
+      "capacityStakingBadge": "Hadiah staking",
+      "capacityCanceledBadge": "Dibatalkan",
       "oneTimeAgent": "satu kali / agen",
       "annualAgent": "/ tahun / agen",
       "monthAgent": "/ 30 hari / agen",
@@ -1739,6 +1747,26 @@
         "expires": "Kedaluwarsa {date}",
         "lifetime": "Seumur hidup"
       },
+      "capacity": {
+        "title": "Add-on kapasitas",
+        "prepaidNote": "Unit prabayar 30 hari, per agen dan dapat ditumpuk — tidak pernah diperpanjang otomatis; perpanjang dengan membeli lagi. Kapasitas baru berlaku dalam sekitar satu menit saat kontainer dibuat ulang.",
+        "composedCapacity": "Kapasitas gabungan",
+        "storageLine": "Penyimpanan workspace: {amount}",
+        "ceiling": "Batas teknis: {capacity} per agen",
+        "stakingBadge": "Hadiah staking",
+        "canceledBadge": "Dibatalkan",
+        "daysLeft": "{days, plural, other {tersisa # hari}}",
+        "cancel": "Batalkan",
+        "cancelConfirm": "Batalkan unit {name} ini? Unit tetap aktif sampai 30 hari prabayarnya berakhir dan tidak akan diperpanjang.",
+        "canceledUntil": "{name} dibatalkan. Tetap berlaku sampai {date}.",
+        "canceledNow": "{name} dibatalkan.",
+        "per30Days": "/ 30 hari",
+        "quantity": "Jumlah",
+        "buy": "Beli — ${price}",
+        "checkoutFailed": "Checkout gagal. Silakan coba lagi.",
+        "cryptoHint": "Lebih suka membayar dengan SOL, USDC, atau $HATCHER?",
+        "cryptoHintLink": "Beli dari halaman Penagihan"
+      },
       "schedules": {
         "new": "Jadwal Baru",
         "noSchedules": "Belum ada jadwal.",
@@ -2379,6 +2407,18 @@
       "ai_credits_50000": {
         "name": "50.000 AI Credits",
         "description": "Isi ulang satu kali untuk penggunaan host bervolume tinggi"
+      },
+      "boost_s": {
+        "name": "Boost S",
+        "description": "+1 vCPU, +1 GB RAM untuk satu agen"
+      },
+      "boost_l": {
+        "name": "Boost L",
+        "description": "+2 vCPU, +3 GB RAM untuk satu agen"
+      },
+      "storage_plus": {
+        "name": "Storage+",
+        "description": "+10 GB penyimpanan workspace untuk satu agen"
       }
     },
     "frameworks": {

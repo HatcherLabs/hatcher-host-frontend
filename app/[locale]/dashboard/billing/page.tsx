@@ -15,6 +15,14 @@ import type { UserTierKey, AddonKey } from '@hatcher/shared';
 import { usePaymentDrivers } from '@/lib/payment-drivers';
 import { ConfirmPaymentModal } from '@/components/payments/ConfirmPaymentModal';
 import { formatFeatureKey } from '@/lib/feature-labels';
+import {
+  CAPACITY_ADDONS,
+  daysRemaining,
+  findCapacityAddon,
+  formatMemoryMb,
+  isCapacityAddonKey,
+} from '@/lib/capacity-addons';
+import type { CapacityAddonsSummaryResponse } from '@/lib/api';
 import { payWithSolanaX402, type SolanaX402Network } from '@/lib/solana-x402-client';
 import { trustedRedirectUrl } from '@/lib/trusted-redirect';
 import {
@@ -44,6 +52,7 @@ import {
   Clock,
   CreditCard,
   Crown,
+  Gauge,
   Loader2,
   Plus,
   Receipt,
@@ -108,7 +117,10 @@ type BillingAddonKey = Exclude<AddonKey, RetiredAddonKey>
   | 'addon.ai_credits.5000'
   | 'addon.ai_credits.10000'
   | 'addon.ai_credits.25000'
-  | 'addon.ai_credits.50000';
+  | 'addon.ai_credits.50000'
+  | 'addon.boost_s'
+  | 'addon.boost_l'
+  | 'addon.storage_plus';
 
 type BillingAddon = {
   key: BillingAddonKey;
@@ -174,6 +186,23 @@ const AI_CREDIT_ADDONS: BillingAddon[] = [
   },
 ];
 
+// Per-agent capacity add-ons (Boost S/L, Storage+). Prepaid 30-day
+// units, stackable, no auto-renew — modeled as one_time so the
+// annual toggle never applies and the modal always charges the flat
+// per-30-days price. The crypto rails settle through the same
+// /features/addon flow as every other addon (single unit); Stripe
+// multi-unit checkout lives on the agent's Stats tab.
+const CAPACITY_BILLING_ADDONS: BillingAddon[] = CAPACITY_ADDONS.map((addon) => ({
+  key: addon.key,
+  name: addon.kind === 'boost_s' ? 'Boost S' : addon.kind === 'boost_l' ? 'Boost L' : 'Storage+',
+  description: addon.storageMb > 0
+    ? `+${formatMemoryMb(addon.storageMb)} workspace storage for one agent. Prepaid 30 days, renew by re-purchase.`
+    : `+${addon.cpus} vCPU, +${formatMemoryMb(addon.memoryMb)} RAM for one agent. Prepaid 30 days, renew by re-purchase.`,
+  usdPrice: addon.usdPrice,
+  type: 'one_time',
+  perAgent: true,
+}));
+
 const VISIBLE_ADDONS: BillingAddon[] = [
   ...(ADDONS as unknown as BillingAddon[]).filter(
     (addon) => {
@@ -187,6 +216,7 @@ const VISIBLE_ADDONS: BillingAddon[] = [
     },
   ),
   ...AI_CREDIT_ADDONS,
+  ...CAPACITY_BILLING_ADDONS,
 ];
 
 function findBillingAddon(addonKey: string | undefined): BillingAddon | undefined {
@@ -436,6 +466,7 @@ export default function BillingPage() {
   const t  = useTranslations('dashboard.billing');
   const tc = useTranslations('dashboard.common');
   const tTiers = useTranslations('shared.tiers');
+  const tSharedAddons = useTranslations('shared.addons');
   const format = useFormatter();
   const formatDate = (dateStr: string) =>
     format.dateTime(new Date(dateStr), { year: 'numeric', month: 'short', day: 'numeric' });
@@ -455,6 +486,7 @@ export default function BillingPage() {
   } = usePaymentDrivers();
 
   const [accountData, setAccountData] = useState<AccountFeatures | null>(null);
+  const [capacitySummary, setCapacitySummary] = useState<CapacityAddonsSummaryResponse | null>(null);
   const [foundingInfo, setFoundingInfo] = useState<{ maxSlots: number; taken: number; remaining: number } | null>(null);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -586,7 +618,7 @@ export default function BillingPage() {
   // founding slots, agent list). The only difference vs. the initial
   // load is that we don't flip the top-level `loading` spinner.
   const loadAccountData = useCallback(async () => {
-    const [acctRes, balRes, payRes, histRes, catalogRes, agentsRes, recurringRes] = await Promise.all([
+    const [acctRes, balRes, payRes, histRes, catalogRes, agentsRes, recurringRes, capacityRes] = await Promise.all([
       api.getAccountFeatures(),
       api.getAiCreditBalance(),
       api.getPayments(),
@@ -594,8 +626,10 @@ export default function BillingPage() {
       api.getTiersCatalog(),
       api.getMyAgents(),
       api.getSolanaRecurringAuthorizations(),
+      api.getCapacityAddonsSummary(),
     ]);
     if (acctRes.success) setAccountData(acctRes.data as unknown as AccountFeatures);
+    if (capacityRes.success) setCapacitySummary(capacityRes.data);
     if (balRes.success) setAiCreditBalance(balRes.data.balance);
     if (payRes.success) setPayments(payRes.data.payments);
     if (histRes.success) setAiCreditHistory(histRes.data.usage);
@@ -764,8 +798,10 @@ export default function BillingPage() {
       api.getMyAgents(),
       api.getTiersCatalog(),
       api.getSolanaRecurringAuthorizations(),
-    ]).then(([acctRes, payRes, balRes, histRes, agentsRes, catalogRes, recurringRes]) => {
+      api.getCapacityAddonsSummary(),
+    ]).then(([acctRes, payRes, balRes, histRes, agentsRes, catalogRes, recurringRes, capacityRes]) => {
       if (acctRes.success) setAccountData(acctRes.data as unknown as AccountFeatures);
+      if (capacityRes.success) setCapacitySummary(capacityRes.data);
       if (payRes.success) setPayments(payRes.data.payments);
       if (balRes.success) setAiCreditBalance(balRes.data.balance);
       if (histRes.success) setAiCreditHistory(histRes.data.usage);
@@ -2356,7 +2392,8 @@ export default function BillingPage() {
           {([
             { label: 'AI Credits', keys: ['addon.ai_credits.5000', 'addon.ai_credits.10000', 'addon.ai_credits.25000', 'addon.ai_credits.50000'] },
             { label: 'Extra Agents', keys: ['addon.agents.1', 'addon.agents.3', 'addon.agents.5', 'addon.agents.10'] },
-          ] as const).map((group) => {
+            { label: t('capacityGroup'), keys: ['addon.boost_s', 'addon.boost_l', 'addon.storage_plus'], note: t('capacityGroupNote') },
+          ] as Array<{ label: string; keys: readonly BillingAddonKey[]; note?: string }>).map((group) => {
             const groupAddons = group.keys
               .map((k) => findBillingAddon(k))
               .filter((a): a is BillingAddon => Boolean(a));
@@ -2367,17 +2404,25 @@ export default function BillingPage() {
                 <p className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)] mb-2">
                   {group.label}
                 </p>
+                {group.note && (
+                  <p className="text-[11px] text-[var(--text-muted)] mb-2">{group.note}</p>
+                )}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                   {groupAddons.map((addon) => {
                     const isBuying = purchasingAddon === addon.key;
                     const isSub = addon.type === 'subscription';
+                    const isCapacity = isCapacityAddonKey(addon.key);
                     const displayPrice = isSub && billingPeriod === 'annual'
                       ? computePrice(addon.usdPrice, true)
                       : addon.usdPrice;
                     const hatcherPrice = priceForHatcherPayment(displayPrice);
-                    const suffix = addon.type === 'one_time'
-                      ? t('oneTimeSuffix')
-                      : billingPeriod === 'annual' ? t('annualSuffix') : t('monthSuffix');
+                    // Capacity add-ons are prepaid 30-day units — reuse the
+                    // "/ 30 days" suffix instead of the "one-time" wording.
+                    const suffix = isCapacity
+                      ? t('monthSuffix')
+                      : addon.type === 'one_time'
+                        ? t('oneTimeSuffix')
+                        : billingPeriod === 'annual' ? t('annualSuffix') : t('monthSuffix');
 
                     return (
                       <div
@@ -2385,7 +2430,9 @@ export default function BillingPage() {
                         className="p-4 rounded-xl border border-[var(--border-default)] hover:border-[var(--color-accent)]/30 transition-all flex flex-col min-w-0"
                       >
                         <div className="flex items-center gap-2 mb-2 min-w-0">
-                          {addon.aiCredits ? (
+                          {isCapacity ? (
+                            <Gauge className="w-4 h-4 text-[var(--color-accent)] shrink-0" />
+                          ) : addon.aiCredits ? (
                             <Zap className="w-4 h-4 text-[var(--color-accent)] shrink-0" />
                           ) : (
                             <Users className="w-4 h-4 text-[var(--color-accent)] shrink-0" />
@@ -2433,6 +2480,61 @@ export default function BillingPage() {
               </div>
             );
           })}
+        </div>
+      </motion.div>
+
+      {/* ── Active capacity add-ons (per-agent, all agents) ── */}
+      <motion.div className={`mb-8 ${cardClass}`} variants={itemVariants}>
+        <div className="px-4 sm:px-6 py-4 flex items-center justify-between gap-3 flex-wrap border-b border-[var(--border-default)]">
+          <div className="flex items-center gap-2">
+            <Gauge className="w-4 h-4 text-[var(--color-accent)]" />
+            <h2 className="font-semibold text-[var(--text-primary)]">{t('capacityActiveTitle')}</h2>
+          </div>
+          {capacitySummary && capacitySummary.addons.length > 0 && (
+            <span className="text-xs font-semibold text-[var(--text-secondary)] tabular-nums">
+              {t('capacityMonthlyTotal', { amount: capacitySummary.monthlyUsd })}
+            </span>
+          )}
+        </div>
+        <div className="p-4 sm:p-6">
+          {capacitySummary && capacitySummary.addons.length > 0 ? (
+            <div className="space-y-2">
+              {capacitySummary.addons.map((unit) => {
+                const def = findCapacityAddon(unit.kind);
+                const days = daysRemaining(unit.expiresAt);
+                return (
+                  <div key={unit.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-2 text-sm">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="font-medium text-[var(--text-primary)]">
+                        {def ? tSharedAddons(`${def.kind}.name`) : unit.kind}
+                      </span>
+                      {unit.agentName && (
+                        <span className="text-xs text-[var(--text-muted)] truncate">· {unit.agentName}</span>
+                      )}
+                      {unit.source === 'staking' && (
+                        <span className="rounded-full border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-2 py-0.5 text-[10px] font-semibold text-[var(--color-warning)]">
+                          {t('capacityStakingBadge')}
+                        </span>
+                      )}
+                      {unit.status === 'canceled' && (
+                        <span className="rounded-full border border-[var(--border-default)] bg-[var(--bg-card)] px-2 py-0.5 text-[10px] font-semibold text-[var(--text-muted)]">
+                          {t('capacityCanceledBadge')}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0 text-xs text-[var(--text-muted)]">
+                      {unit.expiresAt && <span>{t('expires', { date: formatDate(unit.expiresAt) })}</span>}
+                      {days !== null && (
+                        <span className="tabular-nums">{t('capacityDaysLeft', { days })}</span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-sm text-[var(--text-muted)]">{t('capacityNone')}</p>
+          )}
         </div>
       </motion.div>
 

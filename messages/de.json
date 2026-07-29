@@ -1030,6 +1030,14 @@
       "foundingSlots": "{remaining} von {max} Plätzen verfügbar",
       "foundingSoldOut": "Ausverkauft",
       "oneTimeSuffix": "einmalig",
+      "capacityGroup": "Kapazität pro Agent",
+      "capacityGroupNote": "Vorausbezahlte 30-Tage-Boosts für einen einzelnen Agenten — stapelbar, ohne automatische Verlängerung; zum Verlängern einfach erneut kaufen. Neue Kapazität greift innerhalb von etwa einer Minute.",
+      "capacityActiveTitle": "Aktive Kapazitäts-Add-ons",
+      "capacityMonthlyTotal": "${amount}/Monat",
+      "capacityNone": "Noch keine Kapazitäts-Add-ons aktiv. Booste einen Agenten über die Add-ons oben oder über den Stats-Tab des Agenten.",
+      "capacityDaysLeft": "{days, plural, one {noch # Tag} other {noch # Tage}}",
+      "capacityStakingBadge": "Staking-Belohnung",
+      "capacityCanceledBadge": "Gekündigt",
       "oneTimeAgent": "einmalig / Agent",
       "annualAgent": "/ Jahr / Agent",
       "monthAgent": "/ 30 Tage / Agent",
@@ -1715,6 +1723,26 @@
         "expires": "Läuft ab am {date}",
         "lifetime": "Lebenslang"
       },
+      "capacity": {
+        "title": "Kapazitäts-Add-ons",
+        "prepaidNote": "Vorausbezahlte 30-Tage-Einheiten, pro Agent und stapelbar — sie verlängern sich nie automatisch; zum Verlängern einfach erneut kaufen. Neue Kapazität greift innerhalb von etwa einer Minute, während der Container neu erstellt wird.",
+        "composedCapacity": "Zusammengesetzte Kapazität",
+        "storageLine": "Workspace-Speicher: {amount}",
+        "ceiling": "Technische Obergrenze: {capacity} pro Agent",
+        "stakingBadge": "Staking-Belohnung",
+        "canceledBadge": "Gekündigt",
+        "daysLeft": "{days, plural, one {noch # Tag} other {noch # Tage}}",
+        "cancel": "Kündigen",
+        "cancelConfirm": "Diese {name}-Einheit kündigen? Sie bleibt bis zum Ende der vorausbezahlten 30 Tage aktiv und verlängert sich einfach nicht.",
+        "canceledUntil": "{name} gekündigt. Bleibt bis {date} wirksam.",
+        "canceledNow": "{name} gekündigt.",
+        "per30Days": "/ 30 Tage",
+        "quantity": "Menge",
+        "buy": "Kaufen — ${price}",
+        "checkoutFailed": "Checkout fehlgeschlagen. Bitte erneut versuchen.",
+        "cryptoHint": "Lieber mit SOL, USDC oder $HATCHER zahlen?",
+        "cryptoHintLink": "Auf der Abrechnungsseite kaufen"
+      },
       "schedules": {
         "new": "Neuer Zeitplan",
         "noSchedules": "Noch keine Zeitpläne.",
@@ -2355,6 +2383,18 @@
       "ai_credits_50000": {
         "name": "50.000 AI Credits",
         "description": "Einmalige Aufladung für hohes gehostetes Nutzungsvolumen"
+      },
+      "boost_s": {
+        "name": "Boost S",
+        "description": "+1 vCPU, +1 GB RAM für einen Agenten"
+      },
+      "boost_l": {
+        "name": "Boost L",
+        "description": "+2 vCPU, +3 GB RAM für einen Agenten"
+      },
+      "storage_plus": {
+        "name": "Storage+",
+        "description": "+10 GB Workspace-Speicher für einen Agenten"
       }
     },
     "frameworks": {

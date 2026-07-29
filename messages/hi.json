@@ -1052,6 +1052,14 @@
       "foundingSlots": "शेष {max} स्लॉट की {remaining}",
       "foundingSoldOut": "बिक गया",
       "oneTimeSuffix": "एक बार",
+      "capacityGroup": "प्रति-एजेंट क्षमता",
+      "capacityGroupNote": "एक एजेंट के लिए 30 दिनों के प्रीपेड बूस्ट — स्टैक किए जा सकते हैं, कोई ऑटो-रिन्यू नहीं; दोबारा खरीदकर रिन्यू करें। नई क्षमता लगभग एक मिनट में लागू हो जाती है।",
+      "capacityActiveTitle": "सक्रिय क्षमता ऐड-ऑन",
+      "capacityMonthlyTotal": "${amount}/माह",
+      "capacityNone": "अभी कोई क्षमता ऐड-ऑन सक्रिय नहीं है। ऊपर दिए ऐड-ऑन से या एजेंट के Stats टैब से किसी एजेंट को बूस्ट करें।",
+      "capacityDaysLeft": "{days, plural, one {# दिन शेष} other {# दिन शेष}}",
+      "capacityStakingBadge": "स्टेकिंग इनाम",
+      "capacityCanceledBadge": "रद्द",
       "oneTimeAgent": "एक बार/एजेंट",
       "annualAgent": "/ वर्ष/एजेंट",
       "monthAgent": "/ 30 दिन / एजेंट",
@@ -1739,6 +1747,26 @@
         "expires": "{date} समाप्त हो रहा है",
         "lifetime": "आजीवन"
       },
+      "capacity": {
+        "title": "क्षमता ऐड-ऑन",
+        "prepaidNote": "30 दिनों की प्रीपेड इकाइयाँ, प्रति एजेंट और स्टैक करने योग्य — ये कभी ऑटो-रिन्यू नहीं होतीं; दोबारा खरीदकर रिन्यू करें। कंटेनर दोबारा बनने के दौरान नई क्षमता लगभग एक मिनट में लागू हो जाती है।",
+        "composedCapacity": "संयोजित क्षमता",
+        "storageLine": "वर्कस्पेस स्टोरेज: {amount}",
+        "ceiling": "तकनीकी सीमा: प्रति एजेंट {capacity}",
+        "stakingBadge": "स्टेकिंग इनाम",
+        "canceledBadge": "रद्द",
+        "daysLeft": "{days, plural, one {# दिन शेष} other {# दिन शेष}}",
+        "cancel": "रद्द करें",
+        "cancelConfirm": "क्या इस {name} इकाई को रद्द करें? यह अपने प्रीपेड 30 दिन पूरे होने तक सक्रिय रहेगी और बस रिन्यू नहीं होगी।",
+        "canceledUntil": "{name} रद्द किया गया। यह {date} तक प्रभावी रहेगा।",
+        "canceledNow": "{name} रद्द किया गया।",
+        "per30Days": "30 दिन",
+        "quantity": "मात्रा",
+        "buy": "खरीदें — ${price}",
+        "checkoutFailed": "चेकआउट विफल रहा। कृपया फिर से प्रयास करें।",
+        "cryptoHint": "SOL, USDC या $HATCHER से भुगतान करना चाहते हैं?",
+        "cryptoHintLink": "बिलिंग पेज से खरीदें"
+      },
       "schedules": {
         "new": "नई अनुसूची",
         "noSchedules": "अभी तक कोई शेड्यूल नहीं है।",
@@ -2379,6 +2407,18 @@
       "ai_credits_50000": {
         "name": "50,000 AI Credits",
         "description": "उच्च-मात्रा में होस्ट किए गए उपयोग के लिए एकमुश्त टॉप-अप"
+      },
+      "boost_s": {
+        "name": "Boost S",
+        "description": "एक एजेंट के लिए +1 vCPU, +1 GB RAM"
+      },
+      "boost_l": {
+        "name": "Boost L",
+        "description": "एक एजेंट के लिए +2 vCPU, +3 GB RAM"
+      },
+      "storage_plus": {
+        "name": "Storage+",
+        "description": "एक एजेंट के लिए +10 GB वर्कस्पेस स्टोरेज"
       }
     },
     "frameworks": {

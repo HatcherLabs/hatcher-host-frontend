@@ -1030,6 +1030,14 @@
       "foundingSlots": "剩余 {remaining}/{max} 个名额",
       "foundingSoldOut": "已售罄",
       "oneTimeSuffix": "一次性",
+      "capacityGroup": "按智能体的容量",
+      "capacityGroupNote": "面向单个智能体的 30 天预付费加速包——可叠加，绝不自动续费；再次购买即可续期。新容量约一分钟内生效。",
+      "capacityActiveTitle": "生效中的容量扩展项",
+      "capacityMonthlyTotal": "${amount}/月",
+      "capacityNone": "尚无生效中的容量扩展项。可通过上方的扩展项或智能体的 Stats 标签页为智能体加速。",
+      "capacityDaysLeft": "{days, plural, other {剩余 # 天}}",
+      "capacityStakingBadge": "质押奖励",
+      "capacityCanceledBadge": "已取消",
       "oneTimeAgent": "一次性/智能体",
       "annualAgent": "/ 年/智能体",
       "monthAgent": "/ 30天/智能体",
@@ -1715,6 +1723,26 @@
         "expires": "到期时间 {date}",
         "lifetime": "终身"
       },
+      "capacity": {
+        "title": "容量扩展项",
+        "prepaidNote": "按智能体计的 30 天预付费单元，可叠加——绝不自动续费；再次购买即可续期。容器重建期间，新容量约一分钟内生效。",
+        "composedCapacity": "组合容量",
+        "storageLine": "工作区存储：{amount}",
+        "ceiling": "技术上限：每个智能体 {capacity}",
+        "stakingBadge": "质押奖励",
+        "canceledBadge": "已取消",
+        "daysLeft": "{days, plural, other {剩余 # 天}}",
+        "cancel": "取消",
+        "cancelConfirm": "取消这个 {name} 单元？它会保持生效直到预付费的 30 天结束，只是不再续期。",
+        "canceledUntil": "已取消 {name}。将保持生效至 {date}。",
+        "canceledNow": "已取消 {name}。",
+        "per30Days": "/ 30天",
+        "quantity": "数量",
+        "buy": "购买 — ${price}",
+        "checkoutFailed": "结账失败，请重试。",
+        "cryptoHint": "想用 SOL、USDC 或 $HATCHER 支付？",
+        "cryptoHintLink": "前往账单页面购买"
+      },
       "schedules": {
         "new": "新建计划",
         "noSchedules": "暂无计划任务。",
@@ -2355,6 +2383,18 @@
       "ai_credits_50000": {
         "name": "50,000 AI Credits",
         "description": "高容量托管使用的一次性充值"
+      },
+      "boost_s": {
+        "name": "Boost S",
+        "description": "为单个智能体增加 +1 vCPU、+1 GB 内存"
+      },
+      "boost_l": {
+        "name": "Boost L",
+        "description": "为单个智能体增加 +2 vCPU、+3 GB 内存"
+      },
+      "storage_plus": {
+        "name": "Storage+",
+        "description": "为单个智能体增加 +10 GB 工作区存储"
       }
     },
     "frameworks": {

@@ -1030,6 +1030,14 @@
       "foundingSlots": "{remaining} sur {max} emplacements restants",
       "foundingSoldOut": "Épuisé",
       "oneTimeSuffix": "paiement unique",
+      "capacityGroup": "Capacité par agent",
+      "capacityGroupNote": "Boosts prépayés de 30 jours pour un seul agent — cumulables, sans renouvellement automatique ; renouvelez en rachetant. La nouvelle capacité s’applique en une minute environ.",
+      "capacityActiveTitle": "Add-ons de capacité actifs",
+      "capacityMonthlyTotal": "${amount}/mois",
+      "capacityNone": "Aucun add-on de capacité actif pour l’instant. Boostez un agent depuis les add-ons ci-dessus ou depuis l’onglet Stats de l’agent.",
+      "capacityDaysLeft": "{days, plural, one {# jour restant} other {# jours restants}}",
+      "capacityStakingBadge": "Récompense de staking",
+      "capacityCanceledBadge": "Annulé",
       "oneTimeAgent": "paiement unique / agent",
       "annualAgent": "/ an / agent",
       "monthAgent": "/ 30 jours / agent",
@@ -1715,6 +1723,26 @@
         "expires": "Expire le {date}",
         "lifetime": "À vie"
       },
+      "capacity": {
+        "title": "Add-ons de capacité",
+        "prepaidNote": "Unités prépayées de 30 jours, par agent et cumulables — jamais de renouvellement automatique ; renouvelez en rachetant. La nouvelle capacité s’applique en une minute environ, le temps de recréer le conteneur.",
+        "composedCapacity": "Capacité composée",
+        "storageLine": "Stockage du workspace : {amount}",
+        "ceiling": "Plafond technique : {capacity} par agent",
+        "stakingBadge": "Récompense de staking",
+        "canceledBadge": "Annulé",
+        "daysLeft": "{days, plural, one {# jour restant} other {# jours restants}}",
+        "cancel": "Annuler",
+        "cancelConfirm": "Annuler cette unité {name} ? Elle reste active jusqu’à la fin de ses 30 jours prépayés et ne sera simplement pas renouvelée.",
+        "canceledUntil": "{name} annulé. Reste actif jusqu’au {date}.",
+        "canceledNow": "{name} annulé.",
+        "per30Days": "/ 30 jours",
+        "quantity": "Quantité",
+        "buy": "Acheter — ${price}",
+        "checkoutFailed": "Échec du paiement. Veuillez réessayer.",
+        "cryptoHint": "Vous préférez payer en SOL, USDC ou $HATCHER ?",
+        "cryptoHintLink": "Achetez depuis la page Facturation"
+      },
       "schedules": {
         "new": "Nouvelle planification",
         "noSchedules": "Aucune planification.",
@@ -2355,6 +2383,18 @@
       "ai_credits_50000": {
         "name": "50 000 AI Credits",
         "description": "Recharge unique pour usage hébergé à volume élevé"
+      },
+      "boost_s": {
+        "name": "Boost S",
+        "description": "+1 vCPU, +1 Go de RAM pour un agent"
+      },
+      "boost_l": {
+        "name": "Boost L",
+        "description": "+2 vCPU, +3 Go de RAM pour un agent"
+      },
+      "storage_plus": {
+        "name": "Storage+",
+        "description": "+10 Go de stockage workspace pour un agent"
       }
     },
     "frameworks": {

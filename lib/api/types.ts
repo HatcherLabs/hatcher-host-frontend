@@ -196,6 +196,50 @@ export interface AgentFeature {
   createdAt: string;
 }
 
+/**
+ * One prepaid 30-day capacity add-on unit on an agent (Boost S/L,
+ * Storage+). `source: 'staking'` units are granted by staking rewards
+ * and cannot be canceled; canceled units stay `inEffect` until their
+ * prepaid window ends.
+ */
+export interface AgentCapacityAddon {
+  id: string;
+  kind: string;
+  source: "purchase" | "staking";
+  status: "active" | "canceled" | "expired";
+  inEffect: boolean;
+  expiresAt: string | null;
+  canceledAt: string | null;
+  createdAt: string;
+  usdPrice: number;
+}
+
+/** vCPU + RAM pair, as composed by the API. */
+export interface AgentCapacityLimits {
+  cpus: number;
+  memoryMb: number;
+  storageMb?: number;
+}
+
+/** `GET /agents/:id/addons` — active units + composed capacity. */
+export interface AgentCapacityAddonsResponse {
+  addons: AgentCapacityAddon[];
+  capacity: {
+    base: AgentCapacityLimits;
+    effective: AgentCapacityLimits;
+    ceiling: { cpus: number; memoryMb: number };
+  };
+  catalog?: unknown;
+}
+
+/** `GET /features/capacity-addons` — user-level roll-up across agents. */
+export interface CapacityAddonsSummaryResponse {
+  addons: Array<AgentCapacityAddon & { agentId?: string; agentName: string | null }>;
+  monthlyUsd: number;
+  catalog?: unknown;
+  ceiling?: { cpus: number; memoryMb: number };
+}
+
 export type StakingPoolKey = "7d" | "30d" | "90d";
 
 export interface StakingPoolConfig {
