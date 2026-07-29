@@ -1,10 +1,5 @@
 import type { Metadata } from 'next';
-import Script from 'next/script';
 import { LandingV3 } from '@/components/landing/v3/LandingV3';
-import {
-  QWERTI_WIDGET_SCRIPT_INTEGRITY,
-  QWERTI_WIDGET_SCRIPT_SRC,
-} from '@/lib/qwerti-widget';
 import { buildLanguagesMap } from '@/lib/seo';
 
 export const metadata: Metadata = {
@@ -14,20 +9,9 @@ export const metadata: Metadata = {
   alternates: { languages: buildLanguagesMap('/') },
 };
 
+// The Qwerti widget script is mounted globally by QwertiWidgetGate (root
+// layout), which only loads it on this landing route and hides its floating
+// UI on every other page.
 export default function HomePage() {
-  return (
-    <>
-      <LandingV3 />
-      <Script
-        src={QWERTI_WIDGET_SCRIPT_SRC}
-        integrity={QWERTI_WIDGET_SCRIPT_INTEGRITY}
-        crossOrigin="anonymous"
-        strategy="afterInteractive"
-        data-widget="qwerti-widget"
-        data-campaign="hatcher-792703809-48487"
-        data-auto-open="false"
-        data-loader-version="1.0.0"
-      />
-    </>
-  );
+  return <LandingV3 />;
 }

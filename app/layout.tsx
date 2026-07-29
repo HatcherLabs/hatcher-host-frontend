@@ -10,6 +10,7 @@ import { AuthProvider } from '@/lib/auth-context';
 import { LayoutShell } from '@/components/layout/LayoutShell';
 import { ToastProvider } from '@/components/ui/ToastProvider';
 import { CommandPalette } from '@/components/ui/CommandPalette';
+import { QwertiWidgetGate } from '@/components/landing/QwertiWidgetGate';
 import { PosthogProvider } from '@/components/providers/PosthogProvider';
 import { CookieConsent } from '@/components/ui/CookieConsent';
 import { NextIntlClientProvider } from 'next-intl';
@@ -288,6 +289,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   <ToastProvider>
                     <LayoutShell>{children}</LayoutShell>
                     <CommandPalette />
+                    <QwertiWidgetGate />
                   </ToastProvider>
                 </WalletProvider>
               </AuthProvider>
