@@ -3,6 +3,7 @@
 // ============================================================
 
 import { API_URL } from "@/lib/config";
+import type { ModelPricingPayload } from "@/lib/model-pricing";
 import { getToken, req } from "./core";
 import {
   parseAgentChatStreamEvent,
@@ -4011,6 +4012,9 @@ export const api = {
         createdAt: string;
       }>;
     }>(`/ai-credits/history?limit=${limit}${before ? `&before=${encodeURIComponent(before)}` : ''}`),
+
+  /** Live hosted-model pricing in AI Credits (public, no auth). */
+  getModelPricing: () => req<ModelPricingPayload>("/models/pricing"),
 
   getStakingConfig: () => req<StakingConfigResponse>("/staking/config"),
 

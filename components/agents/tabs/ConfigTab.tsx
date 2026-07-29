@@ -51,6 +51,12 @@ import {
   type HostedModelTag,
 } from '@/lib/hosted-model-catalog';
 import { mergeHostedModelsWithVirtualsLive } from '@/lib/virtuals-compute-models';
+import {
+  mergeHostedModelsWithLivePricing,
+  modelPricingById,
+  parseModelPricingPayload,
+  type ModelPricingPayload,
+} from '@/lib/model-pricing';
 import { resolveLoadedModelConfig } from '@/hooks/useAgentConfig';
 import {
   useAgentContext,
@@ -395,14 +401,22 @@ export function ConfigTab() {
   const [presetImportError, setPresetImportError] = useState<string | null>(null);
   const [liveVirtualsModels, setLiveVirtualsModels] = useState<HostedModelOption[]>([]);
   const [virtualsModelStatus, setVirtualsModelStatus] = useState<VirtualsModelCatalogStatus>('loading');
+  const [liveModelPricing, setLiveModelPricing] = useState<ModelPricingPayload | null>(null);
   const presetImportRef = useRef<HTMLInputElement | null>(null);
   const modelNetworkAgentIdRef = useRef(agent.id);
 
   const isHostedMode = configProvider === hostedProvider;
   const normalizedHostedModel = normalizeHostedModelForUi(configModel);
+  const liveModelPricingById = useMemo(
+    () => modelPricingById(liveModelPricing),
+    [liveModelPricing],
+  );
   const availableHostedModels = useMemo(
-    () => mergeHostedModelsWithVirtualsLive(HOSTED_MODELS, liveVirtualsModels),
-    [liveVirtualsModels],
+    () => mergeHostedModelsWithLivePricing(
+      mergeHostedModelsWithVirtualsLive(HOSTED_MODELS, liveVirtualsModels),
+      liveModelPricingById,
+    ),
+    [liveModelPricingById, liveVirtualsModels],
   );
   const selectedHostedModel = useMemo(
     () => availableHostedModels.find((m) => m.id === normalizedHostedModel)
@@ -730,6 +744,22 @@ export function ConfigTab() {
 
     return () => {
       controller.abort();
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    api.getModelPricing()
+      .then((res) => {
+        if (cancelled || !res.success) return;
+        setLiveModelPricing(parseModelPricingPayload(res.data));
+      })
+      .catch(() => {
+        // Degrade silently to the static tier badges.
+        if (!cancelled) setLiveModelPricing(null);
+      });
+    return () => {
+      cancelled = true;
     };
   }, []);
 
@@ -1569,7 +1599,7 @@ export function ConfigTab() {
                 <span>Provider / Model</span>
                 <span>Context Window</span>
                 <span>Strengths</span>
-                <span>Cost</span>
+                <span title={liveModelPricing?.billingNote || undefined}>Cost</span>
                 <span>Route</span>
                 <span className="text-right">Status</span>
               </div>
