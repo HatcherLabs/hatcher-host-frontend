@@ -7,6 +7,8 @@ export interface ChatMessageUsage {
   credits: number;
   inputTokens: number;
   outputTokens: number;
+  /** Model id that produced the reply (max 128 chars); absent when unknown. */
+  model?: string;
 }
 
 export interface ChatMsg {

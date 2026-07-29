@@ -11,6 +11,7 @@ export interface ChatMessageMetadata {
 const MAX_TOOL_EVENTS = 12;
 const MAX_STRING_LENGTH = 4_000;
 const MAX_PREVIEW_LENGTH = 600;
+const MAX_MODEL_LENGTH = 128;
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   return value && typeof value === 'object' && !Array.isArray(value)
@@ -40,7 +41,13 @@ function normalizeUsage(value: unknown): ChatMessageUsage | undefined {
   const outputTokens = cleanCount(record.outputTokens);
   if (credits === undefined || inputTokens === undefined || outputTokens === undefined) return undefined;
 
-  return { credits, inputTokens, outputTokens };
+  // Optional model id. Mirrors the API rule: a malformed model drops JUST
+  // this field, never the whole usage object.
+  const model = typeof record.model === 'string'
+    ? record.model.trim().slice(0, MAX_MODEL_LENGTH)
+    : '';
+
+  return { credits, inputTokens, outputTokens, ...(model ? { model } : {}) };
 }
 
 function normalizeToolEvent(value: unknown): ChatMessageToolEvent | undefined {

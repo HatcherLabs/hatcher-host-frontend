@@ -102,6 +102,45 @@ describe('chatHistoryMetadata', () => {
     });
   });
 
+  it('normalizes the optional model on persisted usage metadata', () => {
+    expect(normalizeChatMessageMetadata({
+      usage: {
+        credits: 3,
+        inputTokens: 12_340,
+        outputTokens: 890,
+        model: '  claude-fable-5  ',
+      },
+    })).toEqual({
+      usage: {
+        credits: 3,
+        inputTokens: 12_340,
+        outputTokens: 890,
+        model: 'claude-fable-5',
+      },
+    });
+  });
+
+  it('caps an over-long usage model at 128 characters', () => {
+    expect(normalizeChatMessageMetadata({
+      usage: { credits: 3, inputTokens: 1, outputTokens: 2, model: 'm'.repeat(200) },
+    })).toEqual({
+      usage: { credits: 3, inputTokens: 1, outputTokens: 2, model: 'm'.repeat(128) },
+    });
+  });
+
+  it('drops a malformed usage model but keeps the rest of the usage object', () => {
+    const expected = { usage: { credits: 3, inputTokens: 1, outputTokens: 2 } };
+    expect(normalizeChatMessageMetadata({
+      usage: { credits: 3, inputTokens: 1, outputTokens: 2, model: 42 },
+    })).toEqual(expected);
+    expect(normalizeChatMessageMetadata({
+      usage: { credits: 3, inputTokens: 1, outputTokens: 2, model: '' },
+    })).toEqual(expected);
+    expect(normalizeChatMessageMetadata({
+      usage: { credits: 3, inputTokens: 1, outputTokens: 2, model: '   ' },
+    })).toEqual(expected);
+  });
+
   it('drops malformed usage metadata', () => {
     expect(normalizeChatMessageMetadata({
       usage: { credits: -1, inputTokens: 1, outputTokens: 2 },
@@ -125,7 +164,7 @@ describe('chatHistoryMetadata', () => {
       id: 'msg-1',
       role: 'assistant',
       content: 'Done.',
-      usage: { credits: 3, inputTokens: 12_340, outputTokens: 890 },
+      usage: { credits: 3, inputTokens: 12_340, outputTokens: 890, model: 'claude-fable-5' },
       toolEvents: [
         {
           callId: 'terminal-1',

@@ -118,6 +118,55 @@ describe('ChatMessage', () => {
     expect(html).not.toContain('credit');
   });
 
+  it('shows the model name and tooltip suffix on finished replies with a usage model', () => {
+    const html = renderMessage({
+      id: 'msg-1',
+      role: 'assistant',
+      content: 'Done.',
+      timestamp: new Date('2026-06-25T09:00:00Z'),
+      usage: { credits: 3, inputTokens: 123, outputTokens: 45, model: 'claude-fable-5' },
+    });
+
+    expect(html).toContain('123 in / 45 out tokens · claude-fable-5');
+    expect(html).toContain('>claude-fable-5</span>');
+  });
+
+  it('keeps the plain tooltip and renders no model element when the model is absent', () => {
+    const html = renderMessage({
+      id: 'msg-1',
+      role: 'assistant',
+      content: 'Done.',
+      usage: { credits: 3, inputTokens: 123, outputTokens: 45 },
+    });
+
+    expect(html).toContain('title="123 in / 45 out tokens"');
+    expect(html).not.toContain('·');
+  });
+
+  it('still shows the model on zero-credit replies without a credits hint', () => {
+    const html = renderMessage({
+      id: 'msg-1',
+      role: 'assistant',
+      content: 'Done.',
+      usage: { credits: 0, inputTokens: 123, outputTokens: 45, model: 'claude-fable-5' },
+    });
+
+    expect(html).not.toContain('credit');
+    expect(html).toContain('>claude-fable-5</span>');
+  });
+
+  it('hides the model while the reply is still streaming', () => {
+    const html = renderMessage({
+      id: 'msg-1',
+      role: 'assistant',
+      content: 'Partial',
+      streaming: true,
+      usage: { credits: 3, inputTokens: 123, outputTokens: 45, model: 'claude-fable-5' },
+    });
+
+    expect(html).not.toContain('claude-fable-5');
+  });
+
   it('never renders a zero-credit hint', () => {
     const html = renderMessage({
       id: 'msg-1',
