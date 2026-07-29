@@ -923,12 +923,12 @@
       "details": "Chi tiết",
       "tourCreateTitle": "Tạo tác nhân đầu tiên của bạn",
       "tourCreateDescription": "Nhấp vào đây để ấp tác nhân AI đầu tiên của bạn với OpenClaw hoặc Hermes.",
-      "tourFilterTitle": "Lọc theo khung",
-      "tourFilterDescription": "OpenClaw là lựa chọn tốt nhất cho tự động hóa; Hermes là giải pháp tốt nhất cho quy trình làm việc của bộ nhớ thích ứng.",
-      "tourSearchTitle": "Tìm kiếm & Khám phá",
-      "tourSearchDescription": "Tìm kiếm tác nhân hoặc khởi chạy Chat-to-Hatch để bắt đầu nhanh chóng.",
-      "tourPlanTitle": "Kế hoạch của bạn",
-      "tourPlanDescription": "Bắt đầu miễn phí với 1 tác nhân, 500 AI Credits/tháng và các công cụ đi kèm. Nâng cấp bất cứ lúc nào.",
+      "tourWorkspaceTitle": "Không gian làm việc của bạn",
+      "tourWorkspaceDescription": "Chuyển giữa Tác nhân, Mission Control, Outcome Packs và Approvals từ thanh này.",
+      "tourImportTitle": "Nhập tác nhân có sẵn",
+      "tourImportDescription": "Bạn đã có tác nhân? Nhập cấu hình của nó thay vì bắt đầu từ đầu.",
+      "tourPlanTitle": "Gói và AI Credits",
+      "tourPlanDescription": "Gói dịch vụ và số dư AI Credits của bạn nằm trong menu này. Xem mức sử dụng hoặc nâng cấp bất cứ lúc nào.",
       "statTotal": "Tổng cộng",
       "statActive": "Đang hoạt động",
       "statSleeping": "đang ngủ",
@@ -3065,5 +3065,12 @@
       "description": "No tasks match the selected agent and status filters.",
       "action": "Clear filters"
     }
+  },
+  "guidedTour": {
+    "stepCounter": "Bước {current}/{total}",
+    "back": "Quay lại",
+    "next": "Tiếp theo",
+    "done": "Hoàn tất",
+    "skip": "Bỏ qua hướng dẫn"
   }
 }

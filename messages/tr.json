@@ -923,12 +923,12 @@
       "details": "Detaylar",
       "tourCreateTitle": "İlk Temsilcinizi Oluşturun",
       "tourCreateDescription": "İlk yapay zeka ajanınızı OpenClaw veya Hermes ile açmak için buraya tıklayın.",
-      "tourFilterTitle": "Çerçeveye Göre Filtre",
-      "tourFilterDescription": "OpenClaw otomasyon için en iyisidir; Hermes uyarlanabilir bellek iş akışları için en iyisidir.",
-      "tourSearchTitle": "Arama ve Keşf",
-      "tourSearchDescription": "Hızlı başlamak için ajanları arayın veya Chat-to-Hatch fırlatın.",
-      "tourPlanTitle": "Planın",
-      "tourPlanDescription": "Ücretsiz başlayın, 1 ajan, ayda 500 AI Credits ve dahil edilen araçlar. İstediğin zaman yükseltebilirsin.",
+      "tourWorkspaceTitle": "Çalışma Alanınız",
+      "tourWorkspaceDescription": "Bu çubuktan Ajanlar, Mission Control, Outcome Packs ve Approvals arasında geçiş yapabilirsiniz.",
+      "tourImportTitle": "Mevcut Ajanı İçe Aktarın",
+      "tourImportDescription": "Zaten bir ajanınız var mı? Sıfırdan başlamak yerine yapılandırmasını buradan içe aktarın.",
+      "tourPlanTitle": "Plan ve AI Credits",
+      "tourPlanDescription": "Planınız ve AI Credits bakiyeniz bu menüde. Kullanımınızı görüntüleyin veya dilediğiniz zaman yükseltin.",
       "statTotal": "Toplam",
       "statActive": "Aktif",
       "statSleeping": "Uyumak",
@@ -3065,5 +3065,12 @@
       "description": "No tasks match the selected agent and status filters.",
       "action": "Clear filters"
     }
+  },
+  "guidedTour": {
+    "stepCounter": "Adım {current}/{total}",
+    "back": "Geri",
+    "next": "İleri",
+    "done": "Bitti",
+    "skip": "Turu atla"
   }
 }

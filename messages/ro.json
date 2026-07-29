@@ -924,12 +924,12 @@
       "details": "Detalii",
       "tourCreateTitle": "Creează Primul Tău Agent",
       "tourCreateDescription": "Dă click aici pentru a lansa primul tău agent AI cu OpenClaw sau Hermes.",
-      "tourFilterTitle": "Filtrează după Framework",
-      "tourFilterDescription": "OpenClaw este bun pentru automatizări; Hermes este bun pentru workflow-uri adaptive cu memorie.",
-      "tourSearchTitle": "Caută & Explorează",
-      "tourSearchDescription": "Caută agenți sau pornește Chat-to-Hatch pentru a începe rapid.",
-      "tourPlanTitle": "Planul Tău",
-      "tourPlanDescription": "Începe gratuit cu 1 agent, AI Credits și tool-uri incluse. Extinde oricând.",
+      "tourWorkspaceTitle": "Spațiul Tău de Lucru",
+      "tourWorkspaceDescription": "Din această bară treci între Agenți, Mission Control, Outcome Packs și Approvals.",
+      "tourImportTitle": "Importă un Agent Existent",
+      "tourImportDescription": "Ai deja un agent? Importă-i configurația în loc să o iei de la zero.",
+      "tourPlanTitle": "Plan și AI Credits",
+      "tourPlanDescription": "Planul tău și soldul de AI Credits sunt în acest meniu. Verifică utilizarea sau treci la un plan superior oricând.",
       "statTotal": "Total",
       "statActive": "Active",
       "statSleeping": "În pauză",
@@ -3201,5 +3201,12 @@
         }
       }
     }
+  },
+  "guidedTour": {
+    "stepCounter": "Pasul {current} din {total}",
+    "back": "Înapoi",
+    "next": "Înainte",
+    "done": "Gata",
+    "skip": "Sari peste tur"
   }
 }

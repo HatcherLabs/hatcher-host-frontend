@@ -923,12 +923,12 @@
       "details": "詳細",
       "tourCreateTitle": "最初のエージェントを作成しましょう",
       "tourCreateDescription": "OpenClawまたはHermesで初めてのAIエージェントをハットするには、こちらをクリックしてください。",
-      "tourFilterTitle": "フレームワークによるフィルター",
-      "tourFilterDescription": "OpenClawは自動化に最適です。Hermesは適応型記憶のワークフローに最適です。",
-      "tourSearchTitle": "検索・探索",
-      "tourSearchDescription": "エージェントを探したり、すぐにChat-to-Hatchを始めましょう。",
-      "tourPlanTitle": "あなたの計画",
-      "tourPlanDescription": "1人のエージェント、月500 AI Credits、ツール同梱で無料でスタートします。いつでもアップグレードできます。",
+      "tourWorkspaceTitle": "ワークスペース",
+      "tourWorkspaceDescription": "このバーからエージェント、Mission Control、Outcome Packs、Approvals を切り替えられます。",
+      "tourImportTitle": "既存のエージェントをインポート",
+      "tourImportDescription": "すでにエージェントをお持ちですか？ゼロから作らずに、設定をそのままインポートできます。",
+      "tourPlanTitle": "プランとAI Credits",
+      "tourPlanDescription": "プランとAI Creditsの残高はこのメニューから確認できます。利用状況の確認やアップグレードもいつでも可能です。",
       "statTotal": "合計",
       "statActive": "現役",
       "statSleeping": "眠っている",
@@ -3065,5 +3065,12 @@
       "description": "No tasks match the selected agent and status filters.",
       "action": "Clear filters"
     }
+  },
+  "guidedTour": {
+    "stepCounter": "ステップ {current}/{total}",
+    "back": "戻る",
+    "next": "次へ",
+    "done": "完了",
+    "skip": "ツアーをスキップ"
   }
 }

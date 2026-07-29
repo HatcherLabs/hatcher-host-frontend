@@ -923,12 +923,12 @@
       "details": "विवरण",
       "tourCreateTitle": "अपना पहला एजेंट बनाएं",
       "tourCreateDescription": "यहां क्लिक करें OpenClaw या Hermes के साथ अपना पहला एआई एजेंट बनाने के लिए।",
-      "tourFilterTitle": "फ्रेमवर्क द्वारा फ़िल्टर करें",
-      "tourFilterDescription": "स्वचालन के लिए OpenClaw सबसे अच्छा है; अनुकूली मेमोरी वर्कफ़्लो के लिए Hermes सबसे अच्छा है।",
-      "tourSearchTitle": "खोजें और एक्सप्लोर करें",
-      "tourSearchDescription": "शीघ्रता से आरंभ करने के लिए खोज एजेंट या लॉन्च Chat-to-Hatch।",
-      "tourPlanTitle": "आपकी योजना",
-      "tourPlanDescription": "1 एजेंट, 500 AI Credits/माह और शामिल टूल के साथ निःशुल्क शुरुआत करें। किसी भी समय अपग्रेड करें।",
+      "tourWorkspaceTitle": "आपका वर्कस्पेस",
+      "tourWorkspaceDescription": "इस बार से एजेंट्स, Mission Control, Outcome Packs और Approvals के बीच स्विच करें।",
+      "tourImportTitle": "मौजूदा एजेंट इंपोर्ट करें",
+      "tourImportDescription": "पहले से कोई एजेंट है? शुरुआत से बनाने के बजाय उसका कॉन्फ़िगरेशन यहां इंपोर्ट करें।",
+      "tourPlanTitle": "प्लान और AI Credits",
+      "tourPlanDescription": "आपका प्लान और AI Credits बैलेंस इसी मेनू में मिलेंगे। उपयोग देखें या कभी भी अपग्रेड करें।",
       "statTotal": "कुल",
       "statActive": "सक्रिय",
       "statSleeping": "सोना",
@@ -3065,5 +3065,12 @@
       "description": "No tasks match the selected agent and status filters.",
       "action": "Clear filters"
     }
+  },
+  "guidedTour": {
+    "stepCounter": "चरण {current} / {total}",
+    "back": "पीछे",
+    "next": "आगे",
+    "done": "हो गया",
+    "skip": "टूर छोड़ें"
   }
 }

@@ -352,10 +352,10 @@ export default function MyAgentsPage() {
             <Link href="/dashboard/approvals" className={styles.secondaryCta}>
               <ShieldCheck size={14} aria-hidden /> Approvals
             </Link>
-            <Link href="/dashboard/agents/import" className={styles.secondaryCta}>
+            <Link href="/dashboard/agents/import" className={styles.secondaryCta} data-tour="import-agent">
               <PackageOpen size={14} aria-hidden /> {t('importCta')}
             </Link>
-            <Link href="/create" className={styles.cta}>
+            <Link href="/create" className={styles.cta} data-tour="create-agent">
               {t('createCta')} <ArrowRight size={14} aria-hidden />
             </Link>
           </div>
@@ -698,7 +698,7 @@ export default function MyAgentsPage() {
               <Bot className={styles.emptyIcon} aria-hidden />
               <h2 className={styles.emptyTitle}>{t('emptyTitle')}</h2>
               <p className={styles.emptyDesc}>{t('emptyDescription')}</p>
-              <Link href="/create" className={styles.cta}>
+              <Link href="/create" className={styles.cta} data-tour="create-agent">
                 {t('emptyActionLabel')} <ArrowRight size={14} aria-hidden />
               </Link>
             </div>
