@@ -406,7 +406,7 @@
         "Selalu aktif (tidak tidur)",
         "25.000 AI Credits/bulan",
         "Pencarian web menggunakan AI Credits",
-        "2 CPU · 4 GB RAM per agen",
+        "4 CPU · 6 GB RAM per agen",
         "Ruang kerja 40 GB",
         "Manajer File + Log Lengkap",
         "Dukungan prioritas",
@@ -666,8 +666,8 @@
       "founding_member": {
         "agents": "10 agen disertakan",
         "messages": "25.000 AI Credits/bulan",
-        "cpu": "2 CPU",
-        "ram": "RAM 4 GB",
+        "cpu": "4 CPU",
+        "ram": "RAM 6 GB",
         "storage": "Ruang kerja 40 GB",
         "sleep": "Selalu aktif",
         "features": [
@@ -818,7 +818,7 @@
         },
         {
           "q": "Apa yang dimaksud dengan tingkatan Anggota Pendiri?",
-          "a": "Anggota Pendiri adalah pembayaran satu kali $99 yang memberi Anda akses seumur hidup ke Hatcher: 10 agen, 25.000 AI Credits/bulan, 2 CPU / 4 GB RAM, ruang kerja 40 GB, agen selalu aktif, Manajer File, Log Lengkap, dukungan prioritas, dan peran Pendiri Discord + tag Telegram. Tidak ada biaya bulanan, selamanya. Terbatas pada 20 tempat — setelah hilang, tingkatan ini hilang."
+          "a": "Anggota Pendiri adalah pembayaran satu kali $99 yang memberi Anda akses seumur hidup ke Hatcher: 10 agen, 25.000 AI Credits/bulan, 4 CPU / 6 GB RAM, ruang kerja 40 GB, agen selalu aktif, Manajer File, Log Lengkap, dukungan prioritas, dan peran Pendiri Discord + tag Telegram. Tidak ada biaya bulanan, selamanya. Terbatas pada 20 tempat — setelah hilang, tingkatan ini hilang."
         }
       ]
     },

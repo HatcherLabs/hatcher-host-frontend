@@ -406,7 +406,7 @@
         "Mereu activ (fără somn)",
         "25.000 AI Credits/lună",
         "Web search consumă AI Credits",
-        "2 CPU · 4 GB RAM per agent",
+        "4 CPU · 6 GB RAM per agent",
         "40 GB spațiu de lucru",
         "File Manager + Jurnale complete",
         "Suport prioritar",
@@ -666,8 +666,8 @@
       "founding_member": {
         "agents": "10 agenți incluși",
         "messages": "25.000 AI Credits/lună",
-        "cpu": "2 CPU",
-        "ram": "4 GB RAM",
+        "cpu": "4 CPU",
+        "ram": "6 GB RAM",
         "storage": "40 GB spațiu de lucru",
         "sleep": "Mereu activ",
         "features": [
@@ -818,7 +818,7 @@
         },
         {
           "q": "Ce este planul Founding Member?",
-          "a": "Founding Member este o plată o singură dată de $99 care îți oferă acces pe viață la Hatcher: 10 agenți, 25.000 AI Credits lunar, 2 CPU / 4 GB RAM, 40 GB spațiu de lucru, agenți mereu activi, File Manager, Jurnale complete, suport prioritar și rol Discord Founding + tag Telegram. Fără taxe lunare, niciodată. Limitat la 20 de locuri — odată ce s-au epuizat, acest plan dispare."
+          "a": "Founding Member este o plată o singură dată de $99 care îți oferă acces pe viață la Hatcher: 10 agenți, 25.000 AI Credits lunar, 4 CPU / 6 GB RAM, 40 GB spațiu de lucru, agenți mereu activi, File Manager, Jurnale complete, suport prioritar și rol Discord Founding + tag Telegram. Fără taxe lunare, niciodată. Limitat la 20 de locuri — odată ce s-au epuizat, acest plan dispare."
         }
       ]
     },

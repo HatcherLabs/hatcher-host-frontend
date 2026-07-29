@@ -406,7 +406,7 @@
         "始终在线（不休眠）",
         "每月 25,000 AI Credits",
         "网页搜索使用 AI Credits",
-        "每智能体 2 CPU · 4 GB RAM",
+        "每智能体 4 CPU · 6 GB RAM",
         "40 GB 工作区",
         "文件管理器 + 完整日志",
         "优先支持",
@@ -666,8 +666,8 @@
       "founding_member": {
         "agents": "包含10个智能体",
         "messages": "每月 25,000 AI Credits",
-        "cpu": "2 CPU",
-        "ram": "4 GB RAM",
+        "cpu": "4 CPU",
+        "ram": "6 GB RAM",
         "storage": "40 GB 工作区",
         "sleep": "始终在线",
         "features": [
@@ -818,7 +818,7 @@
         },
         {
           "q": "什么是创始会员套餐？",
-          "a": "创始会员是一次性$99付款，提供Hatcher终身访问权限：10个智能体、每月25,000 AI Credits、2 CPU / 4 GB RAM、40 GB工作区、智能体始终在线、文件管理器、完整日志、优先支持，以及 Founding Discord 角色 + Telegram 标签。永不收月费。限量20个名额——售完即止。"
+          "a": "创始会员是一次性$99付款，提供Hatcher终身访问权限：10个智能体、每月25,000 AI Credits、4 CPU / 6 GB RAM、40 GB工作区、智能体始终在线、文件管理器、完整日志、优先支持，以及 Founding Discord 角色 + Telegram 标签。永不收月费。限量20个名额——售完即止。"
         }
       ]
     },

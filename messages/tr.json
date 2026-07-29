@@ -406,7 +406,7 @@
         "Her zaman açık (uykusuz)",
         "25.000 AI Credits/ay",
         "Web arama AI Credits kullanır",
-        "2 CPU · Her ajan için 4 GB RAM",
+        "4 CPU · Her ajan için 6 GB RAM",
         "40 GB çalışma alanı",
         "Dosya Yöneticisi + Tam Loglar",
         "Öncelikli destek",
@@ -666,8 +666,8 @@
       "founding_member": {
         "agents": "10 ajan dahil",
         "messages": "25.000 AI Credits/ay",
-        "cpu": "2 CPU",
-        "ram": "4 GB RAM",
+        "cpu": "4 CPU",
+        "ram": "6 GB RAM",
         "storage": "40 GB çalışma alanı",
         "sleep": "Her zaman aktif",
         "features": [
@@ -818,7 +818,7 @@
         },
         {
           "q": "Kurucu Üye seviyesi nedir?",
-          "a": "Kurucu Üye, ömür boyu erişim sağlayan tek seferlik $99 ödemedir ve size ömür boyu Hatcher erişim sağlar: 10 ajan, ayda 25.000 AI Credits, 2 CPU / 4 GB RAM, 40 GB çalışma alanı, her zaman aktif ajanlar, Dosya Yöneticisi, Tam Loglar, öncelikli destek ve Founding Discord rolü + Telegram etiketi. Aylık ücret yok, asla. 20 yerle sınırlı — onlar gittikten sonra bu seviye de yok oluyor."
+          "a": "Kurucu Üye, ömür boyu erişim sağlayan tek seferlik $99 ödemedir ve size ömür boyu Hatcher erişim sağlar: 10 ajan, ayda 25.000 AI Credits, 4 CPU / 6 GB RAM, 40 GB çalışma alanı, her zaman aktif ajanlar, Dosya Yöneticisi, Tam Loglar, öncelikli destek ve Founding Discord rolü + Telegram etiketi. Aylık ücret yok, asla. 20 yerle sınırlı — onlar gittikten sonra bu seviye de yok oluyor."
         }
       ]
     },

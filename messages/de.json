@@ -406,7 +406,7 @@
         "Immer aktiv (kein Ruhezustand)",
         "25.000 AI Credits/Monat",
         "Websuche nutzt AI Credits",
-        "2 CPU · 4 GB RAM pro Agent",
+        "4 CPU · 6 GB RAM pro Agent",
         "40 GB Arbeitsbereich",
         "Dateimanager + Vollständige Logs",
         "Prioritäts-Support",
@@ -666,8 +666,8 @@
       "founding_member": {
         "agents": "10 Agenten inklusive",
         "messages": "25.000 AI Credits/Monat",
-        "cpu": "2 CPU",
-        "ram": "4 GB RAM",
+        "cpu": "4 CPU",
+        "ram": "6 GB RAM",
         "storage": "40 GB Arbeitsbereich",
         "sleep": "Immer aktiv",
         "features": [
@@ -818,7 +818,7 @@
         },
         {
           "q": "Was ist der Gründungsmitglied-Tarif?",
-          "a": "Gründungsmitglied ist eine einmalige Zahlung von $99, die Ihnen lebenslangen Zugang zu Hatcher gibt: 10 Agenten, 25.000 AI Credits monatlich, 2 CPU / 4 GB RAM, 40 GB Arbeitsbereich, immer aktive Agenten, Dateimanager, vollständige Logs, Prioritäts-Support und Founding-Discord-Rolle + Telegram-Tag. Keine monatlichen Gebühren, jemals. Begrenzt auf 20 Plätze — sobald sie weg sind, ist dieser Tarif weg."
+          "a": "Gründungsmitglied ist eine einmalige Zahlung von $99, die Ihnen lebenslangen Zugang zu Hatcher gibt: 10 Agenten, 25.000 AI Credits monatlich, 4 CPU / 6 GB RAM, 40 GB Arbeitsbereich, immer aktive Agenten, Dateimanager, vollständige Logs, Prioritäts-Support und Founding-Discord-Rolle + Telegram-Tag. Keine monatlichen Gebühren, jemals. Begrenzt auf 20 Plätze — sobald sie weg sind, ist dieser Tarif weg."
         }
       ]
     },

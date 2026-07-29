@@ -406,7 +406,7 @@
         "Toujours actif (pas de veille)",
         "25 000 AI Credits/mois",
         "La recherche web utilise les AI Credits",
-        "2 CPU · 4 GB RAM par agent",
+        "4 CPU · 6 GB RAM par agent",
         "40 GB d'espace de travail",
         "Gestionnaire de fichiers + journaux complets",
         "Support prioritaire",
@@ -666,8 +666,8 @@
       "founding_member": {
         "agents": "10 agents inclus",
         "messages": "25 000 AI Credits/mois",
-        "cpu": "2 CPU",
-        "ram": "4 GB RAM",
+        "cpu": "4 CPU",
+        "ram": "6 GB RAM",
         "storage": "40 GB d'espace de travail",
         "sleep": "Toujours actif",
         "features": [
@@ -818,7 +818,7 @@
         },
         {
           "q": "Qu'est-ce que le forfait Membre fondateur ?",
-          "a": "Membre fondateur est un paiement unique de 99$ qui vous donne un accès à vie à Hatcher : 10 agents, 25 000 AI Credits mensuels, 2 CPU / 4 GB RAM, 40 GB d'espace de travail, agents toujours actifs, gestionnaire de fichiers, journaux complets, support prioritaire et rôle Discord fondateur + tag Telegram. Aucun frais mensuel, jamais. Limité à 20 places — une fois parties, ce forfait disparaît."
+          "a": "Membre fondateur est un paiement unique de 99$ qui vous donne un accès à vie à Hatcher : 10 agents, 25 000 AI Credits mensuels, 4 CPU / 6 GB RAM, 40 GB d'espace de travail, agents toujours actifs, gestionnaire de fichiers, journaux complets, support prioritaire et rôle Discord fondateur + tag Telegram. Aucun frais mensuel, jamais. Limité à 20 places — une fois parties, ce forfait disparaît."
         }
       ]
     },
