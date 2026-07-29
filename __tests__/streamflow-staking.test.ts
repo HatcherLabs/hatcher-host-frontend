@@ -7,14 +7,22 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { WalletContextState } from '@solana/wallet-adapter-react';
 import {
   claimHatcherRewardsWithStreamflow,
+  fetchHatcherRewardStatusWithStreamflow,
+  resetHatcherRewardPoolCache,
+  resolveHatcherRewardPool,
   stakeHatcherWithStreamflow,
   unstakeHatcherWithStreamflow,
 } from '@/lib/streamflow-staking';
+import { SolanaStakingClient } from '@streamflow/staking';
+import { HATCH_TOKEN_MINT } from '@/lib/config';
 
 const stakingMocks = vi.hoisted(() => ({
   claimRewards: vi.fn(async () => ({ txId: 'claim-tx' })),
   createRewardEntry: vi.fn(async () => ({ txId: 'create-entry-tx' })),
   deriveStakeMintPDA: vi.fn(),
+  deriveRewardPoolPDA: vi.fn((...args: unknown[]) => `reward-pool-${String(args[3])}`),
+  rewardPoolAll: vi.fn(async (): Promise<unknown[]> => []),
+  rewardEntryAll: vi.fn(async (): Promise<unknown[]> => []),
   stakeAndCreateEntries: vi.fn(async () => ({ txId: 'sdk-stake-tx' })),
   getAccountInfo: vi.fn(async (): Promise<unknown> => ({ owner: { equals: () => true } })),
   getLatestBlockhashAndContext: vi.fn(async (): Promise<unknown> => ({
@@ -32,7 +40,7 @@ const stakingMocks = vi.hoisted(() => ({
   prepareUnstakeAndClaimInstructions: vi.fn(async (): Promise<{ ixs: unknown[] }> => ({ ixs: [] })),
   prepareUnstakeInstructions: vi.fn(async (): Promise<{ ixs: unknown[] }> => ({ ixs: [] })),
   rewardEntryFetchNullable: vi.fn(async (): Promise<unknown> => ({ accountedAmount: { toString: () => '100' } })),
-  simulateTransaction: vi.fn(async (): Promise<{ value: { err: unknown | null } }> => ({ value: { err: null } })),
+  simulateTransaction: vi.fn(async (): Promise<{ value: { err: unknown | null; logs?: string[] | null } }> => ({ value: { err: null } })),
 }));
 
 vi.mock('@streamflow/staking', () => ({
@@ -57,12 +65,16 @@ vi.mock('@streamflow/staking', () => ({
     programs = {
       rewardPoolDynamicProgram: {
         account: {
-          rewardEntry: { fetchNullable: stakingMocks.rewardEntryFetchNullable },
+          rewardPool: { all: stakingMocks.rewardPoolAll },
+          rewardEntry: {
+            fetchNullable: stakingMocks.rewardEntryFetchNullable,
+            all: stakingMocks.rewardEntryAll,
+          },
         },
       },
     };
   },
-  deriveRewardPoolPDA: vi.fn(() => 'reward-pool'),
+  deriveRewardPoolPDA: stakingMocks.deriveRewardPoolPDA,
   deriveRewardEntryPDA: vi.fn(() => 'reward-entry'),
   deriveStakeMintPDA: stakingMocks.deriveStakeMintPDA,
   deriveStakeEntryPDA: vi.fn(() => ({
@@ -70,12 +82,30 @@ vi.mock('@streamflow/staking', () => ({
   })),
 }));
 
-describe('streamflow staking rewards', () => {
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
+const HATCHER_MINT_PK = new PublicKey(HATCH_TOKEN_MINT);
+const STAKE_POOL_ADDRESS = '7BVxRYGoTJjr3bgvDhpJggJrnUhyYoGPbnxTRAWuDmtH';
 
-  beforeEach(() => {
+function hatcherRewardPool(params: {
+  nonce: number;
+  mint?: PublicKey;
+  fundedAmount?: number;
+  createdTs?: number;
+}) {
+  return {
+    account: {
+      nonce: params.nonce,
+      mint: params.mint ?? HATCHER_MINT_PK,
+      fundedAmount: params.fundedAmount ?? 0,
+      createdTs: params.createdTs ?? 0,
+    },
+  };
+}
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
+beforeEach(() => {
     stakingMocks.claimRewards.mockClear();
     stakingMocks.createRewardEntry.mockClear();
     stakingMocks.deriveStakeMintPDA.mockClear();
@@ -91,6 +121,10 @@ describe('streamflow staking rewards', () => {
     stakingMocks.prepareUnstakeInstructions.mockClear();
     stakingMocks.rewardEntryFetchNullable.mockClear();
     stakingMocks.simulateTransaction.mockClear();
+    stakingMocks.deriveRewardPoolPDA.mockClear();
+    stakingMocks.rewardPoolAll.mockClear();
+    stakingMocks.rewardEntryAll.mockClear();
+    resetHatcherRewardPoolCache();
     stakingMocks.getAccountInfo.mockResolvedValue({
       owner: new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'),
     });
@@ -136,8 +170,11 @@ describe('streamflow staking rewards', () => {
     stakingMocks.sendRawTransaction.mockResolvedValue('stake-tx');
     stakingMocks.rewardEntryFetchNullable.mockResolvedValue({ accountedAmount: { toString: () => '100' } });
     stakingMocks.simulateTransaction.mockResolvedValue({ value: { err: null } });
-  });
+    stakingMocks.rewardPoolAll.mockResolvedValue([]);
+    stakingMocks.rewardEntryAll.mockResolvedValue([]);
+});
 
+describe('streamflow staking rewards', () => {
   it('includes missing Streamflow receipt account setup in the staking transaction', async () => {
     const keypair = Keypair.generate();
     const stakeMint = Keypair.generate().publicKey;
@@ -203,12 +240,15 @@ describe('streamflow staking rewards', () => {
     expect(stakingMocks.sendRawTransaction).not.toHaveBeenCalled();
   });
 
-  it('stakes through the Streamflow SDK when the receipt token account exists', async () => {
+  it('stakes through the Streamflow SDK against the discovered reward pool nonce', async () => {
     const walletKeypair = Keypair.generate();
     const tokenProgramId = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
     stakingMocks.getAccountInfo.mockResolvedValue({
       owner: tokenProgramId,
     });
+    stakingMocks.rewardPoolAll.mockResolvedValue([
+      hatcherRewardPool({ nonce: 3, fundedAmount: 10, createdTs: 50 }),
+    ]);
     const onTransactionSubmitted = vi.fn();
     const wallet = {
       publicKey: walletKeypair.publicKey,
@@ -232,7 +272,7 @@ describe('streamflow staking rewards', () => {
         nonce: expect.any(Number),
         rewardPools: [expect.objectContaining({
           mint: expect.any(PublicKey),
-          nonce: 0,
+          nonce: 3,
           rewardPoolType: 'dynamic',
           tokenProgramId,
         })],
@@ -377,6 +417,9 @@ describe('streamflow staking rewards', () => {
     stakingMocks.getAccountInfo.mockResolvedValue({
       owner: tokenProgramId,
     });
+    stakingMocks.rewardPoolAll.mockResolvedValue([
+      hatcherRewardPool({ nonce: 3, fundedAmount: 10, createdTs: 50 }),
+    ]);
     const onTransactionSubmitted = vi.fn();
     const wallet = {
       publicKey: walletKeypair.publicKey,
@@ -398,7 +441,7 @@ describe('streamflow staking rewards', () => {
         rewardPools: [expect.objectContaining({
           governor: null,
           mint: expect.any(PublicKey),
-          nonce: 0,
+          nonce: 3,
           rewardPoolType: 'dynamic',
           tokenProgramId,
         })],
@@ -496,6 +539,7 @@ describe('streamflow staking rewards', () => {
     for (const [claimArgs] of claimCalls) {
       expect(claimArgs).toEqual(expect.objectContaining({
         governor: null,
+        rewardPoolNonce: 0,
         rewardPoolType: 'dynamic',
       }));
     }
@@ -528,7 +572,12 @@ describe('streamflow staking rewards', () => {
   });
 
   it('stops before submitting a claim transaction when no HATCHER rewards are available', async () => {
-    stakingMocks.simulateTransaction.mockResolvedValueOnce({ value: { err: { InstructionError: [0, 'Custom'] } } });
+    stakingMocks.simulateTransaction.mockResolvedValueOnce({
+      value: {
+        err: { InstructionError: [0, { Custom: 6013 }] },
+        logs: ['Program log: Error Code: RewardPoolDrained.'],
+      },
+    });
 
     const owner = new PublicKey('7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAs');
     const wallet = {
@@ -545,5 +594,253 @@ describe('streamflow staking rewards', () => {
 
     expect(stakingMocks.createRewardEntry).not.toHaveBeenCalled();
     expect(stakingMocks.claimRewards).not.toHaveBeenCalled();
+  });
+
+  it('threads a discovered reward pool nonce through claim preparation', async () => {
+    stakingMocks.rewardPoolAll.mockResolvedValue([
+      hatcherRewardPool({ nonce: 3, fundedAmount: 10, createdTs: 50 }),
+    ]);
+    const owner = new PublicKey('7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAs');
+    const wallet = {
+      publicKey: owner,
+      signTransaction: vi.fn(),
+      sendTransaction: vi.fn(async () => 'claim-tx'),
+    } as unknown as WalletContextState;
+
+    await expect(claimHatcherRewardsWithStreamflow({
+      wallet,
+      stakePoolAddress: STAKE_POOL_ADDRESS,
+      stakeEntryAddress: '3zS6NsWw2f6Fj9nJmxrnE5EepLqghdQgkvZpg6gTYQbQ',
+      depositNonce: 123,
+    })).resolves.toEqual({ txIds: ['claim-tx'] });
+
+    expect(stakingMocks.rewardPoolAll).toHaveBeenCalledTimes(1);
+    expect(stakingMocks.deriveRewardPoolPDA).toHaveBeenCalledWith(
+      'reward-program',
+      expect.anything(),
+      expect.anything(),
+      3,
+    );
+    const claimCalls = stakingMocks.prepareClaimRewardsInstructions.mock.calls as unknown as Array<[Record<string, unknown>]>;
+    expect(claimCalls.length).toBe(2);
+    for (const [claimArgs] of claimCalls) {
+      expect(claimArgs).toEqual(expect.objectContaining({ rewardPoolNonce: 3 }));
+    }
+  });
+
+  it('surfaces claim-check failures instead of reporting zero rewards', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    stakingMocks.simulateTransaction.mockResolvedValueOnce({
+      value: {
+        err: { InstructionError: [0, { Custom: 6001 }] },
+        logs: ['Program log: Error Code: Unauthorized.'],
+      },
+    });
+    const owner = new PublicKey('7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAs');
+    const wallet = {
+      publicKey: owner,
+      signTransaction: vi.fn(),
+    } as unknown as WalletContextState;
+
+    await expect(claimHatcherRewardsWithStreamflow({
+      wallet,
+      stakePoolAddress: STAKE_POOL_ADDRESS,
+      stakeEntryAddress: '3zS6NsWw2f6Fj9nJmxrnE5EepLqghdQgkvZpg6gTYQbQ',
+      depositNonce: 123,
+    })).rejects.toThrow(/check failed/i);
+
+    expect(stakingMocks.claimRewards).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+});
+
+describe('hatcher reward pool discovery', () => {
+  const stakePool = new PublicKey(STAKE_POOL_ADDRESS);
+
+  function discoveryClient(): SolanaStakingClient {
+    return new SolanaStakingClient({ clusterUrl: 'http://localhost:8899' });
+  }
+
+  it('discovers the HATCHER reward pool nonce and ignores other mints', async () => {
+    stakingMocks.rewardPoolAll.mockResolvedValue([
+      hatcherRewardPool({ nonce: 7, mint: Keypair.generate().publicKey, fundedAmount: 99, createdTs: 999 }),
+      hatcherRewardPool({ nonce: 2, fundedAmount: 5, createdTs: 10 }),
+    ]);
+
+    await expect(resolveHatcherRewardPool(discoveryClient(), stakePool)).resolves.toEqual({
+      nonce: 2,
+      source: 'discovered',
+    });
+    expect(stakingMocks.rewardPoolAll).toHaveBeenCalledWith([
+      { memcmp: { offset: 10, bytes: stakePool.toBase58() } },
+    ]);
+  });
+
+  it('falls back to nonce 0 when no HATCHER reward pool is found', async () => {
+    await expect(resolveHatcherRewardPool(discoveryClient(), stakePool)).resolves.toEqual({
+      nonce: 0,
+      source: 'fallback',
+    });
+  });
+
+  it('prefers the funded, most recently created pool when multiple exist', async () => {
+    stakingMocks.rewardPoolAll.mockResolvedValue([
+      hatcherRewardPool({ nonce: 1, fundedAmount: 10, createdTs: 50 }),
+      hatcherRewardPool({ nonce: 2, fundedAmount: 0, createdTs: 99 }),
+      hatcherRewardPool({ nonce: 3, fundedAmount: 10, createdTs: 80 }),
+    ]);
+
+    await expect(resolveHatcherRewardPool(discoveryClient(), stakePool)).resolves.toEqual({
+      nonce: 3,
+      source: 'discovered',
+    });
+  });
+
+  it('falls back to nonce 0 and warns when discovery fails', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    stakingMocks.rewardPoolAll.mockRejectedValueOnce(new Error('getProgramAccounts unavailable'));
+
+    await expect(resolveHatcherRewardPool(discoveryClient(), stakePool)).resolves.toEqual({
+      nonce: 0,
+      source: 'fallback',
+    });
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  it('caches discovery per stake pool until the cache is reset', async () => {
+    stakingMocks.rewardPoolAll.mockResolvedValue([
+      hatcherRewardPool({ nonce: 4, fundedAmount: 1, createdTs: 1 }),
+    ]);
+    const client = discoveryClient();
+
+    await resolveHatcherRewardPool(client, stakePool);
+    await resolveHatcherRewardPool(client, stakePool);
+    expect(stakingMocks.rewardPoolAll).toHaveBeenCalledTimes(1);
+
+    resetHatcherRewardPoolCache();
+    await resolveHatcherRewardPool(client, stakePool);
+    expect(stakingMocks.rewardPoolAll).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('hatcher reward status diagnostics', () => {
+  const statusParams = {
+    walletAddress: '7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAs',
+    stakePoolAddress: STAKE_POOL_ADDRESS,
+    stakeEntryAddress: '3zS6NsWw2f6Fj9nJmxrnE5EepLqghdQgkvZpg6gTYQbQ',
+    depositNonce: 123,
+  };
+
+  it('reports claimable when the claim simulation succeeds', async () => {
+    await expect(fetchHatcherRewardStatusWithStreamflow(statusParams)).resolves.toEqual({
+      canClaim: true,
+      rewardEntryExists: true,
+      kind: 'claimable',
+      reason: null,
+    });
+  });
+
+  it('keeps the no-rewards copy for recognized nothing-to-claim program errors', async () => {
+    stakingMocks.simulateTransaction.mockResolvedValueOnce({
+      value: {
+        err: { InstructionError: [0, { Custom: 6013 }] },
+        logs: ['Program log: Error Code: RewardPoolDrained.'],
+      },
+    });
+
+    await expect(fetchHatcherRewardStatusWithStreamflow(statusParams)).resolves.toEqual({
+      canClaim: false,
+      rewardEntryExists: true,
+      kind: 'no_rewards',
+      reason: 'No HATCHER rewards are available to claim yet.',
+    });
+  });
+
+  it('reports simulation_error with diagnostics for unrecognized simulation failures', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    stakingMocks.simulateTransaction.mockResolvedValueOnce({
+      value: {
+        err: { InstructionError: [0, { Custom: 6001 }] },
+        logs: ['Program log: something', 'Program log: Error Code: Unauthorized boom.'],
+      },
+    });
+
+    const status = await fetchHatcherRewardStatusWithStreamflow(statusParams);
+    expect(status).toMatchObject({
+      canClaim: false,
+      rewardEntryExists: true,
+      kind: 'simulation_error',
+    });
+    expect(status.reason).not.toBe('No HATCHER rewards are available to claim yet.');
+    expect(status.detail).toContain('6001');
+    expect(status.detail).toContain('Unauthorized boom');
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  it('reports rpc_error when the claim simulation request itself fails', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    stakingMocks.simulateTransaction.mockRejectedValueOnce(new Error('429 Too Many Requests'));
+
+    const status = await fetchHatcherRewardStatusWithStreamflow(statusParams);
+    expect(status).toMatchObject({
+      canClaim: false,
+      rewardEntryExists: true,
+      kind: 'rpc_error',
+    });
+    expect(status.detail).toContain('429');
+    warn.mockRestore();
+  });
+
+  it('reports entry_missing when no reward entry exists anywhere for the stake', async () => {
+    stakingMocks.rewardEntryFetchNullable.mockResolvedValueOnce(null);
+    stakingMocks.rewardEntryAll.mockResolvedValueOnce([]);
+
+    await expect(fetchHatcherRewardStatusWithStreamflow(statusParams)).resolves.toEqual({
+      canClaim: false,
+      rewardEntryExists: false,
+      kind: 'entry_missing',
+      reason: 'Reward tracking account is missing for this stake.',
+    });
+    expect(stakingMocks.rewardEntryAll).toHaveBeenCalledWith([
+      { memcmp: { offset: 40, bytes: statusParams.stakeEntryAddress } },
+    ]);
+  });
+
+  it('detects reward pool drift and invalidates the discovery cache', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    stakingMocks.rewardEntryFetchNullable.mockResolvedValue(null);
+    stakingMocks.rewardEntryAll.mockResolvedValue([
+      { account: { rewardPool: 'reward-pool-9', stakeEntry: statusParams.stakeEntryAddress } },
+    ]);
+
+    const status = await fetchHatcherRewardStatusWithStreamflow(statusParams);
+    expect(status).toMatchObject({
+      canClaim: false,
+      rewardEntryExists: false,
+      kind: 'pool_missing',
+    });
+    expect(status.detail).toContain('reward-pool-9');
+    expect(status.detail).toContain('reward-pool-0');
+    expect(stakingMocks.rewardPoolAll).toHaveBeenCalledTimes(1);
+
+    await fetchHatcherRewardStatusWithStreamflow(statusParams);
+    expect(stakingMocks.rewardPoolAll).toHaveBeenCalledTimes(2);
+    warn.mockRestore();
+  });
+
+  it('keeps entry_missing with a note when the reward entry search fails', async () => {
+    stakingMocks.rewardEntryFetchNullable.mockResolvedValueOnce(null);
+    stakingMocks.rewardEntryAll.mockRejectedValueOnce(new Error('search down'));
+
+    const status = await fetchHatcherRewardStatusWithStreamflow(statusParams);
+    expect(status).toMatchObject({
+      canClaim: false,
+      rewardEntryExists: false,
+      kind: 'entry_missing',
+      reason: 'Reward tracking account is missing for this stake.',
+    });
+    expect(status.detail).toContain('search down');
   });
 });
