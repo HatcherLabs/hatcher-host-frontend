@@ -3,6 +3,7 @@ import type { AgentFramework } from '@hatcher/shared';
 import type { ActiveModelDisplay } from '@/lib/hosted-model-catalog';
 import type { ChatMessageToolEvent } from '../tabs/ChatTab/chatToolEvents';
 import type { ChatMessageThinkingState } from '../tabs/ChatTab/chatThinkingEvents';
+import type { ChatMessageUsage } from '../tabs/ChatTab/types';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -16,6 +17,7 @@ export interface Message {
   timestamp?: Date;
   toolEvents?: ChatMessageToolEvent[];
   thinking?: ChatMessageThinkingState;
+  usage?: ChatMessageUsage;
 }
 
 export interface LogEntry {

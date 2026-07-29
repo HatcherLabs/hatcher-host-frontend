@@ -1418,6 +1418,7 @@
       "chat": {
         "live": "रहना",
         "liveTitle": "वेबसॉकेट के माध्यम से वास्तविक समय स्ट्रीमिंग",
+        "creditsSpent": "{count} क्रेडिट",
         "voiceButton": "आवाज",
         "voiceCallTitle": "वॉयस कॉल शुरू करें",
         "autoRead": "स्वतः पढ़ें",

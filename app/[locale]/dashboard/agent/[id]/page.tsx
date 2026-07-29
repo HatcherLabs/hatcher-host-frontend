@@ -9,7 +9,7 @@ import { api } from '@/lib/api';
 import { API_URL } from '@/lib/config';
 import type { Agent, AgentFeature, ChatAttachmentPayload, ChatSessionSummary } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { useWebSocketChat, type ChatThinkingEvent, type ChatToolEvent } from '@/hooks/useWebSocketChat';
+import { useWebSocketChat, type ChatThinkingEvent, type ChatToolEvent, type ChatUsageEvent } from '@/hooks/useWebSocketChat';
 import { FRAMEWORKS, getBYOKProvider } from '@hatcher/shared';
 import type { UserTierKey } from '@hatcher/shared';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -330,6 +330,7 @@ export default function AgentManagePage() {
         timestamp: m.ts ? new Date(m.ts) : new Date(),
         ...(metadata?.thinking ? { thinking: metadata.thinking } : {}),
         ...(metadata?.toolEvents ? { toolEvents: metadata.toolEvents } : {}),
+        ...(metadata?.usage ? { usage: metadata.usage } : {}),
       };
     });
   }, []);
@@ -920,6 +921,24 @@ export default function AgentManagePage() {
     }
   }, [updateLastStreamingAssistant]);
 
+  // Attach the server-reported AI credit cost to the reply it belongs to.
+  // Over WS the frame arrives AFTER chat_done (reply already finalized);
+  // over SSE the usage event arrives BEFORE [DONE] (reply still streaming) —
+  // in both cases it targets the most recent assistant message.
+  const handleChatUsage = useCallback((usage: ChatUsageEvent) => {
+    setMessages((prev) => {
+      for (let i = prev.length - 1; i >= 0; i--) {
+        const msg = prev[i];
+        if (msg?.role === 'assistant') {
+          const updated = [...prev];
+          updated[i] = { ...msg, usage };
+          return updated;
+        }
+      }
+      return prev;
+    });
+  }, []);
+
   const wsChat = useWebSocketChat({
     agentId: id,
     // Keep the socket alive while a response is in flight even if the user
@@ -947,6 +966,7 @@ export default function AgentManagePage() {
     },
     onToolEvent: handleChatToolEvent,
     onThinkingEvent: handleChatThinkingEvent,
+    onUsage: handleChatUsage,
     onMessage: (message) => {
       if (message.role !== 'assistant' || !message.content.trim()) return;
       setChatError(null);
@@ -1203,6 +1223,7 @@ export default function AgentManagePage() {
         abortController.signal,
         handleChatToolEvent,
         handleChatThinkingEvent,
+        handleChatUsage,
       );
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {

@@ -2,6 +2,7 @@
 
 import { memo, useState, useCallback, useMemo, Fragment } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import {
   Bot,
   Brain,
@@ -14,6 +15,7 @@ import {
   ThumbsUp,
   Volume2,
   Wrench,
+  Zap,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { SoundWaveBars, TypingIndicator } from './SoundWaveBars';
@@ -35,6 +37,7 @@ const ChatMessage = memo(function ChatMessage({
   showThinking,
   showToolCalls,
 }: ChatMessageProps) {
+  const t = useTranslations('dashboard.agentDetail.chat');
   const [vote, setVote] = useState<'up' | 'down' | null>(null);
   const activityRows = useMemo(() => (
     msg.role === 'assistant'
@@ -110,6 +113,15 @@ const ChatMessage = memo(function ChatMessage({
           {msg.timestamp && !msg.streaming && (
             <span className="text-[10px] px-1.5 text-[var(--text-muted)] select-none">
               {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </span>
+          )}
+          {msg.role === 'assistant' && !msg.streaming && msg.usage && msg.usage.credits > 0 && (
+            <span
+              className="inline-flex items-center gap-0.5 text-[10px] text-[var(--text-muted)] select-none"
+              title={`${msg.usage.inputTokens.toLocaleString()} in / ${msg.usage.outputTokens.toLocaleString()} out tokens`}
+            >
+              <Zap size={12} />
+              {t('creditsSpent', { count: msg.usage.credits })}
             </span>
           )}
           {msg.role === 'assistant' && !msg.streaming && msg.content && ttsSupported && (

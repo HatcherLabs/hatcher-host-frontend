@@ -1418,6 +1418,7 @@
       "chat": {
         "live": "Trực tiếp",
         "liveTitle": "Truyền phát thời gian thực qua WebSocket",
+        "creditsSpent": "{count} credit",
         "voiceButton": "Giọng nói",
         "voiceCallTitle": "Bắt đầu cuộc gọi thoại",
         "autoRead": "Tự động đọc",

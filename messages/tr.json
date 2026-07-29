@@ -1418,6 +1418,7 @@
       "chat": {
         "live": "Canlı",
         "liveTitle": "WebSocket üzerinden gerçek zamanlı yayın",
+        "creditsSpent": "{count} kredi",
         "voiceButton": "Ses",
         "voiceCallTitle": "Sesli görüşmeyi başlat",
         "autoRead": "Otomatik okuma",

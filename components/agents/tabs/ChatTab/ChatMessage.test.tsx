@@ -1,6 +1,8 @@
 import { renderToStaticMarkup } from 'react-dom/server';
+import { NextIntlClientProvider } from 'next-intl';
 import { describe, expect, it, vi } from 'vitest';
 import ChatMessage from './ChatMessage';
+import type { ChatMsg } from './types';
 
 vi.mock('@/lib/api', () => ({
   api: {
@@ -8,32 +10,21 @@ vi.mock('@/lib/api', () => ({
   },
 }));
 
-describe('ChatMessage', () => {
-  it('renders thinking and tool activity inside the assistant bubble', () => {
-    const html = renderToStaticMarkup(
+const messages = {
+  dashboard: {
+    agentDetail: {
+      chat: {
+        creditsSpent: '{count, plural, one {# credit} other {# credits}}',
+      },
+    },
+  },
+};
+
+function renderMessage(msg: ChatMsg): string {
+  return renderToStaticMarkup(
+    <NextIntlClientProvider locale="en" timeZone="UTC" messages={messages}>
       <ChatMessage
-        msg={{
-          id: 'msg-1',
-          role: 'assistant',
-          content: 'Done.',
-          timestamp: new Date('2026-06-25T09:00:00Z'),
-          thinking: {
-            content: '',
-            streaming: false,
-            label: 'Thinking',
-            startedAt: 1_000,
-            endedAt: 2_500,
-          },
-          toolEvents: [
-            {
-              callId: 'terminal-1',
-              name: 'terminal',
-              phase: 'done',
-              argsPreview: 'pwd',
-              resultPreview: '{"exit_code":0,"output":"/workspace\\n","error":null}',
-            },
-          ],
-        }}
+        msg={msg}
         isSpeakingThis={false}
         ttsSupported={false}
         onSpeak={() => undefined}
@@ -42,8 +33,35 @@ describe('ChatMessage', () => {
         framework="hermes"
         showThinking
         showToolCalls
-      />,
-    );
+      />
+    </NextIntlClientProvider>,
+  );
+}
+
+describe('ChatMessage', () => {
+  it('renders thinking and tool activity inside the assistant bubble', () => {
+    const html = renderMessage({
+      id: 'msg-1',
+      role: 'assistant',
+      content: 'Done.',
+      timestamp: new Date('2026-06-25T09:00:00Z'),
+      thinking: {
+        content: '',
+        streaming: false,
+        label: 'Thinking',
+        startedAt: 1_000,
+        endedAt: 2_500,
+      },
+      toolEvents: [
+        {
+          callId: 'terminal-1',
+          name: 'terminal',
+          phase: 'done',
+          argsPreview: 'pwd',
+          resultPreview: '{"exit_code":0,"output":"/workspace\\n","error":null}',
+        },
+      ],
+    });
 
     const bubbleStart = html.indexOf('chat-bubble-assistant');
     expect(bubbleStart).toBeGreaterThan(-1);
@@ -51,5 +69,63 @@ describe('ChatMessage', () => {
     expect(bubbleHtml).toContain('Thought for 1.5s');
     expect(bubbleHtml).toContain('Ran &quot;pwd&quot;');
     expect(bubbleHtml).toContain('Done.');
+  });
+
+  it('shows the credits hint on finished assistant replies with usage', () => {
+    const html = renderMessage({
+      id: 'msg-1',
+      role: 'assistant',
+      content: 'Done.',
+      timestamp: new Date('2026-06-25T09:00:00Z'),
+      usage: { credits: 3, inputTokens: 123, outputTokens: 45 },
+    });
+
+    expect(html).toContain('3 credits');
+    expect(html).toContain('123 in / 45 out tokens');
+  });
+
+  it('uses the singular form for a single credit', () => {
+    const html = renderMessage({
+      id: 'msg-1',
+      role: 'assistant',
+      content: 'Done.',
+      usage: { credits: 1, inputTokens: 10, outputTokens: 5 },
+    });
+
+    expect(html).toContain('1 credit');
+    expect(html).not.toContain('1 credits');
+  });
+
+  it('hides the credits hint when usage is absent', () => {
+    const html = renderMessage({
+      id: 'msg-1',
+      role: 'assistant',
+      content: 'Done.',
+    });
+
+    expect(html).not.toContain('credit');
+  });
+
+  it('hides the credits hint while the reply is still streaming', () => {
+    const html = renderMessage({
+      id: 'msg-1',
+      role: 'assistant',
+      content: 'Partial',
+      streaming: true,
+      usage: { credits: 3, inputTokens: 123, outputTokens: 45 },
+    });
+
+    expect(html).not.toContain('credit');
+  });
+
+  it('never renders a zero-credit hint', () => {
+    const html = renderMessage({
+      id: 'msg-1',
+      role: 'assistant',
+      content: 'Done.',
+      usage: { credits: 0, inputTokens: 123, outputTokens: 45 },
+    });
+
+    expect(html).not.toContain('credit');
   });
 });

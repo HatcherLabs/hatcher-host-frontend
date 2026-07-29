@@ -1,10 +1,11 @@
-import type { ChatMsg } from './types';
+import type { ChatMessageUsage, ChatMsg } from './types';
 import type { ChatMessageThinkingState } from './chatThinkingEvents';
 import type { ChatMessageToolEvent } from './chatToolEvents';
 
 export interface ChatMessageMetadata {
   thinking?: ChatMessageThinkingState;
   toolEvents?: ChatMessageToolEvent[];
+  usage?: ChatMessageUsage;
 }
 
 const MAX_TOOL_EVENTS = 12;
@@ -24,6 +25,22 @@ function cleanString(value: unknown, maxLength = MAX_STRING_LENGTH): string | un
 
 function cleanNumber(value: unknown): number | undefined {
   return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+}
+
+function cleanCount(value: unknown): number | undefined {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0 ? value : undefined;
+}
+
+function normalizeUsage(value: unknown): ChatMessageUsage | undefined {
+  const record = asRecord(value);
+  if (!record) return undefined;
+
+  const credits = cleanCount(record.credits);
+  const inputTokens = cleanCount(record.inputTokens);
+  const outputTokens = cleanCount(record.outputTokens);
+  if (credits === undefined || inputTokens === undefined || outputTokens === undefined) return undefined;
+
+  return { credits, inputTokens, outputTokens };
 }
 
 function normalizeToolEvent(value: unknown): ChatMessageToolEvent | undefined {
@@ -75,6 +92,7 @@ export function normalizeChatMessageMetadata(
   if (!record) return undefined;
 
   const thinking = normalizeThinking(record.thinking, now);
+  const usage = normalizeUsage(record.usage);
   const toolEvents = Array.isArray(record.toolEvents)
     ? record.toolEvents
       .map(normalizeToolEvent)
@@ -82,14 +100,18 @@ export function normalizeChatMessageMetadata(
       .slice(-MAX_TOOL_EVENTS)
     : [];
 
-  if (!thinking && toolEvents.length === 0) return undefined;
+  if (!thinking && toolEvents.length === 0 && !usage) return undefined;
 
   return {
     ...(thinking ? { thinking } : {}),
     ...(toolEvents.length > 0 ? { toolEvents } : {}),
+    ...(usage ? { usage } : {}),
   };
 }
 
+/** Builds the metadata payload for the debounced client history save.
+ *  `usage` is intentionally NOT serialized: the API strips client-supplied
+ *  usage and attaches it server-side (server-authoritative billing data). */
 export function serializeChatMessageMetadata(
   message: Pick<ChatMsg, 'thinking' | 'toolEvents'>,
   now: () => number = Date.now,
