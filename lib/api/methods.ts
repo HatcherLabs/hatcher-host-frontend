@@ -191,6 +191,9 @@ import type {
   OobeX402BalanceResponse,
   OobeX402CallBody,
   OobeX402CallResponse,
+  StakingBenefitDesignationResponse,
+  StakingBenefitsResponse,
+  StakingBoostBenefitKey,
   StakingClaimResponse,
   StakingConfigResponse,
   UserStakingSummary,
@@ -248,6 +251,8 @@ export type AuthProfileData = {
   activeAgents?: number;
   featureCount: number;
   createdAt: string;
+  /** True while a >=5M HATCHER 30d/90d lock keeps the Staker badge active. */
+  stakerBadge?: boolean;
 };
 
 export type ChatAttachmentPayload = {
@@ -4052,6 +4057,16 @@ export const api = {
   claimStakingAiCredits: () =>
     req<StakingClaimResponse>("/staking/claim-ai-credits", {
       method: "POST",
+    }),
+
+  /** Platform benefits from HATCHER locked in the 30d/90d pools (auth). */
+  getStakingBenefits: () => req<StakingBenefitsResponse>("/staking/benefits"),
+
+  /** Designate (or move) a free staking boost onto an owned agent. */
+  designateStakingBenefit: (benefit: StakingBoostBenefitKey, agentId: string) =>
+    req<StakingBenefitDesignationResponse>("/staking/benefits/designate", {
+      method: "POST",
+      body: JSON.stringify({ benefit, agentId }),
     }),
 
   /** Submit thumbs up/down feedback for a message */

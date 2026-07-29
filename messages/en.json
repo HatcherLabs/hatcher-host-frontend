@@ -53,7 +53,8 @@
       "sub_affiliate": "Partner referrals and reporting.",
       "sub_admin": "Platform controls.",
       "sub_signOut": "End session on this device.",
-      "tierSuffix": "tier"
+      "tierSuffix": "tier",
+      "stakerBadge": "Staker"
     },
     "groups": {
       "build": "Build",
