@@ -31,4 +31,17 @@ describe('parseAgentChatStreamEvent', () => {
       model: 'openclaw',
     });
   });
+
+  it('parses usage events emitted before the [DONE] terminator', () => {
+    expect(parseAgentChatStreamEvent('usage', '{"credits":3,"inputTokens":12340,"outputTokens":890}')).toEqual({
+      kind: 'usage',
+      usage: { credits: 3, inputTokens: 12_340, outputTokens: 890 },
+    });
+  });
+
+  it('skips usage events with missing or non-numeric fields', () => {
+    expect(parseAgentChatStreamEvent('usage', '{"credits":"3","inputTokens":1,"outputTokens":2}')).toEqual({ kind: 'skip' });
+    expect(parseAgentChatStreamEvent('usage', '{"credits":3,"inputTokens":1}')).toEqual({ kind: 'skip' });
+    expect(parseAgentChatStreamEvent('usage', 'not-json')).toEqual({ kind: 'skip' });
+  });
 });

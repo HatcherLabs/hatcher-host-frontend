@@ -1,6 +1,14 @@
 import type { ChatMessageToolEvent } from './chatToolEvents';
 import type { ChatMessageThinkingState } from './chatThinkingEvents';
 
+/** AI credit cost of one finished assistant turn. Server-authoritative:
+ *  absent when the turn used no hosted credits (BYOK agents etc.). */
+export interface ChatMessageUsage {
+  credits: number;
+  inputTokens: number;
+  outputTokens: number;
+}
+
 export interface ChatMsg {
   id: string;
   role: 'user' | 'assistant';
@@ -9,6 +17,7 @@ export interface ChatMsg {
   timestamp?: Date;
   toolEvents?: ChatMessageToolEvent[];
   thinking?: ChatMessageThinkingState;
+  usage?: ChatMessageUsage;
 }
 
 export interface ChatMessageProps {

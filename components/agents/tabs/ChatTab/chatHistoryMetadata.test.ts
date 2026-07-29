@@ -4,6 +4,7 @@ import {
   normalizeChatMessageMetadata,
   serializeChatMessageMetadata,
 } from './chatHistoryMetadata';
+import type { ChatMsg } from './types';
 
 describe('chatHistoryMetadata', () => {
   it('normalizes persisted thinking and tool events from API history', () => {
@@ -79,6 +80,67 @@ describe('chatHistoryMetadata', () => {
           name: 'web_search',
           phase: 'start',
           argsPreview: 'BTC price',
+        },
+      ],
+    });
+  });
+
+  it('normalizes persisted usage metadata from API history', () => {
+    expect(normalizeChatMessageMetadata({
+      usage: {
+        credits: 3,
+        inputTokens: 12_340,
+        outputTokens: 890,
+        extra: 'ignored',
+      },
+    })).toEqual({
+      usage: {
+        credits: 3,
+        inputTokens: 12_340,
+        outputTokens: 890,
+      },
+    });
+  });
+
+  it('drops malformed usage metadata', () => {
+    expect(normalizeChatMessageMetadata({
+      usage: { credits: -1, inputTokens: 1, outputTokens: 2 },
+    })).toBeUndefined();
+    expect(normalizeChatMessageMetadata({
+      usage: { credits: 2.5, inputTokens: 1, outputTokens: 2 },
+    })).toBeUndefined();
+    expect(normalizeChatMessageMetadata({
+      usage: { credits: 3, inputTokens: 1 },
+    })).toBeUndefined();
+    expect(normalizeChatMessageMetadata({
+      usage: { credits: Number.POSITIVE_INFINITY, inputTokens: 1, outputTokens: 2 },
+    })).toBeUndefined();
+    expect(normalizeChatMessageMetadata({
+      usage: 'nope',
+    })).toBeUndefined();
+  });
+
+  it('omits usage from serialized history metadata — the server is authoritative', () => {
+    const message: ChatMsg = {
+      id: 'msg-1',
+      role: 'assistant',
+      content: 'Done.',
+      usage: { credits: 3, inputTokens: 12_340, outputTokens: 890 },
+      toolEvents: [
+        {
+          callId: 'terminal-1',
+          name: 'terminal',
+          phase: 'done',
+        },
+      ],
+    };
+
+    expect(serializeChatMessageMetadata(message, () => 0)).toEqual({
+      toolEvents: [
+        {
+          callId: 'terminal-1',
+          name: 'terminal',
+          phase: 'done',
         },
       ],
     });

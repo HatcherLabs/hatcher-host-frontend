@@ -1536,6 +1536,7 @@
       "chat": {
         "live": "Live",
         "liveTitle": "Streaming în timp real via WebSocket",
+        "creditsSpent": "{count, plural, one {# credit} few {# credite} other {# de credite}}",
         "voiceButton": "Voce",
         "voiceCallTitle": "Pornește apel vocal",
         "autoRead": "Citire automată",

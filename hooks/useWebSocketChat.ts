@@ -6,7 +6,7 @@
 import { useRef, useCallback, useEffect, useState } from 'react';
 import { API_URL } from '@/lib/config';
 import type { ChatAttachmentPayload } from '@/lib/api/methods';
-import type { ChatThinkingEventPayload, ChatToolEventPayload } from '@/lib/api/chatStreamEvents';
+import type { ChatThinkingEventPayload, ChatToolEventPayload, ChatUsagePayload } from '@/lib/api/chatStreamEvents';
 
 /** Derive ws:// or wss:// URL from the API base URL */
 function getWsUrl(agentId: string): string {
@@ -22,6 +22,7 @@ type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';
  *  of staring at silence between thinking and final answer. */
 export type ChatToolEvent = ChatToolEventPayload;
 export type ChatThinkingEvent = ChatThinkingEventPayload;
+export type ChatUsageEvent = ChatUsagePayload;
 
 export interface LiveChatMessage {
   id: string;
@@ -46,6 +47,9 @@ interface UseWebSocketChatOptions {
   onToolEvent?: (evt: ChatToolEvent) => void;
   /** Called when the runtime/provider emits visible reasoning trace events. */
   onThinkingEvent?: (evt: ChatThinkingEvent) => void;
+  /** Called after chat_done with the AI credit cost of the finished turn.
+   *  Only sent when the turn actually consumed hosted credits. */
+  onUsage?: (usage: ChatUsageEvent) => void;
   /** Called when the server pushes a complete message that was not
    *  initiated by the current input request, e.g. cron/workflow output. */
   onMessage?: (message: LiveChatMessage) => void;
@@ -85,6 +89,7 @@ export function useWebSocketChat({
   onError,
   onToolEvent,
   onThinkingEvent,
+  onUsage,
   onMessage,
   onStatusChange,
   onRateLimit,
@@ -106,6 +111,7 @@ export function useWebSocketChat({
   const onErrorRef = useRef(onError);
   const onToolEventRef = useRef(onToolEvent);
   const onThinkingEventRef = useRef(onThinkingEvent);
+  const onUsageRef = useRef(onUsage);
   const onMessageRef = useRef(onMessage);
   const onStatusChangeRef = useRef(onStatusChange);
   const onRateLimitRef = useRef(onRateLimit);
@@ -114,6 +120,7 @@ export function useWebSocketChat({
   onErrorRef.current = onError;
   onToolEventRef.current = onToolEvent;
   onThinkingEventRef.current = onThinkingEvent;
+  onUsageRef.current = onUsage;
   onMessageRef.current = onMessage;
   onStatusChangeRef.current = onStatusChange;
   onRateLimitRef.current = onRateLimit;
@@ -201,6 +208,20 @@ export function useWebSocketChat({
               content: msg.payload.content as string | undefined,
               agentId: msg.payload.agentId as string | undefined,
             });
+          }
+          break;
+        case 'chat_usage':
+          if (onUsageRef.current) {
+            const credits = msg.payload.credits;
+            const inputTokens = msg.payload.inputTokens;
+            const outputTokens = msg.payload.outputTokens;
+            if (
+              typeof credits === 'number' &&
+              typeof inputTokens === 'number' &&
+              typeof outputTokens === 'number'
+            ) {
+              onUsageRef.current({ credits, inputTokens, outputTokens });
+            }
           }
           break;
         case 'chat_message':

@@ -1418,6 +1418,7 @@
       "chat": {
         "live": "ライブ",
         "liveTitle": "WebSocketを使ったリアルタイムストリーミング",
+        "creditsSpent": "{count}クレジット",
         "voiceButton": "声",
         "voiceCallTitle": "音声通話開始",
         "autoRead": "自動読み取り",

@@ -14,16 +14,30 @@ export interface ChatThinkingEventPayload {
   agentId?: string;
 }
 
+/** AI credit cost of one assistant turn, emitted as a named `usage`
+ *  SSE event just before the `[DONE]` terminator. Only present when
+ *  the turn actually consumed hosted credits. */
+export interface ChatUsagePayload {
+  credits: number;
+  inputTokens: number;
+  outputTokens: number;
+}
+
 export type ParsedAgentChatStreamEvent =
   | { kind: 'token'; token: string; model?: string }
   | { kind: 'tool'; event: ChatToolEventPayload }
   | { kind: 'thinking'; event: ChatThinkingEventPayload }
+  | { kind: 'usage'; usage: ChatUsagePayload }
   | { kind: 'error'; error: string }
   | { kind: 'done' }
   | { kind: 'skip'; model?: string };
 
 function stringValue(value: unknown): string | undefined {
   return typeof value === 'string' ? value : undefined;
+}
+
+function numberValue(value: unknown): number | undefined {
+  return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
 }
 
 export function parseAgentChatStreamEvent(
@@ -74,6 +88,16 @@ export function parseAgentChatStreamEvent(
         ...(typeof json.agentId === 'string' ? { agentId: json.agentId } : {}),
       },
     };
+  }
+
+  if (eventName === 'usage') {
+    const credits = numberValue(json.credits);
+    const inputTokens = numberValue(json.inputTokens);
+    const outputTokens = numberValue(json.outputTokens);
+    if (credits === undefined || inputTokens === undefined || outputTokens === undefined) {
+      return { kind: 'skip' };
+    }
+    return { kind: 'usage', usage: { credits, inputTokens, outputTokens } };
   }
 
   const token = stringValue(json.token);

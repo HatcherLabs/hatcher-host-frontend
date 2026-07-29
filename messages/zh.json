@@ -1394,6 +1394,7 @@
       "chat": {
         "live": "实时",
         "liveTitle": "通过 WebSocket 实时流式传输",
+        "creditsSpent": "{count} 积分",
         "voiceButton": "语音",
         "voiceCallTitle": "开始语音通话",
         "autoRead": "自动朗读",

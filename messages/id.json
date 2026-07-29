@@ -1418,6 +1418,7 @@
       "chat": {
         "live": "Hidup",
         "liveTitle": "Streaming waktu nyata melalui WebSocket",
+        "creditsSpent": "{count} kredit",
         "voiceButton": "Suara",
         "voiceCallTitle": "Mulai panggilan suara",
         "autoRead": "Baca otomatis",

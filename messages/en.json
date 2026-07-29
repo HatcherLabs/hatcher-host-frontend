@@ -1536,6 +1536,7 @@
       "chat": {
         "live": "Live",
         "liveTitle": "Real-time streaming via WebSocket",
+        "creditsSpent": "{count, plural, one {# credit} other {# credits}}",
         "voiceButton": "Voice",
         "voiceCallTitle": "Start voice call",
         "autoRead": "Auto-read",

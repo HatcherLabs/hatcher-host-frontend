@@ -8,6 +8,7 @@ import {
   parseAgentChatStreamEvent,
   type ChatThinkingEventPayload,
   type ChatToolEventPayload,
+  type ChatUsagePayload,
 } from "./chatStreamEvents";
 import type {
   Agent,
@@ -2801,6 +2802,9 @@ export const api = {
     signal?: AbortSignal,
     onToolEvent?: (event: ChatToolEventPayload) => void,
     onThinkingEvent?: (event: ChatThinkingEventPayload) => void,
+    /** Named `usage` SSE event emitted before [DONE] when the turn
+     *  consumed hosted AI credits. */
+    onUsage?: (usage: ChatUsagePayload) => void,
   ) => {
     const token = getToken();
 
@@ -2955,6 +2959,8 @@ export const api = {
           onToolEvent?.(event.event);
         } else if (event.kind === "thinking") {
           onThinkingEvent?.(event.event);
+        } else if (event.kind === "usage") {
+          onUsage?.(event.usage);
         } else if (event.model) {
           detectedModel = event.model;
         }
