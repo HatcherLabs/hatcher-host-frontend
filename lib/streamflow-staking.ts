@@ -20,17 +20,56 @@ import {
 export const HATCHER_TOKEN_DECIMALS = 6;
 export const MIN_HATCHER_STAKE_BASE_UNITS = 1_000_000n;
 
+export type HatcherRewardStatusKind =
+  | 'claimable'
+  | 'no_rewards'
+  | 'entry_missing'
+  | 'pool_missing'
+  | 'simulation_error'
+  | 'rpc_error';
+
 export type HatcherRewardStatus = {
   canClaim: boolean;
   rewardEntryExists: boolean;
+  kind: HatcherRewardStatusKind;
   reason: string | null;
+  detail?: string;
+};
+
+export type HatcherRewardUiStatus = HatcherRewardStatus & {
+  loading: boolean;
+  error: string | null;
+};
+
+export type HatcherRewardPoolResolution = {
+  nonce: number;
+  source: 'discovered' | 'fallback';
 };
 
 const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
 const TOKEN_2022_PROGRAM_ID = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
 const ASSOCIATED_TOKEN_PROGRAM_ID = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
 const HATCHER_MINT = new PublicKey(HATCH_TOKEN_MINT);
-const HATCHER_REWARD_POOL_NONCE = 0;
+// Used when on-chain reward pool discovery finds nothing (or fails): today's pools live at nonce 0.
+const HATCHER_REWARD_POOL_FALLBACK_NONCE = 0;
+// Dynamic reward-pool account layout: 8-byte anchor discriminator + bump (u8) + nonce (u8), then
+// stake_pool. Verified against the reward_pool_dynamic IDL bundled with @streamflow/staking 12.5.0.
+// Note the dynamic layout inserts `governor` before `mint` (mint sits at byte 74, not the fixed
+// layout's 42), so pools must be filtered by mint on the DECODED account, never with a mint memcmp.
+const DYNAMIC_REWARD_POOL_STAKE_POOL_OFFSET = 10;
+// Dynamic reward-entry account layout: 8-byte discriminator, then reward_pool (32) and stake_entry.
+const DYNAMIC_REWARD_ENTRY_STAKE_ENTRY_OFFSET = 40;
+// Streamflow dynamic reward-pool program errors that genuinely mean "nothing to claim right now".
+const NOTHING_TO_CLAIM_PROGRAM_ERROR_CODES = new Set([
+  6012, // ClaimTooEarly: claim period has not passed yet
+  6013, // RewardPoolDrained: pool does not have enough rewards for claiming
+]);
+const SIMULATION_DETAIL_LOG_LINES = 4;
+const NO_REWARDS_REASON = 'No HATCHER rewards are available to claim yet.';
+const ENTRY_MISSING_REASON = 'Reward tracking account is missing for this stake.';
+const POOL_MISSING_REASON = 'Rewards for this stake are tracked under a different reward pool. Refresh to re-sync reward data.';
+const SIMULATION_ERROR_REASON = 'HATCHER reward check failed. Refresh and try again.';
+const RPC_ERROR_REASON = 'Could not verify HATCHER rewards right now. Refresh and try again.';
 // Streamflow fetches a governor when this is undefined; Hatcher dynamic reward pools are permissionless.
 const HATCHER_DYNAMIC_REWARD_GOVERNOR = null as unknown as PublicKey;
 const STAKING_PREFLIGHT_ERROR_MESSAGE = 'Staking transaction failed preflight simulation. Refresh staking data and try again.';
@@ -75,6 +114,94 @@ async function getHatcherTokenProgramId(connection: Connection): Promise<PublicK
 
   resolvedHatcherTokenProgramId = TOKEN_2022_PROGRAM_ID;
   return resolvedHatcherTokenProgramId;
+}
+
+function errorMessage(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
+}
+
+function keyString(value: unknown): string {
+  if (value && typeof (value as { toBase58?: unknown }).toBase58 === 'function') {
+    return (value as { toBase58: () => string }).toBase58();
+  }
+  return String(value);
+}
+
+function toBigIntSafe(value: unknown): bigint {
+  try {
+    if (typeof value === 'bigint') return value;
+    if (typeof value === 'number' && Number.isFinite(value)) return BigInt(Math.trunc(value));
+    const text = typeof value === 'string'
+      ? value
+      : value != null && typeof (value as { toString?: unknown }).toString === 'function'
+        ? (value as { toString: () => string }).toString()
+        : '';
+    if (/^\d+$/.test(text)) return BigInt(text);
+  } catch {
+    // fall through to 0n
+  }
+  return 0n;
+}
+
+type DynamicRewardPoolAccountRecord = {
+  account: {
+    nonce: number;
+    mint: PublicKey;
+    fundedAmount?: unknown;
+    createdTs?: unknown;
+  };
+};
+
+const hatcherRewardPoolCache = new Map<string, HatcherRewardPoolResolution>();
+
+export function resetHatcherRewardPoolCache(): void {
+  hatcherRewardPoolCache.clear();
+}
+
+function invalidateHatcherRewardPoolCache(stakePool: PublicKey): void {
+  hatcherRewardPoolCache.delete(stakePool.toBase58());
+}
+
+// Deterministic pick when a stake pool has several HATCHER reward pools (e.g. a refill created a
+// new one): funded beats unfunded, then the most recently created, then the highest nonce.
+function preferHatcherRewardPool(
+  best: DynamicRewardPoolAccountRecord,
+  candidate: DynamicRewardPoolAccountRecord,
+): DynamicRewardPoolAccountRecord {
+  const bestFunded = toBigIntSafe(best.account.fundedAmount) > 0n;
+  const candidateFunded = toBigIntSafe(candidate.account.fundedAmount) > 0n;
+  if (bestFunded !== candidateFunded) return bestFunded ? best : candidate;
+  const bestCreated = toBigIntSafe(best.account.createdTs);
+  const candidateCreated = toBigIntSafe(candidate.account.createdTs);
+  if (bestCreated !== candidateCreated) return bestCreated > candidateCreated ? best : candidate;
+  return candidate.account.nonce > best.account.nonce ? candidate : best;
+}
+
+export async function resolveHatcherRewardPool(
+  client: SolanaStakingClient,
+  stakePool: PublicKey,
+): Promise<HatcherRewardPoolResolution> {
+  const cacheKey = stakePool.toBase58();
+  const cached = hatcherRewardPoolCache.get(cacheKey);
+  if (cached) return cached;
+
+  try {
+    // Hatcher pools are DYNAMIC reward pools; SolanaStakingClient.searchRewardPools queries the
+    // fixed rewardPoolProgram and returns nothing for them, so query the dynamic program directly.
+    const pools = await client.programs.rewardPoolDynamicProgram.account.rewardPool.all([
+      { memcmp: { offset: DYNAMIC_REWARD_POOL_STAKE_POOL_OFFSET, bytes: cacheKey } },
+    ]) as unknown as DynamicRewardPoolAccountRecord[];
+    const hatcherPools = pools.filter((pool) => pool.account.mint.equals(HATCHER_MINT));
+    const resolution: HatcherRewardPoolResolution = hatcherPools.length === 0
+      ? { nonce: HATCHER_REWARD_POOL_FALLBACK_NONCE, source: 'fallback' }
+      : { nonce: hatcherPools.reduce(preferHatcherRewardPool).account.nonce, source: 'discovered' };
+    hatcherRewardPoolCache.set(cacheKey, resolution);
+    return resolution;
+  } catch (err) {
+    // Do not cache the failure path so a transient RPC error does not pin the fallback nonce.
+    console.warn('[staking] HATCHER reward pool discovery failed; using fallback nonce.', err);
+    return { nonce: HATCHER_REWARD_POOL_FALLBACK_NONCE, source: 'fallback' };
+  }
 }
 
 function associatedTokenAddress(
@@ -346,6 +473,7 @@ export async function stakeHatcherWithStreamflow(params: {
   const tokenProgramId = await getHatcherTokenProgramId(client.connection);
   const invoker = params.wallet as unknown as SignerWalletAdapter;
   const stakePool = new PublicKey(params.stakePoolAddress);
+  const { nonce: rewardPoolNonce } = await resolveHatcherRewardPool(client, stakePool);
   const stakeMint = deriveStakeMintPDA(client.getCurrentProgramId('stakePoolProgram'), stakePool);
   const receiptTokenAccount = associatedTokenAddress(stakeMint, params.wallet.publicKey, tokenProgramId);
   const receiptAccountInfo = await client.connection.getAccountInfo(receiptTokenAccount, 'confirmed');
@@ -367,7 +495,7 @@ export async function stakeHatcherWithStreamflow(params: {
     duration: new BN(params.durationDays * 86_400),
     nonce: randomNonce(),
     rewardPools: [{
-      nonce: HATCHER_REWARD_POOL_NONCE,
+      nonce: rewardPoolNonce,
       mint: HATCHER_MINT,
       tokenProgramId,
       rewardPoolType: 'dynamic',
@@ -416,6 +544,10 @@ export async function unstakeHatcherWithStreamflow(params: {
   });
   const tokenProgramId = await getHatcherTokenProgramId(client.connection);
   const invoker = params.wallet as unknown as SignerWalletAdapter;
+  const { nonce: rewardPoolNonce } = await resolveHatcherRewardPool(
+    client,
+    new PublicKey(params.stakePoolAddress),
+  );
 
   const { ixs } = await client.prepareUnstakeAndClaimInstructions({
     stakePool: params.stakePoolAddress,
@@ -423,7 +555,7 @@ export async function unstakeHatcherWithStreamflow(params: {
     tokenProgramId,
     nonce: params.depositNonce,
     rewardPools: [{
-      nonce: HATCHER_REWARD_POOL_NONCE,
+      nonce: rewardPoolNonce,
       mint: HATCHER_MINT,
       tokenProgramId,
       rewardPoolType: 'dynamic',
@@ -489,21 +621,23 @@ async function fetchHatcherRewardStatusFromClient(params: {
   }
 
   const rewardPoolProgramId = params.client.getCurrentProgramId('rewardPoolDynamicProgram');
+  const { nonce: rewardPoolNonce } = await resolveHatcherRewardPool(params.client, stakePool);
   const rewardPool = deriveRewardPoolPDA(
     rewardPoolProgramId,
     stakePool,
     HATCHER_MINT,
-    HATCHER_REWARD_POOL_NONCE,
+    rewardPoolNonce,
   );
   const rewardEntry = deriveRewardEntryPDA(rewardPoolProgramId, rewardPool, stakeEntry);
 
   const rewardEntryData = await params.client.programs.rewardPoolDynamicProgram.account.rewardEntry.fetchNullable(rewardEntry);
   if (!rewardEntryData) {
-    return {
-      canClaim: false,
-      rewardEntryExists: false,
-      reason: 'Reward tracking account is missing for this stake.',
-    };
+    return diagnoseMissingRewardEntry({
+      client: params.client,
+      stakePool,
+      stakeEntry,
+      expectedRewardPool: rewardPool,
+    });
   }
 
   const tokenProgramId = await getHatcherTokenProgramId(params.client.connection);
@@ -513,7 +647,7 @@ async function fetchHatcherRewardStatusFromClient(params: {
     stakePoolMint: HATCHER_MINT,
     tokenProgramId,
     depositNonce: params.depositNonce,
-    rewardPoolNonce: HATCHER_REWARD_POOL_NONCE,
+    rewardPoolNonce,
     rewardMint: HATCHER_MINT,
     rewardPoolType: 'dynamic',
     governor: HATCHER_DYNAMIC_REWARD_GOVERNOR,
@@ -523,16 +657,118 @@ async function fetchHatcherRewardStatusFromClient(params: {
   transaction.feePayer = walletAddress;
   transaction.add(...ixs);
 
-  const simulation = await params.client.connection.simulateTransaction(transaction, undefined, false);
-  if (simulation.value.err) {
+  let simulation: { value: { err: unknown; logs?: string[] | null } };
+  try {
+    simulation = await params.client.connection.simulateTransaction(transaction, undefined, false);
+  } catch (err) {
+    console.warn('[staking] HATCHER reward claim simulation request failed.', err);
     return {
       canClaim: false,
       rewardEntryExists: true,
-      reason: 'No HATCHER rewards are available to claim yet.',
+      kind: 'rpc_error',
+      reason: RPC_ERROR_REASON,
+      detail: errorMessage(err),
     };
   }
 
-  return { canClaim: true, rewardEntryExists: true, reason: null };
+  if (simulation.value.err) {
+    const logs = simulation.value.logs ?? [];
+    if (isNothingToClaimSimulationError(simulation.value.err)) {
+      return {
+        canClaim: false,
+        rewardEntryExists: true,
+        kind: 'no_rewards',
+        reason: NO_REWARDS_REASON,
+      };
+    }
+    console.warn('[staking] HATCHER reward claim simulation failed.', simulation.value.err, logs);
+    return {
+      canClaim: false,
+      rewardEntryExists: true,
+      kind: 'simulation_error',
+      reason: SIMULATION_ERROR_REASON,
+      detail: formatSimulationFailureDetail(simulation.value.err, logs),
+    };
+  }
+
+  return { canClaim: true, rewardEntryExists: true, kind: 'claimable', reason: null };
+}
+
+function extractCustomProgramErrorCode(err: unknown): number | null {
+  if (!err || typeof err !== 'object') return null;
+  const instructionError = (err as { InstructionError?: unknown }).InstructionError;
+  if (!Array.isArray(instructionError)) return null;
+  const detail = instructionError[1];
+  if (detail && typeof detail === 'object' && typeof (detail as { Custom?: unknown }).Custom === 'number') {
+    return (detail as { Custom: number }).Custom;
+  }
+  return null;
+}
+
+function isNothingToClaimSimulationError(err: unknown): boolean {
+  const code = extractCustomProgramErrorCode(err);
+  return code !== null && NOTHING_TO_CLAIM_PROGRAM_ERROR_CODES.has(code);
+}
+
+function formatSimulationFailureDetail(err: unknown, logs: string[]): string {
+  let errText: string;
+  try {
+    errText = typeof err === 'string' ? err : JSON.stringify(err);
+  } catch {
+    errText = String(err);
+  }
+  // The program's failure message lives at the tail of the log output.
+  const logLines = logs.slice(-SIMULATION_DETAIL_LOG_LINES);
+  return logLines.length > 0 ? `${errText} | ${logLines.join(' | ')}` : errText;
+}
+
+// The stake's reward entry PDA is empty: find out whether the entry lives under a different
+// reward pool (nonce drift after a refill created a new pool) or genuinely does not exist.
+// Reward entries are intentionally NOT auto-created here: creating one costs the user rent.
+async function diagnoseMissingRewardEntry(params: {
+  client: SolanaStakingClient;
+  stakePool: PublicKey;
+  stakeEntry: PublicKey;
+  expectedRewardPool: PublicKey;
+}): Promise<HatcherRewardStatus> {
+  try {
+    const entries = await params.client.programs.rewardPoolDynamicProgram.account.rewardEntry.all([
+      { memcmp: { offset: DYNAMIC_REWARD_ENTRY_STAKE_ENTRY_OFFSET, bytes: params.stakeEntry.toBase58() } },
+    ]) as unknown as Array<{ account: { rewardPool: unknown } }>;
+    const expected = keyString(params.expectedRewardPool);
+    const driftedPools = entries
+      .map((entry) => keyString(entry.account.rewardPool))
+      .filter((pool) => pool !== expected);
+    if (driftedPools.length > 0) {
+      // The cached nonce points at the wrong pool; drop it so the next refresh re-discovers.
+      invalidateHatcherRewardPoolCache(params.stakePool);
+      console.warn('[staking] HATCHER reward entry found under a different reward pool.', {
+        expectedRewardPool: expected,
+        driftedPools,
+      });
+      return {
+        canClaim: false,
+        rewardEntryExists: false,
+        kind: 'pool_missing',
+        reason: POOL_MISSING_REASON,
+        detail: `Expected reward pool ${expected}; found reward entry under ${driftedPools.join(', ')}.`,
+      };
+    }
+    return {
+      canClaim: false,
+      rewardEntryExists: false,
+      kind: 'entry_missing',
+      reason: ENTRY_MISSING_REASON,
+    };
+  } catch (err) {
+    return {
+      canClaim: false,
+      rewardEntryExists: false,
+      kind: 'entry_missing',
+      reason: ENTRY_MISSING_REASON,
+      detail: `Reward entry search failed: ${errorMessage(err)}`,
+    };
+  }
 }
 
 export async function fetchHatcherRewardStatusWithStreamflow(params: {
@@ -578,13 +814,14 @@ export async function claimHatcherRewardsWithStreamflow(params: {
   const tokenProgramId = await getHatcherTokenProgramId(client.connection);
   const invoker = params.wallet as unknown as SignerWalletAdapter;
   const stakePool = new PublicKey(params.stakePoolAddress);
+  const { nonce: rewardPoolNonce } = await resolveHatcherRewardPool(client, stakePool);
 
   const { ixs } = await client.prepareClaimRewardsInstructions({
     stakePool,
     stakePoolMint: HATCHER_MINT,
     tokenProgramId,
     depositNonce: params.depositNonce,
-    rewardPoolNonce: HATCHER_REWARD_POOL_NONCE,
+    rewardPoolNonce,
     rewardMint: HATCHER_MINT,
     rewardPoolType: 'dynamic',
     governor: HATCHER_DYNAMIC_REWARD_GOVERNOR,
@@ -602,4 +839,51 @@ export async function claimHatcherRewardsWithStreamflow(params: {
   });
 
   return { txIds: [txId] };
+}
+
+const HATCHER_REWARD_REASON_FALLBACKS: Record<HatcherRewardStatusKind, string> = {
+  claimable: 'Claim HATCHER rewards',
+  no_rewards: NO_REWARDS_REASON,
+  entry_missing: ENTRY_MISSING_REASON,
+  pool_missing: POOL_MISSING_REASON,
+  simulation_error: SIMULATION_ERROR_REASON,
+  rpc_error: RPC_ERROR_REASON,
+};
+
+export function hatcherRewardStatusLabel(status: HatcherRewardUiStatus | undefined): string {
+  if (!status || status.loading) return 'Checking...';
+  if (status.error) return 'Unavailable';
+  switch (status.kind) {
+    case 'claimable':
+      return 'Claimable';
+    case 'no_rewards':
+      return '0 HATCHER';
+    case 'entry_missing':
+      return 'Not initialized';
+    case 'pool_missing':
+      return 'Rewards unavailable';
+    case 'simulation_error':
+    case 'rpc_error':
+      return 'Check failed';
+    default:
+      return 'Unavailable';
+  }
+}
+
+export function hatcherRewardClaimReason(status: HatcherRewardUiStatus | undefined): string {
+  if (!status || status.loading) return 'Checking HATCHER rewards';
+  if (status.error) return status.error;
+  if (status.kind === 'claimable') return HATCHER_REWARD_REASON_FALLBACKS.claimable;
+  return status.reason ?? HATCHER_REWARD_REASON_FALLBACKS[status.kind] ?? NO_REWARDS_REASON;
+}
+
+export function canClaimHatcherReward(status: HatcherRewardUiStatus | undefined): boolean {
+  return Boolean(
+    status
+    && !status.loading
+    && !status.error
+    && status.kind === 'claimable'
+    && status.rewardEntryExists
+    && status.canClaim,
+  );
 }

@@ -35,16 +35,19 @@ import { isWalletTrustRevokedError, isWalletUserCancellationError } from '@/lib/
 import { buildPhantomBrowseUrl } from '@/lib/wallet-links';
 import {
   baseUnitsToHatcherString,
+  canClaimHatcherReward,
   claimHatcherRewardsWithStreamflow,
   fetchHatcherWalletBalance,
   fetchHatcherRewardStatusWithStreamflow,
+  hatcherRewardClaimReason,
+  hatcherRewardStatusLabel,
   isStakeUnlocked,
   MIN_HATCHER_STAKE_BASE_UNITS,
   parseHatcherAmountToBaseUnits,
   percentOfHatcherBalance,
   stakeHatcherWithStreamflow,
   unstakeHatcherWithStreamflow,
-  type HatcherRewardStatus,
+  type HatcherRewardUiStatus,
 } from '@/lib/streamflow-staking';
 import type {
   StakingClaimResponse,
@@ -58,11 +61,6 @@ import type {
 const DAY_MS = 86_400_000;
 const STAKE_PERCENTAGES = [25, 50, 75, 100] as const;
 const HATCHER_REWARD_STATUS_CONCURRENCY = 2;
-
-type HatcherRewardUiStatus = HatcherRewardStatus & {
-  loading: boolean;
-  error: string | null;
-};
 
 async function mapWithConcurrency<T, R>(
   items: T[],
@@ -114,26 +112,6 @@ function formatEstimatePercent(value: number): string {
 function shortAddress(address: string | null | undefined): string {
   if (!address) return 'none';
   return `${address.slice(0, 4)}...${address.slice(-4)}`;
-}
-
-function hatcherRewardStatusLabel(status: HatcherRewardUiStatus | undefined): string {
-  if (!status || status.loading) return 'Checking...';
-  if (status.error) return 'Unavailable';
-  if (!status.rewardEntryExists) return 'Not initialized';
-  if (!status.canClaim) return '0 HATCHER';
-  return 'Claimable';
-}
-
-function hatcherRewardClaimReason(status: HatcherRewardUiStatus | undefined): string {
-  if (!status || status.loading) return 'Checking HATCHER rewards';
-  if (status.error) return status.error;
-  if (!status.rewardEntryExists) return 'Reward tracking account is missing for this stake.';
-  if (!status.canClaim) return status.reason ?? 'No HATCHER rewards are available to claim yet.';
-  return 'Claim HATCHER rewards';
-}
-
-function canClaimHatcherReward(status: HatcherRewardUiStatus | undefined): boolean {
-  return Boolean(status && !status.loading && !status.error && status.rewardEntryExists && status.canClaim);
 }
 
 function isMobileWalletLinkRuntime(): boolean {
@@ -473,11 +451,15 @@ export function StakingClient() {
     setHatcherRewardStatuses((current) => {
       const next = { ...current };
       for (const stake of visibleRewardStatusStakes) {
+        const previous = current[stake.stakeEntryAddress];
         next[stake.stakeEntryAddress] = {
+          ...(previous ?? {
+            canClaim: false,
+            rewardEntryExists: false,
+            kind: 'no_rewards',
+            reason: null,
+          }),
           loading: true,
-          canClaim: current[stake.stakeEntryAddress]?.canClaim ?? false,
-          rewardEntryExists: current[stake.stakeEntryAddress]?.rewardEntryExists ?? false,
-          reason: current[stake.stakeEntryAddress]?.reason ?? null,
           error: null,
         };
       }
@@ -501,6 +483,7 @@ export function StakingClient() {
             loading: false,
             canClaim: false,
             rewardEntryExists: false,
+            kind: 'rpc_error' as const,
             reason: null,
             error: err instanceof Error ? err.message : 'Could not load HATCHER rewards',
           }];
@@ -879,7 +862,7 @@ export function StakingClient() {
 
       setUnstakeTxId(result.txId);
       setNotice(result.rewardsIncluded === false
-        ? 'Unstake transaction submitted. Streamflow will return the unlocked HATCHER to your wallet. HATCHER rewards were already claimed or not available.'
+        ? 'Unstake transaction submitted. Streamflow will return the unlocked HATCHER to your wallet. The HATCHER reward claim could not be included in this transaction (its preflight check failed), so no rewards were withdrawn - they may have already been claimed or be unavailable.'
         : 'Unstake transaction submitted. Streamflow will return the unlocked HATCHER and available rewards to your wallet.');
       await Promise.all([load(), loadWalletBalance()]);
     } catch (err) {
@@ -1389,9 +1372,19 @@ export function StakingClient() {
                                       ? `${formatEstimatePercent(activeStakeEstimate.poolSharePercent)} pool share`
                                       : 'Pool total unavailable'}
                                   </p>
-                                  {hatcherStatus?.error && (
+                                  {hatcherStatus?.error ? (
                                     <p className="mt-1 text-xs text-amber-400">{hatcherStatus.error}</p>
-                                  )}
+                                  ) : hatcherStatus && !hatcherStatus.loading && !hatcherClaimable ? (
+                                    <p
+                                      className={`mt-1 text-xs ${
+                                        hatcherStatus.kind === 'no_rewards' || hatcherStatus.kind === 'entry_missing'
+                                          ? 'text-[var(--text-muted)]'
+                                          : 'text-amber-400'
+                                      }`}
+                                    >
+                                      {hatcherRewardClaimReason(hatcherStatus)}
+                                    </p>
+                                  ) : null}
                                 </div>
                                 <div className="flex min-w-0 flex-col items-stretch gap-2 md:items-end">
                                   <button
@@ -1404,11 +1397,13 @@ export function StakingClient() {
                                     <Coins size={14} aria-hidden />
                                     {claimingHatcherStake === stake.stakeEntryAddress
                                       ? 'Claiming'
-                                      : hatcherStatus?.loading
+                                      : !hatcherStatus || hatcherStatus.loading
                                         ? 'Checking'
                                         : hatcherClaimable
                                           ? 'Claim HATCHER'
-                                          : 'No rewards'}
+                                          : hatcherStatus.kind === 'no_rewards'
+                                            ? 'No rewards'
+                                            : 'Unavailable'}
                                   </button>
                                   <button
                                     type="button"
