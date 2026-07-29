@@ -66,6 +66,9 @@ import type {
   SolanaRecurringQuoteRequest,
   SolanaRecurringSetupRecordInput,
   AgentFeature,
+  AgentCapacityAddon,
+  AgentCapacityAddonsResponse,
+  CapacityAddonsSummaryResponse,
   ChatMessage,
   ChatSessionSummary,
   Ticket,
@@ -1609,6 +1612,27 @@ export const api = {
   getAgentFeatures: (agentId: string) =>
     req<AgentFeature[]>(`/agents/${agentId}/features`),
 
+  /** Capacity add-on units on one agent (Boost S/L, Storage+) plus the
+   *  composed capacity: tier base, effective limits with add-ons
+   *  applied, and the technical ceiling (16 vCPU / 32768 MB). */
+  getAgentCapacityAddons: (agentId: string) =>
+    req<AgentCapacityAddonsResponse>(`/agents/${agentId}/addons`),
+
+  /** Cancel one capacity add-on unit. The unit stays in effect until
+   *  its prepaid 30-day window ends (`effectiveUntil`); staking-sourced
+   *  units cannot be canceled (server rejects). */
+  cancelAgentCapacityAddon: (agentId: string, addonId: string) =>
+    req<{
+      addon: AgentCapacityAddon;
+      effectiveUntil: string | null;
+      alreadyCanceled: boolean;
+    }>(`/agents/${agentId}/addons/${addonId}/cancel`, { method: "POST" }),
+
+  /** User-level roll-up of capacity add-on units across all agents,
+   *  with the combined monthly USD run-rate. */
+  getCapacityAddonsSummary: () =>
+    req<CapacityAddonsSummaryResponse>("/features/capacity-addons"),
+
   /** Get active account-level features for the current user */
   getAccountFeatures: () =>
     req<{
@@ -1742,12 +1766,16 @@ export const api = {
     }),
 
   /** Start a Stripe checkout session for an add-on. One-time addons
-   *  (File Manager) ignore billingPeriod. */
+   *  (File Manager) ignore billingPeriod. Capacity add-ons (Boost S/L,
+   *  Storage+) accept `quantity` (1-20) to buy several 30-day units in
+   *  one checkout; the server rejects checkouts that would push the
+   *  agent past the technical ceiling with a descriptive 400. */
   stripeCheckoutAddon: (
     addonKey: string,
     agentId: string | undefined,
     billingPeriod: "monthly" | "annual",
     returnUrl: string,
+    quantity?: number,
   ) =>
     req<{ sessionId: string; url: string }>("/stripe/checkout/addon", {
       method: "POST",
@@ -1756,6 +1784,7 @@ export const api = {
         returnUrl,
         billingPeriod,
         ...(agentId ? { agentId } : {}),
+        ...(quantity && quantity > 1 ? { quantity } : {}),
       }),
     }),
 

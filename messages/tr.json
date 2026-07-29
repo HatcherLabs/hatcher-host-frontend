@@ -1052,6 +1052,14 @@
       "foundingSlots": "{remaining} {max} slotu kaldı",
       "foundingSoldOut": "Tükenmişti",
       "oneTimeSuffix": "bir kez",
+      "capacityGroup": "Ajan başına kapasite",
+      "capacityGroupNote": "Tek bir ajan için 30 günlük ön ödemeli boost’lar — üst üste eklenebilir, otomatik yenileme yok; yeniden satın alarak yenileyin. Yeni kapasite yaklaşık bir dakika içinde uygulanır.",
+      "capacityActiveTitle": "Aktif kapasite ekstraları",
+      "capacityMonthlyTotal": "${amount}/ay",
+      "capacityNone": "Henüz aktif kapasite ekstrası yok. Yukarıdaki ekstralardan veya ajanın Stats sekmesinden bir ajanı güçlendirin.",
+      "capacityDaysLeft": "{days, plural, one {# gün kaldı} other {# gün kaldı}}",
+      "capacityStakingBadge": "Staking ödülü",
+      "capacityCanceledBadge": "İptal edildi",
       "oneTimeAgent": "Bir Kez / Ajan",
       "annualAgent": "/ yıl / ajan",
       "monthAgent": "/ 30 gün / ajan",
@@ -1739,6 +1747,26 @@
         "expires": "Süresi {date}",
         "lifetime": "Yaşam Boyu"
       },
+      "capacity": {
+        "title": "Kapasite ekstraları",
+        "prepaidNote": "Ajan başına, üst üste eklenebilir 30 günlük ön ödemeli birimler — asla otomatik yenilenmez; yeniden satın alarak yenileyin. Konteyner yeniden oluşturulurken yeni kapasite yaklaşık bir dakika içinde uygulanır.",
+        "composedCapacity": "Birleşik kapasite",
+        "storageLine": "Çalışma alanı depolaması: {amount}",
+        "ceiling": "Teknik üst sınır: ajan başına {capacity}",
+        "stakingBadge": "Staking ödülü",
+        "canceledBadge": "İptal edildi",
+        "daysLeft": "{days, plural, one {# gün kaldı} other {# gün kaldı}}",
+        "cancel": "İptal et",
+        "cancelConfirm": "Bu {name} birimini iptal etmek istiyor musunuz? Ön ödemeli 30 günü bitene kadar aktif kalır ve yalnızca yenilenmez.",
+        "canceledUntil": "{name} iptal edildi. {date} tarihine kadar geçerli kalır.",
+        "canceledNow": "{name} iptal edildi.",
+        "per30Days": "/ 30 gün",
+        "quantity": "Adet",
+        "buy": "Satın al — ${price}",
+        "checkoutFailed": "Ödeme başlatılamadı. Lütfen tekrar deneyin.",
+        "cryptoHint": "SOL, USDC veya $HATCHER ile mi ödemek istersiniz?",
+        "cryptoHintLink": "Faturalandırma sayfasından satın alın"
+      },
       "schedules": {
         "new": "Yeni Takvim",
         "noSchedules": "Henüz bir program yok.",
@@ -2379,6 +2407,18 @@
       "ai_credits_50000": {
         "name": "50.000 AI Credits",
         "description": "Yüksek hacimli barındırma kullanımı için tek seferlik doldurma"
+      },
+      "boost_s": {
+        "name": "Boost S",
+        "description": "Tek bir ajan için +1 vCPU, +1 GB RAM"
+      },
+      "boost_l": {
+        "name": "Boost L",
+        "description": "Tek bir ajan için +2 vCPU, +3 GB RAM"
+      },
+      "storage_plus": {
+        "name": "Storage+",
+        "description": "Tek bir ajan için +10 GB çalışma alanı depolaması"
       }
     },
     "frameworks": {

@@ -1170,6 +1170,14 @@
       "foundingSlots": "{remaining} din {max} sloturi rămase",
       "foundingSoldOut": "Epuizat",
       "oneTimeSuffix": "o singură dată",
+      "capacityGroup": "Capacitate per agent",
+      "capacityGroupNote": "Boost-uri preplătite pe 30 de zile pentru un singur agent — cumulabile, fără reînnoire automată; reînnoiești cumpărând din nou. Capacitatea nouă se aplică în aproximativ un minut.",
+      "capacityActiveTitle": "Extra de capacitate active",
+      "capacityMonthlyTotal": "${amount}/lună",
+      "capacityNone": "Niciun extra de capacitate activ încă. Accelerează un agent din extra-urile de mai sus sau din tab-ul Stats al agentului.",
+      "capacityDaysLeft": "{days, plural, one {mai rămâne # zi} few {mai rămân # zile} other {mai rămân # de zile}}",
+      "capacityStakingBadge": "Recompensă de staking",
+      "capacityCanceledBadge": "Anulat",
       "oneTimeAgent": "o singură dată / agent",
       "annualAgent": "/ an / agent",
       "monthAgent": "/ 30 zile / agent",
@@ -1857,6 +1865,26 @@
         "expires": "Expiră la {date}",
         "lifetime": "Pe viață"
       },
+      "capacity": {
+        "title": "Extra de capacitate",
+        "prepaidNote": "Unități preplătite pe 30 de zile, per agent și cumulabile — nu se reînnoiesc niciodată automat; reînnoiești cumpărând din nou. Capacitatea nouă se aplică în aproximativ un minut, cât timp containerul este recreat.",
+        "composedCapacity": "Capacitate compusă",
+        "storageLine": "Stocare workspace: {amount}",
+        "ceiling": "Plafon tehnic: {capacity} per agent",
+        "stakingBadge": "Recompensă de staking",
+        "canceledBadge": "Anulat",
+        "daysLeft": "{days, plural, one {mai rămâne # zi} few {mai rămân # zile} other {mai rămân # de zile}}",
+        "cancel": "Anulează",
+        "cancelConfirm": "Anulezi această unitate {name}? Rămâne activă până la finalul celor 30 de zile preplătite și pur și simplu nu se va reînnoi.",
+        "canceledUntil": "{name} anulat. Rămâne în vigoare până la {date}.",
+        "canceledNow": "{name} anulat.",
+        "per30Days": "/ 30 zile",
+        "quantity": "Cantitate",
+        "buy": "Cumpără — ${price}",
+        "checkoutFailed": "Checkout eșuat. Încearcă din nou.",
+        "cryptoHint": "Preferi să plătești cu SOL, USDC sau $HATCHER?",
+        "cryptoHintLink": "Cumpără din pagina de Facturare"
+      },
       "schedules": {
         "new": "Programare nouă",
         "noSchedules": "Nicio programare.",
@@ -2497,6 +2525,18 @@
       "ai_credits_50000": {
         "name": "50.000 AI Credits",
         "description": "Top-up one-time pentru volum mare de utilizare găzduită"
+      },
+      "boost_s": {
+        "name": "Boost S",
+        "description": "+1 vCPU, +1 GB RAM pentru un agent"
+      },
+      "boost_l": {
+        "name": "Boost L",
+        "description": "+2 vCPU, +3 GB RAM pentru un agent"
+      },
+      "storage_plus": {
+        "name": "Storage+",
+        "description": "+10 GB stocare workspace pentru un agent"
       }
     },
     "frameworks": {

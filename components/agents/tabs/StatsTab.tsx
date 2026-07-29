@@ -45,6 +45,7 @@ import {
 import { api } from '@/lib/api';
 import { useAgentContext, GlassCard, FRAMEWORK_BADGE } from '../AgentContext';
 import { useAuth } from '@/lib/auth-context';
+import { CapacityAddonsCard } from './CapacityAddonsCard';
 
 // ─── Types ─────────────────────────────────────────────────────
 
@@ -982,6 +983,12 @@ export function StatsTab() {
             {/* Response Times — shown in stat cards above */}
           </div>
         ) : null}
+
+        {/* Capacity add-ons — rendered even when monitoring data is
+            unavailable (stopped agents can still buy capacity). */}
+        <div className="mt-6">
+          <CapacityAddonsCard />
+        </div>
       </div>
     </motion.div>
   );

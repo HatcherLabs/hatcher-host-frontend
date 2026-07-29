@@ -1170,6 +1170,14 @@
       "foundingSlots": "{remaining} of {max} slots remaining",
       "foundingSoldOut": "Sold out",
       "oneTimeSuffix": "one-time",
+      "capacityGroup": "Per-Agent Capacity",
+      "capacityGroupNote": "Prepaid 30-day boosts for a single agent — stackable, never auto-renewed; renew by purchasing again. New capacity applies within about a minute.",
+      "capacityActiveTitle": "Active capacity add-ons",
+      "capacityMonthlyTotal": "${amount}/month",
+      "capacityNone": "No capacity add-ons active yet. Boost an agent from the add-ons above or from the agent’s Stats tab.",
+      "capacityDaysLeft": "{days, plural, one {# day left} other {# days left}}",
+      "capacityStakingBadge": "Staking reward",
+      "capacityCanceledBadge": "Canceled",
       "oneTimeAgent": "one-time / agent",
       "annualAgent": "/ year / agent",
       "monthAgent": "/ 30 days / agent",
@@ -1857,6 +1865,26 @@
         "expires": "Expires {date}",
         "lifetime": "Lifetime"
       },
+      "capacity": {
+        "title": "Capacity add-ons",
+        "prepaidNote": "Prepaid 30-day units, per agent and stackable — they never auto-renew; renew by purchasing again. New capacity applies within about a minute while the container is recreated.",
+        "composedCapacity": "Composed capacity",
+        "storageLine": "Workspace storage: {amount}",
+        "ceiling": "Technical ceiling: {capacity} per agent",
+        "stakingBadge": "Staking reward",
+        "canceledBadge": "Canceled",
+        "daysLeft": "{days, plural, one {# day left} other {# days left}}",
+        "cancel": "Cancel",
+        "cancelConfirm": "Cancel this {name} unit? It stays active until its prepaid 30 days end and simply won’t renew.",
+        "canceledUntil": "{name} canceled. It stays in effect until {date}.",
+        "canceledNow": "{name} canceled.",
+        "per30Days": "/ 30 days",
+        "quantity": "Quantity",
+        "buy": "Buy — ${price}",
+        "checkoutFailed": "Checkout failed. Please try again.",
+        "cryptoHint": "Prefer to pay with SOL, USDC, or $HATCHER?",
+        "cryptoHintLink": "Purchase from the Billing page"
+      },
       "schedules": {
         "new": "New Schedule",
         "noSchedules": "No schedules yet.",
@@ -2497,6 +2525,18 @@
       "ai_credits_50000": {
         "name": "50,000 AI Credits",
         "description": "One-time top-up for high-volume hosted usage"
+      },
+      "boost_s": {
+        "name": "Boost S",
+        "description": "+1 vCPU, +1 GB RAM for one agent"
+      },
+      "boost_l": {
+        "name": "Boost L",
+        "description": "+2 vCPU, +3 GB RAM for one agent"
+      },
+      "storage_plus": {
+        "name": "Storage+",
+        "description": "+10 GB workspace storage for one agent"
       }
     },
     "frameworks": {

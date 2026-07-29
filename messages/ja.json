@@ -1052,6 +1052,14 @@
       "foundingSlots": "残{remaining} {max}スロット",
       "foundingSoldOut": "完売",
       "oneTimeSuffix": "一度きり",
+      "capacityGroup": "エージェントごとのキャパシティ",
+      "capacityGroupNote": "単一エージェント向けの30日前払いブーストです。スタック可能で自動更新はありません。再購入で更新します。新しいキャパシティは約1分で適用されます。",
+      "capacityActiveTitle": "有効なキャパシティアドオン",
+      "capacityMonthlyTotal": "${amount}/月",
+      "capacityNone": "有効なキャパシティアドオンはまだありません。上のアドオンから、またはエージェントのStatsタブからブーストできます。",
+      "capacityDaysLeft": "{days, plural, other {残り#日}}",
+      "capacityStakingBadge": "ステーキング報酬",
+      "capacityCanceledBadge": "キャンセル済み",
       "oneTimeAgent": "一度きりのエージェント",
       "annualAgent": "/ 年/エージェント",
       "monthAgent": "/ 30日間 / エージェント",
@@ -1739,6 +1747,26 @@
         "expires": "期限切れ{date}",
         "lifetime": "生涯"
       },
+      "capacity": {
+        "title": "キャパシティアドオン",
+        "prepaidNote": "エージェントごとにスタックできる30日前払いのユニットです。自動更新は一切なく、再購入で更新します。コンテナの再作成に伴い、新しいキャパシティは約1分で適用されます。",
+        "composedCapacity": "合成キャパシティ",
+        "storageLine": "ワークスペースストレージ: {amount}",
+        "ceiling": "技術上の上限: エージェントあたり {capacity}",
+        "stakingBadge": "ステーキング報酬",
+        "canceledBadge": "キャンセル済み",
+        "daysLeft": "{days, plural, other {残り#日}}",
+        "cancel": "キャンセル",
+        "cancelConfirm": "この{name}ユニットをキャンセルしますか？前払いの30日が終わるまで有効なままで、更新されなくなるだけです。",
+        "canceledUntil": "{name}をキャンセルしました。{date}まで有効です。",
+        "canceledNow": "{name}をキャンセルしました。",
+        "per30Days": "/ 30日間",
+        "quantity": "数量",
+        "buy": "購入 — ${price}",
+        "checkoutFailed": "チェックアウトに失敗しました。もう一度お試しください。",
+        "cryptoHint": "SOL、USDC、$HATCHERで支払いますか？",
+        "cryptoHintLink": "請求ページから購入"
+      },
       "schedules": {
         "new": "新スケジュール",
         "noSchedules": "まだスケジュールは決まっていません。",
@@ -2379,6 +2407,18 @@
       "ai_credits_50000": {
         "name": "5万AI Credits",
         "description": "大量のホスト使用に対する一度限りの補充"
+      },
+      "boost_s": {
+        "name": "Boost S",
+        "description": "エージェント1体に +1 vCPU、+1 GB RAM"
+      },
+      "boost_l": {
+        "name": "Boost L",
+        "description": "エージェント1体に +2 vCPU、+3 GB RAM"
+      },
+      "storage_plus": {
+        "name": "Storage+",
+        "description": "エージェント1体に +10 GB のワークスペースストレージ"
       }
     },
     "frameworks": {

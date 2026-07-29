@@ -21,6 +21,24 @@ const AI_CREDITS_BY_TIER: Record<UserTierKey, number> = {
   founding_member: 25000,
 };
 
+// Per-agent capacity add-ons (prepaid 30-day units). Kept local for the
+// same reason as AI_CREDIT_ADDONS — the published shared package can
+// lag behind the runtime catalog.
+const CAPACITY_ADDON_LABELS: Record<string, { name: string; description: string }> = {
+  'addon.boost_s': {
+    name: 'Boost S',
+    description: '+1 vCPU, +1 GB RAM for one agent (30 days)',
+  },
+  'addon.boost_l': {
+    name: 'Boost L',
+    description: '+2 vCPU, +3 GB RAM for one agent (30 days)',
+  },
+  'addon.storage_plus': {
+    name: 'Storage+',
+    description: '+10 GB workspace storage for one agent (30 days)',
+  },
+};
+
 const AI_CREDIT_ADDONS: Record<string, { name: string; description: string }> = {
   'addon.ai_credits.5000': {
     name: '5,000 AI Credits',
@@ -64,6 +82,8 @@ export function formatFeatureKey(key: string | null | undefined): string {
   // Addons — direct match in the catalog
   const aiCreditAddon = AI_CREDIT_ADDONS[key];
   if (aiCreditAddon) return aiCreditAddon.name;
+  const capacityAddon = CAPACITY_ADDON_LABELS[key];
+  if (capacityAddon) return capacityAddon.name;
   const addon = ADDONS.find((a) => a.key === key);
   if (addon) return addon.name;
 
@@ -89,6 +109,8 @@ export function describeFeatureKey(key: string | null | undefined): string {
   if (addon) return (addon as typeof addon & { description?: string }).description ?? '';
   const aiCreditAddon = AI_CREDIT_ADDONS[key];
   if (aiCreditAddon) return aiCreditAddon.description;
+  const capacityAddon = CAPACITY_ADDON_LABELS[key];
+  if (capacityAddon) return capacityAddon.description;
   return '';
 }
 
@@ -98,5 +120,6 @@ export function isKnownFeatureKey(key: string | null | undefined): boolean {
   if (key.startsWith('tier.')) return (key.slice('tier.'.length) as UserTierKey) in TIERS;
   if ((key as UserTierKey) in TIERS) return true;
   if (key in AI_CREDIT_ADDONS) return true;
+  if (key in CAPACITY_ADDON_LABELS) return true;
   return !!getAddon(key as AddonKey);
 }
