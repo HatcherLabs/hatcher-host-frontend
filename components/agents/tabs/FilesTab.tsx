@@ -1,56 +1,15 @@
 'use client';
 
-import { useContext, useEffect, useState, useCallback, useMemo } from 'react';
-import { useTranslations } from 'next-intl';
-import { AgentContext, FRAMEWORK_ROOT_PATH, FRAMEWORK_BADGE, GlassCard } from '../AgentContext';
+import { useContext, useState } from 'react';
+import { AgentContext, FRAMEWORK_ROOT_PATH, FRAMEWORK_BADGE } from '../AgentContext';
 import { api } from '@/lib/api';
-import { CodeEditor } from '@/components/ui/CodeEditor';
-import { shouldUseCodeEditor } from '@/components/ui/code-editor-utils';
-import { motion } from 'framer-motion';
+import { Info, X } from 'lucide-react';
 import {
-  File,
-  Folder,
-  FolderOpen,
-  ChevronRight,
-  ArrowLeft,
-  Trash2,
-  Plus,
-  Loader2,
-  RefreshCw,
-  FileText,
-  FileCode,
-  FileImage,
-  Save,
-  X,
-  AlertCircle,
-  Info,
-  ShieldAlert,
-  Home,
-  FileJson,
-  Settings,
-  HardDrive,
-} from 'lucide-react';
-
-interface FileEntry {
-  name: string;
-  path: string;
-  type: 'file' | 'directory';
-  size: number;
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B';
-  const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i] ?? 'B'}`;
-}
-
-/** Framework-specific accent color */
-const FRAMEWORK_ACCENT: Record<string, { color: string; border: string; bg: string; text: string }> = {
-  openclaw: { color: 'var(--color-info)', border: 'border-[var(--color-info-border)]', bg: 'bg-[var(--color-info-bg)]', text: 'text-[var(--color-info)]' },
-  hermes:   { color: 'var(--accent)', border: 'border-[var(--border-hover)]', bg: 'bg-[var(--tech-accent-soft)]', text: 'text-[var(--accent)]' },
-};
+  FileExplorer,
+  FRAMEWORK_ACCENT,
+  type FileEntry,
+} from '@/components/agents/files/FileExplorer';
+import { FileEditor } from '@/components/agents/files/FileEditor';
 
 const FRAMEWORK_FS_INFO: Record<string, { label: string; description: string }> = {
   openclaw: {
@@ -63,50 +22,13 @@ const FRAMEWORK_FS_INFO: Record<string, { label: string; description: string }> 
   },
 };
 
-function getFileIcon(name: string, type: string) {
-  if (type === 'directory') return <Folder size={16} className="text-[var(--color-info)]" />;
-  // .env files — red with warning connotation
-  if (/^\.env/i.test(name)) return <ShieldAlert size={16} className="text-[var(--color-destructive)]" />;
-  // JSON
-  if (/\.json$/i.test(name)) return <FileJson size={16} className="text-[var(--color-warning)]" />;
-  // TypeScript / JavaScript
-  if (/\.(ts|tsx|js|jsx|mjs|cjs)$/i.test(name)) return <FileCode size={16} className="text-[var(--color-info)]" />;
-  // Python
-  if (/\.py$/i.test(name)) return <FileCode size={16} className="text-[var(--color-success)]" />;
-  // Markdown
-  if (/\.md$/i.test(name)) return <FileText size={16} className="text-zinc-400" />;
-  // Config files
-  if (/\.(ya?ml|toml|ini|cfg|conf)$/i.test(name)) return <Settings size={16} className="text-slate-400" />;
-  // Images
-  if (/\.(png|jpg|jpeg|gif|svg|webp)$/i.test(name)) return <FileImage size={16} className="text-[var(--accent)]" />;
-  return <FileText size={16} className="text-[var(--text-secondary)]" />;
-}
-
-/** Small colored dot for file-type hint in the list */
-function getFileTypeTag(name: string): { label: string; color: string } | null {
-  if (/^\.env/i.test(name)) return { label: 'ENV', color: 'text-[var(--color-destructive)] bg-[var(--color-destructive-bg)] border-[var(--color-destructive-border)]' };
-  if (/\.json$/i.test(name)) return { label: 'JSON', color: 'text-[var(--color-warning)] bg-[var(--color-warning-bg)] border-[var(--color-warning-border)]' };
-  if (/\.(ts|tsx)$/i.test(name)) return { label: 'TS', color: 'text-[var(--color-info)] bg-[var(--color-info-bg)] border-[var(--color-info-border)]' };
-  if (/\.(js|jsx|mjs|cjs)$/i.test(name)) return { label: 'JS', color: 'text-[var(--color-info)] bg-[var(--color-info-bg)] border-[var(--color-info-border)]' };
-  if (/\.py$/i.test(name)) return { label: 'PY', color: 'text-[var(--color-success)] bg-[var(--color-success-bg)] border-[var(--color-success-border)]' };
-  return null;
-}
-
 export function FilesTab() {
   const ctx = useContext(AgentContext);
-  const t = useTranslations('dashboard.agentDetail.files');
   const agentId = ctx?.agent?.id ?? '';
   const framework = ctx?.agent?.framework ?? 'openclaw';
   const ROOT_PATH = FRAMEWORK_ROOT_PATH[framework] ?? '/home/node/.openclaw';
   const accent = FRAMEWORK_ACCENT[framework] ?? FRAMEWORK_ACCENT.openclaw;
   const fsInfo = FRAMEWORK_FS_INFO[framework] ?? FRAMEWORK_FS_INFO.openclaw;
-  const [files, setFiles] = useState<FileEntry[]>([]);
-  const [currentPath, setCurrentPath] = useState(ROOT_PATH);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [unlocked, setUnlocked] = useState<boolean | null>(null);
-  const [agentStopped, setAgentStopped] = useState(false);
-  const [stoppedMessage, setStoppedMessage] = useState('');
   const [showInfoBanner, setShowInfoBanner] = useState(true);
 
   // Editor state
@@ -114,75 +36,21 @@ export function FilesTab() {
   const [editContent, setEditContent] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
+  const [editorError, setEditorError] = useState<string | null>(null);
 
-  // New file state
-  const [creating, setCreating] = useState(false);
-  const [newFileName, setNewFileName] = useState('');
-  const [newFileContent, setNewFileContent] = useState('');
-  const [creatingFile, setCreatingFile] = useState(false);
-
-  // Delete state
-  const [deleting, setDeleting] = useState<string | null>(null);
-
-  const loadFiles = useCallback(async (path?: string) => {
-    if (!agentId) return;
-    const targetPath = path ?? currentPath;
-    setLoading(true);
-    setError(null);
-    setAgentStopped(false);
-
-    const res = await api.listContainerFiles(agentId, targetPath);
-    if (res.success) {
-      if (res.data.status === 'stopped') {
-        setAgentStopped(true);
-        setStoppedMessage(res.data.message ?? 'Agent is not running.');
-        setFiles([]);
-        setUnlocked(true);
-      } else {
-        setFiles(res.data.files);
-        setCurrentPath(res.data.currentPath);
-        setUnlocked(true);
-      }
-    } else {
-      if (res.error?.includes('File Manager')) {
-        setUnlocked(false);
-      } else {
-        setError(res.error ?? 'Failed to load files');
-      }
-    }
-    setLoading(false);
-  }, [agentId, currentPath]);
-
-  useEffect(() => { loadFiles(); }, [agentId]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const navigateTo = (path: string) => {
-    setEditingFile(null);
-    setCreating(false);
-    setCurrentPath(path);
-    loadFiles(path);
-  };
-
-  const goUp = () => {
-    const parent = currentPath.split('/').slice(0, -1).join('/') || '/';
-    if (parent.startsWith(ROOT_PATH) || parent === '/app') {
-      navigateTo(parent);
-    }
-  };
-
-  const openFile = async (entry: FileEntry) => {
-    if (entry.type === 'directory') {
-      navigateTo(entry.path);
-      return;
-    }
-    // Read file content
-    setError(null);
+  const handleOpenFile = async (entry: FileEntry): Promise<string | null> => {
     const res = await api.readContainerFile(agentId, entry.path);
     if (res.success) {
       setEditingFile({ path: entry.path, name: entry.name, content: res.data.content });
       setEditContent(res.data.content);
-    } else {
-      setError(res.error ?? 'Failed to read file');
+      setEditorError(null);
+      return null;
     }
+    return res.error ?? 'Failed to read file';
+  };
+
+  const handleEntryDeleted = (entry: FileEntry) => {
+    if (editingFile?.path === entry.path) setEditingFile(null);
   };
 
   const handleSave = async () => {
@@ -195,187 +63,37 @@ export function FilesTab() {
       setEditingFile({ ...editingFile, content: editContent });
       setTimeout(() => setSaveMsg(null), 2000);
     } else {
-      setError(res.error ?? 'Failed to save');
+      setEditorError(res.error ?? 'Failed to save');
     }
     setSaving(false);
   };
 
-  const handleCreateFile = async () => {
-    if (!newFileName.trim()) return;
-    setCreatingFile(true);
-    const filePath = `${currentPath}/${newFileName.trim()}`;
-    const res = await api.writeContainerFile(agentId, filePath, newFileContent);
-    if (res.success) {
-      setCreating(false);
-      setNewFileName('');
-      setNewFileContent('');
-      loadFiles();
-    } else {
-      setError(res.error ?? 'Failed to create file');
-    }
-    setCreatingFile(false);
-  };
-
-  const handleDelete = async (entry: FileEntry) => {
-    if (!confirm(`Delete ${entry.name}?`)) return;
-    setDeleting(entry.path);
-    const res = await api.deleteContainerFile(agentId, entry.path);
-    if (res.success) {
-      setFiles(prev => prev.filter(f => f.path !== entry.path));
-      if (editingFile?.path === entry.path) setEditingFile(null);
-    } else {
-      setError(res.error ?? 'Failed to delete');
-    }
-    setDeleting(null);
-  };
-
-  // Breadcrumb segments
-  const breadcrumbs = useMemo(() => {
-    const relative = currentPath.startsWith(ROOT_PATH)
-      ? currentPath.slice(ROOT_PATH.length)
-      : currentPath;
-    const segments = relative.split('/').filter(Boolean);
-    const crumbs: { label: string; path: string }[] = [
-      { label: '~', path: ROOT_PATH },
-    ];
-    segments.forEach((seg, i) => {
-      crumbs.push({
-        label: seg,
-        path: ROOT_PATH + '/' + segments.slice(0, i + 1).join('/'),
-      });
-    });
-    return crumbs;
-  }, [currentPath, ROOT_PATH]);
-
-  // Total size of files in current directory
-  const totalSize = useMemo(() => {
-    return files.reduce((sum, f) => sum + (f.type === 'file' ? f.size : 0), 0);
-  }, [files]);
-
-  const dirCount = files.filter(f => f.type === 'directory').length;
-  const fileCount = files.filter(f => f.type === 'file').length;
-
-  // ── Loading ──
-  if (loading && unlocked === null) {
-    return (
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center justify-center py-20">
-        <Loader2 className="w-6 h-6 animate-spin" style={{ color: accent.color }} />
-      </motion.div>
-    );
-  }
-
-  // ── Unexpected legacy lock ──
-  if (unlocked === false) {
-    return (
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-16">
-        <FolderOpen className={`w-10 h-10 mx-auto mb-3 ${accent.text}`} />
-        <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2" style={{ fontFamily: 'var(--font-display)' }}>
-          File Manager is included
-        </h3>
-        <p className="text-sm text-[var(--text-secondary)] max-w-sm mx-auto">
-          File Manager is now included on every tier. Refresh the agent or restart it if this stale lock persists.
-        </p>
-        {error && <p className="text-xs text-[var(--color-destructive)] mt-3">{error}</p>}
-      </motion.div>
-    );
-  }
-
-  // ── Agent stopped ──
-  if (agentStopped) {
-    return (
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-16">
-        <AlertCircle className="w-10 h-10 mx-auto mb-3 text-[var(--color-warning)] opacity-60" />
-        <p className="text-sm text-[var(--text-secondary)]">{stoppedMessage}</p>
-      </motion.div>
-    );
-  }
-
   // ── File Editor ──
   if (editingFile) {
-    const isModified = editContent !== editingFile.content;
-    const isEnvFile = /^\.env/i.test(editingFile.name);
-    // Very large or binary-looking files fall back to the plain textarea —
-    // CodeMirror degrades badly on both.
-    const useRichEditor = shouldUseCodeEditor(editingFile.content);
     return (
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        {/* Editor header */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <button onClick={() => setEditingFile(null)} className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)] transition-colors">
-              <ArrowLeft size={16} />
-            </button>
-            {getFileIcon(editingFile.name, 'file')}
-            <span className="text-sm font-medium text-[var(--text-primary)] font-mono">{editingFile.name}</span>
-            {isModified && <span className="text-[10px] text-[var(--color-warning)] ml-1">Modified</span>}
-            {isEnvFile && (
-              <span className="text-[10px] text-[var(--color-destructive)] bg-[var(--color-destructive-bg)] border border-[var(--color-destructive-border)] rounded px-1.5 py-0.5 ml-1">
-                Sensitive
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            {saveMsg && <span className="text-xs text-[var(--color-success)]">{saveMsg}</span>}
-            <button
-              onClick={handleSave}
-              disabled={saving || !isModified}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[var(--text-primary)] disabled:opacity-30 transition-colors"
-              style={{ backgroundColor: isModified ? accent.color : undefined }}
-            >
-              {saving ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
-              Save
-            </button>
-            <button onClick={() => setEditingFile(null)} className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)] transition-colors">
-              <X size={14} />
-            </button>
-          </div>
-        </div>
-
-        {/* Breadcrumb path for editor */}
-        <div className="flex items-center gap-1 text-[10px] text-[var(--text-muted)] mb-3 font-mono overflow-x-auto">
-          {editingFile.path.split('/').filter(Boolean).map((seg, i, arr) => (
-            <span key={i} className="flex items-center gap-1 flex-shrink-0">
-              {i > 0 && <ChevronRight size={8} className="text-[var(--text-muted)]" />}
-              <span className={i === arr.length - 1 ? 'text-[var(--text-primary)]' : ''}>{seg}</span>
-            </span>
-          ))}
-        </div>
-
-        {error && <div className="mb-3 text-xs text-[var(--color-destructive)] bg-[var(--color-destructive-bg)] border border-[var(--color-destructive-border)] rounded-lg px-3 py-2">{error}</div>}
-        {useRichEditor ? (
-          <div
-            className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-base)]/90 overflow-hidden"
-            style={{ borderColor: isModified ? `color-mix(in srgb, ${accent.color} 45%, transparent)` : undefined }}
-          >
-            <CodeEditor
-              value={editContent}
-              onChange={setEditContent}
-              filename={editingFile.name}
-              minHeight="500px"
-              maxHeight="500px"
-              onSave={() => { if (isModified && !saving) void handleSave(); }}
-            />
-          </div>
-        ) : (
-          <textarea
-            value={editContent}
-            onChange={(e) => setEditContent(e.target.value)}
-            className="w-full h-[500px] px-4 py-3 rounded-xl text-xs font-mono text-[var(--text-primary)] bg-[var(--bg-base)]/90 border border-[var(--border-default)] focus:outline-none resize-none leading-relaxed"
-            style={{ borderColor: isModified ? `color-mix(in srgb, ${accent.color} 45%, transparent)` : undefined }}
-            spellCheck={false}
-          />
-        )}
-      </motion.div>
+      <FileEditor
+        file={editingFile}
+        value={editContent}
+        onChange={setEditContent}
+        onSave={handleSave}
+        onClose={() => setEditingFile(null)}
+        saving={saving}
+        saveMessage={saveMsg}
+        error={editorError}
+        accentColor={accent.color}
+      />
     );
   }
 
   // ── File Browser ──
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-      {error && <div className="mb-4 text-xs text-[var(--color-destructive)] bg-[var(--color-destructive-bg)] border border-[var(--color-destructive-border)] rounded-xl px-3 py-2">{error}</div>}
-
-      {/* Framework info banner */}
-      {showInfoBanner && (
+    <FileExplorer
+      agentId={agentId}
+      rootPath={ROOT_PATH}
+      accent={accent}
+      onOpenFile={handleOpenFile}
+      onEntryDeleted={handleEntryDeleted}
+      banner={showInfoBanner && (
         <div className={`mb-4 rounded-xl border ${accent.border} ${accent.bg} px-4 py-3 flex items-start gap-3`}>
           <Info size={16} className={`${accent.text} flex-shrink-0 mt-0.5`} />
           <div className="flex-1 min-w-0">
@@ -395,160 +113,6 @@ export function FilesTab() {
           </button>
         </div>
       )}
-
-      {/* Breadcrumb path navigator */}
-      <div className="mb-4 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] px-3 py-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1 text-xs overflow-x-auto flex-1 min-w-0">
-            {currentPath !== ROOT_PATH && (
-              <button onClick={goUp} className="p-1 rounded-md text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)] transition-colors flex-shrink-0">
-                <ArrowLeft size={14} />
-              </button>
-            )}
-            {breadcrumbs.map((crumb, i) => (
-              <span key={i} className="flex items-center gap-1 flex-shrink-0">
-                {i > 0 && <ChevronRight size={10} className="text-[var(--text-muted)]" />}
-                <button
-                  onClick={() => navigateTo(crumb.path)}
-                  className={`px-1.5 py-0.5 rounded-md font-mono transition-colors ${
-                    i === breadcrumbs.length - 1
-                      ? `${accent.text} ${accent.bg}`
-                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)]'
-                  }`}
-                >
-                  {crumb.label === '~' ? (
-                    <span className="flex items-center gap-1">
-                      <Home size={11} />
-                      <span className="hidden sm:inline">root</span>
-                    </span>
-                  ) : crumb.label}
-                </button>
-              </span>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-2 flex-shrink-0 ml-3">
-            {/* Stats summary */}
-            {files.length > 0 && (
-              <div className="hidden sm:flex items-center gap-2 text-[10px] text-[var(--text-muted)] mr-1">
-                {dirCount > 0 && <span>{dirCount} folder{dirCount !== 1 ? 's' : ''}</span>}
-                {fileCount > 0 && <span>{fileCount} file{fileCount !== 1 ? 's' : ''}</span>}
-                {totalSize > 0 && (
-                  <span className="flex items-center gap-0.5">
-                    <HardDrive size={9} />
-                    {formatBytes(totalSize)}
-                  </span>
-                )}
-              </div>
-            )}
-            <button onClick={() => loadFiles()} className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)] transition-colors" title={t('refresh')}>
-              {loading ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
-            </button>
-            <button
-              onClick={() => setCreating(true)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium ${accent.text} border ${accent.border} hover:${accent.bg} transition-colors`}
-            >
-              <Plus size={12} /> New File
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* New file form */}
-      {creating && (
-        <div className="mb-4 p-4 rounded-xl border border-[var(--border-default)] bg-[var(--bg-base)]/80">
-          <div className="space-y-3">
-            <input
-              type="text"
-              value={newFileName}
-              onChange={(e) => setNewFileName(e.target.value)}
-              placeholder="filename.json"
-              autoFocus
-              className="w-full h-9 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:outline-none placeholder:text-[var(--text-muted)] font-mono"
-              style={{ borderColor: newFileName ? accent.color + '50' : undefined }}
-            />
-            <textarea
-              value={newFileContent}
-              onChange={(e) => setNewFileContent(e.target.value)}
-              placeholder="File content (optional)..."
-              rows={4}
-              className="w-full px-3 py-2 rounded-lg text-xs font-mono text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:outline-none placeholder:text-[var(--text-muted)]"
-              style={{ borderColor: newFileContent ? accent.color + '30' : undefined }}
-            />
-            <div className="flex items-center gap-2 justify-end">
-              <button onClick={() => { setCreating(false); setNewFileName(''); setNewFileContent(''); }} className="px-3 py-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
-                Cancel
-              </button>
-              <button
-                onClick={handleCreateFile}
-                disabled={creatingFile || !newFileName.trim()}
-                className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-medium text-[var(--text-primary)] disabled:opacity-50 transition-colors"
-                style={{ backgroundColor: accent.color }}
-              >
-                {creatingFile ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />}
-                Create
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* File list */}
-      {files.length === 0 && !loading ? (
-        <div className="text-center py-12">
-          <File className="w-10 h-10 mx-auto mb-3 text-[var(--text-muted)] opacity-40" />
-          <p className="text-sm text-[var(--text-muted)]">This directory is empty.</p>
-        </div>
-      ) : (
-        <div className="rounded-xl border border-[var(--border-default)] overflow-hidden" style={{ background: 'var(--bg-base)' }}>
-          {files.map((entry) => {
-            const tag = entry.type === 'file' ? getFileTypeTag(entry.name) : null;
-            const isEnvFile = /^\.env/i.test(entry.name);
-            return (
-              <div
-                key={entry.path}
-                className="flex items-center justify-between px-4 py-2.5 border-b border-[var(--border-default)] last:border-0 hover:bg-[var(--bg-card)] transition-colors group cursor-pointer"
-                onClick={() => openFile(entry)}
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  {getFileIcon(entry.name, entry.type)}
-                  <span className="text-sm text-[var(--text-primary)] truncate font-mono">{entry.name}</span>
-                  {entry.type === 'directory' && <ChevronRight size={12} className="text-[var(--text-muted)]" />}
-                  {tag && (
-                    <span className={`text-[9px] px-1.5 py-0.5 rounded border font-medium tracking-wide ${tag.color}`}>
-                      {tag.label}
-                    </span>
-                  )}
-                  {isEnvFile && (
-                    <span className="text-[9px] px-1.5 py-0.5 rounded border text-[var(--color-destructive)] bg-[var(--color-destructive-bg)] border-[var(--color-destructive-border)] font-medium">
-                      SENSITIVE
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-3">
-                  {entry.type === 'file' && (
-                    <span className="text-[10px] text-[var(--text-muted)] tabular-nums">{formatBytes(entry.size)}</span>
-                  )}
-                  {entry.type === 'directory' && (
-                    <span className="text-[10px] text-[var(--text-muted)]">DIR</span>
-                  )}
-                  {entry.type === 'file' && (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleDelete(entry); }}
-                      disabled={deleting === entry.path}
-                      className="p-1 rounded text-[var(--text-muted)] hover:text-[var(--color-destructive)] hover:bg-[var(--color-destructive-bg)] transition-colors opacity-0 group-hover:opacity-100"
-                      title={t('delete')}
-                    >
-                      {deleting === entry.path ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
-                    </button>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-    </motion.div>
+    />
   );
 }
