@@ -3123,7 +3123,9 @@
       "files": "Dosyalar",
       "editor": "Düzenleyici",
       "terminal": "Terminal",
-      "preview": "Önizleme"
+      "preview": "Önizleme",
+      "browser": "Tarayıcı",
+      "settings": "Ayarlar"
     },
     "window": {
       "minimize": "Küçült",
@@ -3166,6 +3168,30 @@
       "startFailed": "Önizleme başlatılamadı. Ajan durdurulmuş olabilir.",
       "expiredBanner": "Önizleme oturumunun süresi doldu — devam etmek için yenileyin.",
       "retry": "Tekrar dene"
+    },
+    "browser": {
+      "addressLabel": "Adres",
+      "addressPlaceholder": "hatcher.host/docs",
+      "go": "Git",
+      "reload": "Yeniden yükle",
+      "openInNewTab": "Yeni sekmede aç",
+      "invalidUrl": "Geçerli bir web adresi girin (http veya https).",
+      "embedHint": "Bazı siteler gömülü yüklenmeyi reddeder — \"Yeni sekmede aç\" seçeneğini kullanın.",
+      "iframeTitle": "Gömülü web sayfası",
+      "emptyState": "Gezinmeye başlamak için bir adres girin."
+    },
+    "settings": {
+      "framework": "Framework",
+      "model": "Model",
+      "notSet": "Ayarlanmadı",
+      "name": "Ad",
+      "description": "Açıklama",
+      "nameLength": "Ad 3–50 karakter olmalıdır.",
+      "save": "Kaydet",
+      "saving": "Kaydediliyor…",
+      "saved": "Ayarlar kaydedildi.",
+      "saveFailed": "Ayarlar kaydedilemedi.",
+      "openFullSettings": "Tüm ayarları aç"
     }
   }
 }

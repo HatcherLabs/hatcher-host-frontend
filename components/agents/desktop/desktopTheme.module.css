@@ -17,6 +17,8 @@
 
 .root {
   --glass-tint: color-mix(in srgb, var(--bg-card) 72%, transparent);
+  /* Denser variant for chrome that must read as present (taskbar). */
+  --glass-tint-strong: color-mix(in srgb, var(--bg-card) 84%, transparent);
   --glass-well: color-mix(in srgb, var(--bg-elevated) 60%, transparent);
   --glass-blur: blur(14px) saturate(1.2);
   --glass-edge: var(--border-default);
@@ -26,14 +28,20 @@
     0 2px 10px rgba(0, 0, 0, 0.08),
     var(--shadow-card);
 
-  /* Wallpaper: the platform-native base plus two soft accent washes
-     (top-right accent glow, bottom-left surface warm-up). Both layers are
-     token-driven, so the wallpaper re-tunes itself per theme. */
-  background:
-    radial-gradient(1100px 540px at 78% -10%, var(--tech-accent-soft), transparent 70%),
-    radial-gradient(900px 520px at -10% 108%, var(--bg-hover), transparent 72%),
-    var(--bg-base);
+  /* Wallpaper: hand-crafted per-theme SVGs (opaque, with a built-in edge
+     vignette so icon labels stay legible). `--bg-base` stays underneath as
+     the paint-before-load and overscroll color. */
+  background-color: var(--bg-base);
+  background-image: url('/desktop/wallpaper-light.svg');
+  background-size: cover;
+  background-position: center;
   color: var(--text-primary);
+}
+
+/* The app's theme switch toggles a global `.dark` class; the wallpaper is
+   the one thing here the tokens can't re-tune, so swap the file. */
+:global(.dark) .root {
+  background-image: url('/desktop/wallpaper-dark.svg');
 }
 
 /* ---- Shared soft button (taskbar Exit, dialog actions) ---- */
@@ -160,13 +168,16 @@
 
 /* ---- Taskbar ---- */
 
+/* Denser tint, a real hairline and an upward contact shadow: the bar must
+   read as "the taskbar" over the wallpaper even with zero windows open. */
 .taskbar {
   height: 44px;
   padding: 6px 10px;
-  background: var(--glass-tint);
+  background: var(--glass-tint-strong);
   -webkit-backdrop-filter: var(--glass-blur);
   backdrop-filter: var(--glass-blur);
-  border-top: 1px solid var(--border-line);
+  border-top: 1px solid var(--border-default);
+  box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.14);
   color: var(--text-primary);
   font-size: 12px;
 }
@@ -372,7 +383,7 @@
 .dialogText {
   margin: 0;
   max-width: 100%;
-  color: var(--text-secondary);
+  color: var(--text-primary);
 }
 
 /* ---- Reduced motion: no lifts, no eased focus changes ---- */

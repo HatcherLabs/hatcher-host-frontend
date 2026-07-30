@@ -3123,7 +3123,9 @@
       "files": "Berkas",
       "editor": "Editor",
       "terminal": "Terminal",
-      "preview": "Pratinjau"
+      "preview": "Pratinjau",
+      "browser": "Browser",
+      "settings": "Pengaturan"
     },
     "window": {
       "minimize": "Minimalkan",
@@ -3166,6 +3168,30 @@
       "startFailed": "Pratinjau tidak dapat dimulai. Agen mungkin sedang berhenti.",
       "expiredBanner": "Sesi pratinjau berakhir — segarkan untuk melanjutkan.",
       "retry": "Coba lagi"
+    },
+    "browser": {
+      "addressLabel": "Alamat",
+      "addressPlaceholder": "hatcher.host/docs",
+      "go": "Buka",
+      "reload": "Muat ulang",
+      "openInNewTab": "Buka di tab baru",
+      "invalidUrl": "Masukkan alamat web yang valid (http atau https).",
+      "embedHint": "Beberapa situs menolak dimuat secara tersemat — gunakan \"Buka di tab baru\".",
+      "iframeTitle": "Halaman web tersemat",
+      "emptyState": "Masukkan alamat untuk mulai menjelajah."
+    },
+    "settings": {
+      "framework": "Framework",
+      "model": "Model",
+      "notSet": "Belum diatur",
+      "name": "Nama",
+      "description": "Deskripsi",
+      "nameLength": "Nama harus 3–50 karakter.",
+      "save": "Simpan",
+      "saving": "Menyimpan…",
+      "saved": "Pengaturan tersimpan.",
+      "saveFailed": "Gagal menyimpan pengaturan.",
+      "openFullSettings": "Buka pengaturan lengkap"
     }
   }
 }

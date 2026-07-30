@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
-import { ArrowLeft, FileCode, FolderOpen, Globe, Loader2, MonitorX, TerminalSquare } from 'lucide-react';
+import { ArrowLeft, Compass, FileCode, FolderOpen, Globe, Loader2, MonitorX, Settings, TerminalSquare } from 'lucide-react';
 import { api } from '@/lib/api';
 import type { Agent } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
@@ -15,6 +15,8 @@ import { FilesApp } from './apps/FilesApp';
 import { EditorApp } from './apps/EditorApp';
 import { TerminalApp } from './apps/TerminalApp';
 import { PreviewApp } from './apps/PreviewApp';
+import { BrowserApp } from './apps/BrowserApp';
+import { SettingsApp } from './apps/SettingsApp';
 import styles from './desktopTheme.module.css';
 
 /** Window layer — one <Window> per open window, content from the registry. */
@@ -102,6 +104,22 @@ export function DesktopShell({ agentId }: { agentId: string }) {
         icon: <Globe size={16} />,
         title: () => t('apps.preview'),
         render: () => <PreviewApp agent={agent} />,
+      },
+      browser: {
+        singleton: false,
+        defaultRect: { x: 300, y: 56, w: 980, h: 660 },
+        icon: <Compass size={16} />,
+        title: () => t('apps.browser'),
+        render: () => <BrowserApp />,
+      },
+      settings: {
+        singleton: true,
+        defaultRect: { x: 360, y: 100, w: 600, h: 540 },
+        icon: <Settings size={16} />,
+        title: () => t('apps.settings'),
+        // A successful save lifts the fresh agent into the shell, so the
+        // taskbar chip / other windows reflect the rename immediately.
+        render: () => <SettingsApp agent={agent} onAgentUpdated={setAgent} />,
       },
     };
   }, [agent, t]);
