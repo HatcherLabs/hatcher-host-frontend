@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   INITIAL_WINDOW_MANAGER_STATE,
+  clampRectToSurface,
   windowManagerReducer,
+  windowsEditingPath,
   type WindowManagerState,
 } from '../windowManagerReducer';
 
@@ -146,5 +148,64 @@ describe('windowManagerReducer', () => {
       payload: { id: 'files', rect: { x: 5, y: 6, w: 400, h: 300 } },
     });
     expect(state.windows[0].rect).toEqual({ x: 5, y: 6, w: 400, h: 300 });
+  });
+});
+
+describe('clampRectToSurface', () => {
+  const surface = { width: 1280, height: 720 };
+
+  it('keeps an in-bounds rect unchanged', () => {
+    expect(clampRectToSurface({ x: 40, y: 40, w: 640, h: 480 }, surface))
+      .toEqual({ x: 40, y: 40, w: 640, h: 480 });
+  });
+
+  it('pulls a rect saved on a wider screen back inside the surface', () => {
+    // Saved at x=1600 on a wide monitor: fully clipped on a 1280px surface.
+    expect(clampRectToSurface({ x: 1600, y: 900, w: 640, h: 480 }, surface))
+      .toEqual({ x: 1280 - 640, y: 720 - 480, w: 640, h: 480 });
+  });
+
+  it('clamps negative origins to zero', () => {
+    expect(clampRectToSurface({ x: -50, y: -10, w: 640, h: 480 }, surface))
+      .toEqual({ x: 0, y: 0, w: 640, h: 480 });
+  });
+
+  it('shrinks oversized windows to the surface', () => {
+    expect(clampRectToSurface({ x: 100, y: 100, w: 2000, h: 1500 }, surface))
+      .toEqual({ x: 0, y: 0, w: 1280, h: 720 });
+  });
+
+  it('leaves the rect untouched for a degenerate surface', () => {
+    expect(clampRectToSurface({ x: 40, y: 40, w: 640, h: 480 }, { width: 0, height: 0 }))
+      .toEqual({ x: 40, y: 40, w: 640, h: 480 });
+  });
+});
+
+describe('windowsEditingPath', () => {
+  let state = openFiles(INITIAL_WINDOW_MANAGER_STATE);
+  state = openEditor(state, '/ws/notes.md');
+  state = openEditor(state, '/ws/docs/plan.md');
+  state = openEditor(state, '/ws/notes.md.bak');
+  const windows = state.windows;
+
+  it('finds the editor window editing the exact path', () => {
+    expect(windowsEditingPath(windows, '/ws/notes.md').map((w) => w.id))
+      .toEqual(['editor:/ws/notes.md']);
+  });
+
+  it('finds editor windows editing files inside a moved directory', () => {
+    expect(windowsEditingPath(windows, '/ws/docs').map((w) => w.id))
+      .toEqual(['editor:/ws/docs/plan.md']);
+  });
+
+  it('ignores sibling paths that merely share a prefix', () => {
+    expect(windowsEditingPath(windows, '/ws/notes.md').map((w) => w.id))
+      .not.toContain('editor:/ws/notes.md.bak');
+  });
+
+  it('ignores non-editor windows and unknown paths', () => {
+    expect(windowsEditingPath(windows, '/ws')).toHaveLength(3);
+    expect(windowsEditingPath(windows, '/ws').every((w) => w.app === 'editor')).toBe(true);
+    expect(windowsEditingPath(windows, '/elsewhere')).toHaveLength(0);
   });
 });

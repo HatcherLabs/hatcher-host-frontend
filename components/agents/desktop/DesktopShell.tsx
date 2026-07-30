@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
 import { ArrowLeft, FileCode, FolderOpen, Loader2, MonitorX, TerminalSquare } from 'lucide-react';
@@ -45,6 +45,12 @@ export function DesktopShell({ agentId }: { agentId: string }) {
   // '' = failed without a server message (translated at render time so the
   // effect never depends on the translator).
   const [loadError, setLoadError] = useState<string | null>(null);
+  const surfaceRef = useRef<HTMLDivElement>(null);
+
+  const getSurfaceSize = useCallback(() => {
+    const el = surfaceRef.current;
+    return el ? { width: el.clientWidth, height: el.clientHeight } : null;
+  }, []);
 
   useEffect(() => {
     if (authLoading) return;
@@ -132,8 +138,8 @@ export function DesktopShell({ agentId }: { agentId: string }) {
             <Loader2 className="h-6 w-6 animate-spin text-[var(--accent)]" />
           </div>
         ) : (
-          <WindowManagerProvider agentId={agentId} apps={apps}>
-            <div className="relative min-h-0 flex-1">
+          <WindowManagerProvider agentId={agentId} apps={apps} getSurfaceSize={getSurfaceSize}>
+            <div ref={surfaceRef} className="relative min-h-0 flex-1">
               <DesktopIcons />
               <DesktopWindows />
             </div>

@@ -10,6 +10,7 @@ import {
 } from 'react';
 import {
   INITIAL_WINDOW_MANAGER_STATE,
+  clampRectToSurface,
   windowManagerReducer,
   type DesktopAppId,
   type WindowProps,
@@ -97,10 +98,13 @@ function persistStoredRect(agentId: string, windowId: string, rect: WindowRect):
 export function WindowManagerProvider({
   agentId,
   apps,
+  getSurfaceSize,
   children,
 }: {
   agentId: string;
   apps: DesktopAppRegistry;
+  /** Current desktop-surface size, used to clamp restored window rects. */
+  getSurfaceSize?: () => { width: number; height: number } | null;
   children: React.ReactNode;
 }) {
   const [state, dispatch] = useReducer(windowManagerReducer, INITIAL_WINDOW_MANAGER_STATE);
@@ -119,23 +123,29 @@ export function WindowManagerProvider({
     // come back where they were last dragged/resized.
     const saved = loadStoredLayout(agentId)[id];
     const cascade = (openCountRef.current++ % 5) * CASCADE_OFFSET_PX;
-    const rect = saved ?? {
+    const base = saved ?? {
       ...def.defaultRect,
       x: def.defaultRect.x + cascade,
       y: def.defaultRect.y + cascade,
     };
+    // Clamp against the current surface — a rect saved on a wider monitor
+    // must not restore fully clipped (bounds="parent" only constrains drags).
+    const surface = getSurfaceSize?.() ?? null;
+    const rect = surface
+      ? clampRectToSurface(base, surface)
+      : { ...base, x: Math.max(0, base.x), y: Math.max(0, base.y) };
     dispatch({
       type: 'open',
       payload: {
         id,
         app,
         title: def.title(props),
-        rect: { ...rect, x: Math.max(0, rect.x), y: Math.max(0, rect.y) },
+        rect,
         singleton: def.singleton,
         props,
       },
     });
-  }, [agentId, apps]);
+  }, [agentId, apps, getSurfaceSize]);
 
   const closeWindow = useCallback((id: string) => dispatch({ type: 'close', payload: { id } }), []);
   const focusWindow = useCallback((id: string) => dispatch({ type: 'focus', payload: { id } }), []);

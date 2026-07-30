@@ -13,6 +13,7 @@ import {
   type FileEntry,
 } from '@/components/agents/files/FileExplorer';
 import { useWindowManager } from '../WindowManager';
+import { windowsEditingPath } from '../windowManagerReducer';
 import { isPrivateClientPath, makePrivateDestination } from '../privatePaths';
 
 /** Conservative deny-list — everything else is offered to the editor. */
@@ -25,7 +26,7 @@ function isProbablyTextFile(name: string): boolean {
 export function FilesApp({ agent }: { agent: Agent }) {
   const t = useTranslations('desktop.files');
   const { toast } = useToast();
-  const { openWindow } = useWindowManager();
+  const { openWindow, closeWindow, windows } = useWindowManager();
   const rootPath = FRAMEWORK_ROOT_PATH[agent.framework] ?? '/home/node/.openclaw';
   const accent = FRAMEWORK_ACCENT[agent.framework] ?? FRAMEWORK_ACCENT.openclaw;
   const [refreshToken, setRefreshToken] = useState(0);
@@ -36,6 +37,14 @@ export function FilesApp({ agent }: { agent: Agent }) {
     if (!isProbablyTextFile(entry.name)) return t('notEditable', { name: entry.name });
     openWindow('editor', { path: entry.path });
     return null;
+  };
+
+  /**
+   * Close editor windows holding the (old) path of a moved or deleted entry —
+   * a stale editor's Save would silently recreate the file at its old path.
+   */
+  const closeEditorsFor = (path: string) => {
+    for (const win of windowsEditingPath(windows, path)) closeWindow(win.id);
   };
 
   const handleMakePrivate = async (entry: FileEntry) => {
@@ -49,11 +58,15 @@ export function FilesApp({ agent }: { agent: Agent }) {
         return;
       }
       const move = await api.moveContainerFile(agent.id, entry.path, to);
+      // A move attempt can change what the listing should show even when it
+      // fails — a 404 means the row is stale, and the mkdir above may have
+      // created the private/ folder. Always refresh after attempting a move.
+      setRefreshToken((value) => value + 1);
       if (!move.success) {
         toast.error(move.error ?? t('makePrivateFailed'));
         return;
       }
-      setRefreshToken((value) => value + 1);
+      closeEditorsFor(entry.path);
       toast.success(t('madePrivate', { name: entry.name }));
     } finally {
       setBusyPath(null);
@@ -79,6 +92,7 @@ export function FilesApp({ agent }: { agent: Agent }) {
         rootPath={rootPath}
         accent={accent}
         onOpenFile={handleOpenFile}
+        onEntryDeleted={(entry) => closeEditorsFor(entry.path)}
         refreshToken={refreshToken}
         onPathChange={setCurrentPath}
         toolbarActions={

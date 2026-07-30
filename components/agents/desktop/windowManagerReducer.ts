@@ -61,6 +61,38 @@ export const INITIAL_WINDOW_MANAGER_STATE: WindowManagerState = {
   nextZ: 1,
 };
 
+/**
+ * Fit a (saved or cascaded) rect inside the desktop surface so a window can
+ * never open fully clipped — e.g. a layout persisted on a wide monitor and
+ * restored in a narrower viewport. Oversized windows shrink to the surface;
+ * origins are pulled back so the whole window (titlebar included) is visible.
+ * A degenerate surface (unmeasured, <= 0) leaves the rect untouched.
+ */
+export function clampRectToSurface(
+  rect: WindowRect,
+  surface: { width: number; height: number },
+): WindowRect {
+  if (surface.width <= 0 || surface.height <= 0) return rect;
+  const w = Math.min(rect.w, surface.width);
+  const h = Math.min(rect.h, surface.height);
+  const x = Math.min(Math.max(0, rect.x), surface.width - w);
+  const y = Math.min(Math.max(0, rect.y), surface.height - h);
+  return { x, y, w, h };
+}
+
+/**
+ * Editor windows whose file lives at `path` or inside it (for a directory).
+ * Used to close stale editors after a file is moved or deleted — a stale
+ * editor's Save would recreate the file at its old path.
+ */
+export function windowsEditingPath(windows: WindowState[], path: string): WindowState[] {
+  return windows.filter((win) => {
+    if (win.app !== 'editor') return false;
+    const filePath = win.props?.path;
+    return Boolean(filePath && (filePath === path || filePath.startsWith(`${path}/`)));
+  });
+}
+
 function topZ(windows: WindowState[]): number {
   return windows.reduce((max, w) => Math.max(max, w.z), 0);
 }
