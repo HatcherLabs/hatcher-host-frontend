@@ -3098,7 +3098,8 @@
     "apps": {
       "files": "Fichiers",
       "editor": "Éditeur",
-      "terminal": "Terminal"
+      "terminal": "Terminal",
+      "preview": "Aperçu"
     },
     "window": {
       "minimize": "Réduire",
@@ -3132,6 +3133,15 @@
     "terminal": {
       "notActive": "L’agent n’est pas en cours d’exécution. Démarrez-le pour utiliser le terminal.",
       "sessionName": "Bureau"
+    },
+    "preview": {
+      "pathLabel": "workspace/preview/",
+      "refresh": "Actualiser",
+      "openInNewTab": "Ouvrir dans un nouvel onglet",
+      "iframeTitle": "Aperçu de l’application",
+      "startFailed": "Impossible de démarrer l’aperçu. L’agent est peut-être arrêté.",
+      "expiredBanner": "La session d’aperçu a expiré — actualisez pour continuer.",
+      "retry": "Réessayer"
     }
   }
 }

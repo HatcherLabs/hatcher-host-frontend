@@ -3122,7 +3122,8 @@
     "apps": {
       "files": "Tệp",
       "editor": "Trình soạn thảo",
-      "terminal": "Terminal"
+      "terminal": "Terminal",
+      "preview": "Xem trước"
     },
     "window": {
       "minimize": "Thu nhỏ",
@@ -3156,6 +3157,15 @@
     "terminal": {
       "notActive": "Agent không chạy. Hãy khởi động agent để dùng terminal.",
       "sessionName": "Desktop"
+    },
+    "preview": {
+      "pathLabel": "workspace/preview/",
+      "refresh": "Làm mới",
+      "openInNewTab": "Mở trong tab mới",
+      "iframeTitle": "Xem trước ứng dụng",
+      "startFailed": "Không thể khởi động bản xem trước. Có thể agent đã dừng.",
+      "expiredBanner": "Phiên xem trước đã hết hạn — làm mới để tiếp tục.",
+      "retry": "Thử lại"
     }
   }
 }

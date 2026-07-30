@@ -3098,7 +3098,8 @@
     "apps": {
       "files": "Dateien",
       "editor": "Editor",
-      "terminal": "Terminal"
+      "terminal": "Terminal",
+      "preview": "Vorschau"
     },
     "window": {
       "minimize": "Minimieren",
@@ -3132,6 +3133,15 @@
     "terminal": {
       "notActive": "Der Agent läuft nicht. Starte ihn, um das Terminal zu nutzen.",
       "sessionName": "Desktop"
+    },
+    "preview": {
+      "pathLabel": "workspace/preview/",
+      "refresh": "Aktualisieren",
+      "openInNewTab": "In neuem Tab öffnen",
+      "iframeTitle": "App-Vorschau",
+      "startFailed": "Die Vorschau konnte nicht gestartet werden. Der Agent ist möglicherweise gestoppt.",
+      "expiredBanner": "Vorschau-Sitzung abgelaufen – zum Fortfahren aktualisieren.",
+      "retry": "Erneut versuchen"
     }
   }
 }

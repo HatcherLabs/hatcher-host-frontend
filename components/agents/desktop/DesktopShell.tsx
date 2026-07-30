@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
-import { ArrowLeft, FileCode, FolderOpen, Loader2, MonitorX, TerminalSquare } from 'lucide-react';
+import { ArrowLeft, FileCode, FolderOpen, Globe, Loader2, MonitorX, TerminalSquare } from 'lucide-react';
 import { api } from '@/lib/api';
 import type { Agent } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
@@ -14,6 +14,7 @@ import { DesktopIcons } from './DesktopIcons';
 import { FilesApp } from './apps/FilesApp';
 import { EditorApp } from './apps/EditorApp';
 import { TerminalApp } from './apps/TerminalApp';
+import { PreviewApp } from './apps/PreviewApp';
 
 /** Window layer — one <Window> per open window, content from the registry. */
 function DesktopWindows() {
@@ -94,7 +95,13 @@ export function DesktopShell({ agentId }: { agentId: string }) {
         title: () => t('apps.terminal'),
         render: () => <TerminalApp agent={agent} />,
       },
-      // `preview` (app preview) is registered by the follow-up PR.
+      preview: {
+        singleton: true,
+        defaultRect: { x: 260, y: 70, w: 960, h: 640 },
+        icon: <Globe size={16} />,
+        title: () => t('apps.preview'),
+        render: () => <PreviewApp agent={agent} />,
+      },
     };
   }, [agent, t]);
 

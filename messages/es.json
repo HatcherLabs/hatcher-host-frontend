@@ -3122,7 +3122,8 @@
     "apps": {
       "files": "Archivos",
       "editor": "Editor",
-      "terminal": "Terminal"
+      "terminal": "Terminal",
+      "preview": "Vista previa"
     },
     "window": {
       "minimize": "Minimizar",
@@ -3156,6 +3157,15 @@
     "terminal": {
       "notActive": "El agente no está en ejecución. Inícialo para usar el terminal.",
       "sessionName": "Escritorio"
+    },
+    "preview": {
+      "pathLabel": "workspace/preview/",
+      "refresh": "Actualizar",
+      "openInNewTab": "Abrir en una pestaña nueva",
+      "iframeTitle": "Vista previa de la app",
+      "startFailed": "No se pudo iniciar la vista previa. El agente podría estar detenido.",
+      "expiredBanner": "La sesión de vista previa caducó; actualiza para continuar.",
+      "retry": "Reintentar"
     }
   }
 }

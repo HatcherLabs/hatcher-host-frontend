@@ -3122,7 +3122,8 @@
     "apps": {
       "files": "Berkas",
       "editor": "Editor",
-      "terminal": "Terminal"
+      "terminal": "Terminal",
+      "preview": "Pratinjau"
     },
     "window": {
       "minimize": "Minimalkan",
@@ -3156,6 +3157,15 @@
     "terminal": {
       "notActive": "Agen tidak berjalan. Jalankan agen untuk menggunakan terminal.",
       "sessionName": "Desktop"
+    },
+    "preview": {
+      "pathLabel": "workspace/preview/",
+      "refresh": "Segarkan",
+      "openInNewTab": "Buka di tab baru",
+      "iframeTitle": "Pratinjau aplikasi",
+      "startFailed": "Pratinjau tidak dapat dimulai. Agen mungkin sedang berhenti.",
+      "expiredBanner": "Sesi pratinjau berakhir — segarkan untuk melanjutkan.",
+      "retry": "Coba lagi"
     }
   }
 }

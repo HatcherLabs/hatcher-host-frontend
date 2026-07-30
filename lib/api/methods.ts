@@ -2771,6 +2771,16 @@ export const api = {
       body: JSON.stringify({ path }),
     }),
 
+  /**
+   * Mint a short-lived (1h TTL), token-scoped session for the agent desktop's
+   * app-preview window. The token travels in the proxy path, not a header —
+   * it is itself the credential for the unauthenticated preview route.
+   */
+  createPreviewSession: (agentId: string) =>
+    req<{ token: string; expiresAt: string }>(`/agents/${agentId}/preview-session`, {
+      method: "POST",
+    }),
+
   /** Generate speech audio for webchat read-aloud / voice mode. */
   synthesizeAgentSpeech: async (
     agentId: string,

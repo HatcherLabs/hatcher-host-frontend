@@ -3258,7 +3258,8 @@
     "apps": {
       "files": "Fișiere",
       "editor": "Editor",
-      "terminal": "Terminal"
+      "terminal": "Terminal",
+      "preview": "Previzualizare"
     },
     "window": {
       "minimize": "Minimizează",
@@ -3292,6 +3293,15 @@
     "terminal": {
       "notActive": "Agentul nu rulează. Pornește-l pentru a folosi terminalul.",
       "sessionName": "Desktop"
+    },
+    "preview": {
+      "pathLabel": "workspace/preview/",
+      "refresh": "Reîmprospătare",
+      "openInNewTab": "Deschide într-o filă nouă",
+      "iframeTitle": "Previzualizare aplicație",
+      "startFailed": "Previzualizarea nu a putut fi pornită. Este posibil ca agentul să fie oprit.",
+      "expiredBanner": "Sesiunea de previzualizare a expirat — reîmprospătează pentru a continua.",
+      "retry": "Reîncearcă"
     }
   }
 }

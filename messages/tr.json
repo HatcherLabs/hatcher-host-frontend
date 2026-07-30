@@ -3122,7 +3122,8 @@
     "apps": {
       "files": "Dosyalar",
       "editor": "Düzenleyici",
-      "terminal": "Terminal"
+      "terminal": "Terminal",
+      "preview": "Önizleme"
     },
     "window": {
       "minimize": "Küçült",
@@ -3156,6 +3157,15 @@
     "terminal": {
       "notActive": "Ajan çalışmıyor. Terminali kullanmak için başlatın.",
       "sessionName": "Masaüstü"
+    },
+    "preview": {
+      "pathLabel": "workspace/preview/",
+      "refresh": "Yenile",
+      "openInNewTab": "Yeni sekmede aç",
+      "iframeTitle": "Uygulama önizlemesi",
+      "startFailed": "Önizleme başlatılamadı. Ajan durdurulmuş olabilir.",
+      "expiredBanner": "Önizleme oturumunun süresi doldu — devam etmek için yenileyin.",
+      "retry": "Tekrar dene"
     }
   }
 }
