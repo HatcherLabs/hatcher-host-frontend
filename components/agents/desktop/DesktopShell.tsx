@@ -15,7 +15,7 @@ import { FilesApp } from './apps/FilesApp';
 import { EditorApp } from './apps/EditorApp';
 import { TerminalApp } from './apps/TerminalApp';
 import { PreviewApp } from './apps/PreviewApp';
-import styles from './win95.module.css';
+import styles from './desktopTheme.module.css';
 
 /** Window layer — one <Window> per open window, content from the registry. */
 function DesktopWindows() {

@@ -2,7 +2,7 @@
 
 import { useWindowManager, type DesktopAppRegistry } from './WindowManager';
 import type { DesktopAppId } from './windowManagerReducer';
-import styles from './win95.module.css';
+import styles from './desktopTheme.module.css';
 
 /**
  * Desktop icon grid. Click (or Enter on a focused icon) opens the app.

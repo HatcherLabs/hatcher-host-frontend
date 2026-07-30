@@ -1,0 +1,392 @@
+/*
+ * Modern glass chrome for the agent desktop route.
+ *
+ * Scope: CSS Module — every class is hashed and only applied by the desktop
+ * chrome components (DesktopShell, Window, Taskbar, DesktopIcons), so nothing
+ * can leak into other pages. Unlike the fixed-palette skin it replaces, this
+ * theme is fully token-driven: every color comes from the platform variables
+ * in app/globals.css, so light and dark both work with no extra rules here.
+ * The only literal values are alpha layers (contact shadows, tints).
+ *
+ * The glass recipe is defined ONCE as custom properties on `.root`:
+ * translucent card tint + backdrop blur/saturate + hairline border + layered
+ * soft shadow. Focus reads as depth and light, not a color swap: the focused
+ * window gets a deeper shadow plus an accent-tinted top edge; unfocused
+ * surfaces sit flatter with muted title text.
+ */
+
+.root {
+  --glass-tint: color-mix(in srgb, var(--bg-card) 72%, transparent);
+  --glass-well: color-mix(in srgb, var(--bg-elevated) 60%, transparent);
+  --glass-blur: blur(14px) saturate(1.2);
+  --glass-edge: var(--border-default);
+  --glass-shadow-rest: 0 2px 8px rgba(0, 0, 0, 0.06), var(--shadow-soft);
+  --glass-shadow-focused:
+    inset 0 1px 0 color-mix(in srgb, var(--accent) 28%, transparent),
+    0 2px 10px rgba(0, 0, 0, 0.08),
+    var(--shadow-card);
+
+  /* Wallpaper: the platform-native base plus two soft accent washes
+     (top-right accent glow, bottom-left surface warm-up). Both layers are
+     token-driven, so the wallpaper re-tunes itself per theme. */
+  background:
+    radial-gradient(1100px 540px at 78% -10%, var(--tech-accent-soft), transparent 70%),
+    radial-gradient(900px 520px at -10% 108%, var(--bg-hover), transparent 72%),
+    var(--bg-base);
+  color: var(--text-primary);
+}
+
+/* ---- Shared soft button (taskbar Exit, dialog actions) ---- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 14px;
+  background: var(--glass-well);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+}
+
+.btn:active {
+  background: var(--bg-active);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---- Window ---- */
+
+.window {
+  background: var(--glass-tint);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-edge);
+  border-radius: 12px;
+  box-shadow: var(--glass-shadow-rest);
+  color: var(--text-primary);
+  transition: box-shadow 120ms ease, border-color 120ms ease;
+}
+
+/* Focused: deeper shadow + accent-tinted edge and inset top highlight —
+   depth and light rather than a repaint. */
+.windowFocused {
+  border-color: color-mix(in srgb, var(--accent) 32%, var(--border-default));
+  box-shadow: var(--glass-shadow-focused);
+}
+
+/* Titlebar is transparent within the glass: no separate fill, the frost
+   itself is the chrome. */
+.titlebar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  height: 38px;
+  padding: 0 8px 0 14px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.titlebarInactive {
+  color: var(--text-muted);
+}
+
+.titleBtns {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+/* Compact ghost window buttons: circular hover wells, lucide glyphs. */
+.titleBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 999px;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.titleBtn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.titleBtn:active {
+  background: var(--bg-active);
+}
+
+.titleBtn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* Close gets the destructive tint on hover. */
+.titleBtnClose:hover {
+  background: color-mix(in srgb, var(--danger) 14%, transparent);
+  color: var(--danger);
+}
+
+.titleBtnClose:active {
+  background: color-mix(in srgb, var(--danger) 22%, transparent);
+}
+
+/* App content: solid card surface below a hairline separator so app UIs stay
+   fully readable over the frost; corners are clipped by the window radius. */
+.windowBody {
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-line);
+}
+
+/* ---- Taskbar ---- */
+
+.taskbar {
+  height: 44px;
+  padding: 6px 10px;
+  background: var(--glass-tint);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border-top: 1px solid var(--border-line);
+  color: var(--text-primary);
+  font-size: 12px;
+}
+
+/* Agent identity: quiet pill chip. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  padding: 0 12px 0 6px;
+  background: var(--glass-well);
+  border: 1px solid var(--border-line);
+  border-radius: 999px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.chipAvatar {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.chipAvatarFallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--accent);
+}
+
+.divider {
+  width: 1px;
+  height: 20px;
+  flex-shrink: 0;
+  background: var(--border-line);
+}
+
+/* Per-window pill: ghost at rest, accent-tinted fill when focused. */
+.taskBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  height: 30px;
+  max-width: 12rem;
+  padding: 0 12px;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.taskBtn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.taskBtn:active {
+  background: var(--bg-active);
+}
+
+/* Inside the scrolling strip, so the ring sits inward to avoid clipping. */
+.taskBtn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.taskBtnActive {
+  background: var(--accent-glow);
+  border-color: color-mix(in srgb, var(--accent) 32%, transparent);
+  color: var(--text-accent);
+  font-weight: 600;
+}
+
+/* Keep the focused fill legible under hover (hover above would out-rank the
+   single-class fill and gray it out). */
+.taskBtnActive:hover {
+  background: color-mix(in srgb, var(--accent) 26%, transparent);
+  color: var(--text-accent);
+}
+
+/* Clock: quiet muted well. */
+.clock {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  min-width: 64px;
+  padding: 0 12px;
+  background: var(--glass-well);
+  border: 1px solid var(--border-line);
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Desktop icons ---- */
+
+.iconBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 84px;
+  padding: 8px 6px;
+  color: var(--text-primary);
+  border-radius: 12px;
+}
+
+.iconBtn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Soft glass tile with the accent glyph. */
+.iconGlyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  background: var(--glass-tint);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-edge);
+  border-radius: 14px;
+  color: var(--accent);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+  transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+}
+
+.iconBtn:hover .iconGlyph {
+  transform: translateY(-2px);
+  border-color: var(--border-hover);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+/* The registry icons are 16px (right for titlebars and the taskbar);
+   desktop-sized icons scale the same svg up. */
+.iconGlyph > svg {
+  width: 26px;
+  height: 26px;
+}
+
+.iconLabel {
+  max-width: 100%;
+  padding: 1px 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* ---- Small-screen notice / loading / error panels ---- */
+
+.dialog {
+  width: min(20rem, 100%);
+  background: var(--glass-tint);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-edge);
+  border-radius: 14px;
+  box-shadow: var(--glass-shadow-rest);
+  color: var(--text-primary);
+  text-align: center;
+  overflow: hidden;
+}
+
+.dialogTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-line);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.dialogBody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 16px;
+  font-size: 13px;
+}
+
+.dialogText {
+  margin: 0;
+  max-width: 100%;
+  color: var(--text-secondary);
+}
+
+/* ---- Reduced motion: no lifts, no eased focus changes ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .window,
+  .titleBtn,
+  .taskBtn,
+  .iconGlyph {
+    transition: none;
+  }
+
+  .iconBtn:hover .iconGlyph {
+    transform: none;
+  }
+}
