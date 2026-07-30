@@ -126,12 +126,12 @@ export function DesktopShell({ agentId }: { agentId: string }) {
       },
       settings: {
         singleton: true,
-        defaultRect: { x: 360, y: 100, w: 600, h: 540 },
+        // Sized for the full dashboard page it iframes (sidebar + tab
+        // content), not the old mini-form.
+        defaultRect: { x: 220, y: 48, w: 1040, h: 680 },
         icon: <Settings size={16} />,
         title: () => t('apps.settings'),
-        // A successful save lifts the fresh agent into the shell, so the
-        // taskbar chip / other windows reflect the rename immediately.
-        render: () => <SettingsApp agent={agent} onAgentUpdated={setAgent} />,
+        render: () => <SettingsApp agent={agent} />,
       },
     };
   }, [agent, t]);

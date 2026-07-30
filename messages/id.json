@@ -3170,28 +3170,21 @@
       "retry": "Coba lagi"
     },
     "browser": {
-      "addressLabel": "Alamat",
-      "addressPlaceholder": "hatcher.host/docs",
+      "addressLabel": "Pencarian atau alamat",
+      "addressPlaceholder": "Cari atau ketik alamat web",
       "go": "Buka",
       "reload": "Muat ulang",
       "openInNewTab": "Buka di tab baru",
-      "invalidUrl": "Masukkan alamat web yang valid (http atau https).",
+      "home": "Halaman awal",
+      "searchNote": "Pencarian dibuka di tab baru — mesin pencari menolak dimuat secara tersemat.",
       "embedHint": "Beberapa situs menolak dimuat secara tersemat — gunakan \"Buka di tab baru\".",
       "iframeTitle": "Halaman web tersemat",
-      "emptyState": "Masukkan alamat untuk mulai menjelajah."
+      "startTitle": "Mulai menjelajah",
+      "openPreview": "Buka pratinjau aplikasi"
     },
     "settings": {
-      "framework": "Framework",
-      "model": "Model",
-      "notSet": "Belum diatur",
-      "name": "Nama",
-      "description": "Deskripsi",
-      "nameLength": "Nama harus 3–50 karakter.",
-      "save": "Simpan",
-      "saving": "Menyimpan…",
-      "saved": "Pengaturan tersimpan.",
-      "saveFailed": "Gagal menyimpan pengaturan.",
-      "openFullSettings": "Buka pengaturan lengkap"
+      "iframeTitle": "Pengaturan agen",
+      "openFullPage": "Buka di halaman penuh"
     }
   }
 }

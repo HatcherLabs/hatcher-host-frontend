@@ -72,7 +72,13 @@ export function buildCsp(
     `frame-src 'self' ${MIRARI_HOST} https://www.tradingview.com https://s.tradingview.com https://tradingview.com https://www.tradingview-widget.com https://www.geckoterminal.com https://geckoterminal.com https://dexscreener.com https://www.dexscreener.com${isDesktopRoute ? ' https:' : ''}`,
     "base-uri 'self'",
     "form-action 'self'",
-    isEmbedRoute ? 'frame-ancestors *' : "frame-ancestors 'none'",
+    // Framing policy (owner-approved, 2026-07-30): 'self', not 'none' —
+    // only hatcher.host pages may frame hatcher.host pages; external framing
+    // stays fully blocked. This is the standard SAMEORIGIN posture (paired
+    // with X-Frame-Options: SAMEORIGIN in middleware/next.config) and it
+    // unblocks the desktop's same-origin windows (Settings iframe, Browser
+    // navigating our own site, Preview). /embed/* stays frameable anywhere.
+    isEmbedRoute ? 'frame-ancestors *' : "frame-ancestors 'self'",
   ];
   return parts.join('; ');
 }

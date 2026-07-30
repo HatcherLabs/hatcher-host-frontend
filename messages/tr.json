@@ -3170,28 +3170,21 @@
       "retry": "Tekrar dene"
     },
     "browser": {
-      "addressLabel": "Adres",
-      "addressPlaceholder": "hatcher.host/docs",
+      "addressLabel": "Arama veya adres",
+      "addressPlaceholder": "Arayın veya bir web adresi yazın",
       "go": "Git",
       "reload": "Yeniden yükle",
       "openInNewTab": "Yeni sekmede aç",
-      "invalidUrl": "Geçerli bir web adresi girin (http veya https).",
+      "home": "Başlangıç sayfası",
+      "searchNote": "Arama yeni sekmede açıldı — arama motorları gömülü yüklenmeyi reddeder.",
       "embedHint": "Bazı siteler gömülü yüklenmeyi reddeder — \"Yeni sekmede aç\" seçeneğini kullanın.",
       "iframeTitle": "Gömülü web sayfası",
-      "emptyState": "Gezinmeye başlamak için bir adres girin."
+      "startTitle": "Gezinmeye başla",
+      "openPreview": "Uygulama önizlemesini aç"
     },
     "settings": {
-      "framework": "Framework",
-      "model": "Model",
-      "notSet": "Ayarlanmadı",
-      "name": "Ad",
-      "description": "Açıklama",
-      "nameLength": "Ad 3–50 karakter olmalıdır.",
-      "save": "Kaydet",
-      "saving": "Kaydediliyor…",
-      "saved": "Ayarlar kaydedildi.",
-      "saveFailed": "Ayarlar kaydedilemedi.",
-      "openFullSettings": "Tüm ayarları aç"
+      "iframeTitle": "Ajan ayarları",
+      "openFullPage": "Tam sayfada aç"
     }
   }
 }

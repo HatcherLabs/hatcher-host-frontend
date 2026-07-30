@@ -1,17 +1,23 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error -- Next's vendored path-to-regexp ships no type declarations.
 import { pathToRegexp } from 'next/dist/compiled/path-to-regexp';
 import nextConfig from '../next.config.mjs';
 
 /**
- * Locks the next.config.mjs headers() carve-out for the agent preview proxy
- * (see the desktop Preview iframe fix): the global `X-Frame-Options: DENY`
- * block must NOT match `/api/agents/<id>/preview/<...path>` — the desktop
- * Preview app iframes that same-origin route and any XFO header blocks it —
- * while a dedicated block re-applies every other strict-default header to
- * that path. The sources are compiled with the same path-to-regexp Next
- * uses at build time, so these assertions track real routing semantics,
- * not string equality.
+ * Locks the next.config.mjs headers() framing policy (owner-approved,
+ * 2026-07-30): every non-embed path — INCLUDING the tokenized agent preview
+ * proxy — carries `X-Frame-Options: SAMEORIGIN`. Only hatcher.host pages may
+ * frame hatcher.host pages; external framing stays fully blocked; /embed/*
+ * keeps its deliberate no-XFO exception.
+ *
+ * This deliberately REVERTS the previous DENY-plus-preview-carve-out shape:
+ * under SAMEORIGIN the desktop frames the preview same-origin, so no
+ * dedicated `/api/agents/:agentId/preview/:path+` block may exist (its
+ * lookahead also carried a case-sensitivity gap). The sources are compiled
+ * with the same path-to-regexp Next uses at build time, so these assertions
+ * track real routing semantics, not string equality.
  */
 
 interface HeaderBlock {
@@ -19,7 +25,6 @@ interface HeaderBlock {
   headers: { key: string; value: string }[];
 }
 
-const PREVIEW_SOURCE = '/api/agents/:agentId/preview/:path+';
 const PREVIEW_PATH = '/api/agents/agent_1/preview/t/tok_abc/index.html';
 
 async function loadBlocks(): Promise<HeaderBlock[]> {
@@ -33,60 +38,71 @@ function matches(source: string, path: string): boolean {
   return (pathToRegexp(source) as RegExp).test(path);
 }
 
-function keysOf(block: HeaderBlock): string[] {
-  return block.headers.map((h) => h.key).sort();
+function xfoValue(block: HeaderBlock): string | undefined {
+  return block.headers.find((h) => h.key === 'X-Frame-Options')?.value;
 }
 
-describe('preview proxy framing-header carve-out (next.config.mjs)', () => {
-  it('keeps X-Frame-Options in exactly one block, and that block skips the preview proxy path', async () => {
+describe('sitewide framing policy (next.config.mjs)', () => {
+  it('sets X-Frame-Options to SAMEORIGIN (never DENY) in exactly one strict block', async () => {
     const blocks = await loadBlocks();
-    const xfoBlocks = blocks.filter((b) => b.headers.some((h) => h.key === 'X-Frame-Options'));
+    const xfoBlocks = blocks.filter((b) => xfoValue(b) !== undefined);
     expect(xfoBlocks).toHaveLength(1);
-
-    const strict = xfoBlocks[0];
-    expect(matches(strict.source, PREVIEW_PATH)).toBe(false);
+    expect(xfoValue(xfoBlocks[0])).toBe('SAMEORIGIN');
   });
 
-  it('still applies the strict block (XFO DENY) everywhere outside /embed and the preview proxy', async () => {
+  it('applies SAMEORIGIN everywhere outside /embed — including the tokenized preview proxy path', async () => {
     const blocks = await loadBlocks();
-    const strict = blocks.find((b) => b.headers.some((h) => h.key === 'X-Frame-Options'))!;
+    const strict = blocks.find((b) => xfoValue(b) !== undefined)!;
 
-    // Regular pages and API routes keep the frame-blocking defaults.
-    expect(matches(strict.source, '/')).toBe(true);
-    expect(matches(strict.source, '/dashboard/agent/abc123/desktop')).toBe(true);
-    expect(matches(strict.source, '/api/agents/agent_1/settings')).toBe(true);
-    // Near-miss paths must NOT ride the carve-out: a sibling route that
-    // merely starts with "preview", and the bare /preview URL (the route's
-    // [...path] catch-all requires at least one segment).
-    expect(matches(strict.source, '/api/agents/agent_1/previewfoo/bar')).toBe(true);
-    expect(matches(strict.source, '/api/agents/agent_1/preview')).toBe(true);
-    // The embed exception is unchanged.
+    for (const path of [
+      '/',
+      '/dashboard/agent/abc123',
+      '/dashboard/agent/abc123/desktop',
+      '/api/agents/agent_1/settings',
+      // The preview proxy is back under the strict block on purpose: the
+      // desktop frames it same-origin, which SAMEORIGIN permits.
+      PREVIEW_PATH,
+      '/api/agents/agent_1/preview',
+      '/api/agents/agent_1/previewfoo/bar',
+      // Case variants must not dodge the policy (the reverted lookahead
+      // carved out lowercase `preview/` only — that gap is now closed).
+      '/API/AGENTS/AGENT_1/PREVIEW/t/tok_abc/index.html',
+    ]) {
+      expect(matches(strict.source, path), `expected strict block to match ${path}`).toBe(true);
+    }
+
+    // The embed exception is unchanged: no X-Frame-Options there.
     expect(matches(strict.source, '/embed/tv/x')).toBe(false);
   });
 
-  it('serves the preview proxy path the strict headers minus X-Frame-Options via a dedicated block', async () => {
+  it('has no dedicated preview-proxy header block anymore (Task 11 carve-out reverted)', async () => {
     const blocks = await loadBlocks();
-    const preview = blocks.find((b) => b.source === PREVIEW_SOURCE);
-    expect(preview).toBeDefined();
+    const previewBlocks = blocks.filter((b) => b.source.includes('preview'));
+    expect(previewBlocks).toEqual([]);
+    // ...and the strict source no longer excludes anything but /embed.
+    const strict = blocks.find((b) => xfoValue(b) !== undefined)!;
+    expect(strict.source).toBe('/((?!embed).*)');
+  });
 
-    // The dedicated source matches exactly the tokenized preview URLs.
-    expect(matches(PREVIEW_SOURCE, PREVIEW_PATH)).toBe(true);
-    expect(matches(PREVIEW_SOURCE, '/api/agents/agent_1/preview')).toBe(false);
-    expect(matches(PREVIEW_SOURCE, '/api/agents/agent_1/previewfoo/bar')).toBe(false);
-    expect(matches(PREVIEW_SOURCE, '/api/agents/agent_1/settings')).toBe(false);
+  it('keeps the /embed block XFO-free so third-party embedding still works', async () => {
+    const blocks = await loadBlocks();
+    const embed = blocks.find((b) => b.source.startsWith('/embed'));
+    expect(embed).toBeDefined();
+    expect(xfoValue(embed!)).toBeUndefined();
+    expect(matches(embed!.source, '/embed/tv/x')).toBe(true);
+  });
+});
 
-    // No frame-blocking header, no CSP (the route handler owns CSP)...
-    const previewKeys = keysOf(preview!);
-    expect(previewKeys).not.toContain('X-Frame-Options');
-    expect(previewKeys).not.toContain('Content-Security-Policy');
+describe('middleware framing policy (source lock)', () => {
+  // middleware.ts sets the same header on every response it touches;
+  // its withSecurityHeaders helper is not exported, so lock the emitted
+  // value at source level: SAMEORIGIN, never DENY. The CSP side of the
+  // middleware policy (frame-ancestors 'self'/'*') is value-asserted
+  // against the real buildCsp() in __tests__/csp.test.ts.
+  const source = readFileSync(join(__dirname, '..', 'middleware.ts'), 'utf8');
 
-    // ...but every other strict-default header still applies to the path.
-    const strict = blocks.find((b) => b.headers.some((h) => h.key === 'X-Frame-Options'))!;
-    const strictKeysMinusXfo = keysOf(strict).filter((k) => k !== 'X-Frame-Options');
-    expect(previewKeys).toEqual(strictKeysMinusXfo);
-    for (const header of preview!.headers) {
-      const strictTwin = strict.headers.find((h) => h.key === header.key);
-      expect(strictTwin?.value).toBe(header.value);
-    }
+  it('sets X-Frame-Options: SAMEORIGIN on non-embed responses and never DENY', () => {
+    expect(source).toContain("response.headers.set('X-Frame-Options', 'SAMEORIGIN')");
+    expect(source).not.toMatch(/X-Frame-Options'\s*,\s*'DENY'/);
   });
 });

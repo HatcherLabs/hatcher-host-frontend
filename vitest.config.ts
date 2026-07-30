@@ -9,11 +9,21 @@ export default defineConfig({
   resolve: {
     // Mirror tsconfig's "@/*": "./*" so test files can use the same
     // "@/components/..." imports as app code.
-    alias: { '@': path.resolve(__dirname, './') },
+    alias: {
+      '@': path.resolve(__dirname, './'),
+      // next-intl's createNavigation imports the bare `next/navigation`
+      // subpath, which Next only exposes via a CJS shim file — vitest's
+      // ESM resolver needs the explicit mapping (components importing
+      // `@/i18n/routing`, e.g. the desktop SettingsApp, pull it in).
+      'next/navigation': path.resolve(__dirname, 'node_modules/next/navigation.js'),
+    },
   },
   test: {
     globals: true,
     environment: 'node',
     include: ['__tests__/**/*.test.ts', 'components/**/*.test.ts', 'components/**/*.test.tsx'],
+    // Externalized deps are resolved by Node directly and skip the alias
+    // above — inline next-intl so its `next/navigation` import resolves.
+    server: { deps: { inline: ['next-intl'] } },
   },
 });

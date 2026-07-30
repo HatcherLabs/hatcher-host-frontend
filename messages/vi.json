@@ -3170,28 +3170,21 @@
       "retry": "Thử lại"
     },
     "browser": {
-      "addressLabel": "Địa chỉ",
-      "addressPlaceholder": "hatcher.host/docs",
+      "addressLabel": "Tìm kiếm hoặc địa chỉ",
+      "addressPlaceholder": "Tìm kiếm hoặc nhập địa chỉ web",
       "go": "Đi",
       "reload": "Tải lại",
       "openInNewTab": "Mở trong tab mới",
-      "invalidUrl": "Nhập địa chỉ web hợp lệ (http hoặc https).",
+      "home": "Trang bắt đầu",
+      "searchNote": "Tìm kiếm đã mở trong tab mới — các công cụ tìm kiếm từ chối tải khi nhúng.",
       "embedHint": "Một số trang từ chối tải khi nhúng — hãy dùng \"Mở trong tab mới\".",
       "iframeTitle": "Trang web được nhúng",
-      "emptyState": "Nhập địa chỉ để bắt đầu duyệt web."
+      "startTitle": "Bắt đầu duyệt web",
+      "openPreview": "Mở xem trước ứng dụng"
     },
     "settings": {
-      "framework": "Framework",
-      "model": "Mô hình",
-      "notSet": "Chưa đặt",
-      "name": "Tên",
-      "description": "Mô tả",
-      "nameLength": "Tên phải từ 3 đến 50 ký tự.",
-      "save": "Lưu",
-      "saving": "Đang lưu…",
-      "saved": "Đã lưu cài đặt.",
-      "saveFailed": "Không thể lưu cài đặt.",
-      "openFullSettings": "Mở cài đặt đầy đủ"
+      "iframeTitle": "Cài đặt agent",
+      "openFullPage": "Mở trang đầy đủ"
     }
   }
 }

@@ -43,3 +43,35 @@ export function normalizeBrowserUrl(input: string): string | null {
   if (!/[a-zA-Z0-9]/.test(parsed.hostname)) return null;
   return parsed.href;
 }
+
+/**
+ * Address-bar intent for the combined address+search bar: 'url' when the
+ * input reads as a web address, 'search' for everything else (including
+ * empty/garbage input — the UI guards empty queries itself).
+ *
+ * 'url' means: an explicit http(s) scheme, OR a schemeless input whose
+ * normalized hostname contains a dot ("example.com", "hatcher.host/docs").
+ * Dotless words ("rust", "how to center a div") are searches — navigating
+ * to https://rust/ would only produce a dead iframe.
+ *
+ * Pure classifier so it is unit-testable: the Browser app navigates 'url'
+ * input in-frame and hands 'search' input to an external engine in a NEW
+ * TAB — Google, DuckDuckGo (html+lite) and Bing all send
+ * X-Frame-Options/frame-ancestors, so an embedded results page can never
+ * render (verified 2026-07-30).
+ */
+export function classifyBrowserInput(input: string): 'url' | 'search' {
+  const trimmed = input.trim();
+  if (!trimmed) return 'search';
+
+  const normalized = normalizeBrowserUrl(trimmed);
+  // Not navigable (no scheme+host that parses to http(s)) → search intent.
+  if (!normalized) return 'search';
+
+  // Explicit http(s) scheme is always an address, dot or not (e.g.
+  // http://localhost:3000). Non-http(s) schemes never normalize, so they
+  // cannot reach this branch.
+  if (SCHEME_REGEX.test(trimmed)) return 'url';
+
+  return new URL(normalized).hostname.includes('.') ? 'url' : 'search';
+}
