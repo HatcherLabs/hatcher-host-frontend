@@ -28,6 +28,8 @@ export function EditorApp({ agent, windowId, path }: EditorAppProps) {
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
 
+  // '' = failed without a server message (translated at render time so the
+  // loader never depends on the translator).
   const load = useCallback(async () => {
     if (!path) return;
     setLoading(true);
@@ -37,10 +39,10 @@ export function EditorApp({ agent, windowId, path }: EditorAppProps) {
       setFile({ path, name: path.split('/').pop() ?? path, content: res.data.content });
       setValue(res.data.content);
     } else {
-      setLoadError(res.error ?? t('loadFailed'));
+      setLoadError(res.error ?? '');
     }
     setLoading(false);
-  }, [agent.id, path, t]);
+  }, [agent.id, path]);
 
   useEffect(() => { void load(); }, [load]);
 
@@ -78,10 +80,10 @@ export function EditorApp({ agent, windowId, path }: EditorAppProps) {
     );
   }
 
-  if (loadError || !file) {
+  if (loadError !== null || !file) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
-        <p className="text-sm text-[var(--color-destructive)]">{loadError ?? t('loadFailed')}</p>
+        <p className="text-sm text-[var(--color-destructive)]">{loadError || t('loadFailed')}</p>
         <button
           type="button"
           onClick={() => { void load(); }}

@@ -42,6 +42,8 @@ export function DesktopShell({ agentId }: { agentId: string }) {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [agent, setAgent] = useState<Agent | null>(null);
+  // '' = failed without a server message (translated at render time so the
+  // effect never depends on the translator).
   const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -56,11 +58,11 @@ export function DesktopShell({ agentId }: { agentId: string }) {
       if (res.success) {
         setAgent(res.data);
       } else {
-        setLoadError(res.error ?? t('loadFailed'));
+        setLoadError(res.error ?? '');
       }
     });
     return () => { cancelled = true; };
-  }, [agentId, authLoading, isAuthenticated, router, t]);
+  }, [agentId, authLoading, isAuthenticated, router]);
 
   const apps = useMemo<DesktopAppRegistry>(() => {
     if (!agent) return {};
@@ -115,9 +117,9 @@ export function DesktopShell({ agentId }: { agentId: string }) {
 
       {/* Full desktop */}
       <div className="hidden h-full lg:flex lg:flex-col">
-        {loadError ? (
+        {loadError !== null ? (
           <div className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center">
-            <p className="text-sm text-[var(--color-destructive)]">{loadError}</p>
+            <p className="text-sm text-[var(--color-destructive)]">{loadError || t('loadFailed')}</p>
             <Link
               href={`/dashboard/agent/${agentId}`}
               className="inline-flex items-center gap-2 rounded-lg border border-[var(--border-default)] px-4 py-2 text-sm font-semibold text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--accent)]"
