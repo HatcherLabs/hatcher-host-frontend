@@ -650,7 +650,7 @@ export function AgentRoomV2Client({ agentId }: Props) {
         return;
       }
       if (id === 'configTerminal') {
-        openLaptop('config');
+        router.push(`${dashboardHref}/desktop`);
         return;
       }
       if (id === 'agentAvatar') {
@@ -663,7 +663,7 @@ export function AgentRoomV2Client({ agentId }: Props) {
       setLaptopOpen(false);
       setOpenPanel(id);
     },
-    [canEdit, openLaptop, router, setOpenPanel, toast],
+    [canEdit, dashboardHref, openLaptop, router, setOpenPanel, toast],
   );
 
   const handlePassportOpen = useCallback(() => {
