@@ -2869,7 +2869,7 @@
     "ecosystem": {
       "boxLabel": "Ökosystem",
       "title": "Auf dem offenen Stack gebaut",
-      "sub": "OpenClaw- und Hermes-Agenten, zwei Chains. Solana für $HATCHER und Zahlungen. SKALE für gasfreie On-Chain-Identität und Reputation.",
+      "sub": "OpenClaw- und Hermes-Runtimes mit Solana, Base, Cyberia und SKALE für Zahlungen, Wallets, Identität und Provider-Workflows.",
       "frameworksLabel": "Frameworks",
       "chainsLabel": "Chains"
     },

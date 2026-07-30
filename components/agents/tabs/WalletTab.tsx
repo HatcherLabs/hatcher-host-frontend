@@ -74,8 +74,8 @@ type WalletSection = 'overview' | 'networks' | 'providers' | 'security';
 type ProviderPanelId = 'xona' | 'earnfi' | 'oobe' | 'clawville' | 'kausalayer' | 'mirari' | 'mpp32' | 'vantara' | 'medusa' | 'metaplex' | 'virtuals';
 type AgentRuntime = 'hermes' | 'openclaw' | (string & {});
 
-const TAB_ORDER: WalletPanel[] = ['passport', 'skale', 'solana', 'base'];
-const NETWORK_ORDER: AgentPassportNetworkId[] = ['skale', 'solana', 'base'];
+const TAB_ORDER: WalletPanel[] = ['passport', 'skale', 'solana', 'base', 'cyberia'];
+const NETWORK_ORDER: AgentPassportNetworkId[] = ['skale', 'solana', 'base', 'cyberia'];
 const WALLET_SECTIONS: ReadonlyArray<{
   id: WalletSection;
   label: string;
@@ -83,7 +83,7 @@ const WALLET_SECTIONS: ReadonlyArray<{
   icon: ReactNode;
 }> = [
   { id: 'overview', label: 'Overview', description: 'Identity, balances, and readiness.', icon: <Fingerprint size={14} /> },
-  { id: 'networks', label: 'Networks', description: 'SKALE, Solana, and Base wallets.', icon: <Layers3 size={14} /> },
+  { id: 'networks', label: 'Networks', description: 'SKALE, Solana, Base, and Cyberia wallets.', icon: <Layers3 size={14} /> },
   { id: 'providers', label: 'Providers', description: 'Partner rails and runtime tools.', icon: <Zap size={14} /> },
   { id: 'security', label: 'Security', description: 'Runtime access and key export.', icon: <Key size={14} /> },
 ];
@@ -113,6 +113,7 @@ function labelForPanel(panel: WalletPanel): string {
   if (panel === 'passport') return 'Passport';
   if (panel === 'skale') return 'SKALE';
   if (panel === 'solana') return 'Solana';
+  if (panel === 'cyberia') return 'Cyberia';
   return 'Base';
 }
 
@@ -120,6 +121,7 @@ function iconForPanel(panel: WalletPanel) {
   if (panel === 'passport') return <Fingerprint size={14} />;
   if (panel === 'skale') return <ShieldCheck size={14} />;
   if (panel === 'solana') return <Zap size={14} />;
+  if (panel === 'cyberia') return <CircleDot size={14} />;
   return <Layers3 size={14} />;
 }
 
@@ -218,6 +220,7 @@ export function getWalletActivityTransactionsForNetwork(
 function walletEnvFor(id: AgentPassportNetworkId): { walletEnvVar: string; privateKeyEnvVar: string } {
   if (id === 'skale') return { walletEnvVar: 'SKALE_WALLET_ADDRESS', privateKeyEnvVar: 'SKALE_PRIVATE_KEY' };
   if (id === 'base') return { walletEnvVar: 'BASE_WALLET_ADDRESS', privateKeyEnvVar: 'BASE_PRIVATE_KEY' };
+  if (id === 'cyberia') return { walletEnvVar: 'CYBERIA_WALLET_ADDRESS', privateKeyEnvVar: 'CYBERIA_PRIVATE_KEY' };
   return { walletEnvVar: 'SOLANA_WALLET_ADDRESS', privateKeyEnvVar: 'SOLANA_PRIVATE_KEY' };
 }
 

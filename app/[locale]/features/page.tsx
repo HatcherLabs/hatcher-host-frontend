@@ -209,12 +209,13 @@ const FEATURES: Feature[] = [
     id: 'wallets',
     kicker: 'Wallets',
     title: 'Agent wallets',
-    short: 'Solana, Base, and SKALE wallet surfaces per agent.',
+    short: 'Solana, Base, Cyberia, and SKALE wallet surfaces per agent.',
     detail:
       'Agents have wallet surfaces for balances, receiving funds, QR codes, runtime access, and supported transaction workflows. Owners can inspect the state and decide what autonomy they want each agent to have.',
     bullets: [
       'Solana wallet',
       'Base wallet',
+      'Cyberia wallet',
       'SKALE identity',
       'QR and balances',
     ],
@@ -668,7 +669,7 @@ function WalletsVisual() {
   return (
     <div className={styles.previewPanel}>
       <div className={styles.walletRows}>
-        {['Solana', 'Base', 'SKALE'].map((chain) => (
+        {['Solana', 'Base', 'Cyberia', 'SKALE'].map((chain) => (
           <div key={chain}>
             <strong>{chain}</strong>
             <span>balance · QR · runtime access</span>

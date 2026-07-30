@@ -3183,7 +3183,7 @@
     "ecosystem": {
       "boxLabel": "Ecosistem",
       "title": "Construit pe stack-ul deschis",
-      "sub": "Agenți OpenClaw și Hermes, două chain-uri. Solana susține $HATCHER și plățile. SKALE oferă identitate și reputație on-chain fără gas.",
+      "sub": "Runtime-uri OpenClaw și Hermes cu Solana, Base, Cyberia și SKALE pentru plăți, portofele, identitate și fluxuri de furnizori.",
       "frameworksLabel": "Framework-uri",
       "chainsLabel": "Chain-uri"
     },

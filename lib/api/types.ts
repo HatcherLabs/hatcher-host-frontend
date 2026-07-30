@@ -2866,7 +2866,7 @@ export interface KausalayerResourcesResponse {
   contacts: KausalayerResourceResult;
 }
 
-export type AgentPassportNetworkId = "skale" | "base" | "solana";
+export type AgentPassportNetworkId = "skale" | "base" | "cyberia" | "solana";
 export type AgentPassportChainType = "evm" | "solana";
 export type AgentPassportSignerMode =
   "receive-only" | "runtime-signing" | "planned";
