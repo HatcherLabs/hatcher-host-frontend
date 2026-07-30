@@ -2869,7 +2869,7 @@
     "ecosystem": {
       "boxLabel": "生态系统",
       "title": "构建于开放生态",
-      "sub": "OpenClaw 与 Hermes 智能体，两条链。Solana 驱动 $HATCHER 和支付。SKALE 提供免 Gas 的链上身份与信誉。",
+      "sub": "OpenClaw 与 Hermes 运行时支持 Solana、Base、Cyberia 和 SKALE，用于支付、钱包、身份及服务商工作流。",
       "frameworksLabel": "框架",
       "chainsLabel": "区块链"
     },

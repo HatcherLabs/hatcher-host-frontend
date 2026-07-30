@@ -21,11 +21,23 @@ describe('agent passport helpers', () => {
     expect(passport.identity.handle).toBe('hatcher:alpha-agent');
     expect(networkById(passport, 'skale')?.status).toBe('registered');
     expect(networkById(passport, 'base')?.sharedWalletWith).toBe('skale');
+    expect(networkById(passport, 'cyberia')).toMatchObject({
+      caip2: 'eip155:49406',
+      status: 'wallet-ready',
+      walletAddress: '0xAgentEvm',
+      sharedWalletWith: 'skale',
+      contracts: {
+        hatcher: '0x621021F18b6404123f98b1395c418868418ACF36',
+        usdc: '0xdc25597B19799010047F17e9591EFE08EFd40077',
+      },
+    });
     expect(networkById(passport, 'solana')?.caip2).toBe('solana:mainnet-beta');
     expect(networkById(passport, 'base')?.agentId).toBeNull();
+    expect(networkById(passport, 'cyberia')?.agentId).toBeNull();
     expect(networkById(passport, 'solana')?.agentId).toBeNull();
     expect(passport.payments).toEqual([]);
     expect(passport.runtime.signerMode).toBe('runtime-signing');
+    expect(passport.runtime.trading.networks).toEqual(['skale', 'base', 'cyberia']);
     expect((passport.runtime.trading as Record<string, unknown>).requiresExplicitUserIntent).toBeUndefined();
   });
 });

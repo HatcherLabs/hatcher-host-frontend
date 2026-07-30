@@ -15,6 +15,7 @@ describe('Wallet tab integration placement', () => {
     expect(shouldShowMirariPanelForWallet('solana', 'hermes')).toBe(true);
     expect(shouldShowMirariPanelForWallet('base', 'hermes')).toBe(false);
     expect(shouldShowMirariPanelForWallet('skale', 'hermes')).toBe(false);
+    expect(shouldShowMirariPanelForWallet('cyberia', 'hermes')).toBe(false);
   });
 
   it('hides Mirari completely for OpenClaw agents', () => {
@@ -30,6 +31,7 @@ describe('Wallet tab integration placement', () => {
     expect(getProviderPanelIdsForWallet('solana')).toContain('mpp32');
     expect(getProviderPanelIdsForWallet('base')).not.toContain('mpp32');
     expect(getProviderPanelIdsForWallet('skale')).not.toContain('mpp32');
+    expect(getProviderPanelIdsForWallet('cyberia')).not.toContain('mpp32');
   });
 
   it('places Vantara with Solana provider rails', () => {

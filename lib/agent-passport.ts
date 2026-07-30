@@ -141,6 +141,30 @@ export function buildFallbackPassport(agent: PassportFallbackAgent | null, route
           sharedWalletWith: agent?.skaleWalletAddress ? 'skale' : undefined,
         },
         {
+          id: 'cyberia',
+          label: 'Cyberia',
+          chainType: 'evm',
+          status: agent?.skaleWalletAddress ? 'wallet-ready' : 'planned',
+          caip2: 'eip155:49406',
+          chainId: 49406,
+          walletAddress: agent?.skaleWalletAddress ?? null,
+          agentId: null,
+          registry: null,
+          registryStatus: agent?.skaleWalletAddress ? 'wallet-ready' : 'planned',
+          registeredAt: null,
+          explorerUrl: agent?.skaleWalletAddress
+            ? `https://explorer.cyberia.church/address/${agent.skaleWalletAddress}`
+            : null,
+          contracts: {
+            hatcher: '0x621021F18b6404123f98b1395c418868418ACF36',
+            usdc: '0xdc25597B19799010047F17e9591EFE08EFd40077',
+          },
+          sharedWalletWith: agent?.skaleWalletAddress ? 'skale' : undefined,
+          notes: [
+            'Cyberia wallet supports native CYBER and bridged HATCHER. Agent identity remains anchored on SKALE.',
+          ],
+        },
+        {
           id: 'solana',
           label: 'Solana',
           chainType: 'solana',
@@ -161,7 +185,7 @@ export function buildFallbackPassport(agent: PassportFallbackAgent | null, route
         chainType: 'evm',
         status: agent?.skaleWalletAddress ? 'wallet-ready' : 'planned',
         address: agent?.skaleWalletAddress ?? null,
-        networks: ['skale', 'base'],
+        networks: ['skale', 'base', 'cyberia'],
         signerMode: 'runtime-signing',
       },
       {
@@ -177,7 +201,7 @@ export function buildFallbackPassport(agent: PassportFallbackAgent | null, route
       signerMode: 'runtime-signing',
       trading: {
         status: agent?.skaleWalletAddress ? 'enabled' : 'disabled',
-        networks: agent?.skaleWalletAddress ? ['skale', 'base'] : [],
+        networks: agent?.skaleWalletAddress ? ['skale', 'base', 'cyberia'] : [],
         quoteProviders: [
           {
             id: 'jupiter',

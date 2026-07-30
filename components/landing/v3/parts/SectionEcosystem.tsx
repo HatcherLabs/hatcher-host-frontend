@@ -12,6 +12,8 @@ const FRAMEWORKS = [
 const CHAINS = [
   { key: 'solana', label: 'Solana', color: '#746290', href: 'https://solana.com' },
   { key: 'skale',  label: 'SKALE',  color: '#4a778b', href: 'https://skale.space' },
+  { key: 'base', label: 'Base', color: '#4169e1', href: 'https://base.org' },
+  { key: 'cyberia', label: 'Cyberia', color: '#b6ff3b', href: 'https://cyberia.church' },
 ];
 
 export function SectionEcosystem() {

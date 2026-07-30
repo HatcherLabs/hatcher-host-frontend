@@ -2869,7 +2869,7 @@
     "ecosystem": {
       "boxLabel": "Écosystème",
       "title": "Construit sur la pile ouverte",
-      "sub": "Agents OpenClaw et Hermes, deux chaînes. Solana propulse $HATCHER et les paiements. SKALE offre identité et réputation on-chain sans frais de gas.",
+      "sub": "Runtimes OpenClaw et Hermes avec Solana, Base, Cyberia et SKALE pour les paiements, les portefeuilles, l’identité et les workflows fournisseurs.",
       "frameworksLabel": "Frameworks",
       "chainsLabel": "Blockchains"
     },
