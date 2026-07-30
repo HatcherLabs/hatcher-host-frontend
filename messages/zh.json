@@ -3098,7 +3098,8 @@
     "apps": {
       "files": "文件",
       "editor": "编辑器",
-      "terminal": "终端"
+      "terminal": "终端",
+      "preview": "预览"
     },
     "window": {
       "minimize": "最小化",
@@ -3132,6 +3133,15 @@
     "terminal": {
       "notActive": "智能体未在运行。请启动后再使用终端。",
       "sessionName": "桌面"
+    },
+    "preview": {
+      "pathLabel": "workspace/preview/",
+      "refresh": "刷新",
+      "openInNewTab": "在新标签页中打开",
+      "iframeTitle": "应用预览",
+      "startFailed": "无法启动预览。该智能体可能已停止运行。",
+      "expiredBanner": "预览会话已过期 — 请刷新以继续。",
+      "retry": "重试"
     }
   }
 }

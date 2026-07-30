@@ -3122,7 +3122,8 @@
     "apps": {
       "files": "ファイル",
       "editor": "エディタ",
-      "terminal": "ターミナル"
+      "terminal": "ターミナル",
+      "preview": "プレビュー"
     },
     "window": {
       "minimize": "最小化",
@@ -3156,6 +3157,15 @@
     "terminal": {
       "notActive": "エージェントが実行されていません。ターミナルを使うには起動してください。",
       "sessionName": "デスクトップ"
+    },
+    "preview": {
+      "pathLabel": "workspace/preview/",
+      "refresh": "更新",
+      "openInNewTab": "新しいタブで開く",
+      "iframeTitle": "アプリのプレビュー",
+      "startFailed": "プレビューを開始できませんでした。エージェントが停止している可能性があります。",
+      "expiredBanner": "プレビューセッションの有効期限が切れました。続けるには更新してください。",
+      "retry": "再試行"
     }
   }
 }

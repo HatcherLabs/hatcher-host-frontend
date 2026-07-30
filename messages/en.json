@@ -3259,7 +3259,8 @@
     "apps": {
       "files": "Files",
       "editor": "Editor",
-      "terminal": "Terminal"
+      "terminal": "Terminal",
+      "preview": "Preview"
     },
     "window": {
       "minimize": "Minimize",
@@ -3293,6 +3294,15 @@
     "terminal": {
       "notActive": "The agent is not running. Start it to use the terminal.",
       "sessionName": "Desktop"
+    },
+    "preview": {
+      "pathLabel": "workspace/preview/",
+      "refresh": "Refresh",
+      "openInNewTab": "Open in new tab",
+      "iframeTitle": "App preview",
+      "startFailed": "Couldn't start the preview. The agent may be stopped.",
+      "expiredBanner": "Preview session expired — refresh to continue.",
+      "retry": "Retry"
     }
   }
 }

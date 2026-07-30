@@ -3122,7 +3122,8 @@
     "apps": {
       "files": "Arquivos",
       "editor": "Editor",
-      "terminal": "Terminal"
+      "terminal": "Terminal",
+      "preview": "Pré-visualização"
     },
     "window": {
       "minimize": "Minimizar",
@@ -3156,6 +3157,15 @@
     "terminal": {
       "notActive": "O agente não está em execução. Inicie-o para usar o terminal.",
       "sessionName": "Área de trabalho"
+    },
+    "preview": {
+      "pathLabel": "workspace/preview/",
+      "refresh": "Atualizar",
+      "openInNewTab": "Abrir em nova aba",
+      "iframeTitle": "Pré-visualização do app",
+      "startFailed": "Não foi possível iniciar a pré-visualização. O agente pode estar parado.",
+      "expiredBanner": "A sessão de pré-visualização expirou — atualize para continuar.",
+      "retry": "Tentar novamente"
     }
   }
 }
