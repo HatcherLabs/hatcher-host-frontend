@@ -3110,5 +3110,52 @@
     "next": "Avançar",
     "done": "Concluir",
     "skip": "Pular o tour"
+  },
+  "desktop": {
+    "enterDesktop": "Área de trabalho",
+    "loadFailed": "Não foi possível carregar o agente.",
+    "smallScreen": {
+      "title": "A área de trabalho precisa de mais espaço",
+      "description": "A área de trabalho do agente funciona melhor em uma tela maior. Abra em um display maior ou volte ao painel do agente.",
+      "back": "Voltar ao agente"
+    },
+    "apps": {
+      "files": "Arquivos",
+      "editor": "Editor",
+      "terminal": "Terminal"
+    },
+    "window": {
+      "minimize": "Minimizar",
+      "maximize": "Maximizar",
+      "restore": "Restaurar",
+      "close": "Fechar"
+    },
+    "taskbar": {
+      "exit": "Sair da área de trabalho"
+    },
+    "files": {
+      "newFolder": "Nova pasta",
+      "newFolderPrompt": "Nome da pasta",
+      "newFolderFailed": "Não foi possível criar a pasta.",
+      "folderCreated": "Pasta \"{name}\" criada.",
+      "openInEditor": "Abrir no editor",
+      "makePrivate": "Tornar privado",
+      "makePrivateConfirm": "Mover \"{name}\" para uma pasta privada? Arquivos privados ficam fora das prévias compartilhadas.",
+      "makePrivateFailed": "Não foi possível torná-lo privado.",
+      "madePrivate": "\"{name}\" agora é privado.",
+      "privateBadge": "Privado",
+      "notEditable": "\"{name}\" não parece ser um arquivo de texto."
+    },
+    "editor": {
+      "empty": "Abra um arquivo no app Arquivos para editá-lo aqui.",
+      "loadFailed": "Não foi possível carregar o arquivo.",
+      "saveFailed": "Não foi possível salvar o arquivo.",
+      "saved": "Salvo",
+      "retry": "Tentar novamente"
+    },
+    "terminal": {
+      "notActive": "O agente não está em execução. Inicie-o para usar o terminal.",
+      "sessionName": "Área de trabalho"
+    }
   }
 }

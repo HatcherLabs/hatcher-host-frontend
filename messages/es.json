@@ -3110,5 +3110,52 @@
     "next": "Siguiente",
     "done": "Listo",
     "skip": "Omitir el tour"
+  },
+  "desktop": {
+    "enterDesktop": "Escritorio",
+    "loadFailed": "No se pudo cargar el agente.",
+    "smallScreen": {
+      "title": "El escritorio necesita más espacio",
+      "description": "El escritorio del agente funciona mejor en una pantalla más grande. Ábrelo en una pantalla mayor o vuelve al panel del agente.",
+      "back": "Volver al agente"
+    },
+    "apps": {
+      "files": "Archivos",
+      "editor": "Editor",
+      "terminal": "Terminal"
+    },
+    "window": {
+      "minimize": "Minimizar",
+      "maximize": "Maximizar",
+      "restore": "Restaurar",
+      "close": "Cerrar"
+    },
+    "taskbar": {
+      "exit": "Salir del escritorio"
+    },
+    "files": {
+      "newFolder": "Nueva carpeta",
+      "newFolderPrompt": "Nombre de la carpeta",
+      "newFolderFailed": "No se pudo crear la carpeta.",
+      "folderCreated": "Carpeta \"{name}\" creada.",
+      "openInEditor": "Abrir en el editor",
+      "makePrivate": "Hacer privado",
+      "makePrivateConfirm": "¿Mover \"{name}\" a una carpeta privada? Los archivos privados quedan fuera de las vistas previas compartidas.",
+      "makePrivateFailed": "No se pudo hacer privado.",
+      "madePrivate": "\"{name}\" ahora es privado.",
+      "privateBadge": "Privado",
+      "notEditable": "\"{name}\" no parece un archivo de texto."
+    },
+    "editor": {
+      "empty": "Abre un archivo desde la app Archivos para editarlo aquí.",
+      "loadFailed": "No se pudo cargar el archivo.",
+      "saveFailed": "No se pudo guardar el archivo.",
+      "saved": "Guardado",
+      "retry": "Reintentar"
+    },
+    "terminal": {
+      "notActive": "El agente no está en ejecución. Inícialo para usar el terminal.",
+      "sessionName": "Escritorio"
+    }
   }
 }

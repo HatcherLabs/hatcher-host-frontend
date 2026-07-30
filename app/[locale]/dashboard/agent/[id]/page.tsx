@@ -24,6 +24,7 @@ import {
   Trash2,
   Share2,
   Copy,
+  AppWindow,
   ListChecks,
   MoreHorizontal,
   PackageCheck,
@@ -46,7 +47,7 @@ import { AgentSidebar } from '@/components/agents/AgentSidebar';
 import { PortAgentModal } from '@/components/agents/PortAgentModal';
 import { shouldMountTerminalTab } from '@/components/agents/terminalPersistence';
 import { resolveLoadedModelConfig, useAgentConfig } from '@/hooks/useAgentConfig';
-import { DEFAULT_AGENT_VIEW_MODE, EASY_AGENT_TABS, resolveAgentViewMode } from '@/components/agents/navigationModel';
+import { DEFAULT_AGENT_VIEW_MODE, EASY_AGENT_TABS, agentDesktopHref, resolveAgentViewMode } from '@/components/agents/navigationModel';
 import { applyChatToolEvent, streamToolEventToChatToolEvent } from '@/components/agents/tabs/ChatTab/chatToolEvents';
 import { applyChatThinkingEvent } from '@/components/agents/tabs/ChatTab/chatThinkingEvents';
 import {
@@ -195,6 +196,7 @@ export default function AgentManagePage() {
   const tStatusPoll = useTranslations('dashboard.agentDetail.statusPoll');
   const tMission = useTranslations('missionControl');
   const tOutcome = useTranslations('outcomePacks');
+  const tDesktop = useTranslations('desktop');
 
   // View mode (easy = operational tabs only, advanced = everything).
   // Default to advanced so the full dashboard is visible for new workspaces.
@@ -1503,6 +1505,14 @@ export default function AgentManagePage() {
             >
               <ShieldCheck size={13} aria-hidden />
               <span className="hidden md:inline">Approvals</span>
+            </Link>
+            <Link
+              href={agentDesktopHref(agent.id)}
+              className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 text-xs font-semibold text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--accent)]"
+              title={tDesktop('enterDesktop')}
+            >
+              <AppWindow size={13} aria-hidden />
+              <span className="hidden md:inline">{tDesktop('enterDesktop')}</span>
             </Link>
 
             {/* Spacer */}

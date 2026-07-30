@@ -3086,5 +3086,52 @@
     "next": "Weiter",
     "done": "Fertig",
     "skip": "Tour überspringen"
+  },
+  "desktop": {
+    "enterDesktop": "Desktop",
+    "loadFailed": "Der Agent konnte nicht geladen werden.",
+    "smallScreen": {
+      "title": "Der Desktop braucht mehr Platz",
+      "description": "Der Agenten-Desktop funktioniert am besten auf einem größeren Bildschirm. Öffne ihn auf einem größeren Display oder kehre zum Agenten-Dashboard zurück.",
+      "back": "Zurück zum Agenten"
+    },
+    "apps": {
+      "files": "Dateien",
+      "editor": "Editor",
+      "terminal": "Terminal"
+    },
+    "window": {
+      "minimize": "Minimieren",
+      "maximize": "Maximieren",
+      "restore": "Wiederherstellen",
+      "close": "Schließen"
+    },
+    "taskbar": {
+      "exit": "Desktop verlassen"
+    },
+    "files": {
+      "newFolder": "Neuer Ordner",
+      "newFolderPrompt": "Ordnername",
+      "newFolderFailed": "Der Ordner konnte nicht erstellt werden.",
+      "folderCreated": "Ordner \"{name}\" erstellt.",
+      "openInEditor": "Im Editor öffnen",
+      "makePrivate": "Privat machen",
+      "makePrivateConfirm": "\"{name}\" in einen privaten Ordner verschieben? Private Dateien bleiben aus geteilten Vorschauen ausgeschlossen.",
+      "makePrivateFailed": "Konnte nicht privat gemacht werden.",
+      "madePrivate": "\"{name}\" ist jetzt privat.",
+      "privateBadge": "Privat",
+      "notEditable": "\"{name}\" scheint keine Textdatei zu sein."
+    },
+    "editor": {
+      "empty": "Öffne eine Datei aus der Dateien-App, um sie hier zu bearbeiten.",
+      "loadFailed": "Die Datei konnte nicht geladen werden.",
+      "saveFailed": "Die Datei konnte nicht gespeichert werden.",
+      "saved": "Gespeichert",
+      "retry": "Erneut versuchen"
+    },
+    "terminal": {
+      "notActive": "Der Agent läuft nicht. Starte ihn, um das Terminal zu nutzen.",
+      "sessionName": "Desktop"
+    }
   }
 }

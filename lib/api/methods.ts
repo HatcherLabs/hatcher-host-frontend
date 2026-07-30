@@ -2757,6 +2757,20 @@ export const api = {
       },
     ),
 
+  /** Move/rename a file or directory inside agent's running container */
+  moveContainerFile: (agentId: string, from: string, to: string) =>
+    req<{ ok: true }>(`/agents/${agentId}/container-files/move`, {
+      method: "POST",
+      body: JSON.stringify({ from, to }),
+    }),
+
+  /** Create a directory inside agent's running container */
+  mkdirContainerFile: (agentId: string, path: string) =>
+    req<{ ok: true }>(`/agents/${agentId}/container-files/mkdir`, {
+      method: "POST",
+      body: JSON.stringify({ path }),
+    }),
+
   /** Generate speech audio for webchat read-aloud / voice mode. */
   synthesizeAgentSpeech: async (
     agentId: string,

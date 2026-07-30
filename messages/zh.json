@@ -3086,5 +3086,52 @@
     "next": "下一步",
     "done": "完成",
     "skip": "跳过导览"
+  },
+  "desktop": {
+    "enterDesktop": "桌面",
+    "loadFailed": "无法加载智能体。",
+    "smallScreen": {
+      "title": "桌面需要更大的空间",
+      "description": "智能体桌面在更大的屏幕上体验最佳。请在更大的显示器上打开，或返回智能体控制台。",
+      "back": "返回智能体"
+    },
+    "apps": {
+      "files": "文件",
+      "editor": "编辑器",
+      "terminal": "终端"
+    },
+    "window": {
+      "minimize": "最小化",
+      "maximize": "最大化",
+      "restore": "还原",
+      "close": "关闭"
+    },
+    "taskbar": {
+      "exit": "退出桌面"
+    },
+    "files": {
+      "newFolder": "新建文件夹",
+      "newFolderPrompt": "文件夹名称",
+      "newFolderFailed": "无法创建文件夹。",
+      "folderCreated": "已创建文件夹“{name}”。",
+      "openInEditor": "在编辑器中打开",
+      "makePrivate": "设为私密",
+      "makePrivateConfirm": "将“{name}”移动到私密文件夹？私密文件不会出现在共享预览中。",
+      "makePrivateFailed": "无法设为私密。",
+      "madePrivate": "“{name}”现已私密。",
+      "privateBadge": "私密",
+      "notEditable": "“{name}”似乎不是文本文件。"
+    },
+    "editor": {
+      "empty": "从“文件”应用中打开一个文件以在此编辑。",
+      "loadFailed": "无法加载文件。",
+      "saveFailed": "无法保存文件。",
+      "saved": "已保存",
+      "retry": "重试"
+    },
+    "terminal": {
+      "notActive": "智能体未在运行。请启动后再使用终端。",
+      "sessionName": "桌面"
+    }
   }
 }

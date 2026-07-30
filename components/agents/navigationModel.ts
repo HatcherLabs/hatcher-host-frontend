@@ -53,6 +53,11 @@ const AGENT_NAVIGATION: AgentNavigationSpec[] = [
   { id: 'schedules', group: 'advanced' },
 ];
 
+/** Route for the OS-like agent workspace desktop (windowed files/editor/terminal). */
+export function agentDesktopHref(agentId: string): string {
+  return `/dashboard/agent/${agentId}/desktop`;
+}
+
 export function buildAgentNavigationTabs(
   framework: string | undefined,
   labelFor: (id: Tab) => string,
