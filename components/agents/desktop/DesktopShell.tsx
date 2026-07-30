@@ -56,6 +56,18 @@ export function DesktopShell({ agentId }: { agentId: string }) {
     return el ? { width: el.clientWidth, height: el.clientHeight } : null;
   }, []);
 
+  // The desktop is a fixed full-viewport overlay (it covers the site nav,
+  // the dashboard tab row and the cookie banner) — while it is mounted the
+  // page underneath must not scroll, or wheel/touch input at the overlay
+  // edges scroll-bleeds into the hidden page.
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, []);
+
   useEffect(() => {
     if (authLoading) return;
     if (!isAuthenticated) {
@@ -125,7 +137,15 @@ export function DesktopShell({ agentId }: { agentId: string }) {
   }, [agent, t]);
 
   return (
-    <div className={`relative h-[calc(100dvh-var(--app-nav-height,64px))] overflow-hidden ${styles.root}`}>
+    // True fullscreen: a fixed inset-0 overlay instead of in-flow height
+    // math (the old calc assumed ONE 64px nav; under the real site nav +
+    // dashboard tab row the taskbar landed below the fold). z-[10000] sits
+    // one step above the cookie-consent banner and GuidedTour (z-[9999]) so
+    // nothing from the page chrome overlays the desktop, and below the
+    // toast layer (z-[10010] in ToastProvider) so in-desktop feedback stays
+    // visible. The taskbar Exit link / small-screen back link are the way
+    // out — the site nav is intentionally covered.
+    <div className={`fixed inset-0 z-[10000] overflow-hidden ${styles.root}`}>
       {/* Small screens: the desktop needs room — link back instead */}
       <div className="flex h-full flex-col items-center justify-center p-6 md:hidden">
         <div className={styles.dialog}>

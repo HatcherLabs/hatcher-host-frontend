@@ -116,11 +116,36 @@ const nextConfig = {
         ],
       },
       {
-        // Strict default for every path EXCEPT /embed/* — the `missing` key
-        // tells Next to skip this block when the URL starts with /embed/.
-        // Without it, /(.*) would also match /embed/* and (per Next's
-        // headers() merge rules) override the relaxed frame-ancestors.
-        source: '/((?!embed).*)',
+        // Agent preview proxy (/api/agents/<id>/preview/t/<token>/...) —
+        // the desktop Preview app iframes this same-origin route, so it
+        // must NOT carry X-Frame-Options: DENY. The route handler sets its
+        // own CSP (`sandbox ...; frame-ancestors 'self'`) as the only
+        // frame policy; here we re-apply every OTHER strict-default header
+        // from the block below so the carve-out drops framing protection
+        // only. `:path+` (one or more segments) mirrors the route's
+        // required [...path] catch-all — the bare /preview URL (no
+        // segments, not a real route) keeps the strict defaults.
+        source: '/api/agents/:agentId/preview/:path+',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(self), geolocation=()' },
+          { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin-allow-popups' },
+          { key: 'Cross-Origin-Resource-Policy', value: 'same-origin' },
+          { key: 'X-Permitted-Cross-Domain-Policies', value: 'none' },
+        ],
+      },
+      {
+        // Strict default for every path EXCEPT /embed/* and the agent
+        // preview proxy — the negative lookahead skips this block for
+        // those prefixes. Without it, /(.*) would also match them and
+        // (per Next's headers() merge rules) re-impose X-Frame-Options
+        // DENY / override the relaxed frame-ancestors. The preview
+        // exclusion requires the trailing slash (`preview/`) so only the
+        // framed sub-paths are carved out — /api/agents/<id>/previewfoo
+        // or bare .../preview still get the strict defaults.
+        source: '/((?!embed|api/agents/[^/]+/preview/).*)',
         headers: [
           {
             key: 'X-Frame-Options',

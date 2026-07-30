@@ -25,8 +25,11 @@ export function buildPreviewUpstreamUrl(apiBase: string, agentId: string, pathSe
  * upstream — every other upstream header (including any `x-frame-options`)
  * is dropped by construction, never forwarded. HTML documents get a
  * sandboxed CSP so agent-authored pages render with an opaque origin: no
- * cookies, no access to the parent DOM. This is the security boundary — do
- * not weaken it.
+ * cookies, no access to the parent DOM. `frame-ancestors 'self'` is the
+ * ONLY frame policy on this route (next.config.mjs carves the path out of
+ * the global `X-Frame-Options: DENY` block): our own pages — the desktop
+ * Preview window — may iframe the proxy, third-party sites may not. This
+ * is the security boundary — do not weaken it.
  */
 export function buildPreviewResponseHeaders(contentType: string | null): Headers {
   const headers = new Headers();
@@ -34,7 +37,7 @@ export function buildPreviewResponseHeaders(contentType: string | null): Headers
   headers.set('cache-control', 'no-store');
   const mimeType = (contentType ?? '').toLowerCase().split(';', 1)[0]?.trim();
   if (mimeType === 'text/html') {
-    headers.set('content-security-policy', 'sandbox allow-scripts allow-forms');
+    headers.set('content-security-policy', "sandbox allow-scripts allow-forms; frame-ancestors 'self'");
   }
   return headers;
 }

@@ -36,7 +36,7 @@ describe('buildPreviewUpstreamUrl', () => {
 describe('buildPreviewResponseHeaders', () => {
   it('sets the sandbox CSP for html responses and always sets cache-control: no-store', () => {
     const headers = buildPreviewResponseHeaders('text/html; charset=utf-8');
-    expect(headers.get('content-security-policy')).toBe('sandbox allow-scripts allow-forms');
+    expect(headers.get('content-security-policy')).toBe("sandbox allow-scripts allow-forms; frame-ancestors 'self'");
     expect(headers.get('cache-control')).toBe('no-store');
     expect(headers.get('content-type')).toBe('text/html; charset=utf-8');
   });
@@ -106,7 +106,7 @@ describe('agent preview proxy route', () => {
     );
 
     expect(response.status).toBe(200);
-    expect(response.headers.get('content-security-policy')).toBe('sandbox allow-scripts allow-forms');
+    expect(response.headers.get('content-security-policy')).toBe("sandbox allow-scripts allow-forms; frame-ancestors 'self'");
     expect(response.headers.get('x-frame-options')).toBeNull();
     expect(response.headers.get('cache-control')).toBe('no-store');
   });
@@ -142,6 +142,6 @@ describe('agent preview proxy route', () => {
     );
 
     expect(response.status).toBe(404);
-    expect(response.headers.get('content-security-policy')).toBe('sandbox allow-scripts allow-forms');
+    expect(response.headers.get('content-security-policy')).toBe("sandbox allow-scripts allow-forms; frame-ancestors 'self'");
   });
 });
