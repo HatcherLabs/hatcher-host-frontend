@@ -110,9 +110,13 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     <ToastContext.Provider value={{ toast }}>
       {children}
 
-      {/* Toast container -- fixed top-center */}
+      {/* Toast container -- fixed top-center. z-[10010]: toasts are
+          transient feedback and must stay visible over every app surface,
+          including the agent desktop overlay (z-[10000] in DesktopShell,
+          whose Files/Settings apps fire toasts) and the cookie banner /
+          GuidedTour (z-[9999]). */}
       <div
-        className="pointer-events-none fixed top-20 left-1/2 z-50 flex w-[calc(100vw-1rem)] max-w-md -translate-x-1/2 flex-col items-center gap-3 sm:px-4"
+        className="pointer-events-none fixed top-20 left-1/2 z-[10010] flex w-[calc(100vw-1rem)] max-w-md -translate-x-1/2 flex-col items-center gap-3 sm:px-4"
         role="status"
         aria-live="polite"
         aria-label="Notifications"
