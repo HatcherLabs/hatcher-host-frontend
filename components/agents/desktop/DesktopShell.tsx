@@ -15,6 +15,7 @@ import { FilesApp } from './apps/FilesApp';
 import { EditorApp } from './apps/EditorApp';
 import { TerminalApp } from './apps/TerminalApp';
 import { PreviewApp } from './apps/PreviewApp';
+import styles from './win95.module.css';
 
 /** Window layer — one <Window> per open window, content from the registry. */
 function DesktopWindows() {
@@ -106,43 +107,43 @@ export function DesktopShell({ agentId }: { agentId: string }) {
   }, [agent, t]);
 
   return (
-    <div
-      className="relative h-[calc(100dvh-var(--app-nav-height,64px))] overflow-hidden bg-[var(--bg-base)]"
-      style={{
-        backgroundImage:
-          'radial-gradient(1100px 540px at 78% -10%, var(--tech-accent-soft), transparent), radial-gradient(900px 480px at -10% 110%, var(--bg-hover), transparent)',
-      }}
-    >
+    <div className={`relative h-[calc(100dvh-var(--app-nav-height,64px))] overflow-hidden ${styles.root}`}>
       {/* Small screens: the desktop needs room — link back instead */}
-      <div className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center md:hidden">
-        <MonitorX size={32} className="text-[var(--text-muted)]" aria-hidden />
-        <div>
-          <h1 className="text-base font-bold text-[var(--text-primary)]">{t('smallScreen.title')}</h1>
-          <p className="mt-1 max-w-xs text-sm text-[var(--text-muted)]">{t('smallScreen.description')}</p>
+      <div className="flex h-full flex-col items-center justify-center p-6 md:hidden">
+        <div className={styles.dialog}>
+          <h1 className={styles.dialogTitle}>
+            <MonitorX size={14} aria-hidden />
+            {t('smallScreen.title')}
+          </h1>
+          <div className={styles.dialogBody}>
+            <p className={styles.dialogText}>{t('smallScreen.description')}</p>
+            <Link href={`/dashboard/agent/${agentId}`} className={styles.btn}>
+              <ArrowLeft size={12} aria-hidden /> {t('smallScreen.back')}
+            </Link>
+          </div>
         </div>
-        <Link
-          href={`/dashboard/agent/${agentId}`}
-          className="inline-flex items-center gap-2 rounded-lg border border-[var(--border-default)] px-4 py-2 text-sm font-semibold text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--accent)]"
-        >
-          <ArrowLeft size={14} aria-hidden /> {t('smallScreen.back')}
-        </Link>
       </div>
 
       {/* Full desktop */}
       <div className="hidden h-full md:flex md:flex-col">
         {loadError !== null ? (
-          <div className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center">
-            <p className="text-sm text-[var(--color-destructive)]">{loadError || t('loadFailed')}</p>
-            <Link
-              href={`/dashboard/agent/${agentId}`}
-              className="inline-flex items-center gap-2 rounded-lg border border-[var(--border-default)] px-4 py-2 text-sm font-semibold text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--accent)]"
-            >
-              <ArrowLeft size={14} aria-hidden /> {t('smallScreen.back')}
-            </Link>
+          <div className="flex h-full flex-col items-center justify-center p-6">
+            <div className={styles.dialog}>
+              <div className={styles.dialogBody}>
+                <p className={styles.dialogText}>{loadError || t('loadFailed')}</p>
+                <Link href={`/dashboard/agent/${agentId}`} className={styles.btn}>
+                  <ArrowLeft size={12} aria-hidden /> {t('smallScreen.back')}
+                </Link>
+              </div>
+            </div>
           </div>
         ) : !agent ? (
           <div className="flex h-full items-center justify-center">
-            <Loader2 className="h-6 w-6 animate-spin text-[var(--accent)]" />
+            <div className={styles.dialog}>
+              <div className={styles.dialogBody}>
+                <Loader2 className="h-6 w-6 animate-spin" aria-hidden />
+              </div>
+            </div>
           </div>
         ) : (
           <WindowManagerProvider agentId={agentId} apps={apps} getSurfaceSize={getSurfaceSize}>

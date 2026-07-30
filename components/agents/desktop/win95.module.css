@@ -1,0 +1,331 @@
+/*
+ * Windows 95 chrome for the agent desktop route.
+ *
+ * Scope: CSS Module — every class is hashed and only applied by the desktop
+ * components (DesktopShell, Window, Taskbar, DesktopIcons), so nothing can
+ * leak into other pages. The look is deliberately FIXED: it does not follow
+ * the platform light/dark theme.
+ *
+ * The signature bevel recipe lives ONCE in the custom properties on `.root`:
+ * raised = 2px #fff top/left + #808080 bottom/right with a 1px #404040 outer
+ * edge bottom/right; sunken = the inverse. Everything chrome composes
+ * `.raised` / `.sunken` (or reuses the variables for pressed states).
+ */
+
+.root {
+  --w95-face: #c0c0c0;
+  --w95-highlight: #ffffff;
+  --w95-shadow: #808080;
+  --w95-dark: #404040;
+  --w95-navy: #000080;
+  --w95-teal: #008080;
+  --w95-titlebar-gradient: linear-gradient(90deg, #000080, #1084d0);
+  --w95-bevel-raised:
+    inset -1px -1px 0 var(--w95-dark),
+    inset 1px 1px 0 var(--w95-highlight),
+    inset -2px -2px 0 var(--w95-shadow),
+    inset 2px 2px 0 var(--w95-highlight);
+  --w95-bevel-sunken:
+    inset -1px -1px 0 var(--w95-highlight),
+    inset 1px 1px 0 var(--w95-dark),
+    inset -2px -2px 0 var(--w95-highlight),
+    inset 2px 2px 0 var(--w95-shadow);
+  /* 1px variant for small wells (taskbar clock). */
+  --w95-bevel-sunken-thin:
+    inset -1px -1px 0 var(--w95-highlight),
+    inset 1px 1px 0 var(--w95-shadow);
+
+  background: var(--w95-teal);
+  color: #000;
+  font-family: Tahoma, 'MS Sans Serif', 'Segoe UI', sans-serif;
+}
+
+/* ---- Bevel utilities (the one place the recipe is applied) ---- */
+
+.raised {
+  box-shadow: var(--w95-bevel-raised);
+}
+
+.sunken {
+  box-shadow: var(--w95-bevel-sunken);
+}
+
+/* ---- Shared push button: raised silver, inverts while pressed ---- */
+
+.btn {
+  composes: raised;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  background: var(--w95-face);
+  color: #000;
+  font-size: 11px;
+  font-weight: 400;
+  border-radius: 0;
+}
+
+/* Pressed: bevel inverts and the content drops 1px (padding, not transform,
+   so bare text nodes shift too and the button width stays put). */
+.btn:active {
+  box-shadow: var(--w95-bevel-sunken);
+  padding-top: 2px;
+}
+
+.btn:focus-visible {
+  outline: 1px dotted #000;
+  outline-offset: -5px;
+}
+
+/* ---- Window ---- */
+
+.window {
+  composes: raised;
+  background: var(--w95-face);
+  padding: 3px;
+  color: #000;
+}
+
+.titlebar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  height: 26px;
+  margin-bottom: 2px;
+  padding: 0 3px 0 5px;
+  background: var(--w95-titlebar-gradient);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.titlebarInactive {
+  background: var(--w95-shadow);
+}
+
+.titleBtns {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  flex-shrink: 0;
+}
+
+.titleBtn {
+  composes: raised;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 18px;
+  padding: 0;
+  background: var(--w95-face);
+  color: #000;
+  border-radius: 0;
+}
+
+/* Win95's minimize glyph sits on the baseline, not centered. */
+.titleBtnMin {
+  align-items: flex-end;
+  padding-bottom: 3px;
+}
+
+.titleBtnClose {
+  margin-left: 2px;
+}
+
+.titleBtn:active {
+  box-shadow: var(--w95-bevel-sunken);
+}
+
+.titleBtn:active > svg {
+  transform: translate(1px, 1px);
+}
+
+.titleBtn:focus-visible {
+  outline: 1px dotted #000;
+  outline-offset: -4px;
+}
+
+/* App content sits in a sunken, white-backed panel; the content itself keeps
+   the platform styling (including the regular app font). */
+.windowBody {
+  composes: sunken;
+  background: #fff;
+  padding: 2px;
+  font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
+}
+
+/* ---- Taskbar ---- */
+
+.taskbar {
+  height: 40px;
+  padding: 3px 4px;
+  background: var(--w95-face);
+  border-top: 1px solid var(--w95-highlight);
+  color: #000;
+  font-size: 11px;
+}
+
+.chip {
+  composes: raised;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 8px 0 4px;
+  background: var(--w95-face);
+  font-weight: 700;
+}
+
+.chipAvatar {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.chipAvatarFallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: #000;
+}
+
+.divider {
+  width: 2px;
+  height: 26px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--w95-shadow);
+  border-right: 1px solid var(--w95-highlight);
+}
+
+.taskBtn {
+  composes: btn;
+  justify-content: flex-start;
+  max-width: 12rem;
+  padding: 0 8px;
+}
+
+/* Focused window: sunken button with the classic white-on-silver dither. */
+.taskBtnActive {
+  box-shadow: var(--w95-bevel-sunken);
+  font-weight: 700;
+  background-image: conic-gradient(
+    var(--w95-highlight) 25%,
+    transparent 0 50%,
+    var(--w95-highlight) 0 75%,
+    transparent 0
+  );
+  background-size: 2px 2px;
+}
+
+.clock {
+  display: inline-flex;
+  align-items: center;
+  box-shadow: var(--w95-bevel-sunken-thin);
+  height: 28px;
+  min-width: 64px;
+  justify-content: center;
+  padding: 0 10px;
+  color: #000;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Desktop icons ---- */
+
+.iconBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: 84px;
+  padding: 6px 4px;
+  color: #fff;
+  border-radius: 0;
+}
+
+.iconBtn:focus-visible {
+  outline: none;
+}
+
+.iconGlyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: #fff;
+  filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.55));
+}
+
+/* The registry icons are 16px (right for titlebars and the taskbar);
+   desktop-sized icons scale the same svg up. */
+.iconGlyph > svg {
+  width: 32px;
+  height: 32px;
+}
+
+.iconLabel {
+  max-width: 100%;
+  padding: 1px 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+  font-size: 11px;
+  color: #fff;
+  text-shadow: 1px 1px 0 #000;
+}
+
+/* Classic selected-icon look: navy behind the label, dotted focus rect. */
+.iconBtn:focus-visible .iconLabel {
+  background: var(--w95-navy);
+  text-shadow: none;
+  outline: 1px dotted #fff;
+  outline-offset: -1px;
+}
+
+/* ---- Small-screen notice / loading / error panels ---- */
+
+.dialog {
+  composes: raised;
+  width: min(20rem, 100%);
+  padding: 3px;
+  background: var(--w95-face);
+  color: #000;
+  text-align: center;
+}
+
+.dialogTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  background: var(--w95-titlebar-gradient);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.dialogBody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 12px;
+  font-size: 11px;
+}
+
+.dialogText {
+  margin: 0;
+  max-width: 100%;
+  color: #000;
+}

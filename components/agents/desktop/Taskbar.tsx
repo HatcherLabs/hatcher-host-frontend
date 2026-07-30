@@ -7,6 +7,7 @@ import { Link } from '@/i18n/routing';
 import { Bot, LogOut } from 'lucide-react';
 import type { Agent } from '@/lib/api';
 import { useWindowManager } from './WindowManager';
+import styles from './win95.module.css';
 
 function Clock() {
   const locale = useLocale();
@@ -19,7 +20,7 @@ function Clock() {
   }, []);
 
   return (
-    <span className="text-xs font-mono tabular-nums text-[var(--text-secondary)]" suppressHydrationWarning>
+    <span className={styles.clock} suppressHydrationWarning>
       {now ? now.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' }) : ''}
     </span>
   );
@@ -44,30 +45,30 @@ export function Taskbar({ agent }: { agent: Agent }) {
   };
 
   return (
-    <div className="flex h-12 flex-shrink-0 items-center gap-3 border-t border-[var(--border-default)] bg-[var(--bg-card)] px-3">
+    <div className={`flex flex-shrink-0 items-center gap-1.5 ${styles.taskbar}`}>
       {/* Agent identity */}
-      <div className="flex min-w-0 flex-shrink-0 items-center gap-2">
+      <div className={`min-w-0 flex-shrink-0 ${styles.chip}`}>
         {agent.avatarUrl ? (
           <Image
             src={agent.avatarUrl}
             alt=""
-            width={28}
-            height={28}
+            width={20}
+            height={20}
             unoptimized
-            className="h-7 w-7 flex-shrink-0 rounded-lg border border-[var(--border-default)] object-cover"
+            className={styles.chipAvatar}
           />
         ) : (
-          <span className="inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--accent)]" aria-hidden>
+          <span className={styles.chipAvatarFallback} aria-hidden>
             <Bot size={15} />
           </span>
         )}
-        <span className="max-w-40 truncate text-xs font-semibold text-[var(--text-primary)]">{agent.name}</span>
+        <span className="max-w-40 truncate">{agent.name}</span>
       </div>
 
-      <div className="h-6 w-px flex-shrink-0 bg-[var(--border-default)]" aria-hidden />
+      <div className={styles.divider} aria-hidden />
 
       {/* Open windows */}
-      <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto">
+      <div className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto">
         {windows.map((win) => {
           const isTop = !win.minimized && win.z === topVisibleZ;
           return (
@@ -75,29 +76,20 @@ export function Taskbar({ agent }: { agent: Agent }) {
               key={win.id}
               type="button"
               onClick={() => handleWindowButton(win.id)}
-              className={`inline-flex h-8 max-w-48 flex-shrink-0 items-center gap-1.5 rounded-lg border px-2.5 text-xs transition-colors ${
-                isTop
-                  ? 'border-[var(--border-hover)] bg-[var(--tech-accent-soft)] text-[var(--text-primary)]'
-                  : win.minimized
-                    ? 'border-[var(--border-default)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-                    : 'border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-              }`}
+              className={`flex-shrink-0 ${styles.taskBtn} ${isTop ? styles.taskBtnActive : ''}`}
               title={win.title}
             >
-              <span className="flex-shrink-0 text-[var(--accent)]" aria-hidden>{apps[win.app]?.icon}</span>
-              <span className="min-w-0 truncate font-medium">{win.title}</span>
+              <span className="flex-shrink-0" aria-hidden>{apps[win.app]?.icon}</span>
+              <span className="min-w-0 truncate">{win.title}</span>
             </button>
           );
         })}
       </div>
 
       {/* Clock + exit */}
-      <div className="flex flex-shrink-0 items-center gap-3">
+      <div className="flex flex-shrink-0 items-center gap-1.5">
         <Clock />
-        <Link
-          href={`/dashboard/agent/${agent.id}`}
-          className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[var(--border-default)] px-2.5 text-xs font-semibold text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--accent)]"
-        >
+        <Link href={`/dashboard/agent/${agent.id}`} className={styles.btn}>
           <LogOut size={12} aria-hidden />
           {t('exit')}
         </Link>
