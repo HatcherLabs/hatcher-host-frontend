@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Copy, Minus, Square, X } from 'lucide-react';
 import { useWindowManager } from './WindowManager';
 import type { WindowState } from './windowManagerReducer';
+import styles from './win95.module.css';
 
 const MIN_WINDOW_WIDTH = 320;
 const MIN_WINDOW_HEIGHT = 240;
@@ -22,7 +23,13 @@ export interface WindowProps {
  */
 export function Window({ window: win, icon, children }: WindowProps) {
   const t = useTranslations('desktop.window');
-  const { focusWindow, minimizeWindow, toggleMaximize, closeWindow, moveResizeWindow } = useWindowManager();
+  const { windows, focusWindow, minimizeWindow, toggleMaximize, closeWindow, moveResizeWindow } = useWindowManager();
+
+  // Purely visual: the topmost visible window gets the active (navy gradient)
+  // titlebar, everything else the inactive gray one — same derivation the
+  // taskbar already uses for its pressed button.
+  const topVisibleZ = windows.reduce((max, w) => (!w.minimized && w.z > max ? w.z : max), 0);
+  const isActive = !win.minimized && win.z === topVisibleZ;
 
   return (
     <Rnd
@@ -43,54 +50,54 @@ export function Window({ window: win, icon, children }: WindowProps) {
       })}
       onMouseDown={() => focusWindow(win.id)}
       style={{ zIndex: win.z, display: win.minimized ? 'none' : undefined }}
-      className={`flex flex-col overflow-hidden border border-[var(--border-default)] bg-[var(--bg-elevated)] shadow-[var(--shadow-card)] ${win.maximized ? '' : 'rounded-xl'}`}
+      className={`flex flex-col overflow-hidden ${styles.window}`}
     >
       {/* Titlebar (drag handle) */}
       <div
-        className="desktop-window-titlebar flex h-9 flex-shrink-0 cursor-default select-none items-center gap-2 border-b border-[var(--border-default)] bg-[var(--bg-card)] px-3"
+        className={`desktop-window-titlebar cursor-default select-none ${styles.titlebar} ${isActive ? '' : styles.titlebarInactive}`}
         onDoubleClick={() => toggleMaximize(win.id)}
       >
-        <span className="flex-shrink-0 text-[var(--accent)]" aria-hidden>{icon}</span>
-        <span className="min-w-0 flex-1 truncate text-xs font-semibold text-[var(--text-primary)]">
+        <span className="flex-shrink-0" aria-hidden>{icon}</span>
+        <span className="min-w-0 flex-1 truncate">
           {win.title}
         </span>
         <div
-          className="flex flex-shrink-0 items-center gap-1"
+          className={styles.titleBtns}
           onMouseDown={(e) => e.stopPropagation()}
           onDoubleClick={(e) => e.stopPropagation()}
         >
           <button
             type="button"
             onClick={() => minimizeWindow(win.id)}
-            className="inline-flex h-6 w-6 items-center justify-center rounded-md text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"
+            className={`${styles.titleBtn} ${styles.titleBtnMin}`}
             title={t('minimize')}
             aria-label={t('minimize')}
           >
-            <Minus size={12} />
+            <Minus size={10} />
           </button>
           <button
             type="button"
             onClick={() => { toggleMaximize(win.id); focusWindow(win.id); }}
-            className="inline-flex h-6 w-6 items-center justify-center rounded-md text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"
+            className={styles.titleBtn}
             title={win.maximized ? t('restore') : t('maximize')}
             aria-label={win.maximized ? t('restore') : t('maximize')}
           >
-            {win.maximized ? <Copy size={11} /> : <Square size={11} />}
+            {win.maximized ? <Copy size={9} /> : <Square size={9} />}
           </button>
           <button
             type="button"
             onClick={() => closeWindow(win.id)}
-            className="inline-flex h-6 w-6 items-center justify-center rounded-md text-[var(--text-muted)] transition-colors hover:bg-[var(--color-destructive-bg)] hover:text-[var(--color-destructive)]"
+            className={`${styles.titleBtn} ${styles.titleBtnClose}`}
             title={t('close')}
             aria-label={t('close')}
           >
-            <X size={13} />
+            <X size={11} />
           </button>
         </div>
       </div>
 
       {/* App content */}
-      <div className="min-h-0 flex-1 overflow-hidden">
+      <div className={`min-h-0 flex-1 overflow-hidden ${styles.windowBody}`}>
         {children}
       </div>
     </Rnd>

@@ -128,6 +128,7 @@ export function PreviewApp({ agent }: PreviewAppProps) {
             src={src}
             title={t('iframeTitle')}
             sandbox="allow-scripts allow-forms"
+            referrerPolicy="no-referrer"
             onLoad={handleIframeLoad}
             className="h-full w-full border-0 bg-white"
           />

@@ -2,6 +2,7 @@
 
 import { useWindowManager, type DesktopAppRegistry } from './WindowManager';
 import type { DesktopAppId } from './windowManagerReducer';
+import styles from './win95.module.css';
 
 /**
  * Desktop icon grid. Click (or Enter on a focused icon) opens the app.
@@ -23,13 +24,13 @@ export function DesktopIcons() {
               openWindow(appId);
             }
           }}
-          className="flex w-20 flex-col items-center gap-1.5 rounded-xl border border-transparent p-2.5 text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-hover)] focus-visible:border-[var(--border-hover)] focus-visible:bg-[var(--bg-hover)] focus-visible:outline-none"
+          className={styles.iconBtn}
           title={def.title()}
         >
-          <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] text-[var(--accent)] shadow-[var(--shadow-soft)]" aria-hidden>
+          <span className={styles.iconGlyph} aria-hidden>
             {def.icon}
           </span>
-          <span className="w-full truncate text-center text-[11px] font-medium text-[var(--text-primary)]">
+          <span className={styles.iconLabel}>
             {def.title()}
           </span>
         </button>
