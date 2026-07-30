@@ -3307,28 +3307,21 @@
       "retry": "Retry"
     },
     "browser": {
-      "addressLabel": "Address",
-      "addressPlaceholder": "hatcher.host/docs",
+      "addressLabel": "Search or address",
+      "addressPlaceholder": "Search or type a web address",
       "go": "Go",
       "reload": "Reload",
       "openInNewTab": "Open in new tab",
-      "invalidUrl": "Enter a valid web address (http or https).",
+      "home": "Start page",
+      "searchNote": "Search opened in a new tab — search engines refuse to load embedded.",
       "embedHint": "Some sites refuse to load embedded — use Open in new tab.",
       "iframeTitle": "Embedded web page",
-      "emptyState": "Enter an address to start browsing."
+      "startTitle": "Start browsing",
+      "openPreview": "Open app preview"
     },
     "settings": {
-      "framework": "Framework",
-      "model": "Model",
-      "notSet": "Not set",
-      "name": "Name",
-      "description": "Description",
-      "nameLength": "The name must be 3-50 characters.",
-      "save": "Save",
-      "saving": "Saving…",
-      "saved": "Settings saved.",
-      "saveFailed": "Failed to save the settings.",
-      "openFullSettings": "Open full settings"
+      "iframeTitle": "Agent settings",
+      "openFullPage": "Open in full page"
     }
   }
 }

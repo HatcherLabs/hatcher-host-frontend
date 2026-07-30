@@ -5,10 +5,16 @@ import { Nav } from '@/components/marketing/v3/Nav';
 import { Footer as FooterV3 } from '@/components/marketing/v3/Footer';
 import { ScrollToTop } from '@/components/ui/ScrollToTop';
 import { isImmersiveChromePath } from './routeChrome';
+import { useIsFramed } from './useIsFramed';
 
 export function LayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const immersive = isImmersiveChromePath(pathname);
+  // Framed same-origin (e.g. the agent desktop's Settings window iframing
+  // the dashboard): hide the site nav/footer but KEEP the wrapper tree —
+  // children must not reparent when the flag flips after hydration, or the
+  // page would remount and refetch.
+  const framed = useIsFramed();
 
   if (immersive) {
     // No skip-link, no header, no footer — the page owns the screen.
@@ -25,7 +31,7 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
       >
         Skip to content
       </a>
-      <Nav />
+      {!framed && <Nav />}
       <main
         id="main-content"
         role="main"
@@ -34,8 +40,8 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
       >
         {children}
       </main>
-      <FooterV3 />
-      <ScrollToTop />
+      {!framed && <FooterV3 />}
+      {!framed && <ScrollToTop />}
     </div>
   );
 }

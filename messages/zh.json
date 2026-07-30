@@ -3146,28 +3146,21 @@
       "retry": "重试"
     },
     "browser": {
-      "addressLabel": "地址",
-      "addressPlaceholder": "hatcher.host/docs",
+      "addressLabel": "搜索或地址",
+      "addressPlaceholder": "搜索或输入网址",
       "go": "转到",
       "reload": "重新加载",
       "openInNewTab": "在新标签页中打开",
-      "invalidUrl": "请输入有效的网址（http 或 https）。",
+      "home": "起始页",
+      "searchNote": "搜索已在新标签页中打开——搜索引擎拒绝以内嵌方式加载。",
       "embedHint": "部分网站拒绝以内嵌方式加载——请使用“在新标签页中打开”。",
       "iframeTitle": "内嵌网页",
-      "emptyState": "输入网址开始浏览。"
+      "startTitle": "开始浏览",
+      "openPreview": "打开应用预览"
     },
     "settings": {
-      "framework": "框架",
-      "model": "模型",
-      "notSet": "未设置",
-      "name": "名称",
-      "description": "描述",
-      "nameLength": "名称必须为 3 到 50 个字符。",
-      "save": "保存",
-      "saving": "保存中…",
-      "saved": "设置已保存。",
-      "saveFailed": "无法保存设置。",
-      "openFullSettings": "打开完整设置"
+      "iframeTitle": "智能体设置",
+      "openFullPage": "在完整页面中打开"
     }
   }
 }

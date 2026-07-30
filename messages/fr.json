@@ -3146,28 +3146,21 @@
       "retry": "Réessayer"
     },
     "browser": {
-      "addressLabel": "Adresse",
-      "addressPlaceholder": "hatcher.host/docs",
+      "addressLabel": "Recherche ou adresse",
+      "addressPlaceholder": "Recherchez ou saisissez une adresse web",
       "go": "Aller",
       "reload": "Recharger",
       "openInNewTab": "Ouvrir dans un nouvel onglet",
-      "invalidUrl": "Saisissez une adresse web valide (http ou https).",
+      "home": "Page de démarrage",
+      "searchNote": "La recherche s'est ouverte dans un nouvel onglet — les moteurs de recherche refusent de se charger intégrés.",
       "embedHint": "Certains sites refusent de se charger intégrés — utilisez « Ouvrir dans un nouvel onglet ».",
       "iframeTitle": "Page web intégrée",
-      "emptyState": "Saisissez une adresse pour commencer à naviguer."
+      "startTitle": "Commencer à naviguer",
+      "openPreview": "Ouvrir l'aperçu de l'app"
     },
     "settings": {
-      "framework": "Framework",
-      "model": "Modèle",
-      "notSet": "Non défini",
-      "name": "Nom",
-      "description": "Description",
-      "nameLength": "Le nom doit comporter entre 3 et 50 caractères.",
-      "save": "Enregistrer",
-      "saving": "Enregistrement…",
-      "saved": "Paramètres enregistrés.",
-      "saveFailed": "Impossible d’enregistrer les paramètres.",
-      "openFullSettings": "Ouvrir tous les paramètres"
+      "iframeTitle": "Paramètres de l'agent",
+      "openFullPage": "Ouvrir en pleine page"
     }
   }
 }

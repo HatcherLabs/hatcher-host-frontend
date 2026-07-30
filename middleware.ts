@@ -244,7 +244,14 @@ function withSecurityHeaders(
   response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
 
   if (!isEmbedRoute) {
-    response.headers.set('X-Frame-Options', 'DENY');
+    // Framing policy (owner-approved, 2026-07-30): SAMEORIGIN, not DENY —
+    // only hatcher.host pages may frame hatcher.host pages; external framing
+    // stays fully blocked. This unblocks the agent desktop's same-origin
+    // windows (Settings iframe, Browser navigating our own site, Preview).
+    // CSP's `frame-ancestors 'self'` (lib/csp.ts) is the modern equivalent;
+    // X-Frame-Options covers legacy user agents. /embed/* keeps its
+    // deliberate frame-ancestors * / no-XFO exception.
+    response.headers.set('X-Frame-Options', 'SAMEORIGIN');
     response.headers.set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
     response.headers.set('Cross-Origin-Resource-Policy', 'same-origin');
     response.headers.set('X-Permitted-Cross-Domain-Policies', 'none');

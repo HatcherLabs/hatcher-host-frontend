@@ -3306,28 +3306,21 @@
       "retry": "Reîncearcă"
     },
     "browser": {
-      "addressLabel": "Adresă",
-      "addressPlaceholder": "hatcher.host/docs",
+      "addressLabel": "Căutare sau adresă",
+      "addressPlaceholder": "Caută sau introdu o adresă web",
       "go": "Accesează",
       "reload": "Reîncarcă",
       "openInNewTab": "Deschide într-o filă nouă",
-      "invalidUrl": "Introdu o adresă web validă (http sau https).",
+      "home": "Pagina de start",
+      "searchNote": "Căutarea s-a deschis într-o filă nouă — motoarele de căutare refuză să se încarce încorporate.",
       "embedHint": "Unele site-uri refuză să se încarce încorporate — folosește \"Deschide într-o filă nouă\".",
       "iframeTitle": "Pagină web încorporată",
-      "emptyState": "Introdu o adresă pentru a începe navigarea."
+      "startTitle": "Începe navigarea",
+      "openPreview": "Deschide previzualizarea aplicației"
     },
     "settings": {
-      "framework": "Framework",
-      "model": "Model",
-      "notSet": "Nesetat",
-      "name": "Nume",
-      "description": "Descriere",
-      "nameLength": "Numele trebuie să aibă între 3 și 50 de caractere.",
-      "save": "Salvează",
-      "saving": "Se salvează…",
-      "saved": "Setări salvate.",
-      "saveFailed": "Setările nu au putut fi salvate.",
-      "openFullSettings": "Deschide toate setările"
+      "iframeTitle": "Setările agentului",
+      "openFullPage": "Deschide ca pagină completă"
     }
   }
 }

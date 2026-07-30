@@ -10,6 +10,7 @@ import {
   isDashboardWorkspaceRouteActive,
   type DashboardWorkspaceKey,
 } from '@/lib/dashboard-overview';
+import { useIsFramed } from '@/components/layout/useIsFramed';
 import styles from './DashboardWorkspaceNavigation.module.css';
 
 const ICONS = {
@@ -24,10 +25,14 @@ export function DashboardWorkspaceNavigation() {
   const searchParams = useSearchParams();
   const tNav = useTranslations('nav');
   const tOutcome = useTranslations('outcomePacks');
+  // Framed same-origin (the agent desktop's Settings window iframes the
+  // dashboard page): the workspace tab row is site chrome — hide it and let
+  // the framed page show content only.
+  const framed = useIsFramed();
   const activeRoute = DASHBOARD_WORKSPACE_ROUTES.find((route) =>
     isDashboardWorkspaceRouteActive(pathname, route.key));
 
-  if (!activeRoute) return null;
+  if (!activeRoute || framed) return null;
 
   const labels: Record<DashboardWorkspaceKey, string> = {
     agents: tNav('myAgents'),
