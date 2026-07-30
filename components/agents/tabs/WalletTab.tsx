@@ -482,8 +482,8 @@ export function WalletTab() {
                 <div className="h-3 w-64 rounded-full shimmer" />
               </div>
             </div>
-            <div className="grid gap-3 md:grid-cols-3">
-              {[0, 1, 2].map((item) => (
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              {[0, 1, 2, 3].map((item) => (
                 <div key={item} className="h-28 rounded-xl shimmer" />
               ))}
             </div>
@@ -717,7 +717,7 @@ function PassportPanel({
           </div>
         </div>
 
-        <div className="mt-4 grid gap-3 md:grid-cols-3">
+        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           {networks.map((network) => (
             <button
               key={network.id}
@@ -803,7 +803,7 @@ function NetworkSelector({
 }) {
   return (
     <WalletSurface className="p-2">
-      <div className="grid gap-2 md:grid-cols-3">
+      <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4">
         {networks.map((network) => {
           const isActive = activePanel === network.id;
           return (
