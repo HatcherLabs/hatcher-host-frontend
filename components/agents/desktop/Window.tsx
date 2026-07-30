@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Copy, Minus, Square, X } from 'lucide-react';
 import { useWindowManager } from './WindowManager';
 import type { WindowState } from './windowManagerReducer';
-import styles from './win95.module.css';
+import styles from './desktopTheme.module.css';
 
 const MIN_WINDOW_WIDTH = 320;
 const MIN_WINDOW_HEIGHT = 240;
@@ -25,9 +25,9 @@ export function Window({ window: win, icon, children }: WindowProps) {
   const t = useTranslations('desktop.window');
   const { windows, focusWindow, minimizeWindow, toggleMaximize, closeWindow, moveResizeWindow } = useWindowManager();
 
-  // Purely visual: the topmost visible window gets the active (navy gradient)
-  // titlebar, everything else the inactive gray one — same derivation the
-  // taskbar already uses for its pressed button.
+  // Purely visual: the topmost visible window reads as focused (deeper
+  // shadow, accent-tinted edge, full-contrast title), everything else sits
+  // flatter — same derivation the taskbar already uses for its active pill.
   const topVisibleZ = windows.reduce((max, w) => (!w.minimized && w.z > max ? w.z : max), 0);
   const isActive = !win.minimized && win.z === topVisibleZ;
 
@@ -50,7 +50,7 @@ export function Window({ window: win, icon, children }: WindowProps) {
       })}
       onMouseDown={() => focusWindow(win.id)}
       style={{ zIndex: win.z, display: win.minimized ? 'none' : undefined }}
-      className={`flex flex-col overflow-hidden ${styles.window}`}
+      className={`flex flex-col overflow-hidden ${styles.window} ${isActive ? styles.windowFocused : ''}`}
     >
       {/* Titlebar (drag handle) */}
       <div
@@ -69,7 +69,7 @@ export function Window({ window: win, icon, children }: WindowProps) {
           <button
             type="button"
             onClick={() => minimizeWindow(win.id)}
-            className={`${styles.titleBtn} ${styles.titleBtnMin}`}
+            className={styles.titleBtn}
             title={t('minimize')}
             aria-label={t('minimize')}
           >

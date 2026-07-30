@@ -7,7 +7,7 @@ import { Link } from '@/i18n/routing';
 import { Bot, LogOut } from 'lucide-react';
 import type { Agent } from '@/lib/api';
 import { useWindowManager } from './WindowManager';
-import styles from './win95.module.css';
+import styles from './desktopTheme.module.css';
 
 function Clock() {
   const locale = useLocale();
