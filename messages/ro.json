@@ -3246,5 +3246,52 @@
     "next": "Înainte",
     "done": "Gata",
     "skip": "Sari peste tur"
+  },
+  "desktop": {
+    "enterDesktop": "Desktop",
+    "loadFailed": "Agentul nu a putut fi încărcat.",
+    "smallScreen": {
+      "title": "Desktopul are nevoie de mai mult spațiu",
+      "description": "Desktopul agentului funcționează cel mai bine pe un ecran mai mare. Deschide-l pe un display mai mare sau întoarce-te la panoul agentului.",
+      "back": "Înapoi la agent"
+    },
+    "apps": {
+      "files": "Fișiere",
+      "editor": "Editor",
+      "terminal": "Terminal"
+    },
+    "window": {
+      "minimize": "Minimizează",
+      "maximize": "Maximizează",
+      "restore": "Restaurează",
+      "close": "Închide"
+    },
+    "taskbar": {
+      "exit": "Ieși din desktop"
+    },
+    "files": {
+      "newFolder": "Folder nou",
+      "newFolderPrompt": "Numele folderului",
+      "newFolderFailed": "Folderul nu a putut fi creat.",
+      "folderCreated": "Folderul „{name}” a fost creat.",
+      "openInEditor": "Deschide în editor",
+      "makePrivate": "Fă privat",
+      "makePrivateConfirm": "Muți „{name}” într-un folder privat? Fișierele private rămân în afara previzualizărilor partajate.",
+      "makePrivateFailed": "Nu a putut fi făcut privat.",
+      "madePrivate": "„{name}” este acum privat.",
+      "privateBadge": "Privat",
+      "notEditable": "„{name}” nu pare a fi un fișier text."
+    },
+    "editor": {
+      "empty": "Deschide un fișier din aplicația Fișiere pentru a-l edita aici.",
+      "loadFailed": "Fișierul nu a putut fi încărcat.",
+      "saveFailed": "Fișierul nu a putut fi salvat.",
+      "saved": "Salvat",
+      "retry": "Reîncearcă"
+    },
+    "terminal": {
+      "notActive": "Agentul nu rulează. Pornește-l pentru a folosi terminalul.",
+      "sessionName": "Desktop"
+    }
   }
 }

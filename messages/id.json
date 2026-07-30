@@ -3110,5 +3110,52 @@
     "next": "Berikutnya",
     "done": "Selesai",
     "skip": "Lewati tur"
+  },
+  "desktop": {
+    "enterDesktop": "Desktop",
+    "loadFailed": "Gagal memuat agen.",
+    "smallScreen": {
+      "title": "Desktop butuh ruang lebih",
+      "description": "Desktop agen paling nyaman di layar yang lebih besar. Buka di layar yang lebih lebar, atau kembali ke dasbor agen.",
+      "back": "Kembali ke agen"
+    },
+    "apps": {
+      "files": "Berkas",
+      "editor": "Editor",
+      "terminal": "Terminal"
+    },
+    "window": {
+      "minimize": "Minimalkan",
+      "maximize": "Maksimalkan",
+      "restore": "Pulihkan",
+      "close": "Tutup"
+    },
+    "taskbar": {
+      "exit": "Keluar dari desktop"
+    },
+    "files": {
+      "newFolder": "Folder baru",
+      "newFolderPrompt": "Nama folder",
+      "newFolderFailed": "Gagal membuat folder.",
+      "folderCreated": "Folder \"{name}\" dibuat.",
+      "openInEditor": "Buka di editor",
+      "makePrivate": "Jadikan privat",
+      "makePrivateConfirm": "Pindahkan \"{name}\" ke folder privat? Berkas privat tidak muncul di pratinjau bersama.",
+      "makePrivateFailed": "Gagal menjadikannya privat.",
+      "madePrivate": "\"{name}\" sekarang privat.",
+      "privateBadge": "Privat",
+      "notEditable": "\"{name}\" sepertinya bukan berkas teks."
+    },
+    "editor": {
+      "empty": "Buka berkas dari aplikasi Berkas untuk menyuntingnya di sini.",
+      "loadFailed": "Gagal memuat berkas.",
+      "saveFailed": "Gagal menyimpan berkas.",
+      "saved": "Tersimpan",
+      "retry": "Coba lagi"
+    },
+    "terminal": {
+      "notActive": "Agen tidak berjalan. Jalankan agen untuk menggunakan terminal.",
+      "sessionName": "Desktop"
+    }
   }
 }

@@ -3110,5 +3110,52 @@
     "next": "Tiếp theo",
     "done": "Hoàn tất",
     "skip": "Bỏ qua hướng dẫn"
+  },
+  "desktop": {
+    "enterDesktop": "Màn hình desktop",
+    "loadFailed": "Không thể tải agent.",
+    "smallScreen": {
+      "title": "Desktop cần nhiều không gian hơn",
+      "description": "Desktop của agent hoạt động tốt nhất trên màn hình lớn. Hãy mở trên màn hình lớn hơn hoặc quay lại bảng điều khiển agent.",
+      "back": "Quay lại agent"
+    },
+    "apps": {
+      "files": "Tệp",
+      "editor": "Trình soạn thảo",
+      "terminal": "Terminal"
+    },
+    "window": {
+      "minimize": "Thu nhỏ",
+      "maximize": "Phóng to",
+      "restore": "Khôi phục",
+      "close": "Đóng"
+    },
+    "taskbar": {
+      "exit": "Thoát desktop"
+    },
+    "files": {
+      "newFolder": "Thư mục mới",
+      "newFolderPrompt": "Tên thư mục",
+      "newFolderFailed": "Không thể tạo thư mục.",
+      "folderCreated": "Đã tạo thư mục \"{name}\".",
+      "openInEditor": "Mở trong trình soạn thảo",
+      "makePrivate": "Đặt riêng tư",
+      "makePrivateConfirm": "Chuyển \"{name}\" vào thư mục riêng tư? Tệp riêng tư không xuất hiện trong bản xem trước được chia sẻ.",
+      "makePrivateFailed": "Không thể đặt riêng tư.",
+      "madePrivate": "\"{name}\" hiện đã riêng tư.",
+      "privateBadge": "Riêng tư",
+      "notEditable": "\"{name}\" có vẻ không phải là tệp văn bản."
+    },
+    "editor": {
+      "empty": "Mở một tệp từ ứng dụng Tệp để chỉnh sửa tại đây.",
+      "loadFailed": "Không thể tải tệp.",
+      "saveFailed": "Không thể lưu tệp.",
+      "saved": "Đã lưu",
+      "retry": "Thử lại"
+    },
+    "terminal": {
+      "notActive": "Agent không chạy. Hãy khởi động agent để dùng terminal.",
+      "sessionName": "Desktop"
+    }
   }
 }

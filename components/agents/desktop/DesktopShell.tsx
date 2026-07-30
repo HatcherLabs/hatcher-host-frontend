@@ -1,0 +1,144 @@
+'use client';
+
+import { useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { Link, useRouter } from '@/i18n/routing';
+import { ArrowLeft, FileCode, FolderOpen, Loader2, MonitorX, TerminalSquare } from 'lucide-react';
+import { api } from '@/lib/api';
+import type { Agent } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
+import { WindowManagerProvider, useWindowManager, type DesktopAppRegistry } from './WindowManager';
+import { Window } from './Window';
+import { Taskbar } from './Taskbar';
+import { DesktopIcons } from './DesktopIcons';
+import { FilesApp } from './apps/FilesApp';
+import { EditorApp } from './apps/EditorApp';
+import { TerminalApp } from './apps/TerminalApp';
+
+/** Window layer — one <Window> per open window, content from the registry. */
+function DesktopWindows() {
+  const { windows, apps } = useWindowManager();
+  return (
+    <>
+      {windows.map((win) => {
+        const def = apps[win.app];
+        if (!def) return null;
+        return (
+          <Window key={win.id} window={win} icon={def.icon}>
+            {def.render(win)}
+          </Window>
+        );
+      })}
+    </>
+  );
+}
+
+/**
+ * OS-like agent workspace desktop: icon grid + draggable windows + taskbar.
+ * Desktop-viewport-oriented — small screens get a notice instead.
+ */
+export function DesktopShell({ agentId }: { agentId: string }) {
+  const t = useTranslations('desktop');
+  const router = useRouter();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const [agent, setAgent] = useState<Agent | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (!isAuthenticated) {
+      router.replace(`/login?return=${encodeURIComponent(`/dashboard/agent/${agentId}/desktop`)}`);
+      return;
+    }
+    let cancelled = false;
+    api.getAgent(agentId).then((res) => {
+      if (cancelled) return;
+      if (res.success) {
+        setAgent(res.data);
+      } else {
+        setLoadError(res.error ?? t('loadFailed'));
+      }
+    });
+    return () => { cancelled = true; };
+  }, [agentId, authLoading, isAuthenticated, router, t]);
+
+  const apps = useMemo<DesktopAppRegistry>(() => {
+    if (!agent) return {};
+    return {
+      files: {
+        singleton: true,
+        defaultRect: { x: 140, y: 48, w: 780, h: 560 },
+        icon: <FolderOpen size={16} />,
+        title: () => t('apps.files'),
+        render: () => <FilesApp agent={agent} />,
+      },
+      editor: {
+        singleton: false,
+        defaultRect: { x: 220, y: 90, w: 840, h: 620 },
+        icon: <FileCode size={16} />,
+        title: (props) => props?.path ? props.path.split('/').pop() ?? t('apps.editor') : t('apps.editor'),
+        render: (win) => <EditorApp agent={agent} windowId={win.id} path={win.props?.path} />,
+      },
+      terminal: {
+        singleton: true,
+        defaultRect: { x: 180, y: 130, w: 820, h: 520 },
+        icon: <TerminalSquare size={16} />,
+        title: () => t('apps.terminal'),
+        render: () => <TerminalApp agent={agent} />,
+      },
+      // `preview` (app preview) is registered by the follow-up PR.
+    };
+  }, [agent, t]);
+
+  return (
+    <div
+      className="relative h-[calc(100dvh-var(--app-nav-height,64px))] overflow-hidden bg-[var(--bg-base)]"
+      style={{
+        backgroundImage:
+          'radial-gradient(1100px 540px at 78% -10%, var(--tech-accent-soft), transparent), radial-gradient(900px 480px at -10% 110%, var(--bg-hover), transparent)',
+      }}
+    >
+      {/* Small screens: the desktop needs room — link back instead */}
+      <div className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center lg:hidden">
+        <MonitorX size={32} className="text-[var(--text-muted)]" aria-hidden />
+        <div>
+          <h1 className="text-base font-bold text-[var(--text-primary)]">{t('smallScreen.title')}</h1>
+          <p className="mt-1 max-w-xs text-sm text-[var(--text-muted)]">{t('smallScreen.description')}</p>
+        </div>
+        <Link
+          href={`/dashboard/agent/${agentId}`}
+          className="inline-flex items-center gap-2 rounded-lg border border-[var(--border-default)] px-4 py-2 text-sm font-semibold text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--accent)]"
+        >
+          <ArrowLeft size={14} aria-hidden /> {t('smallScreen.back')}
+        </Link>
+      </div>
+
+      {/* Full desktop */}
+      <div className="hidden h-full lg:flex lg:flex-col">
+        {loadError ? (
+          <div className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center">
+            <p className="text-sm text-[var(--color-destructive)]">{loadError}</p>
+            <Link
+              href={`/dashboard/agent/${agentId}`}
+              className="inline-flex items-center gap-2 rounded-lg border border-[var(--border-default)] px-4 py-2 text-sm font-semibold text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--accent)]"
+            >
+              <ArrowLeft size={14} aria-hidden /> {t('smallScreen.back')}
+            </Link>
+          </div>
+        ) : !agent ? (
+          <div className="flex h-full items-center justify-center">
+            <Loader2 className="h-6 w-6 animate-spin text-[var(--accent)]" />
+          </div>
+        ) : (
+          <WindowManagerProvider agentId={agentId} apps={apps}>
+            <div className="relative min-h-0 flex-1">
+              <DesktopIcons />
+              <DesktopWindows />
+            </div>
+            <Taskbar agent={agent} />
+          </WindowManagerProvider>
+        )}
+      </div>
+    </div>
+  );
+}

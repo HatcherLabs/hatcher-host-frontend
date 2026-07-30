@@ -3110,5 +3110,52 @@
     "next": "İleri",
     "done": "Bitti",
     "skip": "Turu atla"
+  },
+  "desktop": {
+    "enterDesktop": "Masaüstü",
+    "loadFailed": "Ajan yüklenemedi.",
+    "smallScreen": {
+      "title": "Masaüstünün daha fazla alana ihtiyacı var",
+      "description": "Ajan masaüstü büyük ekranlarda en iyi şekilde çalışır. Daha büyük bir ekranda açın veya ajan paneline geri dönün.",
+      "back": "Ajana geri dön"
+    },
+    "apps": {
+      "files": "Dosyalar",
+      "editor": "Düzenleyici",
+      "terminal": "Terminal"
+    },
+    "window": {
+      "minimize": "Küçült",
+      "maximize": "Büyüt",
+      "restore": "Geri yükle",
+      "close": "Kapat"
+    },
+    "taskbar": {
+      "exit": "Masaüstünden çık"
+    },
+    "files": {
+      "newFolder": "Yeni klasör",
+      "newFolderPrompt": "Klasör adı",
+      "newFolderFailed": "Klasör oluşturulamadı.",
+      "folderCreated": "\"{name}\" klasörü oluşturuldu.",
+      "openInEditor": "Düzenleyicide aç",
+      "makePrivate": "Gizli yap",
+      "makePrivateConfirm": "\"{name}\" gizli bir klasöre taşınsın mı? Gizli dosyalar paylaşılan önizlemelerin dışında kalır.",
+      "makePrivateFailed": "Gizli yapılamadı.",
+      "madePrivate": "\"{name}\" artık gizli.",
+      "privateBadge": "Gizli",
+      "notEditable": "\"{name}\" bir metin dosyasına benzemiyor."
+    },
+    "editor": {
+      "empty": "Burada düzenlemek için Dosyalar uygulamasından bir dosya açın.",
+      "loadFailed": "Dosya yüklenemedi.",
+      "saveFailed": "Dosya kaydedilemedi.",
+      "saved": "Kaydedildi",
+      "retry": "Tekrar dene"
+    },
+    "terminal": {
+      "notActive": "Ajan çalışmıyor. Terminali kullanmak için başlatın.",
+      "sessionName": "Masaüstü"
+    }
   }
 }

@@ -3247,5 +3247,52 @@
     "next": "Next",
     "done": "Done",
     "skip": "Skip tour"
+  },
+  "desktop": {
+    "enterDesktop": "Desktop",
+    "loadFailed": "Failed to load the agent.",
+    "smallScreen": {
+      "title": "The desktop needs more room",
+      "description": "The agent desktop works best on a larger screen. Open it on a bigger display, or head back to the agent dashboard.",
+      "back": "Back to agent"
+    },
+    "apps": {
+      "files": "Files",
+      "editor": "Editor",
+      "terminal": "Terminal"
+    },
+    "window": {
+      "minimize": "Minimize",
+      "maximize": "Maximize",
+      "restore": "Restore",
+      "close": "Close"
+    },
+    "taskbar": {
+      "exit": "Exit desktop"
+    },
+    "files": {
+      "newFolder": "New folder",
+      "newFolderPrompt": "Folder name",
+      "newFolderFailed": "Failed to create the folder.",
+      "folderCreated": "Folder \"{name}\" created.",
+      "openInEditor": "Open in editor",
+      "makePrivate": "Make private",
+      "makePrivateConfirm": "Move \"{name}\" into a private folder? Private files stay out of shared previews.",
+      "makePrivateFailed": "Failed to make it private.",
+      "madePrivate": "\"{name}\" is now private.",
+      "privateBadge": "Private",
+      "notEditable": "\"{name}\" does not look like a text file."
+    },
+    "editor": {
+      "empty": "Open a file from the Files app to edit it here.",
+      "loadFailed": "Failed to load the file.",
+      "saveFailed": "Failed to save the file.",
+      "saved": "Saved",
+      "retry": "Retry"
+    },
+    "terminal": {
+      "notActive": "The agent is not running. Start it to use the terminal.",
+      "sessionName": "Desktop"
+    }
   }
 }

@@ -3110,5 +3110,52 @@
     "next": "次へ",
     "done": "完了",
     "skip": "ツアーをスキップ"
+  },
+  "desktop": {
+    "enterDesktop": "デスクトップ",
+    "loadFailed": "エージェントを読み込めませんでした。",
+    "smallScreen": {
+      "title": "デスクトップには広い画面が必要です",
+      "description": "エージェントデスクトップは大きな画面で最適に動作します。より大きなディスプレイで開くか、エージェントダッシュボードに戻ってください。",
+      "back": "エージェントに戻る"
+    },
+    "apps": {
+      "files": "ファイル",
+      "editor": "エディタ",
+      "terminal": "ターミナル"
+    },
+    "window": {
+      "minimize": "最小化",
+      "maximize": "最大化",
+      "restore": "元に戻す",
+      "close": "閉じる"
+    },
+    "taskbar": {
+      "exit": "デスクトップを終了"
+    },
+    "files": {
+      "newFolder": "新しいフォルダ",
+      "newFolderPrompt": "フォルダ名",
+      "newFolderFailed": "フォルダを作成できませんでした。",
+      "folderCreated": "フォルダ「{name}」を作成しました。",
+      "openInEditor": "エディタで開く",
+      "makePrivate": "プライベートにする",
+      "makePrivateConfirm": "「{name}」をプライベートフォルダに移動しますか？プライベートファイルは共有プレビューに表示されません。",
+      "makePrivateFailed": "プライベートにできませんでした。",
+      "madePrivate": "「{name}」はプライベートになりました。",
+      "privateBadge": "プライベート",
+      "notEditable": "「{name}」はテキストファイルではないようです。"
+    },
+    "editor": {
+      "empty": "ここで編集するには、ファイルアプリからファイルを開いてください。",
+      "loadFailed": "ファイルを読み込めませんでした。",
+      "saveFailed": "ファイルを保存できませんでした。",
+      "saved": "保存しました",
+      "retry": "再試行"
+    },
+    "terminal": {
+      "notActive": "エージェントが実行されていません。ターミナルを使うには起動してください。",
+      "sessionName": "デスクトップ"
+    }
   }
 }

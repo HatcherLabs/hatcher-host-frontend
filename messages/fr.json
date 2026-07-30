@@ -3086,5 +3086,52 @@
     "next": "Suivant",
     "done": "Terminé",
     "skip": "Passer la visite"
+  },
+  "desktop": {
+    "enterDesktop": "Bureau",
+    "loadFailed": "Impossible de charger l’agent.",
+    "smallScreen": {
+      "title": "Le bureau a besoin de plus de place",
+      "description": "Le bureau de l’agent fonctionne mieux sur un grand écran. Ouvrez-le sur un écran plus grand ou revenez au tableau de bord de l’agent.",
+      "back": "Retour à l’agent"
+    },
+    "apps": {
+      "files": "Fichiers",
+      "editor": "Éditeur",
+      "terminal": "Terminal"
+    },
+    "window": {
+      "minimize": "Réduire",
+      "maximize": "Agrandir",
+      "restore": "Restaurer",
+      "close": "Fermer"
+    },
+    "taskbar": {
+      "exit": "Quitter le bureau"
+    },
+    "files": {
+      "newFolder": "Nouveau dossier",
+      "newFolderPrompt": "Nom du dossier",
+      "newFolderFailed": "Impossible de créer le dossier.",
+      "folderCreated": "Dossier « {name} » créé.",
+      "openInEditor": "Ouvrir dans l’éditeur",
+      "makePrivate": "Rendre privé",
+      "makePrivateConfirm": "Déplacer « {name} » dans un dossier privé ? Les fichiers privés restent exclus des aperçus partagés.",
+      "makePrivateFailed": "Impossible de le rendre privé.",
+      "madePrivate": "« {name} » est désormais privé.",
+      "privateBadge": "Privé",
+      "notEditable": "« {name} » ne semble pas être un fichier texte."
+    },
+    "editor": {
+      "empty": "Ouvrez un fichier depuis l’app Fichiers pour le modifier ici.",
+      "loadFailed": "Impossible de charger le fichier.",
+      "saveFailed": "Impossible d’enregistrer le fichier.",
+      "saved": "Enregistré",
+      "retry": "Réessayer"
+    },
+    "terminal": {
+      "notActive": "L’agent n’est pas en cours d’exécution. Démarrez-le pour utiliser le terminal.",
+      "sessionName": "Bureau"
+    }
   }
 }
