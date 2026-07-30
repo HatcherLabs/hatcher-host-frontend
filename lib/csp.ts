@@ -24,10 +24,20 @@ function configuredApiConnectSource(): string {
   }
 }
 
+/**
+ * Whether a locale-stripped pathname is the agent desktop page
+ * (`/dashboard/agent/<id>/desktop`). Exact page only — sub-paths and other
+ * dashboard routes keep the strict frame-src allowlist.
+ */
+export function isAgentDesktopRoute(strippedPathname: string): boolean {
+  return /^\/dashboard\/agent\/[^/]+\/desktop\/?$/.test(strippedPathname);
+}
+
 export function buildCsp(
   nonce: string,
   isEmbedRoute: boolean,
   isQwertiWidgetRoute = false,
+  isDesktopRoute = false,
 ): string {
   const isDev = process.env.NODE_ENV === 'development';
   const apiConnect = configuredApiConnectSource();
@@ -57,7 +67,9 @@ export function buildCsp(
     `img-src 'self' data: blob: https: ${MIRARI_HOST}`,
     "media-src 'self' data: blob: https:",
     `connect-src 'self' blob: https://api.hatcher.host wss://api.hatcher.host ${MIRARI_HOST} https://*.solana.com wss://*.solana.com https://*.helius-rpc.com wss://*.helius-rpc.com https://api.dexscreener.com https://threejs.org${qwertiConnect}${apiConnect}${devConnect}`,
-    `frame-src 'self' ${MIRARI_HOST} https://www.tradingview.com https://s.tradingview.com https://tradingview.com https://www.tradingview-widget.com https://www.geckoterminal.com https://geckoterminal.com https://dexscreener.com https://www.dexscreener.com`,
+    // The agent desktop's Browser app iframes arbitrary sites, so the desktop
+    // route (and ONLY that route) additionally allows any https origin.
+    `frame-src 'self' ${MIRARI_HOST} https://www.tradingview.com https://s.tradingview.com https://tradingview.com https://www.tradingview-widget.com https://www.geckoterminal.com https://geckoterminal.com https://dexscreener.com https://www.dexscreener.com${isDesktopRoute ? ' https:' : ''}`,
     "base-uri 'self'",
     "form-action 'self'",
     isEmbedRoute ? 'frame-ancestors *' : "frame-ancestors 'none'",

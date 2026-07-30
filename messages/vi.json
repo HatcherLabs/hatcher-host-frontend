@@ -3123,7 +3123,9 @@
       "files": "Tệp",
       "editor": "Trình soạn thảo",
       "terminal": "Terminal",
-      "preview": "Xem trước"
+      "preview": "Xem trước",
+      "browser": "Trình duyệt",
+      "settings": "Cài đặt"
     },
     "window": {
       "minimize": "Thu nhỏ",
@@ -3166,6 +3168,30 @@
       "startFailed": "Không thể khởi động bản xem trước. Có thể agent đã dừng.",
       "expiredBanner": "Phiên xem trước đã hết hạn — làm mới để tiếp tục.",
       "retry": "Thử lại"
+    },
+    "browser": {
+      "addressLabel": "Địa chỉ",
+      "addressPlaceholder": "hatcher.host/docs",
+      "go": "Đi",
+      "reload": "Tải lại",
+      "openInNewTab": "Mở trong tab mới",
+      "invalidUrl": "Nhập địa chỉ web hợp lệ (http hoặc https).",
+      "embedHint": "Một số trang từ chối tải khi nhúng — hãy dùng \"Mở trong tab mới\".",
+      "iframeTitle": "Trang web được nhúng",
+      "emptyState": "Nhập địa chỉ để bắt đầu duyệt web."
+    },
+    "settings": {
+      "framework": "Framework",
+      "model": "Mô hình",
+      "notSet": "Chưa đặt",
+      "name": "Tên",
+      "description": "Mô tả",
+      "nameLength": "Tên phải từ 3 đến 50 ký tự.",
+      "save": "Lưu",
+      "saving": "Đang lưu…",
+      "saved": "Đã lưu cài đặt.",
+      "saveFailed": "Không thể lưu cài đặt.",
+      "openFullSettings": "Mở cài đặt đầy đủ"
     }
   }
 }

@@ -22,7 +22,7 @@ import type { NextRequest } from 'next/server';
 import { routing } from './i18n/routing';
 import { defaultLocale, locales } from './i18n/config';
 import { HATCHER_LOCALE_HEADER, resolveLocaleFromPathAndCookie } from './i18n/localeHeader';
-import { buildCsp } from './lib/csp';
+import { buildCsp, isAgentDesktopRoute } from './lib/csp';
 import { buildSensitiveAuthTokenRedirectUrl } from './lib/reset-password-token-url';
 import {
   ANALYTICS_CONSENT_COOKIE,
@@ -101,11 +101,15 @@ export default function middleware(req: NextRequest): NextResponse {
   const unprefixedPathname = stripLocalePrefix(pathname);
   const isEmbedRoute = unprefixedPathname.startsWith('/embed');
   const isQwertiWidgetRoute = unprefixedPathname === '/';
+  // Desktop route: the Browser app iframes arbitrary https sites, so only
+  // this exact page gets the relaxed frame-src (see lib/csp.ts).
+  const isDesktopRoute = isAgentDesktopRoute(unprefixedPathname);
   const requestHeaders = withCspRequestHeaders(
     req,
     nonce,
     isEmbedRoute,
     isQwertiWidgetRoute,
+    isDesktopRoute,
   );
   requestHeaders.set(
     HATCHER_LOCALE_HEADER,
@@ -124,7 +128,7 @@ export default function middleware(req: NextRequest): NextResponse {
   if (authTokenRedirect) {
     const response = NextResponse.redirect(authTokenRedirect, 303);
     response.headers.set('Cache-Control', 'no-store');
-    return withSecurityHeaders(response, nonce, isEmbedRoute, isQwertiWidgetRoute);
+    return withSecurityHeaders(response, nonce, isEmbedRoute, isQwertiWidgetRoute, isDesktopRoute);
   }
 
   // Non-locale paths (admin, legal pages, og, skill) bypass the intl middleware.
@@ -135,6 +139,7 @@ export default function middleware(req: NextRequest): NextResponse {
       nonce,
       isEmbedRoute,
       isQwertiWidgetRoute,
+      isDesktopRoute,
     );
   }
 
@@ -145,6 +150,7 @@ export default function middleware(req: NextRequest): NextResponse {
       nonce,
       isEmbedRoute,
       isQwertiWidgetRoute,
+      isDesktopRoute,
     );
   }
 
@@ -187,7 +193,7 @@ export default function middleware(req: NextRequest): NextResponse {
     });
   }
 
-  return withSecurityHeaders(response, nonce, isEmbedRoute, isQwertiWidgetRoute);
+  return withSecurityHeaders(response, nonce, isEmbedRoute, isQwertiWidgetRoute, isDesktopRoute);
 }
 
 function createNonce(): string {
@@ -201,12 +207,13 @@ function withCspRequestHeaders(
   nonce: string,
   isEmbedRoute: boolean,
   isQwertiWidgetRoute: boolean,
+  isDesktopRoute: boolean,
 ): Headers {
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-nonce', nonce);
   requestHeaders.set(
     'Content-Security-Policy',
-    buildCsp(nonce, isEmbedRoute, isQwertiWidgetRoute),
+    buildCsp(nonce, isEmbedRoute, isQwertiWidgetRoute, isDesktopRoute),
   );
   return requestHeaders;
 }
@@ -225,10 +232,11 @@ function withSecurityHeaders(
   nonce: string,
   isEmbedRoute: boolean,
   isQwertiWidgetRoute: boolean,
+  isDesktopRoute: boolean,
 ): NextResponse {
   response.headers.set(
     'Content-Security-Policy',
-    buildCsp(nonce, isEmbedRoute, isQwertiWidgetRoute),
+    buildCsp(nonce, isEmbedRoute, isQwertiWidgetRoute, isDesktopRoute),
   );
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');

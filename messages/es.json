@@ -3123,7 +3123,9 @@
       "files": "Archivos",
       "editor": "Editor",
       "terminal": "Terminal",
-      "preview": "Vista previa"
+      "preview": "Vista previa",
+      "browser": "Navegador",
+      "settings": "Ajustes"
     },
     "window": {
       "minimize": "Minimizar",
@@ -3166,6 +3168,30 @@
       "startFailed": "No se pudo iniciar la vista previa. El agente podría estar detenido.",
       "expiredBanner": "La sesión de vista previa caducó; actualiza para continuar.",
       "retry": "Reintentar"
+    },
+    "browser": {
+      "addressLabel": "Dirección",
+      "addressPlaceholder": "hatcher.host/docs",
+      "go": "Ir",
+      "reload": "Recargar",
+      "openInNewTab": "Abrir en una pestaña nueva",
+      "invalidUrl": "Introduce una dirección web válida (http o https).",
+      "embedHint": "Algunos sitios no se cargan incrustados; usa \"Abrir en una pestaña nueva\".",
+      "iframeTitle": "Página web incrustada",
+      "emptyState": "Introduce una dirección para empezar a navegar."
+    },
+    "settings": {
+      "framework": "Framework",
+      "model": "Modelo",
+      "notSet": "Sin definir",
+      "name": "Nombre",
+      "description": "Descripción",
+      "nameLength": "El nombre debe tener entre 3 y 50 caracteres.",
+      "save": "Guardar",
+      "saving": "Guardando…",
+      "saved": "Ajustes guardados.",
+      "saveFailed": "No se pudieron guardar los ajustes.",
+      "openFullSettings": "Abrir la configuración completa"
     }
   }
 }

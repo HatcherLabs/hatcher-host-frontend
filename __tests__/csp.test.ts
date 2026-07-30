@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { buildCsp } from '../lib/csp';
+import { buildCsp, isAgentDesktopRoute } from '../lib/csp';
 import {
   QWERTI_WIDGET_ORIGIN,
   QWERTI_WIDGET_SCRIPT_CSP_HASH,
@@ -111,5 +111,60 @@ describe('CSP', () => {
 
     expect(getDirective(csp, 'connect-src')).toContain('http://localhost:3001');
     expect(getDirective(csp, 'connect-src')).toContain('ws://localhost:3001');
+  });
+
+  it('relaxes frame-src to any https origin on the agent desktop route only', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    const desktopCsp = buildCsp('testnonce', false, false, true);
+
+    // Token-level check: `https:` must be a standalone source, not a
+    // substring of the allowlisted https://... origins.
+    const frameSources = getDirective(desktopCsp, 'frame-src').split(/\s+/);
+    expect(frameSources).toContain('https:');
+    // The pre-existing allowlist stays present alongside the relaxation.
+    expect(frameSources).toContain("'self'");
+    expect(frameSources).toContain('https://entermirari.cloud');
+    expect(frameSources).toContain('https://www.tradingview.com');
+  });
+
+  it('keeps the strict frame-src allowlist on every non-desktop route', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    const normalCsp = buildCsp('testnonce', false);
+    const embedCsp = buildCsp('testnonce', true);
+
+    expect(getDirective(normalCsp, 'frame-src').split(/\s+/)).not.toContain('https:');
+    expect(getDirective(embedCsp, 'frame-src').split(/\s+/)).not.toContain('https:');
+  });
+
+  it('changes nothing but frame-src for the desktop route', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    const desktopCsp = buildCsp('testnonce', false, false, true);
+    const normalCsp = buildCsp('testnonce', false);
+
+    const stripFrameSrc = (csp: string) =>
+      csp
+        .split(';')
+        .map((part) => part.trim())
+        .filter((part) => !part.startsWith('frame-src '));
+    expect(stripFrameSrc(desktopCsp)).toEqual(stripFrameSrc(normalCsp));
+    // The desktop is an authenticated app page — it must stay unframeable.
+    expect(getDirective(desktopCsp, 'frame-ancestors')).toBe("frame-ancestors 'none'");
+  });
+});
+
+describe('isAgentDesktopRoute', () => {
+  it('matches only the agent desktop page (locale-stripped path)', () => {
+    expect(isAgentDesktopRoute('/dashboard/agent/abc123/desktop')).toBe(true);
+    expect(isAgentDesktopRoute('/dashboard/agent/abc123/desktop/')).toBe(true);
+  });
+
+  it('does not match any other route', () => {
+    expect(isAgentDesktopRoute('/dashboard/agent/abc123')).toBe(false);
+    expect(isAgentDesktopRoute('/dashboard/agent/abc123/desktop/extra')).toBe(false);
+    expect(isAgentDesktopRoute('/dashboard/agent//desktop')).toBe(false);
+    expect(isAgentDesktopRoute('/dashboard/agent/desktop')).toBe(false);
+    expect(isAgentDesktopRoute('/desktop')).toBe(false);
+    expect(isAgentDesktopRoute('/')).toBe(false);
+    expect(isAgentDesktopRoute('/embed/tv/x')).toBe(false);
   });
 });

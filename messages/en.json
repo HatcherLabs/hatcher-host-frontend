@@ -3260,7 +3260,9 @@
       "files": "Files",
       "editor": "Editor",
       "terminal": "Terminal",
-      "preview": "Preview"
+      "preview": "Preview",
+      "browser": "Browser",
+      "settings": "Settings"
     },
     "window": {
       "minimize": "Minimize",
@@ -3303,6 +3305,30 @@
       "startFailed": "Couldn't start the preview. The agent may be stopped.",
       "expiredBanner": "Preview session expired — refresh to continue.",
       "retry": "Retry"
+    },
+    "browser": {
+      "addressLabel": "Address",
+      "addressPlaceholder": "hatcher.host/docs",
+      "go": "Go",
+      "reload": "Reload",
+      "openInNewTab": "Open in new tab",
+      "invalidUrl": "Enter a valid web address (http or https).",
+      "embedHint": "Some sites refuse to load embedded — use Open in new tab.",
+      "iframeTitle": "Embedded web page",
+      "emptyState": "Enter an address to start browsing."
+    },
+    "settings": {
+      "framework": "Framework",
+      "model": "Model",
+      "notSet": "Not set",
+      "name": "Name",
+      "description": "Description",
+      "nameLength": "The name must be 3-50 characters.",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Settings saved.",
+      "saveFailed": "Failed to save the settings.",
+      "openFullSettings": "Open full settings"
     }
   }
 }

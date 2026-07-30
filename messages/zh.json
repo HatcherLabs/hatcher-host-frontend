@@ -3099,7 +3099,9 @@
       "files": "文件",
       "editor": "编辑器",
       "terminal": "终端",
-      "preview": "预览"
+      "preview": "预览",
+      "browser": "浏览器",
+      "settings": "设置"
     },
     "window": {
       "minimize": "最小化",
@@ -3142,6 +3144,30 @@
       "startFailed": "无法启动预览。该智能体可能已停止运行。",
       "expiredBanner": "预览会话已过期 — 请刷新以继续。",
       "retry": "重试"
+    },
+    "browser": {
+      "addressLabel": "地址",
+      "addressPlaceholder": "hatcher.host/docs",
+      "go": "转到",
+      "reload": "重新加载",
+      "openInNewTab": "在新标签页中打开",
+      "invalidUrl": "请输入有效的网址（http 或 https）。",
+      "embedHint": "部分网站拒绝以内嵌方式加载——请使用“在新标签页中打开”。",
+      "iframeTitle": "内嵌网页",
+      "emptyState": "输入网址开始浏览。"
+    },
+    "settings": {
+      "framework": "框架",
+      "model": "模型",
+      "notSet": "未设置",
+      "name": "名称",
+      "description": "描述",
+      "nameLength": "名称必须为 3 到 50 个字符。",
+      "save": "保存",
+      "saving": "保存中…",
+      "saved": "设置已保存。",
+      "saveFailed": "无法保存设置。",
+      "openFullSettings": "打开完整设置"
     }
   }
 }

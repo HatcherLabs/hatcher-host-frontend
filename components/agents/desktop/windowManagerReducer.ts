@@ -1,12 +1,11 @@
 /**
  * Pure reducer behind the agent desktop's window manager.
  *
- * The `preview` app id is reserved for the app-preview window (follow-up
- * work); the reducer and types already accept it so registering the app is
- * the only change needed there.
+ * App ids double as the registry keys in DesktopShell — adding an app means
+ * extending this union and registering a definition there.
  */
 
-export type DesktopAppId = 'files' | 'editor' | 'terminal' | 'preview';
+export type DesktopAppId = 'files' | 'editor' | 'terminal' | 'preview' | 'browser' | 'settings';
 
 export interface WindowRect {
   x: number;

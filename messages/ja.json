@@ -3123,7 +3123,9 @@
       "files": "ファイル",
       "editor": "エディタ",
       "terminal": "ターミナル",
-      "preview": "プレビュー"
+      "preview": "プレビュー",
+      "browser": "ブラウザ",
+      "settings": "設定"
     },
     "window": {
       "minimize": "最小化",
@@ -3166,6 +3168,30 @@
       "startFailed": "プレビューを開始できませんでした。エージェントが停止している可能性があります。",
       "expiredBanner": "プレビューセッションの有効期限が切れました。続けるには更新してください。",
       "retry": "再試行"
+    },
+    "browser": {
+      "addressLabel": "アドレス",
+      "addressPlaceholder": "hatcher.host/docs",
+      "go": "移動",
+      "reload": "再読み込み",
+      "openInNewTab": "新しいタブで開く",
+      "invalidUrl": "有効なウェブアドレスを入力してください（http または https）。",
+      "embedHint": "埋め込み表示を拒否するサイトもあります。「新しいタブで開く」をご利用ください。",
+      "iframeTitle": "埋め込みウェブページ",
+      "emptyState": "アドレスを入力してブラウジングを開始してください。"
+    },
+    "settings": {
+      "framework": "フレームワーク",
+      "model": "モデル",
+      "notSet": "未設定",
+      "name": "名前",
+      "description": "説明",
+      "nameLength": "名前は3〜50文字にしてください。",
+      "save": "保存",
+      "saving": "保存中…",
+      "saved": "設定を保存しました。",
+      "saveFailed": "設定を保存できませんでした。",
+      "openFullSettings": "詳細設定を開く"
     }
   }
 }
