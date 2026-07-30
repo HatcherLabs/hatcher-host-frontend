@@ -107,7 +107,7 @@ export function DesktopShell({ agentId }: { agentId: string }) {
       }}
     >
       {/* Small screens: the desktop needs room — link back instead */}
-      <div className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center lg:hidden">
+      <div className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center md:hidden">
         <MonitorX size={32} className="text-[var(--text-muted)]" aria-hidden />
         <div>
           <h1 className="text-base font-bold text-[var(--text-primary)]">{t('smallScreen.title')}</h1>
@@ -122,7 +122,7 @@ export function DesktopShell({ agentId }: { agentId: string }) {
       </div>
 
       {/* Full desktop */}
-      <div className="hidden h-full lg:flex lg:flex-col">
+      <div className="hidden h-full md:flex md:flex-col">
         {loadError !== null ? (
           <div className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center">
             <p className="text-sm text-[var(--color-destructive)]">{loadError || t('loadFailed')}</p>

@@ -4,7 +4,7 @@ import { useWindowManager, type DesktopAppRegistry } from './WindowManager';
 import type { DesktopAppId } from './windowManagerReducer';
 
 /**
- * Desktop icon grid. Double-click (or Enter on a focused icon) opens the app.
+ * Desktop icon grid. Click (or Enter on a focused icon) opens the app.
  */
 export function DesktopIcons() {
   const { apps, openWindow } = useWindowManager();
@@ -16,7 +16,7 @@ export function DesktopIcons() {
         <button
           key={appId}
           type="button"
-          onDoubleClick={() => openWindow(appId)}
+          onClick={() => openWindow(appId)}
           onKeyDown={(event) => {
             if (event.key === 'Enter') {
               event.preventDefault();
