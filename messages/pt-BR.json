@@ -754,7 +754,7 @@
       "heading": "Todas as integrações gratuitas",
       "badge": "cada nível",
       "body": "Telegram, Discord, WhatsApp, Slack, Signal, iMessage e mais de 14 plataformas estão incluídas gratuitamente em todos os níveis. Sem custo extra, nunca.",
-      "note": "Todos os preços estão listados em dólares americanos. Pague com cartão, SOL, USDC em Solana, $HATCHER ou $KAUSA. Os pagamentos $HATCHER recebem 10% de desconto; o modelo hospedado e o uso de pesquisa na web são medidos com AI Credits, enquanto o BYOK é pago diretamente com sua própria chave de provedor."
+      "note": "Todos os preços estão listados em dólares americanos. Pague com cartão, SOL, USDC em Solana, ou $HATCHER. Os pagamentos $HATCHER recebem 10% de desconto; o modelo hospedado e o uso de pesquisa na web são medidos com AI Credits, enquanto o BYOK é pago diretamente com sua própria chave de provedor."
     },
     "compareTable": {
       "heading": "Comparar planos",
@@ -802,7 +802,7 @@
         },
         {
           "q": "Quais métodos de pagamento são aceitos?",
-          "a": "Você pode pagar com cartão, SOL, USDC em Solana, $HATCHER ou $KAUSA. Os preços da criptografia são listados em dólares americanos e convertidos a taxas ao vivo via Júpiter."
+          "a": "Você pode pagar com cartão, SOL, USDC em Solana, ou $HATCHER. Os preços da criptografia são listados em dólares americanos e convertidos a taxas ao vivo via Júpiter."
         },
         {
           "q": "Posso fazer downgrade do meu nível?",
@@ -834,7 +834,7 @@
       "createAgent": "Criar agente",
       "seeFrameworks": "Veja Estruturas"
     },
-    "footerNote": "Todos os preços em dólares americanos, pagáveis com cartão, SOL, USDC em Solana, $HATCHER ou $KAUSA. O modelo hospedado e o uso de pesquisa na web são medidos com AI Credits; O BYOK é pago diretamente com sua própria chave de provedor."
+    "footerNote": "Todos os preços em dólares americanos, pagáveis com cartão, SOL, USDC em Solana, ou $HATCHER. O modelo hospedado e o uso de pesquisa na web são medidos com AI Credits; O BYOK é pago diretamente com sua própria chave de provedor."
   },
   "dashboard": {
     "common": {
@@ -1038,8 +1038,6 @@
       "payWithHatcher": "Pague com $HATCHER",
       "hatcherDesc": "Token HATCHER em Solana",
       "hatcherDiscountDesc": "10% de desconto com $HATCHER: {price}",
-      "payWithKausa": "Pague com $KAUSA",
-      "kausaDesc": "Token de parceiro KausaLayer em Solana",
       "payWithAnsem": "Pagar com $ANSEM",
       "ansemDesc": "Preço cheio, 10% queimado on-chain",
       "payWithUsdcSolana": "Pague com USDC em Solana",
@@ -1379,7 +1377,6 @@
         "addons": "Extras",
         "wallet": "Carteira",
         "robinhood": "Robinhood",
-        "kausalayer": "KausaLayer",
         "files": "Arquivos",
         "workspace": "Espaço de trabalho",
         "schedules": "Horários",
@@ -2783,7 +2780,6 @@
       "description": "O catálogo selecionado não retornou packs da Hatcher."
     }
   },
-
   "landingV3": {
     "hero": {
       "boxLabel": "Implantar",

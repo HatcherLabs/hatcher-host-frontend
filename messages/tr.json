@@ -754,7 +754,7 @@
       "heading": "Tüm Entegrasyonlar Ücretsiz",
       "badge": "her seviye",
       "body": "Telegram, Discord, WhatsApp, Slack, Signal, iMessage ve 14+ daha platformlar tüm seviyelerde ücretsiz olarak dahil edilmiştir. Ekstra ücret yok, asla.",
-      "note": "Tüm fiyatlar USD cinsinden listelenmiştir. Kart, SOL, USDC Solana, $HATCHER veya $KAUSA ile ödeme yapın. $HATCHER ödemeler %10 indirim alıyor; Barındırılan model ve web arama kullanımı AI Credits ile ölçülürken, BYOK doğrudan kendi sağlayıcı anahtarınızla ödenir."
+      "note": "Tüm fiyatlar USD cinsinden listelenmiştir. Kart, SOL, USDC Solana, veya $HATCHER ile ödeme yapın. $HATCHER ödemeler %10 indirim alıyor; Barındırılan model ve web arama kullanımı AI Credits ile ölçülürken, BYOK doğrudan kendi sağlayıcı anahtarınızla ödenir."
     },
     "compareTable": {
       "heading": "Planları Karşılaştırın",
@@ -802,7 +802,7 @@
         },
         {
           "q": "Hangi ödeme yöntemleri kabul ediliyor?",
-          "a": "Kart, SOL, USDC Solana, $HATCHER veya $KAUSA ile ödeme yapabilirsiniz. Kripto fiyatları USD cinsinden listelenir ve Jupiter üzerinden canlı oranlara dönüştürülür."
+          "a": "Kart, SOL, USDC Solana, veya $HATCHER ile ödeme yapabilirsiniz. Kripto fiyatları USD cinsinden listelenir ve Jupiter üzerinden canlı oranlara dönüştürülür."
         },
         {
           "q": "Seviyemi düşürebilir miyim?",
@@ -834,7 +834,7 @@
       "createAgent": "Ajan Oluştur",
       "seeFrameworks": "Bkz. Çerçeveler"
     },
-    "footerNote": "Tüm fiyatlar USD cinsinden, kartla ödenebilir, SOL, USDC Solana, $HATCHER veya $KAUSA ile ödenebilir. Barındırılan model ve web arama kullanımı AI Credits ile ölçülür; BYOK doğrudan kendi sağlayıcı anahtarınızla ödenir."
+    "footerNote": "Tüm fiyatlar USD cinsinden, kartla ödenebilir, SOL, USDC Solana, veya $HATCHER ile ödenebilir. Barındırılan model ve web arama kullanımı AI Credits ile ölçülür; BYOK doğrudan kendi sağlayıcı anahtarınızla ödenir."
   },
   "dashboard": {
     "common": {
@@ -1038,8 +1038,6 @@
       "payWithHatcher": "Ödeme $HATCHER",
       "hatcherDesc": "HATCHER tokeni Solana",
       "hatcherDiscountDesc": "$HATCHER ile %10 indirim: {price}",
-      "payWithKausa": "Ödeme $KAUSA",
-      "kausaDesc": "KausaLayer ortak tokenı Solana",
       "payWithAnsem": "$ANSEM ile öde",
       "ansemDesc": "Tam fiyat, %10 on-chain yakılır",
       "payWithUsdcSolana": "Ödeme USDC Solana",
@@ -1379,7 +1377,6 @@
         "addons": "Ekstralar",
         "wallet": "Cüzdan",
         "robinhood": "Robinhood",
-        "kausalayer": "KausaLayer",
         "files": "Dosyalar",
         "workspace": "Çalışma alanı",
         "schedules": "Takvim",
@@ -2783,7 +2780,6 @@
       "description": "Seçilmiş katalog Hatcher paketi döndürmedi."
     }
   },
-
   "landingV3": {
     "hero": {
       "boxLabel": "Konuşlandırma",

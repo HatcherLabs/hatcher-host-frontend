@@ -5,16 +5,11 @@ import {
   Activity,
   AlertTriangle,
   ArrowUpRight,
-  CircleDollarSign,
   GitFork,
   ShieldCheck,
 } from 'lucide-react';
 import type { CityOperationsSummary } from '@/lib/api';
-import {
-  cityOperationsAttentionTotal,
-  primarySettlementLabel,
-  settlementCountLabel,
-} from '@/lib/city-operations';
+import { cityOperationsAttentionTotal } from '@/lib/city-operations';
 import { agentRoomFromBuildingHref } from './cityNavigation';
 
 interface Props {
@@ -125,21 +120,6 @@ export function CityOperationsPanel({
                 <span className="block truncate text-[9px] text-white/35">{detail}</span>
               </div>
             ))}
-          </div>
-
-          <div className="mt-3 flex items-center justify-between gap-3 border-y border-white/10 py-2">
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5 text-[10px] font-medium uppercase text-white/45">
-                <CircleDollarSign size={12} />
-                verified gross / {summary.partnerEarnings.windowDays}d
-              </div>
-              <p className="mt-0.5 truncate text-sm font-semibold text-emerald-200">
-                {primarySettlementLabel(summary)}
-              </p>
-            </div>
-            <span className="shrink-0 text-[10px] tabular-nums text-white/45">
-              {settlementCountLabel(summary)}
-            </span>
           </div>
 
           {attention > 0 ? (

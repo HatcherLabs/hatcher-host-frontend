@@ -22,7 +22,7 @@ const ASSOCIATED_TOKEN_PROGRAM_ID = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xW
 const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
 const TOKEN_2022_PROGRAM_ID = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
 const MEMO_PROGRAM_ID = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
-export type SplPaymentMint = 'usdc' | 'hatch' | 'kausa' | 'ansem';
+export type SplPaymentMint = 'usdc' | 'hatch' | 'ansem';
 export const MIN_PAYMENT_QUOTE_VALIDITY_MS = 120_000;
 
 const SPL_PAYMENT_TOKENS: Record<SplPaymentMint, {
@@ -42,12 +42,6 @@ const SPL_PAYMENT_TOKENS: Record<SplPaymentMint, {
     symbol: '$HATCHER',
     tokenProgramId: TOKEN_2022_PROGRAM_ID,
     burnBps: 1000,
-  },
-  kausa: {
-    decimals: 6,
-    symbol: '$KAUSA',
-    tokenProgramId: TOKEN_2022_PROGRAM_ID,
-    burnBps: 0,
   },
   ansem: {
     decimals: 6,
@@ -441,7 +435,7 @@ export async function payWithSplToken(params: {
   }
 
   // Burn-enabled Token-2022 rails use a 90/10 treasury/burn split.
-  // Non-burn partner tokens such as $KAUSA and stablecoins transfer 100%.
+  // Non-burn tokens such as stablecoins transfer 100%.
   const burnBaseUnits = token.burnBps > 0 ? (totalBaseUnits * BigInt(token.burnBps)) / 10_000n : 0n;
   const transferBaseUnits = totalBaseUnits - burnBaseUnits;
 

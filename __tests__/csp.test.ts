@@ -74,15 +74,6 @@ describe('CSP', () => {
     expect(csp).not.toContain('googlesyndication.com');
   });
 
-  it('allows the Mirari dashboard embed origin in browser-facing directives', () => {
-    vi.stubEnv('NODE_ENV', 'production');
-    const csp = buildCsp('testnonce', false);
-
-    expect(getDirective(csp, 'frame-src')).toContain('https://entermirari.cloud');
-    expect(getDirective(csp, 'connect-src')).toContain('https://entermirari.cloud');
-    expect(getDirective(csp, 'img-src')).toContain('https://entermirari.cloud');
-  });
-
   it('allows the configured public API origin in connect-src for alternate dev ports', () => {
     vi.stubEnv('NODE_ENV', 'development');
     vi.stubEnv('NEXT_PUBLIC_API_URL', 'http://172.29.246.51:3011');
@@ -123,7 +114,6 @@ describe('CSP', () => {
     expect(frameSources).toContain('https:');
     // The pre-existing allowlist stays present alongside the relaxation.
     expect(frameSources).toContain("'self'");
-    expect(frameSources).toContain('https://entermirari.cloud');
     expect(frameSources).toContain('https://www.tradingview.com');
   });
 

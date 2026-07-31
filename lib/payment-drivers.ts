@@ -29,7 +29,7 @@ import { payWithSol, payWithSplToken, validateSolanaPaymentQuote } from '@/lib/s
 import type { ConfirmPaymentModalState } from '@/components/payments/ConfirmPaymentModal';
 import type { SolanaPaymentQuote } from '@/lib/api/types';
 
-export type PaymentRail = 'sol' | 'usdc' | 'hatch' | 'kausa' | 'ansem';
+export type PaymentRail = 'sol' | 'usdc' | 'hatch' | 'ansem';
 
 export interface PaymentDriverOptions {
   onSignature?: (signature: string) => void;
@@ -49,8 +49,6 @@ export interface UsePaymentDrivers {
    * transaction. The server's Jupiter quote is used without re-pricing.
    */
   driveHatch: (quote: SolanaPaymentQuote, label: string, options?: PaymentDriverOptions) => Promise<string>;
-  /** $KAUSA payment using the server-bound amount, mint, and recipient. */
-  driveKausa: (quote: SolanaPaymentQuote, label: string, options?: PaymentDriverOptions) => Promise<string>;
   /** $ANSEM → 90% to the quoted recipient + 10% burn. */
   driveAnsem: (quote: SolanaPaymentQuote, label: string, options?: PaymentDriverOptions) => Promise<string>;
   /** Open the wallet-select modal so the user can connect / switch. */
@@ -243,31 +241,6 @@ export function usePaymentDrivers(): UsePaymentDrivers {
     }
   }, [connection, ensureConnected, askConfirm, forceReconnect]);
 
-  const driveKausa = useCallback(async (quote: SolanaPaymentQuote, label: string, options: PaymentDriverOptions = {}): Promise<string> => {
-    await ensureConnected();
-    validateSolanaPaymentQuote(quote, 'kausa', walletRef.current.publicKey!.toBase58());
-    const approved = await askConfirm({
-      token: 'kausa', label, usdAmount: quote.amountUsd,
-      tokenAmount: quote.expectedAmount, rate: quote.amountUsd / quote.expectedAmount,
-      recipientWallet: quote.recipientWallet,
-    });
-    if (!approved) throw new Error('Cancelled');
-    try {
-      const { signature } = await payWithSplToken({
-        wallet: walletRef.current, connection, mint: 'kausa', quote, onSignature: options.onSignature,
-      });
-      return signature;
-    } catch (e) {
-      if (isUserCancellation(e)) throw new Error('Cancelled');
-      if (!isTrustRevokedError(e)) throw e;
-      await forceReconnect();
-      const { signature } = await payWithSplToken({
-        wallet: walletRef.current, connection, mint: 'kausa', quote, onSignature: options.onSignature,
-      });
-      return signature;
-    }
-  }, [connection, ensureConnected, askConfirm, forceReconnect]);
-
   const driveAnsem = useCallback(async (quote: SolanaPaymentQuote, label: string, options: PaymentDriverOptions = {}): Promise<string> => {
     await ensureConnected();
     validateSolanaPaymentQuote(quote, 'ansem', walletRef.current.publicKey!.toBase58());
@@ -320,7 +293,6 @@ export function usePaymentDrivers(): UsePaymentDrivers {
     driveSol,
     driveUsdc,
     driveHatch,
-    driveKausa,
     driveAnsem,
     ensurePaymentWallet,
     openWalletModal,

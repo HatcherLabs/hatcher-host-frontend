@@ -95,13 +95,6 @@ import type {
   UpdateAgentMailSettingsBody,
   UpdateAgentMailSettingsResponse,
   AgentMailDirection,
-  KausalayerCallBody,
-  KausalayerCallResponse,
-  KausalayerConfigBody,
-  KausalayerConfigStatus,
-  KausalayerHealthResponse,
-  KausalayerResourcesResponse,
-  KausalayerToolsResponse,
   XonaCallBody,
   XonaCallResponse,
   XonaConfigStatus,
@@ -125,14 +118,6 @@ import type {
   VirtualsScoutResult,
   Mpp32ConfigBody,
   Mpp32ConfigStatus,
-  VantaraConfigStatus,
-  VantaraCapabilityCallsResponse,
-  VantaraCapabilityStatusBody,
-  VantaraHermesInvokeBody,
-  VantaraHermesInvokeResponse,
-  VantaraProviderPinBody,
-  VantaraProviderSettingsBody,
-  VantaraCapabilityRegistration,
   MetaplexAvatarUploadResponse,
   MetaplexConfigStatus,
   MetaplexMintAgentPlan,
@@ -150,12 +135,6 @@ import type {
   MetaplexTokenLaunchPrepareInput,
   MetaplexTokenLaunchPrepareResponse,
   MetaplexTokenLaunchResponse,
-  MirariConfigStatus,
-  MirariDreamResult,
-  MirariDreamBody,
-  MirariGrantResponse,
-  MirariSignalResult,
-  MirariTestSignalBody,
   MedusaConfigStatus,
   MedusaHandoffBody,
   MedusaHandoffResponse,
@@ -792,36 +771,6 @@ export const api = {
       registryProgram: string;
     }>(`/agents/${id}/solana-register`, { method: "POST" }),
 
-  /** KausaLayer privacy-wallet tools proxied through Hatcher. */
-  getAgentKausalayerConfig: (id: string) =>
-    req<KausalayerConfigStatus>(`/agents/${id}/kausalayer/config`),
-
-  updateAgentKausalayerConfig: (id: string, body: KausalayerConfigBody) =>
-    req<KausalayerConfigStatus>(`/agents/${id}/kausalayer/config`, {
-      method: "PUT",
-      body: JSON.stringify(body),
-    }),
-
-  clearAgentKausalayerConfig: (id: string) =>
-    req<KausalayerConfigStatus>(`/agents/${id}/kausalayer/config`, {
-      method: "DELETE",
-    }),
-
-  getAgentKausalayerHealth: (id: string) =>
-    req<KausalayerHealthResponse>(`/agents/${id}/kausalayer/health`),
-
-  getAgentKausalayerResources: (id: string) =>
-    req<KausalayerResourcesResponse>(`/agents/${id}/kausalayer/resources`),
-
-  getAgentKausalayerTools: (id: string) =>
-    req<KausalayerToolsResponse>(`/agents/${id}/kausalayer/tools`),
-
-  callAgentKausalayerTool: (id: string, body: KausalayerCallBody) =>
-    req<KausalayerCallResponse>(`/agents/${id}/kausalayer/call`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
-
   /** Xona xPay partner resources proxied through Hatcher. */
   getAgentXonaConfig: (id: string) =>
     req<XonaConfigStatus>(`/agents/${id}/xona/config`),
@@ -936,48 +885,6 @@ export const api = {
   updateAgentMpp32Config: (id: string, body: Mpp32ConfigBody) =>
     req<Mpp32ConfigStatus>(`/agents/${id}/mpp32/config`, {
       method: "PATCH",
-      body: JSON.stringify(body),
-    }),
-
-  /** Vantara MPP paid compute and provider publishing controls. */
-  getAgentVantaraConfig: (id: string) =>
-    req<VantaraConfigStatus>(`/agents/${id}/vantara/config`),
-
-  updateAgentVantaraProvider: (id: string, body: VantaraProviderSettingsBody) =>
-    req<VantaraCapabilityRegistration>(`/agents/${id}/vantara/provider`, {
-      method: "PUT",
-      body: JSON.stringify(body),
-    }),
-
-  pinAgentVantaraCapability: (id: string, body: VantaraProviderPinBody) =>
-    req<VantaraCapabilityRegistration>(`/agents/${id}/vantara/provider/pin`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
-
-  updateAgentVantaraProviderStatus: (
-    id: string,
-    body: VantaraCapabilityStatusBody,
-  ) =>
-    req<VantaraCapabilityRegistration>(
-      `/agents/${id}/vantara/provider/status`,
-      {
-        method: "PATCH",
-        body: JSON.stringify(body),
-      },
-    ),
-
-  deleteAgentVantaraProvider: (id: string) =>
-    req<VantaraCapabilityRegistration>(`/agents/${id}/vantara/provider`, {
-      method: "DELETE",
-    }),
-
-  getAgentVantaraProviderCalls: (id: string) =>
-    req<VantaraCapabilityCallsResponse>(`/agents/${id}/vantara/provider/calls`),
-
-  invokeAgentVantaraHermes: (id: string, body: VantaraHermesInvokeBody) =>
-    req<VantaraHermesInvokeResponse>(`/agents/${id}/vantara/hermes/invoke`, {
-      method: "POST",
       body: JSON.stringify(body),
     }),
 
@@ -1100,28 +1007,6 @@ export const api = {
         body: JSON.stringify(body),
       },
     ),
-
-  /** Mirari live mirror signals and dashboard grant. */
-  getAgentMirariConfig: (id: string) =>
-    req<MirariConfigStatus>(`/agents/${id}/mirari/config`),
-
-  sendAgentMirariTestSignal: (id: string, body: MirariTestSignalBody) =>
-    req<MirariSignalResult>(`/agents/${id}/mirari/signals/test`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
-
-  sendAgentMirariDreamTest: (id: string, body: MirariDreamBody) =>
-    req<MirariDreamResult>(`/agents/${id}/mirari/dreams/test`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
-
-  createAgentMirariGrant: (id: string, scopes?: string[]) =>
-    req<MirariGrantResponse>(`/agents/${id}/mirari/grant`, {
-      method: "POST",
-      body: JSON.stringify(scopes?.length ? { scopes } : {}),
-    }),
 
   /** zkMedusa privacy passport verification and presale enrollment. */
   getAgentMedusaConfig: (id: string) =>
@@ -1692,7 +1577,7 @@ export const api = {
     tier: string,
     txSignature: string,
     paymentIntentId: string,
-    paymentToken: "sol" | "hatch" | "usdc" | "kausa" | "ansem" = "sol",
+    paymentToken: "sol" | "hatch" | "usdc" | "ansem" = "sol",
     billingPeriod: "monthly" | "annual" = "monthly",
   ) =>
     req<{
@@ -1720,7 +1605,7 @@ export const api = {
     txSignature: string,
     paymentIntentId: string,
     agentId?: string,
-    paymentToken: "sol" | "hatch" | "usdc" | "kausa" | "ansem" = "sol",
+    paymentToken: "sol" | "hatch" | "usdc" | "ansem" = "sol",
     billingPeriod: "monthly" | "annual" = "monthly",
   ) =>
     req<{ addonKey: string }>("/features/addon", {
@@ -1739,7 +1624,7 @@ export const api = {
    *  This is intentionally fire-and-forget in the UI; payment must continue
    *  even if observability logging fails. */
   logCryptoPaymentIntent: (payload: {
-    rail: "sol" | "hatch" | "usdc" | "kausa" | "ansem";
+    rail: "sol" | "hatch" | "usdc" | "ansem";
     flow: "tier" | "addon";
     targetKey: string;
     billingPeriod?: "monthly" | "annual" | "lifetime";
@@ -2347,7 +2232,7 @@ export const api = {
     }),
 
   /** Get token price from Jupiter */
-  getPrice: (token: "hatch" | "kausa" | "ansem" | "sol") =>
+  getPrice: (token: "hatch" | "ansem" | "sol") =>
     req<{ price: number; currency: string; source: string; error?: string }>(
       `/prices/${token}`,
     ),

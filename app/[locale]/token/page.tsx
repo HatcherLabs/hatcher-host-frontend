@@ -29,7 +29,7 @@ const PLANNED_USE_CASES: UseCase[] = [
   {
     icon: CreditCard,
     title: 'Payment Option',
-    description: 'Card, SOL, USDC, $HATCHER, and $KAUSA sit behind one billing surface with transparent totals before checkout.',
+    description: 'Card, SOL, USDC, and $HATCHER sit behind one billing surface with transparent totals before checkout.',
   },
   {
     icon: Users,
@@ -153,7 +153,7 @@ export default function TokenPage() {
               <div className="space-y-3">
                 {[
                   ['Subscription tier', 'USD price shown before payment'],
-                  ['Payment rail', 'Card, SOL, USDC, $HATCHER, or $KAUSA'],
+                  ['Payment rail', 'Card, SOL, USDC, or $HATCHER'],
                   ['Burn mechanic', t('burnBadge')],
                   ['AI Credits', 'Hosted usage remains metered separately from BYOK'],
                 ].map(([label, value]) => (

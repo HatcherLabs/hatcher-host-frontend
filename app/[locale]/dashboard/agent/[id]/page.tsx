@@ -228,7 +228,6 @@ export default function AgentManagePage() {
   const normalizeTab = (t: string | null): Tab => {
     if (!t) return 'overview';
     if (t === 'workspace') return 'files';
-    if (t === 'kausalayer') return 'wallet';
     return validTabs.includes(t as Tab) ? (t as Tab) : 'overview';
   };
   const initialTab = normalizeTab(rawTab);

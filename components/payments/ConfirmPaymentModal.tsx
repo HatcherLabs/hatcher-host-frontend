@@ -13,7 +13,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 
-export type PayToken = 'sol' | 'usdc' | 'hatch' | 'kausa' | 'ansem';
+export type PayToken = 'sol' | 'usdc' | 'hatch' | 'ansem';
 
 export type ConfirmPaymentModalState = {
   isOpen: boolean;
@@ -39,15 +39,12 @@ export function ConfirmPaymentModal(props: {
 
   const tokenLabel = state.token === 'sol' ? 'SOL'
     : state.token === 'usdc' ? 'USDC'
-    : state.token === 'kausa' ? '$KAUSA'
     : state.token === 'ansem' ? '$ANSEM'
     : '$HATCHER';
   const tokenTone = state.token === 'hatch'
     ? 'border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] text-[var(--color-warning)]'
     : state.token === 'ansem'
       ? 'border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] text-[var(--color-warning)]'
-    : state.token === 'kausa'
-      ? 'border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success)]'
       : 'border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-primary)]';
 
   return (
@@ -72,11 +69,9 @@ export function ConfirmPaymentModal(props: {
               <span className="font-bold text-xs">
                 {tokenLabel === '$HATCHER'
                   ? 'HATCH'
-                  : tokenLabel === '$KAUSA'
-                    ? 'KAUSA'
-                    : tokenLabel === '$ANSEM'
-                      ? 'ANSEM'
-                      : tokenLabel}
+                  : tokenLabel === '$ANSEM'
+                    ? 'ANSEM'
+                    : tokenLabel}
               </span>
             </div>
             <div className="flex-1 min-w-0">

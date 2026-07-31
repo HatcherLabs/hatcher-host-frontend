@@ -754,7 +754,7 @@
       "heading": "Todas las integraciones gratis",
       "badge": "cada nivel",
       "body": "Telegram, Discord, WhatsApp, Slack, Signal, iMessage y más de 14 plataformas más se incluyen de forma gratuita en todos los niveles. Sin cargo extra, nunca.",
-      "note": "Todos los precios están listados en USD. Pague con tarjeta, SOL, USDC en Solana, $HATCHER o $KAUSA. Los pagos de $HATCHER obtienen un 10% de descuento; El uso del modelo alojado y de la búsqueda web se mide con AI Credits, mientras que BYOK se paga directamente con su propia clave de proveedor."
+      "note": "Todos los precios están listados en USD. Pague con tarjeta, SOL, USDC en Solana, o $HATCHER. Los pagos de $HATCHER obtienen un 10% de descuento; El uso del modelo alojado y de la búsqueda web se mide con AI Credits, mientras que BYOK se paga directamente con su propia clave de proveedor."
     },
     "compareTable": {
       "heading": "Comparar planes",
@@ -802,7 +802,7 @@
         },
         {
           "q": "¿Qué métodos de pago se aceptan?",
-          "a": "Puede pagar con tarjeta, SOL, USDC en Solana, $HATCHER o $KAUSA. Los precios de las criptomonedas se cotizan en USD y se convierten a tasas en vivo a través de Júpiter."
+          "a": "Puede pagar con tarjeta, SOL, USDC en Solana, o $HATCHER. Los precios de las criptomonedas se cotizan en USD y se convierten a tasas en vivo a través de Júpiter."
         },
         {
           "q": "¿Puedo bajar de nivel?",
@@ -834,7 +834,7 @@
       "createAgent": "Crear agente",
       "seeFrameworks": "Ver marcos"
     },
-    "footerNote": "Todos los precios en USD, pagaderos con tarjeta, SOL, USDC en Solana, $HATCHER o $KAUSA. El uso del modelo alojado y de la búsqueda web se mide con AI Credits; BYOK se paga directamente con su propia clave de proveedor."
+    "footerNote": "Todos los precios en USD, pagaderos con tarjeta, SOL, USDC en Solana, o $HATCHER. El uso del modelo alojado y de la búsqueda web se mide con AI Credits; BYOK se paga directamente con su propia clave de proveedor."
   },
   "dashboard": {
     "common": {
@@ -1038,8 +1038,6 @@
       "payWithHatcher": "Paga con $HATCHER",
       "hatcherDesc": "Token HATCHER en Solana",
       "hatcherDiscountDesc": "10% de descuento con $HATCHER: {price}",
-      "payWithKausa": "Paga con $KAUSA",
-      "kausaDesc": "Token de socio KausaLayer en Solana",
       "payWithAnsem": "Pagar con $ANSEM",
       "ansemDesc": "Precio completo, 10% quemado on-chain",
       "payWithUsdcSolana": "Pague con USDC en Solana",
@@ -1379,7 +1377,6 @@
         "addons": "Extras",
         "wallet": "Cartera",
         "robinhood": "Robinhood",
-        "kausalayer": "KausaLayer",
         "files": "Archivos",
         "workspace": "Espacio de trabajo",
         "schedules": "Horarios",
@@ -2783,7 +2780,6 @@
       "description": "El catálogo seleccionado no devolvió packs propios."
     }
   },
-
   "landingV3": {
     "hero": {
       "boxLabel": "Implementar",

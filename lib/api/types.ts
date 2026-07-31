@@ -46,7 +46,7 @@ export interface Payment {
   agent?: { name: string };
 }
 
-export type SolanaPaymentToken = "sol" | "hatch" | "usdc" | "kausa" | "ansem";
+export type SolanaPaymentToken = "sol" | "hatch" | "usdc" | "ansem";
 
 export type SolanaPaymentTarget =
   | { kind: "tier"; key: string; billingPeriod?: "monthly" | "annual" }
@@ -644,12 +644,6 @@ export interface CityOperationsSummary {
     latencyMs: number;
     createdAt: string;
   }>;
-  partnerEarnings: {
-    windowDays: number;
-    verifiedGrossSettlements: number;
-    byAsset: Array<{ asset: string; amount: number }>;
-    partial: boolean;
-  };
   generatedAt: string;
 }
 
@@ -1576,42 +1570,6 @@ export interface UpdateAgentMailSettingsResponse {
   settings: AgentMailSettings;
 }
 
-export interface KausalayerConfigStatus {
-  enabled: boolean;
-  configured: boolean;
-  baseUrl: string;
-  keySource?: "platform" | "agent" | "none";
-}
-
-export interface KausalayerConfigBody {
-  enabled?: boolean;
-  apiKey?: string;
-}
-
-export interface KausalayerTool {
-  name: string;
-  description?: string;
-  inputSchema?: Record<string, unknown>;
-}
-
-export interface KausalayerToolsResponse {
-  tools: KausalayerTool[];
-}
-
-export interface KausalayerHealthResponse {
-  status?: string;
-  service?: string;
-  version?: string;
-  [key: string]: unknown;
-}
-
-export interface KausalayerCallBody {
-  tool: string;
-  arguments: Record<string, unknown>;
-}
-
-export type KausalayerCallResponse = unknown;
-
 export type XonaToolId =
   | "creative_director"
   | "generate_flux2_pro_image"
@@ -1952,141 +1910,6 @@ export interface Mpp32ConfigBody {
   maxPerCallUsd?: number;
 }
 
-export interface VantaraCapabilityRegistration {
-  id: string;
-  agentId: string;
-  ownerId: string;
-  capabilityId: string | null;
-  name: string;
-  description: string;
-  pricePerCallUsdc: number;
-  providerReceiveWallet: string;
-  platformFeeWallet: string;
-  split: {
-    providerBps: number;
-    platformBps: number;
-    vantaraBps: number;
-  };
-  callbackUrl: string;
-  status:
-    | "draft"
-    | "pending_registration"
-    | "pending_update"
-    | "live"
-    | "paused"
-    | "deleted"
-    | "suspended"
-    | "failed"
-    | string;
-  mode: "escrow" | "pay_then_serve" | "free" | string;
-  acceptanceStatus:
-    "not_started" | "pending_acceptance" | "accepted" | "failed" | string;
-  acceptanceRequestId: string | null;
-  selfServeManaged?: boolean;
-  metadata: Record<string, unknown>;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
-
-export interface VantaraConfigStatus {
-  enabled: boolean;
-  baseUrl: string;
-  hermesAgentId: string;
-  route: string;
-  settlement: "mpp-solana-usdc";
-  maxPerCallUsdc: number;
-  allowlist: {
-    mint: string;
-    recipient: string;
-    memo: string;
-  };
-  consumer: {
-    enabled: boolean;
-    hermesAgentId: string;
-    route: string;
-    agentWallet: string | null;
-    maxPerCallUsdc: number;
-  };
-  provider: {
-    enabled: boolean;
-    defaultName: string;
-    defaultDescription: string;
-    callbackUrl: string;
-    platformFeeWallet: string;
-    split: {
-      providerBps: number;
-      platformBps: number;
-      vantaraBps: number;
-    };
-    registration: VantaraCapabilityRegistration | null;
-  };
-  recentCalls: Array<{
-    id: string;
-    requestId: string | null;
-    status: string;
-    verificationStatus: string;
-    latencyMs: number;
-    settlementMetadata: Record<string, unknown>;
-    requestMetadata: Record<string, unknown>;
-    createdAt: string | null;
-  }>;
-}
-
-export interface VantaraProviderSettingsBody {
-  name: string;
-  description: string;
-  pricePerCallUsdc: number;
-  providerReceiveWallet?: string;
-}
-
-export interface VantaraProviderPinBody {
-  capabilityId: string;
-  acceptanceStatus?: "pending_acceptance" | "accepted" | "failed";
-}
-
-export interface VantaraCapabilityStatusBody {
-  status: "live" | "paused";
-}
-
-export interface VantaraCapabilityCallsResponse {
-  capabilityId: string;
-  selfServeManaged?: boolean;
-  calls: Array<{
-    requestId?: string | null;
-    mode?: string;
-    status?: string;
-    amountUsdc?: number;
-    payerWallet?: string | null;
-    providerWallet?: string | null;
-    paymentSig?: string | null;
-    releaseSig?: string | null;
-    platformSig?: string | null;
-    refundSig?: string | null;
-    callbackStatus?: number | string | null;
-    createdAt?: string | null;
-    [key: string]: unknown;
-  }>;
-}
-
-export interface VantaraHermesInvokeBody {
-  prompt: string;
-  maxTokens?: number;
-}
-
-export interface VantaraHermesInvokeResponse {
-  status: number;
-  vantaraRequestId: string | null;
-  amountPaidUsdc: number;
-  txSignature: string;
-  payer: string;
-  paymentReceipt: string | null;
-  data: {
-    output: string;
-    latencyMs: number;
-    modelTier: string;
-  };
-}
-
 export type MetaplexConfigStatusValue =
   "disabled" | "wallet-missing" | "metadata-ready" | "registered";
 
@@ -2381,110 +2204,6 @@ export interface MetaplexRegistrationResponse {
   txHash: string;
   registeredAt: string;
   status: "cached" | "registered";
-}
-
-export type MirariRuntime = "hermes";
-export type MirariSignalKind =
-  "drift" | "contradiction" | "skill_misfire" | "focus_hit" | "judge_score";
-export type MirariDreamMode = "stress_test" | "replay" | "consolidate";
-export type MirariDreamTrigger = "manual" | "idle" | "scheduled";
-export type MirariDreamFindingKind =
-  "weakness" | "insight" | "contradiction" | "proposal";
-export type MirariDreamFindingSeverity = "low" | "medium" | "high";
-
-export interface MirariConfigStatus {
-  enabled: boolean;
-  configured: boolean;
-  ingestUrl: string;
-  ingestHost: string;
-  workspaceId: string;
-  grantConfigured: boolean;
-  grantTtlSeconds: number;
-  runtimeSupport: MirariRuntime[];
-  scopes: string[];
-  runtime: MirariRuntime;
-}
-
-export interface MirariTestSignalBody {
-  kind?: MirariSignalKind;
-  severity?: number;
-  summary?: string;
-  payload?: Record<string, unknown>;
-  conversationId?: string;
-}
-
-export interface MirariSignalResult {
-  ok: boolean;
-  ingested: number;
-  deduped: number;
-}
-
-export interface MirariDreamIngestedResponse {
-  ok: true;
-  session_id: string;
-  findings_ingested: number;
-  [key: string]: unknown;
-}
-
-export interface MirariDreamDedupedResponse {
-  ok: true;
-  deduped: true;
-  session_id: string;
-  [key: string]: unknown;
-}
-
-export interface MirariDreamPartialResponse {
-  ok: true;
-  session_id: string;
-  findings_ingested: 0;
-  error: "findings_insert_failed";
-  [key: string]: unknown;
-}
-
-export interface MirariDreamFallbackResponse {
-  delivery: "signal_fallback";
-  reason: string;
-  signal: MirariSignalResult;
-  [key: string]: unknown;
-}
-
-export type MirariDreamResultBody =
-  | MirariDreamIngestedResponse
-  | MirariDreamDedupedResponse
-  | MirariDreamPartialResponse
-  | MirariDreamFallbackResponse;
-
-export interface MirariDreamFindingBody {
-  kind: MirariDreamFindingKind;
-  severity?: MirariDreamFindingSeverity;
-  title: string;
-  detail?: string;
-  target_ref?: Record<string, unknown>;
-}
-
-export interface MirariDreamBody {
-  externalSessionId?: string;
-  mode?: MirariDreamMode;
-  trigger?: MirariDreamTrigger;
-  status?: "complete" | "failed";
-  summary?: string;
-  error?: string;
-  findings?: MirariDreamFindingBody[];
-}
-
-export interface MirariDreamResult {
-  ok: true;
-  status: number;
-  body: MirariDreamResultBody;
-}
-
-export interface MirariGrantResponse {
-  token: string;
-  expiresAt: string;
-  workspaceId: string;
-  orgId: string;
-  agentId: string;
-  scopes: string[];
 }
 
 export type MedusaTier = 1 | 2 | 3;
@@ -2852,19 +2571,6 @@ export interface OobeX402BalanceBody {
 export type OobeX402CallResponse = unknown;
 export type OobeX402BalanceResponse = unknown;
 
-export interface KausalayerResourceResult {
-  tool: string;
-  data: unknown | null;
-  error: string | null;
-}
-
-export interface KausalayerResourcesResponse {
-  config: KausalayerConfigStatus;
-  privateResourcesAvailable: boolean;
-  pockets: KausalayerResourceResult;
-  savedWallets: KausalayerResourceResult;
-  contacts: KausalayerResourceResult;
-}
 
 export type AgentPassportNetworkId = "skale" | "base" | "cyberia" | "solana";
 export type AgentPassportChainType = "evm" | "solana";

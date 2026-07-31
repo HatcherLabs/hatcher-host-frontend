@@ -3,7 +3,6 @@ import {
   QWERTI_WIDGET_SCRIPT_CSP_HASH,
 } from './qwerti-widget';
 
-const MIRARI_HOST = 'https://entermirari.cloud';
 const QWERTI_API_HOST = 'https://api.qwerti.ai';
 const DEFAULT_LOCAL_API_URL = 'http://localhost:3001';
 
@@ -64,12 +63,12 @@ export function buildCsp(
     styleSrcElem,
     "style-src-attr 'unsafe-inline'",
     `font-src 'self' https://fonts.gstatic.com${qwertiFont}`,
-    `img-src 'self' data: blob: https: ${MIRARI_HOST}`,
+    `img-src 'self' data: blob: https:`,
     "media-src 'self' data: blob: https:",
-    `connect-src 'self' blob: https://api.hatcher.host wss://api.hatcher.host ${MIRARI_HOST} https://*.solana.com wss://*.solana.com https://*.helius-rpc.com wss://*.helius-rpc.com https://api.dexscreener.com https://threejs.org${qwertiConnect}${apiConnect}${devConnect}`,
+    `connect-src 'self' blob: https://api.hatcher.host wss://api.hatcher.host https://*.solana.com wss://*.solana.com https://*.helius-rpc.com wss://*.helius-rpc.com https://api.dexscreener.com https://threejs.org${qwertiConnect}${apiConnect}${devConnect}`,
     // The agent desktop's Browser app iframes arbitrary sites, so the desktop
     // route (and ONLY that route) additionally allows any https origin.
-    `frame-src 'self' ${MIRARI_HOST} https://www.tradingview.com https://s.tradingview.com https://tradingview.com https://www.tradingview-widget.com https://www.geckoterminal.com https://geckoterminal.com https://dexscreener.com https://www.dexscreener.com${isDesktopRoute ? ' https:' : ''}`,
+    `frame-src 'self' https://www.tradingview.com https://s.tradingview.com https://tradingview.com https://www.tradingview-widget.com https://www.geckoterminal.com https://geckoterminal.com https://dexscreener.com https://www.dexscreener.com${isDesktopRoute ? ' https:' : ''}`,
     "base-uri 'self'",
     "form-action 'self'",
     // Framing policy (owner-approved, 2026-07-30): 'self', not 'none' —

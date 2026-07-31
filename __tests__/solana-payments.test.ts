@@ -6,7 +6,6 @@ import type { SolanaPaymentQuote, SolanaPaymentToken } from '@/lib/api/types';
 import {
   ANSEM_TOKEN_MINT,
   HATCH_TOKEN_MINT,
-  KAUSA_TOKEN_MINT,
   TREASURY_WALLET,
   USDC_TOKEN_MINT,
 } from '@/lib/config';
@@ -14,7 +13,6 @@ import {
 const MINTS: Record<Exclude<SolanaPaymentToken, 'sol'>, string> = {
   usdc: USDC_TOKEN_MINT,
   hatch: HATCH_TOKEN_MINT,
-  kausa: KAUSA_TOKEN_MINT,
   ansem: ANSEM_TOKEN_MINT,
 };
 
@@ -308,56 +306,6 @@ describe('Solana payment helpers', () => {
     expect(connection.getParsedTokenAccountsByOwner).toHaveBeenCalledWith(
       owner,
       { programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA') },
-      'confirmed',
-    );
-    expect(calls).toEqual(['send', `signature:${signature}`, 'confirm']);
-  });
-
-  it('uses Token-2022 accounts for KAUSA payments', async () => {
-    const calls: string[] = [];
-    const signature = 'kausa-signature-789';
-    const source = Keypair.generate().publicKey;
-    const owner = Keypair.generate().publicKey;
-    const wallet = {
-      publicKey: owner,
-      sendTransaction: vi.fn(async () => {
-        calls.push('send');
-        return signature;
-      }),
-    } as unknown as WalletContextState;
-    const connection = {
-      ...mockConnection(calls, '0'),
-      getParsedTokenAccountsByOwner: vi.fn(async () => ({
-        value: [{
-          pubkey: source,
-          account: {
-            data: {
-              parsed: {
-                info: {
-                  mint: 'BWXSNRBKMviG68MqavyssnzDq4qSArcN7eNYjqEfpump',
-                  owner: owner.toBase58(),
-                  tokenAmount: { amount: '10000000' },
-                },
-              },
-            },
-          },
-        }],
-      })),
-    } as unknown as Connection;
-
-    await expect(
-      payWithSplToken({
-        wallet,
-        connection,
-        mint: 'kausa',
-        quote: serverQuote(owner.toBase58(), 'kausa'),
-        onSignature: (value) => calls.push(`signature:${value}`),
-      }),
-    ).rejects.toThrow('confirmation expired after broadcast');
-
-    expect(connection.getParsedTokenAccountsByOwner).toHaveBeenCalledWith(
-      owner,
-      { programId: new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb') },
       'confirmed',
     );
     expect(calls).toEqual(['send', `signature:${signature}`, 'confirm']);
