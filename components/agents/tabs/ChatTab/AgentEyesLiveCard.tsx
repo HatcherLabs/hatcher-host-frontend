@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { MouseEvent, ReactNode } from 'react';
-import Link from 'next/link';
 import {
   ArrowDown,
   ArrowUp,
@@ -10,7 +9,6 @@ import {
   ChevronDown,
   ChevronUp,
   CornerDownLeft,
-  ExternalLink,
   Keyboard,
   MousePointerClick,
   Navigation,
@@ -415,13 +413,6 @@ export function AgentEyesLiveCard({
             ? `${stopped ? 'last frame' : state?.mode ?? 'visual'} · ${Math.round(screenshot.size / 1024)} KB`
             : state?.mode ?? 'Waiting for visual action'}
         </span>
-        <Link
-          href={`/agent/${agentId}/room?from=dashboard`}
-          className="inline-flex items-center gap-1 text-[var(--color-accent)] hover:underline"
-        >
-          Room
-          <ExternalLink size={10} />
-        </Link>
       </div>
     </section>
   );

@@ -12,13 +12,11 @@ import {
 import {
   ArrowRight,
   Bot,
-  Building2,
   CheckCircle2,
   Eye,
   Github,
   Layers,
   Mail,
-  Map,
   Network,
   Play,
   Smartphone,
@@ -32,8 +30,6 @@ import styles from './page.module.css';
 type Tone = 'copper' | 'cyan' | 'amber' | 'rose' | 'violet' | 'blue';
 type Visual =
   | 'email'
-  | 'city'
-  | 'room'
   | 'eyes'
   | 'skills'
   | 'cli'
@@ -72,44 +68,12 @@ const FEATURES: Feature[] = [
     tone: 'copper',
   },
   {
-    id: 'city',
-    kicker: 'Spatial ops',
-    title: '3D Hatcher City',
-    short: 'A walkable map of live agents and buildings.',
-    detail:
-      'Hatcher City turns agents into a visible operating network. Users can move through the city, find live agents, enter buildings, and inspect the agent rooms behind each deployed worker.',
-    bullets: [
-      'Live city map',
-      'Agent buildings',
-      'Public discovery',
-      'Fast room entry',
-    ],
-    icon: Map,
-    tone: 'cyan',
-  },
-  {
-    id: 'room',
-    kicker: 'Agent workspace',
-    title: '3D rooms and buildings',
-    short: 'Each agent gets a dedicated room with controls.',
-    detail:
-      'Rooms are the owner workspace for an agent. Chat, avatar controls, model settings, files, terminal, wallet, stats, logs, and integrations live together so the user understands what the agent is doing without hunting across pages.',
-    bullets: [
-      'Chat sessions',
-      'Avatar selector',
-      'Runtime logs',
-      'Wallet and files',
-    ],
-    icon: Building2,
-    tone: 'amber',
-  },
-  {
     id: 'eyes',
     kicker: 'Computer use',
     title: 'Eyes visual workspace',
     short: 'Watch agent browser work as a live screen feed.',
     detail:
-      'Eyes gives agents an opt-in visual workspace for browser and desktop tasks. Owners can see a live PIP preview in the room, start or stop capture, and keep visual work transparent instead of relying only on text logs.',
+      'Eyes gives agents an opt-in visual workspace for browser and desktop tasks. Owners can see a live PIP preview in the dashboard, start or stop capture, and keep visual work transparent instead of relying only on text logs.',
     bullets: [
       'Live screen preview',
       '1 focused PIP by default',
@@ -228,9 +192,6 @@ const SURFACES = [
   'Web dashboard',
   'Public webchat',
   'Agent terminal',
-  '3D city',
-  '3D building',
-  '3D room',
   'iOS app',
   'Android app',
   'Solana Mobile',
@@ -253,7 +214,7 @@ export default function FeaturesPage() {
             <h1>Everything your agents need after launch.</h1>
             <p className={styles.heroText}>
               Hatcher is the control plane for hosted OpenClaw and Hermes
-              agents: chat, terminal, skills, email, wallets, 3D spaces, mobile
+              agents: chat, terminal, skills, email, wallets, mobile
               access, GitHub workflows, and agent-to-agent coordination.
             </p>
             <div className={styles.actions}>
@@ -411,7 +372,7 @@ export default function FeaturesPage() {
           <div>
             <p className={styles.eyebrow}>Ready to hatch</p>
             <h2>
-              Start with one agent. Add skills, rooms, mobile, and CLI when you
+              Start with one agent. Add skills, mobile, and CLI when you
               need them.
             </h2>
           </div>
@@ -477,8 +438,6 @@ function StorePhone() {
 
 function FeatureVisual({ type }: { type: Visual }) {
   if (type === 'email') return <EmailVisual />;
-  if (type === 'city') return <CityVisual />;
-  if (type === 'room') return <RoomVisual />;
   if (type === 'eyes') return <EyesVisual />;
   if (type === 'skills') return <SkillsVisual />;
   if (type === 'cli') return <CliVisual />;
@@ -508,44 +467,6 @@ function EmailVisual() {
           </div>
         </div>
       ))}
-    </div>
-  );
-}
-
-function CityVisual() {
-  return (
-    <div className={`${styles.previewPanel} ${styles.cityPreview}`}>
-      <div className={styles.cityShot}>
-        <Image
-          src="/features/city-current.png"
-          alt="Hatcher City live agent network"
-          fill
-          sizes="(max-width: 980px) 100vw, 420px"
-          className={styles.cityImage}
-          unoptimized
-        />
-      </div>
-      <div className={styles.cityLegend}>
-        <strong>Hatcher City</strong>
-        <span>25 districts · live agents · owner buildings</span>
-      </div>
-    </div>
-  );
-}
-
-function RoomVisual() {
-  return (
-    <div className={`${styles.previewPanel} ${styles.roomPreviewPanel}`}>
-      <div className={styles.roomScene}>
-        <Image
-          src="/features/room-current.png"
-          alt="Current Hatcher 3D agent room"
-          fill
-          sizes="(max-width: 980px) 100vw, 420px"
-          className={styles.roomSceneImage}
-          unoptimized
-        />
-      </div>
     </div>
   );
 }

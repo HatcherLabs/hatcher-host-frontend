@@ -13,7 +13,6 @@ import {
 } from "./chatStreamEvents";
 import type {
   Agent,
-  CityOperationsSummary,
   CommitLiftImportBody,
   CreateMissionTaskBody,
   LiftImport,
@@ -510,9 +509,6 @@ export const api = {
   /** List the current user's agents */
   getMyAgents: () => req<Agent[]>("/agents"),
 
-  /** Private owner-only operational rollup used by Hatcher City. */
-  getCityOperationsSummary: () =>
-    req<{ summary: CityOperationsSummary }>("/operations/summary"),
 
   /** Analyze an OpenClaw or Hermes ZIP without exposing archive contents to the browser. */
   analyzeLiftImport: (file: File) => {

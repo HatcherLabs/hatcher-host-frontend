@@ -781,14 +781,6 @@ export default function MyAgentsPage() {
                         >
                           <ArrowRight size={14} />
                         </Link>
-                        <Link
-                          href={`/agent/${slugOrId}/room?from=agents`}
-                          className={styles.iconAction}
-                          title={t('cardOpenTooltip')}
-                          aria-label={t('cardOpenTooltip')}
-                        >
-                          <Box size={14} />
-                        </Link>
                         {isRunning ? (
                           <button
                             type="button"
@@ -886,12 +878,6 @@ export default function MyAgentsPage() {
                     className={styles.actionBtn}
                   >
                     <ShieldCheck size={12} aria-hidden /> Approvals
-                  </Link>
-                  <Link
-                    href={`/agent/${selectedAgent.slug ?? selectedAgent.id}/room?from=agents`}
-                    className={styles.actionBtn}
-                  >
-                    {t('cardOpen')}
                   </Link>
                   {(selectedAgent.status === 'active' || selectedAgent.status === 'restarting') ? (
                     <button

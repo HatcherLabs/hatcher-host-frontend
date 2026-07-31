@@ -2,7 +2,6 @@
 
 import { useRef, useEffect, memo, useMemo, useState } from 'react';
 import {
-  ArrowRight,
   Check,
   ChevronDown,
   ChevronRight,
@@ -411,20 +410,6 @@ export const AgentSidebar = memo(function AgentSidebar({ agent, agents, agentsLo
         })}
       </div>
 
-      <div className="border-t border-[var(--border-default)] p-3">
-        <Link
-          href={`/agent/${agent.slug ?? agent.id}/room?from=dashboard`}
-          className="group flex items-center gap-2 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] px-3 py-2.5 text-[var(--text-primary)] transition-colors hover:border-[var(--border-hover)] hover:bg-[var(--bg-hover)]"
-          title={tSidebar('enter3DRoomTooltip')}
-        >
-          <Box size={15} className="text-[var(--accent)]" aria-hidden />
-          <span className="flex min-w-0 flex-col gap-0.5">
-            <span className="text-xs font-semibold">{tSidebar('enter3DRoom')}</span>
-            <span className="truncate text-[10px] text-[var(--text-muted)]">{tSidebar('enter3DRoomSubtitle')}</span>
-          </span>
-          <ArrowRight size={13} className="ml-auto text-[var(--accent)] opacity-60 transition-opacity group-hover:opacity-100" aria-hidden />
-        </Link>
-      </div>
     </nav>
   );
 

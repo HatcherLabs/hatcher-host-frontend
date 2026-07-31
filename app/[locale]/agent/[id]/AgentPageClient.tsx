@@ -16,16 +16,13 @@ function BackLink({ isOwner }: { isOwner: boolean }) {
     if (typeof window === 'undefined') {
       return isOwner
         ? { href: '/dashboard/agents', label: t('toMyAgents') }
-        : { href: '/city', label: t('toCity') };
+        : { href: '/explore', label: t('toExplore') };
     }
     const ref = document.referrer;
     if (ref) {
       try {
         const u = new URL(ref);
         if (u.origin === window.location.origin) {
-          if (u.pathname === '/city' || u.pathname.startsWith('/city/')) {
-            return { href: '/city', label: t('toCity') };
-          }
           if (u.pathname === '/dashboard/agents') {
             return { href: '/dashboard/agents', label: t('toMyAgents') };
           }
@@ -37,7 +34,7 @@ function BackLink({ isOwner }: { isOwner: boolean }) {
     }
     return isOwner
       ? { href: '/dashboard/agents', label: t('toMyAgents') }
-      : { href: '/city', label: t('toCity') };
+      : { href: '/explore', label: t('toExplore') };
   }, [isOwner, t]);
   return (
     <Link

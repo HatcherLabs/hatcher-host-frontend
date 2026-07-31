@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Radio, Search, Sparkles, TrendingUp } from "lucide-react";
+import { Search, Sparkles, TrendingUp } from "lucide-react";
 import { API_URL } from "@/lib/config";
 import { Link } from "@/i18n/routing";
 import { MarketingShell } from "@/components/marketing/v3/MarketingShell";
@@ -102,13 +102,6 @@ export default async function ExplorePage() {
               >
                 <TrendingUp className="h-4 w-4" />
                 {navT("tradersLabel")}
-              </Link>
-              <Link
-                href="/city"
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-[var(--border-default)] px-4 text-sm font-semibold text-[var(--text-secondary)] transition-colors hover:border-[var(--color-accent)]/50 hover:text-[var(--text-primary)]"
-              >
-                <Radio className="h-4 w-4" />
-                {t("cityCta")}
               </Link>
             </div>
           </div>

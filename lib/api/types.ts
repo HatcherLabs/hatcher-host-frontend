@@ -81,12 +81,6 @@ export interface SolanaPaymentIntent extends SolanaPaymentQuote {
   target: SolanaPaymentTarget;
 }
 
-export interface DispatchSkinPaymentIntent extends SolanaPaymentQuote {
-  intentId: string;
-  featureKey: string;
-  target: { kind: "dispatch_skin"; key: string };
-}
-
 export type SolanaRecurringAsset = "usdc";
 
 export type SolanaRecurringTarget =
@@ -598,53 +592,6 @@ export interface CreateMissionTaskBody {
   budgetAiCredits?: number;
   maxRuntimeSeconds?: number;
   source?: string;
-}
-
-export type CityOperationalAgentStatus =
-  "running" | "sleeping" | "paused" | "crashed";
-
-export interface CityOperationsSummary {
-  agents: {
-    total: number;
-    running: number;
-    sleeping: number;
-    paused: number;
-    crashed: number;
-    needsAttention: number;
-    items: Array<{
-      id: string;
-      name: string;
-      framework: string;
-      status: CityOperationalAgentStatus;
-      reason: string | null;
-    }>;
-  };
-  tasks: {
-    total: number;
-    active: number;
-    awaitingApproval: number;
-    failed: number;
-    completed: number;
-    pendingApprovals: number;
-  };
-  incidents: {
-    unreadCount: number;
-    items: Array<{
-      id: string;
-      title: string;
-      body: string;
-      createdAt: string;
-    }>;
-  };
-  delegations: Array<{
-    id: string;
-    source: { id: string; name: string; owned: boolean };
-    target: { id: string; name: string; owned: boolean };
-    status: string;
-    latencyMs: number;
-    createdAt: string;
-  }>;
-  generatedAt: string;
 }
 
 export interface PublicOutcomePackInputField {

@@ -17,7 +17,6 @@
     "dashboard": "ダッシュボード",
     "myAgents": "私のエージェントたち",
     "create": "作成",
-    "city": "都市",
     "analytics": "分析",
     "skale": "SKALE 財布",
     "billing": "請求",
@@ -62,8 +61,6 @@
       "tradersSub": "トークン化されたエージェントとオンチェーン活動。",
       "featuresLabel": "特徴",
       "featuresSub": "実行時間、ワークスペース、ツール、ルーム、CLI。",
-      "cityLabel": "Hatcher City",
-      "citySub": "生きたエージェントたちの3Dの世界を歩くようなものです。",
       "frameworksLabel": "フレームワーク",
       "frameworksSub": "OpenClaw ·Hermes。",
       "pricingLabel": "価格設定",
@@ -130,7 +127,6 @@
     "itemPublicAgents": "公的代理人",
     "itemTraders": "公開トレーダー",
     "itemFeatures": "特徴",
-    "itemCity": "Hatcher City",
     "itemFrameworks": "フレームワーク",
     "itemPricing": "価格設定",
     "itemToken": "$HATCHER",
@@ -271,15 +267,6 @@
           "features": "77のバンドルドスキル ·深い記憶 ·マルチモデル"
         }
       ]
-    },
-    "city": {
-      "eyebrow": "★ 新作",
-      "heading": "Hatcher Cityの全エージェントに会いましょう。",
-      "body": "すべてのパブリックエージェントが建物である、ライブ3Dの街。地区はカテゴリー別、色はフレームワーク別、金のビームはあなたの地区を示す。ドラッグ、ズーム、クリックで建物を開けてください。",
-      "videoAriaLabel": "オープンHatcher City",
-      "label": "ハッチャー・シティ",
-      "exploreCta": "全艦隊を探→",
-      "enterCta": "都市の登場"
     },
     "features": {
       "eyebrow": "プラットフォーム",
@@ -879,7 +866,6 @@
       "utilities": {
         "label": "その他のワークスペースツール",
         "lift": "Hatcher Liftでインポート",
-        "city": "Hatcher Cityを開く",
         "agents": "エージェントを管理"
       }
     },
@@ -1274,7 +1260,6 @@
         "start": "開始",
         "starting": "始まる...",
         "share": "シェア",
-        "room": "部屋",
         "clone": "クローン",
         "delete": "削除",
         "deleting": "削除中...",
@@ -1655,10 +1640,7 @@
         "inactive": "非稼働"
       },
       "sidebar": {
-        "switchAgent": "スイッチエージェント",
-        "enter3DRoom": "3Dルームの登場",
-        "enter3DRoomSubtitle": "オープン空間ワークスペース",
-        "enter3DRoomTooltip": "エージェントの空間ワークスペースを開く"
+        "switchAgent": "スイッチエージェント"
       }
     }
   },
@@ -1669,7 +1651,6 @@
     "eyebrow": "公的代理人",
     "title": "パブリックAIエージェントとのチャット",
     "body": "公開チャットを有効にした所有者の代理店を閲覧してください。各セッションはブラウザ上で実行され、エージェントのライブのライブHatcher設定を経由します。",
-    "cityCta": "オープンHatcher City",
     "emptyTitle": "まだパブリックチャットエージェントはいません",
     "emptyBody": "公開プロフィールは今もなおHatcher Cityに掲載されています。エージェントは、所有者がパブリックチャットを有効にするとここに表示されます。",
     "fallbackDescription": "ブラウザチャットセッションに対応できるパブリックの Hatcher エージェント。",
@@ -1698,9 +1679,9 @@
   },
   "agentPublic": {
     "back": {
-      "toCity": "シティに戻る",
       "toMyAgents": "エージェントたちに戻る",
-      "toDashboard": "ダッシュボードに戻る"
+      "toDashboard": "ダッシュボードに戻る",
+      "toExplore": "エージェントを探索"
     },
     "status": {
       "active": "現役",
@@ -1772,20 +1753,6 @@
       "errorId": "エラーID:{id}",
       "tryAgain": "もう一度試してみて",
       "browseAgents": "ブラウズエージェント"
-    }
-  },
-  "city": {
-    "category": {
-      "district": "地区",
-      "breadcrumbCity": "Hatcher City",
-      "statAgents": "エージェント",
-      "statRunning": "走ってる",
-      "statShareOfCity": "市のシェア",
-      "seeIn3d": "3Dで見てみ→",
-      "emptyState": "この地区にはまだエージェントはいない。",
-      "emptyStateCta": "最初に作りましょう。",
-      "otherDistricts": "その他の地区",
-      "msgs": "MSGS"
     }
   },
   "frameworks": {
@@ -2187,15 +2154,6 @@
   "localeSwitcher": {
     "label": "言語の変更"
   },
-  "agentRoom": {
-    "back": {
-      "toCity": "シティに戻る",
-      "toDashboard": "ダッシュボードに戻る",
-      "toAgents": "エージェントに戻る",
-      "toBuilding": "建物に戻る",
-      "toHouse": "ハウスに戻る"
-    }
-  },
   "chatToHatch": {
     "backLink": "←ダッシュボード",
     "eyebrow": "自然言語エージェントビルダー",
@@ -2593,26 +2551,6 @@
       },
       "footer": "すべての建物に自分の場所があり、入れる部屋があり、点検できるログがあります。",
       "cta": "Chat-to-Hatchで創作"
-    },
-    "rooms": {
-      "boxLabel": "制御室",
-      "title": "すべてのエージェントがライブワークスペースを手に入れます",
-      "body": "Hatcher City空間層として残りますが、コアな製品体験は精密なコントロールルームです。チャット、ログ、ファイル、設定、統合、ターミナル、ステータスが一か所にまとめられています。",
-      "stationAvatar": "アバター",
-      "stationSkills": "スキルワークベンチ",
-      "stationIntegrations": "インテグレーションズラック",
-      "stationStatus": "ステータスコンソール",
-      "stationLogs": "丸太の壁",
-      "stationStats": "スタッツ・ホログラム",
-      "stationMemory": "メモリーシェルフ",
-      "stationConfig": "設定ターミナル"
-    },
-    "city": {
-      "boxLabel": "Hatcher City",
-      "title": "エージェントのネットワーク、歩いて行ける",
-      "body": "自分のエージェントの建物を主張しましょう。街を歩き回り、動いているエージェントを見つけ、建物に入ってすべての部屋を管理しましょう。",
-      "cta": "登場Hatcher City",
-      "districts": "25地区 ·グリッド5×5"
     },
     "frameworks": {
       "boxLabel": "フレームワーク",

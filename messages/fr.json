@@ -17,7 +17,6 @@
     "dashboard": "Tableau de bord",
     "myAgents": "Mes agents",
     "create": "Créer",
-    "city": "City",
     "analytics": "Analytiques",
     "skale": "Portefeuilles SKALE",
     "billing": "Facturation",
@@ -62,8 +61,6 @@
       "tradersSub": "Agents tokenisés et leur activité onchain.",
       "featuresLabel": "Features",
       "featuresSub": "Runtime, workspace, outils, rooms et CLI.",
-      "cityLabel": "Hatcher City",
-      "citySub": "Marche dans un monde 3D d'agents en ligne.",
       "frameworksLabel": "Frameworks",
       "frameworksSub": "OpenClaw · Hermes.",
       "pricingLabel": "Tarifs",
@@ -130,7 +127,6 @@
     "itemPublicAgents": "Agents publics",
     "itemTraders": "Traders publics",
     "itemFeatures": "Features",
-    "itemCity": "Hatcher City",
     "itemFrameworks": "Frameworks",
     "itemPricing": "Tarifs",
     "itemToken": "$HATCHER",
@@ -271,15 +267,6 @@
           "features": "77 compétences intégrées · Mémoire approfondie · Multi-modèle"
         }
       ]
-    },
-    "city": {
-      "eyebrow": "★ NOUVEAU",
-      "heading": "Voyez chaque agent dans Hatcher City.",
-      "body": "Une ville 3D en direct où chaque agent public est un bâtiment. Quartiers par catégorie, couleurs par framework, faisceaux dorés pour les vôtres. Faites glisser, zoomez, cliquez sur n'importe quel bâtiment pour l'ouvrir.",
-      "videoAriaLabel": "Ouvrir Hatcher City",
-      "label": "HATCHER CITY",
-      "exploreCta": "Explorer la flotte complète →",
-      "enterCta": "Entrer dans la ville"
     },
     "features": {
       "eyebrow": "Plateforme",
@@ -879,7 +866,6 @@
       "utilities": {
         "label": "Autres outils de l'espace de travail",
         "lift": "Importer avec Hatcher Lift",
-        "city": "Ouvrir Hatcher City",
         "agents": "Gérer les agents"
       }
     },
@@ -1251,7 +1237,6 @@
         "start": "Démarrer",
         "starting": "Démarrage...",
         "share": "Partager",
-        "room": "Salle",
         "clone": "Cloner",
         "delete": "Supprimer",
         "deleting": "Suppression...",
@@ -1632,10 +1617,7 @@
         "inactive": "Inactif"
       },
       "sidebar": {
-        "switchAgent": "Changer d'agent",
-        "enter3DRoom": "Entrer dans la salle 3D",
-        "enter3DRoomSubtitle": "Marcher + configurer en direct",
-        "enter3DRoomTooltip": "Entrer dans le cockpit 3D de votre agent"
+        "switchAgent": "Changer d'agent"
       }
     }
   },
@@ -1646,7 +1628,6 @@
     "eyebrow": "Agents publics",
     "title": "Discutez avec des agents IA publics",
     "body": "Parcourez les agents dont les propriétaires ont activé le chat public. Chaque session s'exécute dans votre navigateur et utilise la configuration Hatcher en direct de l'agent.",
-    "cityCta": "Ouvrir Hatcher City",
     "emptyTitle": "Aucun agent avec chat public pour le moment",
     "emptyBody": "Les profils publics apparaissent toujours dans Hatcher City. Les agents apparaissent ici lorsque leur propriétaire active le chat public.",
     "fallbackDescription": "Un agent Hatcher public prêt pour les sessions de chat dans le navigateur.",
@@ -1675,9 +1656,9 @@
   },
   "agentPublic": {
     "back": {
-      "toCity": "Retour à City",
       "toMyAgents": "Retour à mes agents",
-      "toDashboard": "Retour au tableau de bord"
+      "toDashboard": "Retour au tableau de bord",
+      "toExplore": "Explorer les agents"
     },
     "status": {
       "active": "Actif",
@@ -1749,20 +1730,6 @@
       "errorId": "ID d'erreur : {id}",
       "tryAgain": "Réessayer",
       "browseAgents": "Parcourir les agents"
-    }
-  },
-  "city": {
-    "category": {
-      "district": "Quartier",
-      "breadcrumbCity": "Hatcher City",
-      "statAgents": "agents",
-      "statRunning": "en cours",
-      "statShareOfCity": "part de la ville",
-      "seeIn3d": "Voir en 3D →",
-      "emptyState": "Aucun agent dans ce quartier pour l'instant.",
-      "emptyStateCta": "Soyez le premier à en créer un.",
-      "otherDistricts": "Autres quartiers",
-      "msgs": "msgs"
     }
   },
   "frameworks": {
@@ -2164,15 +2131,6 @@
   "localeSwitcher": {
     "label": "Changer de langue"
   },
-  "agentRoom": {
-    "back": {
-      "toCity": "Retour à la Ville",
-      "toDashboard": "Retour au tableau de bord",
-      "toAgents": "Retour aux agents",
-      "toBuilding": "Retour au Building",
-      "toHouse": "Retour à House"
-    }
-  },
   "chatToHatch": {
     "backLink": "← Tableau de bord",
     "eyebrow": "Constructeur d'agents en langage naturel",
@@ -2570,26 +2528,6 @@
       },
       "footer": "Chacun obtient une place dans ton bâtiment, une salle où entrer et des logs à inspecter.",
       "cta": "Créer avec Chat-to-Hatch"
-    },
-    "rooms": {
-      "boxLabel": "Ton bâtiment",
-      "title": "Une porte pour chaque agent",
-      "body": "Entre depuis Hatcher City, choisis une porte d'agent, puis gère cet agent dans sa salle avec statut, compétences, mémoire, config et logs.",
-      "stationAvatar": "Avatar",
-      "stationSkills": "Atelier de compétences",
-      "stationIntegrations": "Rack d'intégrations",
-      "stationStatus": "Console de statut",
-      "stationLogs": "Mur de logs",
-      "stationStats": "Hologramme de stats",
-      "stationMemory": "Étagères de mémoire",
-      "stationConfig": "Terminal de config"
-    },
-    "city": {
-      "boxLabel": "Hatcher City",
-      "title": "Le réseau d'agents, à pied",
-      "body": "Réclame ton propre bâtiment d'agents. Marche dans la ville, repère les agents actifs en mouvement, puis entre dans ton bâtiment pour gérer chaque salle.",
-      "cta": "Entrer dans Hatcher City",
-      "districts": "25 districts · grille 5×5"
     },
     "frameworks": {
       "boxLabel": "Frameworks",

@@ -17,7 +17,6 @@ import { useToast } from '@/components/ui/ToastProvider';
 import { AgentStatusPill } from '@/components/ui/AgentStatusPill';
 import {
   ArrowLeft,
-  Box,
   Play,
   Square,
   RotateCcw,
@@ -1602,16 +1601,6 @@ export default function AgentManagePage() {
                     <Share2 size={13} />
                     <span>{tHeader('share')}</span>
                   </button>
-                  {agent?.framework && ['openclaw', 'hermes'].includes(agent.framework) && (
-                    <Link
-                      href={`/agent/${id}/room?from=dashboard`}
-                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-semibold text-[var(--text-secondary)] transition hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"
-                      title="Enter 3D Agent Room"
-                    >
-                      <Box size={13} aria-hidden />
-                      <span>{tHeader('room')}</span>
-                    </Link>
-                  )}
                   <button
                     onClick={() => setPortModalOpen(true)}
                     className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-semibold text-[var(--text-secondary)] transition hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"

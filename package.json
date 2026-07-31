@@ -18,9 +18,6 @@
   "dependencies": {
     "@codemirror/language-data": "^6.5.2",
     "@hatcher/shared": "npm:@hatcherlabs/shared@1.4.11",
-    "@react-three/drei": "^10.7.7",
-    "@react-three/fiber": "^9.6.0",
-    "@react-three/postprocessing": "^3.0.4",
     "@sentry/nextjs": "^10.51.0",
     "@solana/kit": "^6.10.0",
     "@solana/spl-token": "0.4.15",
@@ -52,8 +49,7 @@
     "react-rnd": "^10.5.3",
     "reactflow": "^11.11.4",
     "recharts": "^3.8.0",
-    "tailwind-merge": "^2.6.0",
-    "three": "^0.184.0"
+    "tailwind-merge": "^2.6.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
@@ -63,13 +59,11 @@
     "@types/node": "^22.10.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@types/three": "^0.184.0",
     "@vitejs/plugin-react": "^6.0.1",
     "autoprefixer": "^10.4.20",
     "axe-core": "^4.11.3",
     "eslint": "^9.39.4",
     "eslint-config-next": "15.5.21",
-    "gltf-pipeline": "^4.3.1",
     "postcss": "^8.5.18",
     "protobufjs": "8.7.0",
     "tailwindcss": "^3.4.17",
