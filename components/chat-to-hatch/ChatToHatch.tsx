@@ -336,7 +336,7 @@ export function ChatToHatch() {
   // back here after sign-in.
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push('/login?return=/chat-to-hatch');
+      router.push('/login?return=/create');
     }
   }, [isLoading, isAuthenticated, router]);
 

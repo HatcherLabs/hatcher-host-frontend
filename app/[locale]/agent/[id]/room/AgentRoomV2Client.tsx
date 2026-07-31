@@ -57,7 +57,6 @@ import {
   type AvatarVariant,
   type RoomEmoteId,
 } from '@/components/agent-room/v2/stations/AgentBody';
-import { cityBuildingHref } from '@/components/city/v3/cityNavigation';
 import {
   MobileSceneActionButton,
   MobileSceneMenu,
@@ -636,7 +635,7 @@ export function AgentRoomV2Client({ agentId }: Props) {
   const handleStationClick = useCallback(
     (id: StationId) => {
       if (id === 'buildingExit') {
-        router.push(cityBuildingHref());
+        router.push('/city');
         return;
       }
       if (OWNER_ONLY.has(id) && !canEdit) {
@@ -1109,7 +1108,7 @@ function resolveMobileBackTarget(
   }
   if (from === 'agents') return { href: '/dashboard/agents', label: 'Agents' };
   if (from === 'building' || from === 'house') {
-    return { href: cityBuildingHref(), label: 'Building' };
+    return { href: '/city', label: 'City' };
   }
   return { href: '/city', label: 'City' };
 }

@@ -36,7 +36,6 @@ const LOCALIZED_ROUTES: Array<{
   { path: "/docs", changeFrequency: "weekly", priority: 0.6 },
   { path: "/support", changeFrequency: "monthly", priority: 0.5 },
   { path: "/city", changeFrequency: "daily", priority: 0.9 },
-  { path: "/affiliate", changeFrequency: "monthly", priority: 0.6 },
 ];
 
 // Legal pages are English-only (not in i18n scope)

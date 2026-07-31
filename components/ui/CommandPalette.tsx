@@ -18,9 +18,7 @@ import {
   Play,
   Square,
   BarChart3,
-  Users,
   BookOpen,
-  Keyboard,
   ListChecks,
   PackageCheck,
   ShieldCheck,
@@ -57,10 +55,8 @@ const STATIC_COMMANDS: CommandItem[] = [
   { id: 'token', label: '$HATCHER Token', icon: Coins, href: '/token', section: 'Navigation' },
   { id: 'staking', label: '$HATCHER Staking', icon: Clock, href: '/staking', section: 'Navigation' },
   { id: 'analytics', label: 'Analytics', icon: BarChart3, href: '/dashboard/analytics', section: 'Navigation' },
-  { id: 'team', label: 'Team', icon: Users, href: '/dashboard/team', section: 'Navigation' },
   { id: 'help', label: 'Help & Support', icon: HelpCircle, href: '/support', section: 'Navigation' },
   { id: 'docs', label: 'Documentation', icon: BookOpen, href: 'https://docs.hatcher.host', section: 'Navigation' },
-  { id: 'shortcuts', label: 'Keyboard Shortcuts', icon: Keyboard, href: '/shortcuts', shortcut: '?', section: 'Navigation' },
 ];
 
 const RECENT_KEY = 'cmd_palette_recent';

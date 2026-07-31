@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import {
   agentRoomFromBuildingHref,
   buildingPanelEnterLabel,
-  cityBuildingHref,
   cityBuildingTitle,
   isViewerBuilding,
 } from './cityNavigation';
@@ -14,8 +13,7 @@ describe('city navigation helpers', () => {
     expect(cityBuildingTitle(null)).toBe('Builder');
   });
 
-  it('uses the building route for city-to-room navigation', () => {
-    expect(cityBuildingHref()).toBe('/city/building');
+  it('deep-links city buildings straight to the agent room', () => {
     expect(agentRoomFromBuildingHref('agent-123')).toBe(
       '/agent/agent-123/room?from=building',
     );

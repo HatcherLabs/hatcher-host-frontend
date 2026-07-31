@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { ArrowLeft, LayoutDashboard } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
-import { cityBuildingHref } from '@/components/city/v3/cityNavigation';
 
 interface Props {
   agentId?: string;
@@ -76,7 +75,7 @@ function resolve(
     return { href: '/dashboard/agents', label: t('toAgents') };
   }
   if (from === 'building' || from === 'house') {
-    return { href: cityBuildingHref(), label: t('toBuilding') };
+    return { href: '/city', label: t('toCity') };
   }
   if (from === 'city') {
     return { href: '/city', label: t('toCity') };
