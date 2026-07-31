@@ -38,7 +38,6 @@ import {
 import {
   agentRoomFromBuildingHref,
   buildingPanelEnterLabel,
-  cityBuildingHref,
   cityBuildingTitle,
   isViewerBuilding,
 } from './cityNavigation';
@@ -174,7 +173,6 @@ export function LiveCityScene({
   onSceneReady,
 }: Props) {
   const router = useRouter();
-  const buildingHref = cityBuildingHref();
 
   return (
     <QualityProvider>
@@ -191,7 +189,7 @@ export function LiveCityScene({
         onPublicChatClick={(href) => router.push(href)}
         canEnterBuilding={canEnterBuilding}
         viewerUsername={viewerUsername}
-        onBuildingEnterClick={() => router.push(buildingHref)}
+        onBuildingEnterClick={(agentId) => router.push(agentRoomFromBuildingHref(agentId))}
         realAvatarsEnabled={realAvatarsEnabled}
         onSceneReady={onSceneReady}
       />
@@ -219,7 +217,7 @@ function LiveCitySceneBody({
   counts: CityResponse['counts'];
   onDashboardClick: (agentId: string) => void;
   onPublicChatClick: (href: string) => void;
-  onBuildingEnterClick: () => void;
+  onBuildingEnterClick: (agentId: string) => void;
 }) {
   const quality = useQuality();
   const qualityControl = useQualityControl();
@@ -323,7 +321,7 @@ function LiveCitySceneBody({
     selectedBuilding && selectedBuildingIsMine && canEnterBuilding
       ? {
           label: 'Enter',
-          onClick: onBuildingEnterClick,
+          onClick: () => onBuildingEnterClick(selectedBuilding.agentId),
         }
       : selectedAgent && selectedAgent.mine
         ? {
@@ -467,7 +465,7 @@ function LiveCitySceneBody({
         operationsLoading={operationsLoading}
         operationsError={operationsError}
         hasMyBuilding={canEnterBuilding || myBuilding !== null}
-        onMyBuildingClick={onBuildingEnterClick}
+        onMyBuildingClick={() => { if (myBuilding) onBuildingEnterClick(myBuilding.agentId); }}
         onFindMyBuildingClick={myBuilding ? focusMyBuilding : undefined}
         onAgentViewClick={focusAgentMarker}
       />
@@ -484,7 +482,7 @@ function LiveCitySceneBody({
           canEnterBuilding={canEnterBuilding}
           isViewerBuilding={selectedBuildingIsMine}
           onClose={() => setSelectedOwnerKey(null)}
-          onBuildingEnterClick={onBuildingEnterClick}
+          onBuildingEnterClick={() => onBuildingEnterClick(selectedBuilding.agentId)}
         />
       )}
       {selectedAgent && (
@@ -507,7 +505,7 @@ function LiveCitySceneBody({
         qualityOverride={qualityControl.override}
         onQualityChange={qualityControl.setQuality}
         hasMyBuilding={canEnterBuilding || myBuilding !== null}
-        onMyBuildingClick={onBuildingEnterClick}
+        onMyBuildingClick={() => { if (myBuilding) onBuildingEnterClick(myBuilding.agentId); }}
         onFindMyBuildingClick={myBuilding ? focusMyBuilding : undefined}
         onAgentViewClick={focusAgentMarker}
         onToggleViewMode={() => setViewMode((mode) => (mode === 'walk' ? 'survey' : 'walk'))}

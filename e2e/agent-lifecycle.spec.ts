@@ -77,7 +77,7 @@ test.describe('Agent Lifecycle', () => {
     await loginAs(page, email, password);
 
     await page.goto('/create/template');
-    await expect(page).toHaveURL(/\/chat-to-hatch/);
+    await expect(page).toHaveURL(/\/create/);
     await expect(page.getByText(/Hatcher Assistant/i)).toBeVisible();
   });
 

@@ -200,10 +200,20 @@ const nextConfig = {
       destination: '/:locale/city',
       permanent: true,
     });
-    out.push({ source: '/create/template', destination: '/chat-to-hatch', permanent: true });
+    out.push({ source: '/create/template', destination: '/create', permanent: true });
     out.push({
       source: '/:locale(zh|de|fr|ro)/create/template',
-      destination: '/:locale/chat-to-hatch',
+      destination: '/:locale/create',
+      permanent: true,
+    });
+    // Retired marketing/program pages keep old links landing somewhere useful.
+    out.push({ source: '/affiliate', destination: '/', permanent: true });
+    out.push({ source: '/affiliate/apply', destination: '/', permanent: true });
+    // /chat-to-hatch was a duplicate entry point for the same flow as /create.
+    out.push({ source: '/chat-to-hatch', destination: '/create', permanent: true });
+    out.push({
+      source: '/:locale(zh|de|fr|ro)/chat-to-hatch',
+      destination: '/:locale/create',
       permanent: true,
     });
 

@@ -51,7 +51,6 @@ import {
 } from 'lucide-react';
 import { PieChart as RePieChart, Pie, Cell, ResponsiveContainer, Tooltip as ReTooltip, BarChart, Bar, XAxis, YAxis } from 'recharts';
 import type { AdminOverviewExtras } from '@hatcher/shared';
-import AffiliateTab from './_components/AffiliateTab';
 import IdleTab from './_components/IdleTab';
 import OobeTab from './_components/OobeTab';
 import RuntimeReliabilityPanel from '@/components/admin/RuntimeReliabilityPanel';
@@ -178,7 +177,6 @@ type AdminReferralUser = {
 type AdminUserReferralReceived = {
   id: string;
   referrer: AdminReferralUser;
-  affiliate: { id: string; referralCode: string; isActive: boolean; isFrozen: boolean } | null;
   rewardClaimed: boolean;
   isFlagged: boolean;
   flagReason: string | null;
@@ -195,7 +193,6 @@ type AdminUserReferralGiven = {
     aiCreditsBalance: number;
     createdAt: string;
   };
-  affiliate: { id: string; referralCode: string; isActive: boolean; isFrozen: boolean } | null;
   rewardClaimed: boolean;
   isFlagged: boolean;
   flagReason: string | null;
@@ -234,10 +231,6 @@ type AdminUserRow = {
     referrerEmail: string;
     referrerUsername: string | null;
     referrerReferralCode: string | null;
-    affiliateId: string | null;
-    affiliateCode: string | null;
-    affiliateActive: boolean | null;
-    affiliateFrozen: boolean | null;
     rewardClaimed: boolean;
     isFlagged: boolean;
     flagReason: string | null;
@@ -876,7 +869,7 @@ type AuditEntry = {
   details: Record<string, unknown>;
 };
 
-const COMMON_AUDIT_FILTERS = ['agent:', 'user:', 'ticket:', 'affiliate.', 'agent:kill', 'agent:pause'] as const;
+const COMMON_AUDIT_FILTERS = ['agent:', 'user:', 'ticket:', 'agent:kill', 'agent:pause'] as const;
 
 function auditGroup(action: string): string {
   if (action.includes(':')) return `${action.split(':')[0]}:`;
@@ -984,7 +977,7 @@ function AuditLogTab() {
               type="text"
               value={actionFilter}
               onChange={(e) => setActionFilter(e.target.value)}
-              placeholder="Filter by action (e.g. user:ban, agent:kill, affiliate.)"
+              placeholder="Filter by action (e.g. user:ban, agent:kill)"
               className="w-full pl-9 pr-3 py-2 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-primary)] text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/50"
             />
           </div>
@@ -1163,11 +1156,11 @@ export default function AdminPage() {
   const [agentsPagination, setAgentsPagination] = useState<{ total: number; hasMore: boolean }>({ total: 0, hasMore: false });
   const [error, setError] = useState<string | null>(null);
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'agents' | 'users' | 'tickets' | 'purchases' | 'health' | 'analytics' | 'egress' | 'idle' | 'oobe' | 'audit' | 'affiliate'>(() => {
+  const [activeTab, setActiveTab] = useState<'overview' | 'agents' | 'users' | 'tickets' | 'purchases' | 'health' | 'analytics' | 'egress' | 'idle' | 'oobe' | 'audit'>(() => {
     if (typeof window === 'undefined') return 'overview';
     const params = new URLSearchParams(window.location.search);
     const t = params.get('tab');
-    if (t === 'affiliate' || t === 'overview' || t === 'agents' || t === 'users' || t === 'tickets' || t === 'purchases' || t === 'health' || t === 'analytics' || t === 'egress' || t === 'idle' || t === 'oobe' || t === 'audit') return t;
+    if (t === 'overview' || t === 'agents' || t === 'users' || t === 'tickets' || t === 'purchases' || t === 'health' || t === 'analytics' || t === 'egress' || t === 'idle' || t === 'oobe' || t === 'audit') return t;
     return 'overview';
   });
   const [payments, setPayments] = useState<AdminPayment[]>([]);
@@ -1415,7 +1408,6 @@ export default function AdminPage() {
           (u.walletAddress ?? '').toLowerCase().includes(q) ||
           (u.referredBy?.referrerEmail ?? '').toLowerCase().includes(q) ||
           (u.referredBy?.referrerUsername ?? '').toLowerCase().includes(q) ||
-          (u.referredBy?.affiliateCode ?? '').toLowerCase().includes(q) ||
           (u.referredBy?.flagReason ?? '').toLowerCase().includes(q)
       );
     }
@@ -1736,10 +1728,10 @@ export default function AdminPage() {
             className="grid grid-cols-2 gap-1 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-7"
             aria-label="Admin sections"
           >
-            {(['overview', 'agents', 'users', 'tickets', 'purchases', 'health', 'analytics', 'egress', 'idle', 'oobe', 'audit', 'affiliate'] as const).map((tab) => {
-              const tabIcons: Record<string, LucideIcon> = { overview: BarChart3, agents: Bot, users: Users, tickets: Ticket, purchases: DollarSign, health: HeartPulse, analytics: TrendingUp, egress: Network, idle: Radio, oobe: Network, audit: ScrollText, affiliate: UserPlus };
+            {(['overview', 'agents', 'users', 'tickets', 'purchases', 'health', 'analytics', 'egress', 'idle', 'oobe', 'audit'] as const).map((tab) => {
+              const tabIcons: Record<string, LucideIcon> = { overview: BarChart3, agents: Bot, users: Users, tickets: Ticket, purchases: DollarSign, health: HeartPulse, analytics: TrendingUp, egress: Network, idle: Radio, oobe: Network, audit: ScrollText };
               const TabIcon = tabIcons[tab] ?? BarChart3;
-              const tabLabels: Record<string, string> = { overview: 'Overview', agents: `Agents (${agentsPagination.total || agents.length})`, users: `Users (${users.length})`, tickets: `Tickets${tickets.length ? ` (${tickets.length})` : ''}`, purchases: 'Purchases', health: 'Health', analytics: 'Analytics', egress: 'Egress', idle: 'IDLE', oobe: 'OOBE', audit: 'Audit Log', affiliate: 'Affiliate' };
+              const tabLabels: Record<string, string> = { overview: 'Overview', agents: `Agents (${agentsPagination.total || agents.length})`, users: `Users (${users.length})`, tickets: `Tickets${tickets.length ? ` (${tickets.length})` : ''}`, purchases: 'Purchases', health: 'Health', analytics: 'Analytics', egress: 'Egress', idle: 'IDLE', oobe: 'OOBE', audit: 'Audit Log' };
               return (
                 <button
                   key={tab}
@@ -1749,7 +1741,6 @@ export default function AdminPage() {
                       const params = new URLSearchParams(window.location.search);
                       params.set('tab', tab);
                       // Reset sub-tab param when switching top-level tab.
-                      if (tab !== 'affiliate') params.delete('sub');
                       window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
                     }
                   }}
@@ -2610,7 +2601,7 @@ export default function AdminPage() {
                                   )}
                                 </div>
                                 <div className="text-[10px] text-[var(--text-muted)] truncate max-w-[220px]">
-                                  {u.referredBy.affiliateCode ? `affiliate ${u.referredBy.affiliateCode}` : u.referredBy.referrerEmail}
+                                  {u.referredBy.referrerEmail}
                                   {u.referredBy.signupIp ? ` · ${u.referredBy.signupIp}` : ''}
                                 </div>
                               </div>
@@ -3169,7 +3160,6 @@ export default function AdminPage() {
 
           {activeTab === 'audit' && <AuditLogTab />}
 
-          {activeTab === 'affiliate' && <AffiliateTab />}
         </motion.div>
 
         {/* ── Error display ─────────────────────────────────── */}
@@ -3306,9 +3296,7 @@ export default function AdminPage() {
                               <span> · {userDetail.referralReceived.referrer.email}</span>
                             </div>
                             <div>
-                              {userDetail.referralReceived.affiliate
-                                ? `Affiliate code ${userDetail.referralReceived.affiliate.referralCode}`
-                                : `User code ${userDetail.referralReceived.referrer.referralCode || 'unknown'}`}
+                              {`User code ${userDetail.referralReceived.referrer.referralCode || 'unknown'}`}
                               {userDetail.referralReceived.signupIp ? ` · IP ${userDetail.referralReceived.signupIp}` : ''}
                             </div>
                             <div>{new Date(userDetail.referralReceived.createdAt).toLocaleString()}</div>

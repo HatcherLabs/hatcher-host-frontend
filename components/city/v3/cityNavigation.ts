@@ -1,7 +1,3 @@
-export function cityBuildingHref(): '/city/building' {
-  return '/city/building';
-}
-
 export function agentRoomFromBuildingHref(agentId: string): string {
   return `/agent/${encodeURIComponent(agentId)}/room?from=building`;
 }

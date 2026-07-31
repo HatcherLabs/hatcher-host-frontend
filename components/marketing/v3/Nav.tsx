@@ -18,7 +18,6 @@ import {
   FileText,
   GitBranch,
   HelpCircle,
-  Handshake,
   LayoutDashboard,
   ListChecks,
   LogOut,
@@ -41,17 +40,13 @@ import { VersionBadge } from '@/components/layout/VersionBadge';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useAuth } from '@/lib/auth-context';
-import { api } from '@/lib/api';
 import { formatFeatureKey } from '@/lib/feature-labels';
 import { useToast } from '@/components/ui/ToastProvider';
-
-type AffiliateMenuState = 'affiliate' | 'pending' | 'rejected' | 'none';
 
 export function Nav() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [affiliateState, setAffiliateState] = useState<AffiliateMenuState | null>(null);
   const navRef = useRef<HTMLElement | null>(null);
   const userMenuRef = useRef<HTMLDivElement | null>(null);
   const { isAuthenticated, isLoading: authLoading, user, logout } = useAuth();
@@ -78,45 +73,6 @@ export function Nav() {
     { key: 'settings', label: tNav('settings'), sub: tMenu('sub_settings'), href: '/dashboard/settings', Icon: Settings },
     { key: 'support', label: tNav('support'), sub: tMenu('sub_support'), href: '/support', Icon: HelpCircle },
   ] satisfies ReadonlyArray<{ key: string; label: string; sub: string; href: string; Icon: LucideIcon }>), [WORKSPACE_MENU, tNav, tMenu]);
-
-  const affiliateItem = useMemo(() => {
-    switch (affiliateState) {
-      case 'affiliate': return { href: '/dashboard/affiliate', label: tNav('affiliateDashboard') };
-      case 'pending':   return { href: '/affiliate/apply',     label: tNav('affiliatePending') };
-      case 'rejected':  return { href: '/affiliate/apply',     label: tNav('affiliateRejected') };
-      default:          return { href: '/affiliate',           label: tNav('affiliateBecome') };
-    }
-  }, [affiliateState, tNav]);
-
-  useEffect(() => {
-    setAffiliateState(null);
-  }, [user?.id]);
-
-  useEffect(() => {
-    if (!isAuthenticated || !userMenuOpen || affiliateState !== null) return;
-    let cancelled = false;
-    (async () => {
-      try {
-        const me = await api.getAffiliateMe();
-        if (cancelled) return;
-        if (me.success) { setAffiliateState('affiliate'); return; }
-        const app = await api.getMyAffiliateApplication();
-        if (cancelled) return;
-        if (app.success && app.data.application) {
-          const status = app.data.application.status;
-          if (status === 'PENDING') setAffiliateState('pending');
-          else if (status === 'REJECTED') setAffiliateState('rejected');
-          else if (status === 'APPROVED') setAffiliateState('affiliate');
-          else setAffiliateState('none');
-        } else {
-          setAffiliateState('none');
-        }
-      } catch {
-        if (!cancelled) setAffiliateState('none');
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [isAuthenticated, userMenuOpen, affiliateState]);
 
   useEffect(() => {
     if (!openGroup) return;
@@ -351,20 +307,6 @@ export function Nav() {
                           </span>
                         </Link>
                       ))}
-                      <Link
-                        href={affiliateItem.href}
-                        className={styles.item}
-                        role="menuitem"
-                        onClick={() => setUserMenuOpen(false)}
-                      >
-                        <span className={styles.glyph} aria-hidden>
-                          <Handshake size={15} strokeWidth={1.8} />
-                        </span>
-                        <span className={styles.itemBody}>
-                          <span className={styles.itemLabel}>{affiliateItem.label}</span>
-                          <span className={styles.itemSub}>{tMenu('sub_affiliate')}</span>
-                        </span>
-                      </Link>
                       {user.isAdmin && (
                         <Link
                           href="/admin"

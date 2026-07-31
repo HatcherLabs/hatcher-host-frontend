@@ -9,7 +9,7 @@ interface Props {
 
 /**
  * Wraps marketing pages (/pricing, /explore, /traders, /frameworks, /token, /blog, /roadmap,
- * /changelog, /help, /support hub, /affiliate, /privacy, /terms,
+ * /changelog, /help, /support hub, /privacy, /terms,
  * /cookies, /impressum) with the v3 Nav + Footer.
  *
  * Pages wrapped here MUST be in LayoutShell's IMMERSIVE_PATTERNS so the
