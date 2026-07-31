@@ -53,9 +53,6 @@ export const USDC_TOKEN_MINT =
 export const SOLANA_SUBSCRIPTIONS_PROGRAM_ID =
   process.env.NEXT_PUBLIC_SOLANA_SUBSCRIPTIONS_PROGRAM_ID || 'De1egAFMkMWZSN5rYXRj9CAdheBamobVNubTsi9avR44';
 
-// $KAUSA SPL mint on Solana mainnet. Partner token payment rail.
-export const KAUSA_TOKEN_MINT =
-  process.env.NEXT_PUBLIC_KAUSA_MINT || 'BWXSNRBKMviG68MqavyssnzDq4qSArcN7eNYjqEfpump';
 
 // $ANSEM SPL mint on Solana mainnet. Partner token payment rail.
 export const ANSEM_TOKEN_MINT =

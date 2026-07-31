@@ -754,7 +754,7 @@
       "heading": "All Integrations Free",
       "badge": "every tier",
       "body": "Telegram, Discord, WhatsApp, Slack, Signal, iMessage, and 14+ more platforms are included free on all tiers. No extra charge, ever.",
-      "note": "All prices are listed in USD. Pay by card, SOL, USDC on Solana, $HATCHER, or $KAUSA. $HATCHER payments get 10% off; hosted model and web-search usage is metered with AI Credits, while BYOK is paid directly with your own provider key."
+      "note": "All prices are listed in USD. Pay by card, SOL, USDC on Solana, or $HATCHER. $HATCHER payments get 10% off; hosted model and web-search usage is metered with AI Credits, while BYOK is paid directly with your own provider key."
     },
     "compareTable": {
       "heading": "Compare Plans",
@@ -802,7 +802,7 @@
         },
         {
           "q": "What payment methods are accepted?",
-          "a": "You can pay by card, SOL, USDC on Solana, $HATCHER, or $KAUSA. Crypto prices are listed in USD and converted at live rates via Jupiter."
+          "a": "You can pay by card, SOL, USDC on Solana, or $HATCHER. Crypto prices are listed in USD and converted at live rates via Jupiter."
         },
         {
           "q": "Can I downgrade my tier?",
@@ -834,7 +834,7 @@
       "createAgent": "Create Agent",
       "seeFrameworks": "See Frameworks"
     },
-    "footerNote": "All prices in USD, payable by card, SOL, USDC on Solana, $HATCHER, or $KAUSA. Hosted model and web-search usage is metered with AI Credits; BYOK is paid directly with your own provider key."
+    "footerNote": "All prices in USD, payable by card, SOL, USDC on Solana, or $HATCHER. Hosted model and web-search usage is metered with AI Credits; BYOK is paid directly with your own provider key."
   },
   "dashboard": {
     "common": {
@@ -1156,8 +1156,6 @@
       "payWithHatcher": "Pay with $HATCHER",
       "hatcherDesc": "HATCHER token on Solana",
       "hatcherDiscountDesc": "10% off with $HATCHER: {price}",
-      "payWithKausa": "Pay with $KAUSA",
-      "kausaDesc": "KausaLayer partner token on Solana",
       "payWithAnsem": "Pay with $ANSEM",
       "ansemDesc": "Full price, 10% burned on-chain",
       "payWithUsdcSolana": "Pay with USDC on Solana",
@@ -1497,7 +1495,6 @@
         "addons": "Extras",
         "wallet": "Wallet",
         "robinhood": "Robinhood",
-        "kausalayer": "KausaLayer",
         "files": "Files",
         "workspace": "Workspace",
         "schedules": "Schedules",
@@ -3074,7 +3071,6 @@
       "description": "The curated catalog could not return any first-party packs."
     }
   },
-
   "landingV3": {
     "hero": {
       "boxLabel": "Deploy",

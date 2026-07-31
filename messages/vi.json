@@ -754,7 +754,7 @@
       "heading": "Tất cả tích hợp miễn phí",
       "badge": "mỗi tầng",
       "body": "Telegram, Discord, WhatsApp, Slack, Signal, iMessage và hơn 14 nền tảng khác được cung cấp miễn phí trên tất cả các cấp. Không có phí bổ sung, bao giờ hết.",
-      "note": "Tất cả giá đều được niêm yết bằng USD. Thanh toán bằng thẻ, SOL, USDC trên Solana, $HATCHER hoặc $KAUSA. Thanh toán $HATCHER được giảm giá 10%; mô hình lưu trữ và mức sử dụng tìm kiếm trên web được đo lường bằng AI Credits, trong khi BYOK được thanh toán trực tiếp bằng khóa nhà cung cấp của riêng bạn."
+      "note": "Tất cả giá đều được niêm yết bằng USD. Thanh toán bằng thẻ, SOL, USDC trên Solana, hoặc $HATCHER. Thanh toán $HATCHER được giảm giá 10%; mô hình lưu trữ và mức sử dụng tìm kiếm trên web được đo lường bằng AI Credits, trong khi BYOK được thanh toán trực tiếp bằng khóa nhà cung cấp của riêng bạn."
     },
     "compareTable": {
       "heading": "So sánh các gói",
@@ -802,7 +802,7 @@
         },
         {
           "q": "Những phương thức thanh toán nào được chấp nhận?",
-          "a": "Bạn có thể thanh toán bằng thẻ, SOL, USDC trên Solana, $HATCHER hoặc $KAUSA. Giá tiền điện tử được niêm yết bằng USD và được quy đổi theo tỷ giá trực tiếp thông qua Sao Mộc."
+          "a": "Bạn có thể thanh toán bằng thẻ, SOL, USDC trên Solana, hoặc $HATCHER. Giá tiền điện tử được niêm yết bằng USD và được quy đổi theo tỷ giá trực tiếp thông qua Sao Mộc."
         },
         {
           "q": "Tôi có thể hạ cấp bậc của mình không?",
@@ -834,7 +834,7 @@
       "createAgent": "Tạo tác nhân",
       "seeFrameworks": "Xem khung"
     },
-    "footerNote": "Tất cả giá bằng USD, thanh toán bằng thẻ, SOL, USDC trên Solana, $HATCHER hoặc $KAUSA. Mô hình lưu trữ và mức sử dụng tìm kiếm trên web được đo lường bằng AI Credits; BYOK được thanh toán trực tiếp bằng khóa nhà cung cấp của riêng bạn."
+    "footerNote": "Tất cả giá bằng USD, thanh toán bằng thẻ, SOL, USDC trên Solana, hoặc $HATCHER. Mô hình lưu trữ và mức sử dụng tìm kiếm trên web được đo lường bằng AI Credits; BYOK được thanh toán trực tiếp bằng khóa nhà cung cấp của riêng bạn."
   },
   "dashboard": {
     "common": {
@@ -1038,8 +1038,6 @@
       "payWithHatcher": "Thanh toán bằng $HATCHER",
       "hatcherDesc": "Mã thông báo HATCHER trên Solana",
       "hatcherDiscountDesc": "Giảm 10% với $HATCHER: {price}",
-      "payWithKausa": "Thanh toán bằng $KAUSA",
-      "kausaDesc": "Mã thông báo đối tác KausaLayer trên Solana",
       "payWithAnsem": "Thanh toán bằng $ANSEM",
       "ansemDesc": "Giá đầy đủ, đốt 10% on-chain",
       "payWithUsdcSolana": "Thanh toán bằng USDC trên Solana",
@@ -1379,7 +1377,6 @@
         "addons": "Tiện ích bổ sung",
         "wallet": "Ví",
         "robinhood": "Robinhood",
-        "kausalayer": "KausaLayer",
         "files": "Tập tin",
         "workspace": "Không gian làm việc",
         "schedules": "Lịch trình",
@@ -2783,7 +2780,6 @@
       "description": "Danh mục tuyển chọn không trả về pack của Hatcher."
     }
   },
-
   "landingV3": {
     "hero": {
       "boxLabel": "Triển khai",

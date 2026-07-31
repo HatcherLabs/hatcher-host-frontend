@@ -7,20 +7,13 @@ import {
   getProviderPanelIdsForWallet,
   getProviderSelectorOptions,
   getWalletActivityTransactionsForNetwork,
-  shouldShowMirariPanelForWallet,
 } from './WalletTab';
 
 describe('Wallet tab integration placement', () => {
-  it('shows Mirari with Solana-side integrations for Hermes agents', () => {
-    expect(shouldShowMirariPanelForWallet('solana', 'hermes')).toBe(true);
-    expect(shouldShowMirariPanelForWallet('base', 'hermes')).toBe(false);
-    expect(shouldShowMirariPanelForWallet('skale', 'hermes')).toBe(false);
-    expect(shouldShowMirariPanelForWallet('cyberia', 'hermes')).toBe(false);
-  });
-
-  it('hides Mirari completely for OpenClaw agents', () => {
-    expect(shouldShowMirariPanelForWallet('solana', 'openclaw')).toBe(false);
-    expect(getProviderPanelIdsForWallet('solana', 'openclaw')).not.toContain('mirari');
+  it('retires the Kausalayer, Mirari, and Vantara provider panels', () => {
+    expect(getProviderPanelIdsForWallet('solana')).not.toContain('kausalayer');
+    expect(getProviderPanelIdsForWallet('solana')).not.toContain('mirari');
+    expect(getProviderPanelIdsForWallet('solana')).not.toContain('vantara');
     expect(getInitialWalletProviderFromSearch(
       '?tab=wallet&walletSection=providers&walletProvider=mirari',
       'openclaw',
@@ -32,12 +25,6 @@ describe('Wallet tab integration placement', () => {
     expect(getProviderPanelIdsForWallet('base')).not.toContain('mpp32');
     expect(getProviderPanelIdsForWallet('skale')).not.toContain('mpp32');
     expect(getProviderPanelIdsForWallet('cyberia')).not.toContain('mpp32');
-  });
-
-  it('places Vantara with Solana provider rails', () => {
-    expect(getProviderPanelIdsForWallet('solana')).toContain('vantara');
-    expect(getProviderPanelIdsForWallet('base')).not.toContain('vantara');
-    expect(getProviderPanelIdsForWallet('skale')).not.toContain('vantara');
   });
 
   it('places Medusa with Solana provider rails', () => {

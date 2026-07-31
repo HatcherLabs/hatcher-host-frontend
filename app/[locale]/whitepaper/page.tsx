@@ -117,11 +117,6 @@ const PARTNER_COMPUTE = [
     body:
       'Hatcher agents can consume selected partner compute tasks, while running or idle agents can be registered as providers where appropriate.',
   },
-  {
-    name: 'KausaLayer',
-    body:
-      'Agents can access selected privacy wallet and MCP-style tools through Hatcher-managed or user-supplied keys.',
-  },
 ] as const;
 
 const SECURITY_POINTS = [

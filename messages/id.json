@@ -754,7 +754,7 @@
       "heading": "Semua Integrasi Gratis",
       "badge": "setiap tingkatan",
       "body": "Telegram, Discord, WhatsApp, Slack, Signal, iMessage, dan 14+ platform lainnya disertakan gratis di semua tingkatan. Tanpa biaya tambahan.",
-      "note": "Semua harga tercantum dalam USD. Bayar dengan kartu, SOL, USDC di Solana, $HATCHER, atau $KAUSA. Pembayaran $HATCHER mendapat diskon 10%; model yang dihosting dan penggunaan pencarian web diukur dengan AI Credits, sedangkan BYOK dibayar langsung dengan kunci penyedia Anda sendiri."
+      "note": "Semua harga tercantum dalam USD. Bayar dengan kartu, SOL, USDC di Solana, atau $HATCHER. Pembayaran $HATCHER mendapat diskon 10%; model yang dihosting dan penggunaan pencarian web diukur dengan AI Credits, sedangkan BYOK dibayar langsung dengan kunci penyedia Anda sendiri."
     },
     "compareTable": {
       "heading": "Bandingkan Paket",
@@ -802,7 +802,7 @@
         },
         {
           "q": "Metode pembayaran apa yang diterima?",
-          "a": "Anda dapat membayar dengan kartu, SOL, USDC di Solana, $HATCHER, atau $KAUSA. Harga Crypto tercantum dalam USD dan dikonversi dengan kurs langsung melalui Jupiter."
+          "a": "Anda dapat membayar dengan kartu, SOL, USDC di Solana, atau $HATCHER. Harga Crypto tercantum dalam USD dan dikonversi dengan kurs langsung melalui Jupiter."
         },
         {
           "q": "Bisakah saya menurunkan tingkatan saya?",
@@ -834,7 +834,7 @@
       "createAgent": "Buat Agen",
       "seeFrameworks": "Lihat Kerangka"
     },
-    "footerNote": "Semua harga dalam USD, dibayar dengan kartu, SOL, USDC di Solana, $HATCHER, atau $KAUSA. Model yang dihosting dan penggunaan penelusuran web diukur dengan AI Credits; BYOK dibayar langsung dengan kunci penyedia Anda sendiri."
+    "footerNote": "Semua harga dalam USD, dibayar dengan kartu, SOL, USDC di Solana, atau $HATCHER. Model yang dihosting dan penggunaan penelusuran web diukur dengan AI Credits; BYOK dibayar langsung dengan kunci penyedia Anda sendiri."
   },
   "dashboard": {
     "common": {
@@ -1038,8 +1038,6 @@
       "payWithHatcher": "Bayar dengan $HATCHER",
       "hatcherDesc": "Token HATCHER di Solana",
       "hatcherDiscountDesc": "Diskon 10% dengan $HATCHER: {price}",
-      "payWithKausa": "Bayar dengan $KAUSA",
-      "kausaDesc": "Token mitra KausaLayer di Solana",
       "payWithAnsem": "Bayar dengan $ANSEM",
       "ansemDesc": "Harga penuh, 10% dibakar on-chain",
       "payWithUsdcSolana": "Bayar dengan USDC di Solana",
@@ -1379,7 +1377,6 @@
         "addons": "Ekstra",
         "wallet": "Dompet",
         "robinhood": "Robinhood",
-        "kausalayer": "KausaLayer",
         "files": "File",
         "workspace": "Ruang kerja",
         "schedules": "Jadwal",
@@ -2783,7 +2780,6 @@
       "description": "Katalog terkurasi tidak mengembalikan pack Hatcher."
     }
   },
-
   "landingV3": {
     "hero": {
       "boxLabel": "Menyebarkan",

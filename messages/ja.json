@@ -754,7 +754,7 @@
       "heading": "すべての統合は無料です",
       "badge": "すべての階層",
       "body": "Telegram、Discord、WhatsApp、Slack、Signal、iMessage、その他14+プラットフォームがすべてのティアで無料で提供されています。追加料金は一切ありません。",
-      "note": "すべての価格はUSDで記載されています。カード、SOL、USDCでSolana、$HATCHER、または$KAUSAで支払います。$HATCHER支払いは10%割引、ホスティングモデルやウェブ検索の利用はAI Creditsで計測され、BYOKは自分のプロバイダーキーで直接支払います。"
+      "note": "すべての価格はUSDで記載されています。カード、SOL、USDCでSolana、$HATCHER、で支払います。$HATCHER支払いは10%割引、ホスティングモデルやウェブ検索の利用はAI Creditsで計測され、BYOKは自分のプロバイダーキーで直接支払います。"
     },
     "compareTable": {
       "heading": "プランの比較",
@@ -802,7 +802,7 @@
         },
         {
           "q": "どのような支払い方法が受け入れられていますか?",
-          "a": "カード、SOL、USDCでSolana、$HATCHER、$KAUSAで支払うことができます。暗号資産価格はUSDで表示され、Jupiterを通じてライブレートで換算されます。"
+          "a": "カード、SOL、USDCでSolana、$HATCHER、で支払うことができます。暗号資産価格はUSDで表示され、Jupiterを通じてライブレートで換算されます。"
         },
         {
           "q": "ティアをダウングレードできますか?",
@@ -834,7 +834,7 @@
       "createAgent": "エージェント作成",
       "seeFrameworks": "フレームワークを参照"
     },
-    "footerNote": "すべての価格はUSDで、カード、SOL、USDC Solana、$HATCHER、または$KAUSAで支払えます。ホスティングモデルおよびウェブ検索の使用はAI Creditsで計測されます。BYOKは自分のプロバイダーキーで直接支払われます。"
+    "footerNote": "すべての価格はUSDで、カード、SOL、USDC Solana、$HATCHER、で支払えます。ホスティングモデルおよびウェブ検索の使用はAI Creditsで計測されます。BYOKは自分のプロバイダーキーで直接支払われます。"
   },
   "dashboard": {
     "common": {
@@ -1038,8 +1038,6 @@
       "payWithHatcher": "支払って$HATCHER",
       "hatcherDesc": "SolanaのHATCHERトークン",
       "hatcherDiscountDesc": "$HATCHERで10%オフ:{price}",
-      "payWithKausa": "支払って$KAUSA",
-      "kausaDesc": "KausaLayerパートナートークンはSolana",
       "payWithAnsem": "$ANSEMで支払う",
       "ansemDesc": "定価、10%をオンチェーンでバーン",
       "payWithUsdcSolana": "USDCで支払うSolana",
@@ -1379,7 +1377,6 @@
         "addons": "特典",
         "wallet": "財布",
         "robinhood": "Robinhood",
-        "kausalayer": "KausaLayer",
         "files": "ファイル",
         "workspace": "ワークスペース",
         "schedules": "スケジュール",
@@ -2783,7 +2780,6 @@
       "description": "厳選カタログにHatcher公式パックがありません。"
     }
   },
-
   "landingV3": {
     "hero": {
       "boxLabel": "展開",
