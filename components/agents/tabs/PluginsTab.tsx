@@ -100,7 +100,6 @@ const RECOMMENDED: Record<string, Array<{ name: string; displayName?: string; ty
     { name: 'human-writing', displayName: 'Human Writing', type: 'skill', source: 'clawhub', description: 'Write naturally human content — no AI tells, no fluff' },
     { name: 'notion-skill', displayName: 'Notion', type: 'skill', source: 'clawhub', description: 'Work with Notion pages and databases via official API' },
     { name: 'todoist-task-manager', displayName: 'Todoist', type: 'skill', source: 'clawhub', description: 'Manage tasks via todoist CLI — list, add, complete, delete' },
-    { name: 'desearch-web-search', displayName: 'Web Search', type: 'skill', source: 'clawhub', description: 'Real-time SERP-style search results with URLs and snippets' },
     { name: 'neural-memory', displayName: 'Neural Memory', type: 'skill', source: 'clawhub', description: 'Associative memory with spreading activation for recall' },
     { name: 'market-research-agent', displayName: 'Market Research', type: 'skill', source: 'clawhub', description: 'Structured market research — size, trends, competitors' },
     { name: 'elite-longterm-memory', displayName: 'Elite Memory', type: 'skill', source: 'clawhub', description: 'WAL protocol + vector search + cloud backup memory system' },
