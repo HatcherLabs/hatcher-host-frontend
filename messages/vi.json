@@ -32,7 +32,6 @@
     "closeNav": "Đóng menu điều hướng",
     "userMenu": {
       "sub_dashboard": "Tác nhân, nhiệm vụ, phê duyệt và gói.",
-      "sub_outcomePacks": "Công thức tái sử dụng cho các kết quả phổ biến.",
       "sub_myAgents": "Duyệt, chỉnh sửa, triển khai.",
       "sub_create": "Mô tả một tác nhân để nở.",
       "sub_analytics": "AI Credits, mã thông báo, xu hướng.",
@@ -833,10 +832,8 @@
     "overview": {
       "eyebrow": "Tổng quan không gian làm việc",
       "title": "Trang tổng quan",
-      "subtitle": "Theo dõi tác nhân, nhiệm vụ, phê duyệt và các công thức kết quả có thể tái sử dụng trong một chế độ xem vận hành duy nhất.",
-      "signInDescription": "Đăng nhập để xem tác nhân, nhiệm vụ, phê duyệt và Outcome Packs của bạn.",
+      "subtitle": "Theo dõi tác nhân, nhiệm vụ và phê duyệt trong một chế độ xem vận hành duy nhất.",
       "openMissionControl": "Mission Control",
-      "useOutcomePack": "Outcome Packs",
       "refresh": "Làm mới trang tổng quan",
       "partialError": "Không thể tải một số dữ liệu trong không gian làm việc.",
       "unavailable": "Dữ liệu tạm thời không khả dụng.",
@@ -856,12 +853,6 @@
         "empty": "Chưa có nhiệm vụ.",
         "emptyAction": "Tạo nhiệm vụ đầu tiên",
         "unknownAgent": "Tác nhân không xác định"
-      },
-      "packs": {
-        "title": "Outcome Packs",
-        "subtitle": "Các công thức tuyển chọn đã sẵn sàng để cấu hình.",
-        "browse": "Duyệt tất cả",
-        "empty": "Không có Outcome Pack nào."
       },
       "utilities": {
         "label": "Các công cụ khác trong không gian làm việc",
@@ -895,7 +886,7 @@
       "tourCreateTitle": "Tạo tác nhân đầu tiên của bạn",
       "tourCreateDescription": "Nhấp vào đây để ấp tác nhân AI đầu tiên của bạn với OpenClaw hoặc Hermes.",
       "tourWorkspaceTitle": "Không gian làm việc của bạn",
-      "tourWorkspaceDescription": "Chuyển giữa Tác nhân, Mission Control, Outcome Packs và Approvals từ thanh này.",
+      "tourWorkspaceDescription": "Chuyển giữa Tác nhân, Mission Control và Approvals từ thanh này.",
       "tourPlanTitle": "Gói và AI Credits",
       "tourPlanDescription": "Gói dịch vụ và số dư AI Credits của bạn nằm trong menu này. Xem mức sử dụng hoặc nâng cấp bất cứ lúc nào.",
       "statTotal": "Tổng cộng",
@@ -1235,8 +1226,7 @@
         "robinhood": "Robinhood",
         "files": "Tập tin",
         "workspace": "Không gian làm việc",
-        "schedules": "Lịch trình",
-        "workflows": "Quy trình làm việc"
+        "schedules": "Lịch trình"
       },
       "sidebarGroups": {
         "operate": "vận hành",
@@ -1559,23 +1549,6 @@
         "refresh": "Làm mới",
         "limitReached": "Các plugin và kỹ năng được bao gồm ở mọi cấp độ."
       },
-      "workflows": {
-        "new": "Quy trình làm việc mới",
-        "noWorkflows": "Chưa có quy trình làm việc nào.",
-        "noWorkflowsDescription": "Tạo quy trình làm việc đầu tiên để tự động hóa tác nhân của bạn.",
-        "enable": "Kích hoạt",
-        "disable": "Vô hiệu hóa",
-        "delete": "Xóa",
-        "save": "Lưu",
-        "run": "Chạy",
-        "running": "Đang chạy...",
-        "name": "Tên quy trình làm việc",
-        "trigger": "Trình kích hoạt",
-        "lastRun": "Lần chạy cuối cùng",
-        "status": "Trạng thái",
-        "active": "Đang hoạt động",
-        "inactive": "Không hoạt động"
-      },
       "files": {
         "noFiles": "Không tìm thấy tập tin nào.",
         "noFilesDescription": "Trình quản lý tập tin trống.",
@@ -1649,7 +1622,7 @@
     "title": "Trò chuyện với các tác nhân AI công cộng",
     "body": "Duyệt các tác nhân có chủ sở hữu kích hoạt trò chuyện công khai. Mỗi phiên chạy trong trình duyệt của bạn và định tuyến thông qua cấu hình Hatcher trực tiếp của tác nhân.",
     "emptyTitle": "Chưa có tác nhân trò chuyện công khai nào",
-    "emptyBody": "Hồ sơ công khai vẫn xuất hiện trong Hatcher City. Tác nhân hiển thị ở đây khi chủ sở hữu của họ bật trò chuyện công khai.",
+    "emptyBody": "Hồ sơ công khai xuất hiện ở đây sau khi chủ sở hữu bật trò chuyện công khai.",
     "fallbackDescription": "Một tác nhân Hatcher công khai sẵn sàng cho các phiên trò chuyện trên trình duyệt.",
     "interactions": "tương tác",
     "publicChat": "Trò chuyện công khai",
@@ -2203,272 +2176,6 @@
     "errCreate": "Không thể tạo tác nhân. Hãy tinh chỉnh mô tả và thử lại.",
     "errCreateNetwork": "Lỗi mạng khi tạo tác nhân."
   },
-  "outcomePacks": {
-    "contract": {
-      "listPlaceholder": "Mỗi dòng một mục",
-      "allTasksCompleted": "Tất cả tác vụ đã hoàn thành",
-      "artifactRequired": "Yêu cầu một sản phẩm loại {kind}",
-      "artifact": "kết quả",
-      "outputMinLength": "Ít nhất {count} ký tự",
-      "launchedPending": "Đã tạo tác vụ. Cài đặt {count} kỹ năng bắt buộc trước khi chạy."
-    },
-    "content": {
-      "categories": {
-        "markets": "Thị trường & Giao dịch",
-        "research": "Nghiên cứu",
-        "engineering": "Kỹ thuật",
-        "monitoring": "Giám sát",
-        "marketing": "Tiếp thị"
-      },
-      "options": {
-        "x": "X",
-        "linkedin": "LinkedIn",
-        "blog": "Blog",
-        "email": "Email",
-        "long": "Vị thế mua",
-        "short": "Vị thế bán"
-      },
-      "artifactKinds": {
-        "text": "văn bản",
-        "code": "mã",
-        "file": "tệp"
-      },
-      "prerequisites": {
-        "github_connection": "Thiết lập GitHub Connect hoặc token thời gian chạy GitHub cho agent này."
-      },
-      "warnings": {
-        "unsupported_framework": "Framework {framework} không được pack này hỗ trợ.",
-        "required_skills_pending": "{count, plural, one {# kỹ năng bắt buộc sẽ được đưa vào hàng đợi cài đặt. Hãy khởi động lại agent trước khi chạy tác vụ.} other {# kỹ năng bắt buộc sẽ được đưa vào hàng đợi cài đặt. Hãy khởi động lại agent trước khi chạy tác vụ.}}",
-        "schedules_disabled": "{count, plural, one {# mẫu lịch trình đã được chuẩn bị nhưng vẫn bị tắt.} other {# mẫu lịch trình đã được chuẩn bị nhưng vẫn bị tắt.}}"
-      },
-      "packs": {
-        "marketPulse": {
-          "title": "Nhịp thị trường",
-          "summary": "Tạo bản tin thị trường có dấu thời gian cho các tài sản đã chọn và những tín hiệu cần theo dõi.",
-          "fields": {
-            "assets": "Tài sản",
-            "horizon": "Khung thời gian",
-            "focus": "Trọng tâm phân tích",
-            "watchSignals": "Tín hiệu cần theo dõi",
-            "outputLanguage": "Ngôn ngữ đầu ra"
-          },
-          "deliverables": {
-            "deliverable-1": "Bản tin nhịp thị trường có dấu thời gian",
-            "deliverable-2": "Tín hiệu và rủi ro được ưu tiên"
-          },
-          "manualAcceptance": "Các nhận định thị trường có dấu thời gian và nguồn dữ liệu.",
-          "schedules": {
-            "daily-market-pulse": "Nhịp thị trường hằng ngày"
-          },
-          "taskTitle": "Nhịp thị trường",
-          "taskDescription": "Tạo bản tin có dấu thời gian về dữ liệu và rủi ro thị trường cho các tài sản đã chọn."
-        },
-        "tradePlanReview": {
-          "title": "Đánh giá kế hoạch giao dịch",
-          "summary": "Kiểm thử sức chịu đựng của luận điểm giao dịch do người dùng cung cấp mà không đặt lệnh hay quản lý giao dịch.",
-          "fields": {
-            "asset": "Tài sản",
-            "network": "Mạng lưới hoặc sàn giao dịch",
-            "direction": "Hướng giao dịch",
-            "capitalAmount": "Số vốn",
-            "capitalCurrency": "Đơn vị tiền tệ",
-            "maxLossPercent": "Mức lỗ tối đa (% vốn)",
-            "horizon": "Khung thời gian",
-            "thesis": "Luận điểm giao dịch"
-          },
-          "deliverables": {
-            "deliverable-1": "Đánh giá rủi ro kế hoạch giao dịch",
-            "deliverable-2": "Danh sách kịch bản đã được con người đánh giá"
-          },
-          "manualAcceptance": "Các giả định về quy mô vị thế và điều kiện vô hiệu hóa được nêu rõ.",
-          "taskTitle": "Đánh giá kế hoạch giao dịch",
-          "taskDescription": "Đánh giá rủi ro, giả định và kịch bản của kế hoạch giao dịch do người dùng cung cấp."
-        },
-        "portfolioRiskReview": {
-          "title": "Đánh giá rủi ro danh mục",
-          "summary": "Đánh giá các khoản nắm giữ do người dùng cung cấp về mức độ tập trung, thanh khoản và rủi ro giảm giá.",
-          "fields": {
-            "holdings": "Tài sản nắm giữ và tỷ trọng (TÀI SẢN: 25%, mỗi dòng một mục)",
-            "baseCurrency": "Tiền tệ cơ sở",
-            "objective": "Mục tiêu danh mục",
-            "constraints": "Ràng buộc"
-          },
-          "deliverables": {
-            "deliverable-1": "Bản tóm tắt rủi ro danh mục",
-            "deliverable-2": "Phương án tái cân bằng đã được con người đánh giá"
-          },
-          "manualAcceptance": "Các phương án tuân thủ mục tiêu và ràng buộc do người dùng cung cấp.",
-          "taskTitle": "Đánh giá rủi ro danh mục",
-          "taskDescription": "Đánh giá các khoản nắm giữ do người dùng cung cấp và đề xuất phương án rủi ro để con người xem xét."
-        },
-        "researchReport": {
-          "title": "Báo cáo nghiên cứu",
-          "summary": "Tạo báo cáo nghiên cứu có nguồn dẫn, tập trung vào một chủ đề cụ thể và sẵn sàng hỗ trợ quyết định.",
-          "fields": {
-            "topic": "Chủ đề",
-            "questions": "Câu hỏi nghiên cứu",
-            "audience": "Đối tượng",
-            "outputLanguage": "Ngôn ngữ đầu ra"
-          },
-          "deliverables": {
-            "deliverable-1": "Báo cáo có cấu trúc",
-            "deliverable-2": "Danh sách nguồn kèm trích dẫn trực tiếp"
-          },
-          "manualAcceptance": "Các nguồn củng cố những nhận định chính.",
-          "taskTitle": "Báo cáo nghiên cứu",
-          "taskDescription": "Tạo báo cáo nghiên cứu dựa trên nguồn từ bản yêu cầu đã cung cấp."
-        },
-        "pullRequestReview": {
-          "title": "Đánh giá Pull Request",
-          "summary": "Đánh giá một Pull Request trên GitHub về tính chính xác, rủi ro và mức độ sẵn sàng phát hành.",
-          "fields": {
-            "repository": "Repository (chủ sở hữu/tên)",
-            "pullRequestNumber": "Số Pull Request",
-            "focus": "Trọng tâm đánh giá"
-          },
-          "deliverables": {
-            "deliverable-1": "Các phát hiện xếp theo mức độ nghiêm trọng",
-            "deliverable-2": "Kết luận phát hành hoặc chặn"
-          },
-          "manualAcceptance": "Mỗi phát hiện có tính chặn đều kèm bằng chứng cụ thể.",
-          "taskTitle": "Đánh giá Pull Request",
-          "taskDescription": "Đánh giá Pull Request đã chỉ định về tính chính xác và rủi ro phát hành."
-        },
-        "competitorWatch": {
-          "title": "Theo dõi đối thủ",
-          "summary": "Tạo bản tin tình báo cạnh tranh và một mẫu theo dõi hằng ngày ở trạng thái tắt.",
-          "fields": {
-            "company": "Công ty hoặc sản phẩm của bạn",
-            "competitors": "Đối thủ",
-            "market": "Thị trường",
-            "watchSignals": "Tín hiệu cần theo dõi"
-          },
-          "deliverables": {
-            "deliverable-1": "Bản tin cơ sở về đối thủ",
-            "deliverable-2": "Các tín hiệu theo dõi đã được ưu tiên"
-          },
-          "manualAcceptance": "Các nhận định quan trọng đều có ngày và nguồn dẫn.",
-          "schedules": {
-            "daily-competitor-watch": "Theo dõi đối thủ hằng ngày"
-          },
-          "taskTitle": "Theo dõi đối thủ",
-          "taskDescription": "Thiết lập bức tranh cơ sở hiện tại về đối thủ, có nguồn dẫn hỗ trợ."
-        },
-        "launchContent": {
-          "title": "Nội dung ra mắt",
-          "summary": "Chuyển định vị sản phẩm thành các bài đăng sẵn sàng cho từng kênh và một kế hoạch hành động.",
-          "fields": {
-            "product": "Sản phẩm",
-            "positioning": "Định vị và đề nghị",
-            "audience": "Đối tượng",
-            "channels": "Kênh",
-            "tone": "Giọng điệu"
-          },
-          "deliverables": {
-            "deliverable-1": "Tóm tắt định vị",
-            "deliverable-2": "Bản nháp bài đăng sẵn sàng cho từng kênh",
-            "deliverable-3": "Kế hoạch hành động ra mắt"
-          },
-          "manualAcceptance": "Các nhận định khớp với đề nghị do chủ sở hữu cung cấp.",
-          "taskTitle": "Nội dung ra mắt",
-          "taskDescription": "Chuẩn bị bản nháp nội dung ra mắt và kế hoạch hành động có con người xem xét."
-        }
-      }
-    },
-    "authenticating": "Đang kiểm tra phiên...",
-    "signInTitle": "Đăng nhập vào Outcome Packs",
-    "signInDescription": "Outcome Packs cấu hình tác vụ riêng tư và tích hợp cho các agent trong tài khoản.",
-    "signIn": "Đăng nhập",
-    "eyebrow": "Vận hành tuyển chọn",
-    "title": "Outcome Packs",
-    "subtitle": "Cấu hình công thức đã kiểm chứng, xác nhận thiết lập rồi chuyển vào Mission Control.",
-    "refresh": "Làm mới danh mục",
-    "missionControl": "Mission Control",
-    "tryAgain": "Thử lại",
-    "loading": "Đang tải Outcome Packs...",
-    "detailLoading": "Đang tải chi tiết pack...",
-    "detailError": "Không thể tải pack này.",
-    "catalog": {
-      "label": "Danh mục Outcome Pack",
-      "title": "Danh mục",
-      "firstParty": "Do Hatcher cung cấp",
-      "version": "Phiên bản {version}"
-    },
-    "detail": {
-      "curated": "Công thức tuyển chọn",
-      "runtimeMinutes": "Thời lượng: {count} phút",
-      "frameworks": "Framework tương thích",
-      "anyFramework": "Mọi framework được lưu trữ",
-      "requirements": "Kỹ năng và điều kiện",
-      "noRequirements": "Không cần thiết lập thêm",
-      "plan": "Kế hoạch tác vụ",
-      "taskCount": "{count} tác vụ",
-      "tasks": "Tác vụ của pack",
-      "acceptance": "Tiêu chí nghiệm thu"
-    },
-    "configure": {
-      "title": "Cấu hình kết quả",
-      "subtitle": "Chọn agent và cung cấp dữ liệu cho kế hoạch tác vụ.",
-      "agent": "Agent",
-      "agentPlaceholder": "Chọn agent",
-      "selectPlaceholder": "Chọn một tùy chọn",
-      "agentStatus": "{framework} - {status}",
-      "required": "Bắt buộc"
-    },
-    "validation": {
-      "agent": "Chọn agent trước khi chuẩn bị pack.",
-      "required": "Hoàn thành mọi trường bắt buộc.",
-      "fieldInvalid": "Nhập nội dung trong giới hạn cho phép."
-    },
-    "preview": {
-      "label": "Xem trước khi chạy",
-      "title": "Xem trước thiết lập",
-      "subtitle": "Khả năng tương thích, điều kiện, ngân sách và lịch đang tắt.",
-      "empty": "Chuẩn bị pack để kiểm tra thiết lập trước khi tạo bất kỳ thứ gì.",
-      "compatible": "Agent tương thích",
-      "incompatible": "Agent không tương thích",
-      "blockers": "Trở ngại thiết lập",
-      "warnings": "Xem lại trước khi chạy",
-      "resolvedTasks": "Tác vụ đã phân giải",
-      "budget": "Mục tiêu ngân sách",
-      "noBudget": "Không có mục tiêu ngân sách",
-      "credits": "{count} AI Credits",
-      "budgetAdvisory": "Giới hạn cứng cho thực thi trả phí; không thể giữ chỗ AI Credits vượt quá mức này.",
-      "maxRuntime": "Thời lượng tối đa: {count} phút.",
-      "schedules": "Lịch đề xuất",
-      "scheduleOff": "Tắt",
-      "scheduleNotice": "Lịch vẫn tắt khi khởi chạy và cần xác nhận riêng.",
-      "manualReviewTitle": "Yêu cầu chủ sở hữu đánh giá",
-      "manualReviewDescription": "Kết quả hoàn tất vẫn ở Mission Control cho đến khi chủ sở hữu phê duyệt hoặc từ chối.",
-      "setup": {
-        "connectors": "Mở Connectors",
-        "dev": "Mở thiết lập nhà phát triển",
-        "integrations": "Mở Integrations"
-      }
-    },
-    "actions": {
-      "prepare": "Chuẩn bị bản xem trước",
-      "prepareAgain": "Chuẩn bị lại",
-      "preparing": "Đang chuẩn bị...",
-      "launchTitle": "Tạo trong Mission Control",
-      "ready": "Sẵn sàng khởi chạy",
-      "blocked": "Chuẩn bị pack và xử lý trở ngại",
-      "launch": "Khởi chạy pack",
-      "launching": "Đang khởi chạy..."
-    },
-    "messages": {
-      "launched": "Đã khởi chạy Outcome Pack."
-    },
-    "noAgents": {
-      "title": "Không có agent",
-      "description": "Tạo agent trước khi cấu hình Outcome Pack.",
-      "action": "Tạo agent"
-    },
-    "empty": {
-      "title": "Không có Outcome Pack",
-      "description": "Danh mục tuyển chọn không trả về pack của Hatcher."
-    }
-  },
   "landingV3": {
     "hero": {
       "boxLabel": "Triển khai",
@@ -2572,26 +2279,6 @@
     }
   },
   "missionControl": {
-    "outcomePack": {
-      "title": "Outcome Pack",
-      "unknown": "Pack không xác định",
-      "version": "Phiên bản {version}",
-      "skillsReady": "Đã cài các kỹ năng bắt buộc",
-      "skillsPending": "Kỹ năng bắt buộc đang chờ",
-      "openPlugins": "Mở Plugins và khởi động lại agent",
-      "acceptance": "Tiêu chí nghiệm thu",
-      "allTasksCompleted": "Tất cả tác vụ đã hoàn thành",
-      "artifactRequired": "Yêu cầu một sản phẩm loại {kind}",
-      "artifact": "kết quả",
-      "outputMinLength": "Ít nhất {count} ký tự",
-      "schedulesDisabled": "{count} mẫu lịch vẫn bị tắt và sẽ không tự động chạy.",
-      "skillStatus": {
-        "installed": "Đã cài",
-        "pending": "Đang chờ",
-        "failed": "Thất bại",
-        "missing": "Thiếu"
-      }
-    },
     "authenticating": "Checking your session...",
     "signInTitle": "Sign in to Mission Control",
     "signInDescription": "Mission Control shows private tasks, approvals, runs, and artifacts across your agents.",
@@ -2601,7 +2288,6 @@
     "subtitle": "Create, approve, run, and inspect one-shot work across every agent.",
     "refresh": "Refresh tasks",
     "newTask": "New task",
-    "outcomePacks": "Outcome Packs",
     "tryAgain": "Try again",
     "loading": "Loading tasks...",
     "unknownAgent": "Unknown agent",

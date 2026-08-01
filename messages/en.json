@@ -34,7 +34,6 @@
     "userMenu": {
       "sub_dashboard": "Agents, missions, approvals, and packs.",
       "sub_missionControl": "Tasks, approvals, runs, and outputs.",
-      "sub_outcomePacks": "Reusable recipes for common outcomes.",
       "sub_myAgents": "Browse, edit, deploy.",
       "sub_create": "Describe an agent to hatch.",
       "sub_analytics": "AI Credits, tokens, trends.",
@@ -833,10 +832,8 @@
     "overview": {
       "eyebrow": "Workspace overview",
       "title": "Dashboard",
-      "subtitle": "Track agents, missions, approvals, and reusable outcome recipes from one operational view.",
-      "signInDescription": "Sign in to view your agents, missions, approvals, and Outcome Packs.",
+      "subtitle": "Track agents, missions, and approvals from one operational view.",
       "openMissionControl": "Mission Control",
-      "useOutcomePack": "Outcome Packs",
       "refresh": "Refresh dashboard",
       "partialError": "Some workspace data could not be loaded.",
       "unavailable": "Data temporarily unavailable.",
@@ -856,12 +853,6 @@
         "empty": "No missions yet.",
         "emptyAction": "Create your first mission",
         "unknownAgent": "Unknown agent"
-      },
-      "packs": {
-        "title": "Outcome Packs",
-        "subtitle": "Curated recipes ready to configure.",
-        "browse": "Browse all",
-        "empty": "No Outcome Packs are available."
       },
       "utilities": {
         "label": "More workspace tools",
@@ -895,7 +886,7 @@
       "tourCreateTitle": "Create Your First Agent",
       "tourCreateDescription": "Click here to hatch your first AI agent with OpenClaw or Hermes.",
       "tourWorkspaceTitle": "Your Workspace",
-      "tourWorkspaceDescription": "Move between Agents, Mission Control, Outcome Packs, and Approvals from this bar.",
+      "tourWorkspaceDescription": "Move between Agents, Mission Control, and Approvals from this bar.",
       "tourPlanTitle": "Plan & AI Credits",
       "tourPlanDescription": "Your plan and AI credit balance live under this menu. Review usage or upgrade anytime.",
       "statTotal": "Total",
@@ -1235,8 +1226,7 @@
         "robinhood": "Robinhood",
         "files": "Files",
         "workspace": "Workspace",
-        "schedules": "Schedules",
-        "workflows": "Workflows"
+        "schedules": "Schedules"
       },
       "sidebarGroups": {
         "operate": "Operate",
@@ -1559,23 +1549,6 @@
         "refresh": "Refresh",
         "limitReached": "Plugins and skills are included on every tier."
       },
-      "workflows": {
-        "new": "New Workflow",
-        "noWorkflows": "No workflows yet.",
-        "noWorkflowsDescription": "Create your first workflow to automate your agent.",
-        "enable": "Enable",
-        "disable": "Disable",
-        "delete": "Delete",
-        "save": "Save",
-        "run": "Run",
-        "running": "Running...",
-        "name": "Workflow Name",
-        "trigger": "Trigger",
-        "lastRun": "Last Run",
-        "status": "Status",
-        "active": "Active",
-        "inactive": "Inactive"
-      },
       "files": {
         "noFiles": "No files found.",
         "noFilesDescription": "The file manager is empty.",
@@ -1649,7 +1622,7 @@
     "title": "Chat with public AI agents",
     "body": "Browse agents whose owners enabled public chat. Each session runs in your browser and routes through the agent's live Hatcher configuration.",
     "emptyTitle": "No public chat agents yet",
-    "emptyBody": "Public profiles still appear in Hatcher City. Agents show here once their owner enables public chat.",
+    "emptyBody": "Public profiles appear here after their owner enables public chat.",
     "fallbackDescription": "A public Hatcher agent ready for browser chat sessions.",
     "interactions": "interactions",
     "publicChat": "Public chat",
@@ -2204,26 +2177,6 @@
     "errCreateNetwork": "Network error while creating the agent."
   },
   "missionControl": {
-    "outcomePack": {
-      "title": "Outcome Pack",
-      "unknown": "Unknown pack",
-      "version": "Version {version}",
-      "skillsReady": "Required skills installed",
-      "skillsPending": "Required skills pending",
-      "openPlugins": "Open Plugins and restart agent",
-      "acceptance": "Acceptance criteria",
-      "allTasksCompleted": "All tasks are completed",
-      "artifactRequired": "Requires a {kind} artifact",
-      "artifact": "result",
-      "outputMinLength": "At least {count} characters",
-      "schedulesDisabled": "{count} schedule template(s) remain disabled and will not run automatically.",
-      "skillStatus": {
-        "installed": "Installed",
-        "pending": "Pending",
-        "failed": "Failed",
-        "missing": "Missing"
-      }
-    },
     "authenticating": "Checking your session...",
     "signInTitle": "Sign in to Mission Control",
     "signInDescription": "Mission Control shows private tasks, approvals, runs, and artifacts across your agents.",
@@ -2233,7 +2186,6 @@
     "subtitle": "Create, approve, run, and inspect one-shot work across every agent.",
     "refresh": "Refresh tasks",
     "newTask": "New task",
-    "outcomePacks": "Outcome Packs",
     "tryAgain": "Try again",
     "loading": "Loading tasks...",
     "unknownAgent": "Unknown agent",
@@ -2374,272 +2326,6 @@
       "title": "No matching tasks",
       "description": "No tasks match the selected agent and status filters.",
       "action": "Clear filters"
-    }
-  },
-  "outcomePacks": {
-    "contract": {
-      "listPlaceholder": "One item per line",
-      "allTasksCompleted": "All tasks are completed",
-      "artifactRequired": "Requires a {kind} artifact",
-      "artifact": "result",
-      "outputMinLength": "At least {count} characters",
-      "launchedPending": "Task created. Install {count} required skill(s) before starting it."
-    },
-    "content": {
-      "categories": {
-        "markets": "Markets & Trading",
-        "research": "Research",
-        "engineering": "Engineering",
-        "monitoring": "Monitoring",
-        "marketing": "Marketing"
-      },
-      "options": {
-        "x": "X",
-        "linkedin": "LinkedIn",
-        "blog": "Blog",
-        "email": "Email",
-        "long": "Long",
-        "short": "Short"
-      },
-      "artifactKinds": {
-        "text": "text",
-        "code": "code",
-        "file": "file"
-      },
-      "prerequisites": {
-        "github_connection": "Configure GitHub Connect or a GitHub runtime token for this agent."
-      },
-      "warnings": {
-        "unsupported_framework": "Framework {framework} is not supported by this pack.",
-        "required_skills_pending": "{count, plural, one {# required skill will be queued for installation. Restart the agent before starting the task.} other {# required skills will be queued for installation. Restart the agent before starting the task.}}",
-        "schedules_disabled": "{count, plural, one {# schedule template is prepared but remains disabled.} other {# schedule templates are prepared but remain disabled.}}"
-      },
-      "packs": {
-        "marketPulse": {
-          "title": "Market Pulse",
-          "summary": "Produce a timestamped market brief for selected assets and watch signals.",
-          "fields": {
-            "assets": "Assets",
-            "horizon": "Time horizon",
-            "focus": "Analysis focus",
-            "watchSignals": "Signals to watch",
-            "outputLanguage": "Output language"
-          },
-          "deliverables": {
-            "deliverable-1": "Timestamped market pulse",
-            "deliverable-2": "Prioritized watch signals and risks"
-          },
-          "manualAcceptance": "Market observations include timestamps and data sources.",
-          "schedules": {
-            "daily-market-pulse": "Daily market pulse"
-          },
-          "taskTitle": "Market pulse",
-          "taskDescription": "Produce a timestamped market-data and risk brief for the selected assets."
-        },
-        "tradePlanReview": {
-          "title": "Trade Plan Review",
-          "summary": "Stress-test an owner-provided trade thesis without placing or managing a trade.",
-          "fields": {
-            "asset": "Asset",
-            "network": "Network or venue",
-            "direction": "Direction",
-            "capitalAmount": "Capital amount",
-            "capitalCurrency": "Capital currency",
-            "maxLossPercent": "Maximum loss (% of capital)",
-            "horizon": "Time horizon",
-            "thesis": "Trade thesis"
-          },
-          "deliverables": {
-            "deliverable-1": "Trade plan risk review",
-            "deliverable-2": "Human-reviewed scenario checklist"
-          },
-          "manualAcceptance": "Sizing assumptions and invalidation conditions are explicit.",
-          "taskTitle": "Trade plan review",
-          "taskDescription": "Review an owner-provided trade plan for risk, assumptions, and scenarios."
-        },
-        "portfolioRiskReview": {
-          "title": "Portfolio Risk Review",
-          "summary": "Assess owner-provided holdings for concentration, liquidity, and downside risk.",
-          "fields": {
-            "holdings": "Holdings and allocations (ASSET: 25%, one per line)",
-            "baseCurrency": "Base currency",
-            "objective": "Portfolio objective",
-            "constraints": "Constraints"
-          },
-          "deliverables": {
-            "deliverable-1": "Portfolio risk brief",
-            "deliverable-2": "Human-reviewed rebalance options"
-          },
-          "manualAcceptance": "Options respect the owner-provided objective and constraints.",
-          "taskTitle": "Portfolio risk review",
-          "taskDescription": "Assess owner-provided holdings and outline human-reviewed risk options."
-        },
-        "researchReport": {
-          "title": "Research Report",
-          "summary": "Produce a sourced, decision-ready research report on a focused topic.",
-          "fields": {
-            "topic": "Topic",
-            "questions": "Research questions",
-            "audience": "Audience",
-            "outputLanguage": "Output language"
-          },
-          "deliverables": {
-            "deliverable-1": "Structured report",
-            "deliverable-2": "Source list with direct citations"
-          },
-          "manualAcceptance": "Sources support the central claims.",
-          "taskTitle": "Research report",
-          "taskDescription": "Produce a source-backed research report from the supplied brief."
-        },
-        "pullRequestReview": {
-          "title": "Pull Request Review",
-          "summary": "Review a GitHub pull request for correctness, risk, and release readiness.",
-          "fields": {
-            "repository": "Repository (owner/name)",
-            "pullRequestNumber": "Pull request number",
-            "focus": "Review focus"
-          },
-          "deliverables": {
-            "deliverable-1": "Severity-ranked findings",
-            "deliverable-2": "Ship or block verdict"
-          },
-          "manualAcceptance": "Every blocking finding includes concrete evidence.",
-          "taskTitle": "Pull request review",
-          "taskDescription": "Review the specified pull request for correctness and release risk."
-        },
-        "competitorWatch": {
-          "title": "Competitor Watch",
-          "summary": "Create a competitor intelligence brief and a disabled daily monitoring template.",
-          "fields": {
-            "company": "Your company or product",
-            "competitors": "Competitors",
-            "market": "Market",
-            "watchSignals": "Signals to watch"
-          },
-          "deliverables": {
-            "deliverable-1": "Competitor baseline brief",
-            "deliverable-2": "Prioritized watch signals"
-          },
-          "manualAcceptance": "Material claims are dated and sourced.",
-          "schedules": {
-            "daily-competitor-watch": "Daily competitor watch"
-          },
-          "taskTitle": "Competitor watch",
-          "taskDescription": "Establish a current, source-backed competitor baseline."
-        },
-        "launchContent": {
-          "title": "Launch Content",
-          "summary": "Turn product positioning into channel-ready launch posts and an action plan.",
-          "fields": {
-            "product": "Product",
-            "positioning": "Positioning and offer",
-            "audience": "Audience",
-            "channels": "Channels",
-            "tone": "Tone"
-          },
-          "deliverables": {
-            "deliverable-1": "Positioning summary",
-            "deliverable-2": "Channel-ready post drafts",
-            "deliverable-3": "Launch action plan"
-          },
-          "manualAcceptance": "Claims match the owner-provided offer.",
-          "taskTitle": "Launch content",
-          "taskDescription": "Prepare draft launch content and a human-reviewed action plan."
-        }
-      }
-    },
-    "authenticating": "Checking your session...",
-    "signInTitle": "Sign in to Outcome Packs",
-    "signInDescription": "Outcome Packs configure private tasks and integrations for agents in your account.",
-    "signIn": "Sign in",
-    "eyebrow": "Curated operations",
-    "title": "Outcome Packs",
-    "subtitle": "Configure a proven recipe, verify its setup, then launch it into Mission Control.",
-    "refresh": "Refresh catalog",
-    "missionControl": "Mission Control",
-    "tryAgain": "Try again",
-    "loading": "Loading Outcome Packs...",
-    "detailLoading": "Loading pack details...",
-    "detailError": "This pack could not be loaded.",
-    "catalog": {
-      "label": "Outcome Pack catalog",
-      "title": "Catalog",
-      "firstParty": "Hatcher first-party",
-      "version": "Version {version}"
-    },
-    "detail": {
-      "curated": "Curated recipe",
-      "runtimeMinutes": "{count, plural, one {# minute runtime} other {# minutes runtime}}",
-      "frameworks": "Compatible frameworks",
-      "anyFramework": "Any hosted framework",
-      "requirements": "Skills and prerequisites",
-      "noRequirements": "No extra setup",
-      "plan": "Task plan",
-      "taskCount": "{count, plural, one {# task} other {# tasks}}",
-      "tasks": "Pack tasks",
-      "acceptance": "Acceptance criteria"
-    },
-    "configure": {
-      "title": "Configure outcome",
-      "subtitle": "Choose the agent and provide the inputs used to resolve the task plan.",
-      "agent": "Agent",
-      "agentPlaceholder": "Choose an agent",
-      "selectPlaceholder": "Choose an option",
-      "agentStatus": "{framework} - {status}",
-      "required": "Required"
-    },
-    "validation": {
-      "agent": "Choose an agent before preparing this pack.",
-      "required": "Complete every required input.",
-      "fieldInvalid": "Complete this input within its allowed length."
-    },
-    "preview": {
-      "label": "Launch preview",
-      "title": "Setup preview",
-      "subtitle": "Compatibility, prerequisites, budget, and inactive schedules.",
-      "empty": "Prepare the pack to verify its setup before anything is created.",
-      "compatible": "Agent is compatible",
-      "incompatible": "Agent is not compatible",
-      "blockers": "Setup blockers",
-      "warnings": "Review before launch",
-      "resolvedTasks": "Resolved tasks",
-      "budget": "Budget target",
-      "noBudget": "No budget target",
-      "credits": "{count} AI Credits",
-      "budgetAdvisory": "Hard limit for paid execution; the mission cannot reserve AI Credits beyond it.",
-      "maxRuntime": "Maximum runtime: {count, plural, one {# minute} other {# minutes}}.",
-      "schedules": "Proposed schedules",
-      "scheduleOff": "Off",
-      "scheduleNotice": "Schedules stay disabled at launch and require a separate confirmation.",
-      "manualReviewTitle": "Owner review required",
-      "manualReviewDescription": "The completed result stays in Mission Control until the owner approves or rejects it.",
-      "setup": {
-        "connectors": "Open Connectors",
-        "dev": "Open Developer setup",
-        "integrations": "Open Integrations"
-      }
-    },
-    "actions": {
-      "prepare": "Prepare preview",
-      "prepareAgain": "Prepare again",
-      "preparing": "Preparing...",
-      "launchTitle": "Create in Mission Control",
-      "ready": "Ready to launch",
-      "blocked": "Prepare the pack and resolve blockers",
-      "launch": "Launch pack",
-      "launching": "Launching..."
-    },
-    "messages": {
-      "launched": "Outcome Pack launched."
-    },
-    "noAgents": {
-      "title": "No agent available",
-      "description": "Create an agent before configuring an Outcome Pack.",
-      "action": "Create agent"
-    },
-    "empty": {
-      "title": "No Outcome Packs available",
-      "description": "The curated catalog could not return any first-party packs."
     }
   },
   "landingV3": {

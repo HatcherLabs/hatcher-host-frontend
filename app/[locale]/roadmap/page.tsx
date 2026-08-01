@@ -12,8 +12,6 @@ import {
   Landmark,
   ListChecks,
   Network,
-  PackageCheck,
-  Repeat2,
   Route,
   ShieldCheck,
 } from 'lucide-react';
@@ -45,7 +43,6 @@ export function generateMetadata(): Metadata {
 
 const ICONS: Record<RoadmapIcon, LucideIcon> = {
   mission: ListChecks,
-  packs: PackageCheck,
   models: Network,
   operate: CircleGauge,
   run: Bot,
@@ -53,7 +50,6 @@ const ICONS: Record<RoadmapIcon, LucideIcon> = {
   own: Landmark,
   metering: CircleGauge,
   approvals: ShieldCheck,
-  recurring: Repeat2,
   earn: Coins,
   city: Building2,
   verified: BadgeCheck,
@@ -241,9 +237,9 @@ export default async function RoadmapPage() {
               })}
             </div> : (
               <div className={styles.targetEmpty}>
-                <PackageCheck aria-hidden="true" />
+                <ListChecks aria-hidden="true" />
                 <div>
-                  <h3>Outcome Packs V2 shipped</h3>
+                  <h3>No active build target</h3>
                   <p>The next build target will move here once its product scope and proof targets are concrete.</p>
                 </div>
               </div>

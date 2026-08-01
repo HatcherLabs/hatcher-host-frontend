@@ -379,7 +379,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <p>Instead of browsing a static template catalog, describe the outcome you want. Hatcher drafts the framework, identity, skills, integrations, and model settings, then gives you a launch review before deployment.</p>
 
 <h2>What's Next</h2>
-<p>We are a small team and we ship fast. The roadmap includes multi-agent workflows, visual workflow editors, custom domain routing for public-facing agents, and a lot more integrations. We will be posting updates here as we go.</p>
+<p>We are a small team and we ship fast. The roadmap includes stronger agent operations, remote MCP connectors, safer approvals, and more integrations. We will be posting updates here as we go.</p>
 <p>Sign up at <a href="https://hatcher.host/register">hatcher.host/register</a> — it takes 30 seconds, no credit card required. Your first agent is free.</p>`,
     author: 'Hatcher Labs',
     date: '2026-03-28',

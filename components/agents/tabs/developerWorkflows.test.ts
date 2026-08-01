@@ -5,7 +5,6 @@ import {
   getGithubConnectionUi,
   getAgentTaskTemplates,
   getDevCapabilityCards,
-  getDevWorkflowTemplates,
   getGithubConnectionMethods,
   getGithubRepoInputError,
   normalizeGithubRepoInput,
@@ -49,25 +48,6 @@ describe("developer workflows helpers", () => {
       failures: 0,
       averageLatencyMs: 0,
     });
-  });
-
-  it("builds workflow templates with a trigger and at least one action node", () => {
-    const templates = getDevWorkflowTemplates();
-
-    expect(templates.length).toBeGreaterThanOrEqual(2);
-    for (const template of templates) {
-      expect(
-        template.nodes.some((node) => node.data.category === "trigger"),
-      ).toBe(true);
-      expect(
-        template.nodes.some(
-          (node) =>
-            node.data.category === "action" ||
-            node.data.category === "response",
-        ),
-      ).toBe(true);
-      expect(template.edges.length).toBeGreaterThan(0);
-    }
   });
 
   it("describes developer capability cards with stable statuses", () => {

@@ -1,5 +1,5 @@
 export function agentWorkspaceHref(
-  pathname: '/dashboard/missions' | '/dashboard/outcome-packs' | '/dashboard/approvals',
+  pathname: '/dashboard/missions' | '/dashboard/approvals',
   agentId: string,
   params: Record<string, string> = {},
 ): string {

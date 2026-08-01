@@ -14,14 +14,8 @@ import {
 import type {
   Agent,
   CreateMissionTaskBody,
-  LaunchOutcomePackBody,
-  LaunchOutcomePackResponse,
-  OutcomePackRecurrence,
   MissionTask,
   MissionTasksResponse,
-  PreparedOutcomePack,
-  PrepareOutcomePackBody,
-  PublicOutcomePack,
   AgentCommCallBody,
   AgentCommCallResponse,
   AgentCommDiscoverResponse,
@@ -554,53 +548,6 @@ export const api = {
     req<{ task: MissionTask }>(`/agents/${agentId}/tasks/${taskId}/resume`, {
       method: "POST",
     }),
-
-  /** List the curated, first-party task recipes available to the current user. */
-  getOutcomePacks: () => req<{ packs: PublicOutcomePack[] }>("/outcome-packs"),
-
-  /** Get the complete configuration schema for one curated recipe. */
-  getOutcomePack: (packId: string) =>
-    req<{ pack: PublicOutcomePack }>(
-      `/outcome-packs/${encodeURIComponent(packId)}`,
-    ),
-
-  /** Resolve a recipe for an agent without creating tasks or schedules. */
-  prepareOutcomePack: (packId: string, body: PrepareOutcomePackBody) =>
-    req<{ preparation: PreparedOutcomePack }>(
-      `/outcome-packs/${encodeURIComponent(packId)}/prepare`,
-      { method: "POST", body: JSON.stringify(body) },
-    ),
-
-  /** Create the prepared task. Schedules remain disabled for explicit confirmation. */
-  launchOutcomePack: (packId: string, body: LaunchOutcomePackBody) =>
-    req<LaunchOutcomePackResponse>(
-      `/outcome-packs/${encodeURIComponent(packId)}/launch`,
-      { method: "POST", body: JSON.stringify(body) },
-    ),
-
-  /** List owner-authorized Outcome Pack recurrences across agents. */
-  getOutcomePackRecurrences: (agentId?: string) =>
-    req<{ recurrences: OutcomePackRecurrence[] }>(
-      `/outcome-packs/recurrences${agentId ? `?agentId=${encodeURIComponent(agentId)}` : ""}`,
-    ),
-
-  pauseOutcomePackRecurrence: (recurrenceId: string) =>
-    req<{ id: string; enabled: false }>(
-      `/outcome-packs/recurrences/${encodeURIComponent(recurrenceId)}/pause`,
-      { method: "POST" },
-    ),
-
-  resumeOutcomePackRecurrence: (recurrenceId: string) =>
-    req<{ id: string; enabled: true; nextRunAt: string }>(
-      `/outcome-packs/recurrences/${encodeURIComponent(recurrenceId)}/resume`,
-      { method: "POST" },
-    ),
-
-  deleteOutcomePackRecurrence: (recurrenceId: string) =>
-    req<{ id: string; deleted: true }>(
-      `/outcome-packs/recurrences/${encodeURIComponent(recurrenceId)}`,
-      { method: "DELETE" },
-    ),
 
   /** Get a single agent */
   getAgent: (id: string) => req<Agent>(`/agents/${id}`),
@@ -3256,99 +3203,6 @@ export const api = {
       expected?: string;
       found?: string[];
     }>(`/domains/${id}/verify`, { method: "POST" }),
-
-  // ─── Workflows (Visual Builder) ────────────────────────────
-  /** List all workflows for an agent */
-  getAgentWorkflows: (agentId: string) =>
-    req<
-      Array<{
-        id: string;
-        agentId: string;
-        name: string;
-        enabled: boolean;
-        nodes: unknown[];
-        edges: unknown[];
-        createdAt: string;
-        updatedAt: string;
-      }>
-    >(`/agents/${agentId}/workflows`),
-
-  /** Create a new workflow */
-  createAgentWorkflow: (
-    agentId: string,
-    data: { name: string; nodes?: unknown[]; edges?: unknown[] },
-  ) =>
-    req<{
-      id: string;
-      agentId: string;
-      name: string;
-      enabled: boolean;
-      nodes: unknown[];
-      edges: unknown[];
-      createdAt: string;
-      updatedAt: string;
-    }>(`/agents/${agentId}/workflows`, {
-      method: "POST",
-      body: JSON.stringify(data),
-    }),
-
-  /** Update a workflow */
-  updateAgentWorkflow: (
-    agentId: string,
-    workflowId: string,
-    data: {
-      name?: string;
-      nodes?: unknown[];
-      edges?: unknown[];
-      enabled?: boolean;
-    },
-  ) =>
-    req<{
-      id: string;
-      agentId: string;
-      name: string;
-      enabled: boolean;
-      nodes: unknown[];
-      edges: unknown[];
-      createdAt: string;
-      updatedAt: string;
-    }>(`/agents/${agentId}/workflows/${workflowId}`, {
-      method: "PATCH",
-      body: JSON.stringify(data),
-    }),
-
-  /** Delete a workflow */
-  deleteAgentWorkflow: (agentId: string, workflowId: string) =>
-    req<{ deleted: boolean; id: string }>(
-      `/agents/${agentId}/workflows/${workflowId}`,
-      {
-        method: "DELETE",
-      },
-    ),
-
-  /** Toggle workflow enabled/disabled */
-  toggleAgentWorkflow: (agentId: string, workflowId: string) =>
-    req<{ id: string; enabled: boolean }>(
-      `/agents/${agentId}/workflows/${workflowId}/toggle`,
-      {
-        method: "POST",
-      },
-    ),
-
-  /** Get recent workflow execution logs */
-  getAgentWorkflowLogs: (agentId: string, workflowId: string) =>
-    req<{
-      logs: Array<{
-        timestamp: string;
-        trigger: string;
-        workflowId: string;
-        workflowName: string;
-        nodesExecuted: string[];
-        output: string | null;
-        error: string | null;
-        durationMs: number;
-      }>;
-    }>(`/agents/${agentId}/workflows/${workflowId}/logs`),
 
   // ─── Agent-to-Agent Communication ─────────────────────────
   getAgentCommPermissions: (agentId: string) =>

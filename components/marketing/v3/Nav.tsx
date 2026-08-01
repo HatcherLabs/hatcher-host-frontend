@@ -22,7 +22,6 @@ import {
   ListChecks,
   LogOut,
   Newspaper,
-  PackageCheck,
   Plus,
   Rocket,
   Search,
@@ -56,14 +55,12 @@ export function Nav() {
   const tGroups = useTranslations('nav.groups');
   const tMenu = useTranslations('nav.userMenu');
   const tMission = useTranslations('missionControl');
-  const tOutcome = useTranslations('outcomePacks');
 
   const WORKSPACE_MENU = useMemo(() => ([
     { key: 'dashboard', label: tNav('dashboard'), sub: tMenu('sub_dashboard'), href: '/dashboard', Icon: LayoutDashboard },
     { key: 'missions', label: tMission('title'), sub: tMenu('sub_missionControl'), href: '/dashboard/missions', Icon: ListChecks },
-    { key: 'outcomePacks', label: tOutcome('title'), sub: tMenu('sub_outcomePacks'), href: '/dashboard/outcome-packs', Icon: PackageCheck },
     { key: 'approvals', label: 'Action approvals', sub: 'Review effectful agent actions', href: '/dashboard/approvals', Icon: ShieldCheck },
-  ] satisfies ReadonlyArray<{ key: string; label: string; sub: string; href: string; Icon: LucideIcon }>), [tMenu, tMission, tNav, tOutcome]);
+  ] satisfies ReadonlyArray<{ key: string; label: string; sub: string; href: string; Icon: LucideIcon }>), [tMenu, tMission, tNav]);
 
   const USER_MENU = useMemo(() => ([
     ...WORKSPACE_MENU,

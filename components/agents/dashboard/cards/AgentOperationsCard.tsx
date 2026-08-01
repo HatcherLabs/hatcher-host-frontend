@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { ArrowRight, ListChecks, Loader2, PackageCheck, Plus, RefreshCw, ShieldCheck } from 'lucide-react';
+import { ArrowRight, ListChecks, Loader2, Plus, RefreshCw, ShieldCheck } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { api } from '@/lib/api';
@@ -13,7 +13,6 @@ import { useAgentContext } from '../../AgentContext';
 export function AgentOperationsCard() {
   const { agent } = useAgentContext();
   const tMission = useTranslations('missionControl');
-  const tOutcome = useTranslations('outcomePacks');
   const [tasks, setTasks] = useState<MissionTask[]>([]);
   const [counts, setCounts] = useState({ active: 0, approval: 0, actions: 0 });
   const [loading, setLoading] = useState(true);
@@ -67,12 +66,6 @@ export function AgentOperationsCard() {
             className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[var(--action)] bg-[var(--action)] px-3 text-xs font-semibold text-white transition-colors hover:bg-[var(--action-hover)]"
           >
             <Plus size={13} aria-hidden /> {tMission('newTask')}
-          </Link>
-          <Link
-            href={agentWorkspaceHref('/dashboard/outcome-packs', agent.id)}
-            className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 text-xs font-semibold text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]"
-          >
-            <PackageCheck size={13} aria-hidden /> {tOutcome('title')}
           </Link>
           <Link
             href={agentWorkspaceHref('/dashboard/approvals', agent.id)}

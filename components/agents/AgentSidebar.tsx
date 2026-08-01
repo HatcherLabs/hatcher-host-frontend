@@ -17,7 +17,6 @@ import {
   Brain,
   Clock,
   BookOpen,
-  GitMerge,
   ChevronLeft,
   TerminalSquare,
   Wallet,
@@ -74,7 +73,6 @@ function iconForTab(tab: Tab): React.ReactNode {
     robinhood: <Landmark size={16} />,
     files: <FolderOpen size={16} />,
     schedules: <Clock size={16} />,
-    workflows: <GitMerge size={16} />,
   };
 
   return icons[tab];

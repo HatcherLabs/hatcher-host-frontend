@@ -1,6 +1,6 @@
 'use client';
 
-import { Bot, ListChecks, PackageCheck, ShieldCheck } from 'lucide-react';
+import { Bot, ListChecks, ShieldCheck } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
@@ -16,7 +16,6 @@ import styles from './DashboardWorkspaceNavigation.module.css';
 const ICONS = {
   agents: Bot,
   missions: ListChecks,
-  outcomePacks: PackageCheck,
   approvals: ShieldCheck,
 } satisfies Record<DashboardWorkspaceKey, typeof Bot>;
 
@@ -24,7 +23,6 @@ export function DashboardWorkspaceNavigation() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const tNav = useTranslations('nav');
-  const tOutcome = useTranslations('outcomePacks');
   // Framed same-origin (the agent desktop's Settings window iframes the
   // dashboard page): the workspace tab row is site chrome — hide it and let
   // the framed page show content only.
@@ -37,7 +35,6 @@ export function DashboardWorkspaceNavigation() {
   const labels: Record<DashboardWorkspaceKey, string> = {
     agents: tNav('myAgents'),
     missions: tNav('missionControl'),
-    outcomePacks: tOutcome('title'),
     approvals: 'Approvals',
   };
 
@@ -49,7 +46,7 @@ export function DashboardWorkspaceNavigation() {
             const active = route.key === activeRoute.key;
             const Icon = ICONS[route.key];
             const agentId = searchParams.get('agent');
-            const href = agentId && (route.key === 'missions' || route.key === 'outcomePacks' || route.key === 'approvals')
+            const href = agentId && (route.key === 'missions' || route.key === 'approvals')
               ? agentWorkspaceHref(route.href, agentId)
               : route.href;
             return (

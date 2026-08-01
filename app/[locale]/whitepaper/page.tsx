@@ -37,7 +37,7 @@ const PRODUCT_POINTS = [
   'Agent creation and configuration',
   'OpenClaw and Hermes framework support',
   'Web chat, session history, and secure terminal access',
-  '3D agent rooms and Hatcher City',
+  'Agent control rooms with live runtime operations',
   'File manager, workspace storage, runtime logs, and monitoring',
   'Model selector, provider table, BYOK, and AI Credits',
   'Telegram, Discord, WhatsApp, Slack, X/Twitter, Nostr, and web integrations',
@@ -60,7 +60,7 @@ const ARCHITECTURE_LAYERS: Array<{
   {
     title: 'Control plane',
     body:
-      'The control plane manages dashboards, model configuration, integrations, wallets, billing, AI Credits, usage tracking, schedules, workflows, logs, and team or admin controls.',
+      'The control plane manages dashboards, model configuration, integrations, wallets, billing, AI Credits, usage tracking, schedules, task runs, logs, and admin controls.',
     icon: Boxes,
   },
   {
@@ -290,7 +290,7 @@ export default function WhitepaperPage() {
               <p>
                 Hatcher makes autonomous agents usable by founders, creators, developers, and teams without requiring
                 them to run their own infrastructure. Users can create, configure, deploy, monitor, and operate agents
-                through a hosted control panel, web chat, integrations, terminal access, workflows, and 3D agent rooms.
+                through a hosted control panel, web chat, integrations, terminal access, schedules, and agent control rooms.
               </p>
               <p>
                 The platform supports OpenClaw and Hermes agent frameworks, hosted model routing through providers such
@@ -330,7 +330,7 @@ export default function WhitepaperPage() {
               <p>
                 Hatcher is a platform for creating and operating hosted AI agents. The goal is to let a user go from
                 idea to live agent quickly, then continuously improve that agent through configuration, skills, tools,
-                integrations, model presets, workflows, and memory.
+                integrations, model presets, scheduled automations, and memory.
               </p>
               <div className="grid gap-3 sm:grid-cols-2">
                 {PRODUCT_POINTS.map((point) => (

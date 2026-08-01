@@ -153,7 +153,7 @@ const softwareApplicationJsonLd = {
   applicationCategory: 'DeveloperApplication',
   operatingSystem: 'Web',
   description:
-    'Managed AI agent hosting platform. Deploy OpenClaw and Hermes agents across 20+ platforms in 60 seconds. 3D rooms, Hatcher City, UsePod/OpenRouter routing, and BYOK support.',
+    'Managed AI agent hosting platform. Deploy OpenClaw and Hermes agents with control rooms, UsePod/OpenRouter routing, integrations, and BYOK support.',
   offers: [
     {
       '@type': 'Offer',

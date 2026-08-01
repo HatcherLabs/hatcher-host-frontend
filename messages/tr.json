@@ -32,7 +32,6 @@
     "closeNav": "Navigasyon menüsünü kapat",
     "userMenu": {
       "sub_dashboard": "Agentlar, görevler, onaylar ve paketler.",
-      "sub_outcomePacks": "Yaygın sonuçlar için yeniden kullanılabilir tarifler.",
       "sub_myAgents": "Bak, düzenle, dağıt.",
       "sub_create": "Bir ajanı yumurtadan çıkarmayı tarif edin.",
       "sub_analytics": "AI Credits, jetonlar, trendler.",
@@ -833,10 +832,8 @@
     "overview": {
       "eyebrow": "Çalışma alanına genel bakış",
       "title": "Panel",
-      "subtitle": "Ajanları, görevleri, onayları ve yeniden kullanılabilir sonuç tariflerini tek bir operasyon görünümünden takip edin.",
-      "signInDescription": "Ajanlarınızı, görevlerinizi, onayları ve Outcome Packs'i görmek için giriş yapın.",
+      "subtitle": "Ajanları, görevleri ve onayları tek bir operasyon görünümünden takip edin.",
       "openMissionControl": "Mission Control",
-      "useOutcomePack": "Outcome Packs",
       "refresh": "Paneli yenile",
       "partialError": "Bazı çalışma alanı verileri yüklenemedi.",
       "unavailable": "Veriler geçici olarak kullanılamıyor.",
@@ -856,12 +853,6 @@
         "empty": "Henüz görev yok.",
         "emptyAction": "İlk görevinizi oluşturun",
         "unknownAgent": "Bilinmeyen ajan"
-      },
-      "packs": {
-        "title": "Outcome Packs",
-        "subtitle": "Yapılandırılmaya hazır, seçilmiş tarifler.",
-        "browse": "Tümüne göz at",
-        "empty": "Kullanılabilir Outcome Pack yok."
       },
       "utilities": {
         "label": "Diğer çalışma alanı araçları",
@@ -895,7 +886,7 @@
       "tourCreateTitle": "İlk Temsilcinizi Oluşturun",
       "tourCreateDescription": "İlk yapay zeka ajanınızı OpenClaw veya Hermes ile açmak için buraya tıklayın.",
       "tourWorkspaceTitle": "Çalışma Alanınız",
-      "tourWorkspaceDescription": "Bu çubuktan Ajanlar, Mission Control, Outcome Packs ve Approvals arasında geçiş yapabilirsiniz.",
+      "tourWorkspaceDescription": "Bu çubuktan Ajanlar, Mission Control ve Approvals arasında geçiş yapabilirsiniz.",
       "tourPlanTitle": "Plan ve AI Credits",
       "tourPlanDescription": "Planınız ve AI Credits bakiyeniz bu menüde. Kullanımınızı görüntüleyin veya dilediğiniz zaman yükseltin.",
       "statTotal": "Toplam",
@@ -1235,8 +1226,7 @@
         "robinhood": "Robinhood",
         "files": "Dosyalar",
         "workspace": "Çalışma alanı",
-        "schedules": "Takvim",
-        "workflows": "İş Akışları"
+        "schedules": "Takvim"
       },
       "sidebarGroups": {
         "operate": "Çalışma",
@@ -1559,23 +1549,6 @@
         "refresh": "Yenileme",
         "limitReached": "Her seviyede eklentiler ve beceriler var."
       },
-      "workflows": {
-        "new": "Yeni İş Akışı",
-        "noWorkflows": "Henüz iş akışı yok.",
-        "noWorkflowsDescription": "Ajanınızı otomatikleştirmek için ilk iş akışınızı oluşturun.",
-        "enable": "Etkinleştir",
-        "disable": "Devre dışı bırak",
-        "delete": "Sil",
-        "save": "Kayd et",
-        "run": "Koş",
-        "running": "Koşuyorum...",
-        "name": "İş Akışı Adı",
-        "trigger": "Tetikleyici",
-        "lastRun": "Son Koşu",
-        "status": "Durum",
-        "active": "Aktif",
-        "inactive": "Aktif olmayan"
-      },
       "files": {
         "noFiles": "Dosya bulunmadı.",
         "noFilesDescription": "Dosya yöneticisi boş.",
@@ -1649,7 +1622,7 @@
     "title": "Kamuya açık yapay zeka ajanlarıyla sohbet",
     "body": "Sahipleri açık sohbeti etkinleştiren temsilcileri inceleyin. Her oturum tarayıcınızda çalışır ve ajanın canlı Hatcher yapılandırması üzerinden yönlendirilir.",
     "emptyTitle": "Henüz halka açık sohbet temsilcisi yok",
-    "emptyBody": "Kamuya açık profiller hâlâ Hatcher City'de görünüyor. Temsilciler, sahipleri açık sohbeti etkinleştirdiğinde burada gösterirler.",
+    "emptyBody": "Herkese açık profiller, sahipleri açık sohbeti etkinleştirdikten sonra burada görünür.",
     "fallbackDescription": "Tarayıcı sohbet oturumlarına hazır bir kamuya açık Hatcher ajanı.",
     "interactions": "Etkileşimler",
     "publicChat": "Kamuya açık sohbet",
@@ -2203,272 +2176,6 @@
     "errCreate": "Ajanı oluşturamadım. Açıklamayı geliştirin ve tekrar deneyin.",
     "errCreateNetwork": "Ajan oluştururken ağ hatası."
   },
-  "outcomePacks": {
-    "contract": {
-      "listPlaceholder": "Her satıra bir öğe",
-      "allTasksCompleted": "Tüm görevler tamamlandı",
-      "artifactRequired": "{kind} türünde bir çıktı gerektirir",
-      "artifact": "sonuç",
-      "outputMinLength": "En az {count} karakter",
-      "launchedPending": "Görev oluşturuldu. Başlatmadan önce gerekli {count} beceriyi yükleyin."
-    },
-    "content": {
-      "categories": {
-        "markets": "Piyasalar ve Alım Satım",
-        "research": "Araştırma",
-        "engineering": "Mühendislik",
-        "monitoring": "İzleme",
-        "marketing": "Pazarlama"
-      },
-      "options": {
-        "x": "X",
-        "linkedin": "LinkedIn",
-        "blog": "Blog",
-        "email": "E-posta",
-        "long": "Uzun",
-        "short": "Kısa"
-      },
-      "artifactKinds": {
-        "text": "metin",
-        "code": "kod",
-        "file": "dosya"
-      },
-      "prerequisites": {
-        "github_connection": "Bu ajan için GitHub Connect'i veya bir GitHub çalışma zamanı belirtecini yapılandırın."
-      },
-      "warnings": {
-        "unsupported_framework": "{framework} framework'ü bu paket tarafından desteklenmiyor.",
-        "required_skills_pending": "{count, plural, one {# gerekli beceri yükleme kuyruğuna alınacak. Görevi başlatmadan önce ajanı yeniden başlatın.} other {# gerekli beceri yükleme kuyruğuna alınacak. Görevi başlatmadan önce ajanı yeniden başlatın.}}",
-        "schedules_disabled": "{count, plural, one {# zamanlama şablonu hazırlandı ancak devre dışı kalacak.} other {# zamanlama şablonu hazırlandı ancak devre dışı kalacak.}}"
-      },
-      "packs": {
-        "marketPulse": {
-          "title": "Piyasa Nabzı",
-          "summary": "Seçilen varlıklar ve izlenecek sinyaller için zaman damgalı bir piyasa özeti oluşturun.",
-          "fields": {
-            "assets": "Varlıklar",
-            "horizon": "Zaman aralığı",
-            "focus": "Analiz odağı",
-            "watchSignals": "İzlenecek sinyaller",
-            "outputLanguage": "Çıktı dili"
-          },
-          "deliverables": {
-            "deliverable-1": "Zaman damgalı piyasa nabzı",
-            "deliverable-2": "Önceliklendirilmiş sinyaller ve riskler"
-          },
-          "manualAcceptance": "Piyasa gözlemleri zaman damgalarını ve veri kaynaklarını içerir.",
-          "schedules": {
-            "daily-market-pulse": "Günlük piyasa nabzı"
-          },
-          "taskTitle": "Piyasa nabzı",
-          "taskDescription": "Seçilen varlıklar için zaman damgalı bir piyasa verisi ve risk özeti oluşturun."
-        },
-        "tradePlanReview": {
-          "title": "İşlem Planı İncelemesi",
-          "summary": "Kullanıcının sağladığı işlem tezini işlem açmadan veya yönetmeden stres testine tabi tutun.",
-          "fields": {
-            "asset": "Varlık",
-            "network": "Ağ veya işlem platformu",
-            "direction": "Yön",
-            "capitalAmount": "Sermaye tutarı",
-            "capitalCurrency": "Sermaye para birimi",
-            "maxLossPercent": "Azami kayıp (sermayenin %'si)",
-            "horizon": "Zaman aralığı",
-            "thesis": "İşlem tezi"
-          },
-          "deliverables": {
-            "deliverable-1": "İşlem planı risk incelemesi",
-            "deliverable-2": "İnsan tarafından incelenmiş senaryo kontrol listesi"
-          },
-          "manualAcceptance": "Pozisyon büyüklüğü varsayımları ve geçersiz kılma koşulları açıkça belirtilir.",
-          "taskTitle": "İşlem planı incelemesi",
-          "taskDescription": "Kullanıcının sağladığı işlem planını riskler, varsayımlar ve senaryolar açısından inceleyin."
-        },
-        "portfolioRiskReview": {
-          "title": "Portföy Risk İncelemesi",
-          "summary": "Kullanıcının sağladığı varlıkları yoğunlaşma, likidite ve düşüş riski açısından değerlendirin.",
-          "fields": {
-            "holdings": "Varlıklar ve dağılımlar (VARLIK: 25%, satır başına bir tane)",
-            "baseCurrency": "Baz para birimi",
-            "objective": "Portföy hedefi",
-            "constraints": "Kısıtlamalar"
-          },
-          "deliverables": {
-            "deliverable-1": "Portföy risk özeti",
-            "deliverable-2": "İnsan tarafından incelenmiş yeniden dengeleme seçenekleri"
-          },
-          "manualAcceptance": "Seçenekler kullanıcının belirttiği hedefe ve kısıtlamalara uyar.",
-          "taskTitle": "Portföy risk incelemesi",
-          "taskDescription": "Kullanıcının sağladığı varlıkları değerlendirin ve insan incelemesine sunulacak risk seçeneklerini belirleyin."
-        },
-        "researchReport": {
-          "title": "Araştırma Raporu",
-          "summary": "Belirli bir konuya odaklanan, kaynaklı ve karar vermeye hazır bir araştırma raporu oluşturun.",
-          "fields": {
-            "topic": "Konu",
-            "questions": "Araştırma soruları",
-            "audience": "Hedef kitle",
-            "outputLanguage": "Çıktı dili"
-          },
-          "deliverables": {
-            "deliverable-1": "Yapılandırılmış rapor",
-            "deliverable-2": "Doğrudan alıntılar içeren kaynak listesi"
-          },
-          "manualAcceptance": "Kaynaklar temel iddiaları destekliyor.",
-          "taskTitle": "Araştırma raporu",
-          "taskDescription": "Sağlanan özetten yola çıkarak kaynaklarla desteklenen bir araştırma raporu oluşturun."
-        },
-        "pullRequestReview": {
-          "title": "Pull Request İncelemesi",
-          "summary": "Bir GitHub Pull Request'ini doğruluk, risk ve yayına hazır olma açısından inceleyin.",
-          "fields": {
-            "repository": "Repository (sahip/ad)",
-            "pullRequestNumber": "Pull Request numarası",
-            "focus": "İnceleme odağı"
-          },
-          "deliverables": {
-            "deliverable-1": "Önem derecesine göre sıralanmış bulgular",
-            "deliverable-2": "Yayınlama veya engelleme kararı"
-          },
-          "manualAcceptance": "Engelleyici her bulgu somut kanıt içeriyor.",
-          "taskTitle": "Pull Request incelemesi",
-          "taskDescription": "Belirtilen Pull Request'i doğruluk ve yayın riskleri açısından inceleyin."
-        },
-        "competitorWatch": {
-          "title": "Rakip Takibi",
-          "summary": "Bir rekabet istihbaratı özeti ve devre dışı bırakılmış günlük izleme şablonu oluşturun.",
-          "fields": {
-            "company": "Şirketiniz veya ürününüz",
-            "competitors": "Rakipler",
-            "market": "Pazar",
-            "watchSignals": "İzlenecek sinyaller"
-          },
-          "deliverables": {
-            "deliverable-1": "Rakiplere ilişkin başlangıç özeti",
-            "deliverable-2": "Önceliklendirilmiş izleme sinyalleri"
-          },
-          "manualAcceptance": "Önemli iddialar tarih ve kaynak içeriyor.",
-          "schedules": {
-            "daily-competitor-watch": "Günlük rakip takibi"
-          },
-          "taskTitle": "Rakip takibi",
-          "taskDescription": "Kaynaklarla desteklenen güncel bir rakip başlangıç görünümü oluşturun."
-        },
-        "launchContent": {
-          "title": "Lansman İçeriği",
-          "summary": "Ürün konumlandırmasını kanallara hazır lansman gönderilerine ve bir eylem planına dönüştürün.",
-          "fields": {
-            "product": "Ürün",
-            "positioning": "Konumlandırma ve teklif",
-            "audience": "Hedef kitle",
-            "channels": "Kanallar",
-            "tone": "Üslup"
-          },
-          "deliverables": {
-            "deliverable-1": "Konumlandırma özeti",
-            "deliverable-2": "Kanallara hazır gönderi taslakları",
-            "deliverable-3": "Lansman eylem planı"
-          },
-          "manualAcceptance": "İddialar, sahibin sağladığı teklifle eşleşiyor.",
-          "taskTitle": "Lansman içeriği",
-          "taskDescription": "Taslak lansman içeriği ve insan incelemesine tabi bir eylem planı hazırlayın."
-        }
-      }
-    },
-    "authenticating": "Oturumunuz kontrol ediliyor...",
-    "signInTitle": "Outcome Packs için giriş yapın",
-    "signInDescription": "Outcome Packs hesabınızdaki ajanlar için özel görevleri ve entegrasyonları yapılandırır.",
-    "signIn": "Giriş yap",
-    "eyebrow": "Seçilmiş operasyonlar",
-    "title": "Outcome Packs",
-    "subtitle": "Kanıtlanmış bir tarifi yapılandırın, kurulumu doğrulayın ve Mission Control'e gönderin.",
-    "refresh": "Kataloğu yenile",
-    "missionControl": "Mission Control",
-    "tryAgain": "Tekrar dene",
-    "loading": "Outcome Packs yükleniyor...",
-    "detailLoading": "Paket ayrıntıları yükleniyor...",
-    "detailError": "Bu paket yüklenemedi.",
-    "catalog": {
-      "label": "Outcome Pack kataloğu",
-      "title": "Katalog",
-      "firstParty": "Hatcher tarafından",
-      "version": "Sürüm {version}"
-    },
-    "detail": {
-      "curated": "Seçilmiş tarif",
-      "runtimeMinutes": "Süre: {count} dakika",
-      "frameworks": "Uyumlu framework'ler",
-      "anyFramework": "Herhangi bir barındırılan framework",
-      "requirements": "Beceriler ve ön koşullar",
-      "noRequirements": "Ek kurulum yok",
-      "plan": "Görev planı",
-      "taskCount": "{count} görev",
-      "tasks": "Paket görevleri",
-      "acceptance": "Kabul ölçütleri"
-    },
-    "configure": {
-      "title": "Sonucu yapılandır",
-      "subtitle": "Ajanı seçin ve görev planı için kullanılacak girdileri sağlayın.",
-      "agent": "Ajan",
-      "agentPlaceholder": "Ajan seçin",
-      "selectPlaceholder": "Seçenek seçin",
-      "agentStatus": "{framework} - {status}",
-      "required": "Zorunlu"
-    },
-    "validation": {
-      "agent": "Paketi hazırlamadan önce bir ajan seçin.",
-      "required": "Tüm zorunlu girdileri tamamlayın.",
-      "fieldInvalid": "Bu girdiyi izin verilen uzunlukta tamamlayın."
-    },
-    "preview": {
-      "label": "Başlatma önizlemesi",
-      "title": "Kurulum önizlemesi",
-      "subtitle": "Uyumluluk, ön koşullar, bütçe ve kapalı zamanlamalar.",
-      "empty": "Herhangi bir şey oluşturmadan önce kurulumu doğrulamak için paketi hazırlayın.",
-      "compatible": "Ajan uyumlu",
-      "incompatible": "Ajan uyumlu değil",
-      "blockers": "Kurulum engelleri",
-      "warnings": "Başlatmadan önce inceleyin",
-      "resolvedTasks": "Çözümlenmiş görevler",
-      "budget": "Bütçe hedefi",
-      "noBudget": "Bütçe hedefi yok",
-      "credits": "{count} AI Credits",
-      "budgetAdvisory": "Ücretli yürütme için katı sınır; bunun üzerinde AI Credits rezerve edilmez.",
-      "maxRuntime": "Azami süre: {count} dakika.",
-      "schedules": "Önerilen zamanlamalar",
-      "scheduleOff": "Kapalı",
-      "scheduleNotice": "Zamanlamalar başlatmada kapalı kalır ve ayrı onay gerektirir.",
-      "manualReviewTitle": "Sahip incelemesi gerekli",
-      "manualReviewDescription": "Tamamlanan sonuç, sahibi onaylayana veya reddedene kadar Mission Control'de kalır.",
-      "setup": {
-        "connectors": "Connectors'ı aç",
-        "dev": "Geliştirici kurulumunu aç",
-        "integrations": "Integrations'ı aç"
-      }
-    },
-    "actions": {
-      "prepare": "Önizlemeyi hazırla",
-      "prepareAgain": "Tekrar hazırla",
-      "preparing": "Hazırlanıyor...",
-      "launchTitle": "Mission Control'de oluştur",
-      "ready": "Başlatmaya hazır",
-      "blocked": "Paketi hazırlayın ve engelleri çözün",
-      "launch": "Paketi başlat",
-      "launching": "Başlatılıyor..."
-    },
-    "messages": {
-      "launched": "Outcome Pack başlatıldı."
-    },
-    "noAgents": {
-      "title": "Kullanılabilir ajan yok",
-      "description": "Outcome Pack yapılandırmadan önce bir ajan oluşturun.",
-      "action": "Ajan oluştur"
-    },
-    "empty": {
-      "title": "Kullanılabilir Outcome Pack yok",
-      "description": "Seçilmiş katalog Hatcher paketi döndürmedi."
-    }
-  },
   "landingV3": {
     "hero": {
       "boxLabel": "Konuşlandırma",
@@ -2572,26 +2279,6 @@
     }
   },
   "missionControl": {
-    "outcomePack": {
-      "title": "Outcome Pack",
-      "unknown": "Bilinmeyen paket",
-      "version": "Sürüm {version}",
-      "skillsReady": "Gerekli beceriler yüklendi",
-      "skillsPending": "Gerekli beceriler bekliyor",
-      "openPlugins": "Plugins bölümünü aç ve ajanı yeniden başlat",
-      "acceptance": "Kabul ölçütleri",
-      "allTasksCompleted": "Tüm görevler tamamlandı",
-      "artifactRequired": "{kind} türünde bir çıktı gerektirir",
-      "artifact": "sonuç",
-      "outputMinLength": "En az {count} karakter",
-      "schedulesDisabled": "{count} zamanlama şablonu devre dışı kalır ve otomatik çalışmaz.",
-      "skillStatus": {
-        "installed": "Yüklendi",
-        "pending": "Bekliyor",
-        "failed": "Başarısız",
-        "missing": "Eksik"
-      }
-    },
     "authenticating": "Checking your session...",
     "signInTitle": "Sign in to Mission Control",
     "signInDescription": "Mission Control shows private tasks, approvals, runs, and artifacts across your agents.",
@@ -2601,7 +2288,6 @@
     "subtitle": "Create, approve, run, and inspect one-shot work across every agent.",
     "refresh": "Refresh tasks",
     "newTask": "New task",
-    "outcomePacks": "Outcome Packs",
     "tryAgain": "Try again",
     "loading": "Loading tasks...",
     "unknownAgent": "Unknown agent",
