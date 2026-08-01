@@ -65,7 +65,7 @@ export function buildCsp(
     `font-src 'self' https://fonts.gstatic.com${qwertiFont}`,
     `img-src 'self' data: blob: https:`,
     "media-src 'self' data: blob: https:",
-    `connect-src 'self' blob: https://api.hatcher.host wss://api.hatcher.host https://*.solana.com wss://*.solana.com https://*.helius-rpc.com wss://*.helius-rpc.com https://api.dexscreener.com https://threejs.org${qwertiConnect}${apiConnect}${devConnect}`,
+    `connect-src 'self' blob: https://api.hatcher.host wss://api.hatcher.host https://*.solana.com wss://*.solana.com https://*.helius-rpc.com wss://*.helius-rpc.com https://api.dexscreener.com${qwertiConnect}${apiConnect}${devConnect}`,
     // The agent desktop's Browser app iframes arbitrary sites, so the desktop
     // route (and ONLY that route) additionally allows any https origin.
     `frame-src 'self' https://www.tradingview.com https://s.tradingview.com https://tradingview.com https://www.tradingview-widget.com https://www.geckoterminal.com https://geckoterminal.com https://dexscreener.com https://www.dexscreener.com${isDesktopRoute ? ' https:' : ''}`,

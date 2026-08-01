@@ -19,7 +19,6 @@
 // ============================================================
 
 import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
 // CookieConsent is rendered in app/layout.tsx OUTSIDE NextIntlClientProvider
 // so it must use plain next/link — the i18n Link's useLocale call would throw
 // "No intl context found" on bare routes (/privacy, /terms, /cookies, /impressum).
@@ -34,11 +33,6 @@ import {
   type AnalyticsConsentStatus,
 } from '@/lib/analytics-consent';
 
-// Routes that take over the full viewport and shouldn't show a
-// consent banner blocking the canvas. The pathname here still has
-// the locale prefix because next/navigation.usePathname does not
-// strip it (unlike the next-intl version used elsewhere).
-const IMMERSIVE_RE = /\/agent\/[^/]+\/room(?:-legacy)?(?:\/|$)/;
 import { Shield, BarChart3, Cookie as CookieIcon } from 'lucide-react';
 
 /** Read current consent; returns false if the user never decided
@@ -49,8 +43,6 @@ export type ConsentStatus = AnalyticsConsentStatus;
 export const getConsentStatus = getAnalyticsConsentStatus;
 
 export function CookieConsent() {
-  const pathname = usePathname();
-  const immersive = pathname ? IMMERSIVE_RE.test(pathname) : false;
   const [visible, setVisible] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [analyticsChoice, setAnalyticsChoice] = useState(false);
@@ -87,7 +79,7 @@ export function CookieConsent() {
     setVisible(false);
   }
 
-  if (!visible || immersive) return null;
+  if (!visible) return null;
 
   // Collapsed state: slim full-width bottom bar so we don't block the page
   // (hero CTAs, form fields, pricing tables). Expanded state: centered card

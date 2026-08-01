@@ -4,8 +4,6 @@ const LOCALE_PREFIX_RE = new RegExp(`^/(${locales.join("|")})(/.*|$)`);
 
 // Routes that own the full viewport or ship their own page chrome.
 const IMMERSIVE_PATTERNS: RegExp[] = [
-  /^\/agent\/[^/]+\/room(?:-legacy)?(?:\/|$)/,
-  /^\/city(?:\/|$)/,
   /^\/$/,
   /^\/(?:explore|traders|features|pricing|frameworks|token|roadmap|blog|changelog|help|support|security|whitepaper)(?:\/|$)/,
   /^\/(?:login|register|forgot-password|reset-password|verify-email)(?:\/|$)/,

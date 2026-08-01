@@ -103,16 +103,3 @@ export function generateAgentAvatar(name: string, framework: string): string {
   // Node.js fallback (for SSR)
   return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
 }
-
-/**
- * Get the avatar URL for an agent — uses custom avatar if set,
- * otherwise generates a deterministic one.
- */
-export function getAgentAvatarUrl(
-  name: string,
-  framework: string,
-  avatarUrl?: string | null,
-): string {
-  if (avatarUrl) return avatarUrl;
-  return generateAgentAvatar(name, framework);
-}

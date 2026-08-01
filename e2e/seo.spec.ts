@@ -53,7 +53,7 @@ test.describe('SEO routing hygiene', () => {
     const xml = await response.text();
 
     expect(xml).toContain('https://hatcher.host/pricing');
-    expect(xml).toContain('https://hatcher.host/city');
+    expect(xml).toContain('https://hatcher.host/explore');
     expect(xml).toContain('https://hatcher.host/blog/state-of-ai-agent-hosting-2026');
     expect(xml).not.toContain('https://hatcher.host/dashboard');
     expect(xml).not.toContain('https://hatcher.host/admin');
