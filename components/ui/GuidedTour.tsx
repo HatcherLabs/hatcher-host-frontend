@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useLayoutEffect, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { findResolvableStep } from './guidedTourSteps';
@@ -30,6 +30,11 @@ interface Rect {
 }
 
 const PAD = 8;
+const GAP = 12;
+const MARGIN = 12;
+/** Fallback card height for the first frame, replaced by the measured height. */
+const EST_CARD_H = 220;
+const CARD_W = 320;
 const TARGET_WAIT_TIMEOUT = 10_000;
 
 /**
@@ -53,6 +58,8 @@ function canResolve(target: string): boolean {
   return !!resolveTarget(target);
 }
 
+const clamp = (v: number, min: number, max: number) => Math.min(Math.max(v, min), Math.max(min, max));
+
 export function GuidedTour({
   steps,
   storageKey = 'hatcher_tour_complete',
@@ -66,8 +73,10 @@ export function GuidedTour({
   const [visible, setVisible] = useState(false);
   const [targetRect, setTargetRect] = useState<Rect | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [cardH, setCardH] = useState(EST_CARD_H);
   const rafRef = useRef(0);
   const startedRef = useRef(false);
+  const cardRef = useRef<HTMLDivElement | null>(null);
   const onStartRef = useRef(onStart);
   onStartRef.current = onStart;
 
@@ -128,9 +137,10 @@ export function GuidedTour({
     return () => mq.removeEventListener('change', update);
   }, []);
 
-  // Measure target element and keep it in sync on scroll/resize.
-  // If the current target vanished, skip ahead; if nothing resolves, hide
-  // WITHOUT persisting completion so the tour can run on the next visit.
+  // Measure target element (viewport coordinates — everything we render is
+  // position:fixed) and keep it in sync on scroll/resize. If the current
+  // target vanished, skip ahead; if nothing resolves, hide WITHOUT persisting
+  // completion so the tour can run on the next visit.
   const measure = useCallback(() => {
     if (!visible || current >= steps.length) return;
     const el = resolveTarget(steps[current].target);
@@ -145,12 +155,7 @@ export function GuidedTour({
       return;
     }
     const r = el.getBoundingClientRect();
-    setTargetRect({
-      top: r.top + window.scrollY,
-      left: r.left + window.scrollX,
-      width: r.width,
-      height: r.height,
-    });
+    setTargetRect({ top: r.top, left: r.left, width: r.width, height: r.height });
   }, [visible, current, steps]);
 
   useEffect(() => {
@@ -175,6 +180,13 @@ export function GuidedTour({
     const el = resolveTarget(steps[current].target);
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, [visible, current, steps]);
+
+  // The card's real height feeds the flip/clamp math; the estimate only
+  // covers the first animation frame.
+  useLayoutEffect(() => {
+    const h = cardRef.current?.offsetHeight;
+    if (h && Math.abs(h - cardH) > 1) setCardH(h);
+  });
 
   const finish = useCallback((reason: 'complete' | 'skip') => {
     setVisible(false);
@@ -209,39 +221,75 @@ export function GuidedTour({
   if (!visible || !targetRect) return null;
 
   const step = steps[current];
-  const pos = isMobile ? 'bottom' : (step.position ?? 'bottom');
   const isLast = findResolvableStep(steps, current + 1, 1, canResolve) === -1;
 
-  // Tooltip positioning
-  const tooltip = { top: 0, left: 0 };
-  const scrollY = typeof window !== 'undefined' ? window.scrollY : 0;
-  const viewTop = targetRect.top - scrollY;
-
-  if (pos === 'bottom') {
-    tooltip.top = viewTop + targetRect.height + PAD + 12;
-    tooltip.left = targetRect.left + targetRect.width / 2;
-  } else if (pos === 'top') {
-    tooltip.top = viewTop - PAD - 12;
-    tooltip.left = targetRect.left + targetRect.width / 2;
-  } else if (pos === 'left') {
-    tooltip.top = viewTop + targetRect.height / 2;
-    tooltip.left = targetRect.left - PAD - 12;
-  } else {
-    tooltip.top = viewTop + targetRect.height / 2;
-    tooltip.left = targetRect.left + targetRect.width + PAD + 12;
+  // Step counter only counts steps that can actually run on this page;
+  // unresolvable ones are silently skipped and must not inflate the total.
+  const resolvableIdxs: number[] = [];
+  for (let i = 0; i < steps.length; i++) {
+    if (i === current || canResolve(steps[i].target)) resolvableIdxs.push(i);
   }
+  const stepNumber = resolvableIdxs.indexOf(current) + 1;
+
+  const vw = typeof window !== 'undefined' ? window.innerWidth : 1280;
+  const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
 
   // Spotlight rect
-  const sTop = viewTop - PAD;
+  const sTop = targetRect.top - PAD;
   const sLeft = targetRect.left - PAD;
   const sW = targetRect.width + PAD * 2;
   const sH = targetRect.height + PAD * 2;
 
-  const transformOrigin =
-    pos === 'top' ? 'bottom center' :
-    pos === 'left' ? 'center right' :
-    pos === 'right' ? 'center left' :
-    'top center';
+  // Desktop tooltip placement: pick a side with room (flip when the preferred
+  // one has none), then clamp the card fully inside the viewport. Corner-based
+  // coordinates only — a static `transform` in style would be overwritten by
+  // framer-motion's animated transform.
+  let cardStyle: React.CSSProperties;
+  if (isMobile) {
+    // Phones get a bottom sheet: no anchor math, always reachable, above the
+    // home-indicator via safe-area.
+    cardStyle = {
+      left: MARGIN,
+      right: MARGIN,
+      bottom: `calc(env(safe-area-inset-bottom, 0px) + ${MARGIN}px)`,
+    };
+  } else {
+    const spaceAbove = sTop - GAP;
+    const spaceBelow = vh - (sTop + sH) - GAP;
+    const centerX = targetRect.left + targetRect.width / 2;
+
+    let pos: 'top' | 'bottom' | 'left' | 'right' | 'center' = step.position ?? 'bottom';
+    if (pos === 'left' && sLeft - GAP < CARD_W + MARGIN) pos = 'bottom';
+    if (pos === 'right' && vw - (sLeft + sW) - GAP < CARD_W + MARGIN) pos = 'bottom';
+    if (pos === 'bottom' && spaceBelow < cardH + MARGIN && spaceAbove > spaceBelow) pos = 'top';
+    else if (pos === 'top' && spaceAbove < cardH + MARGIN && spaceBelow >= spaceAbove) pos = 'bottom';
+    // Full-viewport targets (e.g. the chat root) leave no room on any side.
+    if (sW > vw * 0.85 && sH > vh * 0.7) pos = 'center';
+
+    let top: number;
+    let left: number;
+    if (pos === 'top') {
+      top = sTop - GAP - cardH;
+      left = centerX - CARD_W / 2;
+    } else if (pos === 'left') {
+      top = sTop + sH / 2 - cardH / 2;
+      left = sLeft - GAP - CARD_W;
+    } else if (pos === 'right') {
+      top = sTop + sH / 2 - cardH / 2;
+      left = sLeft + sW + GAP;
+    } else if (pos === 'center') {
+      top = (vh - cardH) / 2;
+      left = (vw - CARD_W) / 2;
+    } else {
+      top = sTop + sH + GAP;
+      left = centerX - CARD_W / 2;
+    }
+    cardStyle = {
+      top: clamp(top, MARGIN, vh - cardH - MARGIN),
+      left: clamp(left, MARGIN, vw - CARD_W - MARGIN),
+      width: CARD_W,
+    };
+  }
 
   return (
     <>
@@ -267,41 +315,43 @@ export function GuidedTour({
       <AnimatePresence mode="wait">
         <motion.div
           key={current}
-          initial={{ opacity: 0, scale: 0.9, y: pos === 'top' ? 8 : -8 }}
+          initial={{ opacity: 0, scale: 0.96, y: isMobile ? 16 : 0 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.9 }}
+          exit={{ opacity: 0, scale: 0.96 }}
           transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="fixed z-[9999] w-72 sm:w-80"
-          style={{
-            top: tooltip.top,
-            left: tooltip.left,
-            transform:
-              pos === 'bottom' ? 'translateX(-50%)' :
-              pos === 'top' ? 'translateX(-50%) translateY(-100%)' :
-              pos === 'left' ? 'translateX(-100%) translateY(-50%)' :
-              'translateY(-50%)',
-            transformOrigin,
-          }}
+          className="fixed z-[9999]"
+          style={cardStyle}
         >
           <div
-            className="rounded-2xl border p-5 shadow-2xl"
+            ref={cardRef}
+            className="relative rounded-2xl border p-5 shadow-2xl"
             style={{
               background: 'var(--bg-card)',
               borderColor: 'var(--border-default)',
             }}
           >
+            <button
+              onClick={() => finish('skip')}
+              aria-label={t('skip')}
+              className="absolute top-1.5 right-1.5 flex h-10 w-10 items-center justify-center rounded-xl text-[var(--text-muted)] transition-colors cursor-pointer hover:text-[var(--text-primary)]"
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+                <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            </button>
+
             {/* Step counter */}
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between gap-3 mb-3 pr-9">
               <span className="text-[11px] font-semibold text-[var(--accent)] tracking-wide uppercase">
-                {t('stepCounter', { current: current + 1, total: steps.length })}
+                {t('stepCounter', { current: stepNumber, total: resolvableIdxs.length })}
               </span>
               <div className="flex gap-1">
-                {steps.map((_, i) => (
+                {resolvableIdxs.map((idx) => (
                   <span
-                    key={i}
+                    key={idx}
                     className="block w-1.5 h-1.5 rounded-full transition-colors duration-300"
                     style={{
-                      background: i <= current ? 'var(--accent)' : 'var(--border-default)',
+                      background: idx <= current ? 'var(--accent)' : 'var(--border-default)',
                     }}
                   />
                 ))}
@@ -318,7 +368,7 @@ export function GuidedTour({
             <div className="flex items-center justify-between gap-2">
               <button
                 onClick={() => finish('skip')}
-                className="text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors cursor-pointer"
+                className="px-2 py-2 -mx-2 text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors cursor-pointer"
               >
                 {t('skip')}
               </button>
@@ -326,14 +376,14 @@ export function GuidedTour({
                 {current > 0 && (
                   <button
                     onClick={back}
-                    className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-[var(--border-default)] text-[var(--text-secondary)] transition-colors cursor-pointer hover:text-[var(--text-primary)]"
+                    className="px-3 py-2 rounded-lg text-xs font-semibold border border-[var(--border-default)] text-[var(--text-secondary)] transition-colors cursor-pointer hover:text-[var(--text-primary)]"
                   >
                     {t('back')}
                   </button>
                 )}
                 <button
                   onClick={next}
-                  className="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer hover:brightness-110"
+                  className="px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer hover:brightness-110"
                   style={{
                     background: 'var(--accent)',
                     color: 'var(--bg-base)',

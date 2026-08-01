@@ -30,16 +30,6 @@ type InstallPlanItem = {
   reason: string;
 };
 
-type AvatarTraits = {
-  seed?: string;
-  palette?: string;
-  accentColor?: string;
-  secondaryColor?: string;
-  emblem?: string;
-  accessory?: string;
-  mood?: string;
-};
-
 interface ParsedConfig {
   framework: Framework;
   frameworkReason: string;
@@ -54,9 +44,6 @@ interface ParsedConfig {
   installPlan: InstallPlanItem[];
   model: string;
   greeting: string;
-  avatarHint: string;
-  avatarVariant: string;
-  avatarTraits: AvatarTraits;
 }
 
 interface ParseResponse {
@@ -78,57 +65,6 @@ const FW_VISUAL: Record<
   openclaw: { color: 'var(--tech-accent)', mark: 'OC', label: 'OpenClaw' },
   hermes: { color: 'var(--color-info)', mark: 'HE', label: 'Hermes' },
 };
-
-const AVATAR_OPTIONS = [
-  { id: '', name: 'Auto' },
-  { id: 'animated-robot', name: 'Service Robot' },
-  { id: 'freepixel-robot', name: 'Alpha Robot' },
-  { id: 'service-robot', name: 'Stealth Service Bot' },
-  { id: 'rusty-mecha', name: 'Rusty Mecha' },
-  { id: 'abandoned-mecha', name: 'Abandoned Mecha' },
-  { id: 'scout-drone', name: 'Scout Drone' },
-  { id: 'cyber-drone', name: 'Cyber Drone' },
-  { id: 'buzz-droid', name: 'Buzz Droid' },
-  { id: 'xbot-agent', name: 'Blocky Cyborg' },
-  { id: 'cybernetic-warrior', name: 'Cybernetic Warrior' },
-  { id: 'alien-analyst', name: 'Alien Intelligence' },
-  { id: 'space-analyst', name: 'Space Analyst' },
-  { id: 'stealth-operator', name: 'Stealth Operator' },
-  { id: 'rogue-operator', name: 'Rogue Operator' },
-  { id: 'space-operator', name: 'Astronaut Operator' },
-  { id: 'ready-player', name: 'Studio Human' },
-  { id: 'street-scout', name: 'Street Scout Agent' },
-  { id: 'field-operator', name: 'Field Operator' },
-  { id: 'studio-operator', name: 'Lab Analyst' },
-  { id: 'shadow-operator', name: 'Shadow Operator' },
-  { id: 'fox-companion', name: 'Fox Companion' },
-];
-
-function avatarOptionName(id: string): string {
-  return AVATAR_OPTIONS.find((avatar) => avatar.id === id)?.name ?? id;
-}
-
-const AVATAR_OPTION_IDS = new Set(AVATAR_OPTIONS.map((avatar) => avatar.id));
-const AVATAR_LEGACY_ALIASES: Record<string, string> = {
-  'openclaw-mech': 'animated-robot',
-  'openclaw-scout': 'xbot-agent',
-  'openclaw-heavy': 'abandoned-mecha',
-  'openclaw-drone': 'scout-drone',
-  'hermes-oracle': 'freepixel-robot',
-  'hermes-scribe': 'studio-operator',
-  blob: 'buzz-droid',
-  cat: 'street-scout',
-  crab: 'scout-drone',
-  humanoid: 'ready-player',
-  robot: 'animated-robot',
-};
-
-function sanitizeAvatarVariant(value: string | undefined): string {
-  const trimmed = value?.trim();
-  if (!trimmed) return '';
-  if (AVATAR_OPTION_IDS.has(trimmed)) return trimmed;
-  return AVATAR_LEGACY_ALIASES[trimmed] ?? '';
-}
 
 // ChatToHatch keeps a static picker: Virtuals models are only offered in
 // the agent config tab, where the live Virtuals catalog merge provides them.
@@ -228,29 +164,6 @@ function syncInstallPlan(
   return out.slice(0, 12);
 }
 
-function sanitizeAvatarTraits(
-  value: AvatarTraits | undefined,
-  fallbackSeed: string,
-): AvatarTraits {
-  const trim = (raw: string | undefined, max = 48) =>
-    raw?.trim().replace(/\s+/g, ' ').slice(0, max) || undefined;
-  const hex = (raw: string | undefined) => {
-    const value = raw?.trim();
-    return value && /^#[0-9a-f]{6}$/i.test(value)
-      ? value.toUpperCase()
-      : undefined;
-  };
-  return {
-    seed: trim(value?.seed, 80) ?? fallbackSeed,
-    palette: trim(value?.palette) ?? 'adaptive accent',
-    accentColor: hex(value?.accentColor),
-    secondaryColor: hex(value?.secondaryColor),
-    emblem: trim(value?.emblem) ?? 'agent mark',
-    accessory: trim(value?.accessory) ?? 'identity halo',
-    mood: trim(value?.mood) ?? 'focused',
-  };
-}
-
 function normalizeConfig(config: ParsedConfig): ParsedConfig {
   const selectedSkills = uniq(
     config.selectedSkills?.length
@@ -284,11 +197,6 @@ function normalizeConfig(config: ParsedConfig): ParsedConfig {
     selectedSkills,
     selectedPlugins,
     installPlan,
-    avatarVariant: sanitizeAvatarVariant(config.avatarVariant),
-    avatarTraits: sanitizeAvatarTraits(
-      config.avatarTraits,
-      `${config.framework}:${config.name}:${config.avatarHint || config.description}`,
-    ),
   };
 }
 
@@ -467,16 +375,6 @@ export function ChatToHatch() {
       if (draft.installPlan.length) configBody.installPlan = draft.installPlan;
       if (draft.model) configBody.model = draft.model;
       if (draft.greeting.trim()) configBody.greeting = draft.greeting.trim();
-      if (draft.avatarHint.trim())
-        configBody.avatarHint = draft.avatarHint.trim();
-      if (draft.avatarVariant.trim()) {
-        configBody.avatarVariant = draft.avatarVariant.trim();
-        configBody.roomAvatarVariant = draft.avatarVariant.trim();
-      }
-      if (Object.values(draft.avatarTraits).some(Boolean)) {
-        configBody.avatarTraits = draft.avatarTraits;
-        configBody.roomAvatarTraits = draft.avatarTraits;
-      }
 
       const created = await req<{ id: string; slug?: string | null }>(
         '/agents',
@@ -748,11 +646,6 @@ export function ChatToHatch() {
                       alt=""
                       className={styles.avatarImage}
                     />
-                    <span className={styles.avatarBadge}>
-                      {draft.avatarVariant
-                        ? avatarOptionName(draft.avatarVariant)
-                        : 'auto avatar'}
-                    </span>
                   </div>
 
                   <div className={styles.previewHeroMeta}>
@@ -869,89 +762,6 @@ export function ChatToHatch() {
                       <span>Cost: {selectedModel.fixedPrice ?? selectedModel.cost}</span>
                     </div>
 
-                    <label className={styles.selectLabel}>
-                      {t('labelAvatarVariant')}
-                      <select
-                        className={styles.selectInput}
-                        value={draft.avatarVariant}
-                        onChange={(e) =>
-                          patchDraft({ avatarVariant: e.target.value })
-                        }
-                      >
-                        {AVATAR_OPTIONS.map((avatar) => (
-                          <option key={avatar.id || 'auto'} value={avatar.id}>
-                            {avatar.name}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-
-                    <div className={styles.traitGrid}>
-                      <label className={styles.selectLabel}>
-                        {t('labelAvatarPalette')}
-                        <input
-                          className={styles.traitInput}
-                          value={draft.avatarTraits.palette ?? ''}
-                          onChange={(e) =>
-                            patchDraft({
-                              avatarTraits: {
-                                ...draft.avatarTraits,
-                                palette: e.target.value,
-                              },
-                            })
-                          }
-                          maxLength={48}
-                        />
-                      </label>
-                      <label className={styles.selectLabel}>
-                        {t('labelAvatarEmblem')}
-                        <input
-                          className={styles.traitInput}
-                          value={draft.avatarTraits.emblem ?? ''}
-                          onChange={(e) =>
-                            patchDraft({
-                              avatarTraits: {
-                                ...draft.avatarTraits,
-                                emblem: e.target.value,
-                              },
-                            })
-                          }
-                          maxLength={48}
-                        />
-                      </label>
-                      <label className={styles.selectLabel}>
-                        {t('labelAvatarAccessory')}
-                        <input
-                          className={styles.traitInput}
-                          value={draft.avatarTraits.accessory ?? ''}
-                          onChange={(e) =>
-                            patchDraft({
-                              avatarTraits: {
-                                ...draft.avatarTraits,
-                                accessory: e.target.value,
-                              },
-                            })
-                          }
-                          maxLength={48}
-                        />
-                      </label>
-                      <label className={styles.selectLabel}>
-                        {t('labelAvatarMood')}
-                        <input
-                          className={styles.traitInput}
-                          value={draft.avatarTraits.mood ?? ''}
-                          onChange={(e) =>
-                            patchDraft({
-                              avatarTraits: {
-                                ...draft.avatarTraits,
-                                mood: e.target.value,
-                              },
-                            })
-                          }
-                          maxLength={48}
-                        />
-                      </label>
-                    </div>
                   </div>
                 </div>
 
@@ -978,7 +788,7 @@ export function ChatToHatch() {
                 </label>
                 {slug && (
                   <p className={styles.slugHint}>
-                    {t('slugUrl')}: <code>/agent/{slug}/room</code>
+                    {t('slugUrl')}: <code>/agent/{slug}</code>
                   </p>
                 )}
 
@@ -1190,19 +1000,6 @@ export function ChatToHatch() {
                       {t('labelGreeting')}
                     </span>
                     <p className={styles.greetingText}>“{draft.greeting}”</p>
-                  </div>
-                )}
-
-                {draft.avatarHint && (
-                  <div className={styles.metaRow}>
-                    <span className={styles.metaItem}>
-                      <span className={styles.metaLabel}>
-                        {t('labelAvatar')}
-                      </span>
-                      <span className={styles.metaValue}>
-                        {draft.avatarHint}
-                      </span>
-                    </span>
                   </div>
                 )}
 

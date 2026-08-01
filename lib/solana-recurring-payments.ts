@@ -7,7 +7,23 @@ import {
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { createRevokeInstruction } from '@solana/spl-token';
+// SPL Token `Revoke` (discriminator 5, no payload) — identical layout for
+// Token and Token-2022, so we build it inline instead of pulling in
+// @solana/spl-token (whose bigint-buffer chain is flagged by npm audit).
+function createRevokeInstruction(
+  account: PublicKey,
+  owner: PublicKey,
+  tokenProgram: PublicKey,
+): TransactionInstruction {
+  return new TransactionInstruction({
+    programId: tokenProgram,
+    keys: [
+      { pubkey: account, isSigner: false, isWritable: true },
+      { pubkey: owner, isSigner: true, isWritable: false },
+    ],
+    data: Buffer.from([5]),
+  });
+}
 import type { WalletContextState } from '@solana/wallet-adapter-react';
 import {
   AccountRole,
@@ -313,7 +329,7 @@ export async function buildSolanaRecurringCancelPlan(params: {
 
   const revocationTransaction = new Transaction().add(
     kitInstructionToWeb3(revokeDelegationInstruction),
-    createRevokeInstruction(tokenAccount, owner, [], tokenProgram),
+    createRevokeInstruction(tokenAccount, owner, tokenProgram),
     kitInstructionToWeb3(closeAuthorityInstruction),
   );
 

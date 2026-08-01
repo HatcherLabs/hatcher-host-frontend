@@ -158,9 +158,9 @@ const nextConfig = {
           // the "-allow-popups" variant of COOP so Solana wallet adapters
           // can still open wallet popups. CORP=same-origin blocks other
           // sites from embedding our resources as subresources. COEP is
-          // intentionally omitted because Three.js/drei load textures
-          // from CDNs (e.g. threejs.org) that don't send CORP, and
-          // enabling COEP would break those fetches.
+          // intentionally omitted because pages render cross-origin
+          // images/media (agent avatars, token logos) from hosts that
+          // don't send CORP, and enabling COEP would break those fetches.
           {
             key: 'Cross-Origin-Opener-Policy',
             value: 'same-origin-allow-popups',

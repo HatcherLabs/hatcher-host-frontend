@@ -2571,15 +2571,11 @@ export interface AgentPassport {
     framework: string;
     status: string;
     profileUrl: string;
-    roomUrl: string;
     createdAt: string;
     updatedAt: string;
   };
   avatar: {
-    kind: "hatcher-room-v2";
-    stationId: "agentAvatar";
     imageUrl: string | null;
-    roomUrl: string;
   };
   identity: {
     handle: string;
@@ -2616,7 +2612,6 @@ export interface AgentPassport {
   };
   links: {
     profile: string;
-    room: string;
     passport: string;
     skaleMetadata: string;
     solanaMetadata: string;

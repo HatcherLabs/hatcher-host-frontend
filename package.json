@@ -20,7 +20,6 @@
     "@hatcher/shared": "npm:@hatcherlabs/shared@1.4.11",
     "@sentry/nextjs": "^10.51.0",
     "@solana/kit": "^6.10.0",
-    "@solana/spl-token": "0.4.15",
     "@solana/subscriptions": "^0.3.0",
     "@solana/wallet-adapter-base": "^0.9.25",
     "@solana/wallet-adapter-phantom": "^0.9.25",

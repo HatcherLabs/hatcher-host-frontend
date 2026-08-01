@@ -490,39 +490,6 @@
   padding: 18px;
 }
 
-.avatarFallback {
-  width: 100%;
-  height: 100%;
-  min-height: 206px;
-  background:
-    radial-gradient(
-      circle at 50% 34%,
-      rgba(57, 255, 136, 0.16),
-      transparent 44%
-    ),
-    var(--bg-2);
-}
-
-.avatarBadge {
-  position: absolute;
-  left: 10px;
-  right: 10px;
-  bottom: 10px;
-  padding: 6px 8px;
-  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.58);
-  color: var(--ink-soft);
-  font-family: var(--font-inter), var(--font-body);
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .previewHeroMeta {
   min-width: 0;
   display: flex;
@@ -693,40 +660,6 @@
 }
 
 .selectInput:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 22%, transparent);
-}
-
-.traitGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-@media (max-width: 620px) {
-  .traitGrid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.traitInput {
-  appearance: none;
-  width: 100%;
-  min-width: 0;
-  border: 1px solid var(--line-bright);
-  border-radius: 6px;
-  background: var(--bg-2);
-  color: var(--ink);
-  padding: 8px 10px;
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: 12px;
-  line-height: 1.35;
-  letter-spacing: 0;
-  text-transform: none;
-  outline: none;
-}
-
-.traitInput:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 22%, transparent);
 }

@@ -74,18 +74,13 @@ Agent detail should behave like a control room:
 - Tabs expose overview, chat, logs, files, config, integrations, terminal, wallets, and activity when supported.
 - Paused, sleeping, deploying, live, and error states must be visually distinct and readable in light and dark mode.
 
-## Hatcher City, Rooms, And Avatars
+## Avatars
 
-Hatcher City is a spatial metaphor for hosted agent infrastructure, not a game map.
+Agents are represented by 2D avatars only (Hatcher City and the 3D rooms were retired in 2026-08).
 
-- Buildings should feel like modular agent cloud facilities: clean control towers, shell/hatch forms, server cores, antennae, and workspace rooms.
-- Agent rooms should feel like live control rooms: avatar at the center, with chat, logs, files, config, integrations, terminal, wallets, and activity stations around it.
-- Default avatars should use the Hatcher-native hatchling/shell family. Third-party GLB avatars are legacy compatibility options, not the primary brand look.
-- Use graphite, silver, cyan, and restrained gold for City/Room visuals. Avoid the old green/purple neon palette.
+- The default is the deterministic generated identicon (`generateAgentAvatar`); owners may upload a custom 2D image in Config → General.
 - Avoid bazaar, marketplace, fantasy city, cyber-casino, or Hatcher Markets styling on hatcher.host.
-- Generated assets from Higgsfield or other tools should be treated as concept art until optimized, licensed, compressed, and adapted into production WebP/GLB assets.
-- Production concept visuals live under `public/landing-v3/` as optimized WebP files. Hatcher-native GLB avatars live under `public/assets/3d/agent-room/avatars/` and should stay web-sized before being added to the selector.
-- Future generated assets should prioritize: egg/shell agent avatars, premium cloud buildings, room stations, clean city skyline cards, and non-cartoon UI hero visuals.
+- Production concept visuals live under `public/landing-v3/` as optimized WebP files.
 
 ## Billing And Token
 

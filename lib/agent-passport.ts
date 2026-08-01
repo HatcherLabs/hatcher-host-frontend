@@ -75,7 +75,6 @@ export function buildFallbackPassport(agent: PassportFallbackAgent | null, route
   const publicId = slug ?? id;
   const origin = typeof window !== 'undefined' ? window.location.origin : 'https://hatcher.host';
   const apiBase = API_URL.replace(/\/+$/, '');
-  const roomUrl = `${origin}/agent/${publicId}/room`;
   const profileUrl = `${origin}/agent/${publicId}`;
   const skaleStatus: AgentPassportStatus = agent?.skaleAgentId
     ? 'registered'
@@ -94,15 +93,11 @@ export function buildFallbackPassport(agent: PassportFallbackAgent | null, route
       framework: agent?.framework ?? 'openclaw',
       status: agent?.status ?? 'unknown',
       profileUrl,
-      roomUrl,
       createdAt: agent?.createdAt ?? now,
       updatedAt: agent?.updatedAt ?? now,
     },
     avatar: {
-      kind: 'hatcher-room-v2',
-      stationId: 'agentAvatar',
       imageUrl: agent?.avatarUrl ?? null,
-      roomUrl,
     },
     identity: {
       handle: `hatcher:${publicId}`,
@@ -221,7 +216,6 @@ export function buildFallbackPassport(agent: PassportFallbackAgent | null, route
     },
     links: {
       profile: profileUrl,
-      room: roomUrl,
       passport: `${apiBase}/agents/${publicId}/passport.json`,
       skaleMetadata: `${apiBase}/agents/${id}/skale-metadata.json`,
       solanaMetadata: `${apiBase}/agents/${id}/solana-metadata.json`,
