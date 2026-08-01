@@ -40,7 +40,6 @@ import {
 import { api } from '@/lib/api';
 import type { CovenantConnector, CovenantTask, CreateCovenantConnectorResponse } from '@/lib/api/types';
 import { API_URL } from '@/lib/config';
-import { DomainsSection } from './DomainsSection';
 
 // ─── Framework compatibility metadata ────────────────────────
 // Defines how well each integration works with each framework
@@ -2238,9 +2237,6 @@ export function IntegrationsTab() {
               ))}
             </div>
           </div>}
-
-          {/* Custom Domains */}
-          <DomainsSection />
 
           {/* Legend */}
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 pt-2 border-t border-[var(--border-default)]">

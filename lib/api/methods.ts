@@ -106,8 +106,6 @@ import type {
   VirtualsJobDraftResponse,
   VirtualsScoutBody,
   VirtualsScoutResult,
-  Mpp32ConfigBody,
-  Mpp32ConfigStatus,
   MetaplexAvatarUploadResponse,
   MetaplexConfigStatus,
   MetaplexMintAgentPlan,
@@ -774,16 +772,6 @@ export const api = {
   ) =>
     req<VirtualsComputeProbeResponse>(`/agents/${id}/virtuals/compute/probe`, {
       method: "POST",
-      body: JSON.stringify(body),
-    }),
-
-  /** MPP32 signed-settlement broker controls. */
-  getAgentMpp32Config: (id: string) =>
-    req<Mpp32ConfigStatus>(`/agents/${id}/mpp32/config`),
-
-  updateAgentMpp32Config: (id: string, body: Mpp32ConfigBody) =>
-    req<Mpp32ConfigStatus>(`/agents/${id}/mpp32/config`, {
-      method: "PATCH",
       body: JSON.stringify(body),
     }),
 
@@ -3155,54 +3143,6 @@ export const api = {
     }>(`/agents/${agentId}/plugins/${encodeURIComponent(pluginName)}`, {
       method: "DELETE",
     }),
-
-  // ─── Custom Domains ──────────────────────────────────────
-  /** Add a custom domain to an agent */
-  addCustomDomain: (agentId: string, domain: string) =>
-    req<{
-      id: string;
-      agentId: string;
-      domain: string;
-      verified: boolean;
-      sslStatus: string;
-      cnameTarget: string;
-      createdAt: string;
-      updatedAt: string;
-    }>("/domains", {
-      method: "POST",
-      body: JSON.stringify({ agentId, domain }),
-    }),
-
-  /** List all custom domains for the current user */
-  getMyDomains: () =>
-    req<
-      Array<{
-        id: string;
-        agentId: string;
-        domain: string;
-        verified: boolean;
-        sslStatus: string;
-        cnameTarget: string;
-        createdAt: string;
-        updatedAt: string;
-      }>
-    >("/domains"),
-
-  /** Delete a custom domain */
-  deleteDomain: (id: string) =>
-    req<{ deleted: boolean; id: string }>(`/domains/${id}`, {
-      method: "DELETE",
-    }),
-
-  /** Verify a custom domain's DNS CNAME */
-  verifyDomain: (id: string) =>
-    req<{
-      verified: boolean;
-      domain?: unknown;
-      message?: string;
-      expected?: string;
-      found?: string[];
-    }>(`/domains/${id}/verify`, { method: "POST" }),
 
   // ─── Agent-to-Agent Communication ─────────────────────────
   getAgentCommPermissions: (agentId: string) =>

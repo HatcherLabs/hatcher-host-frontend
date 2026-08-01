@@ -109,7 +109,6 @@ function timeAgo(dateStr: string): string {
 // Persist dismissed notification IDs in localStorage
 const DISMISSED_KEY = 'hatcher:dismissed-notifications';
 const NOTIFICATIONS_FETCH_MIN_INTERVAL_MS = 15_000;
-const UNREAD_COUNT_POLL_INTERVAL_MS = 5 * 60_000;
 
 let notificationsCacheByUser = new Map<string, { data: NotificationsPayload; fetchedAt: number }>();
 let notificationsInFlightByUser = new Map<string, Promise<NotificationsPayload | null>>();
@@ -240,28 +239,7 @@ export function NotificationCenter() {
       setUnreadCount(0);
       return;
     }
-
-    let interval: ReturnType<typeof setInterval> | null = null;
-    const refreshIfVisible = (force = false) => {
-      if (document.visibilityState === 'visible') void fetchUnreadCount(force);
-    };
-    const syncPolling = () => {
-      if (interval) clearInterval(interval);
-      interval = null;
-      if (document.visibilityState !== 'visible') return;
-      refreshIfVisible(true);
-      interval = setInterval(refreshIfVisible, UNREAD_COUNT_POLL_INTERVAL_MS);
-    };
-    const onFocus = () => refreshIfVisible(true);
-
-    syncPolling();
-    document.addEventListener('visibilitychange', syncPolling);
-    window.addEventListener('focus', onFocus);
-    return () => {
-      if (interval) clearInterval(interval);
-      document.removeEventListener('visibilitychange', syncPolling);
-      window.removeEventListener('focus', onFocus);
-    };
+    void fetchUnreadCount();
   }, [fetchUnreadCount, isAuthenticated, user?.id]);
 
   useEffect(() => {
@@ -328,6 +306,7 @@ export function NotificationCenter() {
             return;
           }
           setOpen(true);
+          void fetchUnreadCount(true);
           void fetchNotifications(true).then((data) => {
             if (unreadCount > 0 || data?.items.some((notification) => !notification.read)) {
               void markAllRead();

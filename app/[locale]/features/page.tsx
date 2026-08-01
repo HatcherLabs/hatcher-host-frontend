@@ -98,7 +98,7 @@ const FEATURES: Feature[] = [
     title: 'iOS, Android, and Solana Mobile',
     short: 'Hatcher in your pocket, with App Store and mobile surfaces.',
     detail:
-      'The mobile experience gives users a compact way to monitor agents, open city entry points, jump into rooms, and chat with running workers. Hatcher is available through the App Store and Google Play, with Solana Mobile distribution prepared.',
+      'The mobile experience gives users a compact way to monitor agents, inspect status, and chat with running workers. Hatcher is available through the App Store and Google Play, with Solana Mobile distribution prepared.',
     bullets: [
       'App Store',
       'Google Play',
@@ -353,7 +353,7 @@ export default function FeaturesPage() {
           <div>
             <p className={styles.eyebrow}>Ready to hatch</p>
             <h2>
-              Start with one agent. Add skills, mobile, and CLI when you
+              Start with one agent. Add skills, integrations, and mobile when you
               need them.
             </h2>
           </div>

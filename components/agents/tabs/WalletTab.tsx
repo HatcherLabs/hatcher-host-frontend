@@ -45,7 +45,6 @@ import { EarnFiWalletPanel } from './EarnFiWalletPanel';
 import { OobeWalletPanel } from './OobeWalletPanel';
 import { ClawVilleWalletPanel } from './ClawVilleWalletPanel';
 import { XonaPartnerResourcesPanel } from './XonaPartnerResourcesPanel';
-import { Mpp32WalletPanel } from './Mpp32WalletPanel';
 import { MetaplexWalletPanel } from './MetaplexWalletPanel';
 import { VirtualsWalletPanel } from './VirtualsWalletPanel';
 
@@ -67,7 +66,7 @@ interface ReputationState {
 
 type WalletPanel = 'passport' | AgentPassportNetworkId;
 type WalletSection = 'overview' | 'networks' | 'providers' | 'security';
-type ProviderPanelId = 'xona' | 'earnfi' | 'oobe' | 'clawville' | 'mpp32' | 'metaplex' | 'virtuals';
+type ProviderPanelId = 'xona' | 'earnfi' | 'oobe' | 'clawville' | 'metaplex' | 'virtuals';
 type AgentRuntime = 'hermes' | 'openclaw' | (string & {});
 
 const TAB_ORDER: WalletPanel[] = ['passport', 'skale', 'solana', 'base', 'cyberia'];
@@ -90,7 +89,6 @@ const SOLANA_PROVIDERS: ReadonlyArray<{ id: ProviderPanelId; label: string; desc
   { id: 'earnfi', label: 'EarnFi', description: 'Paid task creation and verification.', network: 'Solana' },
   { id: 'oobe', label: 'Oobe', description: 'SAP registration and x402 access.', network: 'Solana' },
   { id: 'clawville', label: 'ClawVille', description: 'Identity wallet and access state.', network: 'Solana' },
-  { id: 'mpp32', label: 'MPP32', description: 'Signed AGTP intelligence and x402 settlement.', network: 'Solana' },
 ];
 
 const BASE_PROVIDERS: ReadonlyArray<{ id: ProviderPanelId; label: string; description: string; network: 'Base' }> = [
@@ -886,8 +884,6 @@ function ProviderPanel({ provider, agentId, solanaWallet }: { provider: Provider
       return <OobeWalletPanel agentId={agentId} />;
     case 'clawville':
       return <ClawVilleWalletPanel agentId={agentId} />;
-    case 'mpp32':
-      return <Mpp32WalletPanel agentId={agentId} />;
     case 'metaplex':
       return <MetaplexWalletPanel agentId={agentId} solanaWallet={solanaWallet} />;
     case 'virtuals':

@@ -518,7 +518,6 @@ export default function PricingPage() {
                       { rowKey: 'autoSleep',       free: '12h',      starter: 'alwaysOn', pro: 'alwaysOn',  business: 'alwaysOn', founding: 'alwaysOn' },
                       { rowKey: 'fileManager',     free: true,       starter: true,       pro: true, business: true, founding: true },
                       { rowKey: 'fullLogs',        free: true,       starter: true,       pro: true, business: true, founding: true },
-                      { rowKey: 'teamCollab',      free: false,       starter: false,       pro: false,  business: true,  founding: false },
                       { rowKey: 'prioritySupport', free: false,       starter: false,       pro: false,  business: true,  founding: true },
                       { rowKey: 'community', label: 'Community perks', free: false, starter: false, pro: false, business: false, founding: 'Discord role + Telegram tag' },
                       { rowKey: 'plugins',         free: 'Included', starter: 'Included', pro: 'Included', business: 'Included', founding: 'Included' },

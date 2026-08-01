@@ -111,7 +111,6 @@ apps/frontend/
 | `/dashboard/agents` | My agents (default after login) | Required |
 | `/dashboard/agent/[id]` | Agent management | Required |
 | `/dashboard/billing` | Billing & plans | Required |
-| `/dashboard/team` | Team collaboration | Required |
 | `/create` | Chat-to-Hatch agent creation flow | Required |
 | `/settings` | Account settings, BYOK config, API keys | Required |
 | `/support` | Support tickets | Required |

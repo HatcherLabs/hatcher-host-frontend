@@ -37,7 +37,6 @@
       "sub_analytics": "AI Credits、token 和趋势。",
       "sub_billing": "套餐、附加项、积分。",
       "sub_wallets": "Solana 支付钱包。",
-      "sub_team": "成员与协作。",
       "sub_settings": "个人资料、API 密钥、偏好设置。",
       "sub_support": "帮助、文档、联系方式。",
       "sub_admin": "平台控制。",
@@ -59,7 +58,7 @@
       "tradersLabel": "公开交易者",
       "tradersSub": "代币化代理及其链上活动。",
       "featuresLabel": "功能",
-      "featuresSub": "运行时、工作区、工具、房间和 CLI。",
+      "featuresSub": "运行时、工作区、工具和集成。",
       "frameworksLabel": "框架",
       "frameworksSub": "OpenClaw · Hermes.。",
       "pricingLabel": "定价",
@@ -351,7 +350,7 @@
             "每月 40,000 AI Credits",
             "50 GB 工作区",
             "始终在线容器",
-            "团队协作"
+            "优先支持"
           ],
           "cta": "选择 Business"
         }
@@ -629,7 +628,6 @@
           "已包含文件管理器",
           "已包含完整日志",
           "优先支持",
-          "团队协作",
           "所有集成"
         ],
         "missing": []
@@ -742,7 +740,6 @@
         "autoSleep": "自动休眠",
         "fileManager": "文件管理器",
         "fullLogs": "完整日志",
-        "teamCollab": "团队协作",
         "prioritySupport": "优先支持",
         "plugins": "插件 + 技能",
         "integrations": "所有集成",

@@ -37,7 +37,6 @@
       "sub_analytics": "AI Credits、トークン、トレンド。",
       "sub_billing": "ティア、アドオン、クレジット。",
       "sub_wallets": "Solana決済ウォレット。",
-      "sub_team": "メンバーとコラボレーション。",
       "sub_settings": "プロフィール、APIキー、好み。",
       "sub_support": "助けてください、医師、連絡してください。",
       "sub_admin": "ホームの操作。",
@@ -59,7 +58,7 @@
       "tradersLabel": "公開トレーダー",
       "tradersSub": "トークン化されたエージェントとオンチェーン活動。",
       "featuresLabel": "特徴",
-      "featuresSub": "実行時間、ワークスペース、ツール、ルーム、CLI。",
+      "featuresSub": "実行環境、ワークスペース、ツール、統合。",
       "frameworksLabel": "フレームワーク",
       "frameworksSub": "OpenClaw ·Hermes。",
       "pricingLabel": "価格設定",
@@ -351,7 +350,7 @@
             "月AI Credits 40,000",
             "50 GBワークスペース",
             "常時稼働のコンテナ",
-            "チームコラボレーション"
+            "優先支援"
           ],
           "cta": "ビジネスを選んでください"
         }
@@ -629,7 +628,6 @@
           "ファイルマネージャーが含まれています",
           "完全なログも含まれています",
           "優先支援",
-          "チームコラボレーション",
           "すべての統合"
         ],
         "missing": []
@@ -742,7 +740,6 @@
         "autoSleep": "オートスリープ",
         "fileManager": "ファイルマネージャー",
         "fullLogs": "全記録",
-        "teamCollab": "チームコラボレーション",
         "prioritySupport": "優先支援",
         "plugins": "プラグイン+スキル",
         "integrations": "すべての統合",

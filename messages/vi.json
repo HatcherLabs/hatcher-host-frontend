@@ -37,7 +37,6 @@
       "sub_analytics": "AI Credits, mã thông báo, xu hướng.",
       "sub_billing": "Cấp, tiện ích bổ sung, tín dụng.",
       "sub_wallets": "Ví thanh toán Solana.",
-      "sub_team": "Thành viên và sự hợp tác.",
       "sub_settings": "Hồ sơ, khóa API, prefs.",
       "sub_support": "Trợ giúp, tài liệu, liên hệ.",
       "sub_admin": "Điều khiển nền tảng.",
@@ -59,7 +58,7 @@
       "tradersLabel": "Trader công khai",
       "tradersSub": "Tác nhân được token hóa và hoạt động onchain.",
       "featuresLabel": "Tính năng",
-      "featuresSub": "Thời gian chạy, không gian làm việc, công cụ, phòng và CLI.",
+      "featuresSub": "Thời gian chạy, không gian làm việc, công cụ và tích hợp.",
       "frameworksLabel": "Khung",
       "frameworksSub": "OpenClaw · Hermes.",
       "pricingLabel": "Định giá",
@@ -351,7 +350,7 @@
             "40.000 AI Credits/tháng",
             "Không gian làm việc 50 GB",
             "Thùng chứa luôn bật",
-            "Hợp tác nhóm"
+            "Hỗ trợ ưu tiên"
           ],
           "cta": "Chọn doanh nghiệp"
         }
@@ -629,7 +628,6 @@
           "Bao gồm Trình quản lý tệp",
           "Bao gồm nhật ký đầy đủ",
           "Hỗ trợ ưu tiên",
-          "Hợp tác nhóm",
           "Tất cả tích hợp"
         ],
         "missing": []
@@ -742,7 +740,6 @@
         "autoSleep": "Tự động ngủ",
         "fileManager": "Trình quản lý tệp",
         "fullLogs": "Nhật ký đầy đủ",
-        "teamCollab": "Hợp tác nhóm",
         "prioritySupport": "Hỗ trợ ưu tiên",
         "plugins": "Plugin + Kỹ năng",
         "integrations": "Tất cả tích hợp",

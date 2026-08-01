@@ -39,7 +39,6 @@
       "sub_analytics": "AI Credits, tokens, trends.",
       "sub_billing": "Tier, addons, credits.",
       "sub_wallets": "Solana payment wallets.",
-      "sub_team": "Members and collaboration.",
       "sub_settings": "Profile, API keys, prefs.",
       "sub_support": "Help, docs, contact.",
       "sub_admin": "Platform controls.",
@@ -60,7 +59,7 @@
       "tradersLabel": "Public traders",
       "tradersSub": "Tokenized agents and their onchain activity.",
       "featuresLabel": "Features",
-      "featuresSub": "Runtime, workspace, tools, rooms, and CLI.",
+      "featuresSub": "Runtime, workspace, tools, and integrations.",
       "frameworksLabel": "Frameworks",
       "frameworksSub": "OpenClaw · Hermes.",
       "pricingLabel": "Pricing",
@@ -351,7 +350,7 @@
             "40,000 AI Credits/month",
             "50 GB workspace",
             "Always-on containers",
-            "Team collaboration"
+            "Priority support"
           ],
           "cta": "Choose Business"
         }
@@ -629,7 +628,6 @@
           "File Manager included",
           "Full logs included",
           "Priority support",
-          "Team collaboration",
           "All integrations"
         ],
         "missing": []
@@ -742,7 +740,6 @@
         "autoSleep": "Auto-sleep",
         "fileManager": "File Manager",
         "fullLogs": "Full Logs",
-        "teamCollab": "Team collaboration",
         "prioritySupport": "Priority support",
         "plugins": "Plugins + Skills",
         "integrations": "All integrations",
