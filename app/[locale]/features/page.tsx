@@ -20,7 +20,6 @@ import {
   Network,
   Play,
   Smartphone,
-  Terminal,
   WalletCards,
   Wrench,
   type LucideIcon,
@@ -32,7 +31,6 @@ type Visual =
   | 'email'
   | 'eyes'
   | 'skills'
-  | 'cli'
   | 'mobile'
   | 'github'
   | 'a2a'
@@ -93,22 +91,6 @@ const FEATURES: Feature[] = [
     bullets: ['Web and files', 'Schedules', 'Integrations', 'Partner compute'],
     icon: Wrench,
     tone: 'rose',
-  },
-  {
-    id: 'cli',
-    kicker: 'Developer',
-    title: 'Hatcher CLI',
-    short: 'Create, chat, and operate agents from the terminal.',
-    detail:
-      'Install the CLI, generate an owner API key, run `hatcher`, and manage agents without opening the browser. The CLI supports agent lists, creation, chat, terminal attachment, and owner workflows for developers who live in a shell.',
-    bullets: [
-      'npm i @hatcherlabs/cli',
-      'Owner API keys',
-      'Agent chat',
-      'Live terminal',
-    ],
-    icon: Terminal,
-    tone: 'violet',
   },
   {
     id: 'mobile',
@@ -195,7 +177,6 @@ const SURFACES = [
   'iOS app',
   'Android app',
   'Solana Mobile',
-  'Hatcher CLI',
 ];
 
 export default function FeaturesPage() {
@@ -440,7 +421,6 @@ function FeatureVisual({ type }: { type: Visual }) {
   if (type === 'email') return <EmailVisual />;
   if (type === 'eyes') return <EyesVisual />;
   if (type === 'skills') return <SkillsVisual />;
-  if (type === 'cli') return <CliVisual />;
   if (type === 'mobile') return <StorePhone />;
   if (type === 'github') return <GithubVisual />;
   if (type === 'a2a') return <A2AVisual />;
@@ -520,21 +500,6 @@ function SkillsVisual() {
           <span key={tool}>{tool}</span>
         ))}
       </div>
-    </div>
-  );
-}
-
-function CliVisual() {
-  return (
-    <div className={styles.terminalPreview}>
-      <span>
-        <b>$</b> npm i @hatcherlabs/cli
-      </span>
-      <span>
-        <b>$</b> hatcher
-      </span>
-      <span>select agent: Pump Sentinel</span>
-      <span>terminal attached · owner session</span>
     </div>
   );
 }

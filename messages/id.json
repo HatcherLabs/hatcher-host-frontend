@@ -2024,10 +2024,6 @@
         "description": "Hubungkan Telegram, Discord, Slack, Twitter/X, Signal, webhook, dan saluran lain yang disertakan di setiap tingkat."
       },
       {
-        "title": "Hatcher CLI",
-        "description": "Instal @hatcherlabs/cli, jalankan hatcher, buat agen, chat, lampirkan terminal, konfigurasi GitHub, dan panggilan A2A dari shell Anda."
-      },
-      {
         "title": "Alur Kerja Pengembang",
         "description": "Hubungkan GitHub, kelola sesi terminal, aktifkan komunikasi agen-ke-agen, dan atur agen yang dimiliki."
       },
@@ -2576,29 +2572,6 @@
       "ctaGhost": "Lihat agen",
       "metaFrameworks": "OpenClaw + Hermes",
       "metaNoCard": "tidak ada kartu kredit"
-    },
-    "cli": {
-      "boxLabel": "CLI",
-      "title": "Jalankan Hatcher dari terminal Anda",
-      "sub": "Instal Hatcher CLI, buat kunci API, lalu jalankan `hatcher`. Bangun agen dari bahasa Inggris sederhana, ngobrol dengan mereka, lampirkan ke runtime langsung mereka, dan kelola alur kerja pengembang tanpa meninggalkan cangkang Anda.",
-      "apiKeyHint": "Hasilkan kunci API di Akun → Kunci API → Buat kunci.",
-      "ctaKey": "Buat kunci API",
-      "ctaDocs": "dokumen CLI",
-      "terminalLabel": "Hatcher CLI",
-      "features": {
-        "hatch": {
-          "title": "Chat-to-Hatch",
-          "body": "Ubah satu perintah menjadi agen OpenClaw atau Hermes yang dikonfigurasi."
-        },
-        "terminal": {
-          "title": "Terminal langsung",
-          "body": "Lampirkan ke sesi kerangka kerja yang sedang berjalan dengan `hatcher terminal`."
-        },
-        "dev": {
-          "title": "Alur kerja pengembangan",
-          "body": "Gunakan akses GitHub, panggilan, sesi, log, dan orkestrasi A2A dari satu CLI."
-        }
-      }
     }
   },
   "missionControl": {
