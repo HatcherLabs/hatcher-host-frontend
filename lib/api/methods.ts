@@ -106,6 +106,8 @@ import type {
   VirtualsJobDraftResponse,
   VirtualsScoutBody,
   VirtualsScoutResult,
+  Mpp32ConfigBody,
+  Mpp32ConfigStatus,
   MetaplexAvatarUploadResponse,
   MetaplexConfigStatus,
   MetaplexMintAgentPlan,
@@ -772,6 +774,16 @@ export const api = {
   ) =>
     req<VirtualsComputeProbeResponse>(`/agents/${id}/virtuals/compute/probe`, {
       method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  /** MPP32 signed-settlement broker controls. */
+  getAgentMpp32Config: (id: string) =>
+    req<Mpp32ConfigStatus>(`/agents/${id}/mpp32/config`),
+
+  updateAgentMpp32Config: (id: string, body: Mpp32ConfigBody) =>
+    req<Mpp32ConfigStatus>(`/agents/${id}/mpp32/config`, {
+      method: "PATCH",
       body: JSON.stringify(body),
     }),
 
