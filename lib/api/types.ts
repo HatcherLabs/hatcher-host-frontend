@@ -1606,6 +1606,36 @@ export interface VirtualsAcpProviderResponseResult {
   }>;
 }
 
+export interface Mpp32AgentSettings {
+  enabled: boolean;
+  dailyBudgetUsd: number;
+  maxPerCallUsd: number;
+  authorityScope: string[];
+}
+
+export interface Mpp32ConfigStatus {
+  enabled: boolean;
+  baseUrl: string;
+  settlement: "x402";
+  agtpIdentityMode: "x402_only" | "hmac_sha256";
+  payerConfigured: boolean;
+  payerSource: "mpp32" | "xona" | "none";
+  network: string;
+  maxPerCallUsdc: number;
+  maxResponseBytes: number;
+  partnerHeaders: {
+    source: "X-Partner-Source";
+    callerId: "X-Partner-Caller-Id";
+  };
+  settings: Mpp32AgentSettings;
+}
+
+export interface Mpp32ConfigBody {
+  enabled?: boolean;
+  dailyBudgetUsd?: number;
+  maxPerCallUsd?: number;
+}
+
 export type MetaplexConfigStatusValue =
   "disabled" | "wallet-missing" | "metadata-ready" | "registered";
 

@@ -69,12 +69,18 @@ describe('retired integrations', () => {
     expect(existsSync(join(root, 'components', 'agents', 'tabs', 'SchedulesTab.tsx'))).toBe(true);
   });
 
-  it('removes MPP32, Custom Domains, and the standalone SKALE dashboard', () => {
-    expect(existsSync(join(root, 'components', 'agents', 'tabs', 'Mpp32WalletPanel.tsx'))).toBe(false);
+  it('preserves MPP32 in the wallet provider rails and API client', () => {
+    expect(existsSync(join(root, 'components', 'agents', 'tabs', 'Mpp32WalletPanel.tsx'))).toBe(true);
+    for (const file of ['lib/api/methods.ts', 'lib/api/types.ts', 'lib/api/index.ts']) {
+      expect(read(file)).toMatch(/mpp32/i);
+    }
+  });
+
+  it('removes Custom Domains and the standalone SKALE dashboard', () => {
     expect(existsSync(join(root, 'components', 'agents', 'tabs', 'DomainsSection.tsx'))).toBe(false);
     expect(existsSync(join(root, 'app', '[locale]', 'dashboard', 'skale', 'page.tsx'))).toBe(false);
     for (const file of ['lib/api/methods.ts', 'lib/api/types.ts', 'lib/api/index.ts']) {
-      expect(read(file)).not.toMatch(/mpp32|customDomain|\/domains/i);
+      expect(read(file)).not.toMatch(/customDomain|\/domains/i);
     }
   });
 
