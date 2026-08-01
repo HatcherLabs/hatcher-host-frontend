@@ -21,19 +21,6 @@ describe('hosted model catalog', () => {
     expect(normalizeHostedModelForUi('virtuals/llama-3-3-70b')).toBe('virtuals/deepseek-deepseek-v3-2');
   });
 
-  it('builds a readable active hosted model display', () => {
-    expect(
-      resolveActiveModelDisplay({
-        provider: 'openrouter',
-        model: 'idle/claude-sonnet-4-6',
-      }),
-    ).toMatchObject({
-      name: 'Claude Sonnet 4.6 (IDLE)',
-      provider: 'IDLE',
-      route: 'IDLE partner',
-    });
-  });
-
   it('builds a readable BYOK model display', () => {
     expect(
       resolveActiveModelDisplay({
@@ -45,18 +32,6 @@ describe('hosted model catalog', () => {
       provider: 'Venice AI',
       privacy: 'BYOK direct',
     });
-  });
-
-  it('filters hosted models by provider, tag, cost, and privacy route', () => {
-    const filtered = filterHostedModels({
-      provider: 'idle',
-      tag: 'fixed price',
-      maxCostRank: 2,
-      privacy: 'partner',
-    });
-
-    expect(filtered.map((model) => model.id)).toContain('idle/claude-haiku-4-5');
-    expect(filtered.every((model) => model.providerKey === 'idle')).toBe(true);
   });
 
   it('surfaces the expanded AceData hosted model catalog', () => {
@@ -164,7 +139,7 @@ describe('hosted model catalog', () => {
       ]),
     );
 
-    for (const provider of ['idle', 'openserv', 'acedata', 'virtuals']) {
+    for (const provider of ['openserv', 'acedata', 'virtuals']) {
       expect(routesByProvider.get(provider)).toEqual(new Set(['partner']));
     }
     for (const provider of ['openai', 'anthropic', 'google', 'qwen', 'z-ai']) {

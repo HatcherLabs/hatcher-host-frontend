@@ -109,9 +109,12 @@ function timeAgo(dateStr: string): string {
 // Persist dismissed notification IDs in localStorage
 const DISMISSED_KEY = 'hatcher:dismissed-notifications';
 const NOTIFICATIONS_FETCH_MIN_INTERVAL_MS = 15_000;
+const UNREAD_COUNT_POLL_INTERVAL_MS = 5 * 60_000;
 
 let notificationsCacheByUser = new Map<string, { data: NotificationsPayload; fetchedAt: number }>();
 let notificationsInFlightByUser = new Map<string, Promise<NotificationsPayload | null>>();
+let unreadCountCacheByUser = new Map<string, { count: number; fetchedAt: number }>();
+let unreadCountInFlightByUser = new Map<string, Promise<number | null>>();
 
 async function loadNotificationsSnapshot(userId: string, force = false): Promise<NotificationsPayload | null> {
   const now = Date.now();
@@ -147,6 +150,34 @@ async function loadNotificationsSnapshot(userId: string, force = false): Promise
   return request;
 }
 
+async function loadUnreadCount(userId: string, force = false): Promise<number | null> {
+  const now = Date.now();
+  const cached = unreadCountCacheByUser.get(userId);
+  if (!force && cached && now - cached.fetchedAt < NOTIFICATIONS_FETCH_MIN_INTERVAL_MS) {
+    return cached.count;
+  }
+
+  const inFlight = unreadCountInFlightByUser.get(userId);
+  if (inFlight) return inFlight;
+
+  const startedAt = Date.now();
+  const request = api.getUnreadNotificationCount()
+    .then((res) => {
+      if (!res.success || !res.data) return null;
+      const latest = unreadCountCacheByUser.get(userId);
+      if (latest && latest.fetchedAt > startedAt) return latest.count;
+      const count = Math.max(0, res.data.count);
+      unreadCountCacheByUser.set(userId, { count, fetchedAt: Date.now() });
+      return count;
+    })
+    .finally(() => {
+      unreadCountInFlightByUser.delete(userId);
+    });
+
+  unreadCountInFlightByUser.set(userId, request);
+  return request;
+}
+
 function getDismissed(): Set<string> {
   try {
     const raw = localStorage.getItem(DISMISSED_KEY);
@@ -172,6 +203,7 @@ export function NotificationCenter() {
   const t = useTranslations('notifications');
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -180,28 +212,57 @@ export function NotificationCenter() {
     setDismissed(getDismissed());
   }, []);
 
-  const fetchNotifications = useCallback(async (force = false) => {
-    if (!isAuthenticated || !user?.id) return;
+  const fetchNotifications = useCallback(async (force = false): Promise<NotificationsPayload | null> => {
+    if (!isAuthenticated || !user?.id) return null;
     try {
       const data = await loadNotificationsSnapshot(user.id, force);
-      if (!data) return;
+      if (!data) return null;
       setNotifications(data.items);
+      return data;
+    } catch {
+      // silently fail
+      return null;
+    }
+  }, [isAuthenticated, user?.id]);
+
+  const fetchUnreadCount = useCallback(async (force = false) => {
+    if (!isAuthenticated || !user?.id) return;
+    try {
+      const count = await loadUnreadCount(user.id, force);
+      if (count !== null) setUnreadCount(count);
     } catch {
       // silently fail
     }
   }, [isAuthenticated, user?.id]);
 
   useEffect(() => {
-    fetchNotifications();
-    const interval = setInterval(fetchNotifications, 60000);
-    return () => clearInterval(interval);
-  }, [fetchNotifications]);
+    if (!isAuthenticated || !user?.id) {
+      setUnreadCount(0);
+      return;
+    }
 
-  useEffect(() => {
-    const onFocus = () => { void fetchNotifications(); };
+    let interval: ReturnType<typeof setInterval> | null = null;
+    const refreshIfVisible = (force = false) => {
+      if (document.visibilityState === 'visible') void fetchUnreadCount(force);
+    };
+    const syncPolling = () => {
+      if (interval) clearInterval(interval);
+      interval = null;
+      if (document.visibilityState !== 'visible') return;
+      refreshIfVisible(true);
+      interval = setInterval(refreshIfVisible, UNREAD_COUNT_POLL_INTERVAL_MS);
+    };
+    const onFocus = () => refreshIfVisible(true);
+
+    syncPolling();
+    document.addEventListener('visibilitychange', syncPolling);
     window.addEventListener('focus', onFocus);
-    return () => window.removeEventListener('focus', onFocus);
-  }, [fetchNotifications]);
+    return () => {
+      if (interval) clearInterval(interval);
+      document.removeEventListener('visibilitychange', syncPolling);
+      window.removeEventListener('focus', onFocus);
+    };
+  }, [fetchUnreadCount, isAuthenticated, user?.id]);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -223,12 +284,11 @@ export function NotificationCenter() {
   // Filter out dismissed notifications
   const visibleNotifications = notifications.filter(n => !dismissed.has(n.id));
 
-  // Count unread (only visible ones)
-  const unreadCount = visibleNotifications.filter((n) => !n.read).length;
-
   const markAllRead = async () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
     if (user?.id) {
+      unreadCountCacheByUser.set(user.id, { count: 0, fetchedAt: Date.now() });
+      setUnreadCount(0);
       const cached = notificationsCacheByUser.get(user.id);
       if (cached) {
         notificationsCacheByUser.set(user.id, {
@@ -262,13 +322,18 @@ export function NotificationCenter() {
   return (
     <div className="relative" ref={containerRef}>
       <button
-        onClick={() => setOpen((o) => {
-          if (!o) {
-            void fetchNotifications(true);
-            if (unreadCount > 0) void markAllRead();
+        onClick={() => {
+          if (open) {
+            setOpen(false);
+            return;
           }
-          return !o;
-        })}
+          setOpen(true);
+          void fetchNotifications(true).then((data) => {
+            if (unreadCount > 0 || data?.items.some((notification) => !notification.read)) {
+              void markAllRead();
+            }
+          });
+        }}
         className="relative h-9 w-9 flex items-center justify-center rounded-lg hover:bg-[var(--bg-card)] transition-colors"
         aria-label={unreadCount > 0 ? t('unreadAriaLabel', { count: unreadCount }) : t('allReadAriaLabel')}
         aria-expanded={open}

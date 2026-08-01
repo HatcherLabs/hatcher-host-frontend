@@ -27,7 +27,6 @@ const TABLE_OF_CONTENTS = [
   { id: 'token', label: '$HATCHER token' },
   { id: 'utility', label: 'Token utility' },
   { id: 'credits', label: 'AI Credits' },
-  { id: 'partners', label: 'Partner compute' },
   { id: 'developers', label: 'Developer workflows' },
   { id: 'security', label: 'Security model' },
   { id: 'roadmap', label: 'Roadmap' },
@@ -108,14 +107,6 @@ const TOKEN_UTILITY = [
     title: 'Marketplace economy',
     body:
       'Future marketplace flows may let users publish, rent, sell, or monetize agents, skills, templates, workflows, and services with $HATCHER as one supported settlement method.',
-  },
-] as const;
-
-const PARTNER_COMPUTE = [
-  {
-    name: 'IDLE',
-    body:
-      'Hatcher agents can consume selected partner compute tasks, while running or idle agents can be registered as providers where appropriate.',
   },
 ] as const;
 
@@ -303,7 +294,7 @@ export default function WhitepaperPage() {
               </p>
               <p>
                 The platform supports OpenClaw and Hermes agent frameworks, hosted model routing through providers such
-                as UsePod, OpenRouter, and IDLE, Bring Your Own Key configurations, AI Credits for metered hosted usage,
+                as UsePod and OpenRouter, Bring Your Own Key configurations, AI Credits for metered hosted usage,
                 and integrations such as Telegram, Discord, WhatsApp, Slack, and X/Twitter.
               </p>
               <p>
@@ -407,29 +398,12 @@ export default function WhitepaperPage() {
             <Section id="credits" eyebrow="AI Credits" title="One metering unit across hosted usage">
               <p>
                 AI Credits simplify usage metering across different model and tool providers. Hosted usage can include
-                LLM inference, web search, compute tools, partner-provider calls, and selected model routes such as IDLE
-                Haiku and Sonnet where available.
+                LLM inference, web search, compute tools, and partner-provider calls.
               </p>
               <p>
                 AI Credits are not cash, stored value, or redeemable currency. They are a platform usage unit for hosted
                 services.
               </p>
-            </Section>
-
-            <Section id="partners" eyebrow="Partner compute and provider economy" title="Agents as economic workers">
-              <p>
-                Hatcher is integrating with partner networks that let agents consume external compute and, in some
-                cases, provide compute back to external networks. These integrations are intended to make agents
-                economically active workers rather than static chatbots.
-              </p>
-              <div className="grid gap-4 md:grid-cols-3">
-                {PARTNER_COMPUTE.map((partner) => (
-                  <article key={partner.name} className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)]/60 p-5">
-                    <h3 className="text-base font-semibold text-[var(--text-primary)]">{partner.name}</h3>
-                    <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">{partner.body}</p>
-                  </article>
-                ))}
-              </div>
             </Section>
 
             <Section id="developers" eyebrow="Developer workflows" title="Agents for software development loops">

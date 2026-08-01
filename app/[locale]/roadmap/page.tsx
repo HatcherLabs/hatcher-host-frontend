@@ -16,7 +16,6 @@ import {
   Repeat2,
   Route,
   ShieldCheck,
-  Upload,
 } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
@@ -47,7 +46,6 @@ export function generateMetadata(): Metadata {
 const ICONS: Record<RoadmapIcon, LucideIcon> = {
   mission: ListChecks,
   packs: PackageCheck,
-  lift: Upload,
   models: Network,
   operate: CircleGauge,
   run: Bot,

@@ -199,7 +199,7 @@ export default function PrivacyPolicyPage() {
               instructions, selected model/provider, uploaded or generated context files, voice transcripts, tool
               inputs/outputs, and routing or usage metadata needed to return the response and meter AI Credits.
               Hatcher routes this data through Hatcher&apos;s backend and may share it with UsePod, OpenRouter, Xiaomi
-              MiMo, AceData, IDLE/OpenServ, or the model provider you select. When you use BYOK, requests are routed
+              MiMo, AceData, OpenServ, or the model provider you select. When you use BYOK, requests are routed
               to the provider attached to your own key. The iOS app asks for permission before sending personal data
               for third-party AI processing.
             </p>
@@ -226,7 +226,7 @@ export default function PrivacyPolicyPage() {
                   <tr><td className="px-3 py-2">OpenRouter</td><td className="px-3 py-2">LLM inference (hosted key)</td><td className="px-3 py-2">AI prompts, chat messages, voice transcripts, agent configs, session context, and generated outputs when routed to hosted models</td><td className="px-3 py-2">USA</td></tr>
                   <tr><td className="px-3 py-2">Xiaomi MiMo</td><td className="px-3 py-2">LLM inference via UsePod/OpenRouter route</td><td className="px-3 py-2">AI prompts, chat messages, voice transcripts, agent configs, session context, and generated outputs when selected</td><td className="px-3 py-2">UsePod/OpenRouter infrastructure</td></tr>
                   <tr><td className="px-3 py-2">AceData</td><td className="px-3 py-2">LLM inference and data/media tools (direct partner route)</td><td className="px-3 py-2">AI prompts, chat messages, voice transcripts, agent configs, session context, files/tool-call content, and generated outputs when selected</td><td className="px-3 py-2">Partner infrastructure</td></tr>
-                  <tr><td className="px-3 py-2">IDLE / OpenServ</td><td className="px-3 py-2">Partner-hosted AI inference and agent services</td><td className="px-3 py-2">AI prompts, chat messages, voice transcripts, agent configs, session context, and generated outputs when selected</td><td className="px-3 py-2">Partner infrastructure</td></tr>
+                  <tr><td className="px-3 py-2">OpenServ</td><td className="px-3 py-2">Partner-hosted AI inference and agent services</td><td className="px-3 py-2">AI prompts, chat messages, voice transcripts, agent configs, session context, and generated outputs when selected</td><td className="px-3 py-2">Partner infrastructure</td></tr>
                   <tr><td className="px-3 py-2">Apple</td><td className="px-3 py-2">In-app purchase processing</td><td className="px-3 py-2">App Store transaction identifiers and subscription status</td><td className="px-3 py-2">Global</td></tr>
                   <tr><td className="px-3 py-2">Stripe</td><td className="px-3 py-2">Card payments</td><td className="px-3 py-2">Email, billing address, card token</td><td className="px-3 py-2">Ireland / USA</td></tr>
                   <tr><td className="px-3 py-2">Resend</td><td className="px-3 py-2">Transactional email</td><td className="px-3 py-2">Email address, email content</td><td className="px-3 py-2">EU / USA</td></tr>

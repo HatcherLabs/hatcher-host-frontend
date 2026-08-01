@@ -13,9 +13,7 @@ import {
 } from "./chatStreamEvents";
 import type {
   Agent,
-  CommitLiftImportBody,
   CreateMissionTaskBody,
-  LiftImport,
   LaunchOutcomePackBody,
   LaunchOutcomePackResponse,
   OutcomePackRecurrence,
@@ -85,7 +83,6 @@ import type {
   AdminOobeOverviewResponse,
   AdminEgressEventsResponse,
   AgentEgressEventsResponse,
-  AdminIdleOverviewResponse,
   AdminHealthResponse,
   GetAgentMailboxResponse,
   GetAgentMailMessagesResponse,
@@ -134,18 +131,6 @@ import type {
   MetaplexTokenLaunchPrepareInput,
   MetaplexTokenLaunchPrepareResponse,
   MetaplexTokenLaunchResponse,
-  MedusaConfigStatus,
-  MedusaHandoffBody,
-  MedusaHandoffResponse,
-  MedusaHandoffStateBody,
-  MedusaHandoffStateResponse,
-  MedusaMintBadgeBody,
-  MedusaMintBadgeResponse,
-  MedusaRegisterBody,
-  MedusaRegisterResponse,
-  MedusaRotateResponse,
-  MedusaVerifyBody,
-  MedusaPassportSummary,
   ClawVilleConfigStatus,
   ClawVilleLaunchResponse,
   ClawVillePatchBody,
@@ -460,6 +445,10 @@ export const api = {
       offset: number;
     }>("/notifications?limit=20&offset=0"),
 
+  /** Get only the indexed unread count for the notification badge. */
+  getUnreadNotificationCount: () =>
+    req<{ count: number }>("/notifications/unread-count"),
+
   /** Mark all notifications as read (persists server-side) */
   markNotificationsRead: () =>
     req<{ marked: number }>("/notifications/read-all", { method: "POST" }),
@@ -509,39 +498,6 @@ export const api = {
   /** List the current user's agents */
   getMyAgents: () => req<Agent[]>("/agents"),
 
-
-  /** Analyze an OpenClaw or Hermes ZIP without exposing archive contents to the browser. */
-  analyzeLiftImport: (file: File) => {
-    const body = new FormData();
-    body.append("file", file);
-    return req<LiftImport>("/agents/lift/analyze", {
-      method: "POST",
-      body,
-    });
-  },
-
-  /** Reload a pending Lift review, for example after a browser refresh. */
-  getLiftImport: (id: string) =>
-    req<LiftImport>(`/agents/lift/${encodeURIComponent(id)}`),
-
-  /** Discard a pending Lift review and its server-side safe manifest. */
-  deleteLiftImport: (id: string) =>
-    req<{ deleted: boolean; id: string }>(
-      `/agents/lift/${encodeURIComponent(id)}`,
-      {
-        method: "DELETE",
-      },
-    ),
-
-  /** Create a paused agent from only the explicitly approved Lift candidates. */
-  commitLiftImport: (id: string, body: CommitLiftImportBody) =>
-    req<{ agent: Agent; idempotent: boolean }>(
-      `/agents/lift/${encodeURIComponent(id)}/commit`,
-      {
-        method: "POST",
-        body: JSON.stringify(body),
-      },
-    ),
 
   /** List account-wide one-shot tasks for Mission Control. */
   getMissionTasks: (
@@ -1003,46 +959,6 @@ export const api = {
         body: JSON.stringify(body),
       },
     ),
-
-  /** zkMedusa privacy passport verification and presale enrollment. */
-  getAgentMedusaConfig: (id: string) =>
-    req<MedusaConfigStatus>(`/agents/${id}/medusa/config`),
-
-  verifyAgentMedusaPassport: (id: string, body: MedusaVerifyBody) =>
-    req<MedusaPassportSummary>(`/agents/${id}/medusa/passport/verify`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
-
-  registerAgentMedusaPresale: (id: string, body: MedusaRegisterBody) =>
-    req<MedusaRegisterResponse>(`/agents/${id}/medusa/presale/register`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
-
-  createAgentMedusaHandoffState: (id: string, body: MedusaHandoffStateBody) =>
-    req<MedusaHandoffStateResponse>(`/agents/${id}/medusa/handoff/state`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
-
-  completeAgentMedusaHandoff: (body: MedusaHandoffBody) =>
-    req<MedusaHandoffResponse>("/agents/medusa/handoff/complete", {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
-
-  rotateAgentMedusaClaimWallet: (id: string, body: MedusaRegisterBody) =>
-    req<MedusaRotateResponse>(`/agents/${id}/medusa/claim/rotate`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
-
-  mintAgentMedusaBadge: (id: string, body: MedusaMintBadgeBody) =>
-    req<MedusaMintBadgeResponse>(`/agents/${id}/medusa/badge/mint`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
 
   /** ClawVille world registration and live callback setup. */
   getAgentClawVilleConfig: (id: string) =>
@@ -2586,9 +2502,6 @@ export const api = {
     const query = qs.toString() ? `?${qs.toString()}` : "";
     return req<AdminEgressEventsResponse>(`/admin/egress-events${query}`);
   },
-
-  /** Admin: IDLE consumer/provider integration overview */
-  adminGetIdleOverview: () => req<AdminIdleOverviewResponse>("/admin/idle"),
 
   /** Admin: OOBE Synapse RPC and SAP registration overview */
   adminGetOobeOverview: () => req<AdminOobeOverviewResponse>("/admin/oobe"),

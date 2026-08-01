@@ -55,7 +55,6 @@ export const HOSTED_MODEL_PROVIDERS: HostedModelProvider[] = [
   { key: 'deepseek', name: 'DeepSeek', description: 'Fast, cost-efficient long-context models.' },
   { key: 'openai', name: 'OpenAI', description: 'General, coding, and frontier models.' },
   { key: 'anthropic', name: 'Anthropic', description: 'Claude models for reasoning and writing.' },
-  { key: 'idle', name: 'IDLE', description: 'Partner-hosted Claude models with fixed request pricing.' },
   { key: 'openserv', name: 'OpenServ', description: 'Private-beta SERV reasoning models for agent workflows.' },
   { key: 'xiaomi', name: 'Xiaomi MiMo', description: 'MiMo models routed through UsePod with OpenRouter fallback.' },
   { key: 'acedata', name: 'AceData', description: 'Partner-hosted frontier models plus data and media intelligence APIs.' },
@@ -237,28 +236,6 @@ export const HOSTED_MODELS: HostedModelOption[] = [
     cost: 'Medium',
     context: '200K',
     description: 'Quick Claude option for structured assistant tasks.',
-  },
-  {
-    id: 'idle/claude-haiku-4-5',
-    name: 'Claude Haiku 4.5 (IDLE)',
-    providerKey: 'idle',
-    provider: 'IDLE',
-    category: 'Partner',
-    cost: 'Low',
-    context: '200K',
-    description: 'Partner-hosted Claude Haiku through IDLE. Fixed price per request.',
-    fixedPrice: '1 AI Credit per request',
-  },
-  {
-    id: 'idle/claude-sonnet-4-6',
-    name: 'Claude Sonnet 4.6 (IDLE)',
-    providerKey: 'idle',
-    provider: 'IDLE',
-    category: 'Partner',
-    cost: 'Medium',
-    context: '1M',
-    description: 'Partner-hosted Claude Sonnet through IDLE. Fixed price per request.',
-    fixedPrice: '3 AI Credits per request',
   },
   {
     id: 'openserv/serv-nano',
@@ -1113,7 +1090,6 @@ export function getHostedModelOption(
 }
 
 export function hostedModelRoute(model: HostedModelOption): string {
-  if (model.providerKey === 'idle') return 'IDLE partner';
   if (model.providerKey === 'openserv') return 'OpenServ primary / OpenRouter fallback';
   if (model.providerKey === 'xiaomi') return 'UsePod primary / OpenRouter fallback';
   if (model.providerKey === 'acedata') return 'AceData primary / OpenRouter fallback';
@@ -1122,13 +1098,12 @@ export function hostedModelRoute(model: HostedModelOption): string {
 }
 
 export function hostedModelPrivacy(model: HostedModelOption): HostedModelPrivacy {
-  return model.providerKey === 'idle' || model.providerKey === 'openserv' || model.providerKey === 'acedata' || model.providerKey === 'virtuals'
+  return model.providerKey === 'openserv' || model.providerKey === 'acedata' || model.providerKey === 'virtuals'
     ? 'partner'
     : 'hatcher';
 }
 
 export function hostedPrivacyLabel(model: HostedModelOption): string {
-  if (model.providerKey === 'idle') return 'Partner-hosted';
   if (model.providerKey === 'openserv') return 'OpenServ-hosted';
   if (model.providerKey === 'xiaomi') return 'UsePod/OpenRouter';
   if (model.providerKey === 'acedata') return 'AceData-hosted';

@@ -865,7 +865,6 @@
       },
       "utilities": {
         "label": "Các công cụ khác trong không gian làm việc",
-        "lift": "Nhập bằng Hatcher Lift",
         "agents": "Quản lý tác nhân"
       }
     },
@@ -897,8 +896,6 @@
       "tourCreateDescription": "Nhấp vào đây để ấp tác nhân AI đầu tiên của bạn với OpenClaw hoặc Hermes.",
       "tourWorkspaceTitle": "Không gian làm việc của bạn",
       "tourWorkspaceDescription": "Chuyển giữa Tác nhân, Mission Control, Outcome Packs và Approvals từ thanh này.",
-      "tourImportTitle": "Nhập tác nhân có sẵn",
-      "tourImportDescription": "Bạn đã có tác nhân? Nhập cấu hình của nó thay vì bắt đầu từ đầu.",
       "tourPlanTitle": "Gói và AI Credits",
       "tourPlanDescription": "Gói dịch vụ và số dư AI Credits của bạn nằm trong menu này. Xem mức sử dụng hoặc nâng cấp bất cứ lúc nào.",
       "statTotal": "Tổng cộng",

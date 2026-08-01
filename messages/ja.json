@@ -865,7 +865,6 @@
       },
       "utilities": {
         "label": "その他のワークスペースツール",
-        "lift": "Hatcher Liftでインポート",
         "agents": "エージェントを管理"
       }
     },
@@ -897,8 +896,6 @@
       "tourCreateDescription": "OpenClawまたはHermesで初めてのAIエージェントをハットするには、こちらをクリックしてください。",
       "tourWorkspaceTitle": "ワークスペース",
       "tourWorkspaceDescription": "このバーからエージェント、Mission Control、Outcome Packs、Approvals を切り替えられます。",
-      "tourImportTitle": "既存のエージェントをインポート",
-      "tourImportDescription": "すでにエージェントをお持ちですか？ゼロから作らずに、設定をそのままインポートできます。",
       "tourPlanTitle": "プランとAI Credits",
       "tourPlanDescription": "プランとAI Creditsの残高はこのメニューから確認できます。利用状況の確認やアップグレードもいつでも可能です。",
       "statTotal": "合計",

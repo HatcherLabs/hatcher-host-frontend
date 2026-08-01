@@ -48,7 +48,6 @@ describe('shouldStartAgentDetailTour', () => {
 
   it('ignores non-agent dashboard pages', () => {
     expect(shouldStartAgentDetailTour({ ...base, pathname: '/dashboard/agents' })).toBe(false);
-    expect(shouldStartAgentDetailTour({ ...base, pathname: '/dashboard/agents/import' })).toBe(false);
     expect(shouldStartAgentDetailTour({ ...base, pathname: '/dashboard/billing' })).toBe(false);
     expect(shouldStartAgentDetailTour({ ...base, pathname: '/dashboard/agent' })).toBe(false);
     expect(shouldStartAgentDetailTour({ ...base, pathname: '/dashboard/agent/' })).toBe(false);

@@ -36,11 +36,6 @@ export function DashboardTour() {
       description: t('tourWorkspaceDescription'),
     },
     {
-      target: '[data-tour="import-agent"]',
-      title: t('tourImportTitle'),
-      description: t('tourImportDescription'),
-    },
-    {
       target: '[data-tour="user-menu"]',
       title: t('tourPlanTitle'),
       description: t('tourPlanDescription'),

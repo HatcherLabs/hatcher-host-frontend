@@ -865,7 +865,6 @@
       },
       "utilities": {
         "label": "Diğer çalışma alanı araçları",
-        "lift": "Hatcher Lift ile içe aktar",
         "agents": "Ajanları yönet"
       }
     },
@@ -897,8 +896,6 @@
       "tourCreateDescription": "İlk yapay zeka ajanınızı OpenClaw veya Hermes ile açmak için buraya tıklayın.",
       "tourWorkspaceTitle": "Çalışma Alanınız",
       "tourWorkspaceDescription": "Bu çubuktan Ajanlar, Mission Control, Outcome Packs ve Approvals arasında geçiş yapabilirsiniz.",
-      "tourImportTitle": "Mevcut Ajanı İçe Aktarın",
-      "tourImportDescription": "Zaten bir ajanınız var mı? Sıfırdan başlamak yerine yapılandırmasını buradan içe aktarın.",
       "tourPlanTitle": "Plan ve AI Credits",
       "tourPlanDescription": "Planınız ve AI Credits bakiyeniz bu menüde. Kullanımınızı görüntüleyin veya dilediğiniz zaman yükseltin.",
       "statTotal": "Toplam",
