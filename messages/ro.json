@@ -33,7 +33,6 @@
     "closeNav": "Închide meniul de navigare",
     "userMenu": {
       "sub_dashboard": "Agenți, misiuni, aprobări și pachete.",
-      "sub_outcomePacks": "Rețete reutilizabile pentru rezultate frecvente.",
       "sub_missionControl": "Taskuri, aprobări, execuții și rezultate.",
       "sub_myAgents": "Răsfoiește, editează, lansează.",
       "sub_create": "Descrie un agent pentru eclozare.",
@@ -833,10 +832,8 @@
     "overview": {
       "eyebrow": "Privire de ansamblu asupra spațiului de lucru",
       "title": "Panou",
-      "subtitle": "Urmărește agenții, misiunile, aprobările și rețetele de rezultate reutilizabile dintr-o singură perspectivă operațională.",
-      "signInDescription": "Autentifică-te pentru a vedea agenții, misiunile, aprobările și Outcome Packs.",
+      "subtitle": "Urmărește agenții, misiunile și aprobările dintr-o singură perspectivă operațională.",
       "openMissionControl": "Mission Control",
-      "useOutcomePack": "Outcome Packs",
       "refresh": "Reîmprospătează panoul",
       "partialError": "Unele date din spațiul de lucru nu au putut fi încărcate.",
       "unavailable": "Datele sunt temporar indisponibile.",
@@ -856,12 +853,6 @@
         "empty": "Nu există încă misiuni.",
         "emptyAction": "Creează prima misiune",
         "unknownAgent": "Agent necunoscut"
-      },
-      "packs": {
-        "title": "Outcome Packs",
-        "subtitle": "Rețete selectate, gata de configurare.",
-        "browse": "Vezi toate",
-        "empty": "Nu este disponibil niciun Outcome Pack."
       },
       "utilities": {
         "label": "Mai multe instrumente pentru spațiul de lucru",
@@ -895,7 +886,7 @@
       "tourCreateTitle": "Creează Primul Tău Agent",
       "tourCreateDescription": "Dă click aici pentru a lansa primul tău agent AI cu OpenClaw sau Hermes.",
       "tourWorkspaceTitle": "Spațiul Tău de Lucru",
-      "tourWorkspaceDescription": "Din această bară treci între Agenți, Mission Control, Outcome Packs și Approvals.",
+      "tourWorkspaceDescription": "Din această bară treci între Agenți, Mission Control și Approvals.",
       "tourPlanTitle": "Plan și AI Credits",
       "tourPlanDescription": "Planul tău și soldul de AI Credits sunt în acest meniu. Verifică utilizarea sau treci la un plan superior oricând.",
       "statTotal": "Total",
@@ -1235,8 +1226,7 @@
         "robinhood": "Robinhood",
         "files": "Fișiere",
         "workspace": "Spațiu de lucru",
-        "schedules": "Programări",
-        "workflows": "Workflow-uri"
+        "schedules": "Programări"
       },
       "sidebarGroups": {
         "operate": "Operare",
@@ -1559,23 +1549,6 @@
         "refresh": "Reîmprospătează",
         "limitReached": "Plugin-urile și abilitățile sunt incluse pe fiecare plan."
       },
-      "workflows": {
-        "new": "Workflow nou",
-        "noWorkflows": "Niciun workflow.",
-        "noWorkflowsDescription": "Creează primul tău workflow pentru a automatiza agentul.",
-        "enable": "Activează",
-        "disable": "Dezactivează",
-        "delete": "Șterge",
-        "save": "Salvează",
-        "run": "Rulează",
-        "running": "Se rulează...",
-        "name": "Nume workflow",
-        "trigger": "Declanșator",
-        "lastRun": "Ultima rulare",
-        "status": "Stare",
-        "active": "Activ",
-        "inactive": "Inactiv"
-      },
       "files": {
         "noFiles": "Niciun fișier găsit.",
         "noFilesDescription": "Managerul de fișiere este gol.",
@@ -1649,7 +1622,7 @@
     "title": "Chat cu agenți AI publici",
     "body": "Explorează agenții pentru care ownerii au activat public chat. Fiecare sesiune rulează în browser și folosește configurația live a agentului din Hatcher.",
     "emptyTitle": "Nu există încă agenți cu public chat",
-    "emptyBody": "Profilurile publice apar în continuare în Hatcher City. Agenții apar aici după ce ownerul activează public chat.",
+    "emptyBody": "Profilurile publice apar aici după ce ownerul activează public chat.",
     "fallbackDescription": "Un agent Hatcher public pregătit pentru sesiuni de chat în browser.",
     "interactions": "interacțiuni",
     "publicChat": "Chat public",
@@ -2204,26 +2177,6 @@
     "errCreateNetwork": "Eroare de rețea la crearea agentului."
   },
   "missionControl": {
-    "outcomePack": {
-      "title": "Outcome Pack",
-      "unknown": "Pack necunoscut",
-      "version": "Versiunea {version}",
-      "skillsReady": "Skillurile necesare sunt instalate",
-      "skillsPending": "Skilluri necesare în așteptare",
-      "openPlugins": "Deschide Plugins și repornește agentul",
-      "acceptance": "Criterii de acceptare",
-      "allTasksCompleted": "Toate taskurile sunt finalizate",
-      "artifactRequired": "Necesită un artefact de tip {kind}",
-      "artifact": "rezultat",
-      "outputMinLength": "Cel puțin {count} caractere",
-      "schedulesDisabled": "{count} șabloane de programare rămân dezactivate și nu vor rula automat.",
-      "skillStatus": {
-        "installed": "Instalat",
-        "pending": "În așteptare",
-        "failed": "Eșuat",
-        "missing": "Lipsește"
-      }
-    },
     "authenticating": "Verificăm sesiunea...",
     "signInTitle": "Autentifică-te în Mission Control",
     "signInDescription": "Mission Control afișează taskurile private, aprobările, execuțiile și artefactele tuturor agenților tăi.",
@@ -2233,7 +2186,6 @@
     "subtitle": "Creează, aprobă, execută și verifică taskuri punctuale pentru toți agenții.",
     "refresh": "Reîncarcă taskurile",
     "newTask": "Task nou",
-    "outcomePacks": "Outcome Packs",
     "tryAgain": "Încearcă din nou",
     "loading": "Se încarcă taskurile...",
     "unknownAgent": "Agent necunoscut",
@@ -2374,272 +2326,6 @@
       "title": "Niciun task găsit",
       "description": "Niciun task nu corespunde filtrelor de agent și stare selectate.",
       "action": "Șterge filtrele"
-    }
-  },
-  "outcomePacks": {
-    "contract": {
-      "listPlaceholder": "Câte un element pe linie",
-      "allTasksCompleted": "Toate taskurile sunt finalizate",
-      "artifactRequired": "Necesită un artefact de tip {kind}",
-      "artifact": "rezultat",
-      "outputMinLength": "Cel puțin {count} caractere",
-      "launchedPending": "Task creat. Instalează cele {count} skilluri necesare înainte de pornire."
-    },
-    "content": {
-      "categories": {
-        "markets": "Piețe și trading",
-        "research": "Cercetare",
-        "engineering": "Inginerie",
-        "monitoring": "Monitorizare",
-        "marketing": "Marketing"
-      },
-      "options": {
-        "x": "X",
-        "linkedin": "LinkedIn",
-        "blog": "Blog",
-        "email": "E-mail",
-        "long": "Long",
-        "short": "Short"
-      },
-      "artifactKinds": {
-        "text": "text",
-        "code": "cod",
-        "file": "fișier"
-      },
-      "prerequisites": {
-        "github_connection": "Configurează GitHub Connect sau un token GitHub pentru rularea acestui agent."
-      },
-      "warnings": {
-        "unsupported_framework": "Framework-ul {framework} nu este compatibil cu acest pack.",
-        "required_skills_pending": "{count, plural, one {# skill obligatoriu va fi pus în coada de instalare. Repornește agentul înainte de a porni taskul.} other {# skilluri obligatorii vor fi puse în coada de instalare. Repornește agentul înainte de a porni taskul.}}",
-        "schedules_disabled": "{count, plural, one {# șablon de programare este pregătit, dar rămâne dezactivat.} other {# șabloane de programare sunt pregătite, dar rămân dezactivate.}}"
-      },
-      "packs": {
-        "marketPulse": {
-          "title": "Pulsul pieței",
-          "summary": "Generează un raport de piață cu marcaje temporale pentru activele selectate și semnalele de urmărit.",
-          "fields": {
-            "assets": "Active",
-            "horizon": "Orizont de timp",
-            "focus": "Obiectivul analizei",
-            "watchSignals": "Semnale de urmărit",
-            "outputLanguage": "Limba rezultatului"
-          },
-          "deliverables": {
-            "deliverable-1": "Puls al pieței cu marcaje temporale",
-            "deliverable-2": "Semnale și riscuri prioritizate"
-          },
-          "manualAcceptance": "Observațiile despre piață includ marcaje temporale și sursele datelor.",
-          "schedules": {
-            "daily-market-pulse": "Pulsul zilnic al pieței"
-          },
-          "taskTitle": "Pulsul pieței",
-          "taskDescription": "Generează un raport cu marcaje temporale despre datele și riscurile de piață pentru activele selectate."
-        },
-        "tradePlanReview": {
-          "title": "Evaluarea planului de tranzacționare",
-          "summary": "Testează în condiții adverse o teză de tranzacționare furnizată de utilizator, fără a plasa sau gestiona tranzacții.",
-          "fields": {
-            "asset": "Activ",
-            "network": "Rețea sau platformă",
-            "direction": "Direcție",
-            "capitalAmount": "Valoarea capitalului",
-            "capitalCurrency": "Moneda capitalului",
-            "maxLossPercent": "Pierdere maximă (% din capital)",
-            "horizon": "Orizont de timp",
-            "thesis": "Teza de tranzacționare"
-          },
-          "deliverables": {
-            "deliverable-1": "Evaluarea riscurilor planului de tranzacționare",
-            "deliverable-2": "Listă de scenarii verificată de o persoană"
-          },
-          "manualAcceptance": "Ipotezele privind dimensiunea poziției și condițiile de invalidare sunt explicite.",
-          "taskTitle": "Evaluarea planului de tranzacționare",
-          "taskDescription": "Evaluează riscurile, ipotezele și scenariile unui plan de tranzacționare furnizat de utilizator."
-        },
-        "portfolioRiskReview": {
-          "title": "Evaluarea riscului portofoliului",
-          "summary": "Evaluează deținerile furnizate de utilizator în privința concentrării, lichidității și riscului de scădere.",
-          "fields": {
-            "holdings": "Dețineri și alocări (ACTIV: 25%, una pe linie)",
-            "baseCurrency": "Monedă de bază",
-            "objective": "Obiectivul portofoliului",
-            "constraints": "Constrângeri"
-          },
-          "deliverables": {
-            "deliverable-1": "Raport privind riscul portofoliului",
-            "deliverable-2": "Opțiuni de reechilibrare verificate de o persoană"
-          },
-          "manualAcceptance": "Opțiunile respectă obiectivul și constrângerile furnizate de utilizator.",
-          "taskTitle": "Evaluarea riscului portofoliului",
-          "taskDescription": "Evaluează deținerile furnizate de utilizator și prezintă opțiuni de risc pentru verificare umană."
-        },
-        "researchReport": {
-          "title": "Raport de cercetare",
-          "summary": "Realizează un raport de cercetare documentat, concentrat pe un subiect clar și pregătit pentru luarea unei decizii.",
-          "fields": {
-            "topic": "Subiect",
-            "questions": "Întrebări de cercetare",
-            "audience": "Public",
-            "outputLanguage": "Limba rezultatului"
-          },
-          "deliverables": {
-            "deliverable-1": "Raport structurat",
-            "deliverable-2": "Listă de surse cu citări directe"
-          },
-          "manualAcceptance": "Sursele susțin afirmațiile principale.",
-          "taskTitle": "Raport de cercetare",
-          "taskDescription": "Realizează un raport de cercetare bazat pe surse, pornind de la brief-ul furnizat."
-        },
-        "pullRequestReview": {
-          "title": "Verificare Pull Request",
-          "summary": "Verifică un Pull Request GitHub din perspectiva corectitudinii, riscurilor și pregătirii pentru lansare.",
-          "fields": {
-            "repository": "Repository (proprietar/nume)",
-            "pullRequestNumber": "Numărul Pull Request-ului",
-            "focus": "Obiectivul verificării"
-          },
-          "deliverables": {
-            "deliverable-1": "Constatări ordonate după severitate",
-            "deliverable-2": "Verdict de lansare sau blocare"
-          },
-          "manualAcceptance": "Fiecare constatare blocantă include dovezi concrete.",
-          "taskTitle": "Verificare Pull Request",
-          "taskDescription": "Verifică Pull Request-ul indicat pentru corectitudine și riscuri de lansare."
-        },
-        "competitorWatch": {
-          "title": "Monitorizarea concurenței",
-          "summary": "Creează un raport de inteligență competitivă și un șablon dezactivat pentru monitorizarea zilnică.",
-          "fields": {
-            "company": "Compania sau produsul tău",
-            "competitors": "Concurenți",
-            "market": "Piață",
-            "watchSignals": "Semnale de urmărit"
-          },
-          "deliverables": {
-            "deliverable-1": "Raport de referință despre concurență",
-            "deliverable-2": "Semnale de monitorizare prioritizate"
-          },
-          "manualAcceptance": "Afirmațiile importante sunt datate și susținute de surse.",
-          "schedules": {
-            "daily-competitor-watch": "Monitorizarea zilnică a concurenței"
-          },
-          "taskTitle": "Monitorizarea concurenței",
-          "taskDescription": "Stabilește o imagine actuală a concurenței, susținută de surse."
-        },
-        "launchContent": {
-          "title": "Conținut de lansare",
-          "summary": "Transformă poziționarea produsului în postări pregătite pentru fiecare canal și într-un plan de acțiune.",
-          "fields": {
-            "product": "Produs",
-            "positioning": "Poziționare și ofertă",
-            "audience": "Public",
-            "channels": "Canale",
-            "tone": "Ton"
-          },
-          "deliverables": {
-            "deliverable-1": "Rezumatul poziționării",
-            "deliverable-2": "Schițe de postări pregătite pentru fiecare canal",
-            "deliverable-3": "Plan de acțiune pentru lansare"
-          },
-          "manualAcceptance": "Afirmațiile corespund ofertei furnizate de proprietar.",
-          "taskTitle": "Conținut de lansare",
-          "taskDescription": "Pregătește schițe de conținut pentru lansare și un plan de acțiune care va fi verificat de o persoană."
-        }
-      }
-    },
-    "authenticating": "Verificăm sesiunea...",
-    "signInTitle": "Autentifică-te pentru Outcome Packs",
-    "signInDescription": "Outcome Packs configurează taskuri private și integrări pentru agenții din contul tău.",
-    "signIn": "Autentificare",
-    "eyebrow": "Operațiuni pregătite",
-    "title": "Outcome Packs",
-    "subtitle": "Configurează o rețetă verificată, validează setup-ul și lanseaz-o în Mission Control.",
-    "refresh": "Reîncarcă catalogul",
-    "missionControl": "Mission Control",
-    "tryAgain": "Încearcă din nou",
-    "loading": "Se încarcă Outcome Packs...",
-    "detailLoading": "Se încarcă detaliile pack-ului...",
-    "detailError": "Acest pack nu a putut fi încărcat.",
-    "catalog": {
-      "label": "Catalog Outcome Packs",
-      "title": "Catalog",
-      "firstParty": "Create de Hatcher",
-      "version": "Versiunea {version}"
-    },
-    "detail": {
-      "curated": "Rețetă verificată",
-      "runtimeMinutes": "{count, plural, one {# minut durată maximă} few {# minute durată maximă} other {# de minute durată maximă}}",
-      "frameworks": "Framework-uri compatibile",
-      "anyFramework": "Orice framework hosted",
-      "requirements": "Skill-uri și prerechizite",
-      "noRequirements": "Fără setup suplimentar",
-      "plan": "Planul de taskuri",
-      "taskCount": "{count, plural, one {# task} few {# taskuri} other {# de taskuri}}",
-      "tasks": "Taskurile pack-ului",
-      "acceptance": "Criterii de acceptare"
-    },
-    "configure": {
-      "title": "Configurează rezultatul",
-      "subtitle": "Alege agentul și completează datele folosite pentru planul de taskuri.",
-      "agent": "Agent",
-      "agentPlaceholder": "Alege un agent",
-      "selectPlaceholder": "Alege o opțiune",
-      "agentStatus": "{framework} - {status}",
-      "required": "Obligatoriu"
-    },
-    "validation": {
-      "agent": "Alege un agent înainte să pregătești pack-ul.",
-      "required": "Completează toate câmpurile obligatorii.",
-      "fieldInvalid": "Completează câmpul în limita de lungime permisă."
-    },
-    "preview": {
-      "label": "Previzualizare lansare",
-      "title": "Previzualizare setup",
-      "subtitle": "Compatibilitate, prerechizite, buget și programe inactive.",
-      "empty": "Pregătește pack-ul pentru a valida setup-ul înainte să fie creat ceva.",
-      "compatible": "Agentul este compatibil",
-      "incompatible": "Agentul nu este compatibil",
-      "blockers": "Blocaje de setup",
-      "warnings": "Verifică înainte de lansare",
-      "resolvedTasks": "Taskuri rezultate",
-      "budget": "Țintă de buget",
-      "noBudget": "Fără țintă de buget",
-      "credits": "{count} AI Credits",
-      "budgetAdvisory": "Limită strictă pentru execuția plătită; misiunea nu poate rezerva AI Credits peste plafon.",
-      "maxRuntime": "Durată maximă: {count, plural, one {# minut} few {# minute} other {# de minute}}.",
-      "schedules": "Programe propuse",
-      "scheduleOff": "Oprit",
-      "scheduleNotice": "Programele rămân dezactivate la lansare și necesită o confirmare separată.",
-      "manualReviewTitle": "Este necesară verificarea proprietarului",
-      "manualReviewDescription": "Rezultatul final rămâne în Mission Control până când proprietarul îl aprobă sau îl respinge.",
-      "setup": {
-        "connectors": "Deschide Conectori",
-        "dev": "Deschide setup-ul Developer",
-        "integrations": "Deschide Integrări"
-      }
-    },
-    "actions": {
-      "prepare": "Pregătește preview",
-      "prepareAgain": "Pregătește din nou",
-      "preparing": "Se pregătește...",
-      "launchTitle": "Creează în Mission Control",
-      "ready": "Pregătit pentru lansare",
-      "blocked": "Pregătește pack-ul și rezolvă blocajele",
-      "launch": "Lansează pack-ul",
-      "launching": "Se lansează..."
-    },
-    "messages": {
-      "launched": "Outcome Pack lansat."
-    },
-    "noAgents": {
-      "title": "Nu există niciun agent",
-      "description": "Creează un agent înainte să configurezi un Outcome Pack.",
-      "action": "Creează agent"
-    },
-    "empty": {
-      "title": "Nu există Outcome Packs",
-      "description": "Catalogul nu a returnat niciun pack first-party."
     }
   },
   "landingV3": {

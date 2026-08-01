@@ -20,7 +20,6 @@ import {
   Loader2,
   ListChecks,
   Network,
-  PackageCheck,
   Play,
   RefreshCw,
   RotateCcw,
@@ -58,7 +57,6 @@ export default function MyAgentsPage() {
   const tc = useTranslations('dashboard.common');
   const tStatus = useTranslations('shared.agentStatus');
   const tMission = useTranslations('missionControl');
-  const tOutcome = useTranslations('outcomePacks');
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
@@ -344,9 +342,6 @@ export default function MyAgentsPage() {
           <div className={styles.headerActions}>
             <Link href="/dashboard/missions" className={styles.secondaryCta}>
               <ListChecks size={14} aria-hidden /> {tMission('title')}
-            </Link>
-            <Link href="/dashboard/outcome-packs" className={styles.secondaryCta}>
-              <PackageCheck size={14} aria-hidden /> {tOutcome('title')}
             </Link>
             <Link href="/dashboard/approvals" className={styles.secondaryCta}>
               <ShieldCheck size={14} aria-hidden /> Approvals
@@ -862,12 +857,6 @@ export default function MyAgentsPage() {
                     className={styles.actionBtn}
                   >
                     <ListChecks size={12} aria-hidden /> {tMission('title')}
-                  </Link>
-                  <Link
-                    href={agentWorkspaceHref('/dashboard/outcome-packs', selectedAgent.id)}
-                    className={styles.actionBtn}
-                  >
-                    <PackageCheck size={12} aria-hidden /> {tOutcome('title')}
                   </Link>
                   <Link
                     href={agentWorkspaceHref('/dashboard/approvals', selectedAgent.id)}

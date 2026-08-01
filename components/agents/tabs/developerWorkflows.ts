@@ -29,26 +29,6 @@ export interface EnvWrite {
   value: string;
 }
 
-export interface DevWorkflowNode {
-  id: string;
-  type: "workflowNode";
-  position: { x: number; y: number };
-  data: {
-    label: string;
-    subtype: string;
-    category: "trigger" | "action" | "condition" | "response";
-    [key: string]: unknown;
-  };
-}
-
-export interface DevWorkflowTemplate {
-  id: string;
-  name: string;
-  description: string;
-  nodes: DevWorkflowNode[];
-  edges: Array<{ id: string; source: string; target: string }>;
-}
-
 export interface AgentTaskTemplate {
   id: string;
   label: string;
@@ -101,7 +81,7 @@ export interface DevCapabilityCard {
   body: string;
   status: DevCapabilityStatus;
   tags: string[];
-  actionTab: "terminal" | "workflows" | "plugins" | "dev";
+  actionTab: "terminal" | "plugins" | "dev";
 }
 
 export function summarizeAgentCommLogs(
@@ -308,87 +288,6 @@ export function getDevCapabilityCards(): DevCapabilityCard[] {
       status: "live",
       tags: ["A2A", "tasks", "logs"],
       actionTab: "dev",
-    },
-  ];
-}
-
-export function getDevWorkflowTemplates(): DevWorkflowTemplate[] {
-  return [
-    {
-      id: "github-pr-review",
-      name: "PR review intake",
-      description:
-        "Catch review requests in chat and route them into a structured reply the agent can expand with GitHub tools.",
-      nodes: [
-        {
-          id: "trigger-pr-review",
-          type: "workflowNode",
-          position: { x: 120, y: 80 },
-          data: {
-            label: "Review request",
-            subtype: "keyword_match",
-            category: "trigger",
-            keywords: "review pr, review pull request, check github",
-          },
-        },
-        {
-          id: "reply-pr-review",
-          type: "workflowNode",
-          position: { x: 120, y: 260 },
-          data: {
-            label: "Confirm review loop",
-            subtype: "send_reply",
-            category: "action",
-            message:
-              "I can review this. Send the GitHub PR URL or repo/branch, and I will inspect changes, risks, tests, and suggested fixes.",
-          },
-        },
-      ],
-      edges: [
-        {
-          id: "edge-pr-review",
-          source: "trigger-pr-review",
-          target: "reply-pr-review",
-        },
-      ],
-    },
-    {
-      id: "daily-dev-standup",
-      name: "Daily dev standup",
-      description:
-        "Schedule a daily prompt that asks the agent to summarize open work, blocked tasks, and next actions.",
-      nodes: [
-        {
-          id: "trigger-dev-standup",
-          type: "workflowNode",
-          position: { x: 120, y: 80 },
-          data: {
-            label: "Daily schedule",
-            subtype: "schedule",
-            category: "trigger",
-            cron: "0 9 * * *",
-          },
-        },
-        {
-          id: "reply-dev-standup",
-          type: "workflowNode",
-          position: { x: 120, y: 260 },
-          data: {
-            label: "Standup summary",
-            subtype: "send_reply",
-            category: "action",
-            message:
-              "Daily dev standup: summarize shipped changes, current blockers, risky files, failing checks, and the next concrete task.",
-          },
-        },
-      ],
-      edges: [
-        {
-          id: "edge-dev-standup",
-          source: "trigger-dev-standup",
-          target: "reply-dev-standup",
-        },
-      ],
     },
   ];
 }

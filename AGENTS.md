@@ -100,7 +100,7 @@ Redesign public pages as premium product surfaces:
 - features
 - frameworks
 - explore/public agents
-- Hatcher City / agent rooms
+- agent workspaces and control rooms
 - $HATCHER token page
 - whitepaper
 - blog
@@ -171,7 +171,7 @@ Avoid:
 - generic “AI magic”
 - vague filler
 
-Use brand language such as Hatch agent, Agent room, and Hatcher City, but balance it with serious SaaS clarity.
+Use brand language such as Hatch agent and Agent room, but balance it with serious SaaS clarity.
 
 ## Validation
 

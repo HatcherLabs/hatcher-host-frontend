@@ -49,7 +49,6 @@ const AGENT_NAVIGATION: AgentNavigationSpec[] = [
   { id: 'sessions', group: 'assets', frameworks: ['openclaw'] },
   { id: 'terminal', group: 'advanced' },
   { id: 'dev', group: 'advanced' },
-  { id: 'workflows', group: 'advanced' },
   { id: 'schedules', group: 'advanced' },
 ];
 

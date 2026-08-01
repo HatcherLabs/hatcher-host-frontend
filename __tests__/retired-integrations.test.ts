@@ -58,4 +58,21 @@ describe('retired integrations', () => {
       expect(read(file)).not.toMatch(/medusa|AgentLift|LiftImport|AdminIdle|adminGetIdle/i);
     }
   });
+
+  it('removes Outcome Packs and Visual Workflows while preserving native schedules', () => {
+    expect(existsSync(join(root, 'app', '[locale]', 'dashboard', 'outcome-packs', 'page.tsx'))).toBe(false);
+    expect(existsSync(join(root, 'lib', 'outcome-packs.ts'))).toBe(false);
+    expect(existsSync(join(root, 'components', 'agents', 'tabs', 'WorkflowsTab.tsx'))).toBe(false);
+    expect(read('lib/api/methods.ts')).not.toMatch(/outcome-packs|AgentWorkflows|createAgentWorkflow/i);
+    expect(read('components/agents/AgentContext/types.ts')).not.toMatch(/['"]workflows['"]/);
+    expect(read('app/[locale]/dashboard/agent/[id]/page.tsx')).toMatch(/SchedulesTab/);
+    expect(existsSync(join(root, 'components', 'agents', 'tabs', 'SchedulesTab.tsx'))).toBe(true);
+  });
+
+  it('removes retired Hatcher City and 3D room copy', () => {
+    expect(read('app/[locale]/whitepaper/page.tsx')).not.toMatch(/Hatcher City|3D agent rooms/i);
+    for (const locale of ['en', 'ro', 'vi', 'tr', 'fr', 'zh', 'hi', 'pt-BR', 'es', 'ja', 'id', 'de']) {
+      expect(read(`messages/${locale}.json`), locale).not.toMatch(/Hatcher City/);
+    }
+  });
 });

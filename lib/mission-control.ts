@@ -82,25 +82,6 @@ function unknownList(value: unknown): unknown[] {
   return Array.isArray(value) ? value : [];
 }
 
-function normalizeOutcomePackSkillReadiness(value: unknown): MissionTask['outcomePackSkillReadiness'] {
-  if (!value) return null;
-  const raw = record(value);
-  const skills = unknownList(raw.skills).map((value) => {
-    const skill = record(value);
-    const status = text(skill.status, 'missing');
-    return {
-      name: text(skill.name),
-      status,
-      installed: skill.installed === true || status === 'installed',
-    };
-  }).filter((skill) => skill.name.length > 0);
-  return {
-    required: raw.required === true || skills.length > 0,
-    ready: raw.ready === true && skills.every((skill) => skill.installed),
-    skills,
-  };
-}
-
 function timestamp(value: unknown): string {
   return typeof value === 'string' && value.length > 0 ? value : new Date(0).toISOString();
 }
@@ -175,11 +156,6 @@ function normalizeArtifact(value: unknown): MissionTaskArtifact {
   };
 }
 
-function normalizeReviewPolicy(value: unknown): MissionTask['reviewPolicy'] {
-  const raw = record(value);
-  return raw.mode === 'manual_required' ? { mode: 'manual_required' } : null;
-}
-
 export function normalizeMissionTask(value: unknown): MissionTask {
   const raw = record(value);
   const agent = record(raw.agent);
@@ -207,8 +183,6 @@ export function normalizeMissionTask(value: unknown): MissionTask {
     sourceVersion: nullableText(raw.sourceVersion),
     acceptanceChecks: unknownList(raw.acceptanceChecks),
     scheduleTemplates: unknownList(raw.scheduleTemplates),
-    reviewPolicy: normalizeReviewPolicy(raw.reviewPolicy),
-    outcomePackSkillReadiness: normalizeOutcomePackSkillReadiness(raw.outcomePackSkillReadiness),
     requiresApproval: raw.requiresApproval === true,
     budget: {
       aiCredits: finiteNumber(budget.aiCredits),
@@ -369,7 +343,7 @@ export function safeMissionArtifactUrl(value: string | null | undefined): string
 }
 
 export function canStartMissionTask(task: MissionTask): boolean {
-  return task.status === 'ready' && task.outcomePackSkillReadiness?.ready !== false;
+  return task.status === 'ready';
 }
 
 export function canApproveMissionTask(task: MissionTask): boolean {
@@ -385,6 +359,5 @@ export function canCancelMissionTask(task: MissionTask): boolean {
 }
 
 export function canResumeMissionTask(task: MissionTask): boolean {
-  return (task.status === 'failed' || task.status === 'cancelled') &&
-    task.outcomePackSkillReadiness?.ready !== false;
+  return task.status === 'failed' || task.status === 'cancelled';
 }

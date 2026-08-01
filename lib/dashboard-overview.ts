@@ -1,7 +1,6 @@
 export const DASHBOARD_WORKSPACE_ROUTES = [
   { key: 'agents', href: '/dashboard/agents' },
   { key: 'missions', href: '/dashboard/missions' },
-  { key: 'outcomePacks', href: '/dashboard/outcome-packs' },
   { key: 'approvals', href: '/dashboard/approvals' },
 ] as const;
 
@@ -24,6 +23,5 @@ export function isDashboardWorkspaceRouteActive(
   if (key === 'approvals') {
     return normalized === '/dashboard/approvals' || normalized.startsWith('/dashboard/approvals/');
   }
-  return normalized === '/dashboard/outcome-packs' ||
-    normalized.startsWith('/dashboard/outcome-packs/');
+  return false;
 }

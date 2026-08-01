@@ -32,7 +32,6 @@
     "closeNav": "Tutup menu navigasi",
     "userMenu": {
       "sub_dashboard": "Agen, misi, persetujuan, dan paket.",
-      "sub_outcomePacks": "Resep yang dapat digunakan ulang untuk hasil umum.",
       "sub_myAgents": "Telusuri, edit, sebarkan.",
       "sub_create": "Jelaskan agen yang akan ditetaskan.",
       "sub_analytics": "AI Credits, token, tren.",
@@ -833,10 +832,8 @@
     "overview": {
       "eyebrow": "Ringkasan ruang kerja",
       "title": "Dasbor",
-      "subtitle": "Pantau agen, misi, persetujuan, dan resep hasil yang dapat digunakan kembali dari satu tampilan operasional.",
-      "signInDescription": "Masuk untuk melihat agen, misi, persetujuan, dan Outcome Packs Anda.",
+      "subtitle": "Pantau agen, misi, dan persetujuan dari satu tampilan operasional.",
       "openMissionControl": "Mission Control",
-      "useOutcomePack": "Outcome Packs",
       "refresh": "Segarkan dasbor",
       "partialError": "Sebagian data ruang kerja tidak dapat dimuat.",
       "unavailable": "Data untuk sementara tidak tersedia.",
@@ -856,12 +853,6 @@
         "empty": "Belum ada misi.",
         "emptyAction": "Buat misi pertama Anda",
         "unknownAgent": "Agen tidak dikenal"
-      },
-      "packs": {
-        "title": "Outcome Packs",
-        "subtitle": "Resep pilihan yang siap dikonfigurasi.",
-        "browse": "Jelajahi semua",
-        "empty": "Tidak ada Outcome Packs yang tersedia."
       },
       "utilities": {
         "label": "Alat ruang kerja lainnya",
@@ -895,7 +886,7 @@
       "tourCreateTitle": "Buat Agen Pertama Anda",
       "tourCreateDescription": "Klik di sini untuk menetaskan agen AI pertama Anda dengan OpenClaw atau Hermes.",
       "tourWorkspaceTitle": "Ruang Kerja Anda",
-      "tourWorkspaceDescription": "Berpindah antara Agen, Mission Control, Outcome Packs, dan Approvals dari bilah ini.",
+      "tourWorkspaceDescription": "Berpindah antara Agen, Mission Control, dan Approvals dari bilah ini.",
       "tourPlanTitle": "Paket & AI Credits",
       "tourPlanDescription": "Paket dan saldo AI Credits Anda ada di menu ini. Pantau penggunaan atau tingkatkan kapan saja.",
       "statTotal": "Jumlah",
@@ -1235,8 +1226,7 @@
         "robinhood": "Robinhood",
         "files": "File",
         "workspace": "Ruang kerja",
-        "schedules": "Jadwal",
-        "workflows": "Alur kerja"
+        "schedules": "Jadwal"
       },
       "sidebarGroups": {
         "operate": "Operasikan",
@@ -1559,23 +1549,6 @@
         "refresh": "Segarkan",
         "limitReached": "Plugin dan keterampilan disertakan di setiap tingkatan."
       },
-      "workflows": {
-        "new": "Alur Kerja Baru",
-        "noWorkflows": "Belum ada alur kerja.",
-        "noWorkflowsDescription": "Buat alur kerja pertama Anda untuk mengotomatiskan agen Anda.",
-        "enable": "Aktifkan",
-        "disable": "Nonaktifkan",
-        "delete": "Hapus",
-        "save": "Simpan",
-        "run": "Jalankan",
-        "running": "Berlari...",
-        "name": "Nama Alur Kerja",
-        "trigger": "Pemicu",
-        "lastRun": "Jalankan Terakhir",
-        "status": "Status",
-        "active": "Aktif",
-        "inactive": "Tidak aktif"
-      },
       "files": {
         "noFiles": "Tidak ada file yang ditemukan.",
         "noFilesDescription": "Manajer file kosong.",
@@ -1649,7 +1622,7 @@
     "title": "Ngobrol dengan agen AI publik",
     "body": "Telusuri agen yang pemiliknya mengaktifkan obrolan publik. Setiap sesi berjalan di browser Anda dan merutekan melalui konfigurasi Hatcher langsung agen.",
     "emptyTitle": "Belum ada agen obrolan publik",
-    "emptyBody": "Profil publik masih muncul di Hatcher City. Agen muncul di sini setelah pemiliknya mengaktifkan obrolan publik.",
+    "emptyBody": "Profil publik muncul di sini setelah pemiliknya mengaktifkan obrolan publik.",
     "fallbackDescription": "Agen Hatcher publik yang siap untuk sesi obrolan browser.",
     "interactions": "interaksi",
     "publicChat": "Obrolan publik",
@@ -2203,272 +2176,6 @@
     "errCreate": "Tidak dapat membuat agen. Perbaiki deskripsinya dan coba lagi.",
     "errCreateNetwork": "Kesalahan jaringan saat membuat agen."
   },
-  "outcomePacks": {
-    "contract": {
-      "listPlaceholder": "Satu item per baris",
-      "allTasksCompleted": "Semua tugas telah selesai",
-      "artifactRequired": "Memerlukan artefak berjenis {kind}",
-      "artifact": "hasil",
-      "outputMinLength": "Minimal {count} karakter",
-      "launchedPending": "Tugas dibuat. Instal {count} skill wajib sebelum memulainya."
-    },
-    "content": {
-      "categories": {
-        "markets": "Pasar & Trading",
-        "research": "Riset",
-        "engineering": "Rekayasa",
-        "monitoring": "Pemantauan",
-        "marketing": "Pemasaran"
-      },
-      "options": {
-        "x": "X",
-        "linkedin": "LinkedIn",
-        "blog": "Blog",
-        "email": "Email",
-        "long": "Long",
-        "short": "Short"
-      },
-      "artifactKinds": {
-        "text": "teks",
-        "code": "kode",
-        "file": "file"
-      },
-      "prerequisites": {
-        "github_connection": "Konfigurasikan GitHub Connect atau token runtime GitHub untuk agen ini."
-      },
-      "warnings": {
-        "unsupported_framework": "Framework {framework} tidak didukung oleh pack ini.",
-        "required_skills_pending": "{count, plural, one {# skill wajib akan dimasukkan ke antrean instalasi. Mulai ulang agen sebelum menjalankan tugas.} other {# skill wajib akan dimasukkan ke antrean instalasi. Mulai ulang agen sebelum menjalankan tugas.}}",
-        "schedules_disabled": "{count, plural, one {# template jadwal telah disiapkan tetapi tetap dinonaktifkan.} other {# template jadwal telah disiapkan tetapi tetap dinonaktifkan.}}"
-      },
-      "packs": {
-        "marketPulse": {
-          "title": "Ringkasan Pasar",
-          "summary": "Buat ringkasan pasar bertanda waktu untuk aset pilihan dan sinyal yang perlu dipantau.",
-          "fields": {
-            "assets": "Aset",
-            "horizon": "Jangka waktu",
-            "focus": "Fokus analisis",
-            "watchSignals": "Sinyal yang dipantau",
-            "outputLanguage": "Bahasa keluaran"
-          },
-          "deliverables": {
-            "deliverable-1": "Ringkasan pasar bertanda waktu",
-            "deliverable-2": "Sinyal dan risiko yang diprioritaskan"
-          },
-          "manualAcceptance": "Pengamatan pasar mencantumkan waktu dan sumber data.",
-          "schedules": {
-            "daily-market-pulse": "Ringkasan pasar harian"
-          },
-          "taskTitle": "Ringkasan pasar",
-          "taskDescription": "Buat ringkasan bertanda waktu tentang data dan risiko pasar untuk aset pilihan."
-        },
-        "tradePlanReview": {
-          "title": "Tinjauan Rencana Trading",
-          "summary": "Uji ketahanan tesis trading yang diberikan pengguna tanpa membuka atau mengelola transaksi.",
-          "fields": {
-            "asset": "Aset",
-            "network": "Jaringan atau platform",
-            "direction": "Arah",
-            "capitalAmount": "Jumlah modal",
-            "capitalCurrency": "Mata uang modal",
-            "maxLossPercent": "Kerugian maksimum (% dari modal)",
-            "horizon": "Jangka waktu",
-            "thesis": "Tesis trading"
-          },
-          "deliverables": {
-            "deliverable-1": "Tinjauan risiko rencana trading",
-            "deliverable-2": "Daftar skenario yang ditinjau manusia"
-          },
-          "manualAcceptance": "Asumsi ukuran posisi dan kondisi invalidasi dijelaskan secara eksplisit.",
-          "taskTitle": "Tinjauan rencana trading",
-          "taskDescription": "Tinjau risiko, asumsi, dan skenario rencana trading yang diberikan pengguna."
-        },
-        "portfolioRiskReview": {
-          "title": "Tinjauan Risiko Portofolio",
-          "summary": "Nilai kepemilikan yang diberikan pengguna berdasarkan konsentrasi, likuiditas, dan risiko penurunan.",
-          "fields": {
-            "holdings": "Kepemilikan dan alokasi (ASET: 25%, satu per baris)",
-            "baseCurrency": "Mata uang dasar",
-            "objective": "Tujuan portofolio",
-            "constraints": "Batasan"
-          },
-          "deliverables": {
-            "deliverable-1": "Ringkasan risiko portofolio",
-            "deliverable-2": "Opsi penyeimbangan ulang yang ditinjau manusia"
-          },
-          "manualAcceptance": "Opsi mematuhi tujuan dan batasan yang diberikan pengguna.",
-          "taskTitle": "Tinjauan risiko portofolio",
-          "taskDescription": "Nilai kepemilikan yang diberikan pengguna dan susun opsi risiko untuk ditinjau manusia."
-        },
-        "researchReport": {
-          "title": "Laporan Riset",
-          "summary": "Buat laporan riset berbasis sumber yang berfokus pada topik tertentu dan siap digunakan untuk mengambil keputusan.",
-          "fields": {
-            "topic": "Topik",
-            "questions": "Pertanyaan riset",
-            "audience": "Audiens",
-            "outputLanguage": "Bahasa output"
-          },
-          "deliverables": {
-            "deliverable-1": "Laporan terstruktur",
-            "deliverable-2": "Daftar sumber dengan kutipan langsung"
-          },
-          "manualAcceptance": "Sumber mendukung klaim utama.",
-          "taskTitle": "Laporan riset",
-          "taskDescription": "Buat laporan riset berbasis sumber dari brief yang diberikan."
-        },
-        "pullRequestReview": {
-          "title": "Peninjauan Pull Request",
-          "summary": "Tinjau Pull Request GitHub untuk memastikan kebenaran, risiko, dan kesiapan rilisnya.",
-          "fields": {
-            "repository": "Repository (pemilik/nama)",
-            "pullRequestNumber": "Nomor Pull Request",
-            "focus": "Fokus peninjauan"
-          },
-          "deliverables": {
-            "deliverable-1": "Temuan yang diurutkan berdasarkan tingkat keparahan",
-            "deliverable-2": "Keputusan rilis atau blokir"
-          },
-          "manualAcceptance": "Setiap temuan yang memblokir menyertakan bukti konkret.",
-          "taskTitle": "Peninjauan Pull Request",
-          "taskDescription": "Tinjau Pull Request yang ditentukan untuk memastikan kebenaran dan risiko rilisnya."
-        },
-        "competitorWatch": {
-          "title": "Pemantauan Pesaing",
-          "summary": "Buat ringkasan intelijen pesaing dan template pemantauan harian yang dinonaktifkan.",
-          "fields": {
-            "company": "Perusahaan atau produk Anda",
-            "competitors": "Pesaing",
-            "market": "Pasar",
-            "watchSignals": "Sinyal yang dipantau"
-          },
-          "deliverables": {
-            "deliverable-1": "Ringkasan dasar pesaing",
-            "deliverable-2": "Sinyal pemantauan yang diprioritaskan"
-          },
-          "manualAcceptance": "Klaim penting mencantumkan tanggal dan sumber.",
-          "schedules": {
-            "daily-competitor-watch": "Pemantauan pesaing harian"
-          },
-          "taskTitle": "Pemantauan pesaing",
-          "taskDescription": "Tetapkan gambaran dasar pesaing terkini yang didukung sumber."
-        },
-        "launchContent": {
-          "title": "Konten Peluncuran",
-          "summary": "Ubah positioning produk menjadi draf postingan yang siap untuk tiap kanal dan rencana tindakan.",
-          "fields": {
-            "product": "Produk",
-            "positioning": "Positioning dan penawaran",
-            "audience": "Audiens",
-            "channels": "Kanal",
-            "tone": "Nada"
-          },
-          "deliverables": {
-            "deliverable-1": "Ringkasan positioning",
-            "deliverable-2": "Draf postingan siap pakai untuk tiap kanal",
-            "deliverable-3": "Rencana tindakan peluncuran"
-          },
-          "manualAcceptance": "Klaim sesuai dengan penawaran yang diberikan pemilik.",
-          "taskTitle": "Konten peluncuran",
-          "taskDescription": "Siapkan draf konten peluncuran dan rencana tindakan yang akan ditinjau manusia."
-        }
-      }
-    },
-    "authenticating": "Memeriksa sesi Anda...",
-    "signInTitle": "Masuk ke Outcome Packs",
-    "signInDescription": "Outcome Packs mengatur tugas privat dan integrasi untuk agen di akun Anda.",
-    "signIn": "Masuk",
-    "eyebrow": "Operasi terkurasi",
-    "title": "Outcome Packs",
-    "subtitle": "Atur resep teruji, periksa penyiapannya, lalu kirim ke Mission Control.",
-    "refresh": "Segarkan katalog",
-    "missionControl": "Mission Control",
-    "tryAgain": "Coba lagi",
-    "loading": "Memuat Outcome Packs...",
-    "detailLoading": "Memuat detail pack...",
-    "detailError": "Pack ini tidak dapat dimuat.",
-    "catalog": {
-      "label": "Katalog Outcome Pack",
-      "title": "Katalog",
-      "firstParty": "Dibuat Hatcher",
-      "version": "Versi {version}"
-    },
-    "detail": {
-      "curated": "Resep terkurasi",
-      "runtimeMinutes": "Durasi: {count} menit",
-      "frameworks": "Framework kompatibel",
-      "anyFramework": "Framework hosting apa pun",
-      "requirements": "Skill dan prasyarat",
-      "noRequirements": "Tanpa penyiapan tambahan",
-      "plan": "Rencana tugas",
-      "taskCount": "{count} tugas",
-      "tasks": "Tugas pack",
-      "acceptance": "Kriteria penerimaan"
-    },
-    "configure": {
-      "title": "Atur hasil",
-      "subtitle": "Pilih agen dan berikan input untuk menyusun rencana tugas.",
-      "agent": "Agen",
-      "agentPlaceholder": "Pilih agen",
-      "selectPlaceholder": "Pilih opsi",
-      "agentStatus": "{framework} - {status}",
-      "required": "Wajib"
-    },
-    "validation": {
-      "agent": "Pilih agen sebelum menyiapkan pack ini.",
-      "required": "Lengkapi semua input wajib.",
-      "fieldInvalid": "Isi input sesuai batas panjang yang diizinkan."
-    },
-    "preview": {
-      "label": "Pratinjau peluncuran",
-      "title": "Pratinjau penyiapan",
-      "subtitle": "Kompatibilitas, prasyarat, anggaran, dan jadwal nonaktif.",
-      "empty": "Siapkan pack untuk memeriksa penyiapan sebelum membuat apa pun.",
-      "compatible": "Agen kompatibel",
-      "incompatible": "Agen tidak kompatibel",
-      "blockers": "Penghambat penyiapan",
-      "warnings": "Tinjau sebelum diluncurkan",
-      "resolvedTasks": "Tugas tersusun",
-      "budget": "Target anggaran",
-      "noBudget": "Tanpa target anggaran",
-      "credits": "{count} AI Credits",
-      "budgetAdvisory": "Batas mutlak untuk eksekusi berbayar; AI Credits tidak dapat dipesan melampaui batas ini.",
-      "maxRuntime": "Durasi maksimum: {count} menit.",
-      "schedules": "Jadwal yang diusulkan",
-      "scheduleOff": "Nonaktif",
-      "scheduleNotice": "Jadwal tetap nonaktif saat peluncuran dan memerlukan konfirmasi terpisah.",
-      "manualReviewTitle": "Peninjauan pemilik diperlukan",
-      "manualReviewDescription": "Hasil akhir tetap berada di Mission Control sampai pemilik menyetujui atau menolaknya.",
-      "setup": {
-        "connectors": "Buka Connectors",
-        "dev": "Buka penyiapan developer",
-        "integrations": "Buka Integrations"
-      }
-    },
-    "actions": {
-      "prepare": "Siapkan pratinjau",
-      "prepareAgain": "Siapkan lagi",
-      "preparing": "Menyiapkan...",
-      "launchTitle": "Buat di Mission Control",
-      "ready": "Siap diluncurkan",
-      "blocked": "Siapkan pack dan selesaikan penghambat",
-      "launch": "Luncurkan pack",
-      "launching": "Meluncurkan..."
-    },
-    "messages": {
-      "launched": "Outcome Pack diluncurkan."
-    },
-    "noAgents": {
-      "title": "Tidak ada agen",
-      "description": "Buat agen sebelum mengatur Outcome Pack.",
-      "action": "Buat agen"
-    },
-    "empty": {
-      "title": "Tidak ada Outcome Pack",
-      "description": "Katalog terkurasi tidak mengembalikan pack Hatcher."
-    }
-  },
   "landingV3": {
     "hero": {
       "boxLabel": "Menyebarkan",
@@ -2572,26 +2279,6 @@
     }
   },
   "missionControl": {
-    "outcomePack": {
-      "title": "Outcome Pack",
-      "unknown": "Pack tidak dikenal",
-      "version": "Versi {version}",
-      "skillsReady": "Skill wajib telah terinstal",
-      "skillsPending": "Skill wajib masih tertunda",
-      "openPlugins": "Buka Plugins dan mulai ulang agen",
-      "acceptance": "Kriteria penerimaan",
-      "allTasksCompleted": "Semua tugas telah selesai",
-      "artifactRequired": "Memerlukan artefak berjenis {kind}",
-      "artifact": "hasil",
-      "outputMinLength": "Minimal {count} karakter",
-      "schedulesDisabled": "{count} template jadwal tetap nonaktif dan tidak akan berjalan otomatis.",
-      "skillStatus": {
-        "installed": "Terinstal",
-        "pending": "Tertunda",
-        "failed": "Gagal",
-        "missing": "Tidak ada"
-      }
-    },
     "authenticating": "Checking your session...",
     "signInTitle": "Sign in to Mission Control",
     "signInDescription": "Mission Control shows private tasks, approvals, runs, and artifacts across your agents.",
@@ -2601,7 +2288,6 @@
     "subtitle": "Create, approve, run, and inspect one-shot work across every agent.",
     "refresh": "Refresh tasks",
     "newTask": "New task",
-    "outcomePacks": "Outcome Packs",
     "tryAgain": "Try again",
     "loading": "Loading tasks...",
     "unknownAgent": "Unknown agent",

@@ -17,7 +17,6 @@ import {
   LayoutDashboard,
   ListChecks,
   Newspaper,
-  PackageCheck,
   Plus,
   ShieldCheck,
   Sparkles,
@@ -81,7 +80,6 @@ export function NavDrawer({ open, onClose }: Props) {
   const tNav = useTranslations('nav');
   const tGroups = useTranslations('nav.groups');
   const tMission = useTranslations('missionControl');
-  const tOutcome = useTranslations('outcomePacks');
   const tMenu = useTranslations('nav.userMenu');
   useEffect(() => {
     if (!open) return;
@@ -163,15 +161,6 @@ export function NavDrawer({ open, onClose }: Props) {
                       <span>
                         <span className={styles.itemLabel}>{tMission('title')}</span>
                         <span className={styles.itemSub}>{tMenu('sub_missionControl')}</span>
-                      </span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/dashboard/outcome-packs" className={styles.item} onClick={onClose}>
-                      <span className={styles.glyph}><PackageCheck size={17} strokeWidth={1.8} aria-hidden /></span>
-                      <span>
-                        <span className={styles.itemLabel}>{tOutcome('title')}</span>
-                        <span className={styles.itemSub}>{tMenu('sub_outcomePacks')}</span>
                       </span>
                     </Link>
                   </li>

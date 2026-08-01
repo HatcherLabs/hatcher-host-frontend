@@ -20,7 +20,6 @@ import {
   BarChart3,
   BookOpen,
   ListChecks,
-  PackageCheck,
   ShieldCheck,
 } from 'lucide-react';
 import {
@@ -46,7 +45,6 @@ interface CommandItem {
 const STATIC_COMMANDS: CommandItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard', shortcut: 'D', section: 'Navigation' },
   { id: 'missions', label: 'Mission Control', icon: ListChecks, href: '/dashboard/missions', shortcut: 'M', section: 'Navigation' },
-  { id: 'outcome-packs', label: 'Outcome Packs', icon: PackageCheck, href: '/dashboard/outcome-packs', shortcut: 'O', section: 'Navigation' },
   { id: 'approvals', label: 'Action approvals', icon: ShieldCheck, href: '/dashboard/approvals', shortcut: 'A', section: 'Navigation' },
   { id: 'create', label: 'Create Agent', icon: PlusCircle, href: '/create', shortcut: 'C', section: 'Actions' },
   { id: 'billing', label: 'Billing', icon: CreditCard, href: '/dashboard/billing', shortcut: 'B', section: 'Navigation' },

@@ -1,6 +1,5 @@
 export type RoadmapIcon =
   | 'mission'
-  | 'packs'
   | 'models'
   | 'operate'
   | 'run'
@@ -8,7 +7,6 @@ export type RoadmapIcon =
   | 'own'
   | 'metering'
   | 'approvals'
-  | 'recurring'
   | 'earn'
   | 'city'
   | 'verified';
@@ -53,12 +51,6 @@ export const roadmapUpdatedAt = {
 
 export const latestReleases = [
   {
-    id: 'outcome-packs-v2',
-    icon: 'recurring',
-    title: 'Outcome Packs V2',
-    description: 'Seven curated packs plus owner-authorized recurring missions with budgets and stop controls.',
-  },
-  {
     id: 'trusted-action-approvals',
     icon: 'approvals',
     title: 'Trusted action approvals',
@@ -95,8 +87,6 @@ export const liveTracks = [
     evidence: [
       'Mission Control for tasks, approvals, runs, and artifacts',
       'Hard mission budgets with run-level AI Credit, token, provider-cost, and acceptance evidence',
-      'Seven Outcome Packs for markets, research, review, monitoring, and launch work',
-      'Owner-authorized recurring missions with per-run budgets, run limits, and pause controls',
       'Trusted MCP connectors configured per agent',
       'Effectful MCP calls gated by one-time approvals or expiring tool grants',
     ],

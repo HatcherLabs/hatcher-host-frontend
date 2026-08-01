@@ -1022,7 +1022,7 @@ export function ConfigTab() {
               Public Access
             </h3>
             <p className="text-sm text-[var(--text-secondary)] mt-1">
-              Public profile appears in Hatcher City. Public chat appears in Explore.
+              Public profile and public chat appear in Explore.
             </p>
           </div>
           {isHostedMode && configPublicChatEnabled && agent?.id && (
@@ -1050,7 +1050,7 @@ export function ConfigTab() {
             <span>
               <span className="block text-sm font-medium text-[var(--text-primary)]">Public profile</span>
               <span className="mt-1 block text-sm text-[var(--text-secondary)]">
-                Show this agent as a public building in Hatcher City.
+                Show this agent in Explore.
               </span>
             </span>
           </label>

@@ -43,9 +43,8 @@ function formatRelativeSeconds(unixSeconds: number | null): string {
  * deleting, and triggering jobs run through the agent's /api/jobs HTTP
  * endpoint; reads come from jobs.json on disk.
  *
- * This is separate from Hatcher's own workflow scheduler (which runs
- * in the API host and writes to the workflows table). Hermes cron
- * runs inside the agent container and fires via the gateway process.
+ * Hermes cron runs inside the agent container and fires via the gateway
+ * process; it does not depend on a Hatcher-hosted scheduler.
  */
 export function HermesCronCard() {
   const { agent } = useAgentContext();

@@ -26,7 +26,6 @@ import {
   AppWindow,
   ListChecks,
   MoreHorizontal,
-  PackageCheck,
   ShieldCheck,
 } from 'lucide-react';
 import {
@@ -152,11 +151,6 @@ const PluginsTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
-const WorkflowsTab = dynamic(
-  () => import('@/components/agents/tabs/WorkflowsTab').then(mod => ({ default: mod.WorkflowsTab })),
-  { loading: () => <TabSkeleton /> }
-);
-
 const TerminalTab = dynamic(
   () => import('@/components/agents/tabs/TerminalTab').then(mod => ({ default: mod.TerminalTab })),
   { loading: TabSkeleton },
@@ -194,7 +188,6 @@ export default function AgentManagePage() {
   const tNotFound = useTranslations('dashboard.agentDetail.notFound');
   const tStatusPoll = useTranslations('dashboard.agentDetail.statusPoll');
   const tMission = useTranslations('missionControl');
-  const tOutcome = useTranslations('outcomePacks');
   const tDesktop = useTranslations('desktop');
 
   // View mode (easy = operational tabs only, advanced = everything).
@@ -220,7 +213,7 @@ export default function AgentManagePage() {
   const [ownedAgentsLoading, setOwnedAgentsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const statusPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const validTabs: Tab[] = ['overview','config','integrations','connectors','skills','plugins','files','logs','terminal','dev','memory','sessions','knowledge','schedules','workflows','chat','mail','stats','wallet','robinhood'];
+  const validTabs: Tab[] = ['overview','config','integrations','connectors','skills','plugins','files','logs','terminal','dev','memory','sessions','knowledge','schedules','chat','mail','stats','wallet','robinhood'];
   // 'skills' kept in validTabs for backwards compat (deep links), but redirects to plugins tab
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
   const rawTab = searchParams.get('tab');
@@ -1489,14 +1482,6 @@ export default function AgentManagePage() {
               <span className="hidden md:inline">{tMission('title')}</span>
             </Link>
             <Link
-              href={agentWorkspaceHref('/dashboard/outcome-packs', agent.id)}
-              className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 text-xs font-semibold text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--accent)]"
-              title={tOutcome('title')}
-            >
-              <PackageCheck size={13} aria-hidden />
-              <span className="hidden md:inline">{tOutcome('title')}</span>
-            </Link>
-            <Link
               href={agentWorkspaceHref('/dashboard/approvals', agent.id)}
               className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 text-xs font-semibold text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--accent)]"
               title="Action approvals"
@@ -1672,7 +1657,6 @@ export default function AgentManagePage() {
               {tab === 'robinhood' && <RobinhoodTab />}
               {tab === 'stats' && <StatsTab />}
               {tab === 'schedules' && <SchedulesTab />}
-              {tab === 'workflows' && <WorkflowsTab />}
             </AnimatePresence>
             {terminalMounted && (
               <div className={tab === 'terminal' ? 'block' : 'hidden'} aria-hidden={tab !== 'terminal'}>

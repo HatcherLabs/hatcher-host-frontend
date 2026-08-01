@@ -32,7 +32,6 @@
     "closeNav": "Fermer le menu de navigation",
     "userMenu": {
       "sub_dashboard": "Agents, missions, approbations et packs.",
-      "sub_outcomePacks": "Recettes réutilisables pour les résultats courants.",
       "sub_myAgents": "Parcourir, modifier, déployer.",
       "sub_create": "Décrire un agent à faire éclore.",
       "sub_analytics": "AI Credits, tokens, tendances.",
@@ -833,10 +832,8 @@
     "overview": {
       "eyebrow": "Vue d'ensemble de l'espace de travail",
       "title": "Tableau de bord",
-      "subtitle": "Suivez les agents, les missions, les approbations et les recettes de résultats réutilisables depuis une vue opérationnelle unique.",
-      "signInDescription": "Connectez-vous pour voir vos agents, missions, approbations et Outcome Packs.",
+      "subtitle": "Suivez les agents, les missions et les approbations depuis une vue opérationnelle unique.",
       "openMissionControl": "Mission Control",
-      "useOutcomePack": "Outcome Packs",
       "refresh": "Actualiser le tableau de bord",
       "partialError": "Certaines données de l'espace de travail n'ont pas pu être chargées.",
       "unavailable": "Données temporairement indisponibles.",
@@ -856,12 +853,6 @@
         "empty": "Aucune mission pour le moment.",
         "emptyAction": "Créer votre première mission",
         "unknownAgent": "Agent inconnu"
-      },
-      "packs": {
-        "title": "Outcome Packs",
-        "subtitle": "Recettes sélectionnées prêtes à être configurées.",
-        "browse": "Tout parcourir",
-        "empty": "Aucun Outcome Pack n'est disponible."
       },
       "utilities": {
         "label": "Autres outils de l'espace de travail",
@@ -895,7 +886,7 @@
       "tourCreateTitle": "Créez votre premier agent",
       "tourCreateDescription": "Cliquez ici pour créer votre premier agent IA. Choisissez entre OpenClaw et Hermes.",
       "tourWorkspaceTitle": "Votre espace de travail",
-      "tourWorkspaceDescription": "Passez d'une zone à l'autre depuis cette barre : Agents, Mission Control, Outcome Packs et Approvals.",
+      "tourWorkspaceDescription": "Passez d’une zone à l’autre depuis cette barre : Agents, Mission Control et Approvals.",
       "tourPlanTitle": "Forfait & AI Credits",
       "tourPlanDescription": "Votre forfait et votre solde d'AI Credits se trouvent dans ce menu. Consultez votre utilisation ou évoluez à tout moment.",
       "statTotal": "Total",
@@ -1212,8 +1203,7 @@
         "robinhood": "Robinhood",
         "files": "Fichiers",
         "workspace": "Espace de travail",
-        "schedules": "Planifications",
-        "workflows": "Workflows"
+        "schedules": "Planifications"
       },
       "sidebarGroups": {
         "operate": "Piloter",
@@ -1536,23 +1526,6 @@
         "refresh": "Actualiser",
         "limitReached": "Plugins et compétences sont inclus sur chaque forfait."
       },
-      "workflows": {
-        "new": "Nouveau workflow",
-        "noWorkflows": "Aucun workflow.",
-        "noWorkflowsDescription": "Créez votre premier workflow pour automatiser votre agent.",
-        "enable": "Activer",
-        "disable": "Désactiver",
-        "delete": "Supprimer",
-        "save": "Enregistrer",
-        "run": "Exécuter",
-        "running": "En cours...",
-        "name": "Nom du workflow",
-        "trigger": "Déclencheur",
-        "lastRun": "Dernière exécution",
-        "status": "Statut",
-        "active": "Actif",
-        "inactive": "Inactif"
-      },
       "files": {
         "noFiles": "Aucun fichier trouvé.",
         "noFilesDescription": "Le gestionnaire de fichiers est vide.",
@@ -1626,7 +1599,7 @@
     "title": "Discutez avec des agents IA publics",
     "body": "Parcourez les agents dont les propriétaires ont activé le chat public. Chaque session s'exécute dans votre navigateur et utilise la configuration Hatcher en direct de l'agent.",
     "emptyTitle": "Aucun agent avec chat public pour le moment",
-    "emptyBody": "Les profils publics apparaissent toujours dans Hatcher City. Les agents apparaissent ici lorsque leur propriétaire active le chat public.",
+    "emptyBody": "Les profils publics apparaissent ici lorsque leur propriétaire active le chat public.",
     "fallbackDescription": "Un agent Hatcher public prêt pour les sessions de chat dans le navigateur.",
     "interactions": "interactions",
     "publicChat": "Chat public",
@@ -2180,272 +2153,6 @@
     "errCreate": "Impossible de créer l'agent. Affine la description et réessaie.",
     "errCreateNetwork": "Erreur réseau lors de la création de l'agent."
   },
-  "outcomePacks": {
-    "contract": {
-      "listPlaceholder": "Un élément par ligne",
-      "allTasksCompleted": "Toutes les tâches sont terminées",
-      "artifactRequired": "Nécessite un artefact de type {kind}",
-      "artifact": "résultat",
-      "outputMinLength": "Au moins {count} caractères",
-      "launchedPending": "Tâche créée. Installez les {count} compétences requises avant de la démarrer."
-    },
-    "content": {
-      "categories": {
-        "markets": "Marchés et trading",
-        "research": "Recherche",
-        "engineering": "Ingénierie",
-        "monitoring": "Suivi",
-        "marketing": "Marketing"
-      },
-      "options": {
-        "x": "X",
-        "linkedin": "LinkedIn",
-        "blog": "Blog",
-        "email": "E-mail",
-        "long": "Long",
-        "short": "Court"
-      },
-      "artifactKinds": {
-        "text": "texte",
-        "code": "code",
-        "file": "fichier"
-      },
-      "prerequisites": {
-        "github_connection": "Configurez GitHub Connect ou un jeton d'exécution GitHub pour cet agent."
-      },
-      "warnings": {
-        "unsupported_framework": "Le framework {framework} n'est pas pris en charge par ce pack.",
-        "required_skills_pending": "{count, plural, one {# compétence requise sera mise en attente d'installation. Redémarrez l'agent avant de lancer la tâche.} other {# compétences requises seront mises en attente d'installation. Redémarrez l'agent avant de lancer la tâche.}}",
-        "schedules_disabled": "{count, plural, one {# modèle de planification est préparé, mais reste désactivé.} other {# modèles de planification sont préparés, mais restent désactivés.}}"
-      },
-      "packs": {
-        "marketPulse": {
-          "title": "Point marché",
-          "summary": "Produit une synthèse horodatée du marché pour les actifs sélectionnés et les signaux à surveiller.",
-          "fields": {
-            "assets": "Actifs",
-            "horizon": "Horizon temporel",
-            "focus": "Axe d’analyse",
-            "watchSignals": "Signaux à surveiller",
-            "outputLanguage": "Langue de sortie"
-          },
-          "deliverables": {
-            "deliverable-1": "Point marché horodaté",
-            "deliverable-2": "Signaux et risques prioritaires"
-          },
-          "manualAcceptance": "Les observations de marché incluent des horodatages et leurs sources de données.",
-          "schedules": {
-            "daily-market-pulse": "Point marché quotidien"
-          },
-          "taskTitle": "Point marché",
-          "taskDescription": "Produit une synthèse horodatée des données et risques de marché pour les actifs sélectionnés."
-        },
-        "tradePlanReview": {
-          "title": "Revue du plan de trading",
-          "summary": "Teste la robustesse d’une thèse de trading fournie par l’utilisateur, sans ouvrir ni gérer de position.",
-          "fields": {
-            "asset": "Actif",
-            "network": "Réseau ou plateforme",
-            "direction": "Direction",
-            "capitalAmount": "Montant du capital",
-            "capitalCurrency": "Devise du capital",
-            "maxLossPercent": "Perte maximale (% du capital)",
-            "horizon": "Horizon temporel",
-            "thesis": "Thèse de trading"
-          },
-          "deliverables": {
-            "deliverable-1": "Revue des risques du plan de trading",
-            "deliverable-2": "Liste de scénarios validée par un humain"
-          },
-          "manualAcceptance": "Les hypothèses de dimensionnement et les conditions d’invalidation sont explicites.",
-          "taskTitle": "Revue du plan de trading",
-          "taskDescription": "Examine les risques, hypothèses et scénarios d’un plan de trading fourni par l’utilisateur."
-        },
-        "portfolioRiskReview": {
-          "title": "Revue des risques du portefeuille",
-          "summary": "Évalue les positions fournies par l’utilisateur selon leur concentration, leur liquidité et leur risque de baisse.",
-          "fields": {
-            "holdings": "Positions et allocations (ACTIF : 25 %, une par ligne)",
-            "baseCurrency": "Devise de référence",
-            "objective": "Objectif du portefeuille",
-            "constraints": "Contraintes"
-          },
-          "deliverables": {
-            "deliverable-1": "Synthèse des risques du portefeuille",
-            "deliverable-2": "Options de rééquilibrage validées par un humain"
-          },
-          "manualAcceptance": "Les options respectent l’objectif et les contraintes fournis par l’utilisateur.",
-          "taskTitle": "Revue des risques du portefeuille",
-          "taskDescription": "Évalue les positions fournies par l’utilisateur et propose des options de risque à valider par un humain."
-        },
-        "researchReport": {
-          "title": "Rapport de recherche",
-          "summary": "Produisez un rapport de recherche sourcé, ciblé et directement exploitable pour la prise de décision.",
-          "fields": {
-            "topic": "Sujet",
-            "questions": "Questions de recherche",
-            "audience": "Public",
-            "outputLanguage": "Langue de sortie"
-          },
-          "deliverables": {
-            "deliverable-1": "Rapport structuré",
-            "deliverable-2": "Liste des sources avec citations directes"
-          },
-          "manualAcceptance": "Les sources étayent les affirmations centrales.",
-          "taskTitle": "Rapport de recherche",
-          "taskDescription": "Produisez un rapport de recherche étayé par des sources à partir du brief fourni."
-        },
-        "pullRequestReview": {
-          "title": "Revue de Pull Request",
-          "summary": "Examinez une Pull Request GitHub pour évaluer sa fiabilité, ses risques et son aptitude à être publiée.",
-          "fields": {
-            "repository": "Dépôt (propriétaire/nom)",
-            "pullRequestNumber": "Numéro de la Pull Request",
-            "focus": "Axes de la revue"
-          },
-          "deliverables": {
-            "deliverable-1": "Constats classés par gravité",
-            "deliverable-2": "Verdict de publication ou de blocage"
-          },
-          "manualAcceptance": "Chaque constat bloquant comporte des preuves concrètes.",
-          "taskTitle": "Revue de Pull Request",
-          "taskDescription": "Examinez la Pull Request indiquée pour évaluer sa fiabilité et les risques liés à sa publication."
-        },
-        "competitorWatch": {
-          "title": "Veille concurrentielle",
-          "summary": "Créez une synthèse de veille concurrentielle et un modèle désactivé pour le suivi quotidien.",
-          "fields": {
-            "company": "Votre entreprise ou produit",
-            "competitors": "Concurrents",
-            "market": "Marché",
-            "watchSignals": "Signaux à surveiller"
-          },
-          "deliverables": {
-            "deliverable-1": "Synthèse concurrentielle de référence",
-            "deliverable-2": "Signaux de veille prioritaires"
-          },
-          "manualAcceptance": "Les affirmations importantes sont datées et sourcées.",
-          "schedules": {
-            "daily-competitor-watch": "Veille concurrentielle quotidienne"
-          },
-          "taskTitle": "Veille concurrentielle",
-          "taskDescription": "Établissez une référence actuelle sur la concurrence, étayée par des sources."
-        },
-        "launchContent": {
-          "title": "Contenu de lancement",
-          "summary": "Transformez le positionnement du produit en publications prêtes pour chaque canal et en plan d'action.",
-          "fields": {
-            "product": "Produit",
-            "positioning": "Positionnement et offre",
-            "audience": "Public",
-            "channels": "Canaux",
-            "tone": "Ton"
-          },
-          "deliverables": {
-            "deliverable-1": "Synthèse du positionnement",
-            "deliverable-2": "Brouillons de publications prêts pour chaque canal",
-            "deliverable-3": "Plan d'action pour le lancement"
-          },
-          "manualAcceptance": "Les affirmations correspondent à l'offre fournie par le propriétaire.",
-          "taskTitle": "Contenu de lancement",
-          "taskDescription": "Préparez des brouillons de contenu pour le lancement et un plan d'action soumis à une validation humaine."
-        }
-      }
-    },
-    "authenticating": "Vérification de votre session...",
-    "signInTitle": "Se connecter à Outcome Packs",
-    "signInDescription": "Outcome Packs configure des tâches privées et des intégrations pour les agents de votre compte.",
-    "signIn": "Se connecter",
-    "eyebrow": "Opérations sélectionnées",
-    "title": "Outcome Packs",
-    "subtitle": "Configurez une recette éprouvée, vérifiez sa préparation puis envoyez-la dans Mission Control.",
-    "refresh": "Actualiser le catalogue",
-    "missionControl": "Mission Control",
-    "tryAgain": "Réessayer",
-    "loading": "Chargement des Outcome Packs...",
-    "detailLoading": "Chargement des détails du pack...",
-    "detailError": "Ce pack n’a pas pu être chargé.",
-    "catalog": {
-      "label": "Catalogue Outcome Packs",
-      "title": "Catalogue",
-      "firstParty": "Créé par Hatcher",
-      "version": "Version {version}"
-    },
-    "detail": {
-      "curated": "Recette sélectionnée",
-      "runtimeMinutes": "Durée : {count} minutes",
-      "frameworks": "Frameworks compatibles",
-      "anyFramework": "Tout framework hébergé",
-      "requirements": "Compétences et prérequis",
-      "noRequirements": "Aucune configuration supplémentaire",
-      "plan": "Plan des tâches",
-      "taskCount": "{count} tâches",
-      "tasks": "Tâches du pack",
-      "acceptance": "Critères d’acceptation"
-    },
-    "configure": {
-      "title": "Configurer le résultat",
-      "subtitle": "Choisissez l’agent et fournissez les données du plan de tâches.",
-      "agent": "Agent",
-      "agentPlaceholder": "Choisir un agent",
-      "selectPlaceholder": "Choisir une option",
-      "agentStatus": "{framework} - {status}",
-      "required": "Obligatoire"
-    },
-    "validation": {
-      "agent": "Choisissez un agent avant de préparer ce pack.",
-      "required": "Renseignez tous les champs obligatoires.",
-      "fieldInvalid": "Respectez la longueur autorisée pour ce champ."
-    },
-    "preview": {
-      "label": "Aperçu du lancement",
-      "title": "Aperçu de la configuration",
-      "subtitle": "Compatibilité, prérequis, budget et planifications inactives.",
-      "empty": "Préparez le pack pour vérifier sa configuration avant toute création.",
-      "compatible": "L’agent est compatible",
-      "incompatible": "L’agent n’est pas compatible",
-      "blockers": "Blocages de configuration",
-      "warnings": "À vérifier avant le lancement",
-      "resolvedTasks": "Tâches résolues",
-      "budget": "Budget cible",
-      "noBudget": "Aucun budget cible",
-      "credits": "{count} AI Credits",
-      "budgetAdvisory": "Limite stricte pour l'exécution payante; aucun AI Credit n'est réservé au-delà.",
-      "maxRuntime": "Durée maximale : {count} minutes.",
-      "schedules": "Planifications proposées",
-      "scheduleOff": "Désactivé",
-      "scheduleNotice": "Les planifications restent désactivées au lancement et nécessitent une confirmation séparée.",
-      "manualReviewTitle": "Validation du propriétaire requise",
-      "manualReviewDescription": "Le résultat final reste dans Mission Control jusqu’à ce que le propriétaire l’approuve ou le rejette.",
-      "setup": {
-        "connectors": "Ouvrir Connectors",
-        "dev": "Ouvrir la configuration développeur",
-        "integrations": "Ouvrir Integrations"
-      }
-    },
-    "actions": {
-      "prepare": "Préparer l’aperçu",
-      "prepareAgain": "Préparer à nouveau",
-      "preparing": "Préparation...",
-      "launchTitle": "Créer dans Mission Control",
-      "ready": "Prêt à lancer",
-      "blocked": "Préparez le pack et résolvez les blocages",
-      "launch": "Lancer le pack",
-      "launching": "Lancement..."
-    },
-    "messages": {
-      "launched": "Outcome Pack lancé."
-    },
-    "noAgents": {
-      "title": "Aucun agent disponible",
-      "description": "Créez un agent avant de configurer un Outcome Pack.",
-      "action": "Créer un agent"
-    },
-    "empty": {
-      "title": "Aucun Outcome Pack disponible",
-      "description": "Le catalogue sélectionné n’a retourné aucun pack Hatcher."
-    }
-  },
   "landingV3": {
     "hero": {
       "boxLabel": "Déploie",
@@ -2549,26 +2256,6 @@
     }
   },
   "missionControl": {
-    "outcomePack": {
-      "title": "Outcome Pack",
-      "unknown": "Pack inconnu",
-      "version": "Version {version}",
-      "skillsReady": "Compétences requises installées",
-      "skillsPending": "Compétences requises en attente",
-      "openPlugins": "Ouvrir Plugins et redémarrer l’agent",
-      "acceptance": "Critères d’acceptation",
-      "allTasksCompleted": "Toutes les tâches sont terminées",
-      "artifactRequired": "Nécessite un artefact de type {kind}",
-      "artifact": "résultat",
-      "outputMinLength": "Au moins {count} caractères",
-      "schedulesDisabled": "{count} modèles de planification restent désactivés et ne s’exécuteront pas automatiquement.",
-      "skillStatus": {
-        "installed": "Installée",
-        "pending": "En attente",
-        "failed": "Échouée",
-        "missing": "Manquante"
-      }
-    },
     "authenticating": "Checking your session...",
     "signInTitle": "Sign in to Mission Control",
     "signInDescription": "Mission Control shows private tasks, approvals, runs, and artifacts across your agents.",
@@ -2578,7 +2265,6 @@
     "subtitle": "Create, approve, run, and inspect one-shot work across every agent.",
     "refresh": "Refresh tasks",
     "newTask": "New task",
-    "outcomePacks": "Outcome Packs",
     "tryAgain": "Try again",
     "loading": "Loading tasks...",
     "unknownAgent": "Unknown agent",

@@ -24,7 +24,6 @@ describe('roadmap content', () => {
 
   it('surfaces the latest operating-system releases', () => {
     expect(latestReleases.map((release) => release.id)).toEqual([
-      'outcome-packs-v2',
       'trusted-action-approvals',
       'measured-verified-missions',
       'mission-control',

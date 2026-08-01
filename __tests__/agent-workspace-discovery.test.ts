@@ -12,7 +12,6 @@ describe('agent workspace discovery', () => {
     expect(DASHBOARD_WORKSPACE_ROUTES).toEqual([
       { key: 'agents', href: '/dashboard/agents' },
       { key: 'missions', href: '/dashboard/missions' },
-      { key: 'outcomePacks', href: '/dashboard/outcome-packs' },
       { key: 'approvals', href: '/dashboard/approvals' },
     ]);
 
@@ -30,9 +29,6 @@ describe('agent workspace discovery', () => {
     expect(agentWorkspaceHref('/dashboard/missions', 'agent-1', { create: '1' })).toBe(
       '/dashboard/missions?create=1&agent=agent-1',
     );
-    expect(agentWorkspaceHref('/dashboard/outcome-packs', 'agent-1', {
-      pack: 'market-pulse-v1',
-    })).toBe('/dashboard/outcome-packs?pack=market-pulse-v1&agent=agent-1');
   });
 
   it('accepts agent context only for agents owned by the current user', () => {
@@ -61,36 +57,24 @@ describe('agent workspace discovery', () => {
     );
 
     expect(agentsPage).toContain('/dashboard/missions');
-    expect(agentsPage).toContain('/dashboard/outcome-packs');
     expect(dashboardTab).toContain('AgentOperationsCard');
     expect(agentPage).toContain('/dashboard/missions');
-    expect(agentPage).toContain('/dashboard/outcome-packs');
     expect(workspaceNavigation).toContain("searchParams.get('agent')");
     expect(workspaceNavigation).toContain('agentWorkspaceHref(route.href, agentId)');
   });
 
-  it('consumes and preserves agent context in both workflow destinations', () => {
+  it('consumes and preserves agent context in Mission Control', () => {
     const missionsPage = readFileSync(
       resolve(process.cwd(), 'app/[locale]/dashboard/missions/page.tsx'),
       'utf8',
     );
-    const packsPage = readFileSync(
-      resolve(process.cwd(), 'app/[locale]/dashboard/outcome-packs/page.tsx'),
-      'utf8',
-    );
-
     expect(missionsPage).toContain('requestedOwnedAgentId');
     expect(missionsPage).toContain("get('create') === '1'");
-    expect(missionsPage).toContain("agentWorkspaceHref('/dashboard/outcome-packs', agentFilter)");
     expect(missionsPage).toContain("params.delete('create')");
     expect(missionsPage).toContain("params.set('task', task.id)");
     expect(missionsPage).toContain("updateAgentFilter('all')");
     expect(missionsPage).toContain("...(scopedAgentId !== 'all' ? { agentId: scopedAgentId } : {})");
     expect(missionsPage).toContain('void loadTasks(false, nextAgentId)');
-    expect(packsPage).toContain('requestedOwnedAgentId');
-    expect(packsPage).toContain("params.set('agent', selectedAgentId)");
-    expect(packsPage).toContain("params.set('agent', agentId)");
-    expect(packsPage).toContain("agentWorkspaceHref('/dashboard/missions', selectedAgentId)");
   });
 
   it('uses server summary totals in the agent Mission Control card', () => {

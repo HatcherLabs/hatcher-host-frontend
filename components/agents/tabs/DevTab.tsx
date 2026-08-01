@@ -5,7 +5,6 @@ import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   AlertTriangle,
-  ArrowRight,
   Bot,
   CheckCircle2,
   Github,
@@ -20,7 +19,6 @@ import {
   Sparkles,
   TerminalSquare,
   Trash2,
-  Workflow,
 } from "lucide-react";
 import {
   api,
@@ -38,12 +36,10 @@ import {
   getGithubDefaultRepoSelectLabel,
   getGithubConnectionUi,
   getDevCapabilityCards,
-  getDevWorkflowTemplates,
   getGithubConnectionMethods,
   getGithubRepoInputError,
   summarizeAgentCommLogs,
   type DevCapabilityStatus,
-  type DevWorkflowTemplate,
 } from "./developerWorkflows";
 
 function StatusPill({ enabled }: { enabled: boolean }) {
@@ -95,9 +91,6 @@ export function DevTab() {
   const [logs, setLogs] = useState<AgentCommLog[]>([]);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [selectedAgentId, setSelectedAgentId] = useState("");
-  const [creatingTemplateId, setCreatingTemplateId] = useState<string | null>(
-    null,
-  );
   const [envKeys, setEnvKeys] = useState<Set<string>>(new Set());
   const [githubToken, setGithubToken] = useState("");
   const [githubRepo, setGithubRepo] = useState("");
@@ -116,7 +109,6 @@ export function DevTab() {
 
   const summary = useMemo(() => summarizeAgentCommLogs(logs), [logs]);
   const capabilityCards = useMemo(() => getDevCapabilityCards(), []);
-  const workflowTemplates = useMemo(() => getDevWorkflowTemplates(), []);
   const githubMethods = useMemo(() => getGithubConnectionMethods(), []);
   const allowedIds = useMemo(
     () => new Set(permissions.map((permission) => permission.allowedAgent.id)),
@@ -422,22 +414,6 @@ export function DevTab() {
     );
   };
 
-  const createWorkflowFromTemplate = async (template: DevWorkflowTemplate) => {
-    setCreatingTemplateId(template.id);
-    setError(null);
-    const res = await api.createAgentWorkflow(agentId, {
-      name: template.name,
-      nodes: template.nodes,
-      edges: template.edges,
-    });
-    setCreatingTemplateId(null);
-    if (!res.success) {
-      setError(res.error ?? "Failed to create workflow template");
-      return;
-    }
-    setTab("workflows");
-  };
-
   return (
     <motion.div
       key="dev"
@@ -483,7 +459,7 @@ export function DevTab() {
               </div>
             </div>
           </div>
-          <div className="grid gap-2 sm:grid-cols-3 xl:min-w-[440px]">
+          <div className="grid gap-2 sm:grid-cols-2 xl:min-w-[300px]">
             <button
               type="button"
               onClick={() => setTab("terminal")}
@@ -491,14 +467,6 @@ export function DevTab() {
             >
               <TerminalSquare size={13} />
               Terminal
-            </button>
-            <button
-              type="button"
-              onClick={() => setTab("workflows")}
-              className="inline-flex items-center justify-center gap-2 rounded-[3px] border border-[var(--border-default)] px-3 py-2 text-xs font-mono text-[var(--text-secondary)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)]"
-            >
-              <Workflow size={13} />
-              Workflows
             </button>
             <button
               type="button"
@@ -1035,77 +1003,6 @@ export function DevTab() {
         </div>
       </section>
 
-      <section className="rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-elevated)] p-4">
-        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h3 className="text-base font-semibold text-[var(--text-primary)]">
-              Dev workflow templates
-            </h3>
-            <p className="mt-1 text-sm text-[var(--text-secondary)]">
-              Create starter workflows for source-control and recurring
-              engineering loops, then edit them in the visual builder.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => setTab("workflows")}
-            className="inline-flex items-center justify-center gap-2 rounded-[3px] border border-[var(--border-default)] px-3 py-2 text-xs font-mono text-[var(--text-secondary)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)]"
-          >
-            <Workflow size={13} />
-            Workflow builder
-          </button>
-        </div>
-        <div className="grid gap-3 md:grid-cols-2">
-          {workflowTemplates.map((template) => (
-            <div
-              key={template.id}
-              className="rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-base)] p-4"
-            >
-              <div className="mb-3 flex items-start gap-3">
-                <span className="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--accent)]">
-                  <Workflow size={15} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <h4 className="text-sm font-semibold text-[var(--text-primary)]">
-                    {template.name}
-                  </h4>
-                  <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
-                    {template.description}
-                  </p>
-                </div>
-              </div>
-              <div className="mb-3 flex flex-wrap items-center gap-2">
-                {template.nodes.map((node, index) => (
-                  <div key={node.id} className="flex items-center gap-2">
-                    <span className="rounded-[3px] border border-[var(--border-default)] px-2 py-1 text-[10px] font-mono uppercase tracking-[0.08em] text-[var(--text-muted)]">
-                      {node.data.label}
-                    </span>
-                    {index < template.nodes.length - 1 && (
-                      <ArrowRight
-                        size={12}
-                        className="text-[var(--text-muted)]"
-                      />
-                    )}
-                  </div>
-                ))}
-              </div>
-              <button
-                type="button"
-                onClick={() => void createWorkflowFromTemplate(template)}
-                disabled={creatingTemplateId !== null}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-[3px] border border-[var(--border-default)] px-3 py-2 text-xs font-mono text-[var(--text-secondary)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                {creatingTemplateId === template.id ? (
-                  <Loader2 size={13} className="animate-spin" />
-                ) : (
-                  <Plus size={13} />
-                )}
-                Create workflow
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
     </motion.div>
   );
 }
