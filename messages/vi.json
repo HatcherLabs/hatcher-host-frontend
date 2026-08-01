@@ -2024,10 +2024,6 @@
         "description": "Kết nối Telegram, Discord, Slack, Twitter/X, Signal, webhooks và các kênh khác có ở mọi cấp độ."
       },
       {
-        "title": "Hatcher CLI",
-        "description": "Cài đặt @hatcherlabs/cli, chạy Hatcher, tạo tác nhân, trò chuyện, đính kèm thiết bị đầu cuối, thiết lập GitHub và các cuộc gọi A2A từ shell của bạn."
-      },
-      {
         "title": "Quy trình làm việc của nhà phát triển",
         "description": "Kết nối GitHub, quản lý các phiên cuối, cho phép liên lạc giữa các tác nhân và điều phối các tác nhân thuộc sở hữu."
       },
@@ -2576,29 +2572,6 @@
       "ctaGhost": "Xem tác nhân",
       "metaFrameworks": "OpenClaw + Hermes",
       "metaNoCard": "không có thẻ tín dụng"
-    },
-    "cli": {
-      "boxLabel": "CLI",
-      "title": "Chạy Hatcher từ thiết bị đầu cuối của bạn",
-      "sub": "Cài đặt Hatcher CLI, tạo khóa API, sau đó chạy `hatcher`. Xây dựng các tác nhân từ tiếng Anh đơn giản, trò chuyện với họ, đính kèm vào thời gian chạy trực tiếp của họ và quản lý quy trình làm việc của nhà phát triển mà không cần rời khỏi vỏ của bạn.",
-      "apiKeyHint": "Tạo khóa API trong Tài khoản → Khóa API → Tạo khóa.",
-      "ctaKey": "Tạo khóa API",
-      "ctaDocs": "Tài liệu CLI",
-      "terminalLabel": "Hatcher CLI",
-      "features": {
-        "hatch": {
-          "title": "Chat-to-Hatch",
-          "body": "Biến một lời nhắc thành tác nhân OpenClaw hoặc Hermes được định cấu hình."
-        },
-        "terminal": {
-          "title": "Thiết bị đầu cuối trực tiếp",
-          "body": "Đính kèm phiên khung đang chạy với `hatcher terminal`."
-        },
-        "dev": {
-          "title": "Quy trình làm việc của nhà phát triển",
-          "body": "Sử dụng quyền truy cập GitHub, cuộc gọi, phiên, nhật ký và điều phối A2A từ một CLI."
-        }
-      }
     }
   },
   "missionControl": {

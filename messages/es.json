@@ -2024,10 +2024,6 @@
         "description": "Conecte Telegram, Discord, Slack, Twitter/X, Signal, webhooks y otros canales incluidos en cada nivel."
       },
       {
-        "title": "Hatcher CLI",
-        "description": "Instale @hatcherlabs/cli, ejecute Hatcher, cree agentes, chatee, conecte terminal, configure GitHub y llame a A2A desde su shell."
-      },
-      {
         "title": "Flujos de trabajo del desarrollador",
         "description": "Conecte GitHub, administre sesiones de terminal, habilite la comunicación entre agentes y organice agentes propios."
       },
@@ -2576,29 +2572,6 @@
       "ctaGhost": "Ver agentes",
       "metaFrameworks": "OpenClaw + Hermes",
       "metaNoCard": "sin tarjeta de crédito"
-    },
-    "cli": {
-      "boxLabel": "CLI",
-      "title": "Ejecute Hatcher desde su terminal",
-      "sub": "Instale Hatcher CLI, cree una clave API y luego ejecute `hatcher`. Cree agentes en inglés sencillo, charle con ellos, conéctese a su tiempo de ejecución en vivo y administre los flujos de trabajo de los desarrolladores sin salir de su caparazón.",
-      "apiKeyHint": "Genere una clave API en Cuenta → Claves API → Crear clave.",
-      "ctaKey": "Crear clave API",
-      "ctaDocs": "Documentos de CLI",
-      "terminalLabel": "Hatcher CLI",
-      "features": {
-        "hatch": {
-          "title": "Chat-to-Hatch",
-          "body": "Convierta un mensaje en un agente OpenClaw o Hermes configurado."
-        },
-        "terminal": {
-          "title": "terminal en vivo",
-          "body": "Adjunte a la sesión del marco en ejecución con `hatcher terminal`."
-        },
-        "dev": {
-          "title": "Flujos de trabajo de desarrollo",
-          "body": "Utilice el acceso a GitHub, llamadas, sesiones, registros y orquestación de A2A desde un CLI."
-        }
-      }
     }
   },
   "missionControl": {

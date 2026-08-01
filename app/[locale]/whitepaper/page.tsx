@@ -443,7 +443,7 @@ export default function WhitepaperPage() {
                   ['Secure terminal sessions', LockKeyhole],
                   ['GitHub skill and credential mounting', GitBranch],
                   ['Agent-to-agent communication', Network],
-                  ['CLI, SDK, GitHub Action, Zapier, and Make surfaces', FileText],
+                  ['SDK, GitHub Action, Zapier, and Make surfaces', FileText],
                 ].map(([label, Icon]) => {
                   const TypedIcon = Icon as LucideIcon;
                   return (

@@ -2024,10 +2024,6 @@
         "description": "Her seviyede bulunan Telegram, Discord, Slack, Twitter/X, Signal, webhooks ve diğer kanalları bağlayın."
       },
       {
-        "title": "Hatcher CLI",
-        "description": "@hatcherlabs/cli'yi kur, hatcher'ı çalıştır, ajanlar oluştur, sohbet et, terminal ekini GitHub kurulum ve shell'den A2A çağrıları yap."
-      },
-      {
         "title": "Geliştirici İş Akışları",
         "description": "GitHub bağlayın, terminal oturumlarını yönetin, ajanlar arasında iletişimi mümkün kılar ve sahip olduğunuz ajanları organize edin."
       },
@@ -2576,29 +2572,6 @@
       "ctaGhost": "Ajanları görüntüleyin",
       "metaFrameworks": "OpenClaw + Hermes",
       "metaNoCard": "Kredi kartı yok"
-    },
-    "cli": {
-      "boxLabel": "CLI",
-      "title": "Terminalinizden Hatcher çalıştırın",
-      "sub": "Hatcher CLI kur, bir API anahtarı oluştur, sonra `hatcher` çalıştır. Basit İngilizceden ajanlar oluşturun, onlarla sohbet edin, canlı çalışma zamanlarına bağlanın ve geliştirici iş akışlarını shell'inizden çıkmadan yönetin.",
-      "apiKeyHint": "Account → API Anahtarlar → Oluştur anahtarında bir API anahtarı oluşturun.",
-      "ctaKey": "API anahtar oluşturun",
-      "ctaDocs": "CLI belgeleri",
-      "terminalLabel": "Hatcher CLI",
-      "features": {
-        "hatch": {
-          "title": "Chat-to-Hatch",
-          "body": "Bir promptu yapılandırılmış bir OpenClaw veya Hermes ajanına dönüştürün."
-        },
-        "terminal": {
-          "title": "Canlı terminal",
-          "body": "Çalışan framework oturumuna `hatcher terminal` ile ekle."
-        },
-        "dev": {
-          "title": "Geliştirici iş akışları",
-          "body": "Tek bir CLI'ten GitHub erişim, çağrılar, oturumlar, kayıtlar ve orkestrasyon A2A kullanın."
-        }
-      }
     }
   },
   "missionControl": {

@@ -2024,10 +2024,6 @@
         "description": "すべてのティアに含まれる Telegram、Discord、Slack、Twitter/X、Signal、ウェブフック、その他のチャネルを接続できます。"
       },
       {
-        "title": "Hatcher CLI",
-        "description": "@hatcherlabs/CLIをインストールし、ハッチャーを実行し、エージェントを作成し、チャット、ターミナルアタッチ、GitHub設定、シェルからの通話A2A。"
-      },
-      {
         "title": "開発者ワークフロー",
         "description": "GitHubを接続し、ターミナルセッションを管理し、エージェント間通信を有効にし、所有エージェントをオーケストレーションします。"
       },
@@ -2576,29 +2572,6 @@
       "ctaGhost": "エージェントを見る",
       "metaFrameworks": "OpenClaw + Hermes",
       "metaNoCard": "クレジットカードは使えません"
-    },
-    "cli": {
-      "boxLabel": "CLI",
-      "title": "端末からHatcher実行してください",
-      "sub": "Hatcher CLIをインストールし、APIキーを作成し、`hatcher`を実行します。平易な英語からエージェントを作成し、チャットし、ライブランタイムにアタッチし、シェルを離れずに開発者のワークフローを管理しましょう。",
-      "apiKeyHint": "アカウント→ APIキーでAPIキーを生成→キーを作成してください。",
-      "ctaKey": "キー API作成",
-      "ctaDocs": "CLIドキュメンタリー",
-      "terminalLabel": "Hatcher CLI",
-      "features": {
-        "hatch": {
-          "title": "Chat-to-Hatch",
-          "body": "1つのプロンプトを設定済みのOpenClawまたはHermesエージェントに変換します。"
-        },
-        "terminal": {
-          "title": "ライブターミナル",
-          "body": "`hatcher terminal`と一緒にランニングフレームワークセッションに参加してください。"
-        },
-        "dev": {
-          "title": "開発ワークフロー",
-          "body": "GitHubアクセス、通話、セッション、ログ、オーケストレーションを一つのCLIからA2Aしてください。"
-        }
-      }
     }
   },
   "missionControl": {

@@ -4,7 +4,6 @@ import { Footer } from '@/components/marketing/v3/Footer';
 import { SectionHero } from './parts/SectionHero';
 import { SectionFlow } from './parts/SectionFlow';
 import { SectionEcosystem } from './parts/SectionEcosystem';
-import { SectionCli } from './parts/SectionCli';
 import { SectionFwPricing } from './parts/SectionFwPricing';
 import { SectionFinalCta } from './parts/SectionFinalCta';
 import styles from './landing-v3.module.css';
@@ -17,7 +16,6 @@ export function LandingV3() {
         <SectionHero />
         <SectionFlow />
         <SectionEcosystem />
-        <SectionCli />
         <SectionFwPricing />
         <SectionFinalCta />
       </main>
