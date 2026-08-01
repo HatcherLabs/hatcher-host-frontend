@@ -95,4 +95,4 @@ if ! find "$repo_root/.next/cache/images" -type f -print -quit 2>/dev/null \
   exit 1
 fi
 
-echo "localhost bind, root, city, read-only ISR, and image cache smoke tests passed"
+echo "localhost bind, root, explore, read-only ISR, and image cache smoke tests passed"
