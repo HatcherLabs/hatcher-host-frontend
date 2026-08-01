@@ -20,11 +20,9 @@ describe('Wallet tab integration placement', () => {
     )).toBe('metaplex');
   });
 
-  it('places MPP32 with Solana provider rails', () => {
-    expect(getProviderPanelIdsForWallet('solana')).toContain('mpp32');
-    expect(getProviderPanelIdsForWallet('base')).not.toContain('mpp32');
-    expect(getProviderPanelIdsForWallet('skale')).not.toContain('mpp32');
-    expect(getProviderPanelIdsForWallet('cyberia')).not.toContain('mpp32');
+  it('retires MPP32 from the provider rails', () => {
+    expect(getProviderPanelIdsForWallet('solana')).not.toContain('mpp32');
+    expect(getProviderSelectorOptions().map((provider) => provider.id)).not.toContain('mpp32');
   });
 
   it('places Metaplex with Solana identity provider rails', () => {

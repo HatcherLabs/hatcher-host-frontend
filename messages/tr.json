@@ -37,7 +37,6 @@
       "sub_analytics": "AI Credits, jetonlar, trendler.",
       "sub_billing": "Katman, eklentiler, krediler.",
       "sub_wallets": "Solana ödeme cüzdanları.",
-      "sub_team": "Üyeler ve iş birliği.",
       "sub_settings": "Profil, API tuşlar, prefler.",
       "sub_support": "Yardım, doktorlar, iletişim.",
       "sub_admin": "Platform kontrolleri.",
@@ -59,7 +58,7 @@
       "tradersLabel": "Herkese açık traderlar",
       "tradersSub": "Tokenleştirilmiş ajanlar ve onchain aktiviteleri.",
       "featuresLabel": "Özellikler",
-      "featuresSub": "Çalışma zamanı, çalışma alanı, araçlar, odalar ve CLI.",
+      "featuresSub": "Çalışma zamanı, çalışma alanı, araçlar ve entegrasyonlar.",
       "frameworksLabel": "Çerçeveler",
       "frameworksSub": "OpenClaw · Hermes.",
       "pricingLabel": "Fiyatlandırma",
@@ -351,7 +350,7 @@
             "40.000 AI Credits/ay",
             "50 GB çalışma alanı",
             "Her zaman açık olan konteynerler",
-            "Ekip iş birliği"
+            "Öncelikli destek"
           ],
           "cta": "İşi Seç"
         }
@@ -629,7 +628,6 @@
           "Dosya Yöneticisi dahil",
           "Tam kayıtlar dahil",
           "Öncelikli destek",
-          "Ekip iş birliği",
           "Tüm entegrasyonlar"
         ],
         "missing": []
@@ -742,7 +740,6 @@
         "autoSleep": "Otomatik uyku",
         "fileManager": "Dosya Yöneticisi",
         "fullLogs": "Tam Kayıtlar",
-        "teamCollab": "Ekip iş birliği",
         "prioritySupport": "Öncelikli destek",
         "plugins": "Eklentiler + Beceriler",
         "integrations": "Tüm entegrasyonlar",

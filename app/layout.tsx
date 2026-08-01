@@ -64,7 +64,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: 'Hatcher — AI Agent Infrastructure', template: '%s | Hatcher' },
   description:
-    'Managed AI agent infrastructure for hosted OpenClaw and Hermes agents: models, wallets, tools, rooms, and runtime controls in one place.',
+    'Managed AI agent infrastructure for hosted OpenClaw and Hermes agents: models, wallets, tools, integrations, and runtime controls in one place.',
   keywords: [
     'AI agents',
     'agent hosting',
@@ -88,7 +88,7 @@ export const metadata: Metadata = {
     siteName: 'Hatcher',
     title: 'Hatcher — AI Agent Infrastructure',
     description:
-      'Managed AI agent infrastructure for hosted OpenClaw and Hermes agents: models, wallets, tools, rooms, and runtime controls in one place.',
+      'Managed AI agent infrastructure for hosted OpenClaw and Hermes agents: models, wallets, tools, integrations, and runtime controls in one place.',
     images: [buildSocialPreviewImage(SITE_URL)],
     locale: 'en_US',
   },
@@ -98,7 +98,7 @@ export const metadata: Metadata = {
     creator: '@HatcherLabs',
     title: 'Hatcher — AI Agent Infrastructure',
     description:
-      'Managed AI agent infrastructure for hosted OpenClaw and Hermes agents: models, wallets, tools, rooms, and runtime controls in one place.',
+      'Managed AI agent infrastructure for hosted OpenClaw and Hermes agents: models, wallets, tools, integrations, and runtime controls in one place.',
     images: [SOCIAL_PREVIEW_URL],
   },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
@@ -128,7 +128,7 @@ const organizationJsonLd = {
   name: 'Hatcher',
   url: 'https://hatcher.host',
   logo: absoluteSiteUrl(ICON_PATHS.svg, SITE_URL),
-  description: 'Deploy OpenClaw and Hermes agents instantly. Configure with no code, launch on Telegram, Discord, WhatsApp, and manage agents in 3D rooms.',
+  description: 'Deploy OpenClaw and Hermes agents instantly. Configure with no code, launch on Telegram, Discord, WhatsApp, and manage them from one workspace.',
   sameAs: ['https://twitter.com/HatcherLabs'],
 };
 
@@ -153,7 +153,7 @@ const softwareApplicationJsonLd = {
   applicationCategory: 'DeveloperApplication',
   operatingSystem: 'Web',
   description:
-    'Managed AI agent hosting platform. Deploy OpenClaw and Hermes agents with control rooms, UsePod/OpenRouter routing, integrations, and BYOK support.',
+    'Managed AI agent hosting platform. Deploy OpenClaw and Hermes agents with workspace controls, UsePod/OpenRouter routing, integrations, and BYOK support.',
   offers: [
     {
       '@type': 'Offer',
@@ -184,7 +184,7 @@ const softwareApplicationJsonLd = {
       price: '49.99',
       priceCurrency: 'USD',
       billingIncrement: 'P1M',
-      description: '5 agents, 40,000 AI Credits/month, 4 CPU/6GB RAM, 50GB workspace, always active, team collaboration.',
+      description: '5 agents, 40,000 AI Credits/month, 4 CPU/6GB RAM, 50GB workspace, always active, priority support.',
     },
     {
       '@type': 'Offer',

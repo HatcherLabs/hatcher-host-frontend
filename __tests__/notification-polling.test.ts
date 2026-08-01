@@ -11,16 +11,14 @@ const methodsSource = readFileSync(
 );
 
 describe('notification polling', () => {
-  it('polls only the indexed unread count every five minutes', () => {
+  it('loads the indexed unread count without background polling', () => {
     expect(methodsSource).toContain('/notifications/unread-count');
-    expect(centerSource).toContain('const UNREAD_COUNT_POLL_INTERVAL_MS = 5 * 60_000');
-    expect(centerSource).toContain('setInterval(refreshIfVisible, UNREAD_COUNT_POLL_INTERVAL_MS)');
-    expect(centerSource).not.toMatch(/setInterval\(fetchNotifications/);
+    expect(centerSource).toContain('void fetchUnreadCount();');
+    expect(centerSource).not.toMatch(/setInterval|visibilitychange|window\.addEventListener\('focus'/);
   });
 
-  it('pauses polling for hidden tabs and loads the full list only on demand', () => {
-    expect(centerSource).toContain("document.visibilityState !== 'visible'");
-    expect(centerSource).toContain("document.addEventListener('visibilitychange', syncPolling)");
+  it('refreshes the count and full list when the center is opened', () => {
+    expect(centerSource).toContain('void fetchUnreadCount(true);');
     expect(centerSource).toContain('fetchNotifications(true).then');
   });
 });

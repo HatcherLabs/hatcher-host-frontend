@@ -39,7 +39,6 @@
       "sub_analytics": "AI Credits, tokeni, trenduri.",
       "sub_billing": "Tier, adăugiri, credite.",
       "sub_wallets": "Portofele de plată Solana.",
-      "sub_team": "Membri și colaborare.",
       "sub_settings": "Profil, chei API, preferințe.",
       "sub_support": "Ajutor, documentație, contact.",
       "sub_admin": "Control platformă.",
@@ -60,7 +59,7 @@
       "tradersLabel": "Traderi publici",
       "tradersSub": "Agenți tokenizați și activitatea lor onchain.",
       "featuresLabel": "Features",
-      "featuresSub": "Runtime, workspace, tool-uri, camere și CLI.",
+      "featuresSub": "Runtime, workspace, tool-uri și integrări.",
       "frameworksLabel": "Framework-uri",
       "frameworksSub": "OpenClaw · Hermes.",
       "pricingLabel": "Prețuri",
@@ -351,7 +350,7 @@
             "40.000 AI Credits/lună",
             "50 GB spațiu de lucru",
             "Containere mereu active",
-            "Colaborare în echipă"
+            "Suport prioritar"
           ],
           "cta": "Alege Business"
         }
@@ -629,7 +628,6 @@
           "File Manager inclus",
           "Jurnale complete incluse",
           "Suport prioritar",
-          "Colaborare în echipă",
           "Toate integrările"
         ],
         "missing": []
@@ -742,7 +740,6 @@
         "autoSleep": "Adormire automată",
         "fileManager": "File Manager",
         "fullLogs": "Jurnale complete",
-        "teamCollab": "Colaborare în echipă",
         "prioritySupport": "Suport prioritar",
         "plugins": "Plugins + Abilități",
         "integrations": "Toate integrările",

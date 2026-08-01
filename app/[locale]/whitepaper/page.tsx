@@ -37,7 +37,7 @@ const PRODUCT_POINTS = [
   'Agent creation and configuration',
   'OpenClaw and Hermes framework support',
   'Web chat, session history, and secure terminal access',
-  'Agent control rooms with live runtime operations',
+  'Agent workspaces with live runtime operations',
   'File manager, workspace storage, runtime logs, and monitoring',
   'Model selector, provider table, BYOK, and AI Credits',
   'Telegram, Discord, WhatsApp, Slack, X/Twitter, Nostr, and web integrations',
@@ -123,7 +123,7 @@ const SECURITY_POINTS = [
 
 const ROADMAP_POINTS = [
   'More robust model presets and BYOK provider support',
-  'Multi-agent orchestration and project rooms',
+  'Multi-agent communication and orchestration',
   'Agent marketplace',
   'More framework support',
   'Better mobile applications',
@@ -290,7 +290,7 @@ export default function WhitepaperPage() {
               <p>
                 Hatcher makes autonomous agents usable by founders, creators, developers, and teams without requiring
                 them to run their own infrastructure. Users can create, configure, deploy, monitor, and operate agents
-                through a hosted control panel, web chat, integrations, terminal access, schedules, and agent control rooms.
+                through a hosted control panel, web chat, integrations, terminal access, schedules, and agent workspaces.
               </p>
               <p>
                 The platform supports OpenClaw and Hermes agent frameworks, hosted model routing through providers such

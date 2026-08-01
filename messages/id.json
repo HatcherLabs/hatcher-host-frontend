@@ -37,7 +37,6 @@
       "sub_analytics": "AI Credits, token, tren.",
       "sub_billing": "Tingkat, tambahan, kredit.",
       "sub_wallets": "Dompet pembayaran Solana.",
-      "sub_team": "Anggota dan kolaborasi.",
       "sub_settings": "Profil, kunci API, preferensi.",
       "sub_support": "Bantuan, dokumen, hubungi.",
       "sub_admin": "Kontrol platform.",
@@ -59,7 +58,7 @@
       "tradersLabel": "Trader publik",
       "tradersSub": "Agen tertokenisasi dan aktivitas onchain mereka.",
       "featuresLabel": "Fitur",
-      "featuresSub": "Waktu proses, ruang kerja, peralatan, ruangan, dan CLI.",
+      "featuresSub": "Waktu proses, ruang kerja, peralatan, dan integrasi.",
       "frameworksLabel": "Kerangka kerja",
       "frameworksSub": "OpenClaw · Hermes.",
       "pricingLabel": "Harga",
@@ -351,7 +350,7 @@
             "40.000 AI Credits/bulan",
             "Ruang kerja 50 GB",
             "Kontainer yang selalu aktif",
-            "Kolaborasi tim"
+            "Dukungan prioritas"
           ],
           "cta": "Pilih Bisnis"
         }
@@ -629,7 +628,6 @@
           "Manajer File disertakan",
           "Log lengkap disertakan",
           "Dukungan prioritas",
-          "Kolaborasi tim",
           "Semua integrasi"
         ],
         "missing": []
@@ -742,7 +740,6 @@
         "autoSleep": "Tidur otomatis",
         "fileManager": "Manajer File",
         "fullLogs": "Log Lengkap",
-        "teamCollab": "Kolaborasi tim",
         "prioritySupport": "Dukungan prioritas",
         "plugins": "Plugin + Keterampilan",
         "integrations": "Semua integrasi",

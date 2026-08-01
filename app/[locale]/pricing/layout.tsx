@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Pricing — Free Tier, Starter, Pro & Business Plans | Hatcher',
     description:
-      'Deploy AI agents free. Upgrade for more AI Credits, workspace, dedicated resources, and team collaboration. File Manager and Full Logs are included on every tier.',
+      'Deploy AI agents free. Upgrade for more AI Credits, workspace, dedicated resources, and priority support. File Manager and Full Logs are included on every tier.',
     url: 'https://hatcher.host/pricing',
     images: [
       {

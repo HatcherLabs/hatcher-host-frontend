@@ -69,6 +69,19 @@ describe('retired integrations', () => {
     expect(existsSync(join(root, 'components', 'agents', 'tabs', 'SchedulesTab.tsx'))).toBe(true);
   });
 
+  it('removes MPP32, Custom Domains, and the standalone SKALE dashboard', () => {
+    expect(existsSync(join(root, 'components', 'agents', 'tabs', 'Mpp32WalletPanel.tsx'))).toBe(false);
+    expect(existsSync(join(root, 'components', 'agents', 'tabs', 'DomainsSection.tsx'))).toBe(false);
+    expect(existsSync(join(root, 'app', '[locale]', 'dashboard', 'skale', 'page.tsx'))).toBe(false);
+    for (const file of ['lib/api/methods.ts', 'lib/api/types.ts', 'lib/api/index.ts']) {
+      expect(read(file)).not.toMatch(/mpp32|customDomain|\/domains/i);
+    }
+  });
+
+  it('does not poll notification counts in the background', () => {
+    expect(read('components/ui/NotificationCenter.tsx')).not.toMatch(/setInterval|visibilitychange|UNREAD_COUNT_POLL/);
+  });
+
   it('removes retired Hatcher City and 3D room copy', () => {
     expect(read('app/[locale]/whitepaper/page.tsx')).not.toMatch(/Hatcher City|3D agent rooms/i);
     for (const locale of ['en', 'ro', 'vi', 'tr', 'fr', 'zh', 'hi', 'pt-BR', 'es', 'ja', 'id', 'de']) {
