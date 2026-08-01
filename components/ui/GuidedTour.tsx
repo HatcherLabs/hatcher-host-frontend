@@ -186,7 +186,7 @@ export function GuidedTour({
   useLayoutEffect(() => {
     const h = cardRef.current?.offsetHeight;
     if (h && Math.abs(h - cardH) > 1) setCardH(h);
-  });
+  }, [current, targetRect, isMobile, cardH]);
 
   const finish = useCallback((reason: 'complete' | 'skip') => {
     setVisible(false);
