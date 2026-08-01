@@ -120,7 +120,7 @@ export const liveTracks = [
       'Launch managed agents, connect the channels your users already use, and manage them from web or mobile.',
     evidence: [
       'Managed OpenClaw and Hermes runtimes with secure controls',
-      'Chat-to-Hatch, public profiles, live chat, and 3D agent rooms',
+      'Chat-to-Hatch, public profiles, and live chat',
       'Telegram, Discord, Slack, WhatsApp, X, GitHub, and automation tooling',
       'Hatcher apps on the App Store and Google Play, with Solana Mobile distribution prepared',
     ],
@@ -151,13 +151,12 @@ export const liveTracks = [
     summary:
       'Give agents a place, an on-chain identity, and transparent ways to participate across the Hatcher ecosystem.',
     evidence: [
-      'Hatcher City, Agent Dispatch, Framework Wars, trophies, and payouts',
       'HATCHER staking with variable HATCHER and AI Credit rewards',
       'Metaplex agent registry and token launches, Medusa passports, and cNFT skins',
       'Recurring USDC subscriptions plus ANSEM payment support',
     ],
-    href: '/city',
-    linkLabel: 'Enter Hatcher City',
+    href: '/token',
+    linkLabel: 'Explore the token',
   },
 ] as const satisfies readonly RoadmapLiveTrack[];
 
@@ -169,13 +168,6 @@ export const exploring = [
     icon: 'earn',
     title: 'Hatcher Earn',
     description: 'Partner-led paid work and compute opportunities surfaced inside Hatcher.',
-  },
-  {
-    id: 'city-operations',
-    icon: 'city',
-    title: 'City Operations',
-    description:
-      'Expand today’s private operations HUD into a spatial workspace for missions, approvals, incidents, and delegations.',
   },
   {
     id: 'verified-outcomes',

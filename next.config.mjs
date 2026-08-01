@@ -178,26 +178,28 @@ const nextConfig = {
     ];
   },
   async redirects() {
-    // V1 city + agent-room routes were deleted on 2026-04-25 in favour
-    // of V2 (which is the only scene now). These 301s preserve any
-    // backlinks, search-engine equity, and embed iframes that landed
-    // in the wild between the V1 launch (2026-04-22) and the cleanup,
-    // turning a hard 404 into a click-through to the V2 agent room.
+    // Hatcher City, the 3D agent room, and their V1 ancestors were
+    // retired on 2026-08-01. These 301s keep old backlinks, search
+    // equity, and embeds landing somewhere useful instead of a 404.
     //
     // Two entries per dead route — one for the EN default (no locale
     // prefix) and one for the explicit non-default locales (zh/de/fr/ro).
     // i18n uses `localePrefix: 'as-needed'` so EN URLs never carry a
     // prefix and the bare path doesn't double-match.
-    const dead = ['agent/:id/room-legacy', 'agent/:id/city', 'embed/agent/:id'];
-    const target = '/agent/:id/room';
+    const dead = ['agent/:id/room', 'agent/:id/room-legacy', 'agent/:id/city', 'embed/agent/:id'];
+    const target = '/agent/:id';
     const out = [];
-    const cityCategory =
-      ':category(automation|business|compliance|creative|customer-success|data|development|devops|ecommerce|education|finance|freelance|healthcare|hr|legal|marketing|moltbook|ollama|personal|productivity|real-estate|saas|security|supply-chain|voice)';
 
-    out.push({ source: `/city/${cityCategory}`, destination: '/city', permanent: true });
+    out.push({ source: '/city', destination: '/', permanent: true });
+    out.push({ source: '/city/:path*', destination: '/', permanent: true });
     out.push({
-      source: `/:locale(zh|de|fr|ro)/city/${cityCategory}`,
-      destination: '/:locale/city',
+      source: '/:locale(zh|de|fr|ro)/city',
+      destination: '/:locale',
+      permanent: true,
+    });
+    out.push({
+      source: '/:locale(zh|de|fr|ro)/city/:path*',
+      destination: '/:locale',
       permanent: true,
     });
     out.push({ source: '/create/template', destination: '/create', permanent: true });

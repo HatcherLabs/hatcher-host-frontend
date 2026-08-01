@@ -18,7 +18,6 @@
     "dashboard": "Dashboard",
     "myAgents": "My Agents",
     "create": "Create",
-    "city": "City",
     "analytics": "Analytics",
     "skale": "SKALE Wallets",
     "billing": "Billing",
@@ -63,8 +62,6 @@
       "tradersSub": "Tokenized agents and their onchain activity.",
       "featuresLabel": "Features",
       "featuresSub": "Runtime, workspace, tools, rooms, and CLI.",
-      "cityLabel": "Hatcher City",
-      "citySub": "Walk a 3D world of live agents.",
       "frameworksLabel": "Frameworks",
       "frameworksSub": "OpenClaw · Hermes.",
       "pricingLabel": "Pricing",
@@ -130,7 +127,6 @@
     "itemPublicAgents": "Public agents",
     "itemTraders": "Public traders",
     "itemFeatures": "Features",
-    "itemCity": "Hatcher City",
     "itemFrameworks": "Frameworks",
     "itemPricing": "Pricing",
     "itemToken": "$HATCHER",
@@ -271,15 +267,6 @@
           "features": "77 bundled skills · Deep memory · Multi-model"
         }
       ]
-    },
-    "city": {
-      "eyebrow": "★ NEW",
-      "heading": "See every agent in Hatcher City.",
-      "body": "A live 3D city where every public agent is a building. Districts by category, colors by framework, gold beams mark yours. Drag, zoom, click any building to open it.",
-      "videoAriaLabel": "Open Hatcher City",
-      "label": "HATCHER CITY",
-      "exploreCta": "Explore the full fleet →",
-      "enterCta": "Enter city"
     },
     "features": {
       "eyebrow": "Platform",
@@ -879,7 +866,6 @@
       "utilities": {
         "label": "More workspace tools",
         "lift": "Import with Hatcher Lift",
-        "city": "Open Hatcher City",
         "agents": "Manage agents"
       }
     },
@@ -1392,7 +1378,6 @@
         "start": "Start",
         "starting": "Starting...",
         "share": "Share",
-        "room": "Room",
         "clone": "Clone",
         "delete": "Delete",
         "deleting": "Deleting...",
@@ -1773,10 +1758,7 @@
         "inactive": "Inactive"
       },
       "sidebar": {
-        "switchAgent": "Switch agent",
-        "enter3DRoom": "Enter 3D Room",
-        "enter3DRoomSubtitle": "Open spatial workspace",
-        "enter3DRoomTooltip": "Open the agent's spatial workspace"
+        "switchAgent": "Switch agent"
       }
     }
   },
@@ -1787,7 +1769,6 @@
     "eyebrow": "Public agents",
     "title": "Chat with public AI agents",
     "body": "Browse agents whose owners enabled public chat. Each session runs in your browser and routes through the agent's live Hatcher configuration.",
-    "cityCta": "Open Hatcher City",
     "emptyTitle": "No public chat agents yet",
     "emptyBody": "Public profiles still appear in Hatcher City. Agents show here once their owner enables public chat.",
     "fallbackDescription": "A public Hatcher agent ready for browser chat sessions.",
@@ -1816,9 +1797,9 @@
   },
   "agentPublic": {
     "back": {
-      "toCity": "Back to City",
       "toMyAgents": "Back to My Agents",
-      "toDashboard": "Back to Dashboard"
+      "toDashboard": "Back to Dashboard",
+      "toExplore": "Explore agents"
     },
     "status": {
       "active": "Active",
@@ -1890,20 +1871,6 @@
       "errorId": "Error ID: {id}",
       "tryAgain": "Try Again",
       "browseAgents": "Browse Agents"
-    }
-  },
-  "city": {
-    "category": {
-      "district": "District",
-      "breadcrumbCity": "Hatcher City",
-      "statAgents": "agents",
-      "statRunning": "running",
-      "statShareOfCity": "share of city",
-      "seeIn3d": "See it in 3D →",
-      "emptyState": "No agents in this district yet.",
-      "emptyStateCta": "Be the first to build one.",
-      "otherDistricts": "Other districts",
-      "msgs": "msgs"
     }
   },
   "frameworks": {
@@ -2304,15 +2271,6 @@
   },
   "localeSwitcher": {
     "label": "Change language"
-  },
-  "agentRoom": {
-    "back": {
-      "toCity": "Back to City",
-      "toDashboard": "Back to Dashboard",
-      "toAgents": "Back to Agents",
-      "toBuilding": "Back to Building",
-      "toHouse": "Back to House"
-    }
   },
   "chatToHatch": {
     "backLink": "← Dashboard",
@@ -2884,26 +2842,6 @@
       },
       "footer": "Every one gets a place in your building, a room you can enter, and logs you can inspect.",
       "cta": "Create with Chat-to-Hatch"
-    },
-    "rooms": {
-      "boxLabel": "Control rooms",
-      "title": "Every agent gets a live workspace",
-      "body": "Hatcher City stays as a spatial layer, but the core product experience is a precise control room: chat, logs, files, config, integrations, terminal, and status in one place.",
-      "stationAvatar": "Avatar",
-      "stationSkills": "Skill Workbench",
-      "stationIntegrations": "Integrations Rack",
-      "stationStatus": "Status Console",
-      "stationLogs": "Log Wall",
-      "stationStats": "Stats Hologram",
-      "stationMemory": "Memory Shelves",
-      "stationConfig": "Config Terminal"
-    },
-    "city": {
-      "boxLabel": "Hatcher City",
-      "title": "The network of agents, walkable",
-      "body": "Claim your own building of agents. Walk the city, find active agents moving through it, then enter your building to manage every room.",
-      "cta": "Enter Hatcher City",
-      "districts": "25 districts · grid 5×5"
     },
     "frameworks": {
       "boxLabel": "Frameworks",

@@ -18,7 +18,6 @@
     "dashboard": "Panou",
     "myAgents": "Agenții mei",
     "create": "Creează",
-    "city": "City",
     "analytics": "Analytics",
     "skale": "Portofele SKALE",
     "billing": "Facturare",
@@ -63,8 +62,6 @@
       "tradersSub": "Agenți tokenizați și activitatea lor onchain.",
       "featuresLabel": "Features",
       "featuresSub": "Runtime, workspace, tool-uri, camere și CLI.",
-      "cityLabel": "Hatcher City",
-      "citySub": "Plimbă-te într-o lume 3D de agenți live.",
       "frameworksLabel": "Framework-uri",
       "frameworksSub": "OpenClaw · Hermes.",
       "pricingLabel": "Prețuri",
@@ -130,7 +127,6 @@
     "itemPublicAgents": "Agenți publici",
     "itemTraders": "Traderi publici",
     "itemFeatures": "Features",
-    "itemCity": "Hatcher City",
     "itemFrameworks": "Framework-uri",
     "itemPricing": "Prețuri",
     "itemToken": "$HATCHER",
@@ -271,15 +267,6 @@
           "features": "77 abilități incluse · Memorie profundă · Multi-model"
         }
       ]
-    },
-    "city": {
-      "eyebrow": "★ NOU",
-      "heading": "Vezi toți agenții în Hatcher City.",
-      "body": "Un oraș 3D live unde fiecare agent public este o clădire. Districte pe categorii, culori după framework, raze aurii îți marchează pe ale tale. Trage, zoom, dă click pe orice clădire pentru a o deschide.",
-      "videoAriaLabel": "Deschide Hatcher City",
-      "label": "HATCHER CITY",
-      "exploreCta": "Explorează flota completă →",
-      "enterCta": "Intră în City"
     },
     "features": {
       "eyebrow": "Platformă",
@@ -879,7 +866,6 @@
       "utilities": {
         "label": "Mai multe instrumente pentru spațiul de lucru",
         "lift": "Importă cu Hatcher Lift",
-        "city": "Deschide Hatcher City",
         "agents": "Gestionează agenții"
       }
     },
@@ -1392,7 +1378,6 @@
         "start": "Pornește",
         "starting": "Se pornește...",
         "share": "Distribuie",
-        "room": "Cameră",
         "clone": "Clonează",
         "delete": "Șterge",
         "deleting": "Se șterge...",
@@ -1773,10 +1758,7 @@
         "inactive": "Inactiv"
       },
       "sidebar": {
-        "switchAgent": "Schimbă agentul",
-        "enter3DRoom": "Intră în camera 3D",
-        "enter3DRoomSubtitle": "Pășește + configurează interactiv",
-        "enter3DRoomTooltip": "Intră în cockpit-ul 3D al agentului"
+        "switchAgent": "Schimbă agentul"
       }
     }
   },
@@ -1787,7 +1769,6 @@
     "eyebrow": "Agenți publici",
     "title": "Chat cu agenți AI publici",
     "body": "Explorează agenții pentru care ownerii au activat public chat. Fiecare sesiune rulează în browser și folosește configurația live a agentului din Hatcher.",
-    "cityCta": "Deschide Hatcher City",
     "emptyTitle": "Nu există încă agenți cu public chat",
     "emptyBody": "Profilurile publice apar în continuare în Hatcher City. Agenții apar aici după ce ownerul activează public chat.",
     "fallbackDescription": "Un agent Hatcher public pregătit pentru sesiuni de chat în browser.",
@@ -1816,9 +1797,9 @@
   },
   "agentPublic": {
     "back": {
-      "toCity": "Înapoi la City",
       "toMyAgents": "Înapoi la agenții mei",
-      "toDashboard": "Înapoi la panou"
+      "toDashboard": "Înapoi la panou",
+      "toExplore": "Explorează agenții"
     },
     "status": {
       "active": "Activ",
@@ -1890,20 +1871,6 @@
       "errorId": "ID eroare: {id}",
       "tryAgain": "Încearcă din nou",
       "browseAgents": "Răsfoiește agenți"
-    }
-  },
-  "city": {
-    "category": {
-      "district": "District",
-      "breadcrumbCity": "Hatcher City",
-      "statAgents": "agenți",
-      "statRunning": "rulând",
-      "statShareOfCity": "din city",
-      "seeIn3d": "Vezi în 3D →",
-      "emptyState": "Niciun agent în acest district încă.",
-      "emptyStateCta": "Fii primul care construiește unul.",
-      "otherDistricts": "Alte districte",
-      "msgs": "msg"
     }
   },
   "frameworks": {
@@ -2304,15 +2271,6 @@
   },
   "localeSwitcher": {
     "label": "Schimbă limba"
-  },
-  "agentRoom": {
-    "back": {
-      "toCity": "Înapoi la Oraș",
-      "toDashboard": "Înapoi la Dashboard",
-      "toAgents": "Înapoi la Agenți",
-      "toBuilding": "Înapoi la Building",
-      "toHouse": "Înapoi la House"
-    }
   },
   "chatToHatch": {
     "backLink": "← Dashboard",
@@ -2884,26 +2842,6 @@
       },
       "footer": "Fiecare primește loc în clădirea ta, o cameră în care poți intra și log-uri pe care le poți verifica.",
       "cta": "Creează cu Chat-to-Hatch"
-    },
-    "rooms": {
-      "boxLabel": "Building-ul tău",
-      "title": "O ușă pentru fiecare agent",
-      "body": "Intri din Hatcher City, alegi ușa unui agent, apoi îl gestionezi în camera lui cu status, skill-uri, memorie, config și log-uri.",
-      "stationAvatar": "Avatar",
-      "stationSkills": "Atelier skill-uri",
-      "stationIntegrations": "Rack integrări",
-      "stationStatus": "Consolă status",
-      "stationLogs": "Perete log-uri",
-      "stationStats": "Hologramă stats",
-      "stationMemory": "Rafturi memorie",
-      "stationConfig": "Terminal config"
-    },
-    "city": {
-      "boxLabel": "Hatcher City",
-      "title": "Rețeaua de agenți, parcurgibilă",
-      "body": "Ia-ți propria clădire de agenți. Plimbă-te prin oraș, vezi agenții activi în mișcare, apoi intră în building ca să gestionezi fiecare cameră.",
-      "cta": "Intră în Hatcher City",
-      "districts": "25 cartiere · grilă 5×5"
     },
     "frameworks": {
       "boxLabel": "Framework-uri",

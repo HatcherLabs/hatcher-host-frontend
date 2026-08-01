@@ -17,7 +17,6 @@
     "dashboard": "Trang tổng quan",
     "myAgents": "Tác nhân của tôi",
     "create": "Tạo",
-    "city": "Thành phố",
     "analytics": "Phân tích",
     "skale": "Ví SKALE",
     "billing": "Thanh toán",
@@ -62,8 +61,6 @@
       "tradersSub": "Tác nhân được token hóa và hoạt động onchain.",
       "featuresLabel": "Tính năng",
       "featuresSub": "Thời gian chạy, không gian làm việc, công cụ, phòng và CLI.",
-      "cityLabel": "Hatcher City",
-      "citySub": "Bước vào thế giới 3D của các tác nhân trực tiếp.",
       "frameworksLabel": "Khung",
       "frameworksSub": "OpenClaw · Hermes.",
       "pricingLabel": "Định giá",
@@ -130,7 +127,6 @@
     "itemPublicAgents": "Tác nhân công",
     "itemTraders": "Trader công khai",
     "itemFeatures": "Tính năng",
-    "itemCity": "Hatcher City",
     "itemFrameworks": "Khung",
     "itemPricing": "Định giá",
     "itemToken": "$HATCHER",
@@ -271,15 +267,6 @@
           "features": "77 kỹ năng đi kèm · Trí nhớ sâu sắc · Đa mô hình"
         }
       ]
-    },
-    "city": {
-      "eyebrow": "★ MỚI",
-      "heading": "Xem mọi tác nhân trong Hatcher City.",
-      "body": "Một thành phố 3D sống động nơi mỗi cơ quan công quyền là một tòa nhà. Các quận theo danh mục, màu sắc theo khung, dầm vàng đánh dấu của bạn. Kéo, thu phóng, nhấp vào bất kỳ tòa nhà nào để mở nó.",
-      "videoAriaLabel": "Mở Hatcher City",
-      "label": "THÀNH PHỐ HATCHER",
-      "exploreCta": "Khám phá toàn bộ hạm đội →",
-      "enterCta": "Nhập thành phố"
     },
     "features": {
       "eyebrow": "Nền tảng",
@@ -879,7 +866,6 @@
       "utilities": {
         "label": "Các công cụ khác trong không gian làm việc",
         "lift": "Nhập bằng Hatcher Lift",
-        "city": "Mở Hatcher City",
         "agents": "Quản lý tác nhân"
       }
     },
@@ -1274,7 +1260,6 @@
         "start": "Bắt đầu",
         "starting": "Đang bắt đầu...",
         "share": "Chia sẻ",
-        "room": "phòng",
         "clone": "bản sao",
         "delete": "Xóa",
         "deleting": "Đang xóa...",
@@ -1655,10 +1640,7 @@
         "inactive": "Không hoạt động"
       },
       "sidebar": {
-        "switchAgent": "Chuyển đổi tác nhân",
-        "enter3DRoom": "Vào phòng 3D",
-        "enter3DRoomSubtitle": "Không gian làm việc không gian mở",
-        "enter3DRoomTooltip": "Mở không gian làm việc không gian của tác nhân"
+        "switchAgent": "Chuyển đổi tác nhân"
       }
     }
   },
@@ -1669,7 +1651,6 @@
     "eyebrow": "Tác nhân công",
     "title": "Trò chuyện với các tác nhân AI công cộng",
     "body": "Duyệt các tác nhân có chủ sở hữu kích hoạt trò chuyện công khai. Mỗi phiên chạy trong trình duyệt của bạn và định tuyến thông qua cấu hình Hatcher trực tiếp của tác nhân.",
-    "cityCta": "Mở Hatcher City",
     "emptyTitle": "Chưa có tác nhân trò chuyện công khai nào",
     "emptyBody": "Hồ sơ công khai vẫn xuất hiện trong Hatcher City. Tác nhân hiển thị ở đây khi chủ sở hữu của họ bật trò chuyện công khai.",
     "fallbackDescription": "Một tác nhân Hatcher công khai sẵn sàng cho các phiên trò chuyện trên trình duyệt.",
@@ -1698,9 +1679,9 @@
   },
   "agentPublic": {
     "back": {
-      "toCity": "Trở lại Thành phố",
       "toMyAgents": "Quay lại Tác nhân của tôi",
-      "toDashboard": "Quay lại Trang tổng quan"
+      "toDashboard": "Quay lại Trang tổng quan",
+      "toExplore": "Khám phá agent"
     },
     "status": {
       "active": "Đang hoạt động",
@@ -1772,20 +1753,6 @@
       "errorId": "ID lỗi: {id}",
       "tryAgain": "Thử lại",
       "browseAgents": "Duyệt tác nhân"
-    }
-  },
-  "city": {
-    "category": {
-      "district": "Quận",
-      "breadcrumbCity": "Hatcher City",
-      "statAgents": "tác nhân",
-      "statRunning": "đang chạy",
-      "statShareOfCity": "chia sẻ của thành phố",
-      "seeIn3d": "Xem nó ở dạng 3D →",
-      "emptyState": "Chưa có tác nhân nào ở quận này.",
-      "emptyStateCta": "Hãy là người đầu tiên xây dựng một.",
-      "otherDistricts": "Các quận khác",
-      "msgs": "tin nhắn"
     }
   },
   "frameworks": {
@@ -2187,15 +2154,6 @@
   "localeSwitcher": {
     "label": "Thay đổi ngôn ngữ"
   },
-  "agentRoom": {
-    "back": {
-      "toCity": "Trở lại Thành phố",
-      "toDashboard": "Quay lại Trang tổng quan",
-      "toAgents": "Quay lại Tác nhân",
-      "toBuilding": "Quay lại tòa nhà",
-      "toHouse": "Trở lại Nhà"
-    }
-  },
   "chatToHatch": {
     "backLink": "← Trang tổng quan",
     "eyebrow": "Trình tạo tác nhân ngôn ngữ tự nhiên",
@@ -2593,26 +2551,6 @@
       },
       "footer": "Mỗi người đều có một vị trí trong tòa nhà của bạn, một căn phòng mà bạn có thể vào và nhật ký mà bạn có thể kiểm tra.",
       "cta": "Tạo với Chat-to-Hatch"
-    },
-    "rooms": {
-      "boxLabel": "Phòng điều khiển",
-      "title": "Mỗi tác nhân đều có một không gian làm việc trực tiếp",
-      "body": "Hatcher City vẫn là một lớp không gian, nhưng trải nghiệm sản phẩm cốt lõi là một phòng điều khiển chính xác: trò chuyện, nhật ký, tệp, cấu hình, tích hợp, thiết bị đầu cuối và trạng thái ở cùng một nơi.",
-      "stationAvatar": "Hình đại diện",
-      "stationSkills": "Bàn làm việc kỹ năng",
-      "stationIntegrations": "Giá tích hợp",
-      "stationStatus": "Bảng điều khiển trạng thái",
-      "stationLogs": "tường gỗ",
-      "stationStats": "Hình ba chiều thống kê",
-      "stationMemory": "Kệ kỷ niệm",
-      "stationConfig": "Cấu hình thiết bị đầu cuối"
-    },
-    "city": {
-      "boxLabel": "Hatcher City",
-      "title": "Mạng lưới tác nhân, có thể đi lại được",
-      "body": "Yêu cầu xây dựng tác nhân của riêng bạn. Đi bộ trong thành phố, tìm các đặc vụ đang hoạt động di chuyển trong đó, sau đó vào tòa nhà của bạn để quản lý mọi phòng.",
-      "cta": "Nhập Hatcher City",
-      "districts": "25 quận · lưới 5×5"
     },
     "frameworks": {
       "boxLabel": "Khung",

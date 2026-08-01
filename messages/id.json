@@ -17,7 +17,6 @@
     "dashboard": "Dasbor",
     "myAgents": "Agen Saya",
     "create": "Buat",
-    "city": "Kota",
     "analytics": "Analisis",
     "skale": "Dompet SKALE",
     "billing": "Penagihan",
@@ -62,8 +61,6 @@
       "tradersSub": "Agen tertokenisasi dan aktivitas onchain mereka.",
       "featuresLabel": "Fitur",
       "featuresSub": "Waktu proses, ruang kerja, peralatan, ruangan, dan CLI.",
-      "cityLabel": "Hatcher City",
-      "citySub": "Berjalanlah di dunia 3D agen langsung.",
       "frameworksLabel": "Kerangka kerja",
       "frameworksSub": "OpenClaw · Hermes.",
       "pricingLabel": "Harga",
@@ -130,7 +127,6 @@
     "itemPublicAgents": "Agen publik",
     "itemTraders": "Trader publik",
     "itemFeatures": "Fitur",
-    "itemCity": "Hatcher City",
     "itemFrameworks": "Kerangka kerja",
     "itemPricing": "Harga",
     "itemToken": "$HATCHER",
@@ -271,15 +267,6 @@
           "features": "77 keterampilan yang dibundel · Memori yang dalam · Multi-model"
         }
       ]
-    },
-    "city": {
-      "eyebrow": "★ BARU",
-      "heading": "Temui setiap agen di Hatcher City.",
-      "body": "Kota 3D yang hidup di mana setiap agen publik adalah sebuah bangunan. Distrik berdasarkan kategori, warna berdasarkan kerangka, balok emas menandai distrik Anda. Seret, perbesar, klik bangunan mana saja untuk membukanya.",
-      "videoAriaLabel": "Buka Hatcher City",
-      "label": "KOTA PENETAS",
-      "exploreCta": "Jelajahi armada lengkap →",
-      "enterCta": "Masuk kota"
     },
     "features": {
       "eyebrow": "Peron",
@@ -879,7 +866,6 @@
       "utilities": {
         "label": "Alat ruang kerja lainnya",
         "lift": "Impor dengan Hatcher Lift",
-        "city": "Buka Hatcher City",
         "agents": "Kelola agen"
       }
     },
@@ -1274,7 +1260,6 @@
         "start": "Mulai",
         "starting": "Mulai...",
         "share": "Bagikan",
-        "room": "Kamar",
         "clone": "Klon",
         "delete": "Hapus",
         "deleting": "Menghapus...",
@@ -1655,10 +1640,7 @@
         "inactive": "Tidak aktif"
       },
       "sidebar": {
-        "switchAgent": "Ganti agen",
-        "enter3DRoom": "Masuk ke Ruang 3D",
-        "enter3DRoomSubtitle": "Ruang kerja spasial terbuka",
-        "enter3DRoomTooltip": "Buka ruang kerja spasial agen"
+        "switchAgent": "Ganti agen"
       }
     }
   },
@@ -1669,7 +1651,6 @@
     "eyebrow": "Agen publik",
     "title": "Ngobrol dengan agen AI publik",
     "body": "Telusuri agen yang pemiliknya mengaktifkan obrolan publik. Setiap sesi berjalan di browser Anda dan merutekan melalui konfigurasi Hatcher langsung agen.",
-    "cityCta": "Buka Hatcher City",
     "emptyTitle": "Belum ada agen obrolan publik",
     "emptyBody": "Profil publik masih muncul di Hatcher City. Agen muncul di sini setelah pemiliknya mengaktifkan obrolan publik.",
     "fallbackDescription": "Agen Hatcher publik yang siap untuk sesi obrolan browser.",
@@ -1698,9 +1679,9 @@
   },
   "agentPublic": {
     "back": {
-      "toCity": "Kembali ke Kota",
       "toMyAgents": "Kembali ke Agen Saya",
-      "toDashboard": "Kembali ke Dasbor"
+      "toDashboard": "Kembali ke Dasbor",
+      "toExplore": "Jelajahi agen"
     },
     "status": {
       "active": "Aktif",
@@ -1772,20 +1753,6 @@
       "errorId": "ID Kesalahan: {id}",
       "tryAgain": "Coba Lagi",
       "browseAgents": "Telusuri Agen"
-    }
-  },
-  "city": {
-    "category": {
-      "district": "Distrik",
-      "breadcrumbCity": "Hatcher City",
-      "statAgents": "agen",
-      "statRunning": "berlari",
-      "statShareOfCity": "bagian kota",
-      "seeIn3d": "Lihat dalam 3D →",
-      "emptyState": "Belum ada agen di distrik ini.",
-      "emptyStateCta": "Jadilah orang pertama yang membangunnya.",
-      "otherDistricts": "Distrik lain",
-      "msgs": "pesan"
     }
   },
   "frameworks": {
@@ -2187,15 +2154,6 @@
   "localeSwitcher": {
     "label": "Ubah bahasa"
   },
-  "agentRoom": {
-    "back": {
-      "toCity": "Kembali ke Kota",
-      "toDashboard": "Kembali ke Dasbor",
-      "toAgents": "Kembali ke Agen",
-      "toBuilding": "Kembali ke Gedung",
-      "toHouse": "Kembali ke Rumah"
-    }
-  },
   "chatToHatch": {
     "backLink": "← Dasbor",
     "eyebrow": "Pembuat agen bahasa alami",
@@ -2593,26 +2551,6 @@
       },
       "footer": "Setiap orang mendapat tempat di gedung Anda, ruangan yang bisa Anda masuki, dan kayu gelondongan yang bisa Anda periksa.",
       "cta": "Buat dengan Chat-to-Hatch"
-    },
-    "rooms": {
-      "boxLabel": "Ruang kontrol",
-      "title": "Setiap agen mendapatkan ruang kerja langsung",
-      "body": "Hatcher City tetap sebagai lapisan spasial, namun pengalaman produk inti adalah ruang kontrol yang tepat: obrolan, log, file, konfigurasi, integrasi, terminal, dan status di satu tempat.",
-      "stationAvatar": "Avatar",
-      "stationSkills": "Meja Kerja Keterampilan",
-      "stationIntegrations": "Rak Integrasi",
-      "stationStatus": "Konsol Status",
-      "stationLogs": "Dinding Log",
-      "stationStats": "Statistik Hologram",
-      "stationMemory": "Rak Memori",
-      "stationConfig": "Terminal Konfigurasi"
-    },
-    "city": {
-      "boxLabel": "Hatcher City",
-      "title": "Jaringan agen, dapat dilalui dengan berjalan kaki",
-      "body": "Klaim gedung agen Anda sendiri. Berjalanlah di kota, temukan agen aktif yang melewatinya, lalu masuki gedung Anda untuk mengelola setiap ruangan.",
-      "cta": "Masukkan Hatcher City",
-      "districts": "25 distrik · jaringan 5×5"
     },
     "frameworks": {
       "boxLabel": "Kerangka kerja",

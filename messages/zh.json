@@ -17,7 +17,6 @@
     "dashboard": "控制台",
     "myAgents": "我的智能体",
     "create": "创建",
-    "city": "城市",
     "analytics": "数据分析",
     "skale": "SKALE 钱包",
     "billing": "账单",
@@ -62,8 +61,6 @@
       "tradersSub": "代币化代理及其链上活动。",
       "featuresLabel": "功能",
       "featuresSub": "运行时、工作区、工具、房间和 CLI。",
-      "cityLabel": "Hatcher 城市",
-      "citySub": "步行 3D 上线代理世界。",
       "frameworksLabel": "框架",
       "frameworksSub": "OpenClaw · Hermes.。",
       "pricingLabel": "定价",
@@ -130,7 +127,6 @@
     "itemPublicAgents": "公共代理",
     "itemTraders": "公开交易者",
     "itemFeatures": "功能",
-    "itemCity": "Hatcher 城市",
     "itemFrameworks": "框架",
     "itemPricing": "定价",
     "itemToken": "$HATCHER",
@@ -271,15 +267,6 @@
           "features": "77 个内置技能 · 深度记忆 · 多模型支持"
         }
       ]
-    },
-    "city": {
-      "eyebrow": "★ 全新上线",
-      "heading": "在 Hatcher 城市中看到每一个智能体。",
-      "body": "一座实时3D城市，每个公开智能体都是一栋建筑。按类别划分区域，颜色代表框架，金色光柱标记您的智能体。拖动、缩放、点击任意建筑即可打开。",
-      "videoAriaLabel": "打开 Hatcher 城市",
-      "label": "HATCHER CITY",
-      "exploreCta": "探索完整舰队 →",
-      "enterCta": "进入城市"
     },
     "features": {
       "eyebrow": "平台",
@@ -879,7 +866,6 @@
       "utilities": {
         "label": "更多工作区工具",
         "lift": "使用 Hatcher Lift 导入",
-        "city": "打开 Hatcher City",
         "agents": "管理智能体"
       }
     },
@@ -1251,7 +1237,6 @@
         "start": "启动",
         "starting": "启动中...",
         "share": "分享",
-        "room": "房间",
         "clone": "克隆",
         "delete": "删除",
         "deleting": "删除中...",
@@ -1632,10 +1617,7 @@
         "inactive": "非活跃"
       },
       "sidebar": {
-        "switchAgent": "切换智能体",
-        "enter3DRoom": "进入 3D 房间",
-        "enter3DRoomSubtitle": "步行 + 互动配置",
-        "enter3DRoomTooltip": "走进你的代理 3D 驾驶舱"
+        "switchAgent": "切换智能体"
       }
     }
   },
@@ -1646,7 +1628,6 @@
     "eyebrow": "公共代理",
     "title": "与公共 AI 代理聊天",
     "body": "浏览已由所有者开启公共聊天的代理。每个会话都在浏览器中运行，并使用该代理在 Hatcher 上的实时配置。",
-    "cityCta": "打开 Hatcher 城市",
     "emptyTitle": "还没有开启公共聊天的代理",
     "emptyBody": "公共资料仍会显示在 Hatcher 城市中。代理所有者开启公共聊天后会显示在这里。",
     "fallbackDescription": "一个可在浏览器中聊天的公共 Hatcher 代理。",
@@ -1675,9 +1656,9 @@
   },
   "agentPublic": {
     "back": {
-      "toCity": "返回城市",
       "toMyAgents": "返回我的智能体",
-      "toDashboard": "返回控制台"
+      "toDashboard": "返回控制台",
+      "toExplore": "探索智能体"
     },
     "status": {
       "active": "活跃",
@@ -1749,20 +1730,6 @@
       "errorId": "错误 ID：{id}",
       "tryAgain": "重试",
       "browseAgents": "浏览智能体"
-    }
-  },
-  "city": {
-    "category": {
-      "district": "区域",
-      "breadcrumbCity": "Hatcher 城市",
-      "statAgents": "智能体",
-      "statRunning": "运行中",
-      "statShareOfCity": "城市占比",
-      "seeIn3d": "在3D中查看 →",
-      "emptyState": "此区域暂无智能体。",
-      "emptyStateCta": "成为第一个在此建设的人。",
-      "otherDistricts": "其他区域",
-      "msgs": "条消息"
     }
   },
   "frameworks": {
@@ -2164,15 +2131,6 @@
   "localeSwitcher": {
     "label": "切换语言"
   },
-  "agentRoom": {
-    "back": {
-      "toCity": "返回城市",
-      "toDashboard": "返回仪表板",
-      "toAgents": "返回代理列表",
-      "toBuilding": "返回 Building",
-      "toHouse": "返回 House"
-    }
-  },
   "chatToHatch": {
     "backLink": "← 仪表板",
     "eyebrow": "自然语言代理构建器",
@@ -2570,26 +2528,6 @@
       },
       "footer": "每个代理都会在你的建筑里有位置、有可进入的房间，也有可检查的日志。",
       "cta": "用 Chat-to-Hatch 创建"
-    },
-    "rooms": {
-      "boxLabel": "你的建筑",
-      "title": "每个代理一扇门",
-      "body": "从 Hatcher City 进入，选择一个代理房门，然后在它自己的房间里管理状态、技能、记忆、配置和日志。",
-      "stationAvatar": "头像",
-      "stationSkills": "技能工作台",
-      "stationIntegrations": "集成机架",
-      "stationStatus": "状态控制台",
-      "stationLogs": "日志墙",
-      "stationStats": "数据全息",
-      "stationMemory": "记忆架",
-      "stationConfig": "配置终端"
-    },
-    "city": {
-      "boxLabel": "Hatcher 城市",
-      "title": "可步行的代理网络",
-      "body": "拥有一栋属于你的代理建筑。漫步城市，看到活跃代理在其中移动，然后进入你的建筑管理每个房间。",
-      "cta": "进入 Hatcher 城市",
-      "districts": "25 个区域 · 5×5 网格"
     },
     "frameworks": {
       "boxLabel": "框架",

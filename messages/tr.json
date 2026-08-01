@@ -17,7 +17,6 @@
     "dashboard": "Dashboard",
     "myAgents": "Ajanlarım",
     "create": "Yarat",
-    "city": "Şehir",
     "analytics": "Analitikler",
     "skale": "SKALE Cüzdanlar",
     "billing": "Faturalandırma",
@@ -62,8 +61,6 @@
       "tradersSub": "Tokenleştirilmiş ajanlar ve onchain aktiviteleri.",
       "featuresLabel": "Özellikler",
       "featuresSub": "Çalışma zamanı, çalışma alanı, araçlar, odalar ve CLI.",
-      "cityLabel": "Hatcher City",
-      "citySub": "Canlı ajanların 3D dünyasında yürüyün.",
       "frameworksLabel": "Çerçeveler",
       "frameworksSub": "OpenClaw · Hermes.",
       "pricingLabel": "Fiyatlandırma",
@@ -130,7 +127,6 @@
     "itemPublicAgents": "Kamu temsilcileri",
     "itemTraders": "Herkese açık traderlar",
     "itemFeatures": "Özellikler",
-    "itemCity": "Hatcher City",
     "itemFrameworks": "Çerçeveler",
     "itemPricing": "Fiyatlandırma",
     "itemToken": "$HATCHER",
@@ -271,15 +267,6 @@
           "features": "77 paketlenmiş beceri · Derin hafıza · Çok modelli"
         }
       ]
-    },
-    "city": {
-      "eyebrow": "★ YENİ",
-      "heading": "Hatcher City'daki tüm ajanları görün.",
-      "body": "Her kamu görevlisinin bir bina olduğu canlı bir 3D şehir. Bölgeler kategoriye göre, renkler çerçeveye göre, altın kirişler sizin bölgelerinizi işaretliyor. Sürükle, büyüt, herhangi bir binaya tıklayarak aç.",
-      "videoAriaLabel": "Açık Hatcher City",
-      "label": "HATCHER ŞEHRI",
-      "exploreCta": "Tüm filoyu keşfedin →",
-      "enterCta": "Şehre Giriş"
     },
     "features": {
       "eyebrow": "Platform",
@@ -879,7 +866,6 @@
       "utilities": {
         "label": "Diğer çalışma alanı araçları",
         "lift": "Hatcher Lift ile içe aktar",
-        "city": "Hatcher City'yi aç",
         "agents": "Ajanları yönet"
       }
     },
@@ -1274,7 +1260,6 @@
         "start": "Başlangıç",
         "starting": "Başlıyorum...",
         "share": "Paylaş",
-        "room": "Oda",
         "clone": "Klon",
         "delete": "Sil",
         "deleting": "Siliyor...",
@@ -1655,10 +1640,7 @@
         "inactive": "Aktif olmayan"
       },
       "sidebar": {
-        "switchAgent": "Anahtar ajanı",
-        "enter3DRoom": "3D Oda'ya Gir",
-        "enter3DRoomSubtitle": "Açık uzaysal çalışma alanı",
-        "enter3DRoomTooltip": "Ajanın uzaysal çalışma alanını aç"
+        "switchAgent": "Anahtar ajanı"
       }
     }
   },
@@ -1669,7 +1651,6 @@
     "eyebrow": "Kamu temsilcileri",
     "title": "Kamuya açık yapay zeka ajanlarıyla sohbet",
     "body": "Sahipleri açık sohbeti etkinleştiren temsilcileri inceleyin. Her oturum tarayıcınızda çalışır ve ajanın canlı Hatcher yapılandırması üzerinden yönlendirilir.",
-    "cityCta": "Açık Hatcher City",
     "emptyTitle": "Henüz halka açık sohbet temsilcisi yok",
     "emptyBody": "Kamuya açık profiller hâlâ Hatcher City'de görünüyor. Temsilciler, sahipleri açık sohbeti etkinleştirdiğinde burada gösterirler.",
     "fallbackDescription": "Tarayıcı sohbet oturumlarına hazır bir kamuya açık Hatcher ajanı.",
@@ -1698,9 +1679,9 @@
   },
   "agentPublic": {
     "back": {
-      "toCity": "Şehre Dönüş",
       "toMyAgents": "Ajanlarıma Geri Dön",
-      "toDashboard": "Dashboard'a Geri Dön"
+      "toDashboard": "Dashboard'a Geri Dön",
+      "toExplore": "Ajanları keşfet"
     },
     "status": {
       "active": "Aktif",
@@ -1772,20 +1753,6 @@
       "errorId": "Hata Kimliği: {id}",
       "tryAgain": "Tekrar Deneyin",
       "browseAgents": "Temsilcilere Göz Atma"
-    }
-  },
-  "city": {
-    "category": {
-      "district": "İlçe",
-      "breadcrumbCity": "Hatcher City",
-      "statAgents": "Ajanlar",
-      "statRunning": "Koşu",
-      "statShareOfCity": "Şehir payı",
-      "seeIn3d": "3D olarak →",
-      "emptyState": "Bu bölgede henüz ajan yok.",
-      "emptyStateCta": "İlk yapan kişi ol.",
-      "otherDistricts": "Diğer bölgeler",
-      "msgs": "mesajlar"
     }
   },
   "frameworks": {
@@ -2187,15 +2154,6 @@
   "localeSwitcher": {
     "label": "Dil değiştir"
   },
-  "agentRoom": {
-    "back": {
-      "toCity": "Şehre Dönüş",
-      "toDashboard": "Dashboard'a Geri Dön",
-      "toAgents": "Ajanlara Geri Dön",
-      "toBuilding": "Binaya Dönüş",
-      "toHouse": "Evine Geri"
-    }
-  },
   "chatToHatch": {
     "backLink": "← Dashboard",
     "eyebrow": "Doğal dil ajanı oluşturucu",
@@ -2593,26 +2551,6 @@
       },
       "footer": "Herkesin binanızda bir yeri, girebileceğiniz bir oda ve inceleyebileceğiniz kütükler olur.",
       "cta": "Yarat Chat-to-Hatch"
-    },
-    "rooms": {
-      "boxLabel": "Kontrol odaları",
-      "title": "Her ajanın canlı bir çalışma alanı elde ediyor",
-      "body": "Hatcher City mekansal bir katman olarak kalır, ancak temel ürün deneyimi hassas bir kontrol odasıdır: sohbet, günlükler, dosyalar, yapılandırma, entegrasyonlar, terminal ve durum tek bir yerde.",
-      "stationAvatar": "Avatar",
-      "stationSkills": "Beceri Çalışma Tezgahı",
-      "stationIntegrations": "Entegrasyon Rafı",
-      "stationStatus": "Durum Konsolu",
-      "stationLogs": "Kütük Duvar",
-      "stationStats": "İstatistik Hologramı",
-      "stationMemory": "Hafıza Rafları",
-      "stationConfig": "Yapılandırma Terminali"
-    },
-    "city": {
-      "boxLabel": "Hatcher City",
-      "title": "Ajanların ağı, yürüme mesafesi",
-      "body": "Kendi ajans binanızı talep edin. Şehirde dolaşın, aktif ajanların içinde hareket ettiğini görün, sonra binanıza girip her odayı yönetin.",
-      "cta": "Sahneye Hatcher City",
-      "districts": "25 ilçe · Grid 5×5"
     },
     "frameworks": {
       "boxLabel": "Çerçeveler",

@@ -62,7 +62,7 @@ check_route() {
 
 paths=(
   /
-  /ro/city
+  /ro/explore
   /sitemap.xml
   '/_next/image?url=%2Ficons%2Ficon-192.png&w=64&q=75'
 )

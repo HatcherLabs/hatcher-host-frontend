@@ -1,7 +1,6 @@
 'use client';
 
-import dynamic from 'next/dynamic';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   ChevronDown,
   ChevronRight,
@@ -11,32 +10,8 @@ import {
   RefreshCw,
   Trash2,
 } from 'lucide-react';
-import {
-  AVATAR_VARIANTS,
-  SELECTABLE_AVATAR_VARIANTS,
-  normalizeAvatarVariant,
-  type AvatarVariant,
-  type RoomEmoteId,
-} from '@/components/agent-room/v2/stations/AgentBody';
-import {
-  AVATAR_SELECT_CLASSNAME,
-  AVATAR_SELECT_OPTION_CLASSNAME,
-  AVATAR_SELECT_STYLE,
-} from '@/components/agent-room/v2/hud/avatarSelectTheme';
-import { api } from '@/lib/api';
 import { useAgentContext } from '../../AgentContext';
 import { AgentEyesLiveCard } from './AgentEyesLiveCard';
-
-const AgentRoomAvatarPreview = dynamic(
-  () =>
-    import('./AgentRoomAvatarPreview').then((m) => m.AgentRoomAvatarPreview),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="h-full w-full rounded-lg bg-black/20" aria-hidden />
-    ),
-  },
-);
 
 interface AgentPresenceRailProps {
   className?: string;
@@ -62,11 +37,6 @@ export function AgentPresenceRail({
 }: AgentPresenceRailProps) {
   const {
     agent,
-    isAuthenticated,
-    loadAgent,
-    messages,
-    sending,
-    inflightTools,
     chatSessions,
     activeChatSessionId,
     setActiveChatSessionId,
@@ -75,37 +45,8 @@ export function AgentPresenceRail({
     deletingChatSessionId,
     refreshChatSessions,
   } = useAgentContext();
-  const [greeting, setGreeting] = useState(true);
   const [sessionsOpen, setSessionsOpen] = useState(true);
   const [refreshingSessions, setRefreshingSessions] = useState(false);
-  const [emoteNonce, setEmoteNonce] = useState(0);
-  const [selectedVariant, setSelectedVariant] = useState<AvatarVariant | null>(
-    () => normalizeAvatarVariant(agent.config?.roomAvatarVariant),
-  );
-  const [savingVariant, setSavingVariant] = useState(false);
-  const [variantError, setVariantError] = useState<string | null>(null);
-
-  useEffect(() => {
-    setGreeting(true);
-    const timer = window.setTimeout(() => setGreeting(false), 2600);
-    return () => window.clearTimeout(timer);
-  }, [agent.id]);
-
-  const lastMessage = messages[messages.length - 1];
-  const thinking =
-    sending || inflightTools.length > 0 || Boolean(lastMessage?.streaming);
-  const mood = greeting ? 'greeting' : thinking ? 'thinking' : 'idle';
-  const activeEmote: RoomEmoteId | null =
-    mood === 'greeting' ? 'wave' : mood === 'thinking' ? 'think' : null;
-
-  useEffect(() => {
-    setEmoteNonce((value) => value + 1);
-  }, [mood]);
-
-  useEffect(() => {
-    setSelectedVariant(normalizeAvatarVariant(agent.config?.roomAvatarVariant));
-    setVariantError(null);
-  }, [agent.config?.roomAvatarVariant, agent.id]);
 
   const handleRefreshSessions = useCallback(async () => {
     setRefreshingSessions(true);
@@ -120,31 +61,6 @@ export function AgentPresenceRail({
     await startNewChatSession();
     onSessionSelect?.();
   }, [onSessionSelect, startNewChatSession]);
-
-  const handleAvatarChange = useCallback(
-    async (value: string) => {
-      const nextVariant = normalizeAvatarVariant(value);
-      const previous = selectedVariant;
-
-      setSelectedVariant(nextVariant);
-      setSavingVariant(true);
-      setVariantError(null);
-      setEmoteNonce((current) => current + 1);
-
-      const res = await api.updateAgent(agent.id, {
-        config: { roomAvatarVariant: nextVariant || null },
-        commitMessage: 'Update room avatar variant from chat',
-      });
-      setSavingVariant(false);
-      if (!res.success) {
-        setSelectedVariant(previous);
-        setVariantError(res.error ?? 'Could not update avatar');
-        return;
-      }
-      await loadAgent();
-    },
-    [agent.id, loadAgent, selectedVariant],
-  );
 
   return (
     <aside
@@ -267,66 +183,6 @@ export function AgentPresenceRail({
           framework={agent.framework}
           status={agent.status}
         />
-
-        <div className="relative h-44 overflow-hidden rounded-lg border border-white/10 bg-[radial-gradient(circle_at_50%_20%,rgba(115,164,185,0.14),rgba(0,0,0,0.45)_58%,rgba(0,0,0,0.72))] md:h-[clamp(12rem,24dvh,16rem)]">
-          <AgentRoomAvatarPreview
-            agentId={agent.id}
-            framework={agent.framework}
-            status={agent.status}
-            avatarVariant={selectedVariant}
-            avatarTraits={
-              agent.config?.roomAvatarTraits ?? agent.config?.avatarTraits
-            }
-            activeEmote={activeEmote}
-            emoteNonce={emoteNonce}
-            isStreaming={thinking}
-          />
-        </div>
-
-        <label className="mt-3 grid gap-1.5">
-          <span className="text-[10px] font-semibold uppercase tracking-wide text-[var(--text-muted)]">
-            Avatar
-          </span>
-          <select
-            value={selectedVariant ?? ''}
-            onChange={(event) => void handleAvatarChange(event.target.value)}
-            disabled={!isAuthenticated || savingVariant}
-            className={`${AVATAR_SELECT_CLASSNAME} h-9 text-xs`}
-            style={AVATAR_SELECT_STYLE}
-          >
-            <option value="" className={AVATAR_SELECT_OPTION_CLASSNAME}>
-              Auto
-            </option>
-            {selectedVariant &&
-              !SELECTABLE_AVATAR_VARIANTS.some(
-                (variant) => variant.id === selectedVariant,
-              ) && (
-                <option
-                  value={selectedVariant}
-                  className={AVATAR_SELECT_OPTION_CLASSNAME}
-                >
-                  {AVATAR_VARIANTS.find(
-                    (variant) => variant.id === selectedVariant,
-                  )?.name ?? 'Legacy avatar'}{' '}
-                  (legacy)
-                </option>
-              )}
-            {SELECTABLE_AVATAR_VARIANTS.map((variant) => (
-              <option
-                key={variant.id}
-                value={variant.id}
-                className={AVATAR_SELECT_OPTION_CLASSNAME}
-              >
-                {variant.name}
-              </option>
-            ))}
-          </select>
-          {variantError && (
-            <span className="text-[11px] leading-tight text-[var(--color-destructive)]">
-              {variantError}
-            </span>
-          )}
-        </label>
       </div>
     </aside>
   );

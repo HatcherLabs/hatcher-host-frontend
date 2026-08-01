@@ -3,10 +3,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
-import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { api, req } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
+import { generateAgentAvatar } from '@/lib/avatar-generator';
 import {
   DEFAULT_HOSTED_MODEL,
   HOSTED_MODELS as HOSTED_MODEL_CATALOG,
@@ -78,17 +78,6 @@ const FW_VISUAL: Record<
   openclaw: { color: 'var(--tech-accent)', mark: 'OC', label: 'OpenClaw' },
   hermes: { color: 'var(--color-info)', mark: 'HE', label: 'Hermes' },
 };
-
-const AgentRoomAvatarPreview = dynamic(
-  () =>
-    import('@/components/agents/tabs/ChatTab/AgentRoomAvatarPreview').then(
-      (m) => m.AgentRoomAvatarPreview,
-    ),
-  {
-    ssr: false,
-    loading: () => <div className={styles.avatarFallback} aria-hidden />,
-  },
-);
 
 const AVATAR_OPTIONS = [
   { id: '', name: 'Auto' },
@@ -750,15 +739,14 @@ export function ChatToHatch() {
               <div className={styles.previewBody}>
                 <div className={styles.previewHero}>
                   <div className={styles.avatarStage}>
-                    <AgentRoomAvatarPreview
-                      agentId={slug || draft.name || 'draft-agent'}
-                      framework={draft.framework}
-                      status="running"
-                      avatarVariant={draft.avatarVariant}
-                      avatarTraits={draft.avatarTraits}
-                      activeEmote={thinking ? 'think' : 'wave'}
-                      emoteNonce={messages.length + (thinking ? 1 : 0)}
-                      isStreaming={thinking}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={generateAgentAvatar(
+                        slug || draft.name || 'draft-agent',
+                        draft.framework,
+                      )}
+                      alt=""
+                      className={styles.avatarImage}
                     />
                     <span className={styles.avatarBadge}>
                       {draft.avatarVariant

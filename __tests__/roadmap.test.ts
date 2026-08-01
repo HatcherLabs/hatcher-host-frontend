@@ -52,7 +52,6 @@ describe('roadmap content', () => {
   it('labels partner- and readiness-dependent bets as exploration', () => {
     expect(exploring.map((item) => item.id)).toEqual([
       'hatcher-earn',
-      'city-operations',
       'verified-outcomes',
     ]);
     expect(exploring.find((item) => item.id === 'verified-outcomes')?.description).toContain(
