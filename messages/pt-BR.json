@@ -865,7 +865,6 @@
       },
       "utilities": {
         "label": "Mais ferramentas do espaço de trabalho",
-        "lift": "Importar com Hatcher Lift",
         "agents": "Gerenciar agentes"
       }
     },
@@ -897,8 +896,6 @@
       "tourCreateDescription": "Clique aqui para criar seu primeiro agente de IA com OpenClaw ou Hermes.",
       "tourWorkspaceTitle": "Seu espaço de trabalho",
       "tourWorkspaceDescription": "Alterne entre Agentes, Mission Control, Outcome Packs e Approvals por esta barra.",
-      "tourImportTitle": "Importe um agente existente",
-      "tourImportDescription": "Já tem um agente? Importe a configuração dele em vez de começar do zero.",
       "tourPlanTitle": "Plano e AI Credits",
       "tourPlanDescription": "Seu plano e seu saldo de AI Credits ficam neste menu. Acompanhe o uso ou faça upgrade quando quiser.",
       "statTotal": "Total",

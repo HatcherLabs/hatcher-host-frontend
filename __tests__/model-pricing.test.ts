@@ -117,7 +117,7 @@ describe('parseModelPricingPayload', () => {
   const contractPayload = {
     models: [
       { id: 'openai/gpt-5.5', pricing: perToken({ inputUsdPer1M: 5, outputUsdPer1M: 30, creditsPer1MInput: 5000, creditsPer1MOutput: 30000 }) },
-      { id: 'idle/claude-haiku-4-5', pricing: fixed() },
+      { id: 'partner/fixed-example', pricing: fixed() },
       { id: 'virtuals/deepseek-deepseek-v3-2', pricing: null },
     ],
     billingNote: 'Hosted models are billed at provider cost with no markup: 1,000 AI Credits = $1.00.',
@@ -146,14 +146,14 @@ describe('parseModelPricingPayload', () => {
       models: [
         { id: 'openai/gpt-5.5', pricing: { kind: 'per_token', inputUsdPer1M: 'NaN' } },
         { pricing: fixed() },
-        { id: 'idle/claude-haiku-4-5', pricing: { kind: 'mystery' } },
+        { id: 'partner/fixed-example', pricing: { kind: 'mystery' } },
       ],
       billingNote: 42,
       fetchedAt: null,
     });
     expect(parsed?.models).toEqual([
       { id: 'openai/gpt-5.5', pricing: null },
-      { id: 'idle/claude-haiku-4-5', pricing: null },
+      { id: 'partner/fixed-example', pricing: null },
     ]);
     expect(parsed?.billingNote).toBe('');
   });
@@ -187,7 +187,7 @@ describe('modelPricingById', () => {
 
 describe('mergeHostedModelsWithLivePricing', () => {
   const gpt = hostedModel({ id: 'openai/gpt-5.5', cost: 'Medium' });
-  const idle = hostedModel({ id: 'idle/claude-haiku-4-5', cost: 'Low', fixedPrice: '~$0.001/request' });
+  const fixedPriceModel = hostedModel({ id: 'partner/fixed-example', cost: 'Low', fixedPrice: '~$0.001/request' });
   const virtualsLive = hostedModel({
     id: 'virtuals/deepseek-deepseek-v3-2',
     providerKey: 'virtuals',
@@ -208,10 +208,10 @@ describe('mergeHostedModelsWithLivePricing', () => {
   });
 
   it('fills fixedPrice and recomputes the tier for fixed pricing', () => {
-    const byId = new Map<string, ModelPricing>([['idle/claude-haiku-4-5', fixed()]]);
-    const [merged] = mergeHostedModelsWithLivePricing([idle], byId);
+    const byId = new Map<string, ModelPricing>([['partner/fixed-example', fixed()]]);
+    const [merged] = mergeHostedModelsWithLivePricing([fixedPriceModel], byId);
     expect(merged).toMatchObject({
-      id: 'idle/claude-haiku-4-5',
+      id: 'partner/fixed-example',
       fixedPrice: '1 credit per request',
       cost: 'Low',
     });
@@ -234,7 +234,7 @@ describe('mergeHostedModelsWithLivePricing', () => {
   });
 
   it('returns the input array unchanged when there is no pricing at all', () => {
-    const models = [gpt, idle];
+    const models = [gpt, fixedPriceModel];
     expect(mergeHostedModelsWithLivePricing(models, new Map())).toBe(models);
   });
 

@@ -21,7 +21,6 @@ import {
   ListChecks,
   Network,
   PackageCheck,
-  PackageOpen,
   Play,
   RefreshCw,
   RotateCcw,
@@ -351,9 +350,6 @@ export default function MyAgentsPage() {
             </Link>
             <Link href="/dashboard/approvals" className={styles.secondaryCta}>
               <ShieldCheck size={14} aria-hidden /> Approvals
-            </Link>
-            <Link href="/dashboard/agents/import" className={styles.secondaryCta} data-tour="import-agent">
-              <PackageOpen size={14} aria-hidden /> {t('importCta')}
             </Link>
             <Link href="/create" className={styles.cta} data-tour="create-agent">
               {t('createCta')} <ArrowRight size={14} aria-hidden />

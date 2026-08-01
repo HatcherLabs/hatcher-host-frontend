@@ -13,6 +13,7 @@ describe('agent workspace discovery', () => {
       { key: 'agents', href: '/dashboard/agents' },
       { key: 'missions', href: '/dashboard/missions' },
       { key: 'outcomePacks', href: '/dashboard/outcome-packs' },
+      { key: 'approvals', href: '/dashboard/approvals' },
     ]);
 
     const source = readFileSync(

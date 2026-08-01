@@ -865,7 +865,6 @@
       },
       "utilities": {
         "label": "Alat ruang kerja lainnya",
-        "lift": "Impor dengan Hatcher Lift",
         "agents": "Kelola agen"
       }
     },
@@ -897,8 +896,6 @@
       "tourCreateDescription": "Klik di sini untuk menetaskan agen AI pertama Anda dengan OpenClaw atau Hermes.",
       "tourWorkspaceTitle": "Ruang Kerja Anda",
       "tourWorkspaceDescription": "Berpindah antara Agen, Mission Control, Outcome Packs, dan Approvals dari bilah ini.",
-      "tourImportTitle": "Impor Agen yang Sudah Ada",
-      "tourImportDescription": "Sudah punya agen? Impor konfigurasinya alih-alih memulai dari awal.",
       "tourPlanTitle": "Paket & AI Credits",
       "tourPlanDescription": "Paket dan saldo AI Credits Anda ada di menu ini. Pantau penggunaan atau tingkatkan kapan saja.",
       "statTotal": "Jumlah",

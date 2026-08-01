@@ -27,23 +27,10 @@ describe('Wallet tab integration placement', () => {
     expect(getProviderPanelIdsForWallet('cyberia')).not.toContain('mpp32');
   });
 
-  it('places Medusa with Solana provider rails', () => {
-    expect(getProviderPanelIdsForWallet('solana')).toContain('medusa');
-    expect(getProviderPanelIdsForWallet('base')).not.toContain('medusa');
-    expect(getProviderPanelIdsForWallet('skale')).not.toContain('medusa');
-  });
-
   it('places Metaplex with Solana identity provider rails', () => {
     expect(getProviderPanelIdsForWallet('solana')[0]).toBe('metaplex');
     expect(getProviderPanelIdsForWallet('base')).not.toContain('metaplex');
     expect(getProviderPanelIdsForWallet('skale')).not.toContain('metaplex');
-  });
-
-  it('deep-links to the Medusa provider panel', () => {
-    const search = '?tab=wallet&walletSection=providers&walletProvider=medusa';
-
-    expect(getInitialWalletSectionFromSearch(search)).toBe('providers');
-    expect(getInitialWalletProviderFromSearch(search)).toBe('medusa');
   });
 
   it('deep-links to the Metaplex provider panel', () => {

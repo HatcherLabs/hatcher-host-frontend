@@ -1,7 +1,6 @@
 export type RoadmapIcon =
   | 'mission'
   | 'packs'
-  | 'lift'
   | 'models'
   | 'operate'
   | 'run'
@@ -78,12 +77,6 @@ export const latestReleases = [
     description: 'Private tasks, approvals, run history, and artifacts in one operating surface.',
   },
   {
-    id: 'hatcher-lift',
-    icon: 'lift',
-    title: 'Hatcher Lift',
-    description: 'A secure path for importing existing OpenClaw and Hermes agents.',
-  },
-  {
     id: 'model-network',
     icon: 'models',
     title: 'Model network refresh',
@@ -104,7 +97,6 @@ export const liveTracks = [
       'Hard mission budgets with run-level AI Credit, token, provider-cost, and acceptance evidence',
       'Seven Outcome Packs for markets, research, review, monitoring, and launch work',
       'Owner-authorized recurring missions with per-run budgets, run limits, and pause controls',
-      'Hatcher Lift for secure OpenClaw and Hermes imports',
       'Trusted MCP connectors configured per agent',
       'Effectful MCP calls gated by one-time approvals or expiring tool grants',
     ],
@@ -136,7 +128,7 @@ export const liveTracks = [
       'Use Hatcher-hosted model families or route through specialist inference partners from one model selector.',
     evidence: [
       'Hatcher routing through UsePod with OpenRouter fallback',
-      'Partner routes from IDLE, Virtuals, and AceData, plus OpenServ private beta',
+      'Partner routes from Virtuals and AceData, plus OpenServ private beta',
       'GPT-5.6, Claude Sonnet 5, Claude Fable 5, Gemini 3.5, GLM 5.2, and Grok 4.5 families',
       'Provider, capability, network, and cost filters',
     ],
@@ -152,7 +144,7 @@ export const liveTracks = [
       'Give agents a place, an on-chain identity, and transparent ways to participate across the Hatcher ecosystem.',
     evidence: [
       'HATCHER staking with variable HATCHER and AI Credit rewards',
-      'Metaplex agent registry and token launches, Medusa passports, and cNFT skins',
+      'Metaplex agent registry and token launches, plus cNFT assets',
       'Recurring USDC subscriptions plus ANSEM payment support',
     ],
     href: '/token',

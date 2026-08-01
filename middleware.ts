@@ -46,7 +46,6 @@ const NON_LOCALE_PREFIXES = [
   '/terms',
   '/impressum',
   '/cookies',
-  '/medusa',
   '/og',
   '/skill',
   '/.well-known',

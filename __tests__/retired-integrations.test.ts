@@ -39,4 +39,23 @@ describe('retired integrations', () => {
     expect(read('lib/api/types.ts')).not.toMatch(/kausa|vantara|mirari/i);
     expect(read('lib/api/index.ts')).not.toMatch(/kausa|vantara|mirari/i);
   });
+
+  it('removes Medusa, IDLE, and Hatcher Lift product surfaces', () => {
+    expect(existsSync(join(root, 'components', 'agents', 'tabs', 'MedusaWalletPanel.tsx'))).toBe(false);
+    expect(existsSync(join(root, 'app', 'medusa', 'callback', 'page.tsx'))).toBe(false);
+    expect(existsSync(join(root, 'app', '[locale]', 'medusa', 'callback', 'page.tsx'))).toBe(false);
+    expect(existsSync(join(root, 'app', 'admin', '_components', 'IdleTab.tsx'))).toBe(false);
+    expect(existsSync(join(root, 'app', '[locale]', 'dashboard', 'agents', 'import', 'page.tsx'))).toBe(false);
+    expect(existsSync(join(root, 'components', 'agents', 'lift', 'LiftImportWizard.tsx'))).toBe(false);
+    expect(read('components/agents/tabs/WalletTab.tsx')).not.toMatch(/medusa/i);
+    expect(read('app/admin/page.tsx')).not.toMatch(/adminGetIdle|IdleTab|['"]idle['"]/i);
+    expect(read('lib/hosted-model-catalog.ts')).not.toMatch(/idle\/claude|providerKey:\s*['"]idle['"]/i);
+    expect(read('app/[locale]/roadmap/roadmap-data.ts')).not.toMatch(/hatcher lift|medusa|\bIDLE\b/i);
+  });
+
+  it('removes retired partner and Lift API contracts from the client', () => {
+    for (const file of ['lib/api/methods.ts', 'lib/api/types.ts', 'lib/api/index.ts']) {
+      expect(read(file)).not.toMatch(/medusa|AgentLift|LiftImport|AdminIdle|adminGetIdle/i);
+    }
+  });
 });

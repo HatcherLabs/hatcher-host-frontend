@@ -19,7 +19,6 @@ describe('dashboard workspace navigation', () => {
 
   it('selects the correct workspace item for nested dashboard routes', () => {
     expect(isDashboardWorkspaceRouteActive('/dashboard', 'agents')).toBe(true);
-    expect(isDashboardWorkspaceRouteActive('/dashboard/agents/import', 'agents')).toBe(true);
     expect(isDashboardWorkspaceRouteActive('/dashboard/agent/agent-1', 'agents')).toBe(true);
     expect(isDashboardWorkspaceRouteActive('/dashboard/missions', 'missions')).toBe(true);
     expect(isDashboardWorkspaceRouteActive('/dashboard/outcome-packs', 'outcomePacks')).toBe(true);

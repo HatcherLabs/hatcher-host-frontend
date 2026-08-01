@@ -865,7 +865,6 @@
       },
       "utilities": {
         "label": "कार्यस्थान के और टूल",
-        "lift": "Hatcher Lift से इम्पोर्ट करें",
         "agents": "एजेंट प्रबंधित करें"
       }
     },
@@ -897,8 +896,6 @@
       "tourCreateDescription": "यहां क्लिक करें OpenClaw या Hermes के साथ अपना पहला एआई एजेंट बनाने के लिए।",
       "tourWorkspaceTitle": "आपका वर्कस्पेस",
       "tourWorkspaceDescription": "इस बार से एजेंट्स, Mission Control, Outcome Packs और Approvals के बीच स्विच करें।",
-      "tourImportTitle": "मौजूदा एजेंट इंपोर्ट करें",
-      "tourImportDescription": "पहले से कोई एजेंट है? शुरुआत से बनाने के बजाय उसका कॉन्फ़िगरेशन यहां इंपोर्ट करें।",
       "tourPlanTitle": "प्लान और AI Credits",
       "tourPlanDescription": "आपका प्लान और AI Credits बैलेंस इसी मेनू में मिलेंगे। उपयोग देखें या कभी भी अपग्रेड करें।",
       "statTotal": "कुल",

@@ -315,7 +315,7 @@ const HostedModelRow = memo(function HostedModelRow({
       <span
         className="inline-flex h-fit items-center gap-1.5 text-xs text-[var(--text-secondary)]"
         title={partnerHosted
-          ? 'Partner inference route. AceData and OpenServ can fall back to OpenRouter; IDLE and Virtuals use dedicated routes.'
+          ? 'Partner inference route. AceData and OpenServ can fall back to OpenRouter; Virtuals uses a dedicated route.'
           : 'Hatcher-managed provider network with UsePod primary and OpenRouter fallback.'}
       >
         <Info className="h-3 w-3" />
@@ -1242,7 +1242,7 @@ export function ConfigTab() {
                         : selectedHostedModel.providerKey === 'openserv'
                           ? 'Inference routes through OpenServ first, with OpenRouter fallback when needed. Review partner policy before using sensitive data.'
                         : hostedModelPrivacy(selectedHostedModel) === 'partner'
-                          ? 'Inference happens through an explicit partner route such as IDLE. Review partner policy before using sensitive data.'
+                          ? 'Inference happens through an explicit partner route. Review partner policy before using sensitive data.'
                           : 'Inference is routed through Hatcher managed infrastructure, currently UsePod first with OpenRouter fallback.'}
                     >
                       <Info className="h-3 w-3" />
@@ -1484,7 +1484,7 @@ export function ConfigTab() {
                   <p className="mt-2 max-w-xs text-[11px] leading-relaxed text-[var(--text-tertiary)]">
                     {modelPrivacyFilter === 'hatcher'
                       ? 'Hatcher routes common models through UsePod with OpenRouter fallback.'
-                      : 'Partner-primary routes from IDLE, OpenServ, AceData, and Virtuals.'}
+                      : 'Partner-primary routes from OpenServ, AceData, and Virtuals.'}
                   </p>
                 </div>
 

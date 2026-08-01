@@ -865,7 +865,6 @@
       },
       "utilities": {
         "label": "更多工作区工具",
-        "lift": "使用 Hatcher Lift 导入",
         "agents": "管理智能体"
       }
     },
@@ -897,8 +896,6 @@
       "tourCreateDescription": "点击此处孵化您的第一个AI智能体，从 OpenClaw 或 Hermes 中选择。",
       "tourWorkspaceTitle": "您的工作区",
       "tourWorkspaceDescription": "通过此栏在智能体、Mission Control、Outcome Packs 和 Approvals 之间切换。",
-      "tourImportTitle": "导入现有智能体",
-      "tourImportDescription": "已经有智能体了？直接导入它的配置，无需从头开始。",
       "tourPlanTitle": "套餐与 AI Credits",
       "tourPlanDescription": "您的套餐和 AI Credits 余额都在此菜单中。随时查看用量或升级。",
       "statTotal": "总计",

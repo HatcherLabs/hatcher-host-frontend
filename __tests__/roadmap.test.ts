@@ -24,10 +24,10 @@ describe('roadmap content', () => {
 
   it('surfaces the latest operating-system releases', () => {
     expect(latestReleases.map((release) => release.id)).toEqual([
+      'outcome-packs-v2',
+      'trusted-action-approvals',
       'measured-verified-missions',
       'mission-control',
-      'outcome-packs',
-      'hatcher-lift',
       'model-network',
     ]);
   });
@@ -41,10 +41,7 @@ describe('roadmap content', () => {
   });
 
   it('keeps near-term targets evidence-led and free of invented delivery dates', () => {
-    expect(buildingNext.map((target) => target.id)).toEqual([
-      'trusted-action-approvals',
-      'outcome-packs-v2',
-    ]);
+    expect(buildingNext.map((target) => target.id)).toEqual([]);
     expect(buildingNext.every((target) => target.proofTargets.length === 3)).toBe(true);
     expect(roadmapCopy).not.toMatch(/next \d|weeks?|months?|Q[1-4]|launching/i);
   });

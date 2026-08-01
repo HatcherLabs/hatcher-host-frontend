@@ -36,7 +36,6 @@ describe('shouldStartDashboardTour', () => {
 
   it('only triggers on the agents dashboard route', () => {
     expect(shouldStartDashboardTour({ ...base, pathname: '/dashboard/billing' })).toBe(false);
-    expect(shouldStartDashboardTour({ ...base, pathname: '/dashboard/agents/import' })).toBe(false);
     expect(shouldStartDashboardTour({ ...base, pathname: '/es/dashboard/agents' })).toBe(true);
   });
 

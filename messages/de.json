@@ -865,7 +865,6 @@
       },
       "utilities": {
         "label": "Weitere Tools im Arbeitsbereich",
-        "lift": "Mit Hatcher Lift importieren",
         "agents": "Agenten verwalten"
       }
     },
@@ -897,8 +896,6 @@
       "tourCreateDescription": "Klicken Sie hier, um Ihren ersten KI-Agenten zu starten. Wählen Sie zwischen OpenClaw und Hermes.",
       "tourWorkspaceTitle": "Ihr Arbeitsbereich",
       "tourWorkspaceDescription": "Wechseln Sie über diese Leiste zwischen Agenten, Mission Control, Outcome Packs und Approvals.",
-      "tourImportTitle": "Bestehenden Agenten importieren",
-      "tourImportDescription": "Sie haben bereits einen Agenten? Importieren Sie seine Konfiguration, statt von vorn zu beginnen.",
       "tourPlanTitle": "Plan & AI Credits",
       "tourPlanDescription": "Ihren Plan und Ihr AI-Credit-Guthaben finden Sie in diesem Menü. Nutzung einsehen oder jederzeit upgraden.",
       "statTotal": "Gesamt",
