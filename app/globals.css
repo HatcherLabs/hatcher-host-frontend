@@ -1437,6 +1437,208 @@ select[aria-invalid="true"] {
   box-shadow: none !important;
 }
 
+/* ── Staking wallet picker ──────────────────────────── */
+.staking-wallet-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(10, 14, 12, 0.66);
+  backdrop-filter: blur(10px);
+}
+
+.staking-wallet-modal__panel {
+  position: relative;
+  width: min(100%, 460px);
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  padding: 28px;
+  color: var(--text-primary);
+  background: var(--bg-card-solid);
+  border: 1px solid var(--border-default);
+  border-radius: 18px;
+  box-shadow: 0 24px 80px rgba(5, 9, 7, 0.34);
+}
+
+.staking-wallet-modal__close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  color: var(--text-secondary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: 10px;
+  transition: color 150ms ease, border-color 150ms ease, background-color 150ms ease;
+}
+
+.staking-wallet-modal__close:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+}
+
+.staking-wallet-modal__close:focus-visible,
+.staking-wallet-modal__wallet:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.staking-wallet-modal__close svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 1.8;
+}
+
+.staking-wallet-modal__header {
+  padding-right: 44px;
+}
+
+.staking-wallet-modal__eyebrow {
+  margin: 0 0 8px;
+  color: var(--text-accent);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.staking-wallet-modal__header h1 {
+  margin: 0;
+  font-family: var(--font-sora), var(--font-inter), 'Inter', system-ui, sans-serif;
+  font-size: clamp(1.35rem, 4vw, 1.65rem);
+  font-weight: 650;
+  letter-spacing: -0.035em;
+}
+
+.staking-wallet-modal__header > p:last-child {
+  margin: 10px 0 24px;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.staking-wallet-modal__section-title {
+  margin: 18px 0 9px;
+  color: var(--text-muted);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.staking-wallet-modal__wallets {
+  display: grid;
+  gap: 8px;
+}
+
+.staking-wallet-modal__wallet {
+  display: flex;
+  width: 100%;
+  min-height: 58px;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 13px;
+  color: var(--text-primary);
+  text-align: left;
+  text-decoration: none;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, transform 150ms ease;
+}
+
+.staking-wallet-modal__wallet:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+  transform: translateY(-1px);
+}
+
+.staking-wallet-modal__wallet-icon,
+.staking-wallet-modal__wallet-icon .wallet-adapter-button-start-icon,
+.staking-wallet-modal__wallet-icon .wallet-adapter-button-start-icon img {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  margin: 0;
+  border-radius: 9px;
+}
+
+.staking-wallet-modal__wallet-name {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  font-size: 0.9375rem;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.staking-wallet-modal__wallet-state {
+  color: var(--text-muted);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.staking-wallet-modal__fallback-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 800;
+  background: linear-gradient(145deg, #e84855, #6f31d8);
+  border-radius: 9px;
+}
+
+.staking-wallet-modal__fallback-icon--backpack {
+  background: linear-gradient(145deg, #ff784b, #dc3535);
+}
+
+.staking-wallet-modal__footnote {
+  margin: 18px 2px 0;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 520px) {
+  .staking-wallet-modal {
+    align-items: end;
+    padding: 10px;
+  }
+
+  .staking-wallet-modal__panel {
+    width: 100%;
+    max-height: calc(100dvh - 20px);
+    padding: 24px 18px max(22px, env(safe-area-inset-bottom));
+    border-radius: 18px;
+  }
+
+  .staking-wallet-modal__close {
+    top: 13px;
+    right: 13px;
+  }
+
+  .staking-wallet-modal__header {
+    padding-right: 40px;
+  }
+}
+
 /* ── Sonner toast overrides ──────────────────────────── */
 [data-sonner-toaster] {
   --normal-bg: var(--bg-card-solid) !important;
