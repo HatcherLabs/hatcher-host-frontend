@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
+import { HatcherWalletModalProvider } from '@/components/providers/HatcherWalletModalProvider';
 import { StakingClient } from './StakingClient';
-import { StakingWalletModalProvider } from './StakingWalletModalProvider';
 
 export const metadata: Metadata = {
   title: 'Hatcher Staking | Hatcher',
@@ -9,8 +9,11 @@ export const metadata: Metadata = {
 
 export default function StakingPage() {
   return (
-    <StakingWalletModalProvider>
+    <HatcherWalletModalProvider
+      description="Choose a wallet that can sign messages and staking transactions."
+      eyebrow="Hatcher staking"
+    >
       <StakingClient />
-    </StakingWalletModalProvider>
+    </HatcherWalletModalProvider>
   );
 }

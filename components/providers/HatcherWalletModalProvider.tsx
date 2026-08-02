@@ -18,28 +18,32 @@ import {
   useState,
 } from 'react';
 import { createPortal } from 'react-dom';
+import { isSelectableSolanaWallet } from '@/lib/wallet-adapter-state';
 
-export interface StakingWalletDescriptor {
+export interface HatcherWalletDescriptor {
   adapter: { name: string };
   readyState: WalletReadyState;
 }
 
-export const RECOMMENDED_STAKING_WALLETS = [
-  { name: 'Phantom', url: 'https://phantom.com/' },
-  { name: 'Solflare', url: 'https://solflare.com/' },
-  { name: 'Backpack', url: 'https://backpack.app/' },
+export const RECOMMENDED_HATCHER_WALLETS = [
+  { name: 'Phantom' },
+  { name: 'Solflare' },
+  { name: 'Backpack' },
 ] as const;
 
 function normalizeWalletName(name: string): string {
   return name.toLowerCase().replace(/\s+wallet$/, '').trim();
 }
 
-export function isSelectableStakingWallet(readyState: WalletReadyState): boolean {
-  return readyState === WalletReadyState.Installed || readyState === WalletReadyState.Loadable;
+export function isSelectableHatcherWallet(
+  walletName: string,
+  readyState: WalletReadyState,
+): boolean {
+  return isSelectableSolanaWallet(walletName, readyState);
 }
 
-export function groupStakingWallets<T extends StakingWalletDescriptor>(wallets: readonly T[]): {
-  recommended: Array<{ config: (typeof RECOMMENDED_STAKING_WALLETS)[number]; wallet: T | null }>;
+export function groupHatcherWallets<T extends HatcherWalletDescriptor>(wallets: readonly T[]): {
+  recommended: Array<{ config: (typeof RECOMMENDED_HATCHER_WALLETS)[number]; wallet: T | null }>;
   additional: T[];
 } {
   const walletsByName = new Map<string, T>();
@@ -49,18 +53,18 @@ export function groupStakingWallets<T extends StakingWalletDescriptor>(wallets: 
   }
 
   const recommendedNames = new Set(
-    RECOMMENDED_STAKING_WALLETS.map((wallet) => normalizeWalletName(wallet.name)),
+    RECOMMENDED_HATCHER_WALLETS.map((wallet) => normalizeWalletName(wallet.name)),
   );
 
   return {
-    recommended: RECOMMENDED_STAKING_WALLETS.map((config) => ({
+    recommended: RECOMMENDED_HATCHER_WALLETS.map((config) => ({
       config,
       wallet: walletsByName.get(normalizeWalletName(config.name)) ?? null,
     })),
     additional: Array.from(walletsByName.values()).filter(
       (wallet) =>
         !recommendedNames.has(normalizeWalletName(wallet.adapter.name))
-        && isSelectableStakingWallet(wallet.readyState),
+        && isSelectableHatcherWallet(wallet.adapter.name, wallet.readyState),
     ),
   };
 }
@@ -76,16 +80,18 @@ function WalletFallbackIcon({ name }: { name: string }) {
 function WalletOption({
   config,
   wallet,
-  onClose,
+  onUnavailable,
   onSelect,
 }: {
-  config?: (typeof RECOMMENDED_STAKING_WALLETS)[number];
+  config?: (typeof RECOMMENDED_HATCHER_WALLETS)[number];
   wallet: Wallet | null;
-  onClose: () => void;
+  onUnavailable: (walletName: string) => void;
   onSelect: (wallet: Wallet) => void;
 }) {
   const name = wallet?.adapter.name ?? config?.name ?? 'Solana wallet';
-  const selectable = wallet ? isSelectableStakingWallet(wallet.readyState) : false;
+  const selectable = wallet
+    ? isSelectableHatcherWallet(wallet.adapter.name, wallet.readyState)
+    : false;
 
   const icon = wallet
     ? <WalletIcon wallet={wallet} />
@@ -96,7 +102,7 @@ function WalletOption({
       <span className="staking-wallet-modal__wallet-icon">{icon}</span>
       <span className="staking-wallet-modal__wallet-name">{name}</span>
       <span className="staking-wallet-modal__wallet-state">
-        {selectable ? 'Detected' : 'Get wallet'}
+        {selectable ? 'Detected' : 'Not installed'}
       </span>
     </>
   );
@@ -114,23 +120,28 @@ function WalletOption({
   }
 
   return (
-    <a
-      className="staking-wallet-modal__wallet"
-      href={wallet?.adapter.url ?? config?.url}
-      onClick={onClose}
-      rel="noreferrer"
-      target="_blank"
+    <button
+      aria-label={`${name} is not installed`}
+      className="staking-wallet-modal__wallet staking-wallet-modal__wallet--unavailable"
+      onClick={() => onUnavailable(name)}
+      type="button"
     >
       {content}
-    </a>
+    </button>
   );
 }
 
-function StakingWalletModal() {
+interface HatcherWalletModalCopy {
+  description: string;
+  eyebrow: string;
+}
+
+function HatcherWalletModal({ description, eyebrow }: HatcherWalletModalCopy) {
   const { wallets, select } = useWallet();
   const { setVisible } = useWalletModal();
   const dialogRef = useRef<HTMLDivElement>(null);
-  const { recommended, additional } = useMemo(() => groupStakingWallets(wallets), [wallets]);
+  const [installationNotice, setInstallationNotice] = useState<string | null>(null);
+  const { recommended, additional } = useMemo(() => groupHatcherWallets(wallets), [wallets]);
 
   const closeModal = useCallback(() => setVisible(false), [setVisible]);
 
@@ -138,6 +149,12 @@ function StakingWalletModal() {
     select(wallet.adapter.name);
     closeModal();
   }, [closeModal, select]);
+
+  const showUnavailableNotice = useCallback((walletName: string) => {
+    setInstallationNotice(
+      `${walletName} is not installed. Install its browser extension, then reload Hatcher.`,
+    );
+  }, []);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -191,8 +208,8 @@ function StakingWalletModal() {
   return createPortal(
     <div className="staking-wallet-modal" onMouseDown={handleBackdropMouseDown}>
       <div
-        aria-describedby="staking-wallet-modal-description"
-        aria-labelledby="staking-wallet-modal-title"
+        aria-describedby="hatcher-wallet-modal-description"
+        aria-labelledby="hatcher-wallet-modal-title"
         aria-modal="true"
         className="staking-wallet-modal__panel"
         ref={dialogRef}
@@ -210,15 +227,13 @@ function StakingWalletModal() {
         </button>
 
         <header className="staking-wallet-modal__header">
-          <p className="staking-wallet-modal__eyebrow">Hatcher staking</p>
-          <h1 id="staking-wallet-modal-title">Connect a Solana wallet</h1>
-          <p id="staking-wallet-modal-description">
-            Choose a wallet that can sign messages and staking transactions.
-          </p>
+          <p className="staking-wallet-modal__eyebrow">{eyebrow}</p>
+          <h1 id="hatcher-wallet-modal-title">Connect a Solana wallet</h1>
+          <p id="hatcher-wallet-modal-description">{description}</p>
         </header>
 
-        <section aria-labelledby="staking-wallet-recommended-title">
-          <h2 className="staking-wallet-modal__section-title" id="staking-wallet-recommended-title">
+        <section aria-labelledby="hatcher-wallet-recommended-title">
+          <h2 className="staking-wallet-modal__section-title" id="hatcher-wallet-recommended-title">
             Recommended
           </h2>
           <div className="staking-wallet-modal__wallets">
@@ -226,7 +241,7 @@ function StakingWalletModal() {
               <WalletOption
                 config={config}
                 key={config.name}
-                onClose={closeModal}
+                onUnavailable={showUnavailableNotice}
                 onSelect={selectWallet}
                 wallet={wallet}
               />
@@ -235,21 +250,27 @@ function StakingWalletModal() {
         </section>
 
         {additional.length > 0 ? (
-          <section aria-labelledby="staking-wallet-detected-title">
-            <h2 className="staking-wallet-modal__section-title" id="staking-wallet-detected-title">
+          <section aria-labelledby="hatcher-wallet-detected-title">
+            <h2 className="staking-wallet-modal__section-title" id="hatcher-wallet-detected-title">
               Other detected wallets
             </h2>
             <div className="staking-wallet-modal__wallets">
               {additional.map((wallet) => (
                 <WalletOption
                   key={wallet.adapter.name}
-                  onClose={closeModal}
+                  onUnavailable={showUnavailableNotice}
                   onSelect={selectWallet}
                   wallet={wallet}
                 />
               ))}
             </div>
           </section>
+        ) : null}
+
+        {installationNotice ? (
+          <p aria-live="polite" className="staking-wallet-modal__notice" role="status">
+            {installationNotice}
+          </p>
         ) : null}
 
         <p className="staking-wallet-modal__footnote">
@@ -261,14 +282,22 @@ function StakingWalletModal() {
   );
 }
 
-export function StakingWalletModalProvider({ children }: { children: ReactNode }) {
+export function HatcherWalletModalProvider({
+  children,
+  description,
+  eyebrow,
+}: {
+  children: ReactNode;
+  description: string;
+  eyebrow: string;
+}) {
   const [visible, setVisible] = useState(false);
   const contextValue = useMemo(() => ({ visible, setVisible }), [visible]);
 
   return (
     <WalletModalContext.Provider value={contextValue}>
       {children}
-      {visible ? <StakingWalletModal /> : null}
+      {visible ? <HatcherWalletModal description={description} eyebrow={eyebrow} /> : null}
     </WalletModalContext.Provider>
   );
 }

@@ -8,8 +8,10 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLocale, useTranslations } from 'next-intl';
 import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
+import { HatcherWalletModalProvider } from '@/components/providers/HatcherWalletModalProvider';
 import { useAuth } from '@/lib/auth-context';
 import { loginHrefForReturn } from '@/lib/safe-redirect';
+import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import {
   ArrowRight,
   Building2,
@@ -120,10 +122,23 @@ const ADDON_PRICES: Record<AddonGroupKey, { price: string; isSubscription: boole
 
 /* ── Page ─────────────────────────────────────────────────── */
 export default function PricingPage() {
+  return (
+    <HatcherWalletModalProvider
+      description="Choose a wallet for HATCHER payments on Solana."
+      eyebrow="Hatcher pricing"
+    >
+      <PricingPageContent />
+    </HatcherWalletModalProvider>
+  );
+}
+
+function PricingPageContent() {
   const t = useTranslations('pricing');
+  const tBilling = useTranslations('dashboard.billing');
   const tTiers = useTranslations('shared.tiers');
   const locale = useLocale();
   const { isAuthenticated } = useAuth();
+  const { setVisible: setWalletModalVisible } = useWalletModal();
   const [isAnnual, setIsAnnual] = useState(false);
   // Founding Member availability — fetched from /features (public).
   // null = still loading; a number = actual remaining slots.
@@ -202,9 +217,16 @@ export default function PricingPage() {
             </button>
           </div>
 
-          <div className="mt-4 inline-flex max-w-full items-center gap-2 rounded-lg border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-3 py-2 text-xs font-medium text-[var(--color-warning)]">
+          <div className="mt-4 inline-flex max-w-full flex-wrap items-center gap-2 rounded-lg border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-3 py-2 text-xs font-medium text-[var(--color-warning)]">
             <Sparkles className="h-3.5 w-3.5 shrink-0" />
             <span>{t('hatcherDiscountBanner')}</span>
+            <button
+              className="rounded-md border border-[var(--color-warning-border)] bg-[var(--bg-card)] px-2.5 py-1 font-semibold text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-hover)]"
+              onClick={() => setWalletModalVisible(true)}
+              type="button"
+            >
+              {tBilling('connectWallet')}
+            </button>
           </div>
         </div>
 
