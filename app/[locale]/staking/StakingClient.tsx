@@ -34,6 +34,7 @@ import { groupActiveStakesByPool, stakesInExpandedPoolGroups } from '@/lib/staki
 import { StakingBenefitsCard } from './StakingBenefitsCard';
 import { isWalletTrustRevokedError, isWalletUserCancellationError } from '@/lib/wallet-errors';
 import { buildPhantomBrowseUrl } from '@/lib/wallet-links';
+import { isSelectableSolanaWallet } from '@/lib/wallet-adapter-state';
 import {
   baseUnitsToHatcherString,
   canClaimHatcherReward,
@@ -539,7 +540,13 @@ export function StakingClient() {
     const current = walletRef.current;
     if (current.connected && current.publicKey) return current.publicKey.toBase58();
 
-    if (current.wallet && !current.connecting) {
+    const selectedWalletIsAvailable = current.wallet
+      ? isSelectableSolanaWallet(current.wallet.adapter.name, current.wallet.readyState)
+      : false;
+
+    if (current.wallet && !selectedWalletIsAvailable) {
+      current.select(null as unknown as never);
+    } else if (current.wallet && !current.connecting) {
       try {
         await current.connect();
       } catch {
