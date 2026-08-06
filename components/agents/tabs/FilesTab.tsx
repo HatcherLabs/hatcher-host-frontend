@@ -1,15 +1,21 @@
 'use client';
 
 import { useContext, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { AgentContext, FRAMEWORK_ROOT_PATH, FRAMEWORK_BADGE } from '../AgentContext';
 import { api } from '@/lib/api';
-import { Info, X } from 'lucide-react';
+import { FolderPlus, Info, Loader2, Lock, X } from 'lucide-react';
 import {
   FileExplorer,
   FRAMEWORK_ACCENT,
   type FileEntry,
 } from '@/components/agents/files/FileExplorer';
 import { FileEditor } from '@/components/agents/files/FileEditor';
+import { useToast } from '@/components/ui/ToastProvider';
+import {
+  isPrivateClientPath,
+  makePrivateDestination,
+} from '@/components/agents/desktop/privatePaths';
 
 const FRAMEWORK_FS_INFO: Record<string, { label: string; description: string }> = {
   openclaw: {
@@ -23,6 +29,8 @@ const FRAMEWORK_FS_INFO: Record<string, { label: string; description: string }> 
 };
 
 export function FilesTab() {
+  const t = useTranslations('desktop.files');
+  const { toast } = useToast();
   const ctx = useContext(AgentContext);
   const agentId = ctx?.agent?.id ?? '';
   const framework = ctx?.agent?.framework ?? 'openclaw';
@@ -30,6 +38,9 @@ export function FilesTab() {
   const accent = FRAMEWORK_ACCENT[framework] ?? FRAMEWORK_ACCENT.openclaw;
   const fsInfo = FRAMEWORK_FS_INFO[framework] ?? FRAMEWORK_FS_INFO.openclaw;
   const [showInfoBanner, setShowInfoBanner] = useState(true);
+  const [refreshToken, setRefreshToken] = useState(0);
+  const [currentPath, setCurrentPath] = useState(ROOT_PATH);
+  const [busyPath, setBusyPath] = useState<string | null>(null);
 
   // Editor state
   const [editingFile, setEditingFile] = useState<{ path: string; name: string; content: string } | null>(null);
@@ -51,6 +62,41 @@ export function FilesTab() {
 
   const handleEntryDeleted = (entry: FileEntry) => {
     if (editingFile?.path === entry.path) setEditingFile(null);
+  };
+
+  const handleExcludeFromPreview = async (entry: FileEntry) => {
+    if (!window.confirm(t('makePrivateConfirm', { name: entry.name }))) return;
+    setBusyPath(entry.path);
+    try {
+      const { dir, to } = makePrivateDestination(entry.path);
+      const mkdir = await api.mkdirContainerFile(agentId, dir);
+      if (!mkdir.success) {
+        toast.error(mkdir.error ?? t('makePrivateFailed'));
+        return;
+      }
+      const move = await api.moveContainerFile(agentId, entry.path, to);
+      setRefreshToken((value) => value + 1);
+      if (!move.success) {
+        toast.error(move.error ?? t('makePrivateFailed'));
+        return;
+      }
+      if (editingFile?.path === entry.path) setEditingFile(null);
+      toast.success(t('madePrivate', { name: entry.name }));
+    } finally {
+      setBusyPath(null);
+    }
+  };
+
+  const handleNewFolder = async () => {
+    const name = window.prompt(t('newFolderPrompt'))?.trim();
+    if (!name) return;
+    const res = await api.mkdirContainerFile(agentId, `${currentPath}/${name}`);
+    if (!res.success) {
+      toast.error(res.error ?? t('newFolderFailed'));
+      return;
+    }
+    setRefreshToken((value) => value + 1);
+    toast.success(t('folderCreated', { name }));
   };
 
   const handleSave = async () => {
@@ -93,6 +139,39 @@ export function FilesTab() {
       accent={accent}
       onOpenFile={handleOpenFile}
       onEntryDeleted={handleEntryDeleted}
+      refreshToken={refreshToken}
+      onPathChange={setCurrentPath}
+      toolbarActions={
+        <button
+          type="button"
+          onClick={handleNewFolder}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium ${accent.text} border ${accent.border} transition-colors`}
+          title={t('newFolder')}
+        >
+          <FolderPlus size={12} /> {t('newFolder')}
+        </button>
+      }
+      rowDecoration={(entry) =>
+        isPrivateClientPath(entry.path) ? (
+          <Lock size={11} className="flex-shrink-0 text-[var(--text-muted)]" aria-label={t('privateBadge')} />
+        ) : null
+      }
+      rowActions={(entry) =>
+        !isPrivateClientPath(entry.path) ? (
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              void handleExcludeFromPreview(entry);
+            }}
+            disabled={busyPath === entry.path}
+            className="p-1 rounded text-[var(--text-muted)] hover:text-[var(--accent)] hover:bg-[var(--bg-hover)] transition-colors opacity-0 group-hover:opacity-100"
+            title={t('makePrivate')}
+          >
+            {busyPath === entry.path ? <Loader2 size={12} className="animate-spin" /> : <Lock size={12} />}
+          </button>
+        ) : null
+      }
       banner={showInfoBanner && (
         <div className={`mb-4 rounded-xl border ${accent.border} ${accent.bg} px-4 py-3 flex items-start gap-3`}>
           <Info size={16} className={`${accent.text} flex-shrink-0 mt-0.5`} />

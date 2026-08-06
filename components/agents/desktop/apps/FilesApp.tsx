@@ -47,7 +47,7 @@ export function FilesApp({ agent }: { agent: Agent }) {
     for (const win of windowsEditingPath(windows, path)) closeWindow(win.id);
   };
 
-  const handleMakePrivate = async (entry: FileEntry) => {
+  const handleExcludeFromPreview = async (entry: FileEntry) => {
     if (!window.confirm(t('makePrivateConfirm', { name: entry.name }))) return;
     setBusyPath(entry.path);
     try {
@@ -130,7 +130,7 @@ export function FilesApp({ agent }: { agent: Agent }) {
                 type="button"
                 onClick={(event) => {
                   event.stopPropagation();
-                  void handleMakePrivate(entry);
+                  void handleExcludeFromPreview(entry);
                 }}
                 disabled={busyPath === entry.path}
                 className="p-1 rounded text-[var(--text-muted)] hover:text-[var(--accent)] hover:bg-[var(--bg-hover)] transition-colors opacity-0 group-hover:opacity-100"
