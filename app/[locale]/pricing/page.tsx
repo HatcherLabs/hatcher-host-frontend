@@ -11,6 +11,7 @@ import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 import { HatcherWalletModalProvider } from '@/components/providers/HatcherWalletModalProvider';
 import { useAuth } from '@/lib/auth-context';
 import { loginHrefForReturn } from '@/lib/safe-redirect';
+import { CAPACITY_ADDONS } from '@/lib/capacity-addons';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import {
   ArrowRight,
@@ -136,6 +137,8 @@ function PricingPageContent() {
   const t = useTranslations('pricing');
   const tBilling = useTranslations('dashboard.billing');
   const tTiers = useTranslations('shared.tiers');
+  const tSharedAddons = useTranslations('shared.addons');
+  const tCapacity = useTranslations('dashboard.agentDetail.capacity');
   const locale = useLocale();
   const { isAuthenticated } = useAuth();
   const { setVisible: setWalletModalVisible } = useWalletModal();
@@ -456,6 +459,43 @@ function PricingPageContent() {
                 </div>
               );
             })}
+            <div>
+              <h3 className="text-sm font-semibold text-[var(--text-muted)] mb-1 text-center">
+                {tBilling('capacityGroup')}
+              </h3>
+              <p className="mx-auto mb-3 max-w-2xl text-center text-[11px] text-[var(--text-muted)]">
+                {tBilling('capacityGroupNote')}
+              </p>
+              <div className="grid sm:grid-cols-3 gap-3">
+                {CAPACITY_ADDONS.map((addon) => {
+                  const hatcherPrice = priceForHatcherPayment(addon.usdPrice);
+                  return (
+                    <motion.div
+                      key={addon.key}
+                      whileHover={{ y: -3 }}
+                      transition={{ duration: 0.2 }}
+                      className="card glass-noise p-4 text-center"
+                    >
+                      <h4 className="font-bold text-[var(--text-primary)] text-sm mb-2">
+                        {tSharedAddons(`${addon.kind}.name`)}
+                      </h4>
+                      <div className="text-xl font-extrabold mb-0.5 text-[var(--text-primary)]">
+                        ${addon.usdPrice}
+                      </div>
+                      <p className="text-[var(--text-muted)] text-[10px] mb-2 font-medium">
+                        {tCapacity('per30Days')}
+                      </p>
+                      <p className="text-[10px] text-[var(--color-warning)] font-semibold mb-2">
+                        {t('addons.hatcherDiscount', { price: hatcherPrice.toFixed(2) })}
+                      </p>
+                      <p className="text-[11px] text-[var(--text-secondary)]">
+                        {tSharedAddons(`${addon.kind}.description`)}
+                      </p>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </section>
 

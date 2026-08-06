@@ -13,8 +13,8 @@ import { classifyBrowserInput, normalizeBrowserUrl } from './browserUrl';
  * Address bar semantics (`classifyBrowserInput`):
  * - 'url' input (explicit http(s) scheme, or a dotted host that passes
  *   `normalizeBrowserUrl`) navigates in-frame, as before.
- * - everything else is a SEARCH and opens Google results in a NEW TAB
- *   (noopener,noreferrer) with a one-line note in the window — Google,
+ * - everything else is a SEARCH and, after explicit confirmation, opens
+ *   Google results in a NEW TAB (noopener,noreferrer) with a one-line note — Google,
  *   DuckDuckGo (html+lite) and Bing all send X-Frame-Options /
  *   frame-ancestors, so a results page framed here can only ever render
  *   blank (verified 2026-07-30). No refusal-detection heuristics: refusal
@@ -72,6 +72,7 @@ export function BrowserApp() {
       return;
     }
     // Search: engines refuse framing, so results honestly open in a new tab.
+    if (!window.confirm(t('searchExternalConfirm'))) return;
     window.open(
       `https://www.google.com/search?q=${encodeURIComponent(input)}`,
       '_blank',

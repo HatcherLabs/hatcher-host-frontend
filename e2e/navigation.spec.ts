@@ -42,6 +42,17 @@ test.describe('Public Page Navigation', () => {
     await expect(page.locator('text=$19.99').first()).toBeVisible();
   });
 
+  test('pricing page shows per-agent capacity boosts', async ({ page }) => {
+    await page.goto('/pricing');
+
+    await expect(page.getByText('Boost S', { exact: true })).toBeVisible();
+    await expect(page.getByText('Boost L', { exact: true })).toBeVisible();
+    await expect(page.getByText('Storage+', { exact: true })).toBeVisible();
+    await expect(page.getByText('+1 vCPU, +1 GB RAM for one agent')).toBeVisible();
+    await expect(page.getByText('+2 vCPU, +3 GB RAM for one agent')).toBeVisible();
+    await expect(page.getByText('+10 GB workspace storage for one agent')).toBeVisible();
+  });
+
   test('create path uses Chat-to-Hatch auth gate', async ({ page }) => {
     await page.goto('/create');
     await expect(
