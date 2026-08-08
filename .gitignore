@@ -47,8 +47,6 @@ test-*.png
 e2e-*.png
 .gstack/
 
-# Skill files fetched from HatcherLabs/hatcher-skill at build time
-/public/skill/
 
 # 3D raw assets — local-only, processed into public/assets/3d/
 assets-raw/*
