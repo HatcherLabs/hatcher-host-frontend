@@ -2,30 +2,21 @@ import type { Metadata } from 'next';
 import type { LucideIcon } from 'lucide-react';
 import {
   ArrowUpRight,
-  BadgeCheck,
   BookOpenText,
   Bot,
-  Building2,
-  Check,
   CircleGauge,
-  Coins,
   Landmark,
-  ListChecks,
-  Network,
-  Route,
-  ShieldCheck,
 } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 import { Link } from '@/i18n/routing';
 import { buildLanguagesMap } from '@/lib/seo';
 import {
-  buildingNext,
-  exploring,
   latestReleases,
-  liveTracks,
+  phases,
   roadmapUpdatedAt,
   type RoadmapIcon,
+  type RoadmapTag,
 } from './roadmap-data';
 import styles from './page.module.css';
 
@@ -33,7 +24,7 @@ export function generateMetadata(): Metadata {
   return {
     title: 'Roadmap — Hatcher',
     description:
-      'What is live on Hatcher, what we are building next, and the longer-term bets behind the agent operating system.',
+      'What is live on Hatcher, what ships next, and the longer-term bets — from the public inference API to the EquiFold agent economy.',
     alternates: {
       canonical: '/roadmap',
       languages: buildLanguagesMap('/roadmap'),
@@ -41,43 +32,39 @@ export function generateMetadata(): Metadata {
   };
 }
 
-const ICONS: Record<RoadmapIcon, LucideIcon> = {
-  mission: ListChecks,
-  models: Network,
+const ICONS: Partial<Record<RoadmapIcon, LucideIcon>> = {
   operate: CircleGauge,
-  run: Bot,
-  route: Route,
-  own: Landmark,
   metering: CircleGauge,
-  approvals: ShieldCheck,
-  earn: Coins,
-  city: Building2,
-  verified: BadgeCheck,
+  own: Landmark,
+  run: Bot,
 };
 
-const PROOF_ICONS: Record<string, readonly LucideIcon[]> = {};
+const TAG_LABEL: Record<RoadmapTag, string> = {
+  hatcher: 'HATCHER',
+  equifold: '× EQUIFOLD',
+};
 
-function SectionHeading({
-  title,
-  description,
-  id,
-}: {
-  title: string;
-  description: string;
-  id: string;
-}) {
+const STATUS_CLASS = {
+  shipped: 'statusShipped',
+  now: 'statusNow',
+  next: 'statusNext',
+  later: 'statusLater',
+} as const;
+
+function TagChips({ tags }: { tags?: readonly RoadmapTag[] }) {
+  if (!tags?.length) return null;
+
   return (
-    <header className={styles.sectionHeading}>
-      <span className={styles.headingRail} aria-hidden="true">
-        <span />
-      </span>
-      <div>
-        <h2 id={id}>{title}</h2>
-        <p>{description}</p>
-      </div>
-    </header>
+    <span className={styles.tagRow}>
+      {tags.map((tag) => (
+        <span key={tag} className={`${styles.tag} ${styles[`tag_${tag}`]}`}>
+          {TAG_LABEL[tag]}
+        </span>
+      ))}
+    </span>
   );
 }
+
 export default async function RoadmapPage() {
   const t = await getTranslations('roadmap');
 
@@ -126,7 +113,7 @@ export default async function RoadmapPage() {
             </div>
             <ol className={styles.releaseRail}>
               {latestReleases.map((release) => {
-                const Icon = ICONS[release.icon];
+                const Icon = ICONS[release.icon] ?? CircleGauge;
 
                 return (
                   <li key={release.id}>
@@ -144,130 +131,74 @@ export default async function RoadmapPage() {
           </aside>
         </section>
 
-        <section className={styles.liveSection} aria-labelledby="live-now-title">
+        <section className={styles.railsNote} aria-label="Token rails">
           <div className={styles.sectionInner}>
-            <SectionHeading
-              id="live-now-title"
-              title="Live now"
-              description="A current view of the product—not a list of promises from launch week."
-            />
-
-            <div className={styles.liveTimeline}>
-              {liveTracks.map((track, index) => {
-                const Icon = ICONS[track.icon];
-
-                return (
-                  <article className={styles.liveRow} key={track.id}>
-                    <div className={styles.liveMarker} aria-hidden="true">
-                      <span>{String(index + 1).padStart(2, '0')}</span>
-                      <i />
-                    </div>
-
-                    <div className={styles.liveCopy}>
-                      <div className={styles.trackLabel}>
-                        <Icon aria-hidden="true" />
-                        <span>{track.label}</span>
-                      </div>
-                      <h3>{track.title}</h3>
-                      <p>{track.summary}</p>
-                      <Link href={track.href} className={styles.inlineLink}>
-                        {track.linkLabel}
-                        <ArrowUpRight aria-hidden="true" />
-                      </Link>
-                    </div>
-
-                    <ul className={styles.evidenceList}>
-                      {track.evidence.map((item) => (
-                        <li key={item}>
-                          <Check aria-hidden="true" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </article>
-                );
-              })}
-            </div>
+            <p>
+              <span className={`${styles.tag} ${styles.tag_hatcher}`}>HATCHER</span>
+              marks features that add utility to the HATCHER token — staking, burns,
+              and AI Credit top-ups.
+              <span className={`${styles.tag} ${styles.tag_equifold}`}>× EQUIFOLD</span>
+              marks the growing bridge to our EquiFold launchpad, where launchpad
+              services run on EQUI.
+            </p>
           </div>
         </section>
 
-        <section className={styles.buildSection} aria-labelledby="building-next-title">
-          <div className={styles.sectionInner}>
-            <SectionHeading
-              id="building-next-title"
-              title="Building next"
-              description="Directional targets, shipped when the product evidence is ready—not on arbitrary dates."
-            />
+        {phases.map((phase) => (
+          <section
+            key={phase.id}
+            className={styles.phaseSection}
+            aria-labelledby={`phase-${phase.id}-title`}
+          >
+            <div className={styles.sectionInner}>
+              <div className={styles.phaseLayout}>
+                <span className={styles.phaseNode} data-status={phase.status} aria-hidden="true" />
+                <header className={styles.phaseHead}>
+                  <p className={styles.phaseMeta}>
+                    <span className={`${styles.statusChip} ${styles[STATUS_CLASS[phase.status]]}`}>
+                      {phase.statusLabel}
+                    </span>
+                    <span className={styles.phaseTimeframe}>{phase.timeframe}</span>
+                  </p>
+                  <h2 id={`phase-${phase.id}-title`}>{phase.title}</h2>
+                  <p className={styles.phaseBlurb}>{phase.blurb}</p>
+                </header>
 
-            {buildingNext.length > 0 ? <div className={styles.targetTimeline}>
-              {buildingNext.map((target, index) => {
-                const Icon = ICONS[target.icon];
-
-                return (
-                  <article className={styles.targetRow} key={target.id}>
-                    <div className={styles.targetMarker} aria-hidden="true">
-                      <span>{String(index + 1).padStart(2, '0')}</span>
-                    </div>
-
-                    <div className={styles.targetCopy}>
-                      <Icon aria-hidden="true" />
-                      <div>
-                        <h3>{target.title}</h3>
-                        <p>{target.description}</p>
-                      </div>
-                    </div>
-
-                    <div className={styles.proofColumn}>
-                      <p className={styles.proofLabel}>Proof targets</p>
-                      <ul>
-                        {target.proofTargets.map((proof, proofIndex) => {
-                          const ProofIcon = PROOF_ICONS[target.id][proofIndex] ?? Check;
-
-                          return (
-                            <li key={proof}>
-                              <ProofIcon aria-hidden="true" />
-                              <span>{proof}</span>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </div>
-                  </article>
-                );
-              })}
-            </div> : (
-              <div className={styles.targetEmpty}>
-                <ListChecks aria-hidden="true" />
-                <div>
-                  <h3>No active build target</h3>
-                  <p>The next build target will move here once its product scope and proof targets are concrete.</p>
-                </div>
-              </div>
-            )}
-
-            <div className={styles.exploringBand}>
-              <div className={styles.exploringTitle}>
-                <h2>Exploring</h2>
-                <span aria-hidden="true" />
-              </div>
-              <div className={styles.exploringGrid}>
-                {exploring.map((item) => {
-                  const Icon = ICONS[item.icon];
-
-                  return (
-                    <article key={item.id}>
-                      <Icon aria-hidden="true" />
-                      <div>
-                        <h3>{item.title}</h3>
-                        <p>{item.description}</p>
-                      </div>
-                    </article>
-                  );
-                })}
+                {phase.status === 'shipped' ? (
+                  <div className={styles.shippedGrid}>
+                    {phase.items.map((item) => (
+                      <article key={item.id}>
+                        <h3>
+                          {item.title}
+                          <TagChips tags={item.tags} />
+                        </h3>
+                        <p>{item.note}</p>
+                        {item.href ? (
+                          <Link href={item.href} className={styles.inlineLink}>
+                            {item.linkLabel ?? 'Open'}
+                            <ArrowUpRight aria-hidden="true" />
+                          </Link>
+                        ) : null}
+                      </article>
+                    ))}
+                  </div>
+                ) : (
+                  <ul className={styles.phaseItems}>
+                    {phase.items.map((item) => (
+                      <li key={item.id}>
+                        <h3>
+                          {item.title}
+                          <TagChips tags={item.tags} />
+                        </h3>
+                        <p>{item.note}</p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        ))}
 
         <section className={styles.cta} aria-labelledby="roadmap-cta-title">
           <div>
