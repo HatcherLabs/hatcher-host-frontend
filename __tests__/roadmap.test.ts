@@ -1,14 +1,12 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
-  buildingNext,
-  exploring,
   latestReleases,
-  liveTracks,
+  phases,
   roadmapUpdatedAt,
 } from '../app/[locale]/roadmap/roadmap-data';
 
-const roadmapCopy = JSON.stringify({ latestReleases, liveTracks, buildingNext, exploring });
+const roadmapCopy = JSON.stringify({ latestReleases, phases });
 const pageSource = readFileSync(
   new URL('../app/[locale]/roadmap/page.tsx', import.meta.url),
   'utf8',
@@ -17,42 +15,50 @@ const pageSource = readFileSync(
 describe('roadmap content', () => {
   it('publishes a current, machine-readable update date', () => {
     expect(roadmapUpdatedAt).toEqual({
-      dateTime: '2026-07-13',
-      label: 'July 2026',
+      dateTime: '2026-08-08',
+      label: 'August 2026',
     });
   });
 
-  it('surfaces the latest operating-system releases', () => {
+  it('surfaces the latest releases', () => {
     expect(latestReleases.map((release) => release.id)).toEqual([
-      'trusted-action-approvals',
-      'measured-verified-missions',
-      'mission-control',
-      'model-network',
+      'agent-workspace',
+      'onchain-traders',
+      'equifold-launches',
+      'mobile-i18n',
     ]);
   });
 
-  it('groups shipped capabilities around current product outcomes', () => {
-    expect(liveTracks.map((track) => track.id)).toEqual(['operate', 'run', 'route', 'own']);
-    expect(roadmapCopy).toContain('App Store');
-    expect(roadmapCopy).toContain('HATCHER staking');
-    expect(roadmapCopy).toContain('GPT-5.6');
+  it('walks the classic phase ladder in order', () => {
+    expect(phases.map((phase) => phase.status)).toEqual([
+      'shipped',
+      'now',
+      'next',
+      'later',
+    ]);
+    for (const phase of phases) {
+      expect(phase.timeframe.length).toBeGreaterThan(0);
+      expect(phase.statusLabel.length).toBeGreaterThan(0);
+      expect(phase.items.length).toBeGreaterThan(0);
+      for (const item of phase.items) {
+        expect(item.title.length).toBeGreaterThan(0);
+        expect(item.note.length).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('anchors the phases in the real product surface', () => {
     expect(roadmapCopy).toContain('Mission Control');
+    expect(roadmapCopy).toContain('HATCHER staking');
+    expect(roadmapCopy).toContain('App Store');
+    expect(roadmapCopy).toContain('EquiFold');
+    expect(roadmapCopy).toContain('Inference');
   });
 
-  it('keeps near-term targets evidence-led and free of invented delivery dates', () => {
-    expect(buildingNext.map((target) => target.id)).toEqual([]);
-    expect(buildingNext.every((target) => target.proofTargets.length === 3)).toBe(true);
-    expect(roadmapCopy).not.toMatch(/next \d|weeks?|months?|Q[1-4]|launching/i);
-  });
-
-  it('labels partner- and readiness-dependent bets as exploration', () => {
-    expect(exploring.map((item) => item.id)).toEqual([
-      'hatcher-earn',
-      'verified-outcomes',
-    ]);
-    expect(exploring.find((item) => item.id === 'verified-outcomes')?.description).toContain(
-      'dependent',
-    );
+  it('keeps token utility on both rails visible', () => {
+    const tagged = phases.flatMap((phase) => phase.items).flatMap((item) => item.tags ?? []);
+    expect(tagged).toContain('hatcher');
+    expect(tagged).toContain('equifold');
   });
 
   it('removes stale launch-era promises and uses semantic page landmarks', () => {
@@ -62,6 +68,8 @@ describe('roadmap content', () => {
       'Next 2–4 weeks',
       'stake HATCHER for subscription discounts',
       'Mobile app — Android',
+      'No active build target',
+      'proofTargets',
     ]) {
       expect(`${roadmapCopy}\n${pageSource}`).not.toContain(stalePhrase);
     }
@@ -74,9 +82,8 @@ describe('roadmap content', () => {
   it('keeps all roadmap identifiers unique', () => {
     const ids = [
       ...latestReleases.map((item) => item.id),
-      ...liveTracks.map((item) => item.id),
-      ...buildingNext.map((item) => item.id),
-      ...exploring.map((item) => item.id),
+      ...phases.map((phase) => phase.id),
+      ...phases.flatMap((phase) => phase.items.map((item) => `${phase.id}:${item.id}`)),
     ];
 
     expect(new Set(ids).size).toBe(ids.length);

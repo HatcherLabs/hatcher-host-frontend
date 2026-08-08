@@ -956,3 +956,239 @@
     transition: none;
   }
 }
+
+/* ---------- Phased roadmap (classic) ---------- */
+.railsNote {
+  padding: 8px 0 40px;
+}
+
+.railsNote p {
+  margin: 0;
+  max-width: 860px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 2;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 8px;
+  padding: 2px 8px;
+  border-radius: 5px;
+  font-size: 10.5px;
+  font-weight: 720;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.railsNote .tag:first-child {
+  margin-left: 0;
+}
+
+.tag_hatcher {
+  color: var(--accent-strong);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.tag_equifold {
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+}
+
+.phaseSection {
+  padding: 0;
+}
+
+.phaseSection .sectionInner {
+  padding: 0;
+}
+
+.phaseSection:last-of-type .phaseLayout {
+  padding-bottom: 10px;
+}
+
+.phaseLayout {
+  position: relative;
+  padding: 6px 0 48px 44px;
+  border-left: 1px solid var(--border-subtle);
+  margin-left: 8px;
+}
+
+.phaseNode {
+  position: absolute;
+  left: -8px;
+  top: 16px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--bg-base);
+  border: 2px solid var(--accent);
+}
+
+.phaseNode[data-status='shipped'] {
+  background: var(--accent);
+}
+
+.phaseNode[data-status='later'] {
+  border-color: var(--border-hover);
+}
+
+.phaseHead {
+  max-width: 760px;
+}
+
+.phaseHead h2 {
+  margin: 0;
+  font-family: var(--font-inter), var(--font-body), system-ui, sans-serif;
+  color: var(--text-primary);
+  letter-spacing: -0.035em;
+  font-size: clamp(26px, 3vw, 34px);
+  font-weight: 720;
+  text-wrap: balance;
+}
+
+.phaseMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 12px;
+}
+
+.statusChip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 11px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 720;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.statusShipped {
+  color: var(--bg-base);
+  background: var(--accent);
+}
+
+.statusNow {
+  color: var(--accent-strong);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.statusNext {
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+}
+
+.statusLater {
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px dashed var(--border-default);
+}
+
+.phaseTimeframe {
+  color: var(--text-muted);
+  font-size: 12.5px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.phaseBlurb {
+  margin: 10px 0 0;
+  color: var(--text-secondary);
+  font-size: 15.5px;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+.shippedGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+  gap: 14px;
+  margin-top: 26px;
+}
+
+.shippedGrid article {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+}
+
+.shippedGrid h3,
+.phaseItems h3 {
+  margin: 0;
+  font-family: var(--font-inter), var(--font-body), system-ui, sans-serif;
+  color: var(--text-primary);
+  letter-spacing: -0.015em;
+  font-size: 15.5px;
+  font-weight: 700;
+}
+
+.shippedGrid p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.shippedGrid .inlineLink {
+  margin-top: auto;
+  padding-top: 6px;
+  font-size: 13px;
+}
+
+.phaseItems {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  max-width: 860px;
+}
+
+.phaseItems li {
+  padding: 16px 0;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.phaseItems li:last-child {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.phaseItems h3 {
+  font-size: 16.5px;
+}
+
+.phaseItems p {
+  margin: 5px 0 0;
+  color: var(--text-secondary);
+  font-size: 14.5px;
+  line-height: 1.6;
+  max-width: 70ch;
+  text-wrap: pretty;
+}
+
+.tagRow {
+  display: inline-flex;
+  gap: 0;
+}
+
+@media (max-width: 720px) {
+  .phaseLayout {
+    padding-left: 26px;
+  }
+
+  .railsNote p {
+    line-height: 1.9;
+  }
+}
