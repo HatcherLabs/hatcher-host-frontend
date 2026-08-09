@@ -1663,7 +1663,7 @@
         },
         "dashboard": {
           "checksReady": "{healthy}/{total} Checks bereit",
-          "previewStorageWarning": "IronClaw markiert Speicher auf gemounteten Volumes als Preview. Die zentralen Runtime-Checks sind betriebsbereit, aber das Stable-Release erfordert weiterhin das PostgreSQL-Speicherprofil pro Agent und eine Recovery-Validierung.",
+          "previewStorageWarning": "IronClaw kennzeichnet den eingebundenen Volume-Speicher als Preview-Profil. Konfigurieren Sie PostgreSQL-Speicher pro Agent, um zum dauerhaften gehosteten Profil zu wechseln.",
           "privateState": "privater libSQL-State",
           "reading": "IronClaw wird gelesen…",
           "runtimeLabel": "Runtime:",
@@ -1933,7 +1933,7 @@
   "frameworks": {
     "eyebrow": "Frameworks",
     "heading": "Das richtige Framework wählen",
-    "subheading": "Hatcher konzentriert sich auf zwei produktionsreife Agenten-Frameworks: OpenClaw für tool-lastige Automatisierung und Hermes für adaptive Langzeit-Agenten.",
+    "subheading": "Hatcher betreibt drei produktionsreife Agenten-Frameworks — OpenClaw für skill-basierte Automatisierung, Hermes für adaptive Langzeit-Agenten und IronClaw für Privacy-First-Agenten auf einer nativen Rust-Laufzeit.",
     "deployCta": "Agenten deployen",
     "docsLink": "Vollständige Docs",
     "atAGlance": "Auf einen Blick",
@@ -2464,7 +2464,7 @@
       "seeAll": "Alle ansehen →",
       "tagOpenclaw": "Multi-Skill-Assistent",
       "tagHermes": "Autonomer Agent",
-      "tagIronclaw": "Private Rust-Runtime · Beta"
+      "tagIronclaw": "Private Rust-Laufzeit"
     },
     "pricing": {
       "boxLabel": "Preise",

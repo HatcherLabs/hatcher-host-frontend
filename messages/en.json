@@ -1624,7 +1624,7 @@
           "runtimeLabel": "Runtime:",
           "checksReady": "{healthy}/{total} checks ready",
           "privateState": "private libSQL state",
-          "previewStorageWarning": "IronClaw marks mounted-volume storage as preview. Core runtime checks are operational, but Stable release still requires the per-agent PostgreSQL storage profile and recovery validation.",
+          "previewStorageWarning": "IronClaw marks mounted-volume storage as a preview profile. Configure per-agent PostgreSQL storage to switch to the durable hosted profile.",
           "unavailable": "Native runtime status is temporarily unavailable. The agent may still be starting."
         },
         "extensions": {
@@ -1933,7 +1933,7 @@
   "frameworks": {
     "eyebrow": "Frameworks",
     "heading": "Pick the right framework",
-    "subheading": "Hatcher is focused on two production agent frameworks — OpenClaw for skill-heavy automation and Hermes for adaptive long-running agents — plus IronClaw, a privacy-first Rust runtime in beta.",
+    "subheading": "Hatcher runs three production agent frameworks — OpenClaw for skill-heavy automation, Hermes for adaptive long-running agents, and IronClaw for privacy-first Rust-native agents.",
     "deployCta": "Deploy an agent",
     "docsLink": "Full docs",
     "atAGlance": "At a glance",
@@ -2616,7 +2616,7 @@
       "seeAll": "See all →",
       "tagOpenclaw": "Multi-skill assistant",
       "tagHermes": "Autonomous agent",
-      "tagIronclaw": "Private Rust runtime · Beta"
+      "tagIronclaw": "Private Rust runtime"
     },
     "pricing": {
       "boxLabel": "Pricing",

@@ -1663,7 +1663,7 @@
         },
         "dashboard": {
           "checksReady": "{healthy}/{total} verificări pregătite",
-          "previewStorageWarning": "IronClaw marchează stocarea pe volum montat ca preview. Verificările de bază ale runtime-ului sunt operaționale, dar lansarea Stable necesită în continuare profilul de stocare PostgreSQL per agent și validarea recuperării.",
+          "previewStorageWarning": "IronClaw marchează stocarea pe volum montat drept profil preview. Configurează stocarea PostgreSQL per agent pentru a trece la profilul durabil găzduit.",
           "privateState": "stare libSQL privată",
           "reading": "Se citește IronClaw…",
           "runtimeLabel": "Runtime:",
@@ -1933,7 +1933,7 @@
   "frameworks": {
     "eyebrow": "Frameworks",
     "heading": "Alege frameworkul potrivit",
-    "subheading": "Hatcher se concentrează pe două framework-uri de producție: OpenClaw pentru automatizări cu multe skill-uri și Hermes pentru agenți adaptivi long-running.",
+    "subheading": "Hatcher rulează trei framework-uri de agenți gata de producție — OpenClaw pentru automatizări bazate pe abilități, Hermes pentru agenți adaptivi de lungă durată și IronClaw pentru agenți privacy-first pe runtime nativ Rust.",
     "deployCta": "Deployează un agent",
     "docsLink": "Documentație completă",
     "atAGlance": "La prima vedere",
@@ -2616,7 +2616,7 @@
       "seeAll": "Vezi toate →",
       "tagOpenclaw": "Asistent multi-skill",
       "tagHermes": "Agent autonom",
-      "tagIronclaw": "Runtime Rust privat · Beta"
+      "tagIronclaw": "Runtime Rust privat"
     },
     "pricing": {
       "boxLabel": "Prețuri",

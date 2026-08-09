@@ -1663,7 +1663,7 @@
         },
         "dashboard": {
           "checksReady": "{healthy}/{total} verificações prontas",
-          "previewStorageWarning": "O IronClaw marca o armazenamento em volume montado como prévia. As verificações principais do tempo de execução estão operacionais, mas a versão Stable ainda exige o perfil de armazenamento PostgreSQL por agente e a validação de recuperação.",
+          "previewStorageWarning": "O IronClaw marca o armazenamento em volume montado como perfil de prévia. Configure o armazenamento PostgreSQL por agente para mudar para o perfil hospedado durável.",
           "privateState": "estado libSQL privado",
           "reading": "Lendo o IronClaw…",
           "runtimeLabel": "Tempo de execução:",
@@ -1933,7 +1933,7 @@
   "frameworks": {
     "eyebrow": "Estruturas",
     "heading": "Escolha a estrutura certa",
-    "subheading": "O Hatcher está focado em duas estruturas de agentes de produção: OpenClaw para automação com muitas habilidades e Hermes para agentes adaptativos de longa execução.",
+    "subheading": "A Hatcher executa três frameworks de agentes prontos para produção — OpenClaw para automação baseada em habilidades, Hermes para agentes adaptativos de longa duração e IronClaw para agentes com foco em privacidade em um runtime nativo em Rust.",
     "deployCta": "Implantar um agente",
     "docsLink": "Documentos completos",
     "atAGlance": "De relance",
@@ -2464,7 +2464,7 @@
       "seeAll": "Ver tudo →",
       "tagOpenclaw": "Assistente multi-habilidades",
       "tagHermes": "Agente autônomo",
-      "tagIronclaw": "Tempo de execução Rust privado · Beta"
+      "tagIronclaw": "Runtime Rust privado"
     },
     "pricing": {
       "boxLabel": "Preços",

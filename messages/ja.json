@@ -1663,7 +1663,7 @@
         },
         "dashboard": {
           "checksReady": "{healthy}/{total}件のチェックが準備完了",
-          "previewStorageWarning": "IronClawはマウントされたボリュームのストレージをプレビュー扱いとしています。コアランタイムのチェックは動作していますが、安定版リリースにはエージェントごとのPostgreSQLストレージプロファイルとリカバリー検証が引き続き必要です。",
+          "previewStorageWarning": "IronClawはマウントされたボリュームストレージをプレビュープロファイルとして扱います。エージェントごとのPostgreSQLストレージを設定すると、永続的なホスト型プロファイルに切り替わります。",
           "privateState": "プライベートlibSQLステート",
           "reading": "IronClawを読み取り中…",
           "runtimeLabel": "ランタイム:",
@@ -1933,7 +1933,7 @@
   "frameworks": {
     "eyebrow": "フレームワーク",
     "heading": "適切なフレームワークを選ぶ",
-    "subheading": "Hatcherは、スキル重視の自動化向けOpenClawと、適応型長期実行エージェント向けHermesという2つの本番エージェントフレームワークに焦点を当てています。",
+    "subheading": "Hatcherは本番運用可能な3つのエージェントフレームワークを提供します — スキル中心の自動化にはOpenClaw、長時間稼働する適応型エージェントにはHermes、プライバシー重視のRustネイティブエージェントにはIronClaw。",
     "deployCta": "エージェントを展開する",
     "docsLink": "全文ドキュメント",
     "atAGlance": "一目で",
@@ -2464,7 +2464,7 @@
       "seeAll": "すべてを見る→",
       "tagOpenclaw": "マルチスキルアシスタント",
       "tagHermes": "自律エージェント",
-      "tagIronclaw": "プライベートRustランタイム · ベータ"
+      "tagIronclaw": "プライベートなRustランタイム"
     },
     "pricing": {
       "boxLabel": "価格設定",

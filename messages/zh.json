@@ -1663,7 +1663,7 @@
         },
         "dashboard": {
           "checksReady": "{healthy}/{total} 项检查就绪",
-          "previewStorageWarning": "IronClaw 将挂载卷存储标记为预览。核心运行时检查正常运行，但稳定版仍需要按智能体的 PostgreSQL 存储配置和恢复验证。",
+          "previewStorageWarning": "IronClaw 将挂载卷存储标记为预览配置。请为每个智能体配置 PostgreSQL 存储，以切换到持久托管配置。",
           "privateState": "私有 libSQL 状态",
           "reading": "正在读取 IronClaw…",
           "runtimeLabel": "运行时：",
@@ -1933,7 +1933,7 @@
   "frameworks": {
     "eyebrow": "框架",
     "heading": "选择合适的框架",
-    "subheading": "Hatcher 专注于两种生产级智能体框架：OpenClaw 适合工具密集型自动化，Hermes 适合长期运行的自适应智能体。",
+    "subheading": "Hatcher 运行三个可用于生产环境的智能体框架 — OpenClaw 适合技能密集型自动化，Hermes 适合长期运行的自适应智能体，IronClaw 则为注重隐私的 Rust 原生智能体而生。",
     "deployCta": "部署智能体",
     "docsLink": "完整文档",
     "atAGlance": "快速概览",
@@ -2464,7 +2464,7 @@
       "seeAll": "查看全部 →",
       "tagOpenclaw": "多技能助手",
       "tagHermes": "自主代理",
-      "tagIronclaw": "私有 Rust 运行时 · Beta"
+      "tagIronclaw": "私密 Rust 运行时"
     },
     "pricing": {
       "boxLabel": "定价",

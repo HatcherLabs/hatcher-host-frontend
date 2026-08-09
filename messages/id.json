@@ -1663,7 +1663,7 @@
         },
         "dashboard": {
           "checksReady": "{healthy}/{total} pemeriksaan siap",
-          "previewStorageWarning": "IronClaw menandai penyimpanan volume terpasang sebagai pratinjau. Pemeriksaan inti runtime beroperasi, tetapi rilis Stable masih memerlukan profil penyimpanan PostgreSQL per-agen dan validasi pemulihan.",
+          "previewStorageWarning": "IronClaw menandai penyimpanan volume yang terpasang sebagai profil pratinjau. Konfigurasikan penyimpanan PostgreSQL per agen untuk beralih ke profil hosting yang tahan lama.",
           "privateState": "status libSQL privat",
           "reading": "Membaca IronClaw…",
           "runtimeLabel": "Runtime:",
@@ -1933,7 +1933,7 @@
   "frameworks": {
     "eyebrow": "Kerangka kerja",
     "heading": "Pilih kerangka kerja yang tepat",
-    "subheading": "Hatcher berfokus pada dua kerangka kerja agen produksi: OpenClaw untuk otomatisasi yang memerlukan keterampilan tinggi dan Hermes untuk agen adaptif yang sudah berjalan lama.",
+    "subheading": "Hatcher menjalankan tiga framework agen siap produksi — OpenClaw untuk otomatisasi berbasis keterampilan, Hermes untuk agen adaptif jangka panjang, dan IronClaw untuk agen yang mengutamakan privasi di runtime Rust native.",
     "deployCta": "Menyebarkan agen",
     "docsLink": "Dokumen lengkap",
     "atAGlance": "Sekilas",
@@ -2464,7 +2464,7 @@
       "seeAll": "Lihat semua →",
       "tagOpenclaw": "Asisten multi-keterampilan",
       "tagHermes": "Agen otonom",
-      "tagIronclaw": "Runtime Rust privat · Beta"
+      "tagIronclaw": "Runtime Rust privat"
     },
     "pricing": {
       "boxLabel": "Harga",

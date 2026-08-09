@@ -1663,7 +1663,7 @@
         },
         "dashboard": {
           "checksReady": "{healthy}/{total} kiểm tra sẵn sàng",
-          "previewStorageWarning": "IronClaw đánh dấu lưu trữ trên volume gắn kèm là bản xem trước. Các kiểm tra thời gian chạy cốt lõi đang hoạt động, nhưng bản phát hành Stable vẫn yêu cầu hồ sơ lưu trữ PostgreSQL theo từng tác nhân và xác thực khôi phục.",
+          "previewStorageWarning": "IronClaw đánh dấu lưu trữ trên volume được gắn là hồ sơ xem trước. Hãy cấu hình lưu trữ PostgreSQL cho từng tác nhân để chuyển sang hồ sơ lưu trữ bền vững.",
           "privateState": "trạng thái libSQL riêng tư",
           "reading": "Đang đọc IronClaw…",
           "runtimeLabel": "Thời gian chạy:",
@@ -1933,7 +1933,7 @@
   "frameworks": {
     "eyebrow": "Khung",
     "heading": "Chọn khung phù hợp",
-    "subheading": "Hatcher tập trung vào hai khung tác nhân sản xuất: OpenClaw dành cho tự động hóa đòi hỏi nhiều kỹ năng và Hermes dành cho các tác nhân thích ứng dài hạn.",
+    "subheading": "Hatcher vận hành ba framework tác nhân sẵn sàng cho production — OpenClaw cho tự động hóa dựa trên kỹ năng, Hermes cho tác nhân thích ứng chạy dài hạn và IronClaw cho tác nhân ưu tiên quyền riêng tư trên thời gian chạy Rust gốc.",
     "deployCta": "Triển khai một tác nhân",
     "docsLink": "Tài liệu đầy đủ",
     "atAGlance": "Trong nháy mắt",
@@ -2464,7 +2464,7 @@
       "seeAll": "Xem tất cả →",
       "tagOpenclaw": "Trợ lý đa kỹ năng",
       "tagHermes": "Tác nhân tự chủ",
-      "tagIronclaw": "Thời gian chạy Rust riêng tư · Beta"
+      "tagIronclaw": "Thời gian chạy Rust riêng tư"
     },
     "pricing": {
       "boxLabel": "Định giá",

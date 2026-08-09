@@ -1663,7 +1663,7 @@
         },
         "dashboard": {
           "checksReady": "{healthy}/{total} kontrol hazır",
-          "previewStorageWarning": "IronClaw, bağlanmış birim depolamasını önizleme olarak işaretler. Temel çalışma zamanı kontrolleri çalışır durumda, ancak Stable sürüm hâlâ ajan başına PostgreSQL depolama profilini ve kurtarma doğrulamasını gerektiriyor.",
+          "previewStorageWarning": "IronClaw, bağlı birim depolamayı önizleme profili olarak işaretler. Kalıcı barındırılan profile geçmek için ajan başına PostgreSQL depolamayı yapılandırın.",
           "privateState": "özel libSQL durumu",
           "reading": "IronClaw okunuyor…",
           "runtimeLabel": "Çalışma zamanı:",
@@ -1933,7 +1933,7 @@
   "frameworks": {
     "eyebrow": "Çerçeveler",
     "heading": "Doğru çerçeveyi seçin",
-    "subheading": "Hatcher, iki üretim ajanı çerçevesine odaklanıyor: OpenClaw beceri ağırlıklı otomasyon için ve Hermes uzun süreli adaptif ajanlar için.",
+    "subheading": "Hatcher, üretime hazır üç ajan çatısı çalıştırır — beceri ağırlıklı otomasyon için OpenClaw, uzun süreli uyarlanabilir ajanlar için Hermes ve yerel Rust çalışma zamanında gizlilik odaklı ajanlar için IronClaw.",
     "deployCta": "Bir ajan gönderin",
     "docsLink": "Tam belgeler",
     "atAGlance": "Bir bakışta",
@@ -2464,7 +2464,7 @@
       "seeAll": "Tüm →",
       "tagOpenclaw": "Çok Becerili Asistan",
       "tagHermes": "Otonom ajan",
-      "tagIronclaw": "Özel Rust çalışma zamanı · Beta"
+      "tagIronclaw": "Özel Rust çalışma zamanı"
     },
     "pricing": {
       "boxLabel": "Fiyatlandırma",
