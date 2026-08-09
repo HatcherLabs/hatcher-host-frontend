@@ -88,12 +88,13 @@ describe('agent navigation model', () => {
       'robinhood',
       'files',
       'memory',
-      'terminal',
       'dev',
       'schedules',
     ]);
     expect(tabs).not.toContain('integrations');
     expect(tabs).not.toContain('connectors');
     expect(tabs).not.toContain('sessions');
+    // No interactive CLI terminal for IronClaw — the tab is hidden.
+    expect(tabs).not.toContain('terminal');
   });
 });
