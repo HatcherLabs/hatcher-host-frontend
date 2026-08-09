@@ -129,6 +129,7 @@ export default async function ExplorePage() {
                 filterAll: t("filterAll"),
                 filterOpenClaw: t("filterOpenClaw"),
                 filterHermes: t("filterHermes"),
+                filterIronClaw: t("filterIronClaw"),
                 filterLive: t("filterLive"),
                 showingCount: t("showingCount", { count: "{count}" }),
                 noResultsTitle: t("noResultsTitle"),

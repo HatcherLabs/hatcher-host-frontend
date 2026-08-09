@@ -315,6 +315,16 @@ export function MailTab() {
                 {copyMsg && <p className="mt-2 text-xs text-[var(--accent)]">{copyMsg}</p>}
               </div>
 
+              {agent.framework === 'ironclaw' ? (
+                <div className="rounded-[3px] border border-amber-500/25 bg-amber-500/10 p-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-amber-300" style={{ fontFamily: 'var(--font-mono)' }}>
+                    {t('ironclawManualTitle')}
+                  </p>
+                  <p className="mt-2 text-xs leading-5 text-amber-100/80">
+                    {t('ironclawManualBody')}
+                  </p>
+                </div>
+              ) : (
               <div className="rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-base)] p-3">
                 <div className="flex items-center justify-between gap-3">
                   <div>
@@ -349,6 +359,7 @@ export function MailTab() {
                   {isActive ? t('runtimeActive') : t('runtimeInactive')}
                 </p>
               </div>
+              )}
             </div>
           </GlassCard>
 

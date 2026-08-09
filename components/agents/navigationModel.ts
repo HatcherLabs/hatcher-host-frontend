@@ -38,18 +38,19 @@ const AGENT_NAVIGATION: AgentNavigationSpec[] = [
   { id: 'mail', group: 'operate' },
   { id: 'stats', group: 'operate' },
   { id: 'config', group: 'configure' },
-  { id: 'integrations', group: 'configure' },
-  { id: 'connectors', group: 'configure' },
+  // 'custom' agents keep the unrestricted set they had before IronClaw gating.
+  { id: 'integrations', group: 'configure', frameworks: ['openclaw', 'hermes', 'custom'] },
+  { id: 'connectors', group: 'configure', frameworks: ['openclaw', 'hermes', 'custom'] },
   { id: 'knowledge', group: 'configure' },
-  { id: 'plugins', group: 'configure' },
+  { id: 'plugins', group: 'configure', frameworks: ['openclaw', 'hermes', 'ironclaw', 'custom'] },
   { id: 'wallet', group: 'assets' },
   { id: 'robinhood', group: 'assets' },
   { id: 'files', group: 'assets' },
-  { id: 'memory', group: 'assets' },
+  { id: 'memory', group: 'assets', frameworks: ['openclaw', 'hermes', 'ironclaw', 'custom'] },
   { id: 'sessions', group: 'assets', frameworks: ['openclaw'] },
   { id: 'terminal', group: 'advanced' },
   { id: 'dev', group: 'advanced' },
-  { id: 'schedules', group: 'advanced' },
+  { id: 'schedules', group: 'advanced', frameworks: ['openclaw', 'hermes', 'ironclaw', 'custom'] },
 ];
 
 /** Route for the OS-like agent workspace desktop (windowed files/editor/terminal). */

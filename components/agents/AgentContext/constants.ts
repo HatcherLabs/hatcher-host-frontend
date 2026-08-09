@@ -27,12 +27,14 @@ export const pageEntranceVariants = {
 export const FRAMEWORK_BADGE: Record<string, string> = {
   openclaw: 'bg-[var(--color-info-bg)] text-[var(--color-info)] border-[var(--color-info-border)]',
   hermes: 'bg-[var(--tech-accent-soft)] text-[var(--accent)] border-[var(--color-info-border)]',
+  ironclaw: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
 };
 
 /** Root filesystem path inside each framework's container */
 export const FRAMEWORK_ROOT_PATH: Record<string, string> = {
   openclaw: '/home/node/.openclaw',
   hermes: '/home/hermes/.hermes',
+  ironclaw: '/home/ironclaw/.ironclaw/reborn',
 };
 
 export const STATUS_STYLES: Record<string, { classes: string; label: string; pulse: boolean; dotColor: string }> = {

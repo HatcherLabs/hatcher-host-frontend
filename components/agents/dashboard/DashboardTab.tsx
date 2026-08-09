@@ -5,6 +5,7 @@ import { useAgentContext } from '../AgentContext';
 import { GenericDashboard } from './GenericDashboard';
 import { HermesDashboard } from './HermesDashboard';
 import { OpenClawDashboard } from './OpenClawDashboard';
+import { IronClawDashboard } from './IronClawDashboard';
 import { AgentOperationsCard } from './cards/AgentOperationsCard';
 
 /**
@@ -31,6 +32,9 @@ export function DashboardTab() {
       break;
     case 'openclaw':
       dashboard = <OpenClawDashboard />;
+      break;
+    case 'ironclaw':
+      dashboard = <IronClawDashboard />;
       break;
     default:
       dashboard = <GenericDashboard />;

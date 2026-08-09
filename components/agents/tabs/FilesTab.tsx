@@ -26,6 +26,10 @@ const FRAMEWORK_FS_INFO: Record<string, { label: string; description: string }> 
     label: 'Hermes Files',
     description: 'Managed Hermes state lives in /home/hermes/.hermes. config.yaml, SOUL.md, memories, sessions, skills, and platform data are stored here.',
   },
+  ironclaw: {
+    label: 'IronClaw Files',
+    description: 'Managed IronClaw state lives in /home/ironclaw/.ironclaw/reborn. The workspace is at /home/ironclaw/.ironclaw/reborn/workspace; skills, memory, and extension state live under the same tree. Runtime config comes from the environment, not an editable JSON file.',
+  },
 };
 
 export function FilesTab() {

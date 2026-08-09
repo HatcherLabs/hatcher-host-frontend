@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   filterExploreAgents,
+  frameworkDisplayName,
   getExploreStats,
+  publicAgentAccent,
   sortExploreAgents,
   type PublicExploreAgent,
 } from './publicAgents';
@@ -87,5 +89,17 @@ describe('public agent explore helpers', () => {
         agent('b', { status: 'sleeping', messageCount: 5 }),
       ]),
     ).toEqual({ total: 2, live: 1, interactions: 17 });
+  });
+
+  it('filters and labels public IronClaw agents', () => {
+    const ironclaw = agent('private-reviewer', { framework: 'ironclaw' });
+
+    expect(filterExploreAgents([ironclaw], {
+      query: '',
+      framework: 'ironclaw',
+      liveOnly: false,
+    })).toEqual([ironclaw]);
+    expect(frameworkDisplayName('ironclaw')).toBe('IronClaw');
+    expect(publicAgentAccent(ironclaw)).toBe('#34d399');
   });
 });

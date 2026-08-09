@@ -44,6 +44,7 @@ export interface FileExplorerAccent {
 export const FRAMEWORK_ACCENT: Record<string, FileExplorerAccent> = {
   openclaw: { color: 'var(--color-info)', border: 'border-[var(--color-info-border)]', bg: 'bg-[var(--color-info-bg)]', text: 'text-[var(--color-info)]' },
   hermes:   { color: 'var(--accent)', border: 'border-[var(--border-hover)]', bg: 'bg-[var(--tech-accent-soft)]', text: 'text-[var(--accent)]' },
+  ironclaw: { color: '#00e676', border: 'border-emerald-500/30', bg: 'bg-emerald-500/10', text: 'text-emerald-400' },
 };
 
 export function formatBytes(bytes: number): string {

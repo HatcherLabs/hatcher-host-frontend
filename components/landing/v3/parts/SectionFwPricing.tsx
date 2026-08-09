@@ -10,6 +10,7 @@ import styles from './SectionFwPricing.module.css';
 const FRAMEWORKS = [
   { key: 'openclaw', label: 'OpenClaw', color: 'var(--accent)', tagKey: 'tagOpenclaw' },
   { key: 'hermes', label: 'Hermes', color: 'var(--tech-accent)', tagKey: 'tagHermes' },
+  { key: 'ironclaw', label: 'IronClaw', color: '#00e676', tagKey: 'tagIronclaw' },
 ] as const;
 
 const TIER_ORDER: ReadonlyArray<UserTierKey> = ['free', 'starter', 'pro', 'business', 'founding_member'];

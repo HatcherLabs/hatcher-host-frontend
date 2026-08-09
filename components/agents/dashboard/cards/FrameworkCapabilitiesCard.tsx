@@ -29,16 +29,25 @@ const FRAMEWORK_CAPABILITIES: Record<string, string[]> = {
     'Learning Agent',
     'Research Mode',
   ],
+  ironclaw: [
+    'Rust Runtime',
+    'WASM Sandbox',
+    'Private Memory',
+    'Signed Extensions',
+    'Responses API',
+  ],
 };
 
 const FRAMEWORK_CAP_STYLE: Record<string, string> = {
   openclaw: 'bg-[var(--color-info-bg)] text-[var(--color-info)] border-[var(--color-info-border)]',
   hermes: 'bg-[var(--tech-accent-soft)] text-[var(--accent)] border-[var(--color-info-border)]',
+  ironclaw: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
 };
 
 const FRAMEWORK_STAT_COLOR: Record<string, string> = {
   openclaw: 'text-[var(--color-info)]',
   hermes: 'text-[var(--accent)]',
+  ironclaw: 'text-emerald-400',
 };
 
 const FRAMEWORK_STATS: Record<string, { label: string; value: string }[]> = {
@@ -51,6 +60,11 @@ const FRAMEWORK_STATS: Record<string, { label: string; value: string }[]> = {
     { label: 'Startup Time', value: '~3s' },
     { label: 'Memory', value: '~290MB' },
     { label: 'Platforms', value: '8' },
+  ],
+  ironclaw: [
+    { label: 'Runtime', value: 'Rust' },
+    { label: 'Isolation', value: 'WASM' },
+    { label: 'State', value: 'Private' },
   ],
 };
 

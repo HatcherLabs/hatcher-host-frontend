@@ -535,7 +535,7 @@
 
 .frameworkChooser {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
 }
 @media (max-width: 620px) {
@@ -599,6 +599,26 @@
   font-size: 11px;
   line-height: 1.35;
   color: var(--ink-soft);
+}
+
+.frameworkBetaNote {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, #00e676 36%, var(--line-bright));
+  border-radius: 8px;
+  background: color-mix(in srgb, #00e676 7%, var(--bg-2));
+  color: var(--ink-soft);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.frameworkBetaNote strong {
+  color: #00e676;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .modelChooser {
@@ -745,6 +765,11 @@
   background: var(--bg-2);
   border: 1px solid var(--line-bright);
   border-radius: 6px;
+}
+.skill:disabled {
+  cursor: not-allowed;
+  opacity: 0.52;
+  border-style: dashed;
 }
 
 .personalityBox {

@@ -32,6 +32,10 @@ const FRAMEWORK_COMMANDS: Record<string, Array<{ cmd: string; desc: string }>> =
     { cmd: '/reset', desc: 'Reset conversation' },
     { cmd: '/status', desc: 'Agent status' },
   ],
+  // The IronClaw Responses API runtime has no slash commands — an empty
+  // list keeps the autocomplete popup closed instead of suggesting
+  // OpenClaw commands that would fail.
+  ironclaw: [],
 };
 
 interface ChatInputProps {

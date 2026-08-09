@@ -33,17 +33,18 @@ import {
 import styles from './agents.module.css';
 
 type StatusFilter = 'all' | 'active' | 'sleeping' | 'paused' | 'archived' | 'error' | 'restarting';
-type FrameworkFilter = 'all' | 'openclaw' | 'hermes';
+type FrameworkFilter = 'all' | 'openclaw' | 'hermes' | 'ironclaw';
 type SortOption = 'newest' | 'az' | 'messages' | 'active';
 type ViewMode = 'agents' | 'orchestration';
 
 const STATUS_FILTERS: StatusFilter[] = ['all', 'active', 'sleeping', 'paused', 'archived', 'error', 'restarting'];
-const FRAMEWORKS: FrameworkFilter[] = ['all', 'openclaw', 'hermes'];
+const FRAMEWORKS: FrameworkFilter[] = ['all', 'openclaw', 'hermes', 'ironclaw'];
 const SORTS: SortOption[] = ['newest', 'az', 'messages', 'active'];
 
 const FRAMEWORK_LABEL: Record<string, string> = {
   openclaw: 'OpenClaw',
   hermes: 'Hermes',
+  ironclaw: 'IronClaw',
 };
 
 function FrameworkIcon({ framework, size = 18 }: { framework: string; size?: number }) {

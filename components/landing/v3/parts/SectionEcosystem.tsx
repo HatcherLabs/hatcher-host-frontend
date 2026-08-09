@@ -7,6 +7,7 @@ import styles from './SectionEcosystem.module.css';
 const FRAMEWORKS = [
   { key: 'openclaw', label: 'OpenClaw', color: '#738a96', kind: 'framework' as const },
   { key: 'hermes', label: 'Hermes', color: '#486a79', kind: 'framework' as const },
+  { key: 'ironclaw', label: 'IronClaw', color: '#00e676', kind: 'framework' as const },
 ];
 
 const CHAINS = [

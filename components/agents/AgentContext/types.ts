@@ -168,7 +168,7 @@ export interface AgentContextValue {
   saving: boolean;
   saveMsg: string | null;
   setSaveMsg: (msg: string | null) => void;
-  saveConfig: (commitMessage?: string) => Promise<void>;
+  saveConfig: (commitMessage?: string) => Promise<boolean>;
 
   // LLM helpers
   llmProvider: string;

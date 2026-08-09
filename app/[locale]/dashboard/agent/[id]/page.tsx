@@ -151,6 +151,21 @@ const PluginsTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
+const IronClawExtensionsTab = dynamic(
+  () => import('@/components/agents/tabs/IronClawExtensionsTab').then(mod => ({ default: mod.IronClawExtensionsTab })),
+  { loading: () => <TabSkeleton /> }
+);
+
+const IronClawAutomationsTab = dynamic(
+  () => import('@/components/agents/tabs/IronClawAutomationsTab').then(mod => ({ default: mod.IronClawAutomationsTab })),
+  { loading: () => <TabSkeleton /> }
+);
+
+const IronClawMemoryTab = dynamic(
+  () => import('@/components/agents/tabs/IronClawMemoryTab').then(mod => ({ default: mod.IronClawMemoryTab })),
+  { loading: () => <TabSkeleton /> }
+);
+
 const TerminalTab = dynamic(
   () => import('@/components/agents/tabs/TerminalTab').then(mod => ({ default: mod.TerminalTab })),
   { loading: TabSkeleton },
@@ -1586,14 +1601,16 @@ export default function AgentManagePage() {
                     <Share2 size={13} />
                     <span>{tHeader('share')}</span>
                   </button>
-                  <button
-                    onClick={() => setPortModalOpen(true)}
-                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-semibold text-[var(--text-secondary)] transition hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"
-                    title="Clone to another framework"
-                  >
-                    <Copy size={13} />
-                    <span>{tHeader('clone')}</span>
-                  </button>
+                  {agent.framework !== 'ironclaw' && (
+                    <button
+                      onClick={() => setPortModalOpen(true)}
+                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-semibold text-[var(--text-secondary)] transition hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"
+                      title="Clone to another framework"
+                    >
+                      <Copy size={13} />
+                      <span>{tHeader('clone')}</span>
+                    </button>
+                  )}
                   <div className="my-1 h-px bg-[var(--border-line)]" />
                   <button
                     onClick={actions.handleDelete}
@@ -1638,16 +1655,21 @@ export default function AgentManagePage() {
               {tab === 'config' && <ConfigTab />}
               {tab === 'integrations' && <IntegrationsTab />}
               {tab === 'connectors' && <ConnectorsTab />}
-              {(tab === 'skills' || tab === 'plugins') && <PluginsTab />}
+              {(tab === 'skills' || tab === 'plugins') && (
+                agent?.framework === 'ironclaw' ? <IronClawExtensionsTab /> : <PluginsTab />
+              )}
               {tab === 'files' && <FilesTab />}
               {tab === 'logs' && <LogsTab />}
               {tab === 'memory' && (
                 agent?.framework === 'hermes' ? <HermesMemoryTab /> :
-                <MemoryTab />
+                agent?.framework === 'ironclaw' ? <IronClawMemoryTab /> : <MemoryTab />
               )}
               {tab === 'sessions' && (
-                agent?.framework === 'openclaw' ? <OpenClawSessionsTab /> :
-                null
+                agent?.framework === 'openclaw' ? <OpenClawSessionsTab /> : (
+                  <div className="bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-lg px-4 py-6 text-center">
+                    <p className="text-sm text-[var(--text-muted)]">{t('tabUnavailable')}</p>
+                  </div>
+                )
               )}
               {tab === 'chat' && <ChatTab />}
               {tab === 'mail' && <MailTab />}
@@ -1656,7 +1678,9 @@ export default function AgentManagePage() {
               {tab === 'wallet' && <WalletTab />}
               {tab === 'robinhood' && <RobinhoodTab />}
               {tab === 'stats' && <StatsTab />}
-              {tab === 'schedules' && <SchedulesTab />}
+              {tab === 'schedules' && (
+                agent?.framework === 'ironclaw' ? <IronClawAutomationsTab /> : <SchedulesTab />
+              )}
             </AnimatePresence>
             {terminalMounted && (
               <div className={tab === 'terminal' ? 'block' : 'hidden'} aria-hidden={tab !== 'terminal'}>
@@ -1668,7 +1692,7 @@ export default function AgentManagePage() {
         </div>
       </motion.div>
 
-      {agent && (
+      {agent && agent.framework !== 'ironclaw' && (
         <PortAgentModal
           agent={{ id: agent.id, name: agent.name, framework: agent.framework }}
           isOpen={portModalOpen}
