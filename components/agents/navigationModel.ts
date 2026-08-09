@@ -48,7 +48,9 @@ const AGENT_NAVIGATION: AgentNavigationSpec[] = [
   { id: 'files', group: 'assets' },
   { id: 'memory', group: 'assets', frameworks: ['openclaw', 'hermes', 'ironclaw', 'custom'] },
   { id: 'sessions', group: 'assets', frameworks: ['openclaw'] },
-  { id: 'terminal', group: 'advanced' },
+  // IronClaw has no interactive CLI terminal (ws-terminal rejects it), so
+  // hide the tab rather than surface a "Network error" on the failed socket.
+  { id: 'terminal', group: 'advanced', frameworks: ['openclaw', 'hermes', 'custom'] },
   { id: 'dev', group: 'advanced' },
   { id: 'schedules', group: 'advanced', frameworks: ['openclaw', 'hermes', 'ironclaw', 'custom'] },
 ];
