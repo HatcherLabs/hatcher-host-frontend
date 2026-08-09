@@ -133,6 +133,14 @@ const FRAMEWORK_THEME: Record<string, { primary: string; primaryDim: string; pri
     gradientDim: 'linear-gradient(90deg, var(--accent), var(--text-muted))',
     label: 'Hermes',
   },
+  ironclaw: {
+    primary: '#00e676',
+    primaryDim: 'color-mix(in srgb, #00e676 40%, transparent)',
+    primaryBg: 'rgba(0, 230, 118, 0.1)',
+    gradient: 'linear-gradient(90deg, #00e676, #34d399)',
+    gradientDim: 'linear-gradient(90deg, #00e676, var(--text-muted))',
+    label: 'IronClaw',
+  },
 };
 
 const DEFAULT_THEME = FRAMEWORK_THEME.openclaw;
@@ -140,11 +148,13 @@ const DEFAULT_THEME = FRAMEWORK_THEME.openclaw;
 const FRAMEWORK_TIPS: Record<string, string> = {
   openclaw: 'OpenClaw agents benefit from tracking tool usage patterns. Watch token output — high output suggests verbose tool responses you can optimize.',
   hermes: 'Hermes agents are conversation-heavy. Monitor AI Credit usage and token output closely, especially on longer conversations.',
+  ironclaw: 'IronClaw agents lean on native extensions and automations. Track extension usage and automation runs, and keep tool permissions tight — auto-approved tools drive most of the spend.',
 };
 
 const FRAMEWORK_CONTEXT: Record<string, { text: string; accent: string; accentBg: string; accentBorder: string }> = {
   openclaw: { text: 'Managed models and web-search usage consume AI Credits. BYOK connects your own provider account and vendor billing.', accent: 'text-[var(--color-info)]', accentBg: 'bg-[var(--color-info-bg)]', accentBorder: 'border-[var(--color-info-border)]' },
   hermes: { text: 'Managed models and web-search usage consume AI Credits. BYOK connects your own provider account and vendor billing.', accent: 'text-[var(--accent)]', accentBg: 'bg-[var(--tech-accent-soft)]', accentBorder: 'border-[var(--color-info-border)]' },
+  ironclaw: { text: 'Managed models and web-search usage consume AI Credits. BYOK connects your own provider account and vendor billing.', accent: 'text-emerald-400', accentBg: 'bg-emerald-500/10', accentBorder: 'border-emerald-500/25' },
 };
 
 const TIER_BADGE: Record<string, { label: string; className: string }> = {
@@ -164,6 +174,7 @@ const HEALTH_STYLES: Record<string, { bg: string; text: string; dot: string; rin
 const FRAMEWORK_COLORS: Record<string, { hex: string; hexLight: string; border: string; text: string }> = {
   openclaw: { hex: 'var(--color-info)', hexLight: 'var(--accent-hover)', border: 'border-[var(--color-info-border)]', text: 'text-[var(--color-info)]' },
   hermes: { hex: 'var(--accent)', hexLight: 'var(--accent-hover)', border: 'border-[var(--border-hover)]', text: 'text-[var(--accent)]' },
+  ironclaw: { hex: '#00e676', hexLight: '#34d399', border: 'border-emerald-500/30', text: 'text-emerald-400' },
 };
 
 const RANGES: { value: Range; label: string }[] = [

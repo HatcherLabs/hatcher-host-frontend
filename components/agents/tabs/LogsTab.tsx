@@ -40,6 +40,13 @@ const FRAMEWORK_LOG_INFO: Record<string, { label: string; description: string; a
     border: 'border-[var(--border-hover)]',
     bg: 'bg-[var(--tech-accent-soft)]',
   },
+  ironclaw: {
+    label: 'IronClaw',
+    description: 'Structured logs from the Rust runtime, streamed from the container stdout. Tool and automation events are included.',
+    accent: 'text-emerald-400',
+    border: 'border-emerald-500/25',
+    bg: 'bg-emerald-500/10',
+  },
 };
 
 /* ── Level badge config ── */

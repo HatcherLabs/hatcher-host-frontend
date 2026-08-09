@@ -69,4 +69,31 @@ describe('agent navigation model', () => {
       });
     }
   });
+
+  it('exposes only the native IronClaw capability surfaces', () => {
+    const tabs = buildAgentNavigationTabs('ironclaw', labelFor, 'advanced').map((tab) => tab.id);
+
+    // Pin the full tab set so a regression in either direction (a tab
+    // disappearing or an unsupported one leaking in) fails loudly.
+    expect(tabs).toEqual([
+      'overview',
+      'chat',
+      'logs',
+      'mail',
+      'stats',
+      'config',
+      'knowledge',
+      'plugins',
+      'wallet',
+      'robinhood',
+      'files',
+      'memory',
+      'terminal',
+      'dev',
+      'schedules',
+    ]);
+    expect(tabs).not.toContain('integrations');
+    expect(tabs).not.toContain('connectors');
+    expect(tabs).not.toContain('sessions');
+  });
 });

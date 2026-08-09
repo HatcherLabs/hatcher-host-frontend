@@ -38,18 +38,18 @@ const AGENT_NAVIGATION: AgentNavigationSpec[] = [
   { id: 'mail', group: 'operate' },
   { id: 'stats', group: 'operate' },
   { id: 'config', group: 'configure' },
-  { id: 'integrations', group: 'configure' },
-  { id: 'connectors', group: 'configure' },
+  { id: 'integrations', group: 'configure', frameworks: ['openclaw', 'hermes'] },
+  { id: 'connectors', group: 'configure', frameworks: ['openclaw', 'hermes'] },
   { id: 'knowledge', group: 'configure' },
-  { id: 'plugins', group: 'configure' },
+  { id: 'plugins', group: 'configure', frameworks: ['openclaw', 'hermes', 'ironclaw'] },
   { id: 'wallet', group: 'assets' },
   { id: 'robinhood', group: 'assets' },
   { id: 'files', group: 'assets' },
-  { id: 'memory', group: 'assets' },
+  { id: 'memory', group: 'assets', frameworks: ['openclaw', 'hermes', 'ironclaw'] },
   { id: 'sessions', group: 'assets', frameworks: ['openclaw'] },
   { id: 'terminal', group: 'advanced' },
   { id: 'dev', group: 'advanced' },
-  { id: 'schedules', group: 'advanced' },
+  { id: 'schedules', group: 'advanced', frameworks: ['openclaw', 'hermes', 'ironclaw'] },
 ];
 
 /** Route for the OS-like agent workspace desktop (windowed files/editor/terminal). */

@@ -2618,7 +2618,7 @@ export type AdminHealthResponse = {
     checkedAt: string;
     latestCheckError: string | null;
     runtimes: Array<{
-      framework: "openclaw" | "hermes";
+      framework: "openclaw" | "hermes" | "ironclaw";
       currentVersion: string;
       currentSourceRef: string;
       latestVersion: string | null;
@@ -2631,3 +2631,43 @@ export type AdminHealthResponse = {
     }>;
   };
 };
+
+// ============================================================
+// IronClaw native runtime control (threads / runs / outbound / LLM)
+// ============================================================
+// The IronClaw runtime returns loosely-versioned JSON; only the fields the
+// dashboard depends on are typed — everything else stays unknown-shaped and
+// is narrowed defensively in the components.
+
+export type IronClawGateResolution =
+  | "approved"
+  | "declined"
+  | "credential_provided";
+
+export interface IronClawGateResolveBody {
+  resolution: IronClawGateResolution;
+  always?: boolean;
+  credentialRef?: string;
+}
+
+/** One parsed SSE frame from an IronClaw thread events stream. */
+export interface IronClawThreadStreamEvent {
+  event?: string;
+  data: unknown;
+}
+
+export interface IronClawMcpRegisterBody {
+  name: string;
+  url: string;
+  auth?: { type: "bearer"; token: string };
+}
+
+export interface IronClawOutboundResponse {
+  preferences?: Record<string, unknown> | null;
+  targets?: Array<Record<string, unknown>> | null;
+}
+
+export interface IronClawLlmResponse {
+  providers?: Array<Record<string, unknown>> | null;
+  active?: { provider_id?: string; model?: string } | null;
+}

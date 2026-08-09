@@ -203,16 +203,18 @@ export function useAgentConfig(
     return !!(secrets && Object.keys(secrets).length > 0);
   })();
 
-  const saveConfig = useCallback(async (commitMessage?: string) => {
-    if (!agent) return;
+  /** Returns true when the update was persisted — callers may chain
+   *  follow-up actions (e.g. IronClaw live model switch) on success. */
+  const saveConfig = useCallback(async (commitMessage?: string): Promise<boolean> => {
+    if (!agent) return false;
     const trimmedName = configName.trim() || agent.name;
     if (trimmedName.length < 3 || trimmedName.length > 50) {
       setSaveMsg('Error: Agent name must be 3-50 characters');
-      return;
+      return false;
     }
     if (!/^[a-zA-Z0-9 \-]+$/.test(trimmedName)) {
       setSaveMsg('Error: Name can only contain letters, numbers, spaces, and hyphens');
-      return;
+      return false;
     }
     const normalizedProvider = normalizeConfigProvider(configProvider);
     const isHostedProvider = normalizedProvider === HOSTED_PROVIDER;
@@ -222,7 +224,7 @@ export function useAgentConfig(
       if (!hasExistingKey && !hasNewKey) {
         const providerName = getBYOKProvider(configProvider)?.name ?? configProvider;
         setSaveMsg(`Error: API key is required for ${providerName}. Enter your key or switch back to Hatcher-hosted models.`);
-        return;
+        return false;
       }
     }
     setSaving(true);
@@ -270,9 +272,10 @@ export function useAgentConfig(
         : '';
       setSaveMsg(`Configuration saved successfully${restartNote}`);
       setTimeout(() => setSaveMsg(null), 5000);
-    } else {
-      setSaveMsg('Error: ' + res.error);
+      return true;
     }
+    setSaveMsg('Error: ' + res.error);
+    return false;
   }, [agent, id, setAgent, configName, configDesc, configSystemPrompt, configSkills, configModel, configProvider,
     useCustomModel, customModelInput, byokKeyInput, hasApiKey,
     configIsPublic, configPublicChatEnabled, configPublicChatDailyAiCreditCap]);

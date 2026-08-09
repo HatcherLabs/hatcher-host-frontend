@@ -1,4 +1,4 @@
-export type ExploreFrameworkFilter = 'all' | 'openclaw' | 'hermes';
+export type ExploreFrameworkFilter = 'all' | 'openclaw' | 'hermes' | 'ironclaw';
 
 export interface PublicExploreAgent {
   id: string;
@@ -73,6 +73,7 @@ export function getExploreStats(agents: PublicExploreAgent[]): {
 
 export function publicAgentAccent(agent: PublicExploreAgent): string {
   if (agent.status === 'crashed') return '#f97316';
+  if (agent.framework.toLowerCase() === 'ironclaw') return '#34d399';
   return agent.framework.toLowerCase() === 'hermes' ? '#38bdf8' : '#486a79';
 }
 
@@ -89,5 +90,6 @@ export function frameworkDisplayName(framework: string): string {
   const normalized = framework.toLowerCase();
   if (normalized === 'openclaw') return 'OpenClaw';
   if (normalized === 'hermes') return 'Hermes';
+  if (normalized === 'ironclaw') return 'IronClaw';
   return framework;
 }

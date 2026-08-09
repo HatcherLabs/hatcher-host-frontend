@@ -1063,6 +1063,7 @@
 }
 .frameworkBadge.openclaw { color: #f0c36a; border-color: rgba(240, 195, 106, 0.28); background: rgba(240, 195, 106, 0.07); }
 .frameworkBadge.hermes { color: #6ea3f7; border-color: rgba(110, 163, 247, 0.28); background: rgba(110, 163, 247, 0.07); }
+.frameworkBadge.ironclaw { color: #34d399; border-color: rgba(0, 230, 118, 0.28); background: rgba(0, 230, 118, 0.07); }
 
 .dot { color: var(--text-muted); opacity: 0.5; }
 

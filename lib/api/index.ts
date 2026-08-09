@@ -196,5 +196,11 @@ export type {
   AdminEgressEventsResponse,
   AgentEgressEventsResponse,
   AdminHealthResponse,
+  IronClawGateResolution,
+  IronClawGateResolveBody,
+  IronClawThreadStreamEvent,
+  IronClawMcpRegisterBody,
+  IronClawOutboundResponse,
+  IronClawLlmResponse,
 } from "./types";
 export { api } from "./methods";

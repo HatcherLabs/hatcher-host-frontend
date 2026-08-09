@@ -154,6 +154,11 @@ import type {
   StakingClaimResponse,
   StakingConfigResponse,
   UserStakingSummary,
+  IronClawGateResolveBody,
+  IronClawLlmResponse,
+  IronClawMcpRegisterBody,
+  IronClawOutboundResponse,
+  IronClawThreadStreamEvent,
 } from "./types";
 import type { TierConfig, AdminOverviewExtras } from "@hatcher/shared";
 
@@ -1215,12 +1220,14 @@ export const api = {
   createAgent: (data: {
     name: string;
     description?: string;
-    framework: "openclaw" | "hermes";
+    framework: "openclaw" | "hermes" | "ironclaw";
     template?: string;
-    config: {
+    config?: {
       model?: string;
       provider?: string;
       skills?: string[];
+      selectedSkills?: string[];
+      selectedExtensions?: string[];
       systemPrompt?: string;
       personality?: string;
       bio?: string;
@@ -3634,4 +3641,253 @@ export const api = {
       },
     ),
 
+  // IronClaw native WebChat v2 dashboard surfaces
+  getIronClawOverview: (agentId: string) =>
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/overview`),
+
+  getIronClawAutomations: (agentId: string, includeCompleted = false) =>
+    req<{ automations: Array<Record<string, unknown>>; scheduler_enabled?: boolean }>(
+      `/agents/${agentId}/ironclaw/automations${includeCompleted ? "?includeCompleted=true" : ""}`,
+    ),
+
+  createIronClawAutomation: (agentId: string, prompt: string) =>
+    req<{ automation: Record<string, unknown>; threadId: string }>(
+      `/agents/${agentId}/ironclaw/automations`,
+      { method: "POST", body: JSON.stringify({ prompt }) },
+    ),
+
+  pauseIronClawAutomation: (agentId: string, automationId: string) =>
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/automations/${encodeURIComponent(automationId)}/pause`, { method: "POST" }),
+
+  resumeIronClawAutomation: (agentId: string, automationId: string) =>
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/automations/${encodeURIComponent(automationId)}/resume`, { method: "POST" }),
+
+  renameIronClawAutomation: (agentId: string, automationId: string, name: string) =>
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/automations/${encodeURIComponent(automationId)}/rename`, { method: "POST", body: JSON.stringify({ name }) }),
+
+  deleteIronClawAutomation: (agentId: string, automationId: string) =>
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/automations/${encodeURIComponent(automationId)}`, { method: "DELETE" }),
+
+  getIronClawExtensions: (agentId: string) =>
+    req<{ installed: { extensions?: Array<Record<string, unknown>> }; registry: { entries?: Array<Record<string, unknown>> } }>(`/agents/${agentId}/ironclaw/extensions`),
+
+  installIronClawExtension: (agentId: string, id: string) =>
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/extensions/install`, { method: "POST", body: JSON.stringify({ id }) }),
+
+  removeIronClawExtension: (agentId: string, id: string) =>
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/extensions/${encodeURIComponent(id)}/remove`, { method: "POST" }),
+
+  getIronClawExtensionSetup: (agentId: string, id: string) =>
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/extensions/${encodeURIComponent(id)}/setup`),
+
+  submitIronClawExtensionSetup: (agentId: string, id: string, action: string, payload: Record<string, unknown>) =>
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/extensions/${encodeURIComponent(id)}/setup`, { method: "POST", body: JSON.stringify({ action, payload }) }),
+
+  startIronClawExtensionOAuth: (agentId: string, id: string, requirement: string, invocationId?: string) =>
+    req<{ flow_id: string; status: string; provider: string; authorization_url: string; expires_at: string; callback_scope?: { invocation_id?: string } }>(
+      `/agents/${agentId}/ironclaw/extensions/${encodeURIComponent(id)}/setup/oauth/start`,
+      { method: "POST", body: JSON.stringify({ requirement, invocationId }) },
+    ),
+
+  reconcileIronClawOAuthFlow: (agentId: string, flowId: string, invocationId?: string) =>
+    req<{ status: string }>(
+      `/agents/${agentId}/ironclaw/oauth/flow/${encodeURIComponent(flowId)}/reconcile${invocationId ? `?invocationId=${encodeURIComponent(invocationId)}` : ""}`,
+      { method: "POST" },
+    ),
+
+  getIronClawExtensionPairingStatus: (agentId: string, id: string) =>
+    req<{ connected: boolean; pending: { code: string; deep_link?: string; expires_at: string } | null }>(`/agents/${agentId}/ironclaw/extensions/${encodeURIComponent(id)}/pairing/status`),
+
+  mintIronClawExtensionPairingCode: (agentId: string, id: string) =>
+    req<{ code: string; deep_link?: string; expires_at: string }>(`/agents/${agentId}/ironclaw/extensions/${encodeURIComponent(id)}/pairing/mint`, { method: "POST" }),
+
+  unpairIronClawExtension: (agentId: string, id: string) =>
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/extensions/${encodeURIComponent(id)}/pairing/unpair`, { method: "POST" }),
+
+  getIronClawSkills: (agentId: string) =>
+    req<{ skills: Array<Record<string, unknown>>; auto_activate_learned?: boolean; count?: number }>(`/agents/${agentId}/ironclaw/skills`),
+
+  getIronClawSkill: (agentId: string, name: string) =>
+    req<{ name: string; content: string }>(`/agents/${agentId}/ironclaw/skills/${encodeURIComponent(name)}`),
+
+  installIronClawSkill: (agentId: string, name: string, content: string) =>
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/skills/install`, { method: "POST", body: JSON.stringify({ name, content }) }),
+
+  updateIronClawSkill: (agentId: string, name: string, content: string) =>
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/skills/${encodeURIComponent(name)}`, { method: "PUT", body: JSON.stringify({ content }) }),
+
+  removeIronClawSkill: (agentId: string, name: string) =>
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/skills/${encodeURIComponent(name)}`, { method: "DELETE" }),
+
+  setIronClawSkillAutoActivate: (agentId: string, name: string, enabled: boolean) =>
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/skills/${encodeURIComponent(name)}/auto-activate`, { method: "POST", body: JSON.stringify({ enabled }) }),
+
+  setIronClawAutoActivateLearned: (agentId: string, enabled: boolean) =>
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/skills/auto-activate-learned`, { method: "POST", body: JSON.stringify({ enabled }) }),
+
+  getIronClawTools: (agentId: string) =>
+    req<{ entries: Array<Record<string, unknown>>; diagnostics?: unknown[] }>(`/agents/${agentId}/ironclaw/tools`),
+
+  setIronClawToolsAutoApprove: (agentId: string, enabled: boolean) =>
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/tools/auto-approve`, { method: "POST", body: JSON.stringify({ enabled }) }),
+
+  setIronClawToolPermission: (agentId: string, capabilityId: string, state: string) =>
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/tools/${encodeURIComponent(capabilityId)}`, { method: "POST", body: JSON.stringify({ state }) }),
+
+  listIronClawFs: (agentId: string, mount: "memory" | "workspace", path = "") =>
+    req<{ mount: string; path: string; entries: Array<{ name: string; path: string; kind: "file" | "directory" }> }>(`/agents/${agentId}/ironclaw/fs?mount=${mount}&path=${encodeURIComponent(path)}`),
+
+  readIronClawFs: (agentId: string, mount: "memory" | "workspace", path: string) =>
+    req<Record<string, unknown> | string>(`/agents/${agentId}/ironclaw/fs/content?mount=${mount}&path=${encodeURIComponent(path)}`),
+
+  // IronClaw native threads, runs & runtime control
+  listIronClawThreads: (agentId: string) =>
+    req<{ threads?: Array<Record<string, unknown>> }>(`/agents/${agentId}/ironclaw/threads`),
+
+  createIronClawThread: (agentId: string) =>
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/threads`, { method: "POST" }),
+
+  deleteIronClawThread: (agentId: string, threadId: string) =>
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/threads/${encodeURIComponent(threadId)}`, { method: "DELETE" }),
+
+  getIronClawThreadTimeline: (agentId: string, threadId: string, options?: { limit?: number; cursor?: string }) => {
+    const params = new URLSearchParams();
+    if (options?.limit !== undefined) params.set("limit", String(options.limit));
+    if (options?.cursor) params.set("cursor", options.cursor);
+    const query = params.toString();
+    return req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/threads/${encodeURIComponent(threadId)}/timeline${query ? `?${query}` : ""}`);
+  },
+
+  cancelIronClawRun: (agentId: string, threadId: string, runId: string, reason?: string) =>
+    req<Record<string, unknown>>(
+      `/agents/${agentId}/ironclaw/threads/${encodeURIComponent(threadId)}/runs/${encodeURIComponent(runId)}/cancel`,
+      { method: "POST", ...(reason ? { body: JSON.stringify({ reason }) } : {}) },
+    ),
+
+  retryIronClawRun: (agentId: string, threadId: string, runId: string) =>
+    req<Record<string, unknown>>(
+      `/agents/${agentId}/ironclaw/threads/${encodeURIComponent(threadId)}/runs/${encodeURIComponent(runId)}/retry`,
+      { method: "POST" },
+    ),
+
+  resolveIronClawRunGate: (agentId: string, threadId: string, runId: string, gateRef: string, body: IronClawGateResolveBody) =>
+    req<Record<string, unknown>>(
+      `/agents/${agentId}/ironclaw/threads/${encodeURIComponent(threadId)}/runs/${encodeURIComponent(runId)}/gates/${encodeURIComponent(gateRef)}/resolve`,
+      { method: "POST", body: JSON.stringify(body) },
+    ),
+
+  getIronClawCommands: (agentId: string) =>
+    req<{ commands?: Array<Record<string, unknown>> }>(`/agents/${agentId}/ironclaw/commands`),
+
+  sendIronClawThreadCommand: (agentId: string, threadId: string, text: string) =>
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/threads/${encodeURIComponent(threadId)}/commands`, { method: "POST", body: JSON.stringify({ text }) }),
+
+  searchIronClawSkills: (agentId: string, query: string) =>
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/skills/search`, { method: "POST", body: JSON.stringify({ query }) }),
+
+  getIronClawLogs: (agentId: string, limit?: number) =>
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/logs${limit !== undefined ? `?limit=${limit}` : ""}`),
+
+  registerIronClawMcpServer: (agentId: string, body: IronClawMcpRegisterBody) =>
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/mcp/register`, { method: "POST", body: JSON.stringify(body) }),
+
+  getIronClawOutbound: (agentId: string) =>
+    req<IronClawOutboundResponse | null>(`/agents/${agentId}/ironclaw/outbound`),
+
+  setIronClawOutboundPreferences: (agentId: string, finalReplyTargetId: string | null) =>
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/outbound/preferences`, { method: "POST", body: JSON.stringify({ finalReplyTargetId }) }),
+
+  getIronClawLlm: (agentId: string) =>
+    req<IronClawLlmResponse>(`/agents/${agentId}/ironclaw/llm`),
+
+  setIronClawModel: (agentId: string, model: string) =>
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/llm/model`, { method: "POST", body: JSON.stringify({ model }) }),
+
+  /** Subscribe to an IronClaw thread's SSE event stream.
+   *
+   *  Raw fetch + ReadableStream (the `req` wrapper is JSON-only). Auth
+   *  mirrors `req`: httpOnly session cookie via credentials: 'include',
+   *  plus a Bearer header only for explicit hk_ API keys. Resolves when
+   *  the stream ends; aborts resolve as success so callers can tear down
+   *  silently. */
+  streamIronClawThreadEvents: async (
+    agentId: string,
+    threadId: string,
+    onEvent: (event: IronClawThreadStreamEvent) => void,
+    signal?: AbortSignal,
+  ): Promise<{ success: boolean; error?: string }> => {
+    const token = getToken();
+    let res: Response;
+    try {
+      res = await fetch(
+        `${API_BASE}/agents/${agentId}/ironclaw/threads/${encodeURIComponent(threadId)}/events`,
+        {
+          headers: {
+            Accept: "text/event-stream",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          credentials: "include",
+          signal,
+        },
+      );
+    } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") return { success: true };
+      return { success: false, error: err instanceof Error ? err.message : "Network error" };
+    }
+    if (!res.ok || !res.body) {
+      return { success: false, error: `HTTP ${res.status}` };
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = "";
+    let eventName: string | undefined;
+    let dataLines: string[] = [];
+
+    const flush = () => {
+      if (dataLines.length === 0 && eventName === undefined) return;
+      const raw = dataLines.join("\n");
+      let data: unknown = raw;
+      if (raw) {
+        try {
+          data = JSON.parse(raw);
+        } catch {
+          // Keep the raw string payload — consumers narrow defensively.
+        }
+      }
+      onEvent({ event: eventName, data });
+      eventName = undefined;
+      dataLines = [];
+    };
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        const lines = buf.split("\n");
+        buf = lines.pop() ?? "";
+        for (const rawLine of lines) {
+          const line = rawLine.endsWith("\r") ? rawLine.slice(0, -1) : rawLine;
+          if (!line) {
+            flush();
+            continue;
+          }
+          if (line.startsWith(":")) continue;
+          if (line.startsWith("event:")) {
+            eventName = line.slice(6).trim();
+            continue;
+          }
+          if (line.startsWith("data:")) {
+            dataLines.push(line.slice(5).replace(/^ /, ""));
+          }
+        }
+      }
+      flush();
+      return { success: true };
+    } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") return { success: true };
+      return { success: false, error: err instanceof Error ? err.message : "Stream error" };
+    }
+  },
 };

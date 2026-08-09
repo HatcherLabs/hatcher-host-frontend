@@ -48,7 +48,11 @@ interface TabDef {
 }
 
 function getTabs(framework: string | undefined, tTabs: ReturnType<typeof useTranslations<'dashboard.agentDetail.tabs'>>): TabDef[] {
-  return buildAgentNavigationTabs(framework, (id) => tTabs(id === 'overview' ? 'dashboard' : id), 'advanced')
+  return buildAgentNavigationTabs(framework, (id) => {
+    if (framework === 'ironclaw' && id === 'plugins') return tTabs('ironclawCapabilities');
+    if (framework === 'ironclaw' && id === 'schedules') return tTabs('ironclawAutomations');
+    return tTabs(id === 'overview' ? 'dashboard' : id);
+  }, 'advanced')
     .map((tab) => ({ ...tab, icon: iconForTab(tab.id) }));
 }
 
@@ -81,6 +85,7 @@ function iconForTab(tab: Tab): React.ReactNode {
 const FRAMEWORK_COLOR: Record<string, string> = {
   openclaw: '#4a778b',
   hermes: '#486a79',
+  ironclaw: '#00e676',
 };
 
 function FrameworkIcon({ framework, size = 18 }: { framework?: string; size?: number }) {

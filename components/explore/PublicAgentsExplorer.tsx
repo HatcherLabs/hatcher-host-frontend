@@ -19,6 +19,7 @@ interface ExploreCopy {
   filterAll: string;
   filterOpenClaw: string;
   filterHermes: string;
+  filterIronClaw: string;
   filterLive: string;
   showingCount: string;
   noResultsTitle: string;
@@ -40,7 +41,7 @@ interface Props {
   copy: ExploreCopy;
 }
 
-const FRAMEWORK_FILTERS: ExploreFrameworkFilter[] = ['all', 'openclaw', 'hermes'];
+const FRAMEWORK_FILTERS: ExploreFrameworkFilter[] = ['all', 'openclaw', 'hermes', 'ironclaw'];
 
 export function PublicAgentsExplorer({ agents, locale, copy }: Props) {
   const [query, setQuery] = useState('');
@@ -301,6 +302,8 @@ function frameworkLabel(filter: ExploreFrameworkFilter, copy: ExploreCopy): stri
       return copy.filterOpenClaw;
     case 'hermes':
       return copy.filterHermes;
+    case 'ironclaw':
+      return copy.filterIronClaw;
     case 'all':
       return copy.filterAll;
   }

@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { api, req } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { generateAgentAvatar } from '@/lib/avatar-generator';
+import { IRONCLAW_OAUTH_EXTENSION_IDS } from '@/components/agents/ironclawExtensions';
 import {
   DEFAULT_HOSTED_MODEL,
   HOSTED_MODELS as HOSTED_MODEL_CATALOG,
@@ -22,10 +23,10 @@ import {
 } from '@/lib/model-pricing';
 import styles from './ChatToHatch.module.css';
 
-type Framework = 'openclaw' | 'hermes';
+type Framework = 'openclaw' | 'hermes' | 'ironclaw';
 
 type InstallPlanItem = {
-  type: 'skill' | 'plugin' | 'integration';
+  type: 'skill' | 'plugin' | 'extension' | 'integration';
   name: string;
   reason: string;
 };
@@ -41,6 +42,7 @@ interface ParsedConfig {
   suggestedPlugins: string[];
   selectedSkills: string[];
   selectedPlugins: string[];
+  selectedExtensions: string[];
   installPlan: InstallPlanItem[];
   model: string;
   greeting: string;
@@ -50,6 +52,8 @@ interface ParseResponse {
   reply: string;
   config: ParsedConfig;
 }
+
+type CreateAgentConfig = NonNullable<Parameters<typeof api.createAgent>[0]['config']>;
 
 interface Msg {
   id: string;
@@ -64,7 +68,15 @@ const FW_VISUAL: Record<
 > = {
   openclaw: { color: 'var(--tech-accent)', mark: 'OC', label: 'OpenClaw' },
   hermes: { color: 'var(--color-info)', mark: 'HE', label: 'Hermes' },
+  ironclaw: { color: '#00e676', mark: 'IC', label: 'IronClaw' },
 };
+
+const FRAMEWORK_OPTIONS = ['openclaw', 'hermes', 'ironclaw'] as const;
+const FRAMEWORK_DESCRIPTION_KEYS = {
+  openclaw: 'frameworkOpenClaw',
+  hermes: 'frameworkHermes',
+  ironclaw: 'frameworkIronClaw',
+} as const;
 
 // ChatToHatch keeps a static picker: Virtuals models are only offered in
 // the agent config tab, where the live Virtuals catalog merge provides them.
@@ -91,6 +103,17 @@ const OPENCLAW_PLUGIN_IDS = new Set([
   '@artflo-ai/artflo-openclaw-plugin',
 ]);
 const HERMES_PLUGIN_IDS = new Set(['42-evey/hermes-plugins']);
+const IRONCLAW_NATIVE_SKILLS = [
+  'coding', 'code-review', 'security-review', 'qa-review', 'github-workflow',
+  'portfolio', 'product-prioritization', 'delegation', 'content-creator-setup', 'trader-setup',
+] as const;
+const IRONCLAW_NATIVE_EXTENSIONS = [
+  'web-access', 'github', 'gmail', 'google-calendar', 'google-docs', 'google-drive',
+  'google-sheets', 'google-slides', 'notion', 'slack', 'telegram', 'nearai',
+] as const;
+const IRONCLAW_SKILL_IDS = new Set<string>(IRONCLAW_NATIVE_SKILLS);
+const IRONCLAW_EXTENSION_IDS = new Set<string>(IRONCLAW_NATIVE_EXTENSIONS);
+const IRONCLAW_OAUTH_PENDING = IRONCLAW_OAUTH_EXTENSION_IDS;
 
 function slugify(name: string): string {
   return name
@@ -119,6 +142,7 @@ function filterPluginsForFramework(
   values: string[],
   framework: Framework,
 ): string[] {
+  if (framework === 'ironclaw') return [];
   return values.filter((plugin) => {
     if (framework === 'hermes') return !OPENCLAW_PLUGIN_IDS.has(plugin);
     return !HERMES_PLUGIN_IDS.has(plugin);
@@ -128,10 +152,12 @@ function filterPluginsForFramework(
 function syncInstallPlan(
   selectedSkills: string[],
   selectedPlugins: string[],
+  selectedExtensions: string[],
   installPlan: InstallPlanItem[],
 ): InstallPlanItem[] {
   const selectedSkillSet = new Set(selectedSkills);
   const selectedPluginSet = new Set(selectedPlugins);
+  const selectedExtensionSet = new Set(selectedExtensions);
   const seen = new Set<string>();
   const out: InstallPlanItem[] = [];
 
@@ -140,6 +166,7 @@ function syncInstallPlan(
     if (seen.has(key)) continue;
     if (item.type === 'skill' && !selectedSkillSet.has(item.name)) continue;
     if (item.type === 'plugin' && !selectedPluginSet.has(item.name)) continue;
+    if (item.type === 'extension' && !selectedExtensionSet.has(item.name)) continue;
     seen.add(key);
     out.push(item);
   }
@@ -160,17 +187,31 @@ function syncInstallPlan(
       reason: 'Install on first start.',
     });
   }
+  for (const extension of selectedExtensions) {
+    const key = `extension:${extension.toLowerCase()}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({
+      type: 'extension',
+      name: extension,
+      reason: 'Install from the native IronClaw registry on first start.',
+    });
+  }
 
   return out.slice(0, 12);
 }
 
 function normalizeConfig(config: ParsedConfig): ParsedConfig {
-  const selectedSkills = uniq(
+  const isIronClaw = config.framework === 'ironclaw';
+  const requestedSkills = uniq(
     config.selectedSkills?.length
       ? config.selectedSkills
       : (config.suggestedSkills ?? []),
     10,
   );
+  const selectedSkills = isIronClaw
+    ? requestedSkills.filter((skill) => IRONCLAW_SKILL_IDS.has(skill))
+    : requestedSkills;
   const selectedPlugins = filterPluginsForFramework(
     uniq(
       config.selectedPlugins?.length
@@ -180,22 +221,26 @@ function normalizeConfig(config: ParsedConfig): ParsedConfig {
     ),
     config.framework,
   );
+  const selectedExtensions = isIronClaw
+    ? uniq(config.selectedExtensions ?? [], 10).filter(
+        (extension) => IRONCLAW_EXTENSION_IDS.has(extension) && !IRONCLAW_OAUTH_PENDING.has(extension),
+      )
+    : [];
   const installPlan = syncInstallPlan(
     selectedSkills,
     selectedPlugins,
+    selectedExtensions,
     config.installPlan ?? [],
   );
   return {
     ...config,
     model: normalizeHostedModelForUi(config.model),
     frameworkReason: config.frameworkReason ?? '',
-    suggestedSkills: uniq(
-      config.suggestedSkills?.length ? config.suggestedSkills : selectedSkills,
-      10,
-    ),
+    suggestedSkills: selectedSkills,
     suggestedPlugins: selectedPlugins,
     selectedSkills,
     selectedPlugins,
+    selectedExtensions,
     installPlan,
   };
 }
@@ -357,7 +402,7 @@ export function ChatToHatch() {
       // Build the config payload the API expects. The backend normalizes
       // suggestedSkills/Plugins into installable pending skills and writes
       // persona files during first container init.
-      const configBody: Record<string, unknown> = {};
+      const configBody: CreateAgentConfig = {};
       if (draft.personality.trim())
         configBody.personality = draft.personality.trim();
       if (draft.systemPrompt.trim())
@@ -370,25 +415,22 @@ export function ChatToHatch() {
         configBody.selectedPlugins = draft.selectedPlugins;
         configBody.suggestedPlugins = draft.selectedPlugins;
       }
+      if (draft.selectedExtensions.length) {
+        configBody.selectedExtensions = draft.selectedExtensions;
+      }
       if (draft.frameworkReason.trim())
         configBody.frameworkReason = draft.frameworkReason.trim();
       if (draft.installPlan.length) configBody.installPlan = draft.installPlan;
       if (draft.model) configBody.model = draft.model;
       if (draft.greeting.trim()) configBody.greeting = draft.greeting.trim();
 
-      const created = await req<{ id: string; slug?: string | null }>(
-        '/agents',
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            name: draft.name.trim(),
-            description: draft.description.trim() || undefined,
-            framework: draft.framework,
-            template: 'custom',
-            config: Object.keys(configBody).length ? configBody : undefined,
-          }),
-        },
-      );
+      const created = await api.createAgent({
+        name: draft.name.trim(),
+        description: draft.description.trim() || undefined,
+        framework: draft.framework,
+        template: 'custom',
+        config: Object.keys(configBody).length ? configBody : undefined,
+      });
       if (created.success) {
         const started = await api.startAgent(created.data.id);
         if (!started.success) {
@@ -467,6 +509,22 @@ export function ChatToHatch() {
     if (!draft) return;
     const next = draft.selectedPlugins.filter((x) => x !== s);
     patchDraft({ selectedPlugins: next, suggestedPlugins: next });
+  }
+
+  function toggleIronClawSkill(name: string) {
+    if (!draft) return;
+    const next = draft.selectedSkills.includes(name)
+      ? draft.selectedSkills.filter((skill) => skill !== name)
+      : [...draft.selectedSkills, name];
+    patchDraft({ selectedSkills: next, suggestedSkills: next });
+  }
+
+  function toggleIronClawExtension(name: string) {
+    if (!draft || IRONCLAW_OAUTH_PENDING.has(name)) return;
+    const next = draft.selectedExtensions.includes(name)
+      ? draft.selectedExtensions.filter((extension) => extension !== name)
+      : [...draft.selectedExtensions, name];
+    patchDraft({ selectedExtensions: next });
   }
 
   function applySuggested() {
@@ -678,7 +736,7 @@ export function ChatToHatch() {
                       className={styles.frameworkChooser}
                       aria-label={t('labelFramework')}
                     >
-                      {(['openclaw', 'hermes'] as const).map((framework) => {
+                      {FRAMEWORK_OPTIONS.map((framework) => {
                         const visual = FW_VISUAL[framework];
                         const active = draft.framework === framework;
                         return (
@@ -699,9 +757,7 @@ export function ChatToHatch() {
                                 {visual.label}
                               </span>
                               <span className={styles.frameworkOptionDesc}>
-                                {framework === 'openclaw'
-                                  ? t('frameworkOpenClaw')
-                                  : t('frameworkHermes')}
+                                {t(FRAMEWORK_DESCRIPTION_KEYS[framework])}
                               </span>
                             </span>
                           </button>
@@ -862,6 +918,76 @@ export function ChatToHatch() {
                   />
                 </details>
 
+                {draft.framework === 'ironclaw' ? (
+                  <>
+                    <div className={styles.frameworkBetaNote}>
+                      <strong>{t('ironclawNativeSetupTitle')}</strong>
+                      <span>{t('ironclawBetaNote')}</span>
+                    </div>
+
+                    <div className={styles.chipsBlock}>
+                      <div className={styles.chipsHead}>
+                        {t('ironclawNativeSkills')}
+                        <span className={styles.fieldHint}>{draft.selectedSkills.length}/{IRONCLAW_NATIVE_SKILLS.length}</span>
+                      </div>
+                      <div className={styles.skillsList}>
+                        {IRONCLAW_NATIVE_SKILLS.map((skill) => {
+                          const selected = draft.selectedSkills.includes(skill);
+                          return (
+                            <button key={skill} type="button" className={`${styles.skill} ${selected ? styles.skillRemovable : ''}`} onClick={() => toggleIronClawSkill(skill)} aria-pressed={selected}>
+                              {selected ? '✓ ' : '+ '}{skill}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className={styles.chipsBlock}>
+                      <div className={styles.chipsHead}>
+                        {t('ironclawNativeExtensions')}
+                        <span className={styles.fieldHint}>{draft.selectedExtensions.length}/{IRONCLAW_NATIVE_EXTENSIONS.length}</span>
+                      </div>
+                      <div className={styles.skillsList}>
+                        {IRONCLAW_NATIVE_EXTENSIONS.map((extension) => {
+                          const selected = draft.selectedExtensions.includes(extension);
+                          const oauthPending = IRONCLAW_OAUTH_PENDING.has(extension);
+                          return (
+                            <button
+                              key={extension}
+                              type="button"
+                              className={`${styles.skill} ${selected ? styles.skillRemovable : ''}`}
+                              onClick={() => toggleIronClawExtension(extension)}
+                              aria-pressed={selected}
+                              disabled={oauthPending}
+                              title={oauthPending ? t('ironclawOauthPendingTitle') : undefined}
+                            >
+                              {selected ? '✓ ' : oauthPending ? '○ ' : '+ '}{extension}{oauthPending ? ` · ${t('ironclawOauthPending')}` : ''}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <p className={styles.fieldHint}>
+                        {t('ironclawOauthNote')}
+                      </p>
+                    </div>
+
+                    {draft.installPlan.length > 0 && (
+                      <div className={styles.installPlan}>
+                        <div className={styles.installPlanHead}>{t('labelInstallPlan')}</div>
+                        <div className={styles.installPlanList}>
+                          {draft.installPlan.slice(0, 8).map((item) => (
+                            <div key={`${item.type}:${item.name}`} className={styles.installPlanItem}>
+                              <span className={styles.installPlanType}>{item.type}</span>
+                              <span className={styles.installPlanName}>{item.name}</span>
+                              <span className={styles.installPlanReason}>{item.reason}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
                 {/* Skills */}
                 <div className={styles.chipsBlock}>
                   <div className={styles.chipsHead}>
@@ -991,6 +1117,8 @@ export function ChatToHatch() {
                       ))}
                     </div>
                   </div>
+                )}
+                  </>
                 )}
 
                 {/* Greeting (read-only display) */}

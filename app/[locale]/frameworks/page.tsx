@@ -125,6 +125,46 @@ enabled = [
 [platforms]
 telegram = { token = "\${TELEGRAM_BOT_TOKEN}" }`,
   },
+  {
+    key: 'ironclaw',
+    name: 'IronClaw',
+    tagline: 'Rust-native private runtime',
+    emoji: 'IC',
+    color: '#00e676',
+    glow: 'rgba(0,230,118,0.15)',
+    border: 'border-[#00e676]/30',
+    bg: 'bg-[#00e676]/10',
+    text: 'text-[#34d399]',
+    complexity: 'Beta',
+    complexityColor: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20',
+    bestFor: 'Privacy-focused agents on a hardened Rust runtime: WASM-sandboxed extensions, private libSQL memory, per-tool permissions, and conversational automations.',
+    useCases: ['Privacy-sensitive assistants', 'Tool-permission-gated workflows', 'Scheduled native automations', 'Telegram-native agents', 'Encrypted credential handling'],
+    features: [
+      { name: '2,500+ ClawHub skills', supported: false },
+      { name: 'Browser automation', supported: false },
+      { name: 'Cron jobs & triggers', supported: true },
+      { name: 'Multi-channel gateway', supported: false },
+      { name: 'Persistent memory', supported: true },
+      { name: 'Character personas', supported: false },
+      { name: 'Plugin ecosystem', supported: true },
+      { name: 'Social media native', supported: false },
+      { name: 'Lightweight deploy', supported: true },
+    ],
+    integrations: ['Telegram', 'GitHub', 'Gmail', 'Notion', 'Slack'],
+    llmSupport: ['OpenAI Responses API', 'NEAR AI'],
+    startupMs: 1100,
+    memoryMb: 120,
+    docsUrl: 'https://github.com/nearai/ironclaw',
+    configExample: `# ironclaw — runtime config comes from the environment,
+# not an editable config file.
+#
+# Managed state lives under /home/ironclaw/.ironclaw/reborn
+#   workspace/    working files
+#   skills, memory and extension state share the same tree
+#
+# Extensions install from the native registry; credentials are
+# stored encrypted inside the runtime's private libSQL state.`,
+  },
 ];
 
 const ALL_FEATURES = [

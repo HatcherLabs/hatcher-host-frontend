@@ -57,7 +57,9 @@ import {
   parseModelPricingPayload,
   type ModelPricingPayload,
 } from '@/lib/model-pricing';
-import { resolveLoadedModelConfig } from '@/hooks/useAgentConfig';
+import { resolveLoadedModelConfig, resolveSavedModel } from '@/hooks/useAgentConfig';
+import { useTranslations } from 'next-intl';
+import { useToast } from '@/components/ui/ToastProvider';
 import {
   useAgentContext,
   tabContentVariants,
@@ -384,6 +386,8 @@ export function ConfigTab() {
   } = useAgentContext();
 
   const hostedProvider = 'openrouter';
+  const tIronclawModel = useTranslations('dashboard.agentDetail.ironclaw.model');
+  const { toast } = useToast();
   const [commitMessage, setCommitMessage] = useState('');
   const [aiCreditBalance, setAiCreditBalance] = useState<AiCreditBalance | null>(null);
   const [activeConfigSubtab, setActiveConfigSubtab] = useState<ConfigSubtab>('general');
@@ -800,8 +804,30 @@ export function ConfigTab() {
   }, []);
 
   const handleSave = async () => {
-    await saveConfig(commitMessage);
+    // Captured before the save: the previously persisted model and the one
+    // the form is about to persist.
+    const previousModel = savedModelConfig.model;
+    const nextModel = resolveSavedModel({
+      configProvider,
+      configModel,
+      useCustomModel,
+      customModelInput,
+    });
+    const saved = await saveConfig(commitMessage);
     setCommitMessage('');
+    // IronClaw can hot-swap the runtime model without a container rebuild.
+    // Best-effort only — the config save above already succeeded.
+    if (
+      saved &&
+      agent.framework === 'ironclaw' &&
+      nextModel &&
+      nextModel !== previousModel
+    ) {
+      void api.setIronClawModel(agent.id, nextModel).then((response) => {
+        if (response.success) toast.success(tIronclawModel('appliedLive'));
+        else toast.info(tIronclawModel('appliesAfterRestart'));
+      });
+    }
   };
 
   // ── Custom 2D avatar (agent cards / Explore) ──
