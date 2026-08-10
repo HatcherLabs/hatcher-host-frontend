@@ -61,7 +61,7 @@
     "@vitejs/plugin-react": "^6.0.1",
     "autoprefixer": "^10.4.20",
     "axe-core": "^4.11.3",
-    "eslint": "^9.39.4",
+    "eslint": "^10.8.0",
     "eslint-config-next": "15.5.21",
     "postcss": "^8.5.18",
     "protobufjs": "8.7.0",
