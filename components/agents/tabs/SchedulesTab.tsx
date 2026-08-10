@@ -19,6 +19,7 @@ import {
   Timer,
   Zap,
   CalendarDays,
+  Copy,
 } from 'lucide-react';
 import {
   useAgentContext,
@@ -262,6 +263,7 @@ export function SchedulesTab() {
   const [showForm, setShowForm] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [viewingLogs, setViewingLogs] = useState<string | null>(null);
+  const [copiedJobId, setCopiedJobId] = useState<string | null>(null);
 
   // Form state
   const [formName, setFormName] = useState('');
@@ -374,6 +376,18 @@ export function SchedulesTab() {
     }
     setActionLoading(null);
   };
+
+  const handleCopyJobId = useCallback(async (jobId: string) => {
+    try {
+      await navigator.clipboard.writeText(jobId);
+      setCopiedJobId(jobId);
+      window.setTimeout(() => {
+        setCopiedJobId(current => current === jobId ? null : current);
+      }, 2000);
+    } catch {
+      setError('Failed to copy schedule ID');
+    }
+  }, []);
 
   // Status-based border/glow styles
   const getStatusStyles = (status: string) => {
@@ -664,6 +678,24 @@ export function SchedulesTab() {
                       </div>
 
                       <p className="text-xs text-[var(--text-secondary)] mt-2 line-clamp-2 leading-relaxed">{job.prompt}</p>
+
+                      <div className="mt-2 flex min-w-0 items-center gap-1.5 text-[10px] text-[var(--text-muted)]">
+                        <span className="shrink-0 uppercase tracking-wide">ID</span>
+                        <code className="min-w-0 truncate font-mono text-[var(--text-secondary)]" title={job.id}>
+                          {job.id}
+                        </code>
+                        <button
+                          type="button"
+                          onClick={() => void handleCopyJobId(job.id)}
+                          title={copiedJobId === job.id ? 'Copied' : 'Copy schedule ID'}
+                          aria-label={copiedJobId === job.id ? 'Schedule ID copied' : 'Copy schedule ID'}
+                          className="shrink-0 rounded p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-card)] hover:text-[var(--text-primary)]"
+                        >
+                          {copiedJobId === job.id
+                            ? <CheckCircle size={11} className="text-[var(--color-success)]" />
+                            : <Copy size={11} />}
+                        </button>
+                      </div>
 
                       <div className="flex items-center gap-4 mt-2">
                         {job.nextRun && (
