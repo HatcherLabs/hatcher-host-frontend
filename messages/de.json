@@ -558,6 +558,7 @@
       "perMonth": "/Mo.",
       "once": " einmalig"
     },
+    "perAgent": "pro Agent",
     "annualSavings": "${annualTotal}/Jahr · sparen Sie ${saved}",
     "switchToAnnual": "Zu jährlich wechseln, 15% sparen",
     "payOnce": "Einmal zahlen, für immer behalten",

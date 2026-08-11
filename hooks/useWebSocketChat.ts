@@ -80,6 +80,7 @@ interface UseWebSocketChatReturn {
 
 const MAX_RECONNECT_ATTEMPTS = 5;
 const RECONNECT_BASE_DELAY_MS = 1000;
+const CHAT_KEEPALIVE_MS = 25_000;
 
 export function useWebSocketChat({
   agentId,
@@ -97,6 +98,7 @@ export function useWebSocketChat({
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectAttemptsRef = useRef(0);
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const keepAliveTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [connectionState, setConnectionState] = useState<ConnectionState>('disconnected');
   const enabledRef = useRef(enabled);
   const agentIdRef = useRef(agentId);
@@ -126,6 +128,10 @@ export function useWebSocketChat({
   onRateLimitRef.current = onRateLimit;
 
   const cleanup = useCallback(() => {
+    if (keepAliveTimerRef.current) {
+      clearInterval(keepAliveTimerRef.current);
+      keepAliveTimerRef.current = null;
+    }
     if (reconnectTimerRef.current) {
       clearTimeout(reconnectTimerRef.current);
       reconnectTimerRef.current = null;
@@ -154,6 +160,10 @@ export function useWebSocketChat({
 
     ws.onopen = () => {
       reconnectAttemptsRef.current = 0;
+      keepAliveTimerRef.current = setInterval(() => {
+        if (wsRef.current !== ws || ws.readyState !== WebSocket.OPEN) return;
+        ws.send(JSON.stringify({ type: 'ping' }));
+      }, CHAT_KEEPALIVE_MS);
     };
 
     ws.onmessage = (event) => {
@@ -237,6 +247,8 @@ export function useWebSocketChat({
             onMessageRef.current(msg.payload as unknown as LiveChatMessage);
           }
           break;
+        case 'pong':
+          break;
         case 'rate_limit':
           if (onRateLimitRef.current) {
             onRateLimitRef.current(
@@ -265,6 +277,10 @@ export function useWebSocketChat({
     };
 
     ws.onclose = (event) => {
+      if (keepAliveTimerRef.current) {
+        clearInterval(keepAliveTimerRef.current);
+        keepAliveTimerRef.current = null;
+      }
       wsRef.current = null;
 
       // Don't reconnect if explicitly closed or auth failure

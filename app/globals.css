@@ -1802,6 +1802,9 @@ button, a, [role="tab"] {
    the user navigates back). */
 body[data-qwerti-hidden] [class*='qwerti-'],
 body[data-qwerti-hidden] [id*='qwerti'],
-body[data-qwerti-hidden] iframe[src*='qwerti'] {
+body[data-qwerti-hidden] iframe[src*='qwerti'],
+body[data-qwerti-occluded] [class*='qwerti-'],
+body[data-qwerti-occluded] [id*='qwerti'],
+body[data-qwerti-occluded] iframe[src*='qwerti'] {
   display: none !important;
 }

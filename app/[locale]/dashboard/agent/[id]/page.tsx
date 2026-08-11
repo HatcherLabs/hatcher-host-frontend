@@ -977,10 +977,41 @@ export default function AgentManagePage() {
     onUsage: handleChatUsage,
     onMessage: (message) => {
       if (message.role !== 'assistant' || !message.content.trim()) return;
+      const recoveredFromDisconnect = message.metadata?.recoveredFromDisconnect === true;
+      const recoveredSessionId = typeof message.metadata?.sessionId === 'string'
+        ? message.metadata.sessionId
+        : null;
+      if (
+        recoveredFromDisconnect &&
+        recoveredSessionId &&
+        activeChatSessionIdRef.current &&
+        recoveredSessionId !== activeChatSessionIdRef.current
+      ) {
+        window.setTimeout(() => void loadChatSessions(), 500);
+        return;
+      }
       setChatError(null);
       setChatErrorType(null);
       setMessages((prev) => {
         if (prev.some((m) => m.id === message.id)) return prev;
+        if (recoveredFromDisconnect) {
+          for (let i = prev.length - 1; i >= 0; i--) {
+            if (prev[i]?.role === 'assistant' && prev[i]?.streaming) {
+              const updated = [...prev];
+              updated[i] = {
+                ...prev[i],
+                id: message.id,
+                content: message.content,
+                timestamp: new Date(message.ts),
+                streaming: false,
+                thinking: prev[i]?.thinking?.streaming
+                  ? applyChatThinkingEvent(prev[i]!.thinking!, { phase: 'done', now: Date.now() })
+                  : prev[i]?.thinking,
+              };
+              return updated;
+            }
+          }
+        }
         return [
           ...prev,
           {
@@ -991,6 +1022,13 @@ export default function AgentManagePage() {
           },
         ];
       });
+      if (recoveredFromDisconnect) {
+        wsStreamingMsgRef.current = false;
+        chatAbortControllerRef.current = null;
+        setInflightTools([]);
+        setCompletedTools([]);
+        setSending(false);
+      }
       window.setTimeout(() => void loadChatSessions(), 500);
     },
     onDone: (_content, _model) => {

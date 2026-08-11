@@ -558,6 +558,7 @@
       "perMonth": "/lună",
       "once": " o dată"
     },
+    "perAgent": "per agent",
     "annualSavings": "${annualTotal}/an · economisești ${saved}",
     "switchToAnnual": "Treci la anual, economisești 15%",
     "payOnce": "Plătești o dată, păstrezi pentru totdeauna",

@@ -147,6 +147,7 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
   const termInstance = useRef<InstanceType<typeof import('@xterm/xterm').Terminal> | null>(null);
   const fitAddonRef = useRef<InstanceType<typeof import('@xterm/addon-fit').FitAddon> | null>(null);
   const terminalInputRef = useRef<{ dispose: () => void } | null>(null);
+  const terminalBinaryRef = useRef<{ dispose: () => void } | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const keepAliveTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -335,6 +336,13 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
         if (!current || current.readyState !== WebSocket.OPEN) return;
         current.send(JSON.stringify({ type: 'input', data }));
       });
+      terminalBinaryRef.current?.dispose();
+      terminalBinaryRef.current = term.onBinary((data: string) => {
+        const current = wsRef.current;
+        if (connectionSeqRef.current !== connectionSeq) return;
+        if (!current || current.readyState !== WebSocket.OPEN) return;
+        current.send(JSON.stringify({ type: 'binary', data: window.btoa(data) }));
+      });
 
       ws.onopen = () => {
         // Connected — wait for server confirmation after the backend attaches.
@@ -443,6 +451,8 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
     stopKeepAlive();
     terminalInputRef.current?.dispose();
     terminalInputRef.current = null;
+    terminalBinaryRef.current?.dispose();
+    terminalBinaryRef.current = null;
     connectionSeqRef.current += 1;
     if (wsRef.current) {
       wsRef.current.close(1000, 'User disconnect');
