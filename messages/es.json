@@ -63,7 +63,7 @@
       "frameworksSub": "OpenClaw · Hermes.",
       "pricingLabel": "Precios",
       "pricingSub": "Gratis · Starter · Pro · Business · Fundación.",
-      "tokenLabel": "$HATCHER",
+      "tokenLabel": "Token",
       "tokenSub": "Pagos de servicios públicos, descuentos y mecánica de quemaduras.",
       "stakingLabel": "Replantear",
       "stakingSub": "Recompensas $HATCHER más AI Credits.",
@@ -127,7 +127,7 @@
     "itemFeatures": "Características",
     "itemFrameworks": "Marcos",
     "itemPricing": "Precios",
-    "itemToken": "$HATCHER",
+    "itemToken": "Token",
     "itemStaking": "Replantear",
     "itemWhitepaper": "Libro blanco",
     "itemBlog": "Blog",
@@ -559,6 +559,10 @@
       "once": "una vez"
     },
     "perAgent": "por agente",
+    "deepseekPromo": {
+      "title": "Semana de lanzamiento de DeepSeek V4 Flash",
+      "body": "Llamadas gratuitas diarias hasta el 18 de agosto: Free 10 · Starter 20 · Pro 40 · Business 60. Se aplican antes de AI Credits."
+    },
     "annualSavings": "${annualTotal}/año · guardar ${saved}",
     "switchToAnnual": "Cambie a anual, ahorre 15%",
     "payOnce": "Paga una vez y quédate para siempre",
@@ -605,7 +609,7 @@
         "agents": "3 agentes incluidos",
         "messages": "15.000 AI Credits/mes",
         "cpu": "1,5 CPU",
-        "ram": "2 GB de RAM",
+        "ram": "4 GB de RAM",
         "storage": "Espacio de trabajo de 25 GB",
         "sleep": "Siempre activo",
         "features": [
@@ -2412,7 +2416,7 @@
       "title": "Tres pasos de la idea al agente real",
       "tile1Title": "Escribe lo que quieras",
       "tile1Body": "Describe el flujo de trabajo en inglés sencillo. Hatcher lo convierte en una especificación de agente estructurada.",
-      "tile1Example": "resumir las noticias criptográficas diariamente",
+      "tile1Example": "resumir noticias del sector diariamente",
       "tile2Title": "Revisa la configuración",
       "tile2Body": "Revise el marco, el modelo, las herramientas, las integraciones, la configuración del tiempo de ejecución y AI Credits antes del lanzamiento.",
       "tile3Title": "Iniciar el tiempo de ejecución",

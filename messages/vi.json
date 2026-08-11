@@ -63,7 +63,7 @@
       "frameworksSub": "OpenClaw · Hermes.",
       "pricingLabel": "Định giá",
       "pricingSub": "Miễn phí · Người mới bắt đầu · Chuyên nghiệp · Kinh doanh · Sáng lập.",
-      "tokenLabel": "$HATCHER",
+      "tokenLabel": "Token",
       "tokenSub": "Thanh toán tiện ích, giảm giá và cơ chế đốt cháy.",
       "stakingLabel": "đặt cược",
       "stakingSub": "Phần thưởng $HATCHER cộng với AI Credits.",
@@ -127,7 +127,7 @@
     "itemFeatures": "Tính năng",
     "itemFrameworks": "Khung",
     "itemPricing": "Định giá",
-    "itemToken": "$HATCHER",
+    "itemToken": "Token",
     "itemStaking": "đặt cược",
     "itemWhitepaper": "Sách trắng",
     "itemBlog": "Blog",
@@ -559,6 +559,10 @@
       "once": "một lần"
     },
     "perAgent": "mỗi tác nhân",
+    "deepseekPromo": {
+      "title": "Tuần ra mắt DeepSeek V4 Flash",
+      "body": "Lượt gọi mô hình miễn phí mỗi ngày đến 18/8: Free 10 · Starter 20 · Pro 40 · Business 60. Tự động áp dụng trước AI Credits."
+    },
     "annualSavings": "${annualTotal}/năm · tiết kiệm ${saved}",
     "switchToAnnual": "Chuyển sang hàng năm, tiết kiệm 15%",
     "payOnce": "Trả tiền một lần, giữ mãi mãi",
@@ -605,7 +609,7 @@
         "agents": "Bao gồm 3 tác nhân",
         "messages": "15.000 AI Credits/tháng",
         "cpu": "CPU 1.5",
-        "ram": "RAM 2GB",
+        "ram": "RAM 4GB",
         "storage": "Không gian làm việc 25 GB",
         "sleep": "Luôn hoạt động",
         "features": [

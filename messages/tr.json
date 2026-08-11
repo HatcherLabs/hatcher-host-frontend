@@ -63,7 +63,7 @@
       "frameworksSub": "OpenClaw · Hermes.",
       "pricingLabel": "Fiyatlandırma",
       "pricingSub": "Ücretsiz · Başlangıç · Avantajları · İş Dünyası · Kuruluş.",
-      "tokenLabel": "$HATCHER",
+      "tokenLabel": "Token",
       "tokenSub": "Fatura ödemeleri, indirimler ve yanma mekanikleri.",
       "stakingLabel": "Staking",
       "stakingSub": "$HATCHER ödüller artı AI Credits.",
@@ -127,7 +127,7 @@
     "itemFeatures": "Özellikler",
     "itemFrameworks": "Çerçeveler",
     "itemPricing": "Fiyatlandırma",
-    "itemToken": "$HATCHER",
+    "itemToken": "Token",
     "itemStaking": "Staking",
     "itemWhitepaper": "Beyaz Kitap",
     "itemBlog": "Blog",
@@ -559,6 +559,10 @@
       "once": "bir kez"
     },
     "perAgent": "ajan başına",
+    "deepseekPromo": {
+      "title": "DeepSeek V4 Flash lansman haftası",
+      "body": "18 Ağustos'a kadar günlük ücretsiz model çağrıları: Free 10 · Starter 20 · Pro 40 · Business 60. AI Credits'ten önce otomatik uygulanır."
+    },
     "annualSavings": "${annualTotal}/yıl · Kurtar ${saved}",
     "switchToAnnual": "Yıllık sisteme geç, %15 tasarruf et",
     "payOnce": "Bir kez öde, sonsuza kadar sakla",
@@ -605,7 +609,7 @@
         "agents": "3 ajan dahil edildi",
         "messages": "15.000 AI Credits/ay",
         "cpu": "1.5 CPU",
-        "ram": "2 GB RAM",
+        "ram": "4 GB RAM",
         "storage": "25 GB çalışma alanı",
         "sleep": "Her zaman aktif",
         "features": [

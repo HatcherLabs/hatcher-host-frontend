@@ -54,12 +54,6 @@
   gap: 12px;
 }
 
-.marketRow {
-  padding: 0 0 12px;
-  margin-bottom: 12px;
-  border-bottom: 1px solid var(--border-line);
-}
-
 .creditRow {
   padding: 0 0 16px;
   margin-bottom: 22px;

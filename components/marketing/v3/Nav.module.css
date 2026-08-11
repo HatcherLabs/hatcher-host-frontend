@@ -294,10 +294,6 @@
   display: inline-flex;
   align-items: center;
 }
-.marketSlot {
-  display: inline-flex;
-  align-items: center;
-}
 @media (max-width: 1040px) {
   .notificationSlot {
     order: 1;
@@ -313,12 +309,6 @@
     display: none;
   }
 }
-@media (max-width: 1380px) {
-  .marketSlot {
-    display: none;
-  }
-}
-
 .userAnchor {
   position: relative;
 }

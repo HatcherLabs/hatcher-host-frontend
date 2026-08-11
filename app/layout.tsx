@@ -176,7 +176,7 @@ const softwareApplicationJsonLd = {
       price: '19.99',
       priceCurrency: 'USD',
       billingIncrement: 'P1M',
-      description: '3 agents, 15,000 AI Credits/month, 1.5 CPU/2GB RAM, 25GB workspace.',
+      description: '3 agents, 15,000 AI Credits/month, 1.5 CPU/4GB RAM per agent, 25GB workspace.',
     },
     {
       '@type': 'Offer',

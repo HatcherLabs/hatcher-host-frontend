@@ -63,7 +63,7 @@
       "frameworksSub": "OpenClaw · Hermes.",
       "pricingLabel": "Tarifs",
       "pricingSub": "Free · Starter · Pro · Business · Founding.",
-      "tokenLabel": "$HATCHER",
+      "tokenLabel": "Token",
       "tokenSub": "Paiements utilitaires, remises et burn.",
       "stakingLabel": "Staking",
       "stakingSub": "Récompenses $HATCHER plus AI Credits.",
@@ -127,7 +127,7 @@
     "itemFeatures": "Features",
     "itemFrameworks": "Frameworks",
     "itemPricing": "Tarifs",
-    "itemToken": "$HATCHER",
+    "itemToken": "Token",
     "itemStaking": "Staking",
     "itemWhitepaper": "Whitepaper",
     "itemBlog": "Blog",
@@ -559,6 +559,10 @@
       "once": " paiement unique"
     },
     "perAgent": "par agent",
+    "deepseekPromo": {
+      "title": "Semaine de lancement DeepSeek V4 Flash",
+      "body": "Appels gratuits quotidiens jusqu'au 18 août : Free 10 · Starter 20 · Pro 40 · Business 60. Appliqués avant les AI Credits."
+    },
     "annualSavings": "${annualTotal}/an · économisez ${saved}",
     "switchToAnnual": "Passer à l'annuel, économisez 15%",
     "payOnce": "Payez une fois, gardez pour toujours",
@@ -605,7 +609,7 @@
         "agents": "3 agents inclus",
         "messages": "15 000 AI Credits/mois",
         "cpu": "1,5 CPU",
-        "ram": "2 GB RAM",
+        "ram": "4 GB RAM",
         "storage": "25 GB d'espace de travail",
         "sleep": "Toujours actif",
         "features": [
@@ -2412,7 +2416,7 @@
       "title": "Trois étapes de l'idée à l'agent en ligne",
       "tile1Title": "Décris ce que tu veux",
       "tile1Body": "Français simple. Dis au chat ce que ton agent doit faire — pas de YAML, pas de flags.",
-      "tile1Example": "résumer les crypto-news quotidiennement",
+      "tile1Example": "résumer l'actualité du secteur quotidiennement",
       "tile2Title": "Vérifie la config",
       "tile2Body": "Framework, modèle, outils, intégrations — Hatcher propose ; tu confirmes ou ajustes.",
       "tile3Title": "Lancer le runtime",

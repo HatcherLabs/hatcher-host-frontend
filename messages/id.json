@@ -63,7 +63,7 @@
       "frameworksSub": "OpenClaw · Hermes.",
       "pricingLabel": "Harga",
       "pricingSub": "Gratis · Pemula · Pro · Bisnis · Pendiri.",
-      "tokenLabel": "$HATCHER",
+      "tokenLabel": "Token",
       "tokenSub": "Pembayaran utilitas, diskon, dan mekanisme pembakaran.",
       "stakingLabel": "Mempertaruhkan",
       "stakingSub": "Hadiah $HATCHER ditambah AI Credits.",
@@ -127,7 +127,7 @@
     "itemFeatures": "Fitur",
     "itemFrameworks": "Kerangka kerja",
     "itemPricing": "Harga",
-    "itemToken": "$HATCHER",
+    "itemToken": "Token",
     "itemStaking": "Mempertaruhkan",
     "itemWhitepaper": "kertas putih",
     "itemBlog": "blog",
@@ -559,6 +559,10 @@
       "once": "sekali"
     },
     "perAgent": "per agen",
+    "deepseekPromo": {
+      "title": "Pekan peluncuran DeepSeek V4 Flash",
+      "body": "Panggilan model gratis harian hingga 18 Agustus: Free 10 · Starter 20 · Pro 40 · Business 60. Otomatis sebelum AI Credits."
+    },
     "annualSavings": "${annualTotal}/tahun · hemat ${saved}",
     "switchToAnnual": "Beralih ke tahunan, hemat 15%",
     "payOnce": "Bayar sekali, simpan selamanya",
@@ -605,7 +609,7 @@
         "agents": "3 agen disertakan",
         "messages": "15.000 AI Credits/bulan",
         "cpu": "1,5 CPU",
-        "ram": "RAM 2 GB",
+        "ram": "RAM 4 GB",
         "storage": "Ruang kerja 25 GB",
         "sleep": "Selalu aktif",
         "features": [
@@ -2412,7 +2416,7 @@
       "title": "Tiga langkah dari ide menjadi agen hidup",
       "tile1Title": "Ketik apa yang Anda inginkan",
       "tile1Body": "Jelaskan alur kerja dalam bahasa Inggris sederhana. Hatcher mengubahnya menjadi spesifikasi agen terstruktur.",
-      "tile1Example": "merangkum berita kripto setiap hari",
+      "tile1Example": "merangkum berita industri setiap hari",
       "tile2Title": "Tinjau konfigurasinya",
       "tile2Body": "Tinjau kerangka kerja, model, alat, integrasi, pengaturan runtime, dan AI Credits sebelum peluncuran.",
       "tile3Title": "Luncurkan waktu proses",
