@@ -38,6 +38,27 @@ const PLANNED_USE_CASES: UseCase[] = [
   },
 ];
 
+const TOKEN_HUB_LINKS = [
+  {
+    href: '/staking',
+    icon: Zap,
+    title: 'Staking & rewards',
+    description: 'Stake $HATCHER and review token plus AI Credit rewards.',
+  },
+  {
+    href: '/dashboard/billing',
+    icon: CreditCard,
+    title: 'Token payments',
+    description: 'Manage plans, extras, and supported payment methods.',
+  },
+  {
+    href: '/whitepaper',
+    icon: ShieldCheck,
+    title: 'Whitepaper',
+    description: 'Read the platform, token utility, and burn mechanics in one place.',
+  },
+] as const;
+
 export default function TokenPage() {
   const t = useTranslations('token');
 
@@ -171,6 +192,29 @@ export default function TokenPage() {
                 </div>
                 Hatcher shows plan costs, extras, and token settlement details before paid actions are confirmed.
               </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-t border-[var(--border-default)] px-4 py-12">
+          <div className="mx-auto max-w-6xl">
+            <div className="mb-6 max-w-2xl">
+              <p className="text-xs font-semibold text-[var(--text-muted)]">Token hub</p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[var(--text-primary)]">Everything token-related, in one place</h2>
+              <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">The main navigation now has one Token entry. Staking, payments, market links, burns, and documentation remain available here.</p>
+            </div>
+            <div className="grid gap-3 md:grid-cols-3">
+              {TOKEN_HUB_LINKS.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link key={item.href} href={item.href} className="group rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-5 transition-colors hover:border-[var(--border-hover)] hover:bg-[var(--bg-hover)]">
+                    <Icon className="h-5 w-5 text-[var(--accent)]" aria-hidden />
+                    <h3 className="mt-4 text-sm font-semibold text-[var(--text-primary)]">{item.title}</h3>
+                    <p className="mt-2 text-xs leading-5 text-[var(--text-secondary)]">{item.description}</p>
+                    <span className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-[var(--accent)]">Open <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" aria-hidden /></span>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </section>

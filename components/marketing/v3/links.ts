@@ -77,13 +77,6 @@ export const NAV_GROUPS: ReadonlyArray<NavGroup> = [
         glyph: "✶",
       },
       {
-        key: "staking",
-        labelKey: "stakingLabel",
-        subKey: "stakingSub",
-        href: "/staking",
-        glyph: "◌",
-      },
-      {
         key: "frameworks",
         labelKey: "frameworksLabel",
         subKey: "frameworksSub",
@@ -164,7 +157,6 @@ export const FOOTER_COLUMNS = [
     items: [
       { labelKey: "itemPricing", href: "/pricing" as Href },
       { labelKey: "itemToken", href: "/token" as Href },
-      { labelKey: "itemStaking", href: "/staking" as Href },
       { labelKey: "itemWhitepaper", href: "/whitepaper" as Href },
       { labelKey: "itemBlog", href: "/blog" as Href },
       { labelKey: "itemRoadmap", href: "/roadmap" as Href },

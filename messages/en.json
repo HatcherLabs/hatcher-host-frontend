@@ -64,7 +64,7 @@
       "frameworksSub": "OpenClaw · Hermes.",
       "pricingLabel": "Pricing",
       "pricingSub": "Free · Starter · Pro · Business · Founding.",
-      "tokenLabel": "$HATCHER",
+      "tokenLabel": "Token",
       "tokenSub": "Utility payments, discounts, and burn mechanics.",
       "stakingLabel": "Staking",
       "stakingSub": "$HATCHER rewards plus AI Credits.",
@@ -127,7 +127,7 @@
     "itemFeatures": "Features",
     "itemFrameworks": "Frameworks",
     "itemPricing": "Pricing",
-    "itemToken": "$HATCHER",
+    "itemToken": "Token",
     "itemStaking": "Staking",
     "itemWhitepaper": "Whitepaper",
     "itemBlog": "Blog",
@@ -559,6 +559,10 @@
       "once": " once"
     },
     "perAgent": "per agent",
+    "deepseekPromo": {
+      "title": "DeepSeek V4 Flash launch week",
+      "body": "Free daily model calls through August 18: Free 10 · Starter 20 · Pro 40 · Business 60. Applied automatically before AI Credits."
+    },
     "annualSavings": "${annualTotal}/year · save ${saved}",
     "switchToAnnual": "Switch to annual, save 15%",
     "payOnce": "Pay once, keep forever",
@@ -605,7 +609,7 @@
         "agents": "3 agents included",
         "messages": "15,000 AI Credits/month",
         "cpu": "1.5 CPU",
-        "ram": "2 GB RAM",
+        "ram": "4 GB RAM",
         "storage": "25 GB workspace",
         "sleep": "Always active",
         "features": [
@@ -2564,7 +2568,7 @@
       "title": "Three steps from idea to live agent",
       "tile1Title": "Type what you want",
       "tile1Body": "Describe the workflow in plain English. Hatcher turns it into a structured agent spec.",
-      "tile1Example": "summarize crypto news daily",
+      "tile1Example": "summarize industry news daily",
       "tile2Title": "Review the config",
       "tile2Body": "Review framework, model, tools, integrations, runtime settings, and AI Credits before launch.",
       "tile3Title": "Launch the runtime",

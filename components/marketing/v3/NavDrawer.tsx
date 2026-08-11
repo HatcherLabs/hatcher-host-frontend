@@ -10,7 +10,6 @@ import {
   Bot,
   Boxes,
   Building2,
-  Clock,
   Coins,
   FileText,
   GitBranch,
@@ -32,7 +31,6 @@ import {
 } from './links';
 import { LocaleSwitcher } from '@/components/layout/LocaleSwitcher';
 import { AiCreditStatus } from '@/components/layout/AiCreditStatus';
-import { HatcherMarketStatus } from '@/components/layout/HatcherMarketStatus';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useAuth } from '@/lib/auth-context';
 
@@ -60,8 +58,6 @@ function DrawerIcon({ itemKey }: { itemKey: string }) {
       return <Coins {...props} />;
     case 'token':
       return <TerminalSquare {...props} />;
-    case 'staking':
-      return <Clock {...props} />;
     case 'whitepaper':
       return <FileText {...props} />;
     case 'blog':
@@ -100,10 +96,6 @@ export function NavDrawer({ open, onClose }: Props) {
   return (
     <div className={styles.drawer} role="dialog" aria-modal="true" aria-label="Site menu">
       <div className={styles.scroll}>
-        <div className={styles.marketRow}>
-          <HatcherMarketStatus variant="drawer" onNavigate={onClose} />
-        </div>
-
         {!authLoading && isAuthenticated && (
           <div className={styles.creditRow}>
             <AiCreditStatus variant="drawer" onNavigate={onClose} />

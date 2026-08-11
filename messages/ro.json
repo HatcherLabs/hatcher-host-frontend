@@ -64,7 +64,7 @@
       "frameworksSub": "OpenClaw · Hermes.",
       "pricingLabel": "Prețuri",
       "pricingSub": "Free · Starter · Pro · Business · Founding.",
-      "tokenLabel": "$HATCHER",
+      "tokenLabel": "Token",
       "tokenSub": "Plăți utilitare, discounturi și mecanică de burn.",
       "stakingLabel": "Staking",
       "stakingSub": "Recompense $HATCHER plus AI Credits.",
@@ -127,7 +127,7 @@
     "itemFeatures": "Features",
     "itemFrameworks": "Framework-uri",
     "itemPricing": "Prețuri",
-    "itemToken": "$HATCHER",
+    "itemToken": "Token",
     "itemStaking": "Staking",
     "itemWhitepaper": "Whitepaper",
     "itemBlog": "Blog",
@@ -559,6 +559,10 @@
       "once": " o dată"
     },
     "perAgent": "per agent",
+    "deepseekPromo": {
+      "title": "Săptămâna de lansare DeepSeek V4 Flash",
+      "body": "Apeluri gratuite zilnic până pe 18 august: Free 10 · Starter 20 · Pro 40 · Business 60. Se aplică automat înaintea AI Credits."
+    },
     "annualSavings": "${annualTotal}/an · economisești ${saved}",
     "switchToAnnual": "Treci la anual, economisești 15%",
     "payOnce": "Plătești o dată, păstrezi pentru totdeauna",
@@ -605,7 +609,7 @@
         "agents": "3 agenți incluși",
         "messages": "15.000 AI Credits/lună",
         "cpu": "1.5 CPU",
-        "ram": "2 GB RAM",
+        "ram": "4 GB RAM",
         "storage": "25 GB spațiu de lucru",
         "sleep": "Mereu activ",
         "features": [
@@ -2564,7 +2568,7 @@
       "title": "Trei pași de la idee la agent live",
       "tile1Title": "Scrie ce vrei",
       "tile1Body": "Limbaj natural. Spune-i chat-ului ce să facă agentul — fără YAML, fără flags.",
-      "tile1Example": "rezumă știri crypto zilnic",
+      "tile1Example": "rezumă știri din industrie zilnic",
       "tile2Title": "Verifică configul",
       "tile2Body": "Framework, model, tool-uri, integrări — Hatcher propune; tu confirmi sau ajustezi.",
       "tile3Title": "Pornește runtime-ul",

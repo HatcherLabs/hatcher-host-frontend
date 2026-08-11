@@ -97,7 +97,7 @@ const AI_CREDITS_BY_TIER: Record<UserTierKey, number> = {
 const TIER_RESOURCE_OVERRIDES: Record<UserTierKey, { includedAgents: number; cpuLimit: number; memoryMb: number; storageMb: number; autoSleep: boolean; autoSleepMinutes: number; fileManager: boolean; fullLogs: boolean }> = {
   free: { includedAgents: 1, cpuLimit: 1, memoryMb: 1024, storageMb: 2048, autoSleep: true, autoSleepMinutes: 720, fileManager: true, fullLogs: true },
   starter: { includedAgents: 1, cpuLimit: 1, memoryMb: 1536, storageMb: 10240, autoSleep: false, autoSleepMinutes: 0, fileManager: true, fullLogs: true },
-  pro: { includedAgents: 3, cpuLimit: 1.5, memoryMb: 2048, storageMb: 25600, autoSleep: false, autoSleepMinutes: 0, fileManager: true, fullLogs: true },
+  pro: { includedAgents: 3, cpuLimit: 1.5, memoryMb: 4096, storageMb: 25600, autoSleep: false, autoSleepMinutes: 0, fileManager: true, fullLogs: true },
   business: { includedAgents: 5, cpuLimit: 4, memoryMb: 6144, storageMb: 51200, autoSleep: false, autoSleepMinutes: 0, fileManager: true, fullLogs: true },
   founding_member: { includedAgents: 10, cpuLimit: 4, memoryMb: 6144, storageMb: 40960, autoSleep: false, autoSleepMinutes: 0, fileManager: true, fullLogs: true },
 };

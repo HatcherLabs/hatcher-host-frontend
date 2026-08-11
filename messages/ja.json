@@ -63,7 +63,7 @@
       "frameworksSub": "OpenClaw ·Hermes。",
       "pricingLabel": "価格設定",
       "pricingSub": "無料・スターター・長所 ·ビジネス ·創設。",
-      "tokenLabel": "$HATCHER",
+      "tokenLabel": "Token",
       "tokenSub": "公共料金の支払い、割引、そして焼却整備士。",
       "stakingLabel": "杭打ち",
       "stakingSub": "$HATCHER報酬に加えて、さらにAI Credits。",
@@ -127,7 +127,7 @@
     "itemFeatures": "特徴",
     "itemFrameworks": "フレームワーク",
     "itemPricing": "価格設定",
-    "itemToken": "$HATCHER",
+    "itemToken": "Token",
     "itemStaking": "杭打ち",
     "itemWhitepaper": "ホワイトペーパー",
     "itemBlog": "ブログ",
@@ -559,6 +559,10 @@
       "once": "一度だけ"
     },
     "perAgent": "エージェントごと",
+    "deepseekPromo": {
+      "title": "DeepSeek V4 Flash ローンチウィーク",
+      "body": "8月18日まで毎日無料モデルコール：Free 10 · Starter 20 · Pro 40 · Business 60。AI Creditsより先に自動適用されます。"
+    },
     "annualSavings": "${annualTotal}年・セーブ${saved}",
     "switchToAnnual": "年次に切り替えれば15%節約できます",
     "payOnce": "一度支払えば、永遠に持ち続けます",
@@ -605,7 +609,7 @@
         "agents": "3人のエージェントが含まれていました",
         "messages": "月15,000 AI Credits",
         "cpu": "1.5 CPU",
-        "ram": "2GB RAM",
+        "ram": "4GB RAM",
         "storage": "25 GB ワークスペース",
         "sleep": "常に活発に",
         "features": [
@@ -2412,7 +2416,7 @@
       "title": "アイデアから実体エージェントまでの三つのステップ",
       "tile1Title": "入力したいものを入力する",
       "tile1Body": "ワークフローをわかりやすい英語で説明してください。Hatcherそれを構造化エージェント仕様書に変換します。",
-      "tile1Example": "Summarize Crypto News Daily(暗号通貨ニュース)を毎日まとめる",
+      "tile1Example": "業界ニュースを毎日まとめる",
       "tile2Title": "設定を見直してください",
       "tile2Body": "ローンチ前にフレームワーク、モデル、ツール、統合、ランタイム設定、AI Creditsを確認しましょう。",
       "tile3Title": "ランタイムを起動してください",

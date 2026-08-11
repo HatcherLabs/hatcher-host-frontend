@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from '@/i18n/routing';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -81,6 +81,7 @@ const AI_CREDITS_BY_TIER: Record<string, number> = {
 };
 
 const HATCHER_PAYMENT_DISCOUNT_FACTOR = 0.9;
+const DEEPSEEK_PROMO_END_MS = Date.parse('2026-08-18T14:00:00.000Z');
 function priceForHatcherPayment(usdPrice: number): number {
   return Math.round(usdPrice * HATCHER_PAYMENT_DISCOUNT_FACTOR * 100) / 100;
 }
@@ -132,6 +133,10 @@ function PricingPageContent() {
   const { isAuthenticated } = useAuth();
   const { setVisible: setWalletModalVisible } = useWalletModal();
   const [isAnnual, setIsAnnual] = useState(false);
+  const [deepSeekPromoActive, setDeepSeekPromoActive] = useState(false);
+  useEffect(() => {
+    setDeepSeekPromoActive(Date.now() < DEEPSEEK_PROMO_END_MS);
+  }, []);
   return (
     <MarketingShell>
       <div className="mx-auto max-w-7xl px-4 pt-20 sm:pt-24 pb-20 relative">
@@ -201,6 +206,17 @@ function PricingPageContent() {
               {tBilling('connectWallet')}
             </button>
           </div>
+          {deepSeekPromoActive && (
+            <div className="mt-4 max-w-3xl rounded-lg border border-[var(--color-accent-border)] bg-[var(--color-accent-bg)] px-4 py-3">
+              <div className="flex items-start gap-3">
+                <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-[var(--color-accent)]" aria-hidden />
+                <div>
+                  <p className="text-sm font-semibold text-[var(--text-primary)]">{t('deepseekPromo.title')}</p>
+                  <p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">{t('deepseekPromo.body')}</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* TIER CARDS */}
@@ -501,7 +517,7 @@ function PricingPageContent() {
                       { rowKey: 'models', label: 'Hosted models', free: 'UsePod/OpenRouter + MiMo + AceData', starter: 'UsePod/OpenRouter + MiMo + AceData', pro: 'UsePod/OpenRouter + MiMo + AceData', business: 'UsePod/OpenRouter + MiMo + AceData' },
                       { rowKey: 'webSearch', label: 'Web search', free: 'Uses AI Credits', starter: 'Uses AI Credits', pro: 'Uses AI Credits', business: 'Uses AI Credits' },
                       { rowKey: 'byok',            free: 'Provider-paid', starter: 'Provider-paid', pro: 'Provider-paid', business: 'Provider-paid' },
-                      { rowKey: 'cpuRam', label: `${t('compareTable.rows.cpuRam')} · ${t('perAgent')}`, free: '1 / 1GB', starter: '1 / 1.5GB', pro: '1.5 / 2GB', business: '4 / 6GB' },
+                      { rowKey: 'cpuRam', label: `${t('compareTable.rows.cpuRam')} · ${t('perAgent')}`, free: '1 / 1GB', starter: '1 / 1.5GB', pro: '1.5 / 4GB', business: '4 / 6GB' },
                       { rowKey: 'storage',         free: '2 GB',     starter: '10 GB',    pro: '25 GB', business: '50 GB' },
                       { rowKey: 'autoSleep',       free: '12h',      starter: 'alwaysOn', pro: 'alwaysOn',  business: 'alwaysOn' },
                       { rowKey: 'fileManager',     free: true,       starter: true,       pro: true, business: true },

@@ -63,7 +63,7 @@
       "frameworksSub": "OpenClaw · Hermes।",
       "pricingLabel": "मूल्य निर्धारण",
       "pricingSub": "नि: शुल्क · स्टार्टर · प्रो · व्यापार · स्थापना।",
-      "tokenLabel": "$HATCHER",
+      "tokenLabel": "Token",
       "tokenSub": "उपयोगिता भुगतान, छूट, और बर्न मैकेनिक्स।",
       "stakingLabel": "स्टेकिंग",
       "stakingSub": "$HATCHER पुरस्कार और AI Credits।",
@@ -127,7 +127,7 @@
     "itemFeatures": "सुविधाऐं",
     "itemFrameworks": "फ्रेमवर्क",
     "itemPricing": "मूल्य निर्धारण",
-    "itemToken": "$HATCHER",
+    "itemToken": "Token",
     "itemStaking": "स्टेकिंग",
     "itemWhitepaper": "श्वेतपत्र",
     "itemBlog": "ब्लॉग",
@@ -559,6 +559,10 @@
       "once": "एक बार"
     },
     "perAgent": "प्रति एजेंट",
+    "deepseekPromo": {
+      "title": "DeepSeek V4 Flash लॉन्च सप्ताह",
+      "body": "18 अगस्त तक प्रतिदिन मुफ्त मॉडल कॉल: Free 10 · Starter 20 · Pro 40 · Business 60। AI Credits से पहले अपने आप लागू।"
+    },
     "annualSavings": "${annualTotal}/वर्ष · ${saved} सहेजें",
     "switchToAnnual": "वार्षिक पर स्विच करें, 15% बचाएं",
     "payOnce": "एक बार भुगतान करें, हमेशा के लिए रखें",
@@ -605,7 +609,7 @@
         "agents": "3 एजेंट शामिल हैं",
         "messages": "15,000 AI Credits/माह",
         "cpu": "1.5 सीपीयू",
-        "ram": "2 जीबी रैम",
+        "ram": "4 जीबी रैम",
         "storage": "25 जीबी कार्यक्षेत्र",
         "sleep": "हमेशा सक्रिय",
         "features": [
@@ -2412,7 +2416,7 @@
       "title": "विचार से लाइव एजेंट तक तीन कदम",
       "tile1Title": "आप जो चाहते हैं उसे टाइप करें",
       "tile1Body": "सादे अंग्रेजी में वर्कफ़्लो का वर्णन करें। Hatcher इसे एक संरचित एजेंट युक्ति में बदल देता है।",
-      "tile1Example": "क्रिप्टो समाचार दैनिक को सारांशित करें",
+      "tile1Example": "उद्योग समाचार का दैनिक सारांश बनाएँ",
       "tile2Title": "कॉन्फ़िगरेशन की समीक्षा करें",
       "tile2Body": "लॉन्च से पहले फ्रेमवर्क, मॉडल, टूल, एकीकरण, रनटाइम सेटिंग्स और AI Credits की समीक्षा करें।",
       "tile3Title": "रनटाइम लॉन्च करें",

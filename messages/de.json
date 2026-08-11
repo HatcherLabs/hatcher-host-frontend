@@ -63,7 +63,7 @@
       "frameworksSub": "OpenClaw · Hermes.",
       "pricingLabel": "Preise",
       "pricingSub": "Free · Starter · Pro · Business · Founding.",
-      "tokenLabel": "$HATCHER",
+      "tokenLabel": "Token",
       "tokenSub": "Utility-Zahlungen, Rabatte und Burn-Mechanik.",
       "stakingLabel": "Staking",
       "stakingSub": "$HATCHER-Belohnungen plus AI Credits.",
@@ -127,7 +127,7 @@
     "itemFeatures": "Features",
     "itemFrameworks": "Frameworks",
     "itemPricing": "Preise",
-    "itemToken": "$HATCHER",
+    "itemToken": "Token",
     "itemStaking": "Staking",
     "itemWhitepaper": "Whitepaper",
     "itemBlog": "Blog",
@@ -559,6 +559,10 @@
       "once": " einmalig"
     },
     "perAgent": "pro Agent",
+    "deepseekPromo": {
+      "title": "DeepSeek V4 Flash Launch-Woche",
+      "body": "Kostenlose tägliche Modellaufrufe bis 18. August: Free 10 · Starter 20 · Pro 40 · Business 60. Automatisch vor AI Credits."
+    },
     "annualSavings": "${annualTotal}/Jahr · sparen Sie ${saved}",
     "switchToAnnual": "Zu jährlich wechseln, 15% sparen",
     "payOnce": "Einmal zahlen, für immer behalten",
@@ -605,7 +609,7 @@
         "agents": "3 Agenten inklusive",
         "messages": "15.000 AI Credits/Monat",
         "cpu": "1,5 CPU",
-        "ram": "2 GB RAM",
+        "ram": "4 GB RAM",
         "storage": "25 GB Arbeitsbereich",
         "sleep": "Immer aktiv",
         "features": [

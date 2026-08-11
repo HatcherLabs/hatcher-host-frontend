@@ -13,7 +13,6 @@ import {
   BookOpen,
   Boxes,
   Building2,
-  Clock,
   CreditCard,
   FileText,
   GitBranch,
@@ -34,7 +33,6 @@ import { NAV_GROUPS, PRIMARY_CTA, PRIMARY_NAV_LINKS, SECONDARY_CTA } from './lin
 import { NavDrawer } from './NavDrawer';
 import { LocaleSwitcher } from '@/components/layout/LocaleSwitcher';
 import { AiCreditStatus } from '@/components/layout/AiCreditStatus';
-import { HatcherMarketStatus } from '@/components/layout/HatcherMarketStatus';
 import { VersionBadge } from '@/components/layout/VersionBadge';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
@@ -207,9 +205,6 @@ export function Nav() {
           <div className={styles.spacer} />
 
           <div className={styles.actions}>
-            <span className={styles.marketSlot}>
-              <HatcherMarketStatus />
-            </span>
             <span className={styles.localeSlot}>
               <LocaleSwitcher />
             </span>
@@ -396,8 +391,6 @@ function NavItemIcon({ itemKey }: { itemKey: string }) {
       return <Boxes {...iconProps} />;
     case 'token':
       return <CreditCard {...iconProps} />;
-    case 'staking':
-      return <Clock {...iconProps} />;
     case 'whitepaper':
       return <FileText {...iconProps} />;
     case 'blog':
