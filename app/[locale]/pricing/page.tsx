@@ -81,7 +81,7 @@ const AI_CREDITS_BY_TIER: Record<string, number> = {
 };
 
 const HATCHER_PAYMENT_DISCOUNT_FACTOR = 0.9;
-const DEEPSEEK_PROMO_END_MS = Date.parse('2026-08-19T00:00:00.000Z');
+const DEEPSEEK_PROMO_END_MS = Date.parse('2026-08-18T14:00:00.000Z');
 function priceForHatcherPayment(usdPrice: number): number {
   return Math.round(usdPrice * HATCHER_PAYMENT_DISCOUNT_FACTOR * 100) / 100;
 }
