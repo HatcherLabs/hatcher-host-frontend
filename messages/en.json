@@ -558,6 +558,7 @@
       "perMonth": "/mo",
       "once": " once"
     },
+    "perAgent": "per agent",
     "annualSavings": "${annualTotal}/year · save ${saved}",
     "switchToAnnual": "Switch to annual, save 15%",
     "payOnce": "Pay once, keep forever",

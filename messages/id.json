@@ -558,6 +558,7 @@
       "perMonth": "/bln",
       "once": "sekali"
     },
+    "perAgent": "per agen",
     "annualSavings": "${annualTotal}/tahun · hemat ${saved}",
     "switchToAnnual": "Beralih ke tahunan, hemat 15%",
     "payOnce": "Bayar sekali, simpan selamanya",

@@ -85,10 +85,12 @@ export function NavDrawer({ open, onClose }: Props) {
     if (!open) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+    document.body.dataset.qwertiOccluded = 'true';
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', onKey);
     return () => {
       document.body.style.overflow = prev;
+      delete document.body.dataset.qwertiOccluded;
       window.removeEventListener('keydown', onKey);
     };
   }, [open, onClose]);

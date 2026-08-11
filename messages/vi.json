@@ -558,6 +558,7 @@
       "perMonth": "/tháng",
       "once": "một lần"
     },
+    "perAgent": "mỗi tác nhân",
     "annualSavings": "${annualTotal}/năm · tiết kiệm ${saved}",
     "switchToAnnual": "Chuyển sang hàng năm, tiết kiệm 15%",
     "payOnce": "Trả tiền một lần, giữ mãi mãi",

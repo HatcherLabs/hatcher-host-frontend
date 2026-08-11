@@ -558,6 +558,7 @@
       "perMonth": "/mo",
       "once": "bir kez"
     },
+    "perAgent": "ajan başına",
     "annualSavings": "${annualTotal}/yıl · Kurtar ${saved}",
     "switchToAnnual": "Yıllık sisteme geç, %15 tasarruf et",
     "payOnce": "Bir kez öde, sonsuza kadar sakla",

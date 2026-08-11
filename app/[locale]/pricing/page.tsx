@@ -1,8 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { api } from '@/lib/api';
-import { FOUNDING_MEMBER_MAX_SLOTS } from '@hatcher/shared';
+import { useState } from 'react';
 import { Link } from '@/i18n/routing';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -19,7 +17,6 @@ import {
   Check,
   ChevronDown,
   Crown,
-  Gem,
   Globe,
   HelpCircle,
   MessageSquare,
@@ -74,13 +71,6 @@ const TIERS_META: TierDef[] = [
     icon: <Building2 className="w-5 h-5" />,
     accent: '#6ea3f7',
   },
-  {
-    key: 'founding_member',
-    name: 'Founding Member',
-    price: 99,
-    icon: <Gem className="w-5 h-5" />,
-    accent: 'var(--color-warning)',
-  },
 ];
 
 const AI_CREDITS_BY_TIER: Record<string, number> = {
@@ -88,7 +78,6 @@ const AI_CREDITS_BY_TIER: Record<string, number> = {
   starter: 3000,
   pro: 15000,
   business: 40000,
-  founding_member: 25000,
 };
 
 const HATCHER_PAYMENT_DISCOUNT_FACTOR = 0.9;
@@ -143,25 +132,6 @@ function PricingPageContent() {
   const { isAuthenticated } = useAuth();
   const { setVisible: setWalletModalVisible } = useWalletModal();
   const [isAnnual, setIsAnnual] = useState(false);
-  // Founding Member availability — fetched from /features (public).
-  // null = still loading; a number = actual remaining slots.
-  const [foundingRemaining, setFoundingRemaining] = useState<number | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await api.getTiersCatalog();
-        if (!cancelled && res.success) {
-          setFoundingRemaining(res.data.founding.remaining);
-        }
-      } catch {
-        // Silent — we just won't render the slots bar.
-      }
-    })();
-    return () => { cancelled = true; };
-  }, []);
-
   return (
     <MarketingShell>
       <div className="mx-auto max-w-7xl px-4 pt-20 sm:pt-24 pb-20 relative">
@@ -234,18 +204,17 @@ function PricingPageContent() {
         </div>
 
         {/* TIER CARDS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-20">
           {TIERS_META.map((tier) => {
-            const isLifetime = tier.key === 'founding_member';
             const monthlyPrice = tier.price;
-            const annualMonthlyPrice = monthlyPrice === 0 || isLifetime ? monthlyPrice : parseFloat((monthlyPrice * 0.85).toFixed(2));
-            const displayPrice = isLifetime ? monthlyPrice : (isAnnual ? annualMonthlyPrice : monthlyPrice);
-            const annualTotal = isAnnual && monthlyPrice > 0 && !isLifetime ? parseFloat((annualMonthlyPrice * 12).toFixed(2)) : null;
+            const annualMonthlyPrice = monthlyPrice === 0 ? monthlyPrice : parseFloat((monthlyPrice * 0.85).toFixed(2));
+            const displayPrice = isAnnual ? annualMonthlyPrice : monthlyPrice;
+            const annualTotal = isAnnual && monthlyPrice > 0 ? parseFloat((annualMonthlyPrice * 12).toFixed(2)) : null;
             const hatcherCharge = annualTotal ?? displayPrice;
             const hatcherPrice = priceForHatcherPayment(hatcherCharge);
 
             // Tier-specific translated strings
-            const tierKey = tier.key as 'free' | 'starter' | 'pro' | 'business' | 'founding_member';
+            const tierKey = tier.key as 'free' | 'starter' | 'pro' | 'business';
             const tierAgents   = t(`tiers.${tierKey}.agents`);
             const tierCpu      = t(`tiers.${tierKey}.cpu`);
             const tierRam      = t(`tiers.${tierKey}.ram`);
@@ -266,16 +235,13 @@ function PricingPageContent() {
                   'relative rounded-lg p-6 flex flex-col',
                   tier.highlighted
                     ? 'border border-[var(--color-accent)] bg-[var(--bg-card)] shadow-[var(--shadow-soft)]'
-                    : isLifetime
-                      ? 'border border-[var(--color-warning-border)] bg-[var(--bg-card)]'
-                      : 'border border-[var(--border-default)] bg-[var(--bg-card)]/40'
+                    : 'border border-[var(--border-default)] bg-[var(--bg-card)]/40'
                 )}
               >
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4">
-                  <p className="text-sm font-semibold text-[var(--text-muted)]">{tTiers(`${tier.key as 'free' | 'starter' | 'pro' | 'business' | 'founding_member'}.name`)}</p>
+                  <p className="text-sm font-semibold text-[var(--text-muted)]">{tTiers(`${tier.key as 'free' | 'starter' | 'pro' | 'business'}.name`)}</p>
                   {tier.highlighted && <span className="text-[11px] font-semibold text-[var(--color-accent)]">{t('tierBadges.popular')}</span>}
-                  {isLifetime && <span className="text-[11px] font-semibold text-[var(--color-accent)]">{t('tierBadges.limited')}</span>}
                 </div>
 
                 {/* Price */}
@@ -294,7 +260,7 @@ function PricingPageContent() {
                       </motion.span>
                     </AnimatePresence>
                     <span className="text-sm text-[var(--text-muted)]">
-                      {displayPrice === 0 ? t('priceUnit.perMonth') : isLifetime ? t('priceUnit.once') : t('priceUnit.perMonth')}
+                      {t('priceUnit.perMonth')}
                     </span>
                   </div>
                   {annualTotal && (
@@ -302,11 +268,8 @@ function PricingPageContent() {
                       {t('annualSavings', { annualTotal, saved: (monthlyPrice * 12 - annualTotal).toFixed(2) })}
                     </p>
                   )}
-                  {!isAnnual && monthlyPrice > 0 && !isLifetime && (
+                  {!isAnnual && monthlyPrice > 0 && (
                     <p className="text-[11px] text-[var(--text-muted)] mt-1.5">{t('switchToAnnual')}</p>
-                  )}
-                  {isLifetime && (
-                    <p className="text-[11px] text-[var(--color-accent)] font-medium mt-1.5">{t('payOnce')}</p>
                   )}
                   {monthlyPrice > 0 && (
                     <p className="text-[11px] text-[var(--color-warning)] font-medium mt-1.5">
@@ -317,39 +280,6 @@ function PricingPageContent() {
                   )}
                 </div>
 
-                {/* Founding availability */}
-                {isLifetime && (
-                  <div className="mb-5">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[11px] font-semibold text-[var(--text-muted)]">{t('availability')}</span>
-                      {foundingRemaining === null ? (
-                        <span className="text-[11px] text-[var(--text-muted)] inline-flex items-center gap-1.5">
-                          <span className="w-2.5 h-2.5 border-2 border-[var(--text-muted)]/30 border-t-[var(--text-muted)] rounded-full animate-spin" />
-                          {t('availabilityLoading')}
-                        </span>
-                      ) : (
-                        <span className={cn(
-                          'text-[11px] font-semibold tabular-nums',
-                          foundingRemaining === 0 ? 'text-[var(--color-destructive)]'
-                            : foundingRemaining <= 3 ? 'text-[var(--color-warning)]'
-                            : 'text-[var(--text-primary)]'
-                        )}>
-                          {foundingRemaining === 0
-                            ? t('soldOut')
-                            : t('slotsLeft', { remaining: foundingRemaining, max: FOUNDING_MEMBER_MAX_SLOTS })}
-                        </span>
-                      )}
-                    </div>
-                    <div className="relative h-1.5 rounded-full bg-[var(--bg-elevated)] overflow-hidden">
-                      {foundingRemaining === null ? (
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--color-accent)]/40 to-transparent animate-[shimmer_1.4s_ease-in-out_infinite]" style={{ backgroundSize: '200% 100%' }} />
-                      ) : (
-                        <div className="absolute inset-y-0 left-0 bg-[var(--color-accent)] transition-all duration-700" style={{ width: `${((FOUNDING_MEMBER_MAX_SLOTS - foundingRemaining) / FOUNDING_MEMBER_MAX_SLOTS) * 100}%` }} />
-                      )}
-                    </div>
-                  </div>
-                )}
-
                 {/* Features */}
                 <div className="space-y-2 flex-1 mb-7">
                   <FeatureCheck color="var(--color-accent)">{tierAgents}</FeatureCheck>
@@ -357,7 +287,7 @@ function PricingPageContent() {
                     {formatAiCredits(AI_CREDITS_BY_TIER[tier.key] ?? 0, locale)} AI Credits{t('priceUnit.perMonth')}
                   </FeatureCheck>
                   <FeatureCheck color="var(--color-accent)">UsePod/OpenRouter model picker</FeatureCheck>
-                  <FeatureCheck color="var(--color-accent)">{tierCpu} / {tierRam}</FeatureCheck>
+                  <FeatureCheck color="var(--color-accent)">{tierCpu} / {tierRam} · {t('perAgent')}</FeatureCheck>
                   <FeatureCheck color="var(--color-accent)">{tierStorage}</FeatureCheck>
                   <FeatureCheck color="var(--color-accent)">{tierSleep}</FeatureCheck>
                   {tierFeatures.map((f) => (
@@ -379,12 +309,12 @@ function PricingPageContent() {
                   }
                   className={cn(
                     'block text-center font-semibold px-5 py-2.5 rounded-md text-sm transition-opacity',
-                    tier.highlighted || isLifetime
+                    tier.highlighted
                       ? 'bg-[var(--text-primary)] text-[var(--bg-base)] hover:opacity-90'
                       : 'border border-[var(--border-hover)] text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
                   )}
                 >
-                  {tier.key === 'free' ? t('tierCta.free') : t('tierCta.paid', { tierName: tTiers(`${tier.key as 'free' | 'starter' | 'pro' | 'business' | 'founding_member'}.name`) })}
+                      {tier.key === 'free' ? t('tierCta.free') : t('tierCta.paid', { tierName: tTiers(`${tier.key as 'free' | 'starter' | 'pro' | 'business'}.name`) })}
                 </Link>
               </motion.div>
             );
@@ -561,32 +491,28 @@ function PricingPageContent() {
                       <div className="text-xs mb-1">{tTiers('business.name')}</div>
                       <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$49.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">{t('priceUnit.perMonth')}</span></div>
                     </th>
-                    <th className="text-center px-2 py-3 sm:p-5 text-[var(--color-destructive)] font-semibold">
-                      <div className="text-xs mb-1">{tTiers('founding_member.name')}</div>
-                      <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">{t('compareTable.onceSuffix')}</span></div>
-                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {(
                     [
-                      { rowKey: 'agents',         free: '1',         starter: '1',         pro: '3',    business: '5',  founding: '10' },
-                      { rowKey: 'aiCredits', label: 'AI Credits / month', free: '500', starter: '3,000', pro: '15,000', business: '40,000', founding: '25,000' },
-                      { rowKey: 'models', label: 'Hosted models', free: 'UsePod/OpenRouter + MiMo + AceData', starter: 'UsePod/OpenRouter + MiMo + AceData', pro: 'UsePod/OpenRouter + MiMo + AceData', business: 'UsePod/OpenRouter + MiMo + AceData', founding: 'UsePod/OpenRouter + MiMo + AceData' },
-                      { rowKey: 'webSearch', label: 'Web search', free: 'Uses AI Credits', starter: 'Uses AI Credits', pro: 'Uses AI Credits', business: 'Uses AI Credits', founding: 'Uses AI Credits' },
-                      { rowKey: 'byok',            free: 'Provider-paid', starter: 'Provider-paid', pro: 'Provider-paid', business: 'Provider-paid', founding: 'Provider-paid' },
-                      { rowKey: 'cpuRam',          free: '1 / 1GB', starter: '1 / 1.5GB', pro: '1.5 / 2GB', business: '4 / 6GB', founding: '4 / 6GB' },
-                      { rowKey: 'storage',         free: '2 GB',     starter: '10 GB',    pro: '25 GB', business: '50 GB', founding: '40 GB' },
-                      { rowKey: 'autoSleep',       free: '12h',      starter: 'alwaysOn', pro: 'alwaysOn',  business: 'alwaysOn', founding: 'alwaysOn' },
-                      { rowKey: 'fileManager',     free: true,       starter: true,       pro: true, business: true, founding: true },
-                      { rowKey: 'fullLogs',        free: true,       starter: true,       pro: true, business: true, founding: true },
-                      { rowKey: 'prioritySupport', free: false,       starter: false,       pro: false,  business: true,  founding: true },
-                      { rowKey: 'community', label: 'Community perks', free: false, starter: false, pro: false, business: false, founding: 'Discord role + Telegram tag' },
-                      { rowKey: 'plugins',         free: 'Included', starter: 'Included', pro: 'Included', business: 'Included', founding: 'Included' },
-                      { rowKey: 'integrations',    free: true,        starter: true,        pro: true,   business: true,  founding: true },
-                      { rowKey: 'byokKey',         free: true,        starter: true,        pro: true,   business: true,  founding: true },
-                      { rowKey: 'defaultLlm',      free: 'llama4Scout', starter: 'llama4Scout', pro: 'llama4Scout', business: 'llama4Scout', founding: 'llama4Scout' },
-                    ] as Array<{ rowKey: string; label?: string; free: string | boolean; starter: string | boolean; pro: string | boolean; business: string | boolean; founding: string | boolean }>
+                      { rowKey: 'agents',         free: '1',         starter: '1',         pro: '3',    business: '5' },
+                      { rowKey: 'aiCredits', label: 'AI Credits / month', free: '500', starter: '3,000', pro: '15,000', business: '40,000' },
+                      { rowKey: 'models', label: 'Hosted models', free: 'UsePod/OpenRouter + MiMo + AceData', starter: 'UsePod/OpenRouter + MiMo + AceData', pro: 'UsePod/OpenRouter + MiMo + AceData', business: 'UsePod/OpenRouter + MiMo + AceData' },
+                      { rowKey: 'webSearch', label: 'Web search', free: 'Uses AI Credits', starter: 'Uses AI Credits', pro: 'Uses AI Credits', business: 'Uses AI Credits' },
+                      { rowKey: 'byok',            free: 'Provider-paid', starter: 'Provider-paid', pro: 'Provider-paid', business: 'Provider-paid' },
+                      { rowKey: 'cpuRam', label: `${t('compareTable.rows.cpuRam')} · ${t('perAgent')}`, free: '1 / 1GB', starter: '1 / 1.5GB', pro: '1.5 / 2GB', business: '4 / 6GB' },
+                      { rowKey: 'storage',         free: '2 GB',     starter: '10 GB',    pro: '25 GB', business: '50 GB' },
+                      { rowKey: 'autoSleep',       free: '12h',      starter: 'alwaysOn', pro: 'alwaysOn',  business: 'alwaysOn' },
+                      { rowKey: 'fileManager',     free: true,       starter: true,       pro: true, business: true },
+                      { rowKey: 'fullLogs',        free: true,       starter: true,       pro: true, business: true },
+                      { rowKey: 'prioritySupport', free: false,      starter: false,      pro: false, business: true },
+                      { rowKey: 'community', label: 'Community perks', free: false, starter: false, pro: false, business: false },
+                      { rowKey: 'plugins',         free: 'Included', starter: 'Included', pro: 'Included', business: 'Included' },
+                      { rowKey: 'integrations',    free: true,       starter: true,       pro: true, business: true },
+                      { rowKey: 'byokKey',         free: true,       starter: true,       pro: true, business: true },
+                      { rowKey: 'defaultLlm',      free: 'llama4Scout', starter: 'llama4Scout', pro: 'llama4Scout', business: 'llama4Scout' },
+                    ] as Array<{ rowKey: string; label?: string; free: string | boolean; starter: string | boolean; pro: string | boolean; business: string | boolean }>
                   ).map((row, i) => (
                     <tr
                       key={row.rowKey}
@@ -600,7 +526,6 @@ function PricingPageContent() {
                       <td className="px-2 py-3 sm:p-4 text-center">{renderCell(row.starter, t)}</td>
                       <td className="px-2 py-3 sm:p-4 text-center bg-[var(--color-info-bg)]">{renderCell(row.pro, t)}</td>
                       <td className="px-2 py-3 sm:p-4 text-center">{renderCell(row.business, t)}</td>
-                      <td className="px-2 py-3 sm:p-4 text-center bg-[var(--color-warning-bg)]">{renderCell(row.founding, t)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -624,7 +549,7 @@ function PricingPageContent() {
             </motion.h2>
           </div>
           <div className="max-w-3xl mx-auto space-y-3">
-            {(t.raw('faq.items') as { q: string; a: string }[]).map((item) => (
+            {(t.raw('faq.items') as { q: string; a: string }[]).slice(0, -1).map((item) => (
               <FAQItem key={item.q} q={item.q} a={item.a} />
             ))}
           </div>

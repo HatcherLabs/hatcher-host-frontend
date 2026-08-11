@@ -558,6 +558,7 @@
       "perMonth": "/月",
       "once": " 一次性"
     },
+    "perAgent": "每个智能体",
     "annualSavings": "${annualTotal}/年 · 节省 ${saved}",
     "switchToAnnual": "切换至年付，节省15%",
     "payOnce": "一次付款，永久使用",

@@ -558,6 +558,7 @@
       "perMonth": "/mo",
       "once": "一度だけ"
     },
+    "perAgent": "エージェントごと",
     "annualSavings": "${annualTotal}年・セーブ${saved}",
     "switchToAnnual": "年次に切り替えれば15%節約できます",
     "payOnce": "一度支払えば、永遠に持ち続けます",
