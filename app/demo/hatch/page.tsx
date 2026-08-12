@@ -7,7 +7,7 @@ import styles from './hatch-demo.module.css';
 
 const HATCH_AGENT_ID = 'cmp2dohkb00jtlsvsq1m5hriq';
 const INSTALL_SNIPPET =
-  '<script src="https://hatcher.host/embed/widget.js" data-agent="cmp2dohkb00jtlsvsq1m5hriq" data-theme="dark" data-accent="green" defer></script>';
+  '<script src="https://hatcher.host/embed/widget.js?v=2" data-agent="cmp2dohkb00jtlsvsq1m5hriq" data-theme="dark" data-accent="green" defer></script>';
 
 export const metadata: Metadata = {
   title: 'Hatch live embed demo',
