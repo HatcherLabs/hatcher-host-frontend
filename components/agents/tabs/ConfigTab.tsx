@@ -422,7 +422,7 @@ export function ConfigTab() {
   const modelNetworkAgentIdRef = useRef(agent.id);
 
   const isHostedMode = configProvider === hostedProvider;
-  const embedPublicId = agent.slug ?? agent.id;
+  const embedPublicId = agent.id;
   const embedSnippet = useMemo(
     () =>
       buildAgentEmbedSnippet(embedPublicId, {

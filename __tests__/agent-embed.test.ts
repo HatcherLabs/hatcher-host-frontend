@@ -10,6 +10,16 @@ import {
 } from '@/lib/agent-embed';
 
 describe('embeddable agent helpers', () => {
+  it('generates dashboard embed code with the API-supported agent id', () => {
+    const configSource = readFileSync(
+      join(__dirname, '..', 'components', 'agents', 'tabs', 'ConfigTab.tsx'),
+      'utf8'
+    );
+
+    expect(configSource).toContain('const embedPublicId = agent.id;');
+    expect(configSource).not.toContain('const embedPublicId = agent.slug ?? agent.id;');
+  });
+
   it('builds a compact agent URL from allowlisted appearance options', () => {
     expect(
       buildAgentEmbedUrl(
@@ -63,6 +73,14 @@ describe('embeddable agent routing', () => {
     expect(source).not.toContain('innerHTML');
   });
 
+  it('supports explicit demo opening without changing the lazy default', async () => {
+    const source = await getAgentWidgetScript().text();
+
+    expect(source).toContain("const openInitially = script.dataset.open === 'true'");
+    expect(source).toContain("window.addEventListener('hatcher:embed:open'");
+    expect(source).toContain('if (openInitially) setOpen(true)');
+  });
+
   it('does not redirect /embed/agent/:id away from the widget surface', async () => {
     const redirects = await nextConfig.redirects();
     expect(
@@ -73,5 +91,10 @@ describe('embeddable agent routing', () => {
   it('keeps /embed outside locale rewriting', () => {
     const middleware = readFileSync(join(__dirname, '..', 'middleware.ts'), 'utf8');
     expect(middleware).toMatch(/NON_LOCALE_PREFIXES\s*=\s*\[[\s\S]*['"]\/embed['"]/u);
+  });
+
+  it('keeps the standalone demo outside locale rewriting', () => {
+    const middleware = readFileSync(join(__dirname, '..', 'middleware.ts'), 'utf8');
+    expect(middleware).toMatch(/NON_LOCALE_PREFIXES\s*=\s*\[[\s\S]*['"]\/demo['"]/u);
   });
 });
