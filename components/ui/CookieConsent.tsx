@@ -19,6 +19,7 @@
 // ============================================================
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 // CookieConsent is rendered in app/layout.tsx OUTSIDE NextIntlClientProvider
 // so it must use plain next/link — the i18n Link's useLocale call would throw
 // "No intl context found" on bare routes (/privacy, /terms, /cookies, /impressum).
@@ -43,11 +44,17 @@ export type ConsentStatus = AnalyticsConsentStatus;
 export const getConsentStatus = getAnalyticsConsentStatus;
 
 export function CookieConsent() {
+  const pathname = usePathname();
+  const isEmbedRoute = pathname.startsWith('/embed');
   const [visible, setVisible] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [analyticsChoice, setAnalyticsChoice] = useState(false);
 
   useEffect(() => {
+    if (isEmbedRoute) {
+      setVisible(false);
+      return;
+    }
     const current = readAnalyticsConsent();
     if (current) {
       // Already decided — honor the stored choice.
@@ -72,14 +79,14 @@ export function CookieConsent() {
     // Slight delay so we don't flash the banner before first paint.
     const t = setTimeout(() => setVisible(true), 800);
     return () => clearTimeout(t);
-  }, []);
+  }, [isEmbedRoute]);
 
   function persist(analytics: boolean) {
     persistAnalyticsConsent(analytics);
     setVisible(false);
   }
 
-  if (!visible) return null;
+  if (isEmbedRoute || !visible) return null;
 
   // Collapsed state: slim full-width bottom bar so we don't block the page
   // (hero CTAs, form fields, pricing tables). Expanded state: centered card

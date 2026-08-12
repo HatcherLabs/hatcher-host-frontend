@@ -15,18 +15,30 @@ const pageSource = readFileSync(
 describe('roadmap content', () => {
   it('publishes a current, machine-readable update date', () => {
     expect(roadmapUpdatedAt).toEqual({
-      dateTime: '2026-08-08',
+      dateTime: '2026-08-12',
       label: 'August 2026',
     });
   });
 
   it('surfaces the latest releases', () => {
     expect(latestReleases.map((release) => release.id)).toEqual([
+      'embeddable-agents',
       'agent-workspace',
       'onchain-traders',
       'equifold-launches',
       'mobile-i18n',
     ]);
+  });
+
+  it('does not advertise already-shipped platform work as active backlog', () => {
+    const activeIds = phases
+      .filter((phase) => phase.status === 'now' || phase.status === 'next')
+      .flatMap((phase) => phase.items.map((item) => item.id));
+
+    expect(activeIds).not.toContain('agent-badges');
+    expect(activeIds).not.toContain('knowledge');
+    expect(activeIds).not.toContain('dev-api');
+    expect(activeIds).not.toContain('embed');
   });
 
   it('walks the classic phase ladder in order', () => {

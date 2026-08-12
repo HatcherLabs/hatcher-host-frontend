@@ -15,6 +15,7 @@ import {
   Bot,
   Brain,
   Code2,
+  Copy,
   DollarSign,
   Download,
   Gauge,
@@ -58,6 +59,13 @@ import {
   type ModelPricingPayload,
 } from '@/lib/model-pricing';
 import { resolveLoadedModelConfig, resolveSavedModel } from '@/hooks/useAgentConfig';
+import {
+  buildAgentEmbedSnippet,
+  buildAgentEmbedUrl,
+  type AgentEmbedAccent,
+  type AgentEmbedPosition,
+  type AgentEmbedTheme,
+} from '@/lib/agent-embed';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/ui/ToastProvider';
 import {
@@ -406,10 +414,44 @@ export function ConfigTab() {
   const [liveVirtualsModels, setLiveVirtualsModels] = useState<HostedModelOption[]>([]);
   const [virtualsModelStatus, setVirtualsModelStatus] = useState<VirtualsModelCatalogStatus>('loading');
   const [liveModelPricing, setLiveModelPricing] = useState<ModelPricingPayload | null>(null);
+  const [embedTheme, setEmbedTheme] = useState<AgentEmbedTheme>('auto');
+  const [embedAccent, setEmbedAccent] = useState<AgentEmbedAccent>('green');
+  const [embedPosition, setEmbedPosition] = useState<AgentEmbedPosition>('right');
+  const [embedCopied, setEmbedCopied] = useState(false);
   const presetImportRef = useRef<HTMLInputElement | null>(null);
   const modelNetworkAgentIdRef = useRef(agent.id);
 
   const isHostedMode = configProvider === hostedProvider;
+  const embedPublicId = agent.slug ?? agent.id;
+  const embedSnippet = useMemo(
+    () =>
+      buildAgentEmbedSnippet(embedPublicId, {
+        theme: embedTheme,
+        accent: embedAccent,
+        position: embedPosition,
+      }),
+    [embedAccent, embedPosition, embedPublicId, embedTheme]
+  );
+  const embedPreviewUrl = useMemo(
+    () =>
+      buildAgentEmbedUrl(embedPublicId, {
+        theme: embedTheme,
+        accent: embedAccent,
+        position: embedPosition,
+      }),
+    [embedAccent, embedPosition, embedPublicId, embedTheme]
+  );
+
+  const copyEmbedSnippet = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(embedSnippet);
+      setEmbedCopied(true);
+      window.setTimeout(() => setEmbedCopied(false), 2_000);
+      toast.success('Embed code copied. Paste it before the closing </body> tag.');
+    } catch {
+      toast.error('Could not copy the embed code. Select the snippet and copy it manually.');
+    }
+  }, [embedSnippet, toast]);
   const normalizedHostedModel = normalizeHostedModelForUi(configModel);
   const liveModelPricingById = useMemo(
     () => modelPricingById(liveModelPricing),
@@ -1104,26 +1146,114 @@ export function ConfigTab() {
           </label>
 
           {isHostedMode && configPublicChatEnabled && (
-            <label className="block rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-4">
-              <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
-                Daily public AI Credit cap
-              </span>
-              <input
-                type="number"
-                min={1}
-                max={100000}
-                step={100}
-                value={configPublicChatDailyAiCreditCap}
-                onChange={(event) => {
-                  const next = Number.parseInt(event.target.value, 10);
-                  setConfigPublicChatDailyAiCreditCap(Number.isFinite(next) ? next : 0);
-                }}
-                className="config-input"
-              />
-              <p className="mt-2 text-xs text-[var(--text-tertiary)]">
-                Public chat stops for visitors once this agent reaches the cap over a rolling 24h window.
-              </p>
-            </label>
+            <>
+              <label className="block rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-4">
+                <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
+                  Daily public AI Credit cap
+                </span>
+                <input
+                  type="number"
+                  min={1}
+                  max={100000}
+                  step={100}
+                  value={configPublicChatDailyAiCreditCap}
+                  onChange={(event) => {
+                    const next = Number.parseInt(event.target.value, 10);
+                    setConfigPublicChatDailyAiCreditCap(Number.isFinite(next) ? next : 0);
+                  }}
+                  className="config-input"
+                />
+                <p className="mt-2 text-xs text-[var(--text-tertiary)]">
+                  Public chat and embedded chat stop once this agent reaches the cap over a rolling 24h window.
+                </p>
+              </label>
+
+              <div className="rounded-xl border border-[var(--accent-primary)]/25 bg-[var(--accent-primary)]/[0.04] p-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
+                      <Code2 className="h-4 w-4 text-[var(--accent-primary)]" />
+                      Embed this agent
+                    </div>
+                    <p className="mt-1 max-w-2xl text-xs leading-relaxed text-[var(--text-tertiary)]">
+                      Add a lazy-loaded chat button to any website. It uses this public chat&apos;s existing AI Credit cap and turns off immediately when Public chat is disabled.
+                    </p>
+                  </div>
+                  <a
+                    href={embedPreviewUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex min-h-9 items-center justify-center rounded-lg border border-[var(--border-subtle)] px-3 text-xs font-medium text-[var(--text-secondary)] transition-colors hover:border-[var(--accent-primary)]/50 hover:text-[var(--accent-primary)]"
+                  >
+                    Preview widget
+                  </a>
+                </div>
+
+                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                  <label className="text-xs font-medium text-[var(--text-secondary)]">
+                    Theme
+                    <select
+                      value={embedTheme}
+                      onChange={(event) => setEmbedTheme(event.target.value as AgentEmbedTheme)}
+                      className="config-input mt-1.5"
+                    >
+                      <option value="auto">Match device</option>
+                      <option value="dark">Dark</option>
+                      <option value="light">Light</option>
+                    </select>
+                  </label>
+                  <label className="text-xs font-medium text-[var(--text-secondary)]">
+                    Accent
+                    <select
+                      value={embedAccent}
+                      onChange={(event) => setEmbedAccent(event.target.value as AgentEmbedAccent)}
+                      className="config-input mt-1.5"
+                    >
+                      <option value="green">Hatcher green</option>
+                      <option value="blue">Blue</option>
+                      <option value="purple">Purple</option>
+                    </select>
+                  </label>
+                  <label className="text-xs font-medium text-[var(--text-secondary)]">
+                    Position
+                    <select
+                      value={embedPosition}
+                      onChange={(event) => setEmbedPosition(event.target.value as AgentEmbedPosition)}
+                      className="config-input mt-1.5"
+                    >
+                      <option value="right">Bottom right</option>
+                      <option value="left">Bottom left</option>
+                    </select>
+                  </label>
+                </div>
+
+                <label className="mt-4 block text-xs font-medium text-[var(--text-secondary)]">
+                  Install snippet
+                  <textarea
+                    readOnly
+                    value={embedSnippet}
+                    onFocus={(event) => event.currentTarget.select()}
+                    rows={4}
+                    spellCheck={false}
+                    className="config-input mt-1.5 resize-none font-mono text-[11px] leading-relaxed"
+                    aria-label="Agent embed code"
+                  />
+                </label>
+                <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-[11px] text-[var(--text-tertiary)]">
+                    Paste once before your site&apos;s closing <code className="font-mono">&lt;/body&gt;</code> tag.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => void copyEmbedSnippet()}
+                    className="inline-flex min-h-9 items-center justify-center gap-2 rounded-lg bg-[var(--accent-primary)] px-3 text-xs font-semibold text-black transition-opacity hover:opacity-90"
+                  >
+                    {embedCopied ? <CheckCircle className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                    {embedCopied ? 'Copied' : 'Copy code'}
+                  </button>
+                </div>
+              </div>
+            </>
           )}
         </div>
       </GlassCard>

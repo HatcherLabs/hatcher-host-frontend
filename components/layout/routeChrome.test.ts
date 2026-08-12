@@ -16,4 +16,8 @@ describe('route chrome classification', () => {
     expect(stripLocaleForChrome('/fr/dashboard/agents')).toBe('/dashboard/agents');
     expect(isImmersiveChromePath('/fr/dashboard/agents')).toBe(false);
   });
+
+  it('lets embeddable agent routes own the full iframe viewport', () => {
+    expect(isImmersiveChromePath('/embed/agent/my-agent')).toBe(true);
+  });
 });
