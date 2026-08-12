@@ -20,4 +20,8 @@ describe('route chrome classification', () => {
   it('lets embeddable agent routes own the full iframe viewport', () => {
     expect(isImmersiveChromePath('/embed/agent/my-agent')).toBe(true);
   });
+
+  it('lets standalone demo routes provide their own site chrome', () => {
+    expect(isImmersiveChromePath('/demo/hatch')).toBe(true);
+  });
 });

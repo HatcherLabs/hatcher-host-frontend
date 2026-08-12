@@ -321,9 +321,9 @@ export function AgentEmbedChat({ agentId }: { agentId: string }) {
         <div className="flex flex-1 flex-col justify-center px-5 py-8">
           <div className="mx-auto w-full max-w-sm text-center">
             <Sparkles className="mx-auto h-7 w-7 text-[var(--color-accent)]" />
-            <h1 className="mt-3 text-lg font-semibold">Chat with {agent?.name}</h1>
-            <p className="mt-2 text-sm text-[var(--text-muted)]">
-              Choose a display name to start a private browser session.
+            <h1 className="mt-3 text-lg font-semibold">Hi there</h1>
+            <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">
+              {agent?.description || `I'm ${agent?.name}, ready to help.`}
             </p>
             <form
               className="mt-6 space-y-3"
@@ -332,16 +332,19 @@ export function AgentEmbedChat({ agentId }: { agentId: string }) {
                 void startSession();
               }}
             >
-              <label className="flex min-h-11 items-center gap-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3">
-                <UserRound className="h-4 w-4 text-[var(--text-muted)]" />
-                <input
-                  value={username}
-                  onChange={(event) => setUsername(sanitizePublicChatUsername(event.target.value))}
-                  maxLength={40}
-                  autoComplete="nickname"
-                  placeholder="Your display name"
-                  className="w-full bg-transparent text-sm outline-none placeholder:text-[var(--text-muted)]"
-                />
+              <label className="block text-left text-xs font-medium text-[var(--text-secondary)]">
+                Your display name
+                <span className="mt-2 flex min-h-11 items-center gap-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3">
+                  <UserRound className="h-4 w-4 text-[var(--text-muted)]" />
+                  <input
+                    value={username}
+                    onChange={(event) => setUsername(sanitizePublicChatUsername(event.target.value))}
+                    maxLength={40}
+                    autoComplete="nickname"
+                    placeholder="Your display name"
+                    className="w-full bg-transparent text-sm outline-none placeholder:text-[var(--text-muted)]"
+                  />
+                </span>
               </label>
               <button
                 type="submit"

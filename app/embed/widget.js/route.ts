@@ -15,6 +15,7 @@ const WIDGET_SOURCE = String.raw`(() => {
   const theme = allowedTheme.has(script.dataset.theme || '') ? script.dataset.theme : 'auto';
   const accent = allowedAccent.has(script.dataset.accent || '') ? script.dataset.accent : 'green';
   const position = allowedPosition.has(script.dataset.position || '') ? script.dataset.position : 'right';
+  const openInitially = script.dataset.open === 'true';
   const colors = { green: '#00e676', blue: '#3b82f6', purple: '#8b5cf6' };
   const color = colors[accent];
   const origin = new URL(script.src, window.location.href).origin;
@@ -72,6 +73,11 @@ const WIDGET_SOURCE = String.raw`(() => {
 
   launcher.addEventListener('click', () => setOpen(true));
   close.addEventListener('click', () => setOpen(false));
+  window.addEventListener('hatcher:embed:open', (event) => {
+    const eventAgent = event instanceof CustomEvent && event.detail ? event.detail.agent : null;
+    if (eventAgent && eventAgent !== agent) return;
+    setOpen(true);
+  });
   window.addEventListener('message', (event) => {
     if (event.origin !== origin || !frame || event.source !== frame.contentWindow) return;
     if (event.data && event.data.type === 'hatcher:embed:close') setOpen(false);
@@ -80,6 +86,7 @@ const WIDGET_SOURCE = String.raw`(() => {
   panel.append(close);
   root.append(panel, launcher);
   document.body.append(root);
+  if (openInitially) setOpen(true);
 })();`;
 
 export function GET() {

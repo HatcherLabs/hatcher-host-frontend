@@ -9,6 +9,7 @@ const IMMERSIVE_PATTERNS: RegExp[] = [
   /^\/(?:login|register|forgot-password|reset-password|verify-email)(?:\/|$)/,
   /^\/(?:privacy|terms|cookies|impressum)(?:\/|$)/,
   /^\/embed(?:\/|$)/,
+  /^\/demo(?:\/|$)/,
 ];
 
 export function stripLocaleForChrome(pathname: string): string {

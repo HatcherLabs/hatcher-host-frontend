@@ -45,7 +45,7 @@ export const getConsentStatus = getAnalyticsConsentStatus;
 
 export function CookieConsent() {
   const pathname = usePathname();
-  const isEmbedRoute = pathname.startsWith('/embed');
+  const isEmbedRoute = pathname.startsWith('/embed') || pathname.startsWith('/demo/hatch');
   const [visible, setVisible] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [analyticsChoice, setAnalyticsChoice] = useState(false);

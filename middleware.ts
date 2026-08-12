@@ -49,6 +49,7 @@ const NON_LOCALE_PREFIXES = [
   '/og',
   '/skill',
   '/embed',
+  '/demo',
   '/.well-known',
 ];
 
