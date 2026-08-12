@@ -1,6 +1,7 @@
 export const AGENT_EMBED_THEMES = ['auto', 'light', 'dark'] as const;
 export const AGENT_EMBED_ACCENTS = ['green', 'blue', 'purple'] as const;
 export const AGENT_EMBED_POSITIONS = ['right', 'left'] as const;
+export const AGENT_EMBED_LOADER_VERSION = '2';
 
 export type AgentEmbedTheme = (typeof AGENT_EMBED_THEMES)[number];
 export type AgentEmbedAccent = (typeof AGENT_EMBED_ACCENTS)[number];
@@ -75,7 +76,7 @@ export function buildAgentEmbedSnippet(
 ): string {
   const normalized = normalizeAgentEmbedOptions(options);
   const origin = normalizedSiteOrigin(siteUrl);
-  return `<script src="${escapeHtmlAttribute(`${origin}/embed/widget.js`)}" data-agent="${escapeHtmlAttribute(publicAgentId)}" data-theme="${normalized.theme}" data-accent="${normalized.accent}" data-position="${normalized.position}" defer></script>`;
+  return `<script src="${escapeHtmlAttribute(`${origin}/embed/widget.js?v=${AGENT_EMBED_LOADER_VERSION}`)}" data-agent="${escapeHtmlAttribute(publicAgentId)}" data-theme="${normalized.theme}" data-accent="${normalized.accent}" data-position="${normalized.position}" defer></script>`;
 }
 
 export function agentEmbedAccentColor(accent: AgentEmbedAccent): string {

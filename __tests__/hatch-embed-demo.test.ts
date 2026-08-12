@@ -14,7 +14,7 @@ const cookieConsentSource = readFileSync(
 describe('Hatch embed demo page', () => {
   it('uses the verified public Hatch agent through the production widget loader', () => {
     expect(pageSource).toContain("const HATCH_AGENT_ID = 'cmp2dohkb00jtlsvsq1m5hriq'");
-    expect(pageSource).toContain('src="/embed/widget.js"');
+    expect(pageSource).toContain('src="/embed/widget.js?v=2"');
     expect(pageSource).toContain('data-agent={HATCH_AGENT_ID}');
     expect(pageSource).toContain('data-open="true"');
   });

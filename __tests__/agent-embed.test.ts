@@ -49,7 +49,7 @@ describe('embeddable agent helpers', () => {
       'https://hatcher.host'
     );
 
-    expect(snippet).toContain('src="https://hatcher.host/embed/widget.js"');
+    expect(snippet).toContain('src="https://hatcher.host/embed/widget.js?v=2"');
     expect(snippet).toContain('data-theme="light"');
     expect(snippet).toContain('data-accent="purple"');
     expect(snippet).toContain('data-position="left"');
