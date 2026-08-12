@@ -42,11 +42,18 @@ export interface RoadmapPhase {
 }
 
 export const roadmapUpdatedAt = {
-  dateTime: '2026-08-08',
+  dateTime: '2026-08-12',
   label: 'August 2026',
 } as const;
 
 export const latestReleases = [
+  {
+    id: 'embeddable-agents',
+    icon: 'route',
+    title: 'Embeddable agents',
+    description:
+      'A lazy-loaded chat widget that puts a public Hatcher agent on any website.',
+  },
   {
     id: 'agent-workspace',
     icon: 'operate',
@@ -137,6 +144,31 @@ export const phases: readonly RoadmapPhase[] = [
         note: "Launch your agent's token on the EquiFold launchpad, without leaving Hatcher.",
         tags: ['equifold'],
       },
+      {
+        id: 'agent-badges',
+        title: 'Agent-launched attribution',
+        note: 'Tokens launched by Hatcher agents carry verified provenance and badges across Hatcher and EquiFold.',
+        tags: ['equifold'],
+      },
+      {
+        id: 'knowledge',
+        title: 'Agent knowledge',
+        note: 'Upload and manage documents that agents can use as durable, per-agent context.',
+      },
+      {
+        id: 'dev-api',
+        title: 'Developer API & SDK',
+        note: 'API keys, agent provisioning, chat, lifecycle controls, usage envelopes, and integration documentation.',
+        href: '/docs/api',
+        linkLabel: 'Read API docs',
+      },
+      {
+        id: 'embed',
+        title: 'Embeddable agents',
+        note: 'Add a configurable, lazy-loaded public agent chat to any website with one script tag.',
+        href: '/dashboard/agents',
+        linkLabel: 'Configure an embed',
+      },
     ],
   },
   {
@@ -153,17 +185,6 @@ export const phases: readonly RoadmapPhase[] = [
         note: 'An OpenAI-compatible public endpoint — one key across every model route we run. Paid in AI Credits topped up with HATCHER, and stakers get a priority lane.',
         tags: ['hatcher'],
       },
-      {
-        id: 'agent-badges',
-        title: 'Agent-launched badges',
-        note: 'Tokens launched by Hatcher agents get attributed and badged on both platforms.',
-        tags: ['equifold'],
-      },
-      {
-        id: 'knowledge',
-        title: 'Knowledge that answers',
-        note: 'Agents answer from the documents you upload — grounded, per agent.',
-      },
     ],
   },
   {
@@ -175,11 +196,6 @@ export const phases: readonly RoadmapPhase[] = [
     blurb:
       'Every item here makes HATCHER more useful to hold — or an EquiFold launch more powerful to run.',
     items: [
-      {
-        id: 'dev-api',
-        title: 'Developer API & SDK',
-        note: 'Provision and manage agents programmatically — the foundation for every integration.',
-      },
       {
         id: 'equifold-operators',
         title: 'EquiFold agent operators',
@@ -205,9 +221,9 @@ export const phases: readonly RoadmapPhase[] = [
         tags: ['hatcher'],
       },
       {
-        id: 'embed',
-        title: 'Embeddable agents',
-        note: "A chat widget that puts your agent on any site — including your token's page on EquiFold.",
+        id: 'triggers',
+        title: 'Event triggers',
+        note: 'Agents that wake on on-chain events, price moves, webhooks, and GitHub activity.',
       },
     ],
   },
@@ -229,11 +245,6 @@ export const phases: readonly RoadmapPhase[] = [
         id: 'teams',
         title: 'Agent teams',
         note: 'Multi-agent missions — your agents collaborate and delegate to each other.',
-      },
-      {
-        id: 'triggers',
-        title: 'Event triggers',
-        note: 'Agents that wake on on-chain events, price moves, webhooks, and GitHub activity.',
       },
       {
         id: 'voting',

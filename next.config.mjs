@@ -186,7 +186,7 @@ const nextConfig = {
     // prefix) and one for the explicit non-default locales (zh/de/fr/ro).
     // i18n uses `localePrefix: 'as-needed'` so EN URLs never carry a
     // prefix and the bare path doesn't double-match.
-    const dead = ['agent/:id/room', 'agent/:id/room-legacy', 'agent/:id/city', 'embed/agent/:id'];
+    const dead = ['agent/:id/room', 'agent/:id/room-legacy', 'agent/:id/city'];
     const target = '/agent/:id';
     const out = [];
 

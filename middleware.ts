@@ -48,6 +48,7 @@ const NON_LOCALE_PREFIXES = [
   '/cookies',
   '/og',
   '/skill',
+  '/embed',
   '/.well-known',
 ];
 
