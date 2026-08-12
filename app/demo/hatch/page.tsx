@@ -115,7 +115,7 @@ export default function HatchEmbedDemoPage() {
       </footer>
 
       <Script
-        src="/embed/widget.js"
+        src="/embed/widget.js?v=2"
         data-agent={HATCH_AGENT_ID}
         data-theme="dark"
         data-accent="green"
