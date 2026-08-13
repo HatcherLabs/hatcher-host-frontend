@@ -51,7 +51,6 @@ import {
   type HostedModelPrivacy,
   type HostedModelTag,
 } from '@/lib/hosted-model-catalog';
-import { mergeHostedModelsWithVirtualsLive } from '@/lib/virtuals-compute-models';
 import {
   mergeHostedModelsWithLivePricing,
   modelPricingById,
@@ -130,7 +129,6 @@ type ModelPreset = {
 };
 
 type ConfigSubtab = 'general' | 'ai-models' | 'public-access' | 'advanced';
-type VirtualsModelCatalogStatus = 'loading' | 'ready' | 'fallback';
 
 const CONFIG_SUBTABS: Array<{
   id: ConfigSubtab;
@@ -177,7 +175,6 @@ const PROVIDER_GLYPH: Record<string, string> = {
   openserv: 'OS',
   xiaomi: 'MI',
   acedata: 'AC',
-  virtuals: 'V',
   google: 'G',
   qwen: 'Q',
   'x-ai': 'X',
@@ -325,7 +322,7 @@ const HostedModelRow = memo(function HostedModelRow({
       <span
         className="inline-flex h-fit items-center gap-1.5 text-xs text-[var(--text-secondary)]"
         title={partnerHosted
-          ? 'Partner inference route. AceData and OpenServ can fall back to OpenRouter; Virtuals uses a dedicated route.'
+          ? 'Partner inference route. AceData and OpenServ can fall back to OpenRouter.'
           : 'Hatcher-managed provider network with UsePod primary and OpenRouter fallback.'}
       >
         <Info className="h-3 w-3" />
@@ -337,27 +334,6 @@ const HostedModelRow = memo(function HostedModelRow({
     </button>
   );
 });
-
-function isHostedModelOption(value: unknown): value is HostedModelOption {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
-  const source = value as Record<string, unknown>;
-  return typeof source.id === 'string'
-    && typeof source.name === 'string'
-    && typeof source.providerKey === 'string'
-    && typeof source.provider === 'string'
-    && typeof source.category === 'string'
-    && typeof source.cost === 'string'
-    && typeof source.context === 'string'
-    && typeof source.description === 'string';
-}
-
-function parseVirtualsModelsPayload(payload: unknown): HostedModelOption[] {
-  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return [];
-  const data = (payload as { data?: unknown }).data;
-  if (!data || typeof data !== 'object' || Array.isArray(data)) return [];
-  const models = (data as { models?: unknown }).models;
-  return Array.isArray(models) ? models.filter(isHostedModelOption) : [];
-}
 
 export function ConfigTab() {
   const searchParams = useSearchParams();
@@ -411,8 +387,6 @@ export function ConfigTab() {
   const [presetName, setPresetName] = useState('');
   const [presetDescription, setPresetDescription] = useState('');
   const [presetImportError, setPresetImportError] = useState<string | null>(null);
-  const [liveVirtualsModels, setLiveVirtualsModels] = useState<HostedModelOption[]>([]);
-  const [virtualsModelStatus, setVirtualsModelStatus] = useState<VirtualsModelCatalogStatus>('loading');
   const [liveModelPricing, setLiveModelPricing] = useState<ModelPricingPayload | null>(null);
   const [embedTheme, setEmbedTheme] = useState<AgentEmbedTheme>('auto');
   const [embedAccent, setEmbedAccent] = useState<AgentEmbedAccent>('green');
@@ -458,11 +432,8 @@ export function ConfigTab() {
     [liveModelPricing],
   );
   const availableHostedModels = useMemo(
-    () => mergeHostedModelsWithLivePricing(
-      mergeHostedModelsWithVirtualsLive(HOSTED_MODELS, liveVirtualsModels),
-      liveModelPricingById,
-    ),
-    [liveModelPricingById, liveVirtualsModels],
+    () => mergeHostedModelsWithLivePricing(HOSTED_MODELS, liveModelPricingById),
+    [liveModelPricingById],
   );
   const selectedHostedModel = useMemo(
     () => availableHostedModels.find((m) => m.id === normalizedHostedModel)
@@ -568,11 +539,6 @@ export function ConfigTab() {
       (a, b) => (providerOrder.get(a.key) ?? Number.MAX_SAFE_INTEGER) - (providerOrder.get(b.key) ?? Number.MAX_SAFE_INTEGER),
     );
   }, [filteredHostedModels, hostedModelProviders]);
-  const virtualsModelStatusLabel = virtualsModelStatus === 'ready'
-    ? `Virtuals: ${liveVirtualsModels.length} models`
-    : virtualsModelStatus === 'loading'
-      ? 'Virtuals: syncing'
-      : 'Virtuals: starter list';
   const draftModelValue = (useCustomModel ? customModelInput : configModel).trim();
   const hasPendingModelChange = savedModelConfig.provider === hostedProvider && configProvider === hostedProvider
     ? savedHostedModel?.id !== selectedHostedModel.id
@@ -766,32 +732,6 @@ export function ConfigTab() {
       setConfigModel(normalizedHostedModel);
     }
   }, [configModel, isHostedMode, normalizedHostedModel, setConfigModel]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    async function loadVirtualsModels() {
-      setVirtualsModelStatus('loading');
-      try {
-        const response = await fetch('/api/virtuals/models', { signal: controller.signal });
-        if (!response.ok) throw new Error('Virtuals model catalog unavailable');
-        const models = parseVirtualsModelsPayload(await response.json());
-        if (controller.signal.aborted) return;
-        setLiveVirtualsModels(models);
-        setVirtualsModelStatus(models.length > 0 ? 'ready' : 'fallback');
-      } catch {
-        if (controller.signal.aborted) return;
-        setLiveVirtualsModels([]);
-        setVirtualsModelStatus('fallback');
-      }
-    }
-
-    loadVirtualsModels();
-
-    return () => {
-      controller.abort();
-    };
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -1393,8 +1333,6 @@ export function ConfigTab() {
                         ? 'Inference routes through UsePod with OpenRouter fallback for Xiaomi MiMo. AI Credit billing applies.'
                         : selectedHostedModel.providerKey === 'acedata'
                           ? 'Inference routes through AceData first, with OpenRouter fallback when needed. Review partner policy before using sensitive data.'
-                        : selectedHostedModel.providerKey === 'virtuals'
-                          ? 'Inference routes through Virtuals Compute with the Hatcher server-side Virtuals key. Review Virtuals policy before using sensitive data.'
                         : selectedHostedModel.providerKey === 'openserv'
                           ? 'Inference routes through OpenServ first, with OpenRouter fallback when needed. Review partner policy before using sensitive data.'
                         : hostedModelPrivacy(selectedHostedModel) === 'partner'
@@ -1640,7 +1578,7 @@ export function ConfigTab() {
                   <p className="mt-2 max-w-xs text-[11px] leading-relaxed text-[var(--text-tertiary)]">
                     {modelPrivacyFilter === 'hatcher'
                       ? 'Hatcher routes common models through UsePod with OpenRouter fallback.'
-                      : 'Partner-primary routes from OpenServ, AceData, and Virtuals.'}
+                      : 'Partner-primary routes from OpenServ and AceData.'}
                   </p>
                 </div>
 
@@ -1650,17 +1588,6 @@ export function ConfigTab() {
                       {modelPrivacyFilter === 'hatcher' ? 'Model families' : 'Inference partners'}
                     </span>
                     <div className="flex items-center gap-2">
-                      {modelPrivacyFilter === 'partner' && (
-                        <span
-                          className={`rounded border px-2 py-0.5 text-[10px] ${
-                            virtualsModelStatus === 'ready'
-                              ? 'border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success)]'
-                              : 'border-[var(--border-subtle)] bg-[var(--bg-panel)] text-[var(--text-tertiary)]'
-                          }`}
-                        >
-                          {virtualsModelStatusLabel}
-                        </span>
-                      )}
                       {selectedProviderFilters.length > 0 && (
                         <button type="button" onClick={() => setSelectedProviderFilters([])} className="text-xs text-[var(--accent-primary)] hover:underline">
                           Clear
