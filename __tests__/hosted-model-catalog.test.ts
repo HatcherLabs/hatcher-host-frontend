@@ -18,7 +18,8 @@ describe('hosted model catalog', () => {
     );
     expect(normalizeHostedModelForUi('x-ai/grok-code-fast-1')).toBe('x-ai/grok-4.5');
     expect(normalizeHostedModelForUi('xiaomi/mimo-v2-omni')).toBe('xiaomi/mimo-v2.5');
-    expect(normalizeHostedModelForUi('virtuals/llama-3-3-70b')).toBe('virtuals/deepseek-deepseek-v3-2');
+    expect(normalizeHostedModelForUi('virtuals/llama-3-3-70b')).toBe('deepseek/deepseek-v4-flash');
+    expect(normalizeHostedModelForUi('virtuals/anthropic-claude-fable-5')).toBe('deepseek/deepseek-v4-flash');
   });
 
   it('builds a readable BYOK model display', () => {
@@ -76,37 +77,8 @@ describe('hosted model catalog', () => {
       context: '500K',
     });
 
-    const virtualsFallback = [
-      ['virtuals/anthropic-claude-fable-5', '1M'],
-      ['virtuals/anthropic-claude-sonnet-5', '1M'],
-      ['virtuals/e2ee-deepseek-v4-flash', '1M'],
-      ['virtuals/openai-gpt-56-luna', '1M'],
-      ['virtuals/openai-gpt-56-luna-pro', '1M'],
-      ['virtuals/openai-gpt-56-sol', '1M'],
-      ['virtuals/openai-gpt-56-sol-pro', '1M'],
-      ['virtuals/openai-gpt-56-terra', '1M'],
-      ['virtuals/openai-gpt-56-terra-pro', '1M'],
-      ['virtuals/x-ai-grok-4-5', '500K'],
-      ['virtuals/google-gemini-3-5-flash', '1M'],
-      ['virtuals/z-ai-glm-5-2', '1M'],
-    ] as const;
-
-    for (const [id, context] of virtualsFallback) {
-      expect(getHostedModelOption(id)).toMatchObject({
-        id,
-        provider: 'Virtuals',
-        cost: 'Variable',
-        context,
-      });
-    }
-
-    expect([
-      getHostedModelOption('virtuals/moonshotai-kimi-k2-5').context,
-      getHostedModelOption('virtuals/moonshotai-kimi-k2-6').context,
-      getHostedModelOption('virtuals/moonshotai-kimi-k2-7-code').context,
-      getHostedModelOption('virtuals/google-gemini-3-flash-preview').context,
-    ]).toEqual(['256K', '256K', '256K', '256K']);
-    expect(getHostedModelOption('virtuals/deepseek-deepseek-v3-2').context).toBe('160K');
+    expect(HOSTED_MODEL_PROVIDERS.some((provider) => provider.key === 'virtuals')).toBe(false);
+    expect(HOSTED_MODELS.some((model) => model.id.startsWith('virtuals/'))).toBe(false);
   });
 
   it('exposes the latest verified common models on the Hatcher network', () => {
@@ -139,7 +111,7 @@ describe('hosted model catalog', () => {
       ]),
     );
 
-    for (const provider of ['openserv', 'acedata', 'virtuals']) {
+    for (const provider of ['openserv', 'acedata']) {
       expect(routesByProvider.get(provider)).toEqual(new Set(['partner']));
     }
     for (const provider of ['openai', 'anthropic', 'google', 'qwen', 'z-ai']) {

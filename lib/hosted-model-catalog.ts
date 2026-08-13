@@ -58,7 +58,6 @@ export const HOSTED_MODEL_PROVIDERS: HostedModelProvider[] = [
   { key: 'openserv', name: 'OpenServ', description: 'Private-beta SERV reasoning models for agent workflows.' },
   { key: 'xiaomi', name: 'Xiaomi MiMo', description: 'MiMo models routed through UsePod with OpenRouter fallback.' },
   { key: 'acedata', name: 'AceData', description: 'Partner-hosted frontier models plus data and media intelligence APIs.' },
-  { key: 'virtuals', name: 'Virtuals', description: 'Virtuals Compute models routed through the Hatcher server key.' },
   { key: 'minimax', name: 'MiniMax', description: 'MiniMax M-series models routed through UsePod and OpenRouter.' },
   { key: 'google', name: 'Google', description: 'Gemini models with large context windows.' },
   { key: 'qwen', name: 'Qwen', description: 'Efficient coding and agentic tool-use models.' },
@@ -832,176 +831,6 @@ export const HOSTED_MODELS: HostedModelOption[] = [
     description: 'Low-cost NVIDIA model for lightweight workflows.',
   },
   {
-    id: 'virtuals/anthropic-claude-fable-5',
-    name: 'Claude Fable 5',
-    providerKey: 'virtuals',
-    provider: 'Virtuals',
-    category: 'Reasoning',
-    cost: 'Variable',
-    context: '1M',
-    description: 'Virtuals Compute Anthropic route for autonomous knowledge work, coding, and multimodal inputs.',
-  },
-  {
-    id: 'virtuals/anthropic-claude-sonnet-5',
-    name: 'Claude Sonnet 5',
-    providerKey: 'virtuals',
-    provider: 'Virtuals',
-    category: 'Balanced',
-    cost: 'Variable',
-    context: '1M',
-    description: 'Virtuals Compute Sonnet route for coding, writing, reasoning, and agent workflows.',
-  },
-  {
-    id: 'virtuals/e2ee-deepseek-v4-flash',
-    name: 'DeepSeek V4 Flash (E2EE)',
-    providerKey: 'virtuals',
-    provider: 'Virtuals',
-    category: 'Fast',
-    cost: 'Variable',
-    context: '1M',
-    description: 'Virtuals provider-side TEE with hardware attestation; Hatcher still processes and forwards the request.',
-  },
-  {
-    id: 'virtuals/openai-gpt-56-luna',
-    name: 'GPT-5.6 Luna',
-    providerKey: 'virtuals',
-    provider: 'Virtuals',
-    category: 'Fast',
-    cost: 'Variable',
-    context: '1M',
-    description: 'Virtuals Compute cost-efficient GPT-5.6 route for high-volume and latency-sensitive tasks.',
-  },
-  {
-    id: 'virtuals/openai-gpt-56-luna-pro',
-    name: 'GPT-5.6 Luna Pro',
-    providerKey: 'virtuals',
-    provider: 'Virtuals',
-    category: 'Reasoning',
-    cost: 'Variable',
-    context: '1M',
-    description: 'Virtuals Compute GPT-5.6 Luna route with the provider pro reasoning mode.',
-  },
-  {
-    id: 'virtuals/openai-gpt-56-sol',
-    name: 'GPT-5.6 Sol',
-    providerKey: 'virtuals',
-    provider: 'Virtuals',
-    category: 'Premium',
-    cost: 'Variable',
-    context: '1M',
-    description: 'Virtuals Compute flagship GPT-5.6 route for complex reasoning, coding, and agentic workflows.',
-  },
-  {
-    id: 'virtuals/openai-gpt-56-sol-pro',
-    name: 'GPT-5.6 Sol Pro',
-    providerKey: 'virtuals',
-    provider: 'Virtuals',
-    category: 'Premium',
-    cost: 'Variable',
-    context: '1M',
-    description: 'Virtuals Compute GPT-5.6 Sol route with the provider pro reasoning mode.',
-  },
-  {
-    id: 'virtuals/openai-gpt-56-terra',
-    name: 'GPT-5.6 Terra',
-    providerKey: 'virtuals',
-    provider: 'Virtuals',
-    category: 'Balanced',
-    cost: 'Variable',
-    context: '1M',
-    description: 'Virtuals Compute balanced GPT-5.6 route for everyday coding, reasoning, and agent tasks.',
-  },
-  {
-    id: 'virtuals/openai-gpt-56-terra-pro',
-    name: 'GPT-5.6 Terra Pro',
-    providerKey: 'virtuals',
-    provider: 'Virtuals',
-    category: 'Reasoning',
-    cost: 'Variable',
-    context: '1M',
-    description: 'Virtuals Compute GPT-5.6 Terra route with the provider pro reasoning mode.',
-  },
-  {
-    id: 'virtuals/x-ai-grok-4-5',
-    name: 'Grok 4.5',
-    providerKey: 'virtuals',
-    provider: 'Virtuals',
-    category: 'Premium',
-    cost: 'Variable',
-    context: '500K',
-    description: 'Virtuals Compute Grok route for coding, knowledge work, and STEM-heavy agent tasks.',
-  },
-  {
-    id: 'virtuals/moonshotai-kimi-k2-5',
-    name: 'Kimi K2 5',
-    providerKey: 'virtuals',
-    provider: 'Virtuals',
-    category: 'Balanced',
-    cost: 'Variable',
-    context: '256K',
-    description: 'Virtuals Compute Kimi model for general agent work, routed with the platform Virtuals key.',
-  },
-  {
-    id: 'virtuals/moonshotai-kimi-k2-6',
-    name: 'Kimi K2 6',
-    providerKey: 'virtuals',
-    provider: 'Virtuals',
-    category: 'Reasoning',
-    cost: 'Variable',
-    context: '256K',
-    description: 'Virtuals Compute Kimi variant for analysis-heavy prompts and longer planning loops.',
-  },
-  {
-    id: 'virtuals/moonshotai-kimi-k2-7-code',
-    name: 'Kimi K2 7 Code',
-    providerKey: 'virtuals',
-    provider: 'Virtuals',
-    category: 'Coding',
-    cost: 'Variable',
-    context: '256K',
-    description: 'Virtuals Compute coding-oriented Kimi route for repo analysis and implementation tasks.',
-  },
-  {
-    id: 'virtuals/deepseek-deepseek-v3-2',
-    name: 'DeepSeek V3.2',
-    providerKey: 'virtuals',
-    provider: 'Virtuals',
-    category: 'Reasoning',
-    cost: 'Variable',
-    context: '160K',
-    description: 'Virtuals Compute DeepSeek route for reasoning and structured task decomposition.',
-  },
-  {
-    id: 'virtuals/google-gemini-3-flash-preview',
-    name: 'Gemini 3 Flash Preview',
-    providerKey: 'virtuals',
-    provider: 'Virtuals',
-    category: 'Fast',
-    cost: 'Variable',
-    context: '256K',
-    description: 'Virtuals Compute Gemini route for quick responses and multimodal-adjacent workflows.',
-  },
-  {
-    id: 'virtuals/google-gemini-3-5-flash',
-    name: 'Gemini 3.5 Flash',
-    providerKey: 'virtuals',
-    provider: 'Virtuals',
-    category: 'Fast',
-    cost: 'Variable',
-    context: '1M',
-    description: 'Virtuals Compute Gemini route for responsive multimodal and long-context agent tasks.',
-  },
-  {
-    id: 'virtuals/z-ai-glm-5-2',
-    name: 'GLM 5.2',
-    providerKey: 'virtuals',
-    provider: 'Virtuals',
-    category: 'Reasoning',
-    cost: 'Variable',
-    context: '1M',
-    description: 'Virtuals Compute GLM route for large-context reasoning, coding, and planning.',
-  },
-  {
     id: 'openrouter/auto',
     name: 'OpenRouter Auto',
     providerKey: 'openrouter',
@@ -1023,7 +852,6 @@ const HOSTED_MODEL_ALIASES = new Map<string, string>([
   ['xiaomi/mimo-v2-omni', 'xiaomi/mimo-v2.5'],
   ['x-ai/grok-4.1-fast', 'x-ai/grok-4.5'],
   ['x-ai/grok-code-fast-1', 'x-ai/grok-4.5'],
-  ['virtuals/llama-3-3-70b', 'virtuals/deepseek-deepseek-v3-2'],
   ['minmax m3', 'minimax/minimax-m3'],
   ['minimax m3', 'minimax/minimax-m3'],
   ['minimax-m3', 'minimax/minimax-m3'],
@@ -1048,6 +876,7 @@ export function normalizeHostedModelForUi(model: string | undefined): string {
   if (trimmed.startsWith(HOSTED_PROXY_PROVIDER_PREFIX)) {
     trimmed = trimmed.slice(HOSTED_PROXY_PROVIDER_PREFIX.length);
   }
+  if (trimmed.startsWith('virtuals/')) return DEFAULT_HOSTED_MODEL;
   return HOSTED_MODEL_ALIASES.get(trimmed) ?? HOSTED_MODEL_ALIASES.get(trimmed.toLowerCase()) ?? trimmed;
 }
 
@@ -1093,12 +922,11 @@ export function hostedModelRoute(model: HostedModelOption): string {
   if (model.providerKey === 'openserv') return 'OpenServ primary / OpenRouter fallback';
   if (model.providerKey === 'xiaomi') return 'UsePod primary / OpenRouter fallback';
   if (model.providerKey === 'acedata') return 'AceData primary / OpenRouter fallback';
-  if (model.providerKey === 'virtuals') return 'Virtuals Compute';
   return 'UsePod primary / OpenRouter fallback';
 }
 
 export function hostedModelPrivacy(model: HostedModelOption): HostedModelPrivacy {
-  return model.providerKey === 'openserv' || model.providerKey === 'acedata' || model.providerKey === 'virtuals'
+  return model.providerKey === 'openserv' || model.providerKey === 'acedata'
     ? 'partner'
     : 'hatcher';
 }
@@ -1107,7 +935,6 @@ export function hostedPrivacyLabel(model: HostedModelOption): string {
   if (model.providerKey === 'openserv') return 'OpenServ-hosted';
   if (model.providerKey === 'xiaomi') return 'UsePod/OpenRouter';
   if (model.providerKey === 'acedata') return 'AceData-hosted';
-  if (model.providerKey === 'virtuals') return 'Virtuals Compute';
   return 'Hatcher-hosted';
 }
 
