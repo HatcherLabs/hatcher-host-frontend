@@ -493,6 +493,91 @@ export interface MissionTasksResponse {
   summary?: MissionTaskSummary;
 }
 
+export interface NeuralMeshCandidate {
+  agent_id: string;
+  score: number;
+  capability: number;
+  inbound_trust: number;
+  mastery: number;
+  expected_latency_ms: number;
+  expected_cost: number;
+  within_constraints: boolean;
+}
+
+export interface NeuralMeshNode {
+  id: string;
+  name: string;
+  framework: string;
+  status: string;
+  role: string;
+  domain: string;
+  enabled: boolean;
+  measured: {
+    attempts?: number;
+    completed?: number;
+    performance?: number;
+    averageLatencyMs?: number;
+    averageCostAiCredits?: number;
+  };
+}
+
+export interface NeuralMeshDecision {
+  id: string;
+  taskId: string;
+  taskTitle: string;
+  actualAgentId: string;
+  actualAgentName: string;
+  recommendedAgentId: string | null;
+  recommendedAgentName: string | null;
+  matched: boolean;
+  source: 'sidecar' | 'unavailable' | string;
+  status: string;
+  domain: string;
+  confidence: number;
+  rationale: string | null;
+  candidates: NeuralMeshCandidate[];
+  meshDigest: string | null;
+  createdAt: string;
+  outcome: {
+    success: boolean;
+    verified: boolean;
+    errorClass: string | null;
+    latencyMs: number | null;
+    costAiCredits: number;
+    provenance: string;
+  } | null;
+}
+
+export interface NeuralMeshOverview {
+  access: { hasAgents: boolean; agentCount: number };
+  config: {
+    enabled: boolean;
+    mode: 'shadow' | string;
+    canaryPercent: number;
+    globallyEnabled: boolean;
+  };
+  metrics: {
+    decisions: number;
+    reportedSuccessRate: number | null;
+    recommendationMatchRate: number | null;
+    averageLatencyMs: number | null;
+    outcomes: number;
+  };
+  nodes: NeuralMeshNode[];
+  recentDecisions: NeuralMeshDecision[];
+}
+
+export interface NeuralMeshPreview {
+  name: string;
+  status: string;
+  mode: string;
+  access: string;
+  description: string;
+  capabilities: string[];
+  safeguards: string[];
+  credit: { project: string; github: string; x: string };
+}
+
 export interface CreateMissionTaskBody {
   title: string;
   prompt: string;
