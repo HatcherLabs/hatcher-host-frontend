@@ -13,6 +13,7 @@ describe('dashboard workspace navigation', () => {
       { key: 'agents', href: '/dashboard/agents' },
       { key: 'missions', href: '/dashboard/missions' },
       { key: 'approvals', href: '/dashboard/approvals' },
+      { key: 'mesh', href: '/dashboard/mesh' },
     ]);
   });
 
@@ -21,6 +22,7 @@ describe('dashboard workspace navigation', () => {
     expect(isDashboardWorkspaceRouteActive('/dashboard/agent/agent-1', 'agents')).toBe(true);
     expect(isDashboardWorkspaceRouteActive('/dashboard/missions', 'missions')).toBe(true);
     expect(isDashboardWorkspaceRouteActive('/dashboard/approvals', 'approvals')).toBe(true);
+    expect(isDashboardWorkspaceRouteActive('/dashboard/mesh', 'mesh')).toBe(true);
     expect(isDashboardWorkspaceRouteActive('/dashboard/billing', 'agents')).toBe(false);
   });
 
