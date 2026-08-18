@@ -500,7 +500,6 @@ export const api = {
   /** List the current user's agents */
   getMyAgents: () => req<Agent[]>("/agents"),
 
-
   /** List account-wide one-shot tasks for Mission Control. */
   getMissionTasks: (
     params: {
@@ -549,19 +548,27 @@ export const api = {
     req<{ task: MissionTask }>(
       `/agents/${agentId}/tasks/${taskId}/runs/${runId}/cancel`,
       { method: "POST" },
-  ),
+    ),
 
   /** Public product preview; contains no tenant telemetry. */
   getNeuralMeshPreview: () => req<NeuralMeshPreview>("/mesh/preview"),
 
-  /** Owner-scoped Neural Mesh telemetry and shadow-routing decisions. */
+  /** Owner-scoped Neural Mesh telemetry and routing decisions. */
   getNeuralMeshOverview: () => req<NeuralMeshOverview>("/mesh/overview"),
 
-  setNeuralMeshEnabled: (enabled: boolean) =>
-    req<{ enabled: boolean; mode: string; canaryPercent: number }>("/mesh/config", {
-      method: "PUT",
-      body: JSON.stringify({ enabled }),
-    }),
+  setNeuralMeshConfig: (config: {
+    enabled: boolean;
+    mode: "shadow" | "live";
+    canaryPercent: number;
+    acknowledgedLiveRouting?: boolean;
+  }) =>
+    req<{ enabled: boolean; mode: string; canaryPercent: number }>(
+      "/mesh/config",
+      {
+        method: "PUT",
+        body: JSON.stringify(config),
+      },
+    ),
 
   /** Resume always creates a new attempt; it never mutates the previous run. */
   resumeMissionTask: (agentId: string, taskId: string) =>
@@ -2536,9 +2543,12 @@ export const api = {
    * it is itself the credential for the unauthenticated preview route.
    */
   createPreviewSession: (agentId: string) =>
-    req<{ token: string; expiresAt: string }>(`/agents/${agentId}/preview-session`, {
-      method: "POST",
-    }),
+    req<{ token: string; expiresAt: string }>(
+      `/agents/${agentId}/preview-session`,
+      {
+        method: "POST",
+      },
+    ),
 
   /** Generate speech audio for webchat read-aloud / voice mode. */
   synthesizeAgentSpeech: async (
@@ -2836,7 +2846,10 @@ export const api = {
     req<{ sessions: ChatSessionSummary[] }>(`/agents/${agentId}/chat/sessions`),
 
   /** Start a new chat session */
-  createChatSession: (agentId: string, options?: { title?: string; folderId?: string }) =>
+  createChatSession: (
+    agentId: string,
+    options?: { title?: string; folderId?: string },
+  ) =>
     req<{ session: ChatSessionSummary }>(`/agents/${agentId}/chat/sessions`, {
       method: "POST",
       body: JSON.stringify(options ?? {}),
@@ -2868,7 +2881,11 @@ export const api = {
     ),
 
   /** Move a chat session into a folder, or null to remove it */
-  moveChatSession: (agentId: string, sessionId: string, folderId: string | null) =>
+  moveChatSession: (
+    agentId: string,
+    sessionId: string,
+    folderId: string | null,
+  ) =>
     req<{ sessionId: string; folderId: string | null }>(
       `/agents/${agentId}/chat/sessions/${encodeURIComponent(sessionId)}/folder`,
       { method: "PATCH", body: JSON.stringify({ folderId }) },
@@ -3578,9 +3595,12 @@ export const api = {
     }>(`/credits/history?limit=${limit}`),
 
   getAiCreditBalance: () =>
-    req<{ balance: number; monthlyGrant: number; tier: string; nextGrantAt?: string | null }>(
-      "/ai-credits/balance",
-    ),
+    req<{
+      balance: number;
+      monthlyGrant: number;
+      tier: string;
+      nextGrantAt?: string | null;
+    }>("/ai-credits/balance"),
 
   getAiCreditHistory: (limit = 20, before?: string) =>
     req<{
@@ -3598,7 +3618,9 @@ export const api = {
         outputTokens?: number;
         createdAt: string;
       }>;
-    }>(`/ai-credits/history?limit=${limit}${before ? `&before=${encodeURIComponent(before)}` : ''}`),
+    }>(
+      `/ai-credits/history?limit=${limit}${before ? `&before=${encodeURIComponent(before)}` : ""}`,
+    ),
 
   /** Live hosted-model pricing in AI Credits (public, no auth). */
   getModelPricing: () => req<ModelPricingPayload>("/models/pricing"),
@@ -3693,7 +3715,10 @@ export const api = {
     req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/overview`),
 
   getIronClawAutomations: (agentId: string, includeCompleted = false) =>
-    req<{ automations: Array<Record<string, unknown>>; scheduler_enabled?: boolean }>(
+    req<{
+      automations: Array<Record<string, unknown>>;
+      scheduler_enabled?: boolean;
+    }>(
       `/agents/${agentId}/ironclaw/automations${includeCompleted ? "?includeCompleted=true" : ""}`,
     ),
 
@@ -3704,111 +3729,248 @@ export const api = {
     ),
 
   pauseIronClawAutomation: (agentId: string, automationId: string) =>
-    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/automations/${encodeURIComponent(automationId)}/pause`, { method: "POST" }),
+    req<Record<string, unknown>>(
+      `/agents/${agentId}/ironclaw/automations/${encodeURIComponent(automationId)}/pause`,
+      { method: "POST" },
+    ),
 
   resumeIronClawAutomation: (agentId: string, automationId: string) =>
-    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/automations/${encodeURIComponent(automationId)}/resume`, { method: "POST" }),
+    req<Record<string, unknown>>(
+      `/agents/${agentId}/ironclaw/automations/${encodeURIComponent(automationId)}/resume`,
+      { method: "POST" },
+    ),
 
-  renameIronClawAutomation: (agentId: string, automationId: string, name: string) =>
-    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/automations/${encodeURIComponent(automationId)}/rename`, { method: "POST", body: JSON.stringify({ name }) }),
+  renameIronClawAutomation: (
+    agentId: string,
+    automationId: string,
+    name: string,
+  ) =>
+    req<Record<string, unknown>>(
+      `/agents/${agentId}/ironclaw/automations/${encodeURIComponent(automationId)}/rename`,
+      { method: "POST", body: JSON.stringify({ name }) },
+    ),
 
   deleteIronClawAutomation: (agentId: string, automationId: string) =>
-    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/automations/${encodeURIComponent(automationId)}`, { method: "DELETE" }),
+    req<Record<string, unknown>>(
+      `/agents/${agentId}/ironclaw/automations/${encodeURIComponent(automationId)}`,
+      { method: "DELETE" },
+    ),
 
   getIronClawExtensions: (agentId: string) =>
-    req<{ installed: { extensions?: Array<Record<string, unknown>> }; registry: { entries?: Array<Record<string, unknown>> } }>(`/agents/${agentId}/ironclaw/extensions`),
+    req<{
+      installed: { extensions?: Array<Record<string, unknown>> };
+      registry: { entries?: Array<Record<string, unknown>> };
+    }>(`/agents/${agentId}/ironclaw/extensions`),
 
   installIronClawExtension: (agentId: string, id: string) =>
-    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/extensions/install`, { method: "POST", body: JSON.stringify({ id }) }),
+    req<Record<string, unknown>>(
+      `/agents/${agentId}/ironclaw/extensions/install`,
+      { method: "POST", body: JSON.stringify({ id }) },
+    ),
 
   removeIronClawExtension: (agentId: string, id: string) =>
-    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/extensions/${encodeURIComponent(id)}/remove`, { method: "POST" }),
+    req<Record<string, unknown>>(
+      `/agents/${agentId}/ironclaw/extensions/${encodeURIComponent(id)}/remove`,
+      { method: "POST" },
+    ),
 
   getIronClawExtensionSetup: (agentId: string, id: string) =>
-    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/extensions/${encodeURIComponent(id)}/setup`),
+    req<Record<string, unknown>>(
+      `/agents/${agentId}/ironclaw/extensions/${encodeURIComponent(id)}/setup`,
+    ),
 
-  submitIronClawExtensionSetup: (agentId: string, id: string, action: string, payload: Record<string, unknown>) =>
-    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/extensions/${encodeURIComponent(id)}/setup`, { method: "POST", body: JSON.stringify({ action, payload }) }),
+  submitIronClawExtensionSetup: (
+    agentId: string,
+    id: string,
+    action: string,
+    payload: Record<string, unknown>,
+  ) =>
+    req<Record<string, unknown>>(
+      `/agents/${agentId}/ironclaw/extensions/${encodeURIComponent(id)}/setup`,
+      { method: "POST", body: JSON.stringify({ action, payload }) },
+    ),
 
-  startIronClawExtensionOAuth: (agentId: string, id: string, requirement: string, invocationId?: string) =>
-    req<{ flow_id: string; status: string; provider: string; authorization_url: string; expires_at: string; callback_scope?: { invocation_id?: string } }>(
+  startIronClawExtensionOAuth: (
+    agentId: string,
+    id: string,
+    requirement: string,
+    invocationId?: string,
+  ) =>
+    req<{
+      flow_id: string;
+      status: string;
+      provider: string;
+      authorization_url: string;
+      expires_at: string;
+      callback_scope?: { invocation_id?: string };
+    }>(
       `/agents/${agentId}/ironclaw/extensions/${encodeURIComponent(id)}/setup/oauth/start`,
       { method: "POST", body: JSON.stringify({ requirement, invocationId }) },
     ),
 
-  reconcileIronClawOAuthFlow: (agentId: string, flowId: string, invocationId?: string) =>
+  reconcileIronClawOAuthFlow: (
+    agentId: string,
+    flowId: string,
+    invocationId?: string,
+  ) =>
     req<{ status: string }>(
       `/agents/${agentId}/ironclaw/oauth/flow/${encodeURIComponent(flowId)}/reconcile${invocationId ? `?invocationId=${encodeURIComponent(invocationId)}` : ""}`,
       { method: "POST" },
     ),
 
   getIronClawExtensionPairingStatus: (agentId: string, id: string) =>
-    req<{ connected: boolean; pending: { code: string; deep_link?: string; expires_at: string } | null }>(`/agents/${agentId}/ironclaw/extensions/${encodeURIComponent(id)}/pairing/status`),
+    req<{
+      connected: boolean;
+      pending: { code: string; deep_link?: string; expires_at: string } | null;
+    }>(
+      `/agents/${agentId}/ironclaw/extensions/${encodeURIComponent(id)}/pairing/status`,
+    ),
 
   mintIronClawExtensionPairingCode: (agentId: string, id: string) =>
-    req<{ code: string; deep_link?: string; expires_at: string }>(`/agents/${agentId}/ironclaw/extensions/${encodeURIComponent(id)}/pairing/mint`, { method: "POST" }),
+    req<{ code: string; deep_link?: string; expires_at: string }>(
+      `/agents/${agentId}/ironclaw/extensions/${encodeURIComponent(id)}/pairing/mint`,
+      { method: "POST" },
+    ),
 
   unpairIronClawExtension: (agentId: string, id: string) =>
-    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/extensions/${encodeURIComponent(id)}/pairing/unpair`, { method: "POST" }),
+    req<Record<string, unknown>>(
+      `/agents/${agentId}/ironclaw/extensions/${encodeURIComponent(id)}/pairing/unpair`,
+      { method: "POST" },
+    ),
 
   getIronClawSkills: (agentId: string) =>
-    req<{ skills: Array<Record<string, unknown>>; auto_activate_learned?: boolean; count?: number }>(`/agents/${agentId}/ironclaw/skills`),
+    req<{
+      skills: Array<Record<string, unknown>>;
+      auto_activate_learned?: boolean;
+      count?: number;
+    }>(`/agents/${agentId}/ironclaw/skills`),
 
   getIronClawSkill: (agentId: string, name: string) =>
-    req<{ name: string; content: string }>(`/agents/${agentId}/ironclaw/skills/${encodeURIComponent(name)}`),
+    req<{ name: string; content: string }>(
+      `/agents/${agentId}/ironclaw/skills/${encodeURIComponent(name)}`,
+    ),
 
   installIronClawSkill: (agentId: string, name: string, content: string) =>
-    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/skills/install`, { method: "POST", body: JSON.stringify({ name, content }) }),
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/skills/install`, {
+      method: "POST",
+      body: JSON.stringify({ name, content }),
+    }),
 
   updateIronClawSkill: (agentId: string, name: string, content: string) =>
-    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/skills/${encodeURIComponent(name)}`, { method: "PUT", body: JSON.stringify({ content }) }),
+    req<Record<string, unknown>>(
+      `/agents/${agentId}/ironclaw/skills/${encodeURIComponent(name)}`,
+      { method: "PUT", body: JSON.stringify({ content }) },
+    ),
 
   removeIronClawSkill: (agentId: string, name: string) =>
-    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/skills/${encodeURIComponent(name)}`, { method: "DELETE" }),
+    req<Record<string, unknown>>(
+      `/agents/${agentId}/ironclaw/skills/${encodeURIComponent(name)}`,
+      { method: "DELETE" },
+    ),
 
-  setIronClawSkillAutoActivate: (agentId: string, name: string, enabled: boolean) =>
-    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/skills/${encodeURIComponent(name)}/auto-activate`, { method: "POST", body: JSON.stringify({ enabled }) }),
+  setIronClawSkillAutoActivate: (
+    agentId: string,
+    name: string,
+    enabled: boolean,
+  ) =>
+    req<Record<string, unknown>>(
+      `/agents/${agentId}/ironclaw/skills/${encodeURIComponent(name)}/auto-activate`,
+      { method: "POST", body: JSON.stringify({ enabled }) },
+    ),
 
   setIronClawAutoActivateLearned: (agentId: string, enabled: boolean) =>
-    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/skills/auto-activate-learned`, { method: "POST", body: JSON.stringify({ enabled }) }),
+    req<Record<string, unknown>>(
+      `/agents/${agentId}/ironclaw/skills/auto-activate-learned`,
+      { method: "POST", body: JSON.stringify({ enabled }) },
+    ),
 
   getIronClawTools: (agentId: string) =>
-    req<{ entries: Array<Record<string, unknown>>; diagnostics?: unknown[] }>(`/agents/${agentId}/ironclaw/tools`),
+    req<{ entries: Array<Record<string, unknown>>; diagnostics?: unknown[] }>(
+      `/agents/${agentId}/ironclaw/tools`,
+    ),
 
   setIronClawToolsAutoApprove: (agentId: string, enabled: boolean) =>
-    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/tools/auto-approve`, { method: "POST", body: JSON.stringify({ enabled }) }),
+    req<Record<string, unknown>>(
+      `/agents/${agentId}/ironclaw/tools/auto-approve`,
+      { method: "POST", body: JSON.stringify({ enabled }) },
+    ),
 
-  setIronClawToolPermission: (agentId: string, capabilityId: string, state: string) =>
-    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/tools/${encodeURIComponent(capabilityId)}`, { method: "POST", body: JSON.stringify({ state }) }),
+  setIronClawToolPermission: (
+    agentId: string,
+    capabilityId: string,
+    state: string,
+  ) =>
+    req<Record<string, unknown>>(
+      `/agents/${agentId}/ironclaw/tools/${encodeURIComponent(capabilityId)}`,
+      { method: "POST", body: JSON.stringify({ state }) },
+    ),
 
   listIronClawFs: (agentId: string, mount: "memory" | "workspace", path = "") =>
-    req<{ mount: string; path: string; entries: Array<{ name: string; path: string; kind: "file" | "directory" }> }>(`/agents/${agentId}/ironclaw/fs?mount=${mount}&path=${encodeURIComponent(path)}`),
+    req<{
+      mount: string;
+      path: string;
+      entries: Array<{
+        name: string;
+        path: string;
+        kind: "file" | "directory";
+      }>;
+    }>(
+      `/agents/${agentId}/ironclaw/fs?mount=${mount}&path=${encodeURIComponent(path)}`,
+    ),
 
-  readIronClawFs: (agentId: string, mount: "memory" | "workspace", path: string) =>
-    req<Record<string, unknown> | string>(`/agents/${agentId}/ironclaw/fs/content?mount=${mount}&path=${encodeURIComponent(path)}`),
+  readIronClawFs: (
+    agentId: string,
+    mount: "memory" | "workspace",
+    path: string,
+  ) =>
+    req<Record<string, unknown> | string>(
+      `/agents/${agentId}/ironclaw/fs/content?mount=${mount}&path=${encodeURIComponent(path)}`,
+    ),
 
   // IronClaw native threads, runs & runtime control
   listIronClawThreads: (agentId: string) =>
-    req<{ threads?: Array<Record<string, unknown>> }>(`/agents/${agentId}/ironclaw/threads`),
+    req<{ threads?: Array<Record<string, unknown>> }>(
+      `/agents/${agentId}/ironclaw/threads`,
+    ),
 
   createIronClawThread: (agentId: string) =>
-    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/threads`, { method: "POST" }),
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/threads`, {
+      method: "POST",
+    }),
 
   deleteIronClawThread: (agentId: string, threadId: string) =>
-    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/threads/${encodeURIComponent(threadId)}`, { method: "DELETE" }),
+    req<Record<string, unknown>>(
+      `/agents/${agentId}/ironclaw/threads/${encodeURIComponent(threadId)}`,
+      { method: "DELETE" },
+    ),
 
-  getIronClawThreadTimeline: (agentId: string, threadId: string, options?: { limit?: number; cursor?: string }) => {
+  getIronClawThreadTimeline: (
+    agentId: string,
+    threadId: string,
+    options?: { limit?: number; cursor?: string },
+  ) => {
     const params = new URLSearchParams();
-    if (options?.limit !== undefined) params.set("limit", String(options.limit));
+    if (options?.limit !== undefined)
+      params.set("limit", String(options.limit));
     if (options?.cursor) params.set("cursor", options.cursor);
     const query = params.toString();
-    return req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/threads/${encodeURIComponent(threadId)}/timeline${query ? `?${query}` : ""}`);
+    return req<Record<string, unknown>>(
+      `/agents/${agentId}/ironclaw/threads/${encodeURIComponent(threadId)}/timeline${query ? `?${query}` : ""}`,
+    );
   },
 
-  cancelIronClawRun: (agentId: string, threadId: string, runId: string, reason?: string) =>
+  cancelIronClawRun: (
+    agentId: string,
+    threadId: string,
+    runId: string,
+    reason?: string,
+  ) =>
     req<Record<string, unknown>>(
       `/agents/${agentId}/ironclaw/threads/${encodeURIComponent(threadId)}/runs/${encodeURIComponent(runId)}/cancel`,
-      { method: "POST", ...(reason ? { body: JSON.stringify({ reason }) } : {}) },
+      {
+        method: "POST",
+        ...(reason ? { body: JSON.stringify({ reason }) } : {}),
+      },
     ),
 
   retryIronClawRun: (agentId: string, threadId: string, runId: string) =>
@@ -3817,38 +3979,72 @@ export const api = {
       { method: "POST" },
     ),
 
-  resolveIronClawRunGate: (agentId: string, threadId: string, runId: string, gateRef: string, body: IronClawGateResolveBody) =>
+  resolveIronClawRunGate: (
+    agentId: string,
+    threadId: string,
+    runId: string,
+    gateRef: string,
+    body: IronClawGateResolveBody,
+  ) =>
     req<Record<string, unknown>>(
       `/agents/${agentId}/ironclaw/threads/${encodeURIComponent(threadId)}/runs/${encodeURIComponent(runId)}/gates/${encodeURIComponent(gateRef)}/resolve`,
       { method: "POST", body: JSON.stringify(body) },
     ),
 
   getIronClawCommands: (agentId: string) =>
-    req<{ commands?: Array<Record<string, unknown>> }>(`/agents/${agentId}/ironclaw/commands`),
+    req<{ commands?: Array<Record<string, unknown>> }>(
+      `/agents/${agentId}/ironclaw/commands`,
+    ),
 
-  sendIronClawThreadCommand: (agentId: string, threadId: string, text: string) =>
-    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/threads/${encodeURIComponent(threadId)}/commands`, { method: "POST", body: JSON.stringify({ text }) }),
+  sendIronClawThreadCommand: (
+    agentId: string,
+    threadId: string,
+    text: string,
+  ) =>
+    req<Record<string, unknown>>(
+      `/agents/${agentId}/ironclaw/threads/${encodeURIComponent(threadId)}/commands`,
+      { method: "POST", body: JSON.stringify({ text }) },
+    ),
 
   searchIronClawSkills: (agentId: string, query: string) =>
-    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/skills/search`, { method: "POST", body: JSON.stringify({ query }) }),
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/skills/search`, {
+      method: "POST",
+      body: JSON.stringify({ query }),
+    }),
 
   getIronClawLogs: (agentId: string, limit?: number) =>
-    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/logs${limit !== undefined ? `?limit=${limit}` : ""}`),
+    req<Record<string, unknown>>(
+      `/agents/${agentId}/ironclaw/logs${limit !== undefined ? `?limit=${limit}` : ""}`,
+    ),
 
   registerIronClawMcpServer: (agentId: string, body: IronClawMcpRegisterBody) =>
-    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/mcp/register`, { method: "POST", body: JSON.stringify(body) }),
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/mcp/register`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
 
   getIronClawOutbound: (agentId: string) =>
-    req<IronClawOutboundResponse | null>(`/agents/${agentId}/ironclaw/outbound`),
+    req<IronClawOutboundResponse | null>(
+      `/agents/${agentId}/ironclaw/outbound`,
+    ),
 
-  setIronClawOutboundPreferences: (agentId: string, finalReplyTargetId: string | null) =>
-    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/outbound/preferences`, { method: "POST", body: JSON.stringify({ finalReplyTargetId }) }),
+  setIronClawOutboundPreferences: (
+    agentId: string,
+    finalReplyTargetId: string | null,
+  ) =>
+    req<Record<string, unknown>>(
+      `/agents/${agentId}/ironclaw/outbound/preferences`,
+      { method: "POST", body: JSON.stringify({ finalReplyTargetId }) },
+    ),
 
   getIronClawLlm: (agentId: string) =>
     req<IronClawLlmResponse>(`/agents/${agentId}/ironclaw/llm`),
 
   setIronClawModel: (agentId: string, model: string) =>
-    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/llm/model`, { method: "POST", body: JSON.stringify({ model }) }),
+    req<Record<string, unknown>>(`/agents/${agentId}/ironclaw/llm/model`, {
+      method: "POST",
+      body: JSON.stringify({ model }),
+    }),
 
   /** Subscribe to an IronClaw thread's SSE event stream.
    *
@@ -3878,8 +4074,12 @@ export const api = {
         },
       );
     } catch (err) {
-      if (err instanceof Error && err.name === "AbortError") return { success: true };
-      return { success: false, error: err instanceof Error ? err.message : "Network error" };
+      if (err instanceof Error && err.name === "AbortError")
+        return { success: true };
+      return {
+        success: false,
+        error: err instanceof Error ? err.message : "Network error",
+      };
     }
     if (!res.ok || !res.body) {
       return { success: false, error: `HTTP ${res.status}` };
@@ -3933,8 +4133,12 @@ export const api = {
       flush();
       return { success: true };
     } catch (err) {
-      if (err instanceof Error && err.name === "AbortError") return { success: true };
-      return { success: false, error: err instanceof Error ? err.message : "Stream error" };
+      if (err instanceof Error && err.name === "AbortError")
+        return { success: true };
+      return {
+        success: false,
+        error: err instanceof Error ? err.message : "Stream error",
+      };
     }
   },
 };

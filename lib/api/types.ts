@@ -539,6 +539,8 @@ export interface NeuralMeshDecision {
   id: string;
   taskId: string;
   taskTitle: string;
+  requestedAgentId: string;
+  requestedAgentName: string;
   actualAgentId: string;
   actualAgentName: string;
   recommendedAgentId: string | null;
@@ -546,6 +548,8 @@ export interface NeuralMeshDecision {
   matched: boolean;
   source: "sidecar" | "unavailable" | string;
   status: string;
+  routeMode: "shadow" | "live" | string;
+  executionApplied: boolean;
   domain: string;
   confidence: number;
   rationale: string | null;
@@ -575,9 +579,12 @@ export interface NeuralMeshOverview {
   };
   config: {
     enabled: boolean;
-    mode: "shadow" | string;
+    mode: "shadow" | "live" | string;
     canaryPercent: number;
+    effectiveCanaryPercent: number;
     globallyEnabled: boolean;
+    liveGloballyEnabled: boolean;
+    minimumLiveConfidence: number;
   };
   metrics: {
     windowDays: number;
@@ -586,6 +593,8 @@ export interface NeuralMeshOverview {
     recommendationAlignmentRate: number | null;
     matchedRecommendationReportedSuccessRate: number | null;
     comparableOutcomes: number;
+    liveDecisions: number;
+    liveRoutesApplied: number;
     averageLatencyMs: number | null;
     outcomes: number;
   };
