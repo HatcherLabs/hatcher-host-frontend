@@ -73,6 +73,8 @@
       "blogSub": "Notlar, çıkışlar, derinlemesine dalışlar.",
       "roadmapLabel": "Yol haritası",
       "roadmapSub": "Sırada ne göndereceğimiz.",
+      "usageLabel": "Platform kullanımı",
+      "usageSub": "Günlük ve toplam token hacmi.",
       "changelogLabel": "Değişiklik Günlüğü",
       "changelogSub": "Ne değişti ve ne zaman."
     },
@@ -132,6 +134,7 @@
     "itemWhitepaper": "Beyaz Kitap",
     "itemBlog": "Blog",
     "itemRoadmap": "Yol haritası",
+    "itemUsage": "Platform kullanımı",
     "itemChangelog": "Değişiklik Günlüğü",
     "itemSecurity": "Güvenlik",
     "itemPrivacy": "Gizlilik",

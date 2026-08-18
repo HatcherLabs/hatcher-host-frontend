@@ -11,6 +11,7 @@ function session(id: string, current = false): ChatSessionSummary {
     startedAt: Date.now(),
     updatedAt: Date.now(),
     current,
+    folderId: null,
   };
 }
 

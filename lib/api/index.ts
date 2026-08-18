@@ -103,6 +103,7 @@ export type {
   StakingStakeEntry,
   UserStakingSummary,
   ChatMessage,
+  ChatFolderSummary,
   ChatSessionSummary,
   GetAgentMailboxResponse,
   GetAgentMailMessagesResponse,

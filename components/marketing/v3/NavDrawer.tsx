@@ -10,6 +10,7 @@ import {
   Bot,
   Boxes,
   Building2,
+  ChartNoAxesCombined,
   Coins,
   FileText,
   GitBranch,
@@ -64,6 +65,8 @@ function DrawerIcon({ itemKey }: { itemKey: string }) {
       return <Newspaper {...props} />;
     case 'roadmap':
       return <GitBranch {...props} />;
+    case 'usage':
+      return <ChartNoAxesCombined {...props} />;
     case 'changelog':
       return <BookOpen {...props} />;
     default:

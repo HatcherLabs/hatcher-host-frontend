@@ -7,7 +7,13 @@ import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 import { API_URL } from '@/lib/config';
-import type { Agent, AgentFeature, ChatAttachmentPayload, ChatSessionSummary } from '@/lib/api';
+import type {
+  Agent,
+  AgentFeature,
+  ChatAttachmentPayload,
+  ChatFolderSummary,
+  ChatSessionSummary,
+} from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { useWebSocketChat, type ChatThinkingEvent, type ChatToolEvent, type ChatUsageEvent } from '@/hooks/useWebSocketChat';
 import { FRAMEWORKS, getBYOKProvider } from '@hatcher/shared';
@@ -261,6 +267,7 @@ export default function AgentManagePage() {
   // Chat state
   const [messages, setMessages] = useState<Message[]>([]);
   const [chatSessions, setChatSessions] = useState<ChatSessionSummary[]>([]);
+  const [chatFolders, setChatFolders] = useState<ChatFolderSummary[]>([]);
   const [activeChatSessionId, setActiveChatSessionIdState] = useState<string | null>(null);
   const [deletingChatSessionId, setDeletingChatSessionId] = useState<string | null>(null);
   const [input, setInput] = useState('');
@@ -680,11 +687,17 @@ export default function AgentManagePage() {
 
   const loadChatSessions = useCallback(async () => {
     if (!id) return;
-    const res = await api.getChatSessions(id);
-    if (!res.success) return;
+    const [sessionsRes, foldersRes] = await Promise.all([
+      api.getChatSessions(id),
+      api.getChatFolders(id),
+    ]);
+    if (!sessionsRes.success) return;
 
-    const sessions = Array.isArray(res.data.sessions) ? res.data.sessions : [];
+    const sessions = Array.isArray(sessionsRes.data.sessions) ? sessionsRes.data.sessions : [];
     setChatSessions(sessions);
+    if (foldersRes.success) {
+      setChatFolders(Array.isArray(foldersRes.data.folders) ? foldersRes.data.folders : []);
+    }
     const current = sessions.find((session) => session.current) ?? sessions[0];
     const selectedStillExists = sessions.some((session) => session.id === activeChatSessionIdRef.current);
     if (current && !selectedStillExists) {
@@ -768,9 +781,9 @@ export default function AgentManagePage() {
     return () => clearInterval(timer);
   }, [id, loadChatHistory, tab]);
 
-  const startNewChatSession = useCallback(async () => {
+  const startNewChatSession = useCallback(async (folderId?: string) => {
     if (!id) return;
-    const res = await api.createChatSession(id);
+    const res = await api.createChatSession(id, folderId ? { folderId } : undefined);
     if (!res.success) {
       toast.error(res.error ?? 'Failed to start a new chat session');
       return;
@@ -780,12 +793,99 @@ export default function AgentManagePage() {
       { ...res.data.session, current: true },
       ...prev.map((session) => ({ ...session, current: false })),
     ]);
+    if (folderId) {
+      setChatFolders((prev) =>
+        prev.map((folder) =>
+          folder.id === folderId
+            ? { ...folder, sessionCount: folder.sessionCount + 1 }
+            : folder,
+        ),
+      );
+    }
     setMessages([]);
     lastSavedCountRef.current = 0;
     lastHistorySignatureRef.current = '';
     loadedChatSessionIdRef.current = res.data.session.id;
     historyLoadedRef.current = true;
   }, [id, setActiveChatSessionId, toast]);
+
+  const createChatFolder = useCallback(async (name: string): Promise<boolean> => {
+    if (!id) return false;
+    const res = await api.createChatFolder(id, name);
+    if (!res.success) {
+      toast.error(res.error ?? 'Failed to create folder');
+      return false;
+    }
+    setChatFolders((prev) => [...prev, res.data.folder]);
+    return true;
+  }, [id, toast]);
+
+  const renameChatFolder = useCallback(async (
+    folderId: string,
+    name: string,
+  ): Promise<boolean> => {
+    if (!id) return false;
+    const res = await api.renameChatFolder(id, folderId, name);
+    if (!res.success) {
+      toast.error(res.error ?? 'Failed to rename folder');
+      return false;
+    }
+    setChatFolders((prev) =>
+      prev.map((folder) => (folder.id === folderId ? res.data.folder : folder)),
+    );
+    return true;
+  }, [id, toast]);
+
+  const deleteChatFolder = useCallback(async (folderId: string): Promise<boolean> => {
+    if (!id) return false;
+    const res = await api.deleteChatFolder(id, folderId);
+    if (!res.success) {
+      toast.error(res.error ?? 'Failed to delete folder');
+      return false;
+    }
+    setChatFolders((prev) => prev.filter((folder) => folder.id !== folderId));
+    setChatSessions((prev) =>
+      prev.map((session) =>
+        session.folderId === folderId ? { ...session, folderId: null } : session,
+      ),
+    );
+    return true;
+  }, [id, toast]);
+
+  const moveChatSession = useCallback(async (
+    sessionId: string,
+    folderId: string | null,
+  ): Promise<boolean> => {
+    if (!id) return false;
+    const previousFolderId = chatSessions.find((session) => session.id === sessionId)?.folderId ?? null;
+    if (previousFolderId === folderId) return true;
+
+    setChatSessions((prev) =>
+      prev.map((session) => (session.id === sessionId ? { ...session, folderId } : session)),
+    );
+    const res = await api.moveChatSession(id, sessionId, folderId);
+    if (!res.success) {
+      setChatSessions((prev) =>
+        prev.map((session) =>
+          session.id === sessionId ? { ...session, folderId: previousFolderId } : session,
+        ),
+      );
+      toast.error(res.error ?? 'Failed to move chat');
+      return false;
+    }
+    setChatFolders((prev) =>
+      prev.map((folder) => ({
+        ...folder,
+        sessionCount:
+          folder.id === previousFolderId
+            ? Math.max(0, folder.sessionCount - 1)
+            : folder.id === folderId
+              ? folder.sessionCount + 1
+              : folder.sessionCount,
+      })),
+    );
+    return true;
+  }, [chatSessions, id, toast]);
 
   const deleteChatSession = useCallback(async (sessionId: string) => {
     if (!id || deletingChatSessionId) return;
@@ -807,6 +907,15 @@ export default function AgentManagePage() {
     }
 
     setChatSessions((prev) => prev.filter((session) => session.id !== sessionId));
+    if (target?.folderId) {
+      setChatFolders((prev) =>
+        prev.map((folder) =>
+          folder.id === target.folderId
+            ? { ...folder, sessionCount: Math.max(0, folder.sessionCount - 1) }
+            : folder,
+        ),
+      );
+    }
     if (deletingActiveSession) {
       activeChatSessionIdRef.current = nextActiveId;
       setActiveChatSessionIdState(nextActiveId);
@@ -1368,10 +1477,15 @@ export default function AgentManagePage() {
       bottomRef, inputRef, sendMessage, abortChatResponse, handleKeyDown, sendCooldown,
       wsConnected: wsChat.isConnected,
       chatSessions,
+      chatFolders,
       activeChatSessionId,
       setActiveChatSessionId,
       startNewChatSession,
       deleteChatSession,
+      createChatFolder,
+      renameChatFolder,
+      deleteChatFolder,
+      moveChatSession,
       deletingChatSessionId,
       refreshChatSessions: loadChatSessions,
       inflightTools, completedTools,
@@ -1425,7 +1539,8 @@ export default function AgentManagePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, agent, stats, tab, logs.logs, logs.logsLoading, logs.logFilter, logs.logSearch, logs.autoScroll, logs.filteredLogs, wsLogsConnected,
     messages, input, sending, queuedChatCount, sendCooldown, chatError, chatErrorType, abortChatResponse,
-    chatSessions, activeChatSessionId, setActiveChatSessionId, startNewChatSession, deleteChatSession, deletingChatSessionId, loadChatSessions,
+    chatSessions, chatFolders, activeChatSessionId, setActiveChatSessionId, startNewChatSession, deleteChatSession,
+    createChatFolder, renameChatFolder, deleteChatFolder, moveChatSession, deletingChatSessionId, loadChatSessions,
     inflightTools, completedTools,
     config.configName, config.configDesc, config.configBio, config.configLore, config.configTopics,
     config.configStyle, config.configAdjectives, config.configSystemPrompt, config.configSkills,

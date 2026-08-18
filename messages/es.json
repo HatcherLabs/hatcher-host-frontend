@@ -73,6 +73,8 @@
       "blogSub": "Notas, lanzamientos, inmersiones profundas.",
       "roadmapLabel": "Hoja de ruta",
       "roadmapSub": "Lo que enviamos a continuación.",
+      "usageLabel": "Uso de la plataforma",
+      "usageSub": "Volumen diario y total de tokens.",
       "changelogLabel": "Registro de cambios",
       "changelogSub": "Qué cambió y cuándo."
     },
@@ -132,6 +134,7 @@
     "itemWhitepaper": "Libro blanco",
     "itemBlog": "Blog",
     "itemRoadmap": "Hoja de ruta",
+    "itemUsage": "Uso de la plataforma",
     "itemChangelog": "Registro de cambios",
     "itemSecurity": "Seguridad",
     "itemPrivacy": "Privacidad",

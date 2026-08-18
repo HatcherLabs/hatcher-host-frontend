@@ -73,6 +73,8 @@
       "blogSub": "メモ、リリース、詳細な調査。",
       "roadmapLabel": "ロードマップ",
       "roadmapSub": "次に何を出荷するか。",
+      "usageLabel": "プラットフォーム利用状況",
+      "usageSub": "日次・累計トークン量。",
       "changelogLabel": "変更ログ",
       "changelogSub": "何がいつ変わったのか。"
     },
@@ -132,6 +134,7 @@
     "itemWhitepaper": "ホワイトペーパー",
     "itemBlog": "ブログ",
     "itemRoadmap": "ロードマップ",
+    "itemUsage": "プラットフォーム利用状況",
     "itemChangelog": "変更ログ",
     "itemSecurity": "セキュリティ",
     "itemPrivacy": "プライバシー",

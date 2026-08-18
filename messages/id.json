@@ -73,6 +73,8 @@
       "blogSub": "Catatan, rilis, penyelaman mendalam.",
       "roadmapLabel": "Peta jalan",
       "roadmapSub": "Apa yang kami kirimkan selanjutnya.",
+      "usageLabel": "Penggunaan platform",
+      "usageSub": "Volume token harian dan sepanjang waktu.",
       "changelogLabel": "log perubahan",
       "changelogSub": "Apa yang berubah dan kapan."
     },
@@ -132,6 +134,7 @@
     "itemWhitepaper": "kertas putih",
     "itemBlog": "blog",
     "itemRoadmap": "Peta jalan",
+    "itemUsage": "Penggunaan platform",
     "itemChangelog": "log perubahan",
     "itemSecurity": "Keamanan",
     "itemPrivacy": "Privasi",

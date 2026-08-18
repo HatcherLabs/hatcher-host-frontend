@@ -10,6 +10,7 @@ import type { LucideIcon } from 'lucide-react';
 import {
   ArrowRight,
   BarChart3,
+  ChartNoAxesCombined,
   BookOpen,
   Boxes,
   Building2,
@@ -397,6 +398,8 @@ function NavItemIcon({ itemKey }: { itemKey: string }) {
       return <Newspaper {...iconProps} />;
     case 'roadmap':
       return <GitBranch {...iconProps} />;
+    case 'usage':
+      return <ChartNoAxesCombined {...iconProps} />;
     case 'changelog':
       return <BookOpen {...iconProps} />;
     default:
