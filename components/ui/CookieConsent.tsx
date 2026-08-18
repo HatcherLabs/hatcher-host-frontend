@@ -95,8 +95,7 @@ export function CookieConsent() {
   if (!expanded) {
     return (
       <div
-        className="fixed inset-x-0 bottom-0 z-[9999] pointer-events-none"
-        style={{ animation: 'cookieSlideUp 0.35s ease-out' }}
+        className="cookie-consent-enter fixed inset-x-0 bottom-0 z-[9999] pointer-events-none"
         role="dialog"
         aria-label="Cookie consent"
         aria-modal="false"
@@ -134,20 +133,13 @@ export function CookieConsent() {
             </div>
           </div>
         </div>
-        <style jsx global>{`
-          @keyframes cookieSlideUp {
-            from { opacity: 0; transform: translateY(100%); }
-            to   { opacity: 1; transform: translateY(0); }
-          }
-        `}</style>
       </div>
     );
   }
 
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-[9999] p-3 sm:p-5 pointer-events-none"
-      style={{ animation: 'cookieSlideUp 0.35s ease-out' }}
+      className="cookie-consent-enter fixed inset-x-0 bottom-0 z-[9999] p-3 sm:p-5 pointer-events-none"
       role="dialog"
       aria-label="Cookie consent"
       aria-modal="false"
@@ -232,12 +224,6 @@ export function CookieConsent() {
           </div>
         </div>
       </div>
-      <style jsx global>{`
-        @keyframes cookieSlideUp {
-          from { opacity: 0; transform: translateY(100%); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </div>
   );
 }

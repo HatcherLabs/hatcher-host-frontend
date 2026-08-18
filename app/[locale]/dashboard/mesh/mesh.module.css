@@ -351,6 +351,120 @@
   cursor: pointer;
 }
 
+/* CSP-safe orbit positions. Hatcher's production policy rejects style attributes,
+   so node coordinates are selected through bounded data attributes instead. */
+.agentNode[data-count="1"][data-index="0"],
+.agentNode[data-count="2"][data-index="0"],
+.agentNode[data-count="3"][data-index="0"],
+.agentNode[data-count="4"][data-index="0"],
+.agentNode[data-count="5"][data-index="0"],
+.agentNode[data-count="6"][data-index="0"],
+.agentNode[data-count="7"][data-index="0"],
+.agentNode[data-count="8"][data-index="0"] {
+  left: 50%;
+  top: 17.105%;
+}
+.agentNode[data-count="2"][data-index="1"] {
+  left: 50%;
+  top: 82.895%;
+}
+.agentNode[data-count="3"][data-index="1"],
+.agentNode[data-count="6"][data-index="1"] {
+  left: 79.77%;
+  top: 33.553%;
+}
+.agentNode[data-count="3"][data-index="1"] {
+  top: 66.447%;
+}
+.agentNode[data-count="3"][data-index="2"] {
+  left: 20.23%;
+  top: 66.447%;
+}
+.agentNode[data-count="4"][data-index="1"],
+.agentNode[data-count="8"][data-index="2"] {
+  left: 84.375%;
+  top: 50%;
+}
+.agentNode[data-count="4"][data-index="2"],
+.agentNode[data-count="6"][data-index="3"],
+.agentNode[data-count="8"][data-index="4"] {
+  left: 50%;
+  top: 82.895%;
+}
+.agentNode[data-count="4"][data-index="3"],
+.agentNode[data-count="8"][data-index="6"] {
+  left: 15.625%;
+  top: 50%;
+}
+.agentNode[data-count="5"][data-index="1"] {
+  left: 82.693%;
+  top: 39.835%;
+}
+.agentNode[data-count="5"][data-index="2"] {
+  left: 70.205%;
+  top: 76.612%;
+}
+.agentNode[data-count="5"][data-index="3"] {
+  left: 29.795%;
+  top: 76.612%;
+}
+.agentNode[data-count="5"][data-index="4"] {
+  left: 17.307%;
+  top: 39.835%;
+}
+.agentNode[data-count="6"][data-index="2"] {
+  left: 79.77%;
+  top: 66.447%;
+}
+.agentNode[data-count="6"][data-index="4"] {
+  left: 20.23%;
+  top: 66.447%;
+}
+.agentNode[data-count="6"][data-index="5"] {
+  left: 20.23%;
+  top: 33.553%;
+}
+.agentNode[data-count="7"][data-index="1"] {
+  left: 76.875%;
+  top: 29.49%;
+}
+.agentNode[data-count="7"][data-index="2"] {
+  left: 83.513%;
+  top: 57.32%;
+}
+.agentNode[data-count="7"][data-index="3"] {
+  left: 64.915%;
+  top: 79.637%;
+}
+.agentNode[data-count="7"][data-index="4"] {
+  left: 35.085%;
+  top: 79.637%;
+}
+.agentNode[data-count="7"][data-index="5"] {
+  left: 16.487%;
+  top: 57.32%;
+}
+.agentNode[data-count="7"][data-index="6"] {
+  left: 23.125%;
+  top: 29.49%;
+}
+.agentNode[data-count="8"][data-index="1"] {
+  left: 74.307%;
+  top: 26.74%;
+}
+.agentNode[data-count="8"][data-index="3"] {
+  left: 74.307%;
+  top: 73.26%;
+}
+.agentNode[data-count="8"][data-index="5"] {
+  left: 25.693%;
+  top: 73.26%;
+}
+.agentNode[data-count="8"][data-index="7"] {
+  left: 25.693%;
+  top: 26.74%;
+}
+
 .agentNode:hover,
 .agentNodeActive {
   border-color: color-mix(

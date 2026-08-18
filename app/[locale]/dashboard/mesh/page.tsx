@@ -142,12 +142,13 @@ function MeshGraph({
         <strong>Mesh</strong>
         <span>{preview ? "preview" : "shadow"}</span>
       </div>
-      {points.map(({ node, x, y }) => (
+      {points.map(({ node }, index) => (
         <button
           key={node.id}
           type="button"
           className={`${styles.agentNode} ${activeAgentId === node.id ? styles.agentNodeActive : ""} ${!node.eligible ? styles.agentNodeIneligible : ""}`}
-          style={{ left: `${(x / 800) * 100}%`, top: `${(y / 380) * 100}%` }}
+          data-count={visibleNodes.length}
+          data-index={index}
           onClick={() => onSelect(node.id)}
           aria-pressed={activeAgentId === node.id}
           aria-label={`${node.name}, ${node.eligible ? "eligible for shadow routing" : `not eligible: ${node.eligibilityReason ?? "unavailable"}`}`}

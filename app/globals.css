@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes cookie-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cookie-consent-enter {
+  animation: cookie-slide-up 0.35s ease-out;
+}
+
 /* ── Mobile app safe areas ──────────────────────────── */
 .safe-area-top {
   padding-top: env(safe-area-inset-top, 0px);
