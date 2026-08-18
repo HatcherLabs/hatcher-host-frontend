@@ -46,6 +46,15 @@
   align-items: center;
 }
 
+.shadowBadge[data-mode="live"] {
+  border-color: color-mix(
+    in srgb,
+    var(--color-success) 42%,
+    var(--border-default)
+  );
+  color: var(--color-success);
+}
+
 .titleLine {
   gap: 9px;
 }
@@ -240,6 +249,37 @@
 }
 .modeBar strong {
   color: var(--text-primary);
+}
+
+.modeActions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.canaryControl {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.canaryControl select {
+  min-height: 36px;
+  padding: 0 28px 0 10px;
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font: inherit;
+}
+
+.canaryControl select:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 .mainGrid {
@@ -820,6 +860,10 @@
   .modeBar {
     align-items: flex-start;
     flex-direction: column;
+  }
+  .modeActions {
+    width: 100%;
+    flex-wrap: wrap;
   }
   .previewColumns {
     grid-template-columns: 1fr;

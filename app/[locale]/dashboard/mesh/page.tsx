@@ -110,11 +110,13 @@ function MeshGraph({
   activeAgentId,
   onSelect,
   preview,
+  mode = "shadow",
 }: {
   nodes: NeuralMeshNode[];
   activeAgentId: string | null;
   onSelect: (agentId: string) => void;
   preview?: boolean;
+  mode?: "shadow" | "live";
 }) {
   const visibleNodes = nodes.slice(0, 8);
   const points = visibleNodes.map((node, index) => {
@@ -140,7 +142,7 @@ function MeshGraph({
       <div className={styles.meshCore}>
         <Network size={22} aria-hidden />
         <strong>Mesh</strong>
-        <span>{preview ? "preview" : "shadow"}</span>
+        <span>{preview ? "preview" : mode}</span>
       </div>
       {points.map(({ node }, index) => (
         <button
@@ -151,7 +153,7 @@ function MeshGraph({
           data-index={index}
           onClick={() => onSelect(node.id)}
           aria-pressed={activeAgentId === node.id}
-          aria-label={`${node.name}, ${node.eligible ? "eligible for shadow routing" : `not eligible: ${node.eligibilityReason ?? "unavailable"}`}`}
+          aria-label={`${node.name}, ${node.eligible ? `eligible for ${mode} routing` : `not eligible: ${node.eligibilityReason ?? "unavailable"}`}`}
         >
           <span className={styles.nodeIcon}>
             <Bot size={16} aria-hidden />
@@ -258,6 +260,7 @@ export default function NeuralMeshPage() {
     null,
   );
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
+  const [liveCanaryPercent, setLiveCanaryPercent] = useState(10);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -269,6 +272,11 @@ export default function NeuralMeshPage() {
     if (previewResult.success) setPreview(previewResult.data);
     if (overviewResult?.success) {
       setOverview(overviewResult.data);
+      setLiveCanaryPercent(
+        overviewResult.data.config.canaryPercent > 0
+          ? overviewResult.data.config.canaryPercent
+          : 10,
+      );
       setSelectedDecisionId(
         (current) =>
           current ?? overviewResult.data.recentDecisions[0]?.id ?? null,
@@ -298,23 +306,36 @@ export default function NeuralMeshPage() {
     [overview],
   );
 
-  const toggleMesh = async () => {
+  const saveMeshConfig = async (enabled: boolean, mode: "shadow" | "live") => {
     if (!overview) return;
+    if (
+      enabled &&
+      mode === "live" &&
+      !window.confirm(
+        `Live Mode can route Mission Control runs to another eligible agent in this workspace for up to ${liveCanaryPercent}% of runs. Continue?`,
+      )
+    ) {
+      return;
+    }
     setSaving(true);
-    const result = await api.setNeuralMeshEnabled(!overview.config.enabled);
+    const result = await api.setNeuralMeshConfig({
+      enabled,
+      mode,
+      canaryPercent: mode === "live" ? liveCanaryPercent : 1,
+      acknowledgedLiveRouting: enabled && mode === "live",
+    });
     setSaving(false);
     if (!result.success) {
       toast.error(result.error);
       return;
     }
-    setOverview({
-      ...overview,
-      config: { ...overview.config, enabled: result.data.enabled },
-    });
+    await load();
     toast.success(
-      result.data.enabled
-        ? "Neural Mesh shadow mode enabled"
-        : "Neural Mesh shadow mode paused",
+      !result.data.enabled
+        ? "Neural Mesh paused"
+        : result.data.mode === "live"
+          ? `Neural Mesh Live Mode enabled at ${result.data.canaryPercent}% canary`
+          : "Neural Mesh Shadow Mode enabled",
     );
   };
 
@@ -334,13 +355,27 @@ export default function NeuralMeshPage() {
             </div>
             <h1>Neural Mesh</h1>
             <p>
-              Compare explainable routing recommendations against real outcomes
-              before giving the mesh execution authority.
+              Coordinate owner-isolated agents with explainable routing,
+              measured outcomes, and guarded live execution.
             </p>
           </div>
           <div className={styles.headerActions}>
-            <span className={styles.shadowBadge}>
-              <Eye size={14} aria-hidden /> Shadow mode
+            <span
+              className={styles.shadowBadge}
+              data-mode={
+                overview?.config.enabled ? overview.config.mode : "paused"
+              }
+            >
+              {overview?.config.enabled && overview.config.mode === "live" ? (
+                <Activity size={14} aria-hidden />
+              ) : (
+                <Eye size={14} aria-hidden />
+              )}
+              {overview?.config.enabled
+                ? overview.config.mode === "live"
+                  ? "Live mode"
+                  : "Shadow mode"
+                : "Paused"}
             </span>
             <button
               type="button"
@@ -377,7 +412,7 @@ export default function NeuralMeshPage() {
               <div className={styles.systemNotice}>
                 <TriangleAlert size={16} />
                 <span>
-                  Shadow collection is available in the UI, but the Neural Mesh
+                  Mesh controls are available in the UI, but the Neural Mesh
                   sidecar is not enabled on this environment yet.
                 </span>
               </div>
@@ -386,9 +421,18 @@ export default function NeuralMeshPage() {
               <div className={styles.systemNotice}>
                 <TriangleAlert size={16} />
                 <span>
-                  No agent is currently eligible for shadow routing. Start or
-                  wake a supported agent and clear any workspace quota issue
-                  before enabling collection.
+                  No agent is currently eligible for routing. Start or wake a
+                  supported agent and clear any workspace quota issue before
+                  enabling the mesh.
+                </span>
+              </div>
+            ) : null}
+            {!overview.config.liveGloballyEnabled ? (
+              <div className={styles.systemNotice}>
+                <ShieldCheck size={16} />
+                <span>
+                  Live routing is protected by the environment kill switch.
+                  Shadow Mode remains available until an operator enables it.
                 </span>
               </div>
             ) : null}
@@ -406,9 +450,11 @@ export default function NeuralMeshPage() {
                 <small>owner-scoped agents</small>
               </div>
               <div>
-                <span>Shadow decisions</span>
+                <span>Routing decisions</span>
                 <strong>{overview.metrics.decisions}</strong>
-                <small>last {overview.metrics.windowDays} days</small>
+                <small>
+                  {overview.metrics.liveRoutesApplied} live routes applied
+                </small>
               </div>
               <div>
                 <span>Assigned-agent success</span>
@@ -444,33 +490,92 @@ export default function NeuralMeshPage() {
 
             <div className={styles.modeBar}>
               <div>
-                <Activity size={17} />
+                {overview.config.mode === "live" && overview.config.enabled ? (
+                  <Activity size={17} />
+                ) : (
+                  <Eye size={17} />
+                )}
                 <span>
-                  <strong>Evidence collection</strong> Records recommendations
-                  and outcomes without changing who executes.
+                  <strong>
+                    {overview.config.mode === "live" && overview.config.enabled
+                      ? "Guarded live routing"
+                      : "Shadow evaluation"}
+                  </strong>{" "}
+                  {overview.config.mode === "live" && overview.config.enabled
+                    ? `The mesh may route up to ${overview.config.effectiveCanaryPercent}% of runs after every safety gate passes.`
+                    : "Records recommendations and outcomes without changing who executes."}
                 </span>
               </div>
-              <button
-                type="button"
-                className={
-                  overview.config.enabled
-                    ? styles.pauseButton
-                    : styles.primaryButton
-                }
-                onClick={() => void toggleMesh()}
-                disabled={
-                  saving ||
-                  (!overview.config.enabled &&
-                    (!overview.config.globallyEnabled ||
-                      overview.access.eligibleAgentCount === 0))
-                }
-              >
-                {saving
-                  ? "Saving…"
-                  : overview.config.enabled
-                    ? "Pause shadow mode"
-                    : "Enable shadow mode"}
-              </button>
+              <div className={styles.modeActions}>
+                <label className={styles.canaryControl}>
+                  <span>Live canary</span>
+                  <select
+                    value={liveCanaryPercent}
+                    onChange={(event) =>
+                      setLiveCanaryPercent(Number(event.target.value))
+                    }
+                    disabled={saving}
+                  >
+                    {[10, 25, 50, 100].map((value) => (
+                      <option key={value} value={value}>
+                        {value}%
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button
+                  type="button"
+                  className={styles.pauseButton}
+                  onClick={() =>
+                    void saveMeshConfig(
+                      !(
+                        overview.config.enabled &&
+                        overview.config.mode === "shadow"
+                      ),
+                      "shadow",
+                    )
+                  }
+                  disabled={
+                    saving ||
+                    (!overview.config.globallyEnabled &&
+                      !overview.config.enabled) ||
+                    (overview.access.eligibleAgentCount === 0 &&
+                      !overview.config.enabled)
+                  }
+                >
+                  {saving
+                    ? "Saving…"
+                    : overview.config.enabled &&
+                        overview.config.mode === "shadow"
+                      ? "Pause"
+                      : "Use Shadow"}
+                </button>
+                <button
+                  type="button"
+                  className={styles.primaryButton}
+                  onClick={() =>
+                    void saveMeshConfig(
+                      !(
+                        overview.config.enabled &&
+                        overview.config.mode === "live"
+                      ),
+                      "live",
+                    )
+                  }
+                  disabled={
+                    saving ||
+                    !overview.config.globallyEnabled ||
+                    !overview.config.liveGloballyEnabled ||
+                    overview.access.eligibleAgentCount < 2
+                  }
+                >
+                  {saving
+                    ? "Saving…"
+                    : overview.config.enabled && overview.config.mode === "live"
+                      ? "Pause Live"
+                      : "Enable Live"}
+                </button>
+              </div>
             </div>
 
             <div className={styles.mainGrid}>
@@ -485,13 +590,18 @@ export default function NeuralMeshPage() {
                     data-live={overview.config.enabled}
                   >
                     <span className={styles.statusDot} />
-                    {overview.config.enabled ? "Collecting" : "Paused"}
+                    {overview.config.enabled
+                      ? overview.config.mode === "live"
+                        ? "Routing live"
+                        : "Observing"
+                      : "Paused"}
                   </span>
                 </div>
                 <MeshGraph
                   nodes={overview.nodes}
                   activeAgentId={selectedAgentId}
                   onSelect={setSelectedAgentId}
+                  mode={overview.config.mode === "live" ? "live" : "shadow"}
                 />
               </section>
 
@@ -519,16 +629,13 @@ export default function NeuralMeshPage() {
                   <div className={styles.inspectorBody}>
                     <div className={styles.decisionRoute}>
                       <div>
-                        <span>Assigned</span>
-                        <strong>{selectedDecision.actualAgentName}</strong>
+                        <span>Requested</span>
+                        <strong>{selectedDecision.requestedAgentName}</strong>
                       </div>
                       <ArrowRight size={16} />
                       <div>
-                        <span>Recommended</span>
-                        <strong>
-                          {selectedDecision.recommendedAgentName ??
-                            "Unavailable"}
-                        </strong>
+                        <span>Executed</span>
+                        <strong>{selectedDecision.actualAgentName}</strong>
                       </div>
                     </div>
                     <dl className={styles.detailList}>
@@ -537,9 +644,20 @@ export default function NeuralMeshPage() {
                         <dd>{percent(selectedDecision.confidence)}</dd>
                       </div>
                       <div>
-                        <dt>Agreement</dt>
+                        <dt>Mesh recommendation</dt>
                         <dd>
-                          {selectedDecision.matched ? "Matched" : "Different"}
+                          {selectedDecision.recommendedAgentName ??
+                            "Unavailable"}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt>Routing mode</dt>
+                        <dd>
+                          {selectedDecision.routeMode === "live"
+                            ? selectedDecision.executionApplied
+                              ? "Live · applied"
+                              : "Live · fallback"
+                            : "Shadow · observed"}
                         </dd>
                       </div>
                       <div>
@@ -551,7 +669,7 @@ export default function NeuralMeshPage() {
                         <dd>{duration(selectedDecision.routeLatencyMs)}</dd>
                       </div>
                       <div>
-                        <dt>Assigned-agent outcome</dt>
+                        <dt>Executed-agent outcome</dt>
                         <dd>
                           {selectedDecision.outcome
                             ? selectedDecision.outcome.success
@@ -562,10 +680,10 @@ export default function NeuralMeshPage() {
                         </dd>
                       </div>
                       <div>
-                        <dt>Recommended-agent outcome</dt>
+                        <dt>Recommendation evidence</dt>
                         <dd>
                           {selectedDecision.outcome?.recommendationObserved
-                            ? "Observed — same agent"
+                            ? "Observed on executed agent"
                             : "Unobserved counterfactual"}
                         </dd>
                       </div>
@@ -599,7 +717,7 @@ export default function NeuralMeshPage() {
                     ) : null}
                     {selectedDecision.outcome?.traceDigest ? (
                       <code className={styles.digest}>
-                        assigned outcome{" "}
+                        executed outcome{" "}
                         {selectedDecision.outcome.traceDigest.slice(0, 20)}
                       </code>
                     ) : null}
@@ -608,9 +726,9 @@ export default function NeuralMeshPage() {
                   <div className={styles.emptyInspector}>
                     <GitBranch size={24} />
                     <p>
-                      Enable shadow mode and run a Mission Control task. Its
-                      recommendation will appear here without affecting
-                      execution.
+                      Enable Shadow or Live Mode and run a Mission Control task.
+                      The requested, recommended, and executed route will appear
+                      here.
                     </p>
                   </div>
                 )}
@@ -633,10 +751,11 @@ export default function NeuralMeshPage() {
                     <thead>
                       <tr>
                         <th>Task</th>
-                        <th>Assigned</th>
+                        <th>Requested</th>
+                        <th>Executed</th>
                         <th>Mesh recommendation</th>
                         <th>Confidence</th>
-                        <th>Assigned outcome</th>
+                        <th>Executed outcome</th>
                         <th>Recommendation evidence</th>
                         <th>Time</th>
                       </tr>
@@ -658,7 +777,11 @@ export default function NeuralMeshPage() {
                               <span>{decision.domain}</span>
                             </button>
                           </td>
-                          <td>{decision.actualAgentName}</td>
+                          <td>{decision.requestedAgentName}</td>
+                          <td>
+                            {decision.actualAgentName}
+                            {decision.executionApplied ? " · Live" : ""}
+                          </td>
                           <td>
                             {decision.recommendedAgentName ?? "Unavailable"}
                           </td>
@@ -696,8 +819,8 @@ export default function NeuralMeshPage() {
                 <div className={styles.emptyTable}>
                   <Eye size={22} />
                   <p>
-                    No shadow decisions yet. Existing Mission Control behavior
-                    remains unchanged.
+                    No routing decisions yet. Run a Mission Control task to
+                    create the first auditable decision.
                   </p>
                 </div>
               )}
