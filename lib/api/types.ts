@@ -228,7 +228,9 @@ export interface AgentCapacityAddonsResponse {
 
 /** `GET /features/capacity-addons` — user-level roll-up across agents. */
 export interface CapacityAddonsSummaryResponse {
-  addons: Array<AgentCapacityAddon & { agentId?: string; agentName: string | null }>;
+  addons: Array<
+    AgentCapacityAddon & { agentId?: string; agentName: string | null }
+  >;
   monthlyUsd: number;
   catalog?: unknown;
   ceiling?: { cpus: number; memoryMb: number };
@@ -491,6 +493,105 @@ export interface MissionTasksResponse {
   tasks: MissionTask[];
   nextCursor: string | null;
   summary?: MissionTaskSummary;
+}
+
+export interface NeuralMeshCandidate {
+  agent_id: string;
+  score: number;
+  capability: number;
+  inbound_trust: number;
+  mastery: number;
+  expected_latency_ms: number;
+  expected_cost: number;
+  within_constraints: boolean;
+}
+
+export interface NeuralMeshNode {
+  id: string;
+  name: string;
+  framework: string;
+  status: string;
+  role: string;
+  domain: string;
+  enabled: boolean;
+  eligible: boolean;
+  eligibilityReason: string | null;
+  measured: {
+    attempts?: number;
+    completed?: number;
+    performance?: number;
+    averageLatencyMs?: number;
+    averageCostAiCredits?: number;
+  };
+}
+
+export interface NeuralMeshDecision {
+  id: string;
+  taskId: string;
+  taskTitle: string;
+  actualAgentId: string;
+  actualAgentName: string;
+  recommendedAgentId: string | null;
+  recommendedAgentName: string | null;
+  matched: boolean;
+  source: "sidecar" | "unavailable" | string;
+  status: string;
+  domain: string;
+  confidence: number;
+  rationale: string | null;
+  candidates: NeuralMeshCandidate[];
+  meshDigest: string | null;
+  routeLatencyMs: number | null;
+  createdAt: string;
+  outcome: {
+    observedAgentId: string;
+    observedAgentName: string;
+    recommendationObserved: boolean;
+    success: boolean;
+    verified: boolean;
+    errorClass: string | null;
+    latencyMs: number | null;
+    costAiCredits: number;
+    provenance: string;
+    traceDigest: string | null;
+  } | null;
+}
+
+export interface NeuralMeshOverview {
+  access: {
+    hasAgents: boolean;
+    agentCount: number;
+    eligibleAgentCount: number;
+  };
+  config: {
+    enabled: boolean;
+    mode: "shadow" | string;
+    canaryPercent: number;
+    globallyEnabled: boolean;
+  };
+  metrics: {
+    windowDays: number;
+    decisions: number;
+    assignedReportedSuccessRate: number | null;
+    recommendationAlignmentRate: number | null;
+    matchedRecommendationReportedSuccessRate: number | null;
+    comparableOutcomes: number;
+    averageLatencyMs: number | null;
+    outcomes: number;
+  };
+  nodes: NeuralMeshNode[];
+  recentDecisions: NeuralMeshDecision[];
+}
+
+export interface NeuralMeshPreview {
+  name: string;
+  status: string;
+  mode: string;
+  access: string;
+  description: string;
+  capabilities: string[];
+  safeguards: string[];
+  credit: { project: string; github: string; x: string };
 }
 
 export interface CreateMissionTaskBody {
@@ -2178,7 +2279,6 @@ export interface OobeX402BalanceBody {
 export type OobeX402CallResponse = unknown;
 export type OobeX402BalanceResponse = unknown;
 
-
 export type AgentPassportNetworkId = "skale" | "base" | "cyberia" | "solana";
 export type AgentPassportChainType = "evm" | "solana";
 export type AgentPassportSignerMode =
@@ -2640,9 +2740,7 @@ export type AdminHealthResponse = {
 // is narrowed defensively in the components.
 
 export type IronClawGateResolution =
-  | "approved"
-  | "declined"
-  | "credential_provided";
+  "approved" | "declined" | "credential_provided";
 
 export interface IronClawGateResolveBody {
   resolution: IronClawGateResolution;

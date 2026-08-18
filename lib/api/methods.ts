@@ -16,6 +16,8 @@ import type {
   CreateMissionTaskBody,
   MissionTask,
   MissionTasksResponse,
+  NeuralMeshOverview,
+  NeuralMeshPreview,
   AgentCommCallBody,
   AgentCommCallResponse,
   AgentCommDiscoverResponse,
@@ -546,7 +548,19 @@ export const api = {
     req<{ task: MissionTask }>(
       `/agents/${agentId}/tasks/${taskId}/runs/${runId}/cancel`,
       { method: "POST" },
-    ),
+  ),
+
+  /** Public product preview; contains no tenant telemetry. */
+  getNeuralMeshPreview: () => req<NeuralMeshPreview>("/mesh/preview"),
+
+  /** Owner-scoped Neural Mesh telemetry and shadow-routing decisions. */
+  getNeuralMeshOverview: () => req<NeuralMeshOverview>("/mesh/overview"),
+
+  setNeuralMeshEnabled: (enabled: boolean) =>
+    req<{ enabled: boolean; mode: string; canaryPercent: number }>("/mesh/config", {
+      method: "PUT",
+      body: JSON.stringify({ enabled }),
+    }),
 
   /** Resume always creates a new attempt; it never mutates the previous run. */
   resumeMissionTask: (agentId: string, taskId: string) =>

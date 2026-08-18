@@ -485,6 +485,10 @@ export default function MyAgentsPage() {
                 </div>
               </div>
               <div className={styles.meshActions}>
+                <Link href="/dashboard/mesh" className={styles.actionBtn}>
+                  <Network size={12} />
+                  Neural Mesh
+                </Link>
                 <button
                   type="button"
                   className={styles.actionBtn}

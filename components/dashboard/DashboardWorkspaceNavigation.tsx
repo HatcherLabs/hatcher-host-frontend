@@ -1,6 +1,6 @@
 'use client';
 
-import { Bot, ListChecks, ShieldCheck } from 'lucide-react';
+import { Bot, ListChecks, Network, ShieldCheck } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
@@ -17,6 +17,7 @@ const ICONS = {
   agents: Bot,
   missions: ListChecks,
   approvals: ShieldCheck,
+  mesh: Network,
 } satisfies Record<DashboardWorkspaceKey, typeof Bot>;
 
 export function DashboardWorkspaceNavigation() {
@@ -36,6 +37,7 @@ export function DashboardWorkspaceNavigation() {
     agents: tNav('myAgents'),
     missions: tNav('missionControl'),
     approvals: 'Approvals',
+    mesh: 'Neural Mesh',
   };
 
   return (

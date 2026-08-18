@@ -2,6 +2,7 @@ export const DASHBOARD_WORKSPACE_ROUTES = [
   { key: 'agents', href: '/dashboard/agents' },
   { key: 'missions', href: '/dashboard/missions' },
   { key: 'approvals', href: '/dashboard/approvals' },
+  { key: 'mesh', href: '/dashboard/mesh' },
 ] as const;
 
 export type DashboardWorkspaceKey = (typeof DASHBOARD_WORKSPACE_ROUTES)[number]['key'];
@@ -22,6 +23,9 @@ export function isDashboardWorkspaceRouteActive(
   }
   if (key === 'approvals') {
     return normalized === '/dashboard/approvals' || normalized.startsWith('/dashboard/approvals/');
+  }
+  if (key === 'mesh') {
+    return normalized === '/dashboard/mesh' || normalized.startsWith('/dashboard/mesh/');
   }
   return false;
 }
