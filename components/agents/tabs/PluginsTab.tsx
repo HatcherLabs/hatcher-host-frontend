@@ -19,6 +19,7 @@ import {
   ChevronRight,
   BadgeCheck,
   KeyRound,
+  ExternalLink,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import {
@@ -176,6 +177,7 @@ function StatusIndicator({ status, error }: { status: InstalledItem['status']; e
 
 interface CapabilityDetailsProps {
   item: {
+    name?: string;
     description?: string | null;
     source: string;
     author?: string;
@@ -191,12 +193,50 @@ interface CapabilityDetailsProps {
   bundled?: boolean;
 }
 
+type CapabilityLink = { label: string; href: string };
+
+function getCapabilityLinks(
+  item: CapabilityDetailsProps['item'],
+  framework: string,
+  bundled: boolean,
+): CapabilityLink[] {
+  const name = item.name?.trim();
+  const normalizedName = name?.toLowerCase().replace(/_/g, '-');
+
+  if (framework === 'hermes' && bundled && normalizedName === 'computer-use') {
+    return [{
+      label: 'Hermes guide',
+      href: 'https://hermes-agent.nousresearch.com/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-computer-use',
+    }];
+  }
+  if (!name || bundled) return [];
+  if (item.source === 'github' && /^[a-z0-9_.-]+\/[a-z0-9_.-]+$/i.test(name)) {
+    return [{ label: 'GitHub source', href: `https://github.com/${name}` }];
+  }
+  if (item.source === 'npm' && /^(@[a-z0-9_.-]+\/)?[a-z0-9_.-]+$/i.test(name)) {
+    return [{ label: 'npm package', href: `https://www.npmjs.com/package/${name}` }];
+  }
+  if (item.source === 'clawhub' || item.source === 'clawhub-plugin') {
+    const author = item.author?.trim().replace(/^@/, '');
+    const family = item.source === 'clawhub' ? 'skills' : 'plugins';
+    const exactHref = author && /^[a-z0-9_.-]+$/i.test(author) && /^[a-z0-9_.-]+$/i.test(name)
+      ? `https://clawhub.ai/${author}/${family}/${name}`
+      : null;
+    return [{
+      label: 'ClawHub listing',
+      href: exactHref ?? `https://clawhub.ai/search?q=${encodeURIComponent(name)}`,
+    }];
+  }
+  return [];
+}
+
 function CapabilityDetails({ item, type, framework, bundled = false }: CapabilityDetailsProps) {
   const capabilities = item.tags?.length
     ? item.tags
     : item.category
       ? [item.category]
       : [];
+  const externalLinks = getCapabilityLinks(item, framework, bundled);
 
   return (
     <div className="mt-1 space-y-3 rounded-lg border border-[var(--border-default)] bg-black/10 p-3 text-xs">
@@ -248,6 +288,21 @@ function CapabilityDetails({ item, type, framework, bundled = false }: Capabilit
           </>
         )}
       </dl>
+      {externalLinks.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {externalLinks.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-md border border-[var(--border-default)] bg-white/5 px-2.5 py-1.5 text-[11px] font-medium text-[var(--color-accent)] transition-colors hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-accent)]/10"
+            >
+              <ExternalLink size={11} /> {link.label}
+            </a>
+          ))}
+        </div>
+      )}
       <div className="flex items-start gap-2 rounded-md bg-[var(--color-warning-bg)] px-2.5 py-2 text-[11px] leading-relaxed text-[var(--text-secondary)]">
         <KeyRound size={12} className="mt-0.5 shrink-0 text-[var(--color-warning)]" />
         <span>
@@ -720,6 +775,7 @@ export function PluginsTab() {
                         {expandedDetails === `bundled:${skill.id}` && (
                           <CapabilityDetails
                             item={{
+                              name: skill.id,
                               description: skill.description,
                               source: 'bundled',
                               category: skill.category,

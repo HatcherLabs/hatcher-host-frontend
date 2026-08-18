@@ -157,11 +157,12 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
   const credentialEnvRef = useRef(credentialEnv);
   const scrollLinesRef = useRef(scrollLines ?? loadSavedTerminalScrollLines());
   const wheelRemainderRef = useRef(0);
-  const terminalSelectedRef = useRef(false);
+  const gatewayCopyModeRef = useRef(false);
   const onStateChangeRef = useRef(onStateChange);
   const onErrorMessageRef = useRef(onErrorMessage);
   const [state, setState] = useState<TerminalConnectionState>('disconnected');
   const [terminalScrollState, setTerminalScrollState] = useState<TerminalScrollState>(EMPTY_TERMINAL_SCROLL_STATE);
+  const [gatewayCopyMode, setGatewayCopyMode] = useState(false);
 
   useEffect(() => { onStateChangeRef.current = onStateChange; }, [onStateChange]);
   useEffect(() => { onErrorMessageRef.current = onErrorMessage; }, [onErrorMessage]);
@@ -221,8 +222,39 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
     if (!term) return;
     const scrollState = readTerminalScrollState();
 
-    if ((action === 'line-up' || action === 'page-up') && !scrollState.canScrollUp) return;
-    if ((action === 'page-down' || action === 'bottom') && !scrollState.canScrollDown) return;
+    const canUseLocalBuffer = action === 'line-up' || action === 'page-up'
+      ? scrollState.canScrollUp
+      : scrollState.canScrollDown;
+
+    // Hermes/OpenClaw run inside tmux. Full-screen TUIs keep their history in
+    // tmux copy mode instead of xterm's local buffer, so provide a controlled
+    // fallback for the visible scroll buttons and Shift+PageUp/PageDown.
+    if (!canUseLocalBuffer && mode === 'gateway') {
+      const ws = wsRef.current;
+      if (!ws || ws.readyState !== WebSocket.OPEN) return;
+
+      if (action === 'bottom') {
+        if (!gatewayCopyModeRef.current) return;
+        ws.send(JSON.stringify({ type: 'input', data: 'q' }));
+        gatewayCopyModeRef.current = false;
+        setGatewayCopyMode(false);
+        return;
+      }
+
+      if (action === 'page-down' && !gatewayCopyModeRef.current) return;
+      const enterCopyMode = gatewayCopyModeRef.current ? '' : '\x02[';
+      const key = action === 'line-up'
+        ? '\x1b[A'
+        : action === 'page-up'
+          ? '\x1b[5~'
+          : '\x1b[6~';
+      ws.send(JSON.stringify({ type: 'input', data: `${enterCopyMode}${key}` }));
+      gatewayCopyModeRef.current = true;
+      setGatewayCopyMode(true);
+      return;
+    }
+
+    if (!canUseLocalBuffer) return;
 
     switch (action) {
       case 'line-up':
@@ -236,11 +268,13 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
         break;
       case 'bottom':
         term.scrollToBottom();
+        gatewayCopyModeRef.current = false;
+        setGatewayCopyMode(false);
         break;
     }
 
     window.requestAnimationFrame(refreshTerminalScrollState);
-  }, [readTerminalScrollState, refreshTerminalScrollState]);
+  }, [mode, readTerminalScrollState, refreshTerminalScrollState]);
 
   const stopKeepAlive = useCallback(() => {
     if (keepAliveTimerRef.current) {
@@ -299,6 +333,18 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
         term.loadAddon(links);
         term.open(termRef.current);
         fit.fit();
+        term.attachCustomKeyEventHandler((event) => {
+          if (event.type !== 'keydown' || !event.shiftKey) return true;
+          if (event.key === 'PageUp') {
+            scrollTerminal('page-up');
+            return false;
+          }
+          if (event.key === 'PageDown') {
+            scrollTerminal('page-down');
+            return false;
+          }
+          return true;
+        });
         term.onScroll(refreshTerminalScrollState);
         term.onWriteParsed(refreshTerminalScrollState);
 
@@ -440,6 +486,7 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
     mode,
     refreshTerminalScrollState,
     reportError,
+    scrollTerminal,
     stopKeepAlive,
     stopReconnect,
   ]);
@@ -508,37 +555,12 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
     const root = terminalInteractionRef.current;
     if (!root) return;
 
-    const markSelected = () => {
-      terminalSelectedRef.current = true;
-    };
-    const markDeselected = (event: FocusEvent) => {
-      const nextTarget = event.relatedTarget as Node | null;
-      if (!nextTarget || !root.contains(nextTarget)) {
-        terminalSelectedRef.current = false;
-      }
-    };
-
-    root.addEventListener('pointerdown', markSelected, { capture: true });
-    root.addEventListener('focusin', markSelected);
-    root.addEventListener('focusout', markDeselected);
-    return () => {
-      root.removeEventListener('pointerdown', markSelected, { capture: true });
-      root.removeEventListener('focusin', markSelected);
-      root.removeEventListener('focusout', markDeselected);
-    };
-  }, [active]);
-
-  useEffect(() => {
-    const root = terminalInteractionRef.current;
-    if (!root) return;
-
     const onWheel = (event: WheelEvent) => {
       if (event.ctrlKey) return;
       const term = termInstance.current;
       if (!term) return;
 
       const lines = consumeWheelScrollLines(event);
-      const selected = terminalSelectedRef.current || termRef.current?.contains(document.activeElement);
       let didScroll = false;
 
       if (lines !== 0) {
@@ -551,10 +573,17 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
         } else {
           wheelRemainderRef.current = 0;
           refreshTerminalScrollState();
+          // Let xterm forward the wheel event to tmux when the full-screen
+          // gateway TUI owns scrollback. The previous capture handler stopped
+          // that event before tmux could enter copy mode.
+          if (mode === 'gateway' && lines < 0) {
+            gatewayCopyModeRef.current = true;
+            setGatewayCopyMode(true);
+          }
         }
       }
 
-      if (selected || didScroll) {
+      if (didScroll) {
         event.preventDefault();
         event.stopPropagation();
         event.stopImmediatePropagation();
@@ -563,7 +592,7 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
 
     root.addEventListener('wheel', onWheel, { passive: false, capture: true });
     return () => root.removeEventListener('wheel', onWheel, { capture: true });
-  }, [consumeWheelScrollLines, active, readTerminalScrollState, refreshTerminalScrollState]);
+  }, [consumeWheelScrollLines, active, mode, readTerminalScrollState, refreshTerminalScrollState]);
 
   // ── Handle resize ──
   useEffect(() => {
@@ -600,7 +629,7 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
           <button
             type="button"
             onClick={() => scrollTerminal('line-up')}
-            disabled={!terminalScrollState.canScrollUp}
+            disabled={!terminalScrollState.canScrollUp && mode !== 'gateway'}
             className="border-r border-[var(--border-default)] p-1.5 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-[var(--text-muted)] sm:border-b sm:border-r-0"
             title="Scroll up"
           >
@@ -609,7 +638,7 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
           <button
             type="button"
             onClick={() => scrollTerminal('page-up')}
-            disabled={!terminalScrollState.canScrollUp}
+            disabled={!terminalScrollState.canScrollUp && mode !== 'gateway'}
             className="border-r border-[var(--border-default)] p-1.5 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-[var(--text-muted)] sm:border-b sm:border-r-0"
             title="Page up"
           >
@@ -618,7 +647,7 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
           <button
             type="button"
             onClick={() => scrollTerminal('page-down')}
-            disabled={!terminalScrollState.canScrollDown}
+            disabled={!terminalScrollState.canScrollDown && !gatewayCopyMode}
             className="border-r border-[var(--border-default)] p-1.5 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-[var(--text-muted)] sm:border-b sm:border-r-0"
             title="Page down"
           >
@@ -627,7 +656,7 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
           <button
             type="button"
             onClick={() => scrollTerminal('bottom')}
-            disabled={!terminalScrollState.canScrollDown}
+            disabled={!terminalScrollState.canScrollDown && !gatewayCopyMode}
             className="p-1.5 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-[var(--text-muted)]"
             title="Scroll to bottom"
           >
