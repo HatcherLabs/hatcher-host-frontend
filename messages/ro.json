@@ -74,6 +74,8 @@
       "blogSub": "Notițe, lansări, deep dives.",
       "roadmapLabel": "Roadmap",
       "roadmapSub": "Ce lansăm în continuare.",
+      "usageLabel": "Utilizare platformă",
+      "usageSub": "Volum zilnic și total de tokeni.",
       "changelogLabel": "Changelog",
       "changelogSub": "Ce s-a schimbat și când."
     },
@@ -132,6 +134,7 @@
     "itemWhitepaper": "Whitepaper",
     "itemBlog": "Blog",
     "itemRoadmap": "Roadmap",
+    "itemUsage": "Utilizare platformă",
     "itemChangelog": "Changelog",
     "itemSecurity": "Securitate",
     "itemPrivacy": "Confidențialitate",

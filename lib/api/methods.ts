@@ -64,6 +64,7 @@ import type {
   CapacityAddonsSummaryResponse,
   ChatMessage,
   ChatSessionSummary,
+  ChatFolderSummary,
   Ticket,
   TicketMessage,
   TicketCategory,
@@ -2835,11 +2836,43 @@ export const api = {
     req<{ sessions: ChatSessionSummary[] }>(`/agents/${agentId}/chat/sessions`),
 
   /** Start a new chat session */
-  createChatSession: (agentId: string, title?: string) =>
+  createChatSession: (agentId: string, options?: { title?: string; folderId?: string }) =>
     req<{ session: ChatSessionSummary }>(`/agents/${agentId}/chat/sessions`, {
       method: "POST",
-      body: JSON.stringify(title ? { title } : {}),
+      body: JSON.stringify(options ?? {}),
     }),
+
+  /** Load chat folders */
+  getChatFolders: (agentId: string) =>
+    req<{ folders: ChatFolderSummary[] }>(`/agents/${agentId}/chat/folders`),
+
+  /** Create a chat folder */
+  createChatFolder: (agentId: string, name: string) =>
+    req<{ folder: ChatFolderSummary }>(`/agents/${agentId}/chat/folders`, {
+      method: "POST",
+      body: JSON.stringify({ name }),
+    }),
+
+  /** Rename a chat folder */
+  renameChatFolder: (agentId: string, folderId: string, name: string) =>
+    req<{ folder: ChatFolderSummary }>(
+      `/agents/${agentId}/chat/folders/${encodeURIComponent(folderId)}`,
+      { method: "PATCH", body: JSON.stringify({ name }) },
+    ),
+
+  /** Delete a chat folder without deleting its chats */
+  deleteChatFolder: (agentId: string, folderId: string) =>
+    req<{ deleted: boolean }>(
+      `/agents/${agentId}/chat/folders/${encodeURIComponent(folderId)}`,
+      { method: "DELETE" },
+    ),
+
+  /** Move a chat session into a folder, or null to remove it */
+  moveChatSession: (agentId: string, sessionId: string, folderId: string | null) =>
+    req<{ sessionId: string; folderId: string | null }>(
+      `/agents/${agentId}/chat/sessions/${encodeURIComponent(sessionId)}/folder`,
+      { method: "PATCH", body: JSON.stringify({ folderId }) },
+    ),
 
   /** Delete a chat session */
   deleteChatSession: (agentId: string, sessionId: string) =>

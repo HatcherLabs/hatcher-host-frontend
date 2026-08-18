@@ -28,6 +28,16 @@ export interface ChatSessionSummary {
   startedAt: number;
   updatedAt: number;
   current: boolean;
+  folderId: string | null;
+}
+
+export interface ChatFolderSummary {
+  id: string;
+  name: string;
+  sortOrder: number;
+  sessionCount: number;
+  createdAt: number;
+  updatedAt: number;
 }
 
 /**

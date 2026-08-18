@@ -73,6 +73,8 @@
       "blogSub": "Ghi chú, phát hành, lặn sâu.",
       "roadmapLabel": "Lộ trình",
       "roadmapSub": "Những gì chúng tôi gửi tiếp theo.",
+      "usageLabel": "Mức sử dụng nền tảng",
+      "usageSub": "Lượng token hàng ngày và trọn đời.",
       "changelogLabel": "Nhật ký thay đổi",
       "changelogSub": "Điều gì đã thay đổi và khi nào."
     },
@@ -132,6 +134,7 @@
     "itemWhitepaper": "Sách trắng",
     "itemBlog": "Blog",
     "itemRoadmap": "Lộ trình",
+    "itemUsage": "Mức sử dụng nền tảng",
     "itemChangelog": "Nhật ký thay đổi",
     "itemSecurity": "Bảo mật",
     "itemPrivacy": "Quyền riêng tư",

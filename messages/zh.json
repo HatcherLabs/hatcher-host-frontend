@@ -73,6 +73,8 @@
       "blogSub": "笔记、发布、深度文章。",
       "roadmapLabel": "路线图",
       "roadmapSub": "接下来要发布什么。",
+      "usageLabel": "平台用量",
+      "usageSub": "每日及累计 Token 用量。",
       "changelogLabel": "更新日志",
       "changelogSub": "什么变了，何时变的。"
     },
@@ -132,6 +134,7 @@
     "itemWhitepaper": "Whitepaper",
     "itemBlog": "博客",
     "itemRoadmap": "路线图",
+    "itemUsage": "平台用量",
     "itemChangelog": "更新日志",
     "itemSecurity": "安全",
     "itemPrivacy": "隐私",

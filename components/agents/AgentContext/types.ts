@@ -1,4 +1,10 @@
-import type { Agent, AgentFeature, ChatAttachmentPayload, ChatSessionSummary } from '@/lib/api';
+import type {
+  Agent,
+  AgentFeature,
+  ChatAttachmentPayload,
+  ChatFolderSummary,
+  ChatSessionSummary,
+} from '@/lib/api';
 import type { AgentFramework } from '@hatcher/shared';
 import type { ActiveModelDisplay } from '@/lib/hosted-model-catalog';
 import type { ChatMessageToolEvent } from '../tabs/ChatTab/chatToolEvents';
@@ -115,10 +121,15 @@ export interface AgentContextValue {
   sendCooldown: boolean;
   wsConnected: boolean;
   chatSessions: ChatSessionSummary[];
+  chatFolders: ChatFolderSummary[];
   activeChatSessionId: string | null;
   setActiveChatSessionId: (sessionId: string) => void;
-  startNewChatSession: () => Promise<void>;
+  startNewChatSession: (folderId?: string) => Promise<void>;
   deleteChatSession: (sessionId: string) => Promise<void>;
+  createChatFolder: (name: string) => Promise<boolean>;
+  renameChatFolder: (folderId: string, name: string) => Promise<boolean>;
+  deleteChatFolder: (folderId: string) => Promise<boolean>;
+  moveChatSession: (sessionId: string, folderId: string | null) => Promise<boolean>;
   deletingChatSessionId: string | null;
   refreshChatSessions: () => Promise<void>;
   /** Tool calls currently in flight on the agent container, surfaced live

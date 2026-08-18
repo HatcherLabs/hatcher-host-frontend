@@ -73,6 +73,8 @@
       "blogSub": "Notes, releases, deep dives.",
       "roadmapLabel": "Roadmap",
       "roadmapSub": "Ce qui arrive ensuite.",
+      "usageLabel": "Utilisation de la plateforme",
+      "usageSub": "Volume quotidien et total de jetons.",
       "changelogLabel": "Changelog",
       "changelogSub": "Ce qui a changé et quand."
     },
@@ -132,6 +134,7 @@
     "itemWhitepaper": "Whitepaper",
     "itemBlog": "Blog",
     "itemRoadmap": "Roadmap",
+    "itemUsage": "Utilisation de la plateforme",
     "itemChangelog": "Changelog",
     "itemSecurity": "Sécurité",
     "itemPrivacy": "Confidentialité",

@@ -73,6 +73,8 @@
       "blogSub": "नोट्स, रिलीज़, गहरे गोताखोरी।",
       "roadmapLabel": "रोडमैप",
       "roadmapSub": "हम आगे क्या भेजते हैं।",
+      "usageLabel": "प्लेटफ़ॉर्म उपयोग",
+      "usageSub": "दैनिक और कुल टोकन मात्रा।",
       "changelogLabel": "चैंज",
       "changelogSub": "क्या बदल गया और कब।"
     },
@@ -132,6 +134,7 @@
     "itemWhitepaper": "श्वेतपत्र",
     "itemBlog": "ब्लॉग",
     "itemRoadmap": "रोडमैप",
+    "itemUsage": "प्लेटफ़ॉर्म उपयोग",
     "itemChangelog": "चैंज",
     "itemSecurity": "प्रतिभूति",
     "itemPrivacy": "गोपनीयता",

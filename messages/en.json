@@ -74,6 +74,8 @@
       "blogSub": "Notes, releases, deep dives.",
       "roadmapLabel": "Roadmap",
       "roadmapSub": "What we ship next.",
+      "usageLabel": "Platform usage",
+      "usageSub": "Daily and lifetime token volume.",
       "changelogLabel": "Changelog",
       "changelogSub": "What changed and when."
     },
@@ -132,6 +134,7 @@
     "itemWhitepaper": "Whitepaper",
     "itemBlog": "Blog",
     "itemRoadmap": "Roadmap",
+    "itemUsage": "Platform usage",
     "itemChangelog": "Changelog",
     "itemSecurity": "Security",
     "itemPrivacy": "Privacy",

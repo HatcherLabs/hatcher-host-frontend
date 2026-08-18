@@ -118,6 +118,13 @@ export const NAV_GROUPS: ReadonlyArray<NavGroup> = [
         glyph: "𝍌",
       },
       {
+        key: "usage",
+        labelKey: "usageLabel",
+        subKey: "usageSub",
+        href: "/usage",
+        glyph: "▥",
+      },
+      {
         key: "changelog",
         labelKey: "changelogLabel",
         subKey: "changelogSub",
@@ -160,6 +167,7 @@ export const FOOTER_COLUMNS = [
       { labelKey: "itemWhitepaper", href: "/whitepaper" as Href },
       { labelKey: "itemBlog", href: "/blog" as Href },
       { labelKey: "itemRoadmap", href: "/roadmap" as Href },
+      { labelKey: "itemUsage", href: "/usage" as Href },
       { labelKey: "itemChangelog", href: "/changelog" as Href },
       { labelKey: "itemSecurity", href: "/security" as Href },
     ],

@@ -17,6 +17,8 @@ import {
   Star,
   ChevronDown,
   ChevronRight,
+  BadgeCheck,
+  KeyRound,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import {
@@ -39,6 +41,12 @@ interface InstalledItem {
   status: 'installed' | 'pending' | 'pending_restart' | 'failed';
   error?: string;
   requiresRestart?: boolean;
+  author?: string;
+  category?: string;
+  tags?: string[];
+  isOfficial?: boolean;
+  latestVersion?: string | null;
+  verificationTier?: string | null;
 }
 
 interface AvailableItem {
@@ -47,6 +55,12 @@ interface AvailableItem {
   description: string | null;
   source: string;
   requiresRestart?: boolean;
+  author?: string;
+  category?: string;
+  tags?: string[];
+  isOfficial?: boolean;
+  latestVersion?: string | null;
+  verificationTier?: string | null;
 }
 
 interface PluginLimits {
@@ -160,6 +174,98 @@ function StatusIndicator({ status, error }: { status: InstalledItem['status']; e
   );
 }
 
+interface CapabilityDetailsProps {
+  item: {
+    description?: string | null;
+    source: string;
+    author?: string;
+    category?: string;
+    tags?: string[];
+    isOfficial?: boolean;
+    latestVersion?: string | null;
+    verificationTier?: string | null;
+    requiresRestart?: boolean;
+  };
+  type: 'skill' | 'plugin';
+  framework: string;
+  bundled?: boolean;
+}
+
+function CapabilityDetails({ item, type, framework, bundled = false }: CapabilityDetailsProps) {
+  const capabilities = item.tags?.length
+    ? item.tags
+    : item.category
+      ? [item.category]
+      : [];
+
+  return (
+    <div className="mt-1 space-y-3 rounded-lg border border-[var(--border-default)] bg-black/10 p-3 text-xs">
+      <div>
+        <p className="mb-1 font-semibold text-[var(--text-secondary)]">What it does</p>
+        <p className="leading-relaxed text-[var(--text-muted)]">
+          {item.description || 'The catalog does not provide a detailed description yet.'}
+        </p>
+      </div>
+      {capabilities.length > 0 && (
+        <div>
+          <p className="mb-1.5 font-semibold text-[var(--text-secondary)]">Capabilities</p>
+          <div className="flex flex-wrap gap-1.5">
+            {capabilities.map((tag) => (
+              <span
+                key={tag}
+                className="rounded-md border border-white/5 bg-white/5 px-1.5 py-0.5 text-[10px] text-[var(--text-muted)]"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+      <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-[11px]">
+        <dt className="text-[var(--text-muted)]">Runtime</dt>
+        <dd className="text-[var(--text-secondary)]">{framework}</dd>
+        <dt className="text-[var(--text-muted)]">Source</dt>
+        <dd className="text-[var(--text-secondary)]">{item.source}</dd>
+        {item.author && (
+          <>
+            <dt className="text-[var(--text-muted)]">Author</dt>
+            <dd className="text-[var(--text-secondary)]">{item.author}</dd>
+          </>
+        )}
+        {item.latestVersion && (
+          <>
+            <dt className="text-[var(--text-muted)]">Version</dt>
+            <dd className="text-[var(--text-secondary)]">{item.latestVersion}</dd>
+          </>
+        )}
+        {(item.isOfficial || item.verificationTier) && (
+          <>
+            <dt className="text-[var(--text-muted)]">Verification</dt>
+            <dd className="flex items-center gap-1 text-[var(--status-live)]">
+              <BadgeCheck size={11} />
+              {item.isOfficial ? 'Official' : item.verificationTier}
+            </dd>
+          </>
+        )}
+      </dl>
+      <div className="flex items-start gap-2 rounded-md bg-[var(--color-warning-bg)] px-2.5 py-2 text-[11px] leading-relaxed text-[var(--text-secondary)]">
+        <KeyRound size={12} className="mt-0.5 shrink-0 text-[var(--color-warning)]" />
+        <span>
+          If this {type} needs credentials, store them in Agent → Config → Environment Variables.
+          Never paste secrets into chat.
+        </span>
+      </div>
+      <p className="text-[10px] leading-relaxed text-[var(--text-muted)]">
+        {bundled
+          ? 'Bundled capabilities are maintained with the agent runtime and apply when enabled.'
+          : item.requiresRestart
+            ? 'A runtime restart is required after installation.'
+            : 'Installation adds this capability to the agent workspace. A running agent may restart to apply it.'}
+      </p>
+    </div>
+  );
+}
+
 // ─── Toggle Switch ──────────────────────────────────────────
 
 function ToggleSwitch({
@@ -220,6 +326,7 @@ export function PluginsTab() {
   const [uninstalling, setUninstalling] = useState<string | null>(null);
   const [confirmUninstall, setConfirmUninstall] = useState<string | null>(null);
   const [manualName, setManualName] = useState('');
+  const [expandedDetails, setExpandedDetails] = useState<string | null>(null);
 
   // Bundled skills state
   const [bundledSkills, setBundledSkills] = useState<BundledSkill[]>([]);
@@ -376,6 +483,10 @@ export function PluginsTab() {
   // ─── Filtered available lists ───────────────────────────────
 
   const installedNames = useMemo(() => new Set(installed.map(i => i.name)), [installed]);
+  const availableCatalog = useMemo(
+    () => new Map([...availableSkills, ...availablePlugins].map((item) => [item.name, item])),
+    [availablePlugins, availableSkills],
+  );
 
   // Search results: only populated when user is actively searching
   const searchResults = useMemo(() => {
@@ -416,8 +527,13 @@ export function PluginsTab() {
     return items.filter(i => {
       if (subTab === 'skills') return i.type === 'skill';
       return i.type === 'plugin';
-    }).filter(i => !installedNames.has(i.name));
-  }, [agent?.framework, subTab, installedNames]);
+    }).filter(i => !installedNames.has(i.name)).map((item) => ({
+      ...item,
+      ...(availableCatalog.get(item.name) ?? {}),
+      type: item.type,
+      source: item.source,
+    }));
+  }, [agent?.framework, availableCatalog, subTab, installedNames]);
 
   const bundledEnabledCount = bundledSkills.filter(s => s.enabled).length;
 
@@ -582,6 +698,16 @@ export function PluginsTab() {
                                 {skill.category}
                               </span>
                             )}
+                            <button
+                              type="button"
+                              onClick={() => setExpandedDetails((current) =>
+                                current === `bundled:${skill.id}` ? null : `bundled:${skill.id}`
+                              )}
+                              className="mt-2 flex items-center gap-1 text-[10px] font-medium text-[var(--color-accent)] hover:underline"
+                            >
+                              {expandedDetails === `bundled:${skill.id}` ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
+                              {expandedDetails === `bundled:${skill.id}` ? 'Hide details' : 'View details'}
+                            </button>
                           </div>
                           <div className="flex-shrink-0 pt-0.5">
                             <ToggleSwitch
@@ -591,6 +717,19 @@ export function PluginsTab() {
                             />
                           </div>
                         </div>
+                        {expandedDetails === `bundled:${skill.id}` && (
+                          <CapabilityDetails
+                            item={{
+                              description: skill.description,
+                              source: 'bundled',
+                              category: skill.category,
+                              tags: skill.tags,
+                            }}
+                            type="skill"
+                            framework={agent.framework}
+                            bundled
+                          />
+                        )}
                         {skill.enabled && (
                           <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] shadow-[0_0_4px_rgba(6,182,212,0.6)]" />
                         )}
@@ -651,6 +790,19 @@ export function PluginsTab() {
                   <SourceBadge source={item.source} />
                   <StatusIndicator status={item.status} error={item.error} />
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setExpandedDetails((current) =>
+                    current === `installed:${item.name}` ? null : `installed:${item.name}`
+                  )}
+                  className="flex w-fit items-center gap-1 text-[11px] font-medium text-[var(--color-accent)] hover:underline"
+                >
+                  {expandedDetails === `installed:${item.name}` ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+                  {expandedDetails === `installed:${item.name}` ? 'Hide details' : 'View details'}
+                </button>
+                {expandedDetails === `installed:${item.name}` && (
+                  <CapabilityDetails item={item} type={item.type} framework={agent.framework} />
+                )}
               </GlassCard>
             ))}
           </div>
@@ -713,6 +865,23 @@ export function PluginsTab() {
                       </span>
                     )}
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => setExpandedDetails((current) =>
+                      current === `available:${item.name}` ? null : `available:${item.name}`
+                    )}
+                    className="flex w-fit items-center gap-1 text-[11px] font-medium text-[var(--color-accent)] hover:underline"
+                  >
+                    {expandedDetails === `available:${item.name}` ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+                    {expandedDetails === `available:${item.name}` ? 'Hide details' : 'View details'}
+                  </button>
+                  {expandedDetails === `available:${item.name}` && (
+                    <CapabilityDetails
+                      item={item}
+                      type={subTab === 'skills' ? 'skill' : 'plugin'}
+                      framework={agent.framework}
+                    />
+                  )}
                 </GlassCard>
               ))}
             </div>
@@ -756,6 +925,19 @@ export function PluginsTab() {
                     <TypeBadge type={item.type} />
                     <SourceBadge source={item.source} />
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => setExpandedDetails((current) =>
+                      current === `recommended:${item.name}` ? null : `recommended:${item.name}`
+                    )}
+                    className="flex w-fit items-center gap-1 text-[11px] font-medium text-[var(--color-accent)] hover:underline"
+                  >
+                    {expandedDetails === `recommended:${item.name}` ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+                    {expandedDetails === `recommended:${item.name}` ? 'Hide details' : 'View details'}
+                  </button>
+                  {expandedDetails === `recommended:${item.name}` && (
+                    <CapabilityDetails item={item} type={item.type} framework={agent.framework} />
+                  )}
                 </GlassCard>
               ))}
             </div>
