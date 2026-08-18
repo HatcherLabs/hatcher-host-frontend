@@ -8,7 +8,7 @@
       color-mix(in srgb, var(--color-accent) 12%, transparent),
       transparent 32rem
     ),
-    var(--bg-primary);
+    var(--bg-base);
 }
 
 .hero,
@@ -235,8 +235,8 @@
   margin-top: 1rem;
   padding: 2rem;
   border-radius: 1rem;
-  background: var(--text-primary);
-  color: var(--bg-primary);
+  background: var(--control-active);
+  color: var(--control-active-text);
 }
 .cta p {
   margin: 0 0 0.35rem;
