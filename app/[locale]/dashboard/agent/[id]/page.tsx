@@ -233,6 +233,7 @@ export default function AgentManagePage() {
   const [ownedAgents, setOwnedAgents] = useState<Agent[]>([]);
   const [ownedAgentsLoading, setOwnedAgentsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const statusPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const validTabs: Tab[] = ['overview','config','integrations','connectors','skills','plugins','files','logs','terminal','dev','memory','sessions','knowledge','schedules','chat','mail','stats','wallet','robinhood'];
   // 'skills' kept in validTabs for backwards compat (deep links), but redirects to plugins tab
@@ -359,10 +360,18 @@ export default function AgentManagePage() {
 
   const loadAgent = useCallback(async () => {
     if (!isAuthenticated) return;
-    const res = await api.getAgent(id);
-    setLoading(false);
-    if (res.success) {
-      setAgent(res.data);
+    setLoadError(null);
+    try {
+      const res = await api.getAgent(id);
+      if (res.success) {
+        setAgent(res.data);
+      } else {
+        setLoadError(res.error || 'The workspace could not be loaded.');
+      }
+    } catch (error) {
+      setLoadError(error instanceof Error ? error.message : 'The workspace could not be loaded.');
+    } finally {
+      setLoading(false);
     }
   }, [id, isAuthenticated]);
 
@@ -402,6 +411,7 @@ export default function AgentManagePage() {
       logs.setLogs([]);
       setStats(null);
       setAgent(null);
+      setLoadError(null);
       setLoading(true);
       historyLoadedRef.current = false;
       lastSavedCountRef.current = 0;
@@ -1581,6 +1591,33 @@ export default function AgentManagePage() {
   }
 
   if (!agent) {
+    if (loadError) {
+      return (
+        <div className="mx-auto max-w-md px-4 py-24 text-center text-[var(--text-primary)]">
+          <div className="mb-4 text-4xl text-[var(--color-warning)]">!</div>
+          <h1 className="mb-3 text-2xl font-bold">Workspace did not load</h1>
+          <p className="mb-6 text-[var(--text-muted)]">{loadError}</p>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                setLoading(true);
+                void loadAgent();
+              }}
+              className="inline-flex items-center gap-2 rounded-lg bg-[var(--color-accent)] px-4 py-2 font-medium text-black transition-opacity hover:opacity-90"
+            >
+              <RotateCcw size={16} /> Retry
+            </button>
+            <Link
+              href="/dashboard/agents"
+              className="inline-flex items-center gap-2 rounded-lg border border-[var(--border-default)] px-4 py-2 text-[var(--text-secondary)] transition-colors hover:border-[var(--color-accent)]/40"
+            >
+              <ArrowLeft size={16} /> {tNotFound('backToAgents')}
+            </Link>
+          </div>
+        </div>
+      );
+    }
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center text-[var(--text-primary)]">
         <div className="text-4xl mb-4 text-[var(--color-accent)]">{tNotFound('code')}</div>

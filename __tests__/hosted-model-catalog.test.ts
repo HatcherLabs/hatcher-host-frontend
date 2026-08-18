@@ -122,11 +122,16 @@ describe('hosted model catalog', () => {
   it('shows partner-primary routes and keeps Xiaomi on the Hatcher-hosted route', () => {
     expect(resolveActiveModelDisplay({
       provider: 'openrouter',
-      model: 'openserv/serv-mini',
+      model: 'openserv/deepseek-v4-pro',
     })).toMatchObject({
       route: 'OpenServ primary / OpenRouter fallback',
       privacy: 'OpenServ-hosted',
     });
+
+    expect(filterHostedModels({ provider: 'openserv' }).map((model) => model.id)).toEqual([
+      'openserv/deepseek-v4-flash',
+      'openserv/deepseek-v4-pro',
+    ]);
 
     expect(resolveActiveModelDisplay({
       provider: 'openrouter',

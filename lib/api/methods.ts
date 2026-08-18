@@ -577,7 +577,9 @@ export const api = {
     }),
 
   /** Get a single agent */
-  getAgent: (id: string) => req<Agent>(`/agents/${id}`),
+  getAgent: (id: string) => req<Agent>(`/agents/${id}`, {
+    signal: AbortSignal.timeout(12_000),
+  }),
 
   /** Get the agent's public/owner-safe on-chain passport. */
   getAgentPassport: (id: string) =>
