@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import NextImage from 'next/image';
 import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
-import { ArrowRight, CheckCircle, CreditCard, Database, Rocket, ShieldCheck, Users, Zap } from 'lucide-react';
+import { ArrowRight, CheckCircle, CreditCard, Database, Gift, Rocket, ShieldCheck, Users, Zap } from 'lucide-react';
 import { SOCIAL_LINKS } from '@/lib/config';
 import { TokenBurnTracker } from '@/components/token/TokenBurnTracker';
 
@@ -44,6 +44,12 @@ const TOKEN_HUB_LINKS = [
     icon: Zap,
     title: 'Staking & rewards',
     description: 'Stake $HATCHER and review token plus AI Credit rewards.',
+  },
+  {
+    href: '/stock-rewards',
+    icon: Gift,
+    title: 'AI Stock Rewards',
+    description: 'Track public NVDAx distributions to eligible HATCHER holders and stakers.',
   },
   {
     href: '/dashboard/billing',
@@ -203,7 +209,7 @@ export default function TokenPage() {
               <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[var(--text-primary)]">Everything token-related, in one place</h2>
               <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">The main navigation now has one Token entry. Staking, payments, market links, burns, and documentation remain available here.</p>
             </div>
-            <div className="grid gap-3 md:grid-cols-3">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {TOKEN_HUB_LINKS.map((item) => {
                 const Icon = item.icon;
                 return (

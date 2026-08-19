@@ -1,0 +1,112 @@
+.page { min-height: 100vh; overflow: hidden; color: var(--text-primary); background: var(--bg-base); }
+.hero, .sectionInner, .epochInner { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+.hero { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(360px, .92fr); gap: clamp(52px, 8vw, 104px); align-items: center; min-height: min(700px, calc(100svh - 82px)); padding: clamp(72px, 9vw, 118px) 0; }
+.heroCopy h1, .sectionHeading h2, .verification h2 { margin: 0; font-family: var(--font-inter), var(--font-body), system-ui, sans-serif; letter-spacing: -.045em; }
+.heroCopy h1 { max-width: 720px; font-size: clamp(48px, 6.4vw, 84px); font-weight: 740; line-height: .98; text-wrap: balance; }
+.heroCopy > p { max-width: 680px; margin: 28px 0 0; color: var(--text-secondary); font-size: clamp(17px, 1.45vw, 20px); line-height: 1.6; }
+.heroActions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+.primaryAction, .secondaryAction { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; gap: 9px; border: 1px solid transparent; border-radius: var(--radius); padding: 0 18px; font-size: 14px; font-weight: 680; text-decoration: none; transition: 160ms ease; }
+.primaryAction { color: #fff; background: var(--action); border-color: var(--action); }
+.primaryAction:hover { background: var(--action-hover); border-color: var(--action-hover); }
+.secondaryAction { color: var(--text-primary); background: var(--bg-card); border-color: var(--border-default); }
+.secondaryAction:hover { background: var(--bg-hover); border-color: var(--border-hover); }
+.primaryAction svg, .secondaryAction svg, .roundSummary > a svg, .receiptLinks svg, .payoutRow a svg, .verifyLinks svg { width: 15px; height: 15px; }
+.totalPanel { padding: clamp(28px, 4vw, 42px); border: 1px solid var(--border-default); border-radius: 18px; background: var(--bg-card); box-shadow: var(--shadow-card); }
+.totalHeader { display: flex; align-items: center; justify-content: space-between; gap: 20px; color: var(--text-muted); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.live, .delayed { display: inline-flex; align-items: center; gap: 7px; letter-spacing: .02em; text-transform: none; }
+.live { color: var(--color-success); } .delayed { color: var(--text-muted); }
+.live i, .delayed i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 13%, transparent); }
+.totalPanel > strong { display: block; margin-top: 38px; font-size: clamp(48px, 6vw, 74px); font-weight: 710; line-height: 1; letter-spacing: -.055em; overflow-wrap: anywhere; }
+.asset { display: block; margin-top: 9px; color: var(--accent); font-size: 17px; font-weight: 760; letter-spacing: .08em; }
+.heroMetrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin: 42px 0 0; padding-top: 24px; border-top: 1px solid var(--border-default); }
+.heroMetrics div { min-width: 0; padding: 0 18px; border-left: 1px solid var(--border-default); }
+.heroMetrics div:first-child { padding-left: 0; border-left: 0; }
+.heroMetrics dt, .epochInner dt, .roundSummary dt { color: var(--text-muted); font-size: 11px; font-weight: 650; }
+.heroMetrics dd { margin: 8px 0 0; font-size: 14px; font-weight: 700; }
+.rules, .ledgerSection { padding: clamp(76px, 9vw, 112px) 0; border-top: 1px solid var(--border-default); }
+.sectionHeading { max-width: 670px; }
+.sectionHeading h2, .verification h2 { font-size: clamp(34px, 4vw, 52px); font-weight: 720; line-height: 1.05; text-wrap: balance; }
+.sectionHeading p { margin: 16px 0 0; color: var(--text-secondary); font-size: 16px; line-height: 1.6; }
+.ruleList { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(28px, 4vw, 64px); margin: 64px 0 0; padding: 0; list-style: none; }
+.ruleList li { padding-top: 20px; border-top: 1px solid var(--border-default); }
+.ruleList li > span { color: var(--accent); font-family: var(--font-mono), monospace; font-size: 12px; font-weight: 700; }
+.ruleList h3 { margin: 26px 0 0; font-size: 18px; letter-spacing: -.02em; }
+.ruleList p { margin: 12px 0 0; color: var(--text-secondary); font-size: 14px; line-height: 1.65; }
+.epochBand { padding: 28px 0; border-block: 1px solid var(--border-default); background: var(--bg-elevated); }
+.epochInner { display: flex; align-items: center; justify-content: space-between; gap: 44px; }
+.epochTitle { display: flex; align-items: center; gap: 14px; min-width: 250px; }
+.epochTitle > svg { width: 22px; height: 22px; color: var(--accent); }
+.epochTitle span { display: block; color: var(--text-muted); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.epochTitle strong { display: block; margin-top: 5px; font-size: 13px; }
+.epochInner > dl { display: grid; grid-template-columns: repeat(4, minmax(100px, 1fr)); flex: 1; margin: 0; }
+.epochInner > dl div { padding: 0 22px; border-left: 1px solid var(--border-default); }
+.epochInner dd { margin: 6px 0 0; font-size: 14px; font-weight: 700; }
+.ledgerHeading { display: flex; align-items: end; justify-content: space-between; gap: 30px; }
+.ledgerHeading > span { color: var(--text-muted); font-size: 12px; font-weight: 700; }
+.emptyState { display: grid; justify-items: center; margin-top: 54px; padding: 72px 24px; border-block: 1px solid var(--border-default); text-align: center; }
+.emptyState svg { width: 28px; height: 28px; color: var(--accent); }
+.emptyState h3 { margin: 20px 0 0; font-size: 18px; }
+.emptyState p { max-width: 520px; margin: 10px 0 0; color: var(--text-secondary); font-size: 14px; line-height: 1.6; }
+.rounds { margin-top: 48px; border-top: 1px solid var(--border-default); }
+.round { border-bottom: 1px solid var(--border-default); }
+.roundSummary { display: grid; grid-template-columns: 180px minmax(0, 1fr) auto; gap: 30px; align-items: center; padding: 30px 0; }
+.roundIdentity span { color: var(--accent); font-size: 11px; font-weight: 760; letter-spacing: .08em; text-transform: uppercase; }
+.roundIdentity strong { display: block; margin-top: 7px; font-size: 13px; }
+.roundSummary dl { display: grid; grid-template-columns: repeat(5, minmax(88px, 1fr)); margin: 0; }
+.roundSummary dl div { padding: 0 18px; border-left: 1px solid var(--border-default); }
+.roundSummary dd { margin: 6px 0 0; font-size: 13px; font-weight: 700; }
+.roundSummary > a, .receiptLinks a, .payoutRow a, .verifyLinks a { display: inline-flex; align-items: center; gap: 6px; color: var(--accent); font-size: 12px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.roundSummary > a:hover, .receiptLinks a:hover, .payoutRow a:hover, .verifyLinks a:hover { color: var(--accent-hover); }
+.roundDetails { padding-bottom: 28px; }
+.roundDetails summary { width: fit-content; cursor: pointer; color: var(--text-secondary); font-size: 12px; font-weight: 680; }
+.roundDetails summary:hover { color: var(--text-primary); }
+.receiptLinks { display: flex; flex-wrap: wrap; gap: 14px 24px; margin: 24px 0; }
+.payoutTable { border: 1px solid var(--border-default); border-radius: var(--radius); overflow: hidden; }
+.payoutHeader, .payoutRow { display: grid; grid-template-columns: minmax(150px, 1.2fr) minmax(110px, .8fr) minmax(160px, 1fr); gap: 20px; align-items: center; padding: 12px 16px; }
+.payoutHeader { color: var(--text-muted); background: var(--bg-elevated); font-size: 10px; font-weight: 760; letter-spacing: .08em; text-transform: uppercase; }
+.payoutRow { border-top: 1px solid var(--border-default); font-size: 12px; }
+.payoutRow code { color: var(--text-secondary); font-family: var(--font-mono), monospace; }
+.verification { padding: 54px 0; border-top: 1px solid var(--border-default); background: var(--bg-elevated); }
+.verification .sectionInner { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 28px; align-items: start; }
+.verification .sectionInner > svg { width: 26px; height: 26px; margin-top: 5px; color: var(--accent); }
+.verification h2 { font-size: clamp(27px, 3vw, 38px); }
+.verification p { max-width: 710px; margin: 14px 0 0; color: var(--text-secondary); font-size: 14px; line-height: 1.7; }
+.verifyLinks { display: grid; gap: 12px; padding-top: 7px; }
+.disclosure { padding: 24px 0; border-top: 1px solid var(--border-default); }
+.disclosure .sectionInner { display: flex; align-items: flex-start; gap: 12px; }
+.disclosure svg { width: 16px; height: 16px; flex: none; margin-top: 2px; color: var(--text-muted); }
+.disclosure p { margin: 0; color: var(--text-muted); font-size: 11px; line-height: 1.6; }
+@media (max-width: 920px) {
+  .hero { grid-template-columns: 1fr; min-height: auto; }
+  .ruleList { grid-template-columns: 1fr; }
+  .epochInner { align-items: flex-start; flex-direction: column; }
+  .epochInner > dl { width: 100%; }
+  .roundSummary { grid-template-columns: 130px minmax(0, 1fr); }
+  .roundSummary > a { grid-column: 2; }
+  .roundSummary dl { grid-template-columns: repeat(2, minmax(120px, 1fr)); row-gap: 20px; }
+  .verification .sectionInner { grid-template-columns: auto minmax(0, 1fr); }
+  .verifyLinks { grid-column: 2; }
+}
+@media (max-width: 640px) {
+  .hero, .sectionInner, .epochInner { width: min(100% - 28px, 1180px); }
+  .hero { gap: 42px; padding: 62px 0 70px; }
+  .heroCopy h1 { font-size: clamp(42px, 13vw, 60px); }
+  .heroActions { flex-direction: column; align-items: stretch; }
+  .totalPanel { padding: 24px; }
+  .totalHeader { align-items: flex-start; flex-direction: column; }
+  .heroMetrics { grid-template-columns: 1fr; gap: 18px; }
+  .heroMetrics div, .heroMetrics div:first-child { padding: 0 0 18px; border-left: 0; border-bottom: 1px solid var(--border-default); }
+  .heroMetrics div:last-child { padding-bottom: 0; border-bottom: 0; }
+  .epochInner > dl { grid-template-columns: repeat(2, 1fr); row-gap: 22px; }
+  .epochInner > dl div { padding: 0 14px; }
+  .ledgerHeading { align-items: flex-start; flex-direction: column; }
+  .roundSummary { grid-template-columns: 1fr; gap: 24px; }
+  .roundSummary > a { grid-column: auto; }
+  .roundSummary dl { grid-template-columns: repeat(2, 1fr); }
+  .roundSummary dl div { padding: 0 10px; }
+  .payoutTable { overflow-x: auto; }
+  .payoutHeader, .payoutRow { min-width: 570px; }
+  .verification .sectionInner { grid-template-columns: 1fr; }
+  .verification .sectionInner > svg { margin: 0; }
+  .verifyLinks { grid-column: auto; }
+}
