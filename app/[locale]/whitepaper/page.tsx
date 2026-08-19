@@ -41,7 +41,7 @@ const PRODUCT_POINTS = [
   'File manager, workspace storage, runtime logs, and monitoring',
   'Model selector, provider table, BYOK, and AI Credits',
   'Telegram, Discord, WhatsApp, Slack, X/Twitter, Nostr, and web integrations',
-  'Solana, Base, Cyberia, and SKALE wallet surfaces',
+  'Solana, Base, Cyberia, BOT Chain, Robinhood Chain, and SKALE wallet surfaces',
   'Agent-to-agent communication and orchestration primitives',
   'Crypto payments through SOL, USDC, $HATCHER, and card',
 ] as const;

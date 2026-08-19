@@ -70,8 +70,8 @@ type WalletSection = 'overview' | 'networks' | 'providers' | 'security';
 type ProviderPanelId = 'xona' | 'earnfi' | 'oobe' | 'clawville' | 'mpp32' | 'metaplex' | 'virtuals';
 type AgentRuntime = 'hermes' | 'openclaw' | (string & {});
 
-const TAB_ORDER: WalletPanel[] = ['passport', 'skale', 'solana', 'base', 'cyberia'];
-const NETWORK_ORDER: AgentPassportNetworkId[] = ['skale', 'solana', 'base', 'cyberia'];
+const TAB_ORDER: WalletPanel[] = ['passport', 'skale', 'solana', 'base', 'cyberia', 'botchain'];
+const NETWORK_ORDER: AgentPassportNetworkId[] = ['skale', 'solana', 'base', 'cyberia', 'botchain'];
 const WALLET_SECTIONS: ReadonlyArray<{
   id: WalletSection;
   label: string;
@@ -79,7 +79,7 @@ const WALLET_SECTIONS: ReadonlyArray<{
   icon: ReactNode;
 }> = [
   { id: 'overview', label: 'Overview', description: 'Identity, balances, and readiness.', icon: <Fingerprint size={14} /> },
-  { id: 'networks', label: 'Networks', description: 'SKALE, Solana, Base, and Cyberia wallets.', icon: <Layers3 size={14} /> },
+  { id: 'networks', label: 'Networks', description: 'SKALE, Solana, Base, Cyberia, and BOT Chain wallets.', icon: <Layers3 size={14} /> },
   { id: 'providers', label: 'Providers', description: 'Partner rails and runtime tools.', icon: <Zap size={14} /> },
   { id: 'security', label: 'Security', description: 'Runtime access and key export.', icon: <Key size={14} /> },
 ];
@@ -106,6 +106,8 @@ function labelForPanel(panel: WalletPanel): string {
   if (panel === 'skale') return 'SKALE';
   if (panel === 'solana') return 'Solana';
   if (panel === 'cyberia') return 'Cyberia';
+  if (panel === 'botchain') return 'BOT Chain';
+  if (panel === 'robinhood') return 'Robinhood Chain';
   return 'Base';
 }
 
@@ -114,6 +116,7 @@ function iconForPanel(panel: WalletPanel) {
   if (panel === 'skale') return <ShieldCheck size={14} />;
   if (panel === 'solana') return <Zap size={14} />;
   if (panel === 'cyberia') return <CircleDot size={14} />;
+  if (panel === 'botchain') return <CircleDot size={14} />;
   return <Layers3 size={14} />;
 }
 
@@ -200,6 +203,8 @@ function walletEnvFor(id: AgentPassportNetworkId): { walletEnvVar: string; priva
   if (id === 'skale') return { walletEnvVar: 'SKALE_WALLET_ADDRESS', privateKeyEnvVar: 'SKALE_PRIVATE_KEY' };
   if (id === 'base') return { walletEnvVar: 'BASE_WALLET_ADDRESS', privateKeyEnvVar: 'BASE_PRIVATE_KEY' };
   if (id === 'cyberia') return { walletEnvVar: 'CYBERIA_WALLET_ADDRESS', privateKeyEnvVar: 'CYBERIA_PRIVATE_KEY' };
+  if (id === 'botchain') return { walletEnvVar: 'BOTCHAIN_WALLET_ADDRESS', privateKeyEnvVar: 'BOTCHAIN_PRIVATE_KEY' };
+  if (id === 'robinhood') return { walletEnvVar: 'ROBINHOOD_WALLET_ADDRESS', privateKeyEnvVar: 'ROBINHOOD_PRIVATE_KEY' };
   return { walletEnvVar: 'SOLANA_WALLET_ADDRESS', privateKeyEnvVar: 'SOLANA_PRIVATE_KEY' };
 }
 
@@ -664,7 +669,7 @@ function PassportPanel({
             </div>
             <h3 className="text-base font-semibold text-[var(--text-primary)]">{passport.agent.name}</h3>
             <p className="mt-1 max-w-2xl text-xs leading-relaxed text-[var(--text-muted)]">
-              SKALE anchors identity and reputation. Solana and Base credentials are available to the runtime for
+              SKALE anchors identity and reputation. Solana, Base, Cyberia, and BOT Chain credentials are available to the runtime for
               approved provider workflows and scoped signing.
             </p>
           </div>

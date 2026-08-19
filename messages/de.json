@@ -2487,7 +2487,7 @@
     "ecosystem": {
       "boxLabel": "Ökosystem",
       "title": "Auf dem offenen Stack gebaut",
-      "sub": "OpenClaw- und Hermes-Runtimes mit Solana, Base, Cyberia und SKALE für Zahlungen, Wallets, Identität und Provider-Workflows.",
+      "sub": "OpenClaw- und Hermes-Runtimes mit Solana, Base, Cyberia, BOT Chain, Robinhood Chain und SKALE für Zahlungen, Wallets, Identität und Provider-Workflows.",
       "frameworksLabel": "Frameworks",
       "chainsLabel": "Chains"
     },

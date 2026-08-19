@@ -31,13 +31,21 @@ describe('agent passport helpers', () => {
         usdc: '0xdc25597B19799010047F17e9591EFE08EFd40077',
       },
     });
+    expect(networkById(passport, 'botchain')).toMatchObject({
+      caip2: 'eip155:677',
+      status: 'wallet-ready',
+      walletAddress: '0xAgentEvm',
+      sharedWalletWith: 'skale',
+      explorerUrl: 'https://scan.botchain.ai/address/0xAgentEvm',
+    });
     expect(networkById(passport, 'solana')?.caip2).toBe('solana:mainnet-beta');
     expect(networkById(passport, 'base')?.agentId).toBeNull();
     expect(networkById(passport, 'cyberia')?.agentId).toBeNull();
+    expect(networkById(passport, 'botchain')?.agentId).toBeNull();
     expect(networkById(passport, 'solana')?.agentId).toBeNull();
     expect(passport.payments).toEqual([]);
     expect(passport.runtime.signerMode).toBe('runtime-signing');
-    expect(passport.runtime.trading.networks).toEqual(['skale', 'base', 'cyberia']);
+    expect(passport.runtime.trading.networks).toEqual(['skale', 'base', 'cyberia', 'botchain']);
     expect((passport.runtime.trading as Record<string, unknown>).requiresExplicitUserIntent).toBeUndefined();
   });
 });

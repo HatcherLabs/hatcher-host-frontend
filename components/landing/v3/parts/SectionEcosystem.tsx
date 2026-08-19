@@ -10,11 +10,13 @@ const FRAMEWORKS = [
   { key: 'ironclaw', label: 'IronClaw', color: '#00e676', kind: 'framework' as const },
 ];
 
-const CHAINS = [
+export const LANDING_CHAINS = [
   { key: 'solana', label: 'Solana', color: '#746290', href: 'https://solana.com' },
   { key: 'skale',  label: 'SKALE',  color: '#4a778b', href: 'https://skale.space' },
   { key: 'base', label: 'Base', color: '#4169e1', href: 'https://base.org' },
   { key: 'cyberia', label: 'Cyberia', color: '#b6ff3b', href: 'https://cyberia.church' },
+  { key: 'robinhood', label: 'Robinhood Chain', color: '#00c805', href: 'https://docs.robinhood.com/chain/' },
+  { key: 'botchain', label: 'BOT Chain', color: '#ff7a1a', href: 'https://www.botchain.ai/en' },
 ];
 
 export function SectionEcosystem() {
@@ -46,7 +48,7 @@ export function SectionEcosystem() {
           <div className={styles.group}>
             <span className={styles.groupLabel}>{t('chainsLabel')}</span>
             <div className={styles.tiles}>
-              {CHAINS.map((c) => (
+              {LANDING_CHAINS.map((c) => (
                 <a
                   key={c.key}
                   href={c.href}
