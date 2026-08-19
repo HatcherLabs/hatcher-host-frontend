@@ -160,6 +160,26 @@ export function buildFallbackPassport(agent: PassportFallbackAgent | null, route
           ],
         },
         {
+          id: 'botchain',
+          label: 'BOT Chain',
+          chainType: 'evm',
+          status: agent?.skaleWalletAddress ? 'wallet-ready' : 'planned',
+          caip2: 'eip155:677',
+          chainId: 677,
+          walletAddress: agent?.skaleWalletAddress ?? null,
+          agentId: null,
+          registry: null,
+          registryStatus: agent?.skaleWalletAddress ? 'wallet-ready' : 'planned',
+          registeredAt: null,
+          explorerUrl: agent?.skaleWalletAddress
+            ? `https://scan.botchain.ai/address/${agent.skaleWalletAddress}`
+            : null,
+          sharedWalletWith: agent?.skaleWalletAddress ? 'skale' : undefined,
+          notes: [
+            'BOT Chain wallet supports native BOT and arbitrary ERC-20 reads/transfers. Agent identity remains anchored on SKALE.',
+          ],
+        },
+        {
           id: 'solana',
           label: 'Solana',
           chainType: 'solana',
@@ -180,7 +200,7 @@ export function buildFallbackPassport(agent: PassportFallbackAgent | null, route
         chainType: 'evm',
         status: agent?.skaleWalletAddress ? 'wallet-ready' : 'planned',
         address: agent?.skaleWalletAddress ?? null,
-        networks: ['skale', 'base', 'cyberia'],
+        networks: ['skale', 'base', 'cyberia', 'botchain'],
         signerMode: 'runtime-signing',
       },
       {
@@ -196,7 +216,7 @@ export function buildFallbackPassport(agent: PassportFallbackAgent | null, route
       signerMode: 'runtime-signing',
       trading: {
         status: agent?.skaleWalletAddress ? 'enabled' : 'disabled',
-        networks: agent?.skaleWalletAddress ? ['skale', 'base', 'cyberia'] : [],
+        networks: agent?.skaleWalletAddress ? ['skale', 'base', 'cyberia', 'botchain'] : [],
         quoteProviders: [
           {
             id: 'jupiter',

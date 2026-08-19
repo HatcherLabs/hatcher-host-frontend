@@ -2298,7 +2298,7 @@ export interface OobeX402BalanceBody {
 export type OobeX402CallResponse = unknown;
 export type OobeX402BalanceResponse = unknown;
 
-export type AgentPassportNetworkId = "skale" | "base" | "cyberia" | "solana";
+export type AgentPassportNetworkId = "skale" | "base" | "cyberia" | "botchain" | "robinhood" | "solana";
 export type AgentPassportChainType = "evm" | "solana";
 export type AgentPassportSignerMode =
   "receive-only" | "runtime-signing" | "planned";

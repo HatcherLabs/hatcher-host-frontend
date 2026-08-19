@@ -2487,7 +2487,7 @@
     "ecosystem": {
       "boxLabel": "Écosystème",
       "title": "Construit sur la pile ouverte",
-      "sub": "Runtimes OpenClaw et Hermes avec Solana, Base, Cyberia et SKALE pour les paiements, les portefeuilles, l’identité et les workflows fournisseurs.",
+      "sub": "Runtimes OpenClaw et Hermes avec Solana, Base, Cyberia, BOT Chain, Robinhood Chain et SKALE pour les paiements, les portefeuilles, l’identité et les workflows fournisseurs.",
       "frameworksLabel": "Frameworks",
       "chainsLabel": "Blockchains"
     },
