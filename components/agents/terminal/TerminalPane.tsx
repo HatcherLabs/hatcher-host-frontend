@@ -13,6 +13,11 @@ import { useTheme } from 'next-themes';
 import { API_URL } from '@/lib/config';
 import { resolveTerminalTheme } from '../tabs/terminalTheme';
 import {
+  createTerminalScrollControlMessage,
+  getTerminalScrollShortcut,
+  type TerminalScrollAction,
+} from './terminalScrollControls';
+import {
   ChevronDown,
   ChevronUp,
   ChevronsDown,
@@ -157,12 +162,10 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
   const credentialEnvRef = useRef(credentialEnv);
   const scrollLinesRef = useRef(scrollLines ?? loadSavedTerminalScrollLines());
   const wheelRemainderRef = useRef(0);
-  const gatewayCopyModeRef = useRef(false);
   const onStateChangeRef = useRef(onStateChange);
   const onErrorMessageRef = useRef(onErrorMessage);
   const [state, setState] = useState<TerminalConnectionState>('disconnected');
   const [terminalScrollState, setTerminalScrollState] = useState<TerminalScrollState>(EMPTY_TERMINAL_SCROLL_STATE);
-  const [gatewayCopyMode, setGatewayCopyMode] = useState(false);
 
   useEffect(() => { onStateChangeRef.current = onStateChange; }, [onStateChange]);
   useEffect(() => { onErrorMessageRef.current = onErrorMessage; }, [onErrorMessage]);
@@ -217,42 +220,26 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
     ));
   }, [readTerminalScrollState]);
 
-  const scrollTerminal = useCallback((action: 'line-up' | 'page-up' | 'page-down' | 'bottom') => {
+  const scrollTerminal = useCallback((action: TerminalScrollAction) => {
     const term = termInstance.current;
     if (!term) return;
-    const scrollState = readTerminalScrollState();
 
+    // Full-screen gateway TUIs keep their history in tmux rather than xterm's
+    // local buffer. Ask the API to control that exact pane instead of sending
+    // emulated prefix/key sequences through the TUI input stream. Always use
+    // this path in gateway mode: xterm also contains a few Hatcher status
+    // lines, which can otherwise make its local buffer look scrollable.
+    if (mode === 'gateway') {
+      const ws = wsRef.current;
+      if (!ws || ws.readyState !== WebSocket.OPEN) return;
+      ws.send(JSON.stringify(createTerminalScrollControlMessage(action)));
+      return;
+    }
+
+    const scrollState = readTerminalScrollState();
     const canUseLocalBuffer = action === 'line-up' || action === 'page-up'
       ? scrollState.canScrollUp
       : scrollState.canScrollDown;
-
-    // Hermes/OpenClaw run inside tmux. Full-screen TUIs keep their history in
-    // tmux copy mode instead of xterm's local buffer, so provide a controlled
-    // fallback for the visible scroll buttons and Shift+PageUp/PageDown.
-    if (!canUseLocalBuffer && mode === 'gateway') {
-      const ws = wsRef.current;
-      if (!ws || ws.readyState !== WebSocket.OPEN) return;
-
-      if (action === 'bottom') {
-        if (!gatewayCopyModeRef.current) return;
-        ws.send(JSON.stringify({ type: 'input', data: 'q' }));
-        gatewayCopyModeRef.current = false;
-        setGatewayCopyMode(false);
-        return;
-      }
-
-      if (action === 'page-down' && !gatewayCopyModeRef.current) return;
-      const enterCopyMode = gatewayCopyModeRef.current ? '' : '\x02[';
-      const key = action === 'line-up'
-        ? '\x1b[A'
-        : action === 'page-up'
-          ? '\x1b[5~'
-          : '\x1b[6~';
-      ws.send(JSON.stringify({ type: 'input', data: `${enterCopyMode}${key}` }));
-      gatewayCopyModeRef.current = true;
-      setGatewayCopyMode(true);
-      return;
-    }
 
     if (!canUseLocalBuffer) return;
 
@@ -268,8 +255,6 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
         break;
       case 'bottom':
         term.scrollToBottom();
-        gatewayCopyModeRef.current = false;
-        setGatewayCopyMode(false);
         break;
     }
 
@@ -333,18 +318,6 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
         term.loadAddon(links);
         term.open(termRef.current);
         fit.fit();
-        term.attachCustomKeyEventHandler((event) => {
-          if (event.type !== 'keydown' || !event.shiftKey) return true;
-          if (event.key === 'PageUp') {
-            scrollTerminal('page-up');
-            return false;
-          }
-          if (event.key === 'PageDown') {
-            scrollTerminal('page-down');
-            return false;
-          }
-          return true;
-        });
         term.onScroll(refreshTerminalScrollState);
         term.onWriteParsed(refreshTerminalScrollState);
 
@@ -486,7 +459,6 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
     mode,
     refreshTerminalScrollState,
     reportError,
-    scrollTerminal,
     stopKeepAlive,
     stopReconnect,
   ]);
@@ -552,6 +524,23 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
   }, [isVisible]);
 
   useEffect(() => {
+    if (!isVisible) return;
+    const root = terminalInteractionRef.current;
+    if (!root) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      const action = getTerminalScrollShortcut(event);
+      if (!action || !root.contains(document.activeElement)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      scrollTerminal(action);
+    };
+
+    root.addEventListener('keydown', onKeyDown, { capture: true });
+    return () => root.removeEventListener('keydown', onKeyDown, { capture: true });
+  }, [isVisible, scrollTerminal]);
+
+  useEffect(() => {
     const root = terminalInteractionRef.current;
     if (!root) return;
 
@@ -574,12 +563,8 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
           wheelRemainderRef.current = 0;
           refreshTerminalScrollState();
           // Let xterm forward the wheel event to tmux when the full-screen
-          // gateway TUI owns scrollback. The previous capture handler stopped
-          // that event before tmux could enter copy mode.
-          if (mode === 'gateway' && lines < 0) {
-            gatewayCopyModeRef.current = true;
-            setGatewayCopyMode(true);
-          }
+          // gateway TUI owns scrollback. The explicit buttons and keyboard
+          // shortcuts use the WebSocket scroll control path instead.
         }
       }
 
@@ -647,7 +632,7 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
           <button
             type="button"
             onClick={() => scrollTerminal('page-down')}
-            disabled={!terminalScrollState.canScrollDown && !gatewayCopyMode}
+            disabled={!terminalScrollState.canScrollDown && mode !== 'gateway'}
             className="border-r border-[var(--border-default)] p-1.5 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-[var(--text-muted)] sm:border-b sm:border-r-0"
             title="Page down"
           >
@@ -656,7 +641,7 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
           <button
             type="button"
             onClick={() => scrollTerminal('bottom')}
-            disabled={!terminalScrollState.canScrollDown && !gatewayCopyMode}
+            disabled={!terminalScrollState.canScrollDown && mode !== 'gateway'}
             className="p-1.5 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-[var(--text-muted)]"
             title="Scroll to bottom"
           >
