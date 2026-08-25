@@ -42,45 +42,45 @@ export interface RoadmapPhase {
 }
 
 export const roadmapUpdatedAt = {
-  dateTime: '2026-08-12',
+  dateTime: '2026-08-25',
   label: 'August 2026',
 } as const;
 
 export const latestReleases = [
   {
-    id: 'embeddable-agents',
+    id: 'automation-center',
+    icon: 'operate',
+    title: 'Automation Center',
+    description:
+      'One account-wide surface for recurring schedules and authenticated webhook triggers.',
+  },
+  {
+    id: 'bot-chain',
+    icon: 'own',
+    title: 'BOT Chain wallets',
+    description:
+      'Shared EVM agent wallets now support BOT Chain balances and secure transfers.',
+  },
+  {
+    id: 'ai-stock-rewards',
+    icon: 'metering',
+    title: 'AI stock rewards',
+    description:
+      'A public, finalized ledger for HATCHER creator-fee distributions in tokenized AI stocks.',
+  },
+  {
+    id: 'neural-mesh',
     icon: 'route',
+    title: 'Neural Mesh routing',
+    description:
+      'Measured shadow and guarded live routing across eligible agents in Mission Control.',
+  },
+  {
+    id: 'embeddable-agents',
+    icon: 'verified',
     title: 'Embeddable agents',
     description:
       'A lazy-loaded chat widget that puts a public Hatcher agent on any website.',
-  },
-  {
-    id: 'agent-workspace',
-    icon: 'operate',
-    title: 'Agent Workspace Desktop',
-    description:
-      'A full desktop inside every agent — files, editor, terminal, browser, and live preview.',
-  },
-  {
-    id: 'onchain-traders',
-    icon: 'metering',
-    title: 'Autonomous on-chain traders',
-    description:
-      'Trading agents with measured signals and public, verifiable track records.',
-  },
-  {
-    id: 'equifold-launches',
-    icon: 'own',
-    title: 'EquiFold launches',
-    description:
-      'Agents launch their tokens on the EquiFold launchpad, straight from Hatcher.',
-  },
-  {
-    id: 'mobile-i18n',
-    icon: 'run',
-    title: '12 languages + mobile',
-    description:
-      'Fully localized, with Hatcher on the App Store and Google Play.',
   },
 ] as const satisfies readonly RoadmapRelease[];
 
@@ -102,6 +102,13 @@ export const phases: readonly RoadmapPhase[] = [
         linkLabel: 'Open Mission Control',
       },
       {
+        id: 'automation-center',
+        title: 'Automation Center',
+        note: 'Create and manage recurring schedules across agents, run jobs now, and configure authenticated webhook triggers.',
+        href: '/dashboard/automations',
+        linkLabel: 'Open Automation Center',
+      },
+      {
         id: 'workspace',
         title: 'Agent Workspace Desktop',
         note: 'Files, editor, terminal, browser, and live preview inside every agent.',
@@ -109,7 +116,7 @@ export const phases: readonly RoadmapPhase[] = [
       {
         id: 'channels',
         title: 'Channels & mobile apps',
-        note: 'Telegram, Discord, Slack, WhatsApp, X, and GitHub — with Hatcher on iOS and Android.',
+        note: 'Telegram, Discord, Slack, WhatsApp, X, and GitHub — with Hatcher on the App Store, Google Play, and Solana Mobile.',
       },
       {
         id: 'models',
@@ -129,7 +136,7 @@ export const phases: readonly RoadmapPhase[] = [
       {
         id: 'identity',
         title: 'On-chain agent identity',
-        note: 'Agent registry, token launches, and cNFT assets on Solana.',
+        note: 'Agent registry, token launches, cNFT assets on Solana, and shared EVM wallets across SKALE, Base, Cyberia, and BOT Chain.',
       },
       {
         id: 'traders',
@@ -221,9 +228,9 @@ export const phases: readonly RoadmapPhase[] = [
         tags: ['hatcher'],
       },
       {
-        id: 'triggers',
-        title: 'Event triggers',
-        note: 'Agents that wake on on-chain events, price moves, webhooks, and GitHub activity.',
+        id: 'expanded-triggers',
+        title: 'Expanded event triggers',
+        note: 'Schedules and authenticated webhooks are live. Next: agents that wake on on-chain events, price moves, and GitHub activity.',
       },
     ],
   },
