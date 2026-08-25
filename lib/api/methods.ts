@@ -3082,6 +3082,12 @@ export const api = {
       method: "POST",
     }),
 
+  /** Run a scheduled task immediately without changing its recurring schedule */
+  runAgentSchedule: (agentId: string, jobId: string) =>
+    req<{ queued: boolean }>(`/agents/${agentId}/schedules/${jobId}/run`, {
+      method: "POST",
+    }),
+
   /** Get execution logs for a scheduled task */
   getAgentScheduleLogs: (agentId: string, jobId: string) =>
     req<{

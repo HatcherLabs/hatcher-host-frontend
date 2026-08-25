@@ -14,6 +14,7 @@ import {
   BookOpen,
   Boxes,
   Building2,
+  CalendarClock,
   CreditCard,
   FileText,
   GitBranch,
@@ -59,6 +60,7 @@ export function Nav() {
     { key: 'dashboard', label: tNav('dashboard'), sub: tMenu('sub_dashboard'), href: '/dashboard', Icon: LayoutDashboard },
     { key: 'missions', label: tMission('title'), sub: tMenu('sub_missionControl'), href: '/dashboard/missions', Icon: ListChecks },
     { key: 'approvals', label: 'Action approvals', sub: 'Review effectful agent actions', href: '/dashboard/approvals', Icon: ShieldCheck },
+    { key: 'automations', label: 'Automation Center', sub: 'Run recurring and event-triggered work', href: '/dashboard/automations', Icon: CalendarClock },
   ] satisfies ReadonlyArray<{ key: string; label: string; sub: string; href: string; Icon: LucideIcon }>), [tMenu, tMission, tNav]);
 
   const USER_MENU = useMemo(() => ([

@@ -15,6 +15,7 @@ import {
   FileText,
   GitBranch,
   LayoutDashboard,
+  CalendarClock,
   ListChecks,
   Newspaper,
   Plus,
@@ -167,6 +168,15 @@ export function NavDrawer({ open, onClose }: Props) {
                       <span>
                         <span className={styles.itemLabel}>Action approvals</span>
                         <span className={styles.itemSub}>Review effectful agent actions</span>
+                      </span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/dashboard/automations" className={styles.item} onClick={onClose}>
+                      <span className={styles.glyph}><CalendarClock size={17} strokeWidth={1.8} aria-hidden /></span>
+                      <span>
+                        <span className={styles.itemLabel}>Automation Center</span>
+                        <span className={styles.itemSub}>Run recurring and event-triggered work</span>
                       </span>
                     </Link>
                   </li>

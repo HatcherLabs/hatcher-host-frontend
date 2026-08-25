@@ -13,6 +13,7 @@ describe('dashboard workspace navigation', () => {
       { key: 'agents', href: '/dashboard/agents' },
       { key: 'missions', href: '/dashboard/missions' },
       { key: 'approvals', href: '/dashboard/approvals' },
+      { key: 'automations', href: '/dashboard/automations' },
       { key: 'mesh', href: '/dashboard/mesh' },
     ]);
   });
@@ -22,11 +23,13 @@ describe('dashboard workspace navigation', () => {
     expect(isDashboardWorkspaceRouteActive('/dashboard/agent/agent-1', 'agents')).toBe(true);
     expect(isDashboardWorkspaceRouteActive('/dashboard/missions', 'missions')).toBe(true);
     expect(isDashboardWorkspaceRouteActive('/dashboard/approvals', 'approvals')).toBe(true);
+    expect(isDashboardWorkspaceRouteActive('/dashboard/automations', 'automations')).toBe(true);
+    expect(isDashboardWorkspaceRouteActive('/dashboard/automations/history', 'automations')).toBe(true);
     expect(isDashboardWorkspaceRouteActive('/dashboard/mesh', 'mesh')).toBe(true);
     expect(isDashboardWorkspaceRouteActive('/dashboard/billing', 'agents')).toBe(false);
   });
 
-  it('surfaces missions and approvals in every live navigation path', () => {
+  it('surfaces missions, approvals, and automations in every live navigation path', () => {
     const files = [
       'components/marketing/v3/Nav.tsx',
       'components/marketing/v3/NavDrawer.tsx',
@@ -37,6 +40,7 @@ describe('dashboard workspace navigation', () => {
       const source = readFileSync(resolve(process.cwd(), file), 'utf8');
       expect(source, file).toContain('/dashboard/missions');
       expect(source, file).toContain('/dashboard/approvals');
+      expect(source, file).toContain('/dashboard/automations');
     }
   });
 

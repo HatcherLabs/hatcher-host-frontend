@@ -15,18 +15,18 @@ const pageSource = readFileSync(
 describe('roadmap content', () => {
   it('publishes a current, machine-readable update date', () => {
     expect(roadmapUpdatedAt).toEqual({
-      dateTime: '2026-08-12',
+      dateTime: '2026-08-25',
       label: 'August 2026',
     });
   });
 
   it('surfaces the latest releases', () => {
     expect(latestReleases.map((release) => release.id)).toEqual([
+      'automation-center',
+      'bot-chain',
+      'ai-stock-rewards',
+      'neural-mesh',
       'embeddable-agents',
-      'agent-workspace',
-      'onchain-traders',
-      'equifold-launches',
-      'mobile-i18n',
     ]);
   });
 
@@ -39,6 +39,7 @@ describe('roadmap content', () => {
     expect(activeIds).not.toContain('knowledge');
     expect(activeIds).not.toContain('dev-api');
     expect(activeIds).not.toContain('embed');
+    expect(activeIds).not.toContain('automation-center');
   });
 
   it('walks the classic phase ladder in order', () => {
@@ -65,6 +66,9 @@ describe('roadmap content', () => {
     expect(roadmapCopy).toContain('App Store');
     expect(roadmapCopy).toContain('EquiFold');
     expect(roadmapCopy).toContain('Inference');
+    expect(roadmapCopy).toContain('BOT Chain');
+    expect(roadmapCopy).toContain('Neural Mesh');
+    expect(roadmapCopy).toContain('AI stock rewards');
   });
 
   it('keeps token utility on both rails visible', () => {
