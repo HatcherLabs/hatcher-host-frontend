@@ -31,8 +31,15 @@ describe('gateway terminal scrollback regressions', () => {
   it('maps Shift+PageUp/PageDown before xterm handles the key event', () => {
     expect(getTerminalScrollShortcut({ key: 'PageUp', shiftKey: true })).toBe('page-up');
     expect(getTerminalScrollShortcut({ key: 'PageDown', shiftKey: true })).toBe('page-down');
+    expect(getTerminalScrollShortcut({ key: 'Unidentified', code: 'PageUp', shiftKey: true })).toBe('page-up');
+    expect(getTerminalScrollShortcut({ key: 'Prior', shiftKey: true })).toBe('page-up');
+    expect(getTerminalScrollShortcut({ key: 'Next', shiftKey: true })).toBe('page-down');
+    expect(getTerminalScrollShortcut({ key: 'Unidentified', keyCode: 34, shiftKey: true })).toBe('page-down');
     expect(getTerminalScrollShortcut({ key: 'PageUp', shiftKey: false })).toBeNull();
     expect(getTerminalScrollShortcut({ key: 'ArrowUp', shiftKey: true })).toBeNull();
     expect(terminalSource).toContain("root.addEventListener('keydown', onKeyDown, { capture: true })");
+    expect(terminalSource).toContain('term.attachCustomKeyEventHandler((event) => {');
+    expect(terminalSource).toContain('scrollTerminalRef.current(action)');
+    expect(terminalSource).not.toContain('root.contains(document.activeElement)');
   });
 });

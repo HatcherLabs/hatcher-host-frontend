@@ -260,6 +260,10 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
 
     window.requestAnimationFrame(refreshTerminalScrollState);
   }, [mode, readTerminalScrollState, refreshTerminalScrollState]);
+  const scrollTerminalRef = useRef(scrollTerminal);
+  useEffect(() => {
+    scrollTerminalRef.current = scrollTerminal;
+  }, [scrollTerminal]);
 
   const stopKeepAlive = useCallback(() => {
     if (keepAliveTimerRef.current) {
@@ -318,6 +322,18 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
         term.loadAddon(links);
         term.open(termRef.current);
         fit.fit();
+        // Intercept at xterm's keyboard boundary as well as the surrounding
+        // DOM capture handler below. Some browser/keyboard combinations keep
+        // focus on xterm's hidden textarea and bypass the wrapper's focus
+        // check, which previously forwarded Shift+PageUp/PageDown to Hermes
+        // as command-history input.
+        term.attachCustomKeyEventHandler((event) => {
+          if (event.type !== 'keydown') return true;
+          const action = getTerminalScrollShortcut(event);
+          if (!action) return true;
+          scrollTerminalRef.current(action);
+          return false;
+        });
         term.onScroll(refreshTerminalScrollState);
         term.onWriteParsed(refreshTerminalScrollState);
 
@@ -530,7 +546,11 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
 
     const onKeyDown = (event: KeyboardEvent) => {
       const action = getTerminalScrollShortcut(event);
-      if (!action || !root.contains(document.activeElement)) return;
+      // This listener is attached to the terminal root, so it only receives
+      // key events originating inside the terminal. Do not depend on
+      // document.activeElement: xterm moves focus through a hidden textarea
+      // and some browsers report body during that transition.
+      if (!action) return;
       event.preventDefault();
       event.stopPropagation();
       scrollTerminal(action);
@@ -616,7 +636,7 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(fu
             onClick={() => scrollTerminal('line-up')}
             disabled={!terminalScrollState.canScrollUp && mode !== 'gateway'}
             className="border-r border-[var(--border-default)] p-1.5 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-[var(--text-muted)] sm:border-b sm:border-r-0"
-            title="Scroll up"
+            title="Scroll up one line"
           >
             <ChevronUp size={14} />
           </button>
