@@ -1280,6 +1280,39 @@ export interface McpActionInboxResponse {
   summary: { pending: number; activeGrants: number };
 }
 
+export interface OperatorAuthorizationRequest {
+  client: { id: string; name: string };
+  scopes: Array<"hatcher:read" | "hatcher:chat" | "hatcher:lifecycle">;
+  account: { email: string; emailVerified: boolean };
+  redirectUri: string;
+}
+
+export interface OperatorActionRequest {
+  id: string;
+  userId: string;
+  agentId: string;
+  principalId: string;
+  principalLabel: string;
+  tool: string;
+  argumentsHash: string;
+  argumentsPreview: unknown;
+  resultPreview: unknown | null;
+  authorization: string;
+  status: McpActionStatus;
+  failureMessage: string | null;
+  expiresAt: string;
+  resolvedAt: string | null;
+  executedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  agent: McpActionActor;
+}
+
+export interface OperatorActionInboxResponse {
+  actions: OperatorActionRequest[];
+  summary: { pending: number };
+}
+
 export interface CovenantDispatchBody {
   connectorId?: string;
   text: string;

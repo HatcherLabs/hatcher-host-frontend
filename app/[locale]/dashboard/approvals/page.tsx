@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { Link, useRouter } from '@/i18n/routing';
 import { api } from '@/lib/api';
-import type { Agent, McpActionGrant, McpActionInboxResponse, McpActionRequest, McpActionStatus } from '@/lib/api';
+import type { Agent, McpActionGrant, McpActionInboxResponse, McpActionRequest, McpActionStatus, OperatorActionInboxResponse, OperatorActionRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import styles from './approvals.module.css';
 
@@ -31,6 +31,8 @@ const EMPTY_INBOX: McpActionInboxResponse = {
   grants: [],
   summary: { pending: 0, activeGrants: 0 },
 };
+
+const EMPTY_OPERATOR_INBOX: OperatorActionInboxResponse = { actions: [], summary: { pending: 0 } };
 
 function formatDate(value: string | null | undefined): string {
   if (!value) return '-';
@@ -144,12 +146,55 @@ function GrantRow({ grant, busy, onRevoke }: {
   );
 }
 
+function OperatorActionRow({ action, busy, onApprove, onReject }: {
+  action: OperatorActionRequest;
+  busy: string | null;
+  onApprove: (action: OperatorActionRequest) => void;
+  onReject: (action: OperatorActionRequest) => void;
+}) {
+  const pending = action.status === 'pending';
+  return (
+    <article className={styles.actionRow} data-status={action.status}>
+      <div className={styles.actionIdentity}>
+        <div className={styles.statusIcon} aria-hidden>
+          {pending ? <Clock3 size={15} /> : action.status === 'executed' ? <Check size={15} /> : <ShieldX size={15} />}
+        </div>
+        <div className={styles.actionMain}>
+          <div className={styles.actionTitleLine}>
+            <strong>{action.tool}</strong>
+            <span className={styles.status} data-status={action.status}>{action.status.replace('_', ' ')}</span>
+          </div>
+          <p>{action.agent.name} · {action.principalLabel}</p>
+          <span className={styles.time}>{formatDate(action.createdAt)}</span>
+        </div>
+      </div>
+      <details className={styles.payload}>
+        <summary>Payload preview</summary>
+        <pre>{JSON.stringify(action.argumentsPreview, null, 2)}</pre>
+        <small>The encrypted payload is bound to this approval by SHA-256 and cannot be changed after approval.</small>
+      </details>
+      {action.failureMessage && <p className={styles.failure}>{action.failureMessage}</p>}
+      {pending && (
+        <div className={styles.actions}>
+          <button type="button" onClick={() => onApprove(action)} disabled={busy !== null} className={styles.primaryButton}>
+            {busy === `operator:${action.id}:approve` ? <Loader2 size={14} className={styles.spin} /> : <Check size={14} />} Approve once
+          </button>
+          <button type="button" onClick={() => onReject(action)} disabled={busy !== null} className={styles.rejectButton}>
+            {busy === `operator:${action.id}:reject` ? <Loader2 size={14} className={styles.spin} /> : <ShieldX size={14} />} Reject
+          </button>
+        </div>
+      )}
+    </article>
+  );
+}
+
 export default function ActionApprovalsPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [agents, setAgents] = useState<Agent[]>([]);
   const [inbox, setInbox] = useState<McpActionInboxResponse>(EMPTY_INBOX);
+  const [operatorInbox, setOperatorInbox] = useState<OperatorActionInboxResponse>(EMPTY_OPERATOR_INBOX);
   const [status, setStatus] = useState<'all' | McpActionStatus>('all');
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
@@ -157,14 +202,22 @@ export default function ActionApprovalsPage() {
   const agentId = searchParams.get('agent') ?? '';
 
   const load = useCallback(async (quiet = false) => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated) {
+      setLoading(false);
+      return;
+    }
     if (!quiet) {
       setLoading(true);
       setMessage(null);
     }
-    const [agentsResult, inboxResult] = await Promise.all([
+    const [agentsResult, inboxResult, operatorResult] = await Promise.all([
       api.getMyAgents(),
       api.getMcpActionInbox({
+        ...(agentId ? { agentId } : {}),
+        ...(status !== 'all' ? { status } : {}),
+        limit: 75,
+      }),
+      api.getOperatorActionInbox({
         ...(agentId ? { agentId } : {}),
         ...(status !== 'all' ? { status } : {}),
         limit: 75,
@@ -176,6 +229,8 @@ export default function ActionApprovalsPage() {
     } else {
       setMessage(inboxResult.error ?? 'Could not load action approvals.');
     }
+    if (operatorResult.success) setOperatorInbox(operatorResult.data);
+    else setMessage(operatorResult.error ?? 'Could not load Hatcher Operator approvals.');
     setLoading(false);
   }, [agentId, isAuthenticated, status]);
 
@@ -223,7 +278,7 @@ export default function ActionApprovalsPage() {
           <div>
             <span className={styles.eyebrow}>Owner safety control</span>
             <h1>Action approvals</h1>
-            <p>Review effectful MCP calls before execution and manage narrowly scoped trust.</p>
+            <p>Review outbound connector calls and inbound Hatcher Operator requests before execution.</p>
           </div>
           <button type="button" className={styles.refreshButton} onClick={() => void load()} disabled={busy !== null}>
             <RefreshCw size={14} /> Refresh
@@ -231,7 +286,7 @@ export default function ActionApprovalsPage() {
         </header>
 
         <section className={styles.summary} aria-label="Approval summary">
-          <div><span>Pending</span><strong>{inbox.summary.pending}</strong></div>
+          <div><span>Pending</span><strong>{inbox.summary.pending + operatorInbox.summary.pending}</strong></div>
           <div><span>Active grants</span><strong>{inbox.summary.activeGrants}</strong></div>
           <div><span>Scope</span><strong>{selectedAgentName}</strong></div>
         </section>
@@ -287,7 +342,37 @@ export default function ActionApprovalsPage() {
 
         <section className={styles.section}>
           <div className={styles.sectionHeading}>
-            <div><h2>Request and execution history</h2><p>Newest activity first. Pending requests require an owner decision.</p></div>
+            <div><h2>Hatcher Operator requests</h2><p>Inbound requests from Grok Bot, Cursor, or another authorized MCP client. No reusable grants are allowed here.</p></div>
+            <span>{operatorInbox.actions.length} records</span>
+          </div>
+          {operatorInbox.actions.length === 0 ? (
+            <div className={styles.empty}><ShieldCheck size={22} /><strong>No matching Operator activity</strong><p>Payload-bound requests from connected AI clients will appear here.</p></div>
+          ) : (
+            <div className={styles.actionList}>
+              {operatorInbox.actions.map((action) => (
+                <OperatorActionRow
+                  key={action.id}
+                  action={action}
+                  busy={busy}
+                  onApprove={(item) => void run(
+                    `operator:${item.id}:approve`,
+                    () => api.approveOperatorAction(item.id),
+                    `${item.tool} approved once.`,
+                  )}
+                  onReject={(item) => void run(
+                    `operator:${item.id}:reject`,
+                    () => api.rejectOperatorAction(item.id),
+                    `${item.tool} rejected.`,
+                  )}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className={styles.section}>
+          <div className={styles.sectionHeading}>
+            <div><h2>Outbound connector history</h2><p>Calls made by Hatcher agents to configured remote MCP connectors.</p></div>
             <span>{inbox.actions.length} records</span>
           </div>
           {inbox.actions.length === 0 ? (

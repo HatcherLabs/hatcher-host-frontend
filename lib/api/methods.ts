@@ -37,6 +37,9 @@ import type {
   McpConnector,
   McpActionInboxResponse,
   McpActionRequest,
+  OperatorActionInboxResponse,
+  OperatorActionRequest,
+  OperatorAuthorizationRequest,
   RobinhoodHub,
   PublicTraderData,
   PublicTraderDirectoryData,
@@ -3561,6 +3564,40 @@ export const api = {
       {
         method: "DELETE",
       },
+    ),
+
+  getOperatorAuthorizationRequest: (query: string) =>
+    req<OperatorAuthorizationRequest>(`/oauth/authorize/request?${query}`),
+
+  decideOperatorAuthorization: (body: Record<string, string>) =>
+    req<{ redirectUrl: string }>("/oauth/authorize/decision", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  getOperatorActionInbox: (
+    params: { agentId?: string; status?: string; limit?: number } = {},
+  ) => {
+    const query = new URLSearchParams();
+    if (params.agentId) query.set("agentId", params.agentId);
+    if (params.status) query.set("status", params.status);
+    if (params.limit) query.set("limit", String(params.limit));
+    const suffix = query.toString();
+    return req<OperatorActionInboxResponse>(
+      `/agents/operator/actions${suffix ? `?${suffix}` : ""}`,
+    );
+  },
+
+  approveOperatorAction: (actionId: string) =>
+    req<{ action: OperatorActionRequest }>(
+      `/agents/operator/actions/${actionId}/approve`,
+      { method: "POST" },
+    ),
+
+  rejectOperatorAction: (actionId: string) =>
+    req<{ action: OperatorActionRequest }>(
+      `/agents/operator/actions/${actionId}/reject`,
+      { method: "POST" },
     ),
 
   testAgentGithubAccess: (agentId: string, repo?: string) =>
