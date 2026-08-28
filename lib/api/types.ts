@@ -1313,6 +1313,78 @@ export interface OperatorActionInboxResponse {
   summary: { pending: number };
 }
 
+export interface AutomationPolicy {
+  id: string | null;
+  userId: string;
+  executionMode: "draft_first" | "direct";
+  maxAiCreditsPerRun: number | null;
+  defaultMaxRuntimeSeconds: number;
+  outboundMcpMode: "ask" | "trusted" | "block";
+  operatorMode: "ask" | "block";
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+export interface RoutineRunSummary {
+  taskId: string;
+  status: string;
+  createdAt: string;
+  costAiCredits: number | null;
+  artifactCount: number;
+  run: {
+    id: string;
+    attempt: number;
+    status: string;
+    startedAt: string | null;
+    finishedAt: string | null;
+    error: string | null;
+  } | null;
+}
+
+export interface AgentRoutine {
+  id: string;
+  agentId: string;
+  agent: McpActionActor;
+  name: string;
+  description: string | null;
+  prompt: string;
+  schedule: string;
+  timezone: string;
+  status: "active" | "paused" | "archived";
+  requiresApproval: boolean;
+  budgetAiCredits: number | null;
+  maxRuntimeSeconds: number | null;
+  acceptanceChecks: string[];
+  staleAfterMinutes: number | null;
+  noDataPolicy: "pause" | "continue";
+  version: number;
+  nextRunAt: string | null;
+  lastRunAt: string | null;
+  lastTaskId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  recentRuns: RoutineRunSummary[];
+}
+
+export interface CreateRoutineBody {
+  name: string;
+  description?: string;
+  prompt: string;
+  schedule: string;
+  timezone: string;
+  requiresApproval?: boolean;
+  budgetAiCredits?: number;
+  maxRuntimeSeconds?: number;
+  acceptanceChecks: string[];
+  staleAfterMinutes?: number | null;
+  noDataPolicy: "pause" | "continue";
+}
+
+export interface RoutinesResponse {
+  routines: AgentRoutine[];
+  summary: { total: number; active: number; paused: number; awaitingApproval: number };
+}
+
 export interface CovenantDispatchBody {
   connectorId?: string;
   text: string;

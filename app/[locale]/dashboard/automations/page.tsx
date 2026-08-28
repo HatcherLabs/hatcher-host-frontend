@@ -18,6 +18,7 @@ import {
   Plus,
   RefreshCw,
   Search,
+  ShieldCheck,
   Trash2,
   Webhook,
   X,
@@ -25,7 +26,7 @@ import {
 } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { api } from '@/lib/api';
-import type { Agent } from '@/lib/api';
+import type { Agent, AgentRoutine } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import {
   automationMatches,
@@ -180,10 +181,18 @@ function CreateAutomationDrawer({
   onCreated: (message: string) => Promise<void>;
 }) {
   const [agentId, setAgentId] = useState('');
-  const [trigger, setTrigger] = useState<'schedule' | 'webhook'>('schedule');
+  const [step, setStep] = useState(1);
   const [name, setName] = useState('');
-  const [schedule, setSchedule] = useState('0 9 * * *');
   const [instructions, setInstructions] = useState('');
+  const [frequency, setFrequency] = useState<'daily' | 'weekdays' | 'weekly' | 'six_hours'>('daily');
+  const [time, setTime] = useState('09:00');
+  const [weekday, setWeekday] = useState('1');
+  const [timezone, setTimezone] = useState(() => Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC');
+  const [requiresApproval, setRequiresApproval] = useState(true);
+  const [budget, setBudget] = useState('');
+  const [runtime, setRuntime] = useState('900');
+  const [staleAfter, setStaleAfter] = useState('60');
+  const [acceptance, setAcceptance] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const selected = agents.find((agent) => agent.id === agentId) ?? null;
@@ -192,100 +201,197 @@ function CreateAutomationDrawer({
     if (open && !agentId && agents[0]) setAgentId(agents[0].id);
   }, [agentId, agents, open]);
 
-  const create = async () => {
-    if (!selected || !name.trim() || !schedule.trim() || !instructions.trim()) {
-      setError('Agent, name, schedule, and instructions are required.');
+  const schedule = useMemo(() => {
+    const [hour = '9', minute = '0'] = time.split(':');
+    if (frequency === 'six_hours') return '0 */6 * * *';
+    if (frequency === 'weekdays') return `${Number(minute)} ${Number(hour)} * * 1-5`;
+    if (frequency === 'weekly') return `${Number(minute)} ${Number(hour)} * * ${weekday}`;
+    return `${Number(minute)} ${Number(hour)} * * *`;
+  }, [frequency, time, weekday]);
+
+  const scheduleLabel = frequency === 'six_hours'
+    ? 'Every 6 hours'
+    : frequency === 'weekdays'
+      ? `Weekdays at ${time}`
+      : frequency === 'weekly'
+        ? `Weekly at ${time}`
+        : `Every day at ${time}`;
+
+  const close = () => {
+    setStep(1);
+    setError(null);
+    onClose();
+  };
+
+  const continueToNext = () => {
+    setError(null);
+    if (step === 1 && (!selected || !name.trim() || !instructions.trim())) {
+      setError('Choose an agent, name the routine, and describe the result you want.');
       return;
     }
+    setStep((current) => Math.min(3, current + 1));
+  };
+
+  const create = async () => {
+    if (!selected) return;
     setBusy(true);
     setError(null);
-    const result = selected.framework === 'ironclaw'
-      ? await api.createIronClawAutomation(
-          selected.id,
-          `Create an automation named "${name.trim()}" that runs on "${schedule.trim()}". Instructions: ${instructions.trim()}`,
-        )
-      : await api.createAgentSchedule(selected.id, {
-          name: name.trim(),
-          schedule: schedule.trim(),
-          prompt: instructions.trim(),
-        });
+    const result = await api.createRoutine(selected.id, {
+      name: name.trim(),
+      prompt: instructions.trim(),
+      schedule,
+      timezone,
+      requiresApproval,
+      ...(budget ? { budgetAiCredits: Number(budget) } : {}),
+      maxRuntimeSeconds: Number(runtime),
+      staleAfterMinutes: staleAfter ? Number(staleAfter) : null,
+      noDataPolicy: 'pause',
+      acceptanceChecks: acceptance.split('\n').map((line) => line.trim()).filter(Boolean),
+    });
     setBusy(false);
     if (!result.success) {
-      setError(result.error ?? 'Could not create automation.');
+      setError(result.error ?? 'Could not create routine.');
       return;
     }
     setName('');
     setInstructions('');
-    await onCreated(`Automation created for ${selected.name}.`);
-    onClose();
+    setAcceptance('');
+    setStep(1);
+    await onCreated(`“${result.data.routine.name}” is scheduled for ${selected.name}.`);
+    close();
   };
 
   if (!open) return null;
 
   return (
     <>
-      <button type="button" className={styles.drawerBackdrop} aria-label="Close automation drawer" onClick={onClose} />
-      <aside className={styles.drawer} aria-label="Create automation">
+      <button type="button" className={styles.drawerBackdrop} aria-label="Close routine drawer" onClick={close} />
+      <aside className={styles.drawer} aria-label="Create managed routine">
         <div className={styles.drawerHeader}>
-          <div><h2>Create automation</h2><p>Choose an agent and a real trigger source.</p></div>
-          <button type="button" className={styles.iconButton} onClick={onClose} aria-label="Close"><X size={18} /></button>
+          <div><h2>New managed routine</h2><p>Three simple steps. You can test it before the first scheduled run.</p></div>
+          <button type="button" className={styles.iconButton} onClick={close} aria-label="Close"><X size={18} /></button>
+        </div>
+        <div className={styles.stepper} aria-label={`Step ${step} of 3`}>
+          {[['1', 'Work'], ['2', 'Schedule'], ['3', 'Safety']].map(([number, label]) => (
+            <span key={number} data-active={step >= Number(number)}><b>{number}</b>{label}</span>
+          ))}
         </div>
 
-        <label className={styles.field}>
-          <span>Agent</span>
-          <select value={agentId} onChange={(event) => setAgentId(event.target.value)}>
-            <option value="">Select an agent</option>
-            {agents.map((agent) => <option key={agent.id} value={agent.id}>{agent.name} · {agent.framework}</option>)}
-          </select>
-        </label>
-
-        <fieldset className={styles.triggerChoice}>
-          <legend>Trigger type</legend>
-          <button type="button" data-active={trigger === 'schedule'} onClick={() => setTrigger('schedule')}>
-            <CalendarClock size={17} /><span><strong>Schedule</strong><small>Run recurring instructions</small></span>
-          </button>
-          <button type="button" data-active={trigger === 'webhook'} onClick={() => setTrigger('webhook')}>
-            <Webhook size={17} /><span><strong>Webhook</strong><small>Run when an external event arrives</small></span>
-          </button>
-        </fieldset>
-
-        {trigger === 'webhook' ? (
-          <div className={styles.webhookSetup}>
-            <Webhook size={20} />
-            <div>
-              <strong>Webhook triggers are configured per agent</strong>
-              <p>Hatcher provisions a protected endpoint and bearer token inside the agent Integration settings.</p>
-              {selected && selected.framework !== 'ironclaw' ? (
-                <Link href={`/dashboard/agent/${selected.id}?tab=integrations`} onClick={onClose}>
-                  Open webhook settings <ChevronRight size={13} />
-                </Link>
-              ) : <small>Select an active OpenClaw or Hermes agent.</small>}
-            </div>
-          </div>
-        ) : (
-          <>
+        {step === 1 && <>
             <label className={styles.field}>
-              <span>Name</span>
+              <span>Which agent should do the work?</span>
+              <select value={agentId} onChange={(event) => setAgentId(event.target.value)}>
+                <option value="">Select an agent</option>
+                {agents.map((agent) => <option key={agent.id} value={agent.id}>{agent.name} · {agent.framework}</option>)}
+              </select>
+            </label>
+            <label className={styles.field}>
+              <span>Routine name</span>
               <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Morning research brief" maxLength={100} />
             </label>
             <label className={styles.field}>
-              <span>Schedule</span>
-              <input value={schedule} onChange={(event) => setSchedule(event.target.value)} placeholder="0 9 * * *" maxLength={120} />
-              <small>Cron syntax or supported natural language, interpreted by the selected runtime.</small>
+              <span>What result do you want?</span>
+              <textarea value={instructions} onChange={(event) => setInstructions(event.target.value)} placeholder="Review new support tickets, prepare draft replies, and flag anything that needs my decision." maxLength={100000} rows={7} />
+              <small>Describe the outcome in plain language. Hatcher keeps every run and artifact in Mission Control.</small>
             </label>
+        </>}
+
+        {step === 2 && <>
+          <fieldset className={styles.triggerChoice}>
+            <legend>How often?</legend>
+            {([
+              ['daily', 'Every day'],
+              ['weekdays', 'Weekdays'],
+              ['weekly', 'Once a week'],
+              ['six_hours', 'Every 6 hours'],
+            ] as const).map(([value, label]) => (
+              <button type="button" key={value} data-active={frequency === value} onClick={() => setFrequency(value)}>
+                <CalendarClock size={17} /><span><strong>{label}</strong><small>{value === 'six_hours' ? 'Four predictable runs per day' : 'At a time you choose'}</small></span>
+              </button>
+            ))}
+          </fieldset>
+          {frequency !== 'six_hours' && <label className={styles.field}><span>Time</span><input type="time" value={time} onChange={(event) => setTime(event.target.value)} /></label>}
+          {frequency === 'weekly' && <label className={styles.field}><span>Day</span><select value={weekday} onChange={(event) => setWeekday(event.target.value)}><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option><option value="0">Sunday</option></select></label>}
+          <label className={styles.field}><span>Timezone</span><input value={timezone} onChange={(event) => setTimezone(event.target.value)} placeholder="Europe/Bucharest" /><small>{scheduleLabel} in this timezone.</small></label>
+        </>}
+
+        {step === 3 && <>
+          <label className={styles.approvalChoice}>
+            <input type="checkbox" checked={requiresApproval} onChange={(event) => setRequiresApproval(event.target.checked)} />
+            <span><strong>Draft first, then ask me</strong><small>Scheduled runs wait for your approval before the agent starts. Recommended while you tune the routine.</small></span>
+          </label>
+          <div className={styles.twoColumns}>
             <label className={styles.field}>
-              <span>Instructions</span>
-              <textarea value={instructions} onChange={(event) => setInstructions(event.target.value)} placeholder="Describe what the agent should do..." maxLength={5000} rows={6} />
+              <span>AI Credit limit</span><input inputMode="numeric" value={budget} onChange={(event) => setBudget(event.target.value.replace(/\D/g, ''))} placeholder="Workspace default" />
             </label>
-            {error && <p className={styles.formError}><AlertTriangle size={14} />{error}</p>}
-            <button type="button" className={styles.createButton} disabled={busy || agents.length === 0} onClick={() => void create()}>
-              {busy ? <Loader2 size={16} className={styles.spin} /> : <Plus size={16} />}
-              Create automation
-            </button>
-          </>
-        )}
+            <label className={styles.field}><span>Maximum runtime</span><select value={runtime} onChange={(event) => setRuntime(event.target.value)}><option value="300">5 minutes</option><option value="900">15 minutes</option><option value="1800">30 minutes</option><option value="3600">60 minutes</option></select></label>
+          </div>
+          <label className={styles.field}><span>Data freshness</span><select value={staleAfter} onChange={(event) => setStaleAfter(event.target.value)}><option value="15">Pause if older than 15 minutes</option><option value="60">Pause if older than 1 hour</option><option value="1440">Pause if older than 1 day</option><option value="">No freshness rule</option></select></label>
+          <label className={styles.field}><span>How will you know it worked? <small>(optional, one check per line)</small></span><textarea value={acceptance} onChange={(event) => setAcceptance(event.target.value)} placeholder={'Every ticket has a draft reply\nUrgent tickets are clearly flagged'} rows={4} /><small>Runs with checks are held for final review after completion.</small></label>
+          <div className={styles.reviewCard}><ShieldCheck size={18} /><div><strong>{name || 'New routine'}</strong><p>{selected?.name ?? 'No agent selected'} · {scheduleLabel} · {requiresApproval ? 'approval before every scheduled run' : 'runs automatically within policy'}</p></div></div>
+        </>}
+
+        {error && <p className={styles.formError}><AlertTriangle size={14} />{error}</p>}
+        <div className={styles.drawerActions}>
+          {step > 1 && <button type="button" className={styles.refreshButton} disabled={busy} onClick={() => setStep((current) => current - 1)}>Back</button>}
+          {step < 3 ? <button type="button" className={styles.createButton} onClick={continueToNext}>Continue <ChevronRight size={15} /></button> : <button type="button" className={styles.createButton} disabled={busy || agents.length === 0} onClick={() => void create()}>{busy ? <Loader2 size={16} className={styles.spin} /> : <Plus size={16} />} Create routine</button>}
+        </div>
       </aside>
     </>
+  );
+}
+
+function ManagedRoutinesPanel({ agents, refreshKey, onMessage }: { agents: Agent[]; refreshKey: number; onMessage: (message: string) => void }) {
+  const [routines, setRoutines] = useState<AgentRoutine[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    const result = await api.getRoutines({ limit: 100 });
+    if (result.success) setRoutines(result.data.routines);
+    else onMessage(result.error ?? 'Could not load managed routines.');
+    setLoading(false);
+  }, [onMessage]);
+
+  useEffect(() => { void load(); }, [load, refreshKey]);
+
+  const mutate = async (routine: AgentRoutine, action: 'run' | 'pause' | 'resume' | 'archive') => {
+    if (action === 'archive' && !window.confirm(`Archive “${routine.name}”? Its run history will stay in Mission Control.`)) return;
+    setBusy(`${routine.id}:${action}`);
+    const result = action === 'run'
+      ? await api.runRoutine(routine.agentId, routine.id)
+      : action === 'pause'
+        ? await api.pauseRoutine(routine.agentId, routine.id)
+        : action === 'resume'
+          ? await api.resumeRoutine(routine.agentId, routine.id)
+          : await api.archiveRoutine(routine.agentId, routine.id);
+    setBusy(null);
+    if (!result.success) { onMessage(result.error ?? 'Routine action failed.'); return; }
+    await load();
+    onMessage(action === 'run' ? `Test run for “${routine.name}” is queued.` : `“${routine.name}” updated.`);
+  };
+
+  return (
+    <section className={styles.routinesPanel} aria-labelledby="managed-routines-title">
+      <div className={styles.routinesHeading}><div><span>Routines v2</span><h2 id="managed-routines-title">Managed routines</h2><p>Framework-independent schedules with budgets, approvals, artifacts, and run history.</p></div><strong>{routines.filter((routine) => routine.status === 'active').length} active</strong></div>
+      {loading ? <div className={styles.routineEmpty}><Loader2 size={18} className={styles.spin} /> Loading routines</div> : routines.length === 0 ? <div className={styles.routineEmpty}><CalendarClock size={22} /><strong>No managed routines yet</strong><p>Use “New routine” to automate recurring work without writing cron syntax.</p></div> : <div className={styles.routineGrid}>
+        {routines.map((routine) => {
+          const latest = routine.recentRuns[0];
+          const rowBusy = busy?.startsWith(`${routine.id}:`) ?? false;
+          return <article className={styles.routineCard} key={routine.id}>
+            <div className={styles.routineTop}><span className={styles.kindIcon}><CalendarClock size={15} /></span><div><h3>{routine.name}</h3><p><Bot size={12} /> {routine.agent.name}</p></div><StatusPill status={routine.status === 'active' ? 'active' : 'paused'} /></div>
+            <p className={styles.routinePrompt}>{routine.prompt}</p>
+            <dl className={styles.routineFacts}><div><dt>Next run</dt><dd>{formatDate(routine.nextRunAt)}</dd></div><div><dt>Safety</dt><dd>{routine.requiresApproval ? 'Approval first' : `${routine.budgetAiCredits ?? 'Policy'} credits`}</dd></div><div><dt>Last result</dt><dd>{latest ? latest.status.replace('_', ' ') : 'Not run yet'}</dd></div></dl>
+            <div className={styles.routineActions}>
+              <button type="button" disabled={rowBusy} onClick={() => void mutate(routine, 'run')}>{busy === `${routine.id}:run` ? <Loader2 size={13} className={styles.spin} /> : <Play size={13} />} Test run</button>
+              <button type="button" disabled={rowBusy} onClick={() => void mutate(routine, routine.status === 'paused' ? 'resume' : 'pause')}>{routine.status === 'paused' ? <Play size={13} /> : <Pause size={13} />}{routine.status === 'paused' ? 'Resume' : 'Pause'}</button>
+              {latest && <Link href={`/dashboard/missions?task=${latest.taskId}`}>History <ExternalLink size={12} /></Link>}
+              <button type="button" className={styles.archiveButton} disabled={rowBusy} onClick={() => void mutate(routine, 'archive')} aria-label={`Archive ${routine.name}`}><Trash2 size={13} /></button>
+            </div>
+          </article>;
+        })}
+      </div>}
+    </section>
   );
 }
 
@@ -297,12 +403,14 @@ export default function AutomationCenterPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [routineRefreshKey, setRoutineRefreshKey] = useState(0);
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [kindFilter, setKindFilter] = useState<KindFilter>('all');
   const [agentFilter, setAgentFilter] = useState('');
+  const handleRoutineMessage = useCallback((nextMessage: string) => setMessage(nextMessage), []);
 
   const load = useCallback(async (quiet = false) => {
     if (!isAuthenticated) {
@@ -388,22 +496,26 @@ export default function AutomationCenterPage() {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <div><h1>Automation Center</h1><p>Run recurring work and trigger agents from external events.</p></div>
+        <div><h1>Automation Center</h1><p>Create safe recurring work, test it, and review every result in one place.</p></div>
         <div className={styles.headerActions}>
           <button type="button" className={styles.refreshButton} onClick={() => void load(true)} disabled={refreshing}>
             <RefreshCw size={15} className={refreshing ? styles.spin : ''} /> Refresh
           </button>
           <button type="button" className={styles.createButton} onClick={() => setDrawerOpen(true)}>
-            <Plus size={16} /> New automation
+            <Plus size={16} /> New routine
           </button>
         </div>
       </header>
 
-      <SummaryRail items={items} />
       {message && <div className={styles.notice}><Check size={14} />{message}</div>}
       {loadErrors.length > 0 && (
         <div className={styles.warning}><AlertTriangle size={15} /><span>{loadErrors.length} agent source{loadErrors.length === 1 ? '' : 's'} could not be loaded. Start or restart those agents, then refresh.</span></div>
       )}
+
+      <ManagedRoutinesPanel agents={eligibleAgents} refreshKey={routineRefreshKey} onMessage={handleRoutineMessage} />
+
+      <div className={styles.legacyHeading}><div><span>Runtime sources</span><h2>Agent-native automations</h2><p>Existing framework schedules, webhooks, and IronClaw automations remain available below.</p></div></div>
+      <SummaryRail items={items} />
 
       <div className={styles.workspace}>
         <section className={styles.automationPanel}>
@@ -470,7 +582,7 @@ export default function AutomationCenterPage() {
         <TriggerSources webhookAgentId={webhookAgentId} />
       </div>
 
-      <CreateAutomationDrawer agents={eligibleAgents} open={drawerOpen} onClose={() => setDrawerOpen(false)} onCreated={async (nextMessage) => { await load(true); setMessage(nextMessage); }} />
+      <CreateAutomationDrawer agents={eligibleAgents} open={drawerOpen} onClose={() => setDrawerOpen(false)} onCreated={async (nextMessage) => { setRoutineRefreshKey((value) => value + 1); setMessage(nextMessage); }} />
     </main>
   );
 }

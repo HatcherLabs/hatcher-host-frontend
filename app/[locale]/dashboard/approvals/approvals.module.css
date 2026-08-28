@@ -23,6 +23,20 @@
 .filters button { min-height: 28px; border-radius: 5px; padding: 0 10px; color: var(--text-muted); font-size: 11px; font-weight: 700; }
 .filters button[aria-pressed='true'] { background: var(--control-active); color: var(--control-active-text); }
 .message { margin-bottom: 18px; border: 1px solid var(--border-default); border-radius: 7px; background: var(--bg-elevated); padding: 10px 12px; color: var(--text-secondary); font-size: 12px; }
+.policySection { margin: 24px 0 4px; border: 1px solid var(--border-default); border-radius: 10px; background: var(--bg-surface); overflow: hidden; }
+.policyHeading { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; border-bottom: 1px solid var(--border-line); padding: 17px 18px; }
+.policyHeading > div > span { color: var(--accent); font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+.policyHeading h2 { margin: 4px 0; font-size: 16px; }
+.policyHeading p { margin: 0; color: var(--text-muted); font-size: 11px; }
+.policyGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.policyGrid label { min-width: 0; border-right: 1px solid var(--border-line); border-bottom: 1px solid var(--border-line); padding: 14px; }
+.policyGrid label:nth-child(3n) { border-right: 0; }
+.policyGrid label > span { display: block; margin-bottom: 7px; color: var(--text-secondary); font-size: 10px; font-weight: 800; }
+.policyGrid select, .policyGrid input { width: 100%; height: 38px; border: 1px solid var(--border-default); border-radius: 7px; outline: 0; background: var(--bg-elevated); padding: 0 9px; color: var(--text-primary); font-size: 11px; }
+.policyGrid select:focus, .policyGrid input:focus { border-color: var(--border-active); }
+.policyGrid small { display: block; margin-top: 6px; color: var(--text-muted); font-size: 9px; line-height: 1.45; }
+.policyFootnote { display: flex; align-items: center; gap: 8px; padding: 11px 14px; color: var(--text-muted); font-size: 9px; }
+.policyFootnote svg { flex: 0 0 auto; color: var(--color-success); }
 .section { padding-top: 28px; }
 .sectionHeading { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
 .sectionHeading h2 { margin: 0 0 5px; font-size: 16px; letter-spacing: 0; }
@@ -62,6 +76,9 @@
   .actionRow { grid-template-columns: 1fr; gap: 12px; }
   .actions { justify-content: flex-start; }
   .failure { grid-column: 1; margin: 0; }
+  .policyGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .policyGrid label:nth-child(3n) { border-right: 1px solid var(--border-line); }
+  .policyGrid label:nth-child(2n) { border-right: 0; }
 }
 @media (max-width: 640px) {
   .inner { width: min(100% - 24px, 1180px); padding-top: 22px; }
@@ -77,4 +94,8 @@
   .grantRow { grid-template-columns: 20px minmax(0, 1fr) 34px; }
   .grantRow > span { grid-column: 2; }
   .actions button { flex: 1 1 140px; }
+  .policyHeading { flex-direction: column; }
+  .policyHeading button { width: 100%; }
+  .policyGrid { grid-template-columns: 1fr; }
+  .policyGrid label, .policyGrid label:nth-child(2n), .policyGrid label:nth-child(3n) { border-right: 0; }
 }

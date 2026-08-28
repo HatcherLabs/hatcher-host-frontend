@@ -40,6 +40,10 @@ import type {
   OperatorActionInboxResponse,
   OperatorActionRequest,
   OperatorAuthorizationRequest,
+  AutomationPolicy,
+  AgentRoutine,
+  CreateRoutineBody,
+  RoutinesResponse,
   RobinhoodHub,
   PublicTraderData,
   PublicTraderDirectoryData,
@@ -3548,7 +3552,42 @@ export const api = {
         method: "POST",
         body: JSON.stringify(body),
       },
-    ),
+  ),
+
+  getAutomationPolicy: () => req<{ policy: AutomationPolicy }>("/agents/automation-policy"),
+
+  updateAutomationPolicy: (policy: Omit<AutomationPolicy, "id" | "userId" | "createdAt" | "updatedAt">) =>
+    req<{ policy: AutomationPolicy }>("/agents/automation-policy", {
+      method: "PUT",
+      body: JSON.stringify(policy),
+    }),
+
+  getRoutines: (params: { agentId?: string; status?: string; limit?: number } = {}) => {
+    const query = new URLSearchParams();
+    if (params.agentId) query.set("agentId", params.agentId);
+    if (params.status) query.set("status", params.status);
+    if (params.limit) query.set("limit", String(params.limit));
+    const suffix = query.toString();
+    return req<RoutinesResponse>(`/agents/routines${suffix ? `?${suffix}` : ""}`);
+  },
+
+  createRoutine: (agentId: string, body: CreateRoutineBody) =>
+    req<{ routine: AgentRoutine }>(`/agents/${agentId}/routines`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  pauseRoutine: (agentId: string, routineId: string) =>
+    req<{ routine: AgentRoutine }>(`/agents/${agentId}/routines/${routineId}/pause`, { method: "POST" }),
+
+  resumeRoutine: (agentId: string, routineId: string) =>
+    req<{ routine: AgentRoutine }>(`/agents/${agentId}/routines/${routineId}/resume`, { method: "POST" }),
+
+  runRoutine: (agentId: string, routineId: string) =>
+    req<{ taskId: string; status: string }>(`/agents/${agentId}/routines/${routineId}/run`, { method: "POST" }),
+
+  archiveRoutine: (agentId: string, routineId: string) =>
+    req<{ id: string; status: "archived" }>(`/agents/${agentId}/routines/${routineId}`, { method: "DELETE" }),
 
   rejectMcpAction: (actionId: string) =>
     req<{ action: McpActionRequest }>(
