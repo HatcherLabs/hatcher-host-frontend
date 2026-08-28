@@ -8,13 +8,14 @@ import {
   KeyRound,
   Loader2,
   RefreshCw,
+  Save,
   ShieldCheck,
   ShieldX,
   Trash2,
 } from 'lucide-react';
 import { Link, useRouter } from '@/i18n/routing';
 import { api } from '@/lib/api';
-import type { Agent, McpActionGrant, McpActionInboxResponse, McpActionRequest, McpActionStatus, OperatorActionInboxResponse, OperatorActionRequest } from '@/lib/api';
+import type { Agent, AutomationPolicy, McpActionGrant, McpActionInboxResponse, McpActionRequest, McpActionStatus, OperatorActionInboxResponse, OperatorActionRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import styles from './approvals.module.css';
 
@@ -33,6 +34,17 @@ const EMPTY_INBOX: McpActionInboxResponse = {
 };
 
 const EMPTY_OPERATOR_INBOX: OperatorActionInboxResponse = { actions: [], summary: { pending: 0 } };
+const DEFAULT_POLICY: AutomationPolicy = {
+  id: null,
+  userId: '',
+  executionMode: 'draft_first',
+  maxAiCreditsPerRun: null,
+  defaultMaxRuntimeSeconds: 900,
+  outboundMcpMode: 'ask',
+  operatorMode: 'ask',
+  createdAt: null,
+  updatedAt: null,
+};
 
 function formatDate(value: string | null | undefined): string {
   if (!value) return '-';
@@ -188,6 +200,30 @@ function OperatorActionRow({ action, busy, onApprove, onReject }: {
   );
 }
 
+function PolicyEditor({ policy, saving, onChange, onSave }: {
+  policy: AutomationPolicy;
+  saving: boolean;
+  onChange: (policy: AutomationPolicy) => void;
+  onSave: () => void;
+}) {
+  return (
+    <section className={styles.policySection} aria-labelledby="execution-policy-title">
+      <div className={styles.policyHeading}>
+        <div><span>Unified policy</span><h2 id="execution-policy-title">How agents may act</h2><p>One owner policy for routines, outbound MCP tools, and inbound Hatcher Operator clients.</p></div>
+        <button type="button" className={styles.primaryButton} onClick={onSave} disabled={saving}>{saving ? <Loader2 size={14} className={styles.spin} /> : <Save size={14} />} Save policy</button>
+      </div>
+      <div className={styles.policyGrid}>
+        <label><span>Scheduled routines</span><select value={policy.executionMode} onChange={(event) => onChange({ ...policy, executionMode: event.target.value as AutomationPolicy['executionMode'] })}><option value="draft_first">Draft first — ask before each run</option><option value="direct">Run automatically within limits</option></select><small>Manual test runs start immediately because your click is the approval.</small></label>
+        <label><span>Maximum AI Credits per run</span><input inputMode="numeric" value={policy.maxAiCreditsPerRun ?? ''} onChange={(event) => onChange({ ...policy, maxAiCreditsPerRun: event.target.value ? Number(event.target.value.replace(/\D/g, '')) : null })} placeholder="No workspace cap" /><small>Individual routines may use a lower cap, never a higher one.</small></label>
+        <label><span>Default runtime limit</span><select value={policy.defaultMaxRuntimeSeconds} onChange={(event) => onChange({ ...policy, defaultMaxRuntimeSeconds: Number(event.target.value) })}><option value="300">5 minutes</option><option value="900">15 minutes</option><option value="1800">30 minutes</option><option value="3600">60 minutes</option></select><small>Stops a run that takes longer than expected.</small></label>
+        <label><span>Outbound MCP tools</span><select value={policy.outboundMcpMode} onChange={(event) => onChange({ ...policy, outboundMcpMode: event.target.value as AutomationPolicy['outboundMcpMode'] })}><option value="ask">Ask me for effectful calls</option><option value="trusted">Follow each connector's tool policy</option><option value="block">Block all effectful calls</option></select><small>“Trusted” still respects tool-scoped grants and connector settings.</small></label>
+        <label><span>Hatcher Operator clients</span><select value={policy.operatorMode} onChange={(event) => onChange({ ...policy, operatorMode: event.target.value as AutomationPolicy['operatorMode'] })}><option value="ask">Ask me for every action</option><option value="block">Read-only — block actions</option></select><small>Grok Bot, Cursor, and other clients never receive reusable action grants.</small></label>
+      </div>
+      <div className={styles.policyFootnote}><ShieldCheck size={15} /><span>Safe by default: blocked actions fail closed, secrets stay redacted, and approval remains bound to the exact payload.</span></div>
+    </section>
+  );
+}
+
 export default function ActionApprovalsPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
@@ -199,6 +235,8 @@ export default function ActionApprovalsPage() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [policy, setPolicy] = useState<AutomationPolicy>(DEFAULT_POLICY);
+  const [savingPolicy, setSavingPolicy] = useState(false);
   const agentId = searchParams.get('agent') ?? '';
 
   const load = useCallback(async (quiet = false) => {
@@ -240,6 +278,14 @@ export default function ActionApprovalsPage() {
     return () => window.clearInterval(timer);
   }, [load]);
 
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    void api.getAutomationPolicy().then((result) => {
+      if (result.success) setPolicy(result.data.policy);
+      else setMessage(result.error ?? 'Could not load automation policy.');
+    });
+  }, [isAuthenticated]);
+
   const selectedAgentName = useMemo(
     () => agents.find((agent) => agent.id === agentId)?.name ?? 'All agents',
     [agentId, agents],
@@ -256,6 +302,22 @@ export default function ActionApprovalsPage() {
     }
     await load(true);
     setMessage(success);
+  };
+
+  const savePolicy = async () => {
+    setSavingPolicy(true);
+    setMessage(null);
+    const result = await api.updateAutomationPolicy({
+      executionMode: policy.executionMode,
+      maxAiCreditsPerRun: policy.maxAiCreditsPerRun,
+      defaultMaxRuntimeSeconds: policy.defaultMaxRuntimeSeconds,
+      outboundMcpMode: policy.outboundMcpMode,
+      operatorMode: policy.operatorMode,
+    });
+    setSavingPolicy(false);
+    if (!result.success) { setMessage(result.error ?? 'Could not save policy.'); return; }
+    setPolicy(result.data.policy);
+    setMessage('Execution policy saved. New runs and actions use it immediately.');
   };
 
   if (authLoading || loading) {
@@ -290,6 +352,8 @@ export default function ActionApprovalsPage() {
           <div><span>Active grants</span><strong>{inbox.summary.activeGrants}</strong></div>
           <div><span>Scope</span><strong>{selectedAgentName}</strong></div>
         </section>
+
+        <PolicyEditor policy={policy} saving={savingPolicy} onChange={setPolicy} onSave={() => void savePolicy()} />
 
         <div className={styles.controls}>
           <label>
