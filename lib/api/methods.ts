@@ -354,6 +354,12 @@ export const api = {
   getComputeSettlementLedger: (limit = 50) =>
     req<ComputeSettlementLedgerItem[]>(`/compute/settlement/ledger?limit=${limit}`),
 
+  reconcileComputeSettlements: (limit = 50) =>
+    req<{ inspected: number; recovered: number; abandoned: number; manualReview: number }>(
+      `/compute/settlement/reconcile?limit=${limit}`,
+      { method: 'POST' },
+    ),
+
   createComputeSettlementQuote: (input: {
     model: string;
     messages: Array<{ role: 'system' | 'user' | 'assistant' | 'tool'; content: string }>;

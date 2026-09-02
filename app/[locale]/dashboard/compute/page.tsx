@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   Trash2,
   Wallet,
+  Workflow,
 } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
 import { api } from '@/lib/api';
@@ -162,6 +163,18 @@ export default function ComputeProviderDashboard() {
     await refresh();
   }
 
+  async function reconcileLedger() {
+    setSettlementWorking(true);
+    setError(null);
+    const result = await api.reconcileComputeSettlements(50);
+    setSettlementWorking(false);
+    if (!result.success) {
+      setError(result.error);
+      return;
+    }
+    await refresh();
+  }
+
   if (authLoading || (!isAuthenticated && !authLoading)) return null;
 
   const enrollCommand = enrollment
@@ -275,6 +288,20 @@ export default function ComputeProviderDashboard() {
 
             <section className={styles.panel}>
               <div className={styles.panelHeader}>
+                <div><h2>Distributed workloads</h2><p>Use smaller machines safely without pretending one token stream is divisible.</p></div>
+                <Workflow size={20} aria-hidden />
+              </div>
+              <div className={styles.quoteCard}>
+                <div><span>Independent batch</span><strong>Up to 64 requests</strong></div>
+                <div><span>Fan-out limit</span><strong>4 concurrent by default</strong></div>
+                <div><span>Long documents</span><strong>Map → reduce</strong></div>
+                <div><span>Ordering</span><strong>Input order preserved</strong></div>
+              </div>
+              <p className={styles.muted}>Batch requests are distributed across available providers. Long text is split at useful boundaries, mapped independently, then reduced into one response. A single autoregressive generation remains on one compatible node.</p>
+            </section>
+
+            <section className={styles.panel}>
+              <div className={styles.panelHeader}>
                 <div><h2>Your nodes</h2><p>Outbound polling only; no inbound firewall rule is required.</p></div>
                 <Server size={20} aria-hidden />
               </div>
@@ -292,6 +319,7 @@ export default function ComputeProviderDashboard() {
                       <div><span>Model</span><strong>{provider.supportedModels.join(', ')}</strong></div>
                       <div><span>Jobs</span><strong>{number(provider.totalJobs)}</strong></div>
                       <div><span>Tokens</span><strong>{number(provider.totalTokens)}</strong></div>
+                      <div><span>Signed receipts</span><strong>{provider.receiptReady ? 'ready' : 'upgrade required'}</strong></div>
                       <div><span>Last seen</span><strong>{date(provider.lastSeenAt)}</strong></div>
                     </div>
                     <div className={styles.actions} style={{ marginTop: 14 }}>
@@ -310,9 +338,9 @@ export default function ComputeProviderDashboard() {
               </div>
               <div className={styles.tableWrap}>
                 <table className={styles.table}>
-                  <thead><tr><th>Status</th><th>Node</th><th>Model</th><th>Tokens</th><th>Latency</th><th>Created</th></tr></thead>
+                  <thead><tr><th>Status</th><th>Receipt</th><th>Node</th><th>Model</th><th>Tokens</th><th>Latency</th><th>Created</th></tr></thead>
                   <tbody>
-                    {jobs.map((job) => <tr key={job.id}><td>{job.status}</td><td>{job.provider?.name ?? '—'}</td><td>{job.model}</td><td>{number((job.promptTokens ?? 0) + (job.completionTokens ?? 0))}</td><td>{job.latencyMs === null ? '—' : `${job.latencyMs} ms`}</td><td>{date(job.createdAt)}</td></tr>)}
+                    {jobs.map((job) => <tr key={job.id}><td>{job.status}</td><td>{job.receiptVerifiedAt ? 'verified' : '—'}</td><td>{job.provider?.name ?? '—'}</td><td>{job.model}</td><td>{number((job.promptTokens ?? 0) + (job.completionTokens ?? 0))}</td><td>{job.latencyMs === null ? '—' : `${job.latencyMs} ms`}</td><td>{date(job.createdAt)}</td></tr>)}
                   </tbody>
                 </table>
                 {!loading && jobs.length === 0 ? <div className={styles.empty}>Jobs will appear after this account&apos;s node completes inference.</div> : null}
@@ -353,7 +381,7 @@ export default function ComputeProviderDashboard() {
                 </div>
               ) : null}
               <p className={styles.muted}>Install Node.js 20+ and the local preview package on any supported OS.</p>
-              <code className={styles.command}>npm install --global ./hatcher-compute-node-0.1.0.tgz</code>
+              <code className={styles.command}>npm install --global ./hatcher-compute-node-0.2.0.tgz</code>
               {enrollment ? <><p className={styles.muted}>Enroll:</p><code className={styles.command}>{enrollCommand}</code><button className={styles.secondaryButton} style={{ marginTop: 10 }} onClick={() => void copy(enrollCommand)}><Copy size={14} /> Copy command</button></> : null}
               <p className={styles.muted}>This first command uses the deterministic test runtime. Without a payout wallet, verified work is held instead of becoming eligible.</p>
               <p className={styles.muted}>Then start the worker:</p>
@@ -368,6 +396,7 @@ export default function ComputeProviderDashboard() {
                   ['Local ledger simulator', settlement?.localSimulatorEnabled],
                   ['Provider split', settlement?.checks.providerShareConfigured],
                   ['Devnet mode', settlement?.checks.devnetMode],
+                  ['Execution kill switch', settlement?.checks.executionEnabled],
                   ['USDC mint', settlement?.checks.usdcMintConfigured],
                   ['Escrow wallet', settlement?.checks.escrowWalletConfigured],
                   ['Unit pricing', settlement?.checks.pricingConfigured],
@@ -376,6 +405,9 @@ export default function ComputeProviderDashboard() {
                 ))}
               </div>
               <p className={styles.muted}>Local records: {ledger.length}. A request payer funds escrow first; a verified result can become payout-eligible. On-chain payout remains inactive.</p>
+              <button className={styles.secondaryButton} onClick={() => void reconcileLedger()} disabled={settlementWorking}>
+                {settlementWorking ? <Loader2 size={15} className={styles.spinner} /> : <RefreshCw size={15} />} Reconcile ledger
+              </button>
             </section>
           </aside>
         </div>

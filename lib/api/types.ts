@@ -2874,6 +2874,7 @@ export interface ComputeProvider {
   runtimeMode: 'mock' | 'openai_compatible';
   supportedModels: string[];
   payoutWallet: string | null;
+  receiptReady: boolean;
   maxConcurrency: number;
   version: string | null;
   lastSeenAt: string | null;
@@ -2893,6 +2894,7 @@ export interface ComputeProviderJob {
   latencyMs: number | null;
   attempt: number;
   settlementStatus: string;
+  receiptVerifiedAt: string | null;
   priceUsdc: string;
   createdAt: string;
   completedAt: string | null;
@@ -2941,6 +2943,7 @@ export interface ComputeSettlementReadiness {
   providerShareBps: number;
   checks: {
     devnetMode: boolean;
+    executionEnabled: boolean;
     usdcMintConfigured: boolean;
     escrowWalletConfigured: boolean;
     pricingConfigured: boolean;
@@ -2969,7 +2972,7 @@ export interface ComputeSettlementQuote {
 
 export interface ComputePaymentReceipt {
   id: string;
-  status: 'verified' | 'settled' | 'refund_required' | 'refunded' | 'failed';
+  status: 'verified' | 'settled' | 'refund_required' | 'refunded' | 'failed' | 'execution_failed' | 'settlement_failed' | 'authorization_abandoned';
   protocolVersion: 2;
   scheme: 'exact';
   network: string;
@@ -2977,7 +2980,7 @@ export interface ComputePaymentReceipt {
   payTo: string;
   payerWallet: string | null;
   amountMicrousc: string;
-  transaction: string;
+  transaction: string | null;
   verifiedAt: string;
   settledAt: string | null;
   failureReason: string | null;
@@ -3008,6 +3011,7 @@ export interface ComputeSettlementJobSummary {
   settlementStatus: string;
   providerId: string | null;
   resultDigest: string | null;
+  receiptVerifiedAt: string | null;
   response?: Record<string, unknown> | null;
 }
 
