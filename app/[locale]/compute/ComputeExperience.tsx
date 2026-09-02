@@ -95,7 +95,7 @@ export function ComputeExperience({
           <p className={styles.heroText}>{t("hero.body")}</p>
           <div className={styles.actions}>
             <Link
-              href="/support?topic=compute-provider-alpha"
+              href="/dashboard/compute"
               className={styles.primaryAction}
             >
               {t("actions.joinAlpha")}

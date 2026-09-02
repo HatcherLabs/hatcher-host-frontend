@@ -169,6 +169,12 @@ import type {
   IronClawMcpRegisterBody,
   IronClawOutboundResponse,
   IronClawThreadStreamEvent,
+  ComputeEnrollmentToken,
+  ComputeNetworkStats,
+  ComputeProvider,
+  ComputeProviderJob,
+  ComputeSettlementReadiness,
+  ComputeModelAvailability,
 } from "./types";
 import type { TierConfig, AdminOverviewExtras } from "@hatcher/shared";
 
@@ -328,6 +334,30 @@ export const api = {
   getSession: () =>
     req<{ authenticated: boolean; user: AuthProfileData | null }>(
       "/auth/session",
+    ),
+
+  getComputeStats: () => req<ComputeNetworkStats>("/compute/stats"),
+
+  getComputeProviders: () => req<ComputeProvider[]>("/compute/providers"),
+
+  getComputeModels: () => req<ComputeModelAvailability[]>("/compute/catalog"),
+
+  getComputeProviderJobs: (limit = 50) =>
+    req<ComputeProviderJob[]>(`/compute/provider-jobs?limit=${limit}`),
+
+  getComputeSettlementReadiness: (probe = false) =>
+    req<ComputeSettlementReadiness>(`/compute/settlement/readiness?probe=${probe}`),
+
+  createComputeEnrollmentToken: (label: string) =>
+    req<ComputeEnrollmentToken>("/compute/enrollment-tokens", {
+      method: "POST",
+      body: JSON.stringify({ label }),
+    }),
+
+  revokeComputeProvider: (providerId: string) =>
+    req<{ id: string; status: "revoked" }>(
+      `/compute/providers/${encodeURIComponent(providerId)}`,
+      { method: "DELETE" },
     ),
 
   /** Update profile (username, email, password, or avatarUrl) */

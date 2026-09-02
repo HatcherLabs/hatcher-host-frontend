@@ -22,6 +22,7 @@ import {
   ListChecks,
   ShieldCheck,
   CalendarClock,
+  Cpu,
 } from 'lucide-react';
 import {
   AGENTS_DASHBOARD_PATH,
@@ -55,6 +56,7 @@ const STATIC_COMMANDS: CommandItem[] = [
   { id: 'token', label: '$HATCHER Token', icon: Coins, href: '/token', section: 'Navigation' },
   { id: 'staking', label: '$HATCHER Staking', icon: Clock, href: '/staking', section: 'Navigation' },
   { id: 'analytics', label: 'Analytics', icon: BarChart3, href: '/dashboard/analytics', section: 'Navigation' },
+  { id: 'compute', label: 'Compute providers', icon: Cpu, href: '/dashboard/compute', section: 'Navigation' },
   { id: 'help', label: 'Help & Support', icon: HelpCircle, href: '/support', section: 'Navigation' },
   { id: 'docs', label: 'Documentation', icon: BookOpen, href: 'https://docs.hatcher.host', section: 'Navigation' },
 ];

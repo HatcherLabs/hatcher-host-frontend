@@ -216,5 +216,11 @@ export type {
   IronClawMcpRegisterBody,
   IronClawOutboundResponse,
   IronClawLlmResponse,
+  ComputeEnrollmentToken,
+  ComputeNetworkStats,
+  ComputeProvider,
+  ComputeProviderJob,
+  ComputeSettlementReadiness,
+  ComputeModelAvailability,
 } from "./types";
 export { api } from "./methods";

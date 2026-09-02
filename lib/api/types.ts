@@ -2857,6 +2857,95 @@ export type AdminHealthResponse = {
 };
 
 // ============================================================
+// Hatcher Compute provider network
+// ============================================================
+
+export interface ComputeProvider {
+  id: string;
+  name: string;
+  status: 'online' | 'offline' | 'draining' | 'revoked';
+  platform: string;
+  architecture: string;
+  cpuModel: string;
+  gpuName: string | null;
+  vramMb: number | null;
+  memoryMb: number;
+  backend: string;
+  runtimeMode: 'mock' | 'openai_compatible';
+  supportedModels: string[];
+  payoutWallet: string | null;
+  maxConcurrency: number;
+  version: string | null;
+  lastSeenAt: string | null;
+  totalJobs: number;
+  totalTokens: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ComputeProviderJob {
+  id: string;
+  providerId: string | null;
+  status: 'queued' | 'leased' | 'completed' | 'failed' | 'cancelled';
+  model: string;
+  promptTokens: number | null;
+  completionTokens: number | null;
+  latencyMs: number | null;
+  attempt: number;
+  settlementStatus: string;
+  priceUsdc: string;
+  createdAt: string;
+  completedAt: string | null;
+  provider: { name: string; gpuName: string | null } | null;
+}
+
+export interface ComputeModelAvailability {
+  id: string;
+  object: 'model';
+  created: number;
+  owned_by: 'hatcher-compute';
+  providerCount: number;
+  availableVramMb: number;
+}
+
+export interface ComputeNetworkStats {
+  phase: 'local_preview';
+  settlement: 'disabled';
+  providers: { total: number; online: number };
+  availableVramMb: number;
+  jobs: {
+    queued: number;
+    leased: number;
+    completed: number;
+    completed24h: number;
+    failed: number;
+  };
+  totalTokens: string;
+  averageLatencyMs: number;
+  settledUsdc: string;
+}
+
+export interface ComputeEnrollmentToken {
+  token: string;
+  expiresAt: string;
+}
+
+export interface ComputeSettlementReadiness {
+  mode: 'disabled' | 'local' | 'devnet';
+  enabled: boolean;
+  x402Version: 2;
+  network: string;
+  facilitatorUrl: string;
+  facilitatorSupportsDevnet: boolean | null;
+  checks: {
+    devnetMode: boolean;
+    usdcMintConfigured: boolean;
+    escrowWalletConfigured: boolean;
+    pricingConfigured: boolean;
+  };
+}
+
+// ============================================================
 // IronClaw native runtime control (threads / runs / outbound / LLM)
 // ============================================================
 // The IronClaw runtime returns loosely-versioned JSON; only the fields the

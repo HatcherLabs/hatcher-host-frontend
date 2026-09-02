@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 import { BYOK_PROVIDERS } from '@hatcher/shared';
 import { api } from '@/lib/api';
+import type { ComputeModelAvailability } from '@/lib/api';
 import {
   HOSTED_MODEL_PROVIDERS,
   HOSTED_MODELS,
@@ -388,6 +389,7 @@ export function ConfigTab() {
   const [presetDescription, setPresetDescription] = useState('');
   const [presetImportError, setPresetImportError] = useState<string | null>(null);
   const [liveModelPricing, setLiveModelPricing] = useState<ModelPricingPayload | null>(null);
+  const [computeModels, setComputeModels] = useState<ComputeModelAvailability[]>([]);
   const [embedTheme, setEmbedTheme] = useState<AgentEmbedTheme>('auto');
   const [embedAccent, setEmbedAccent] = useState<AgentEmbedAccent>('green');
   const [embedPosition, setEmbedPosition] = useState<AgentEmbedPosition>('right');
@@ -431,10 +433,38 @@ export function ConfigTab() {
     () => modelPricingById(liveModelPricing),
     [liveModelPricing],
   );
-  const availableHostedModels = useMemo(
-    () => mergeHostedModelsWithLivePricing(HOSTED_MODELS, liveModelPricingById),
-    [liveModelPricingById],
-  );
+  const availableHostedModels = useMemo(() => {
+    const computeOptions: HostedModelOption[] = computeModels.length === 0
+      ? []
+      : [
+          {
+            id: 'compute/auto',
+            name: 'Hatcher Compute Auto',
+            providerKey: 'compute',
+            provider: 'Hatcher Compute',
+            category: 'Distributed',
+            cost: 'Variable',
+            context: 'Node-defined',
+            description: 'Routes each request to an online owner-contributed node with a compatible local model.',
+            warning: 'Local preview: x402 USDC settlement is disabled.',
+          },
+          ...computeModels.map((model) => ({
+            id: model.id,
+            name: model.id.replace(/^compute\//, ''),
+            providerKey: 'compute',
+            provider: 'Hatcher Compute',
+            category: 'Distributed',
+            cost: 'Variable' as const,
+            context: 'Node-defined',
+            description: `${model.providerCount} online node${model.providerCount === 1 ? '' : 's'} · ${(model.availableVramMb / 1024).toFixed(1)} GB reported VRAM.`,
+            warning: 'Local preview: x402 USDC settlement is disabled.',
+          })),
+        ];
+    return mergeHostedModelsWithLivePricing(
+      [...HOSTED_MODELS, ...computeOptions],
+      liveModelPricingById,
+    );
+  }, [computeModels, liveModelPricingById]);
   const selectedHostedModel = useMemo(
     () => availableHostedModels.find((m) => m.id === normalizedHostedModel)
       ?? createSavedHostedModelOption(normalizedHostedModel),
@@ -468,10 +498,22 @@ export function ConfigTab() {
       ? `${savedModelConfig.model} (${savedModelConfig.provider})`
       : 'No saved model';
   const hostedModelProviders = useMemo(
-    () => HOSTED_MODEL_PROVIDERS.some((provider) => provider.key === selectedHostedProvider.key)
-      ? HOSTED_MODEL_PROVIDERS
-      : [...HOSTED_MODEL_PROVIDERS, selectedHostedProvider],
-    [selectedHostedProvider],
+    () => {
+      const providers = computeModels.length > 0
+        ? [
+            ...HOSTED_MODEL_PROVIDERS,
+            {
+              key: 'compute',
+              name: 'Hatcher Compute',
+              description: 'Owner-contributed local inference nodes.',
+            },
+          ]
+        : HOSTED_MODEL_PROVIDERS;
+      return providers.some((provider) => provider.key === selectedHostedProvider.key)
+        ? providers
+        : [...providers, selectedHostedProvider];
+    },
+    [computeModels.length, selectedHostedProvider],
   );
   const contextualHostedModelProviders = useMemo(() => {
     const providerKeys = new Set(
@@ -543,7 +585,9 @@ export function ConfigTab() {
   const hasPendingModelChange = savedModelConfig.provider === hostedProvider && configProvider === hostedProvider
     ? savedHostedModel?.id !== selectedHostedModel.id
     : savedModelConfig.provider !== configProvider || savedModelConfig.model !== draftModelValue;
-  const lowAiCreditBalance = isHostedMode && aiCreditBalance !== null && aiCreditBalance.balance < 100;
+  const usesComputeNetwork = isHostedMode && selectedHostedModel.providerKey === 'compute';
+  const lowAiCreditBalance =
+    isHostedMode && !usesComputeNetwork && aiCreditBalance !== null && aiCreditBalance.balance < 100;
   const sortedModelPresets = useMemo(
     () => [...modelPresets].sort((a, b) => Number(b.favorite) - Number(a.favorite) || b.updatedAt - a.updatedAt),
     [modelPresets],
@@ -585,7 +629,9 @@ export function ConfigTab() {
   }, [configModel, customModelInput, isHostedMode, selectedByokProvider?.models, useCustomModel]);
   const modelModeLabel = isHostedMode ? 'Managed by Hatcher' : 'Use your own provider';
   const modelModeDescription = isHostedMode
-    ? 'Hatcher hosts the model call, meters usage with AI Credits, and keeps provider keys out of this agent.'
+    ? usesComputeNetwork
+      ? 'Hatcher coordinates the request with an online provider node. USDC settlement stays disabled in the local preview.'
+      : 'Hatcher hosts the model call, meters usage with AI Credits, and keeps provider keys out of this agent.'
     : 'You provide the model vendor key. Hatcher stores it as a secret and the vendor bills usage directly.';
   const currentModelName = isHostedMode ? selectedHostedModel.name : selectedByokModelName || 'No model selected';
   const currentModelRoute = isHostedMode
@@ -735,14 +781,20 @@ export function ConfigTab() {
 
   useEffect(() => {
     let cancelled = false;
-    api.getModelPricing()
-      .then((res) => {
-        if (cancelled || !res.success) return;
-        setLiveModelPricing(parseModelPricingPayload(res.data));
+    Promise.all([api.getModelPricing(), api.getComputeModels()])
+      .then(([pricingResult, computeResult]) => {
+        if (cancelled) return;
+        setLiveModelPricing(
+          pricingResult.success ? parseModelPricingPayload(pricingResult.data) : null,
+        );
+        setComputeModels(computeResult.success ? computeResult.data : []);
       })
       .catch(() => {
         // Degrade silently to the static tier badges.
-        if (!cancelled) setLiveModelPricing(null);
+        if (!cancelled) {
+          setLiveModelPricing(null);
+          setComputeModels([]);
+        }
       });
     return () => {
       cancelled = true;
@@ -1260,7 +1312,7 @@ export function ConfigTab() {
             <div className="flex items-center justify-between gap-3">
               <span className="text-[var(--text-tertiary)]">Billing</span>
               <span className="min-w-0 truncate text-right text-[var(--text-secondary)]">
-                {isHostedMode ? 'AI Credits' : 'Provider account'}
+                {isHostedMode ? (usesComputeNetwork ? 'x402 USDC · preview disabled' : 'AI Credits') : 'Provider account'}
               </span>
             </div>
           </div>
@@ -1323,7 +1375,11 @@ export function ConfigTab() {
                     </span>
                     <span
                       className={`rounded border px-2 py-1 ${hostedCostClass(selectedHostedModel.cost)}`}
-                      title={selectedHostedModel.priceLabel ? 'Provider catalog metadata; final AI Credit billing uses Hatcher metering and settlement.' : undefined}
+                      title={selectedHostedModel.priceLabel
+                        ? 'Provider catalog metadata; final AI Credit billing uses Hatcher metering and settlement.'
+                        : usesComputeNetwork
+                          ? 'Provider pricing is not active during the local preview.'
+                          : undefined}
                     >
                       {selectedHostedModel.fixedPrice ?? selectedHostedModel.priceLabel ?? hostedCostEstimate(selectedHostedModel.cost)}
                     </span>
@@ -1335,6 +1391,8 @@ export function ConfigTab() {
                           ? 'Inference routes through AceData first, with OpenRouter fallback when needed. Review partner policy before using sensitive data.'
                         : selectedHostedModel.providerKey === 'openserv'
                           ? 'Inference routes through OpenServ first, with OpenRouter fallback when needed. Review partner policy before using sensitive data.'
+                        : selectedHostedModel.providerKey === 'compute'
+                          ? 'Inference is executed by an independent provider node. Do not send secrets or confidential prompts.'
                         : hostedModelPrivacy(selectedHostedModel) === 'partner'
                           ? 'Inference happens through an explicit partner route. Review partner policy before using sensitive data.'
                           : 'Inference is routed through Hatcher managed infrastructure, currently UsePod first with OpenRouter fallback.'}
