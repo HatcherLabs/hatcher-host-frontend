@@ -2937,12 +2937,92 @@ export interface ComputeSettlementReadiness {
   network: string;
   facilitatorUrl: string;
   facilitatorSupportsDevnet: boolean | null;
+  localSimulatorEnabled: boolean;
+  providerShareBps: number;
   checks: {
     devnetMode: boolean;
     usdcMintConfigured: boolean;
     escrowWalletConfigured: boolean;
     pricingConfigured: boolean;
+    providerShareConfigured: boolean;
   };
+}
+
+export interface ComputeSettlementQuote {
+  id: string;
+  jobId: string | null;
+  model: string;
+  estimatedInputTokens: number;
+  maxOutputTokens: number;
+  amountMicrousc: string;
+  amountUsdc: string;
+  network: string;
+  asset: string;
+  payTo: string;
+  status: 'quoted' | 'authorized' | 'consumed' | 'expired' | 'failed';
+  expiresAt: string;
+  authorizedAt: string | null;
+  consumedAt: string | null;
+  createdAt: string;
+  simulation: boolean;
+}
+
+export interface ComputePaymentReceipt {
+  id: string;
+  status: 'verified' | 'settled' | 'refund_required' | 'refunded' | 'failed';
+  protocolVersion: 2;
+  scheme: 'exact';
+  network: string;
+  asset: string;
+  payTo: string;
+  payerWallet: string | null;
+  amountMicrousc: string;
+  transaction: string;
+  verifiedAt: string;
+  settledAt: string | null;
+  failureReason: string | null;
+}
+
+export interface ComputePayoutLedgerEntry {
+  id: string;
+  jobId: string;
+  providerId: string;
+  payoutWallet: string | null;
+  grossMicrousc: string;
+  providerMicrousc: string;
+  platformMicrousc: string;
+  refundMicrousc: string;
+  status: 'eligible' | 'held' | 'paid' | 'refunded';
+  verificationStatus: 'passed' | 'failed';
+  verificationMethod: string;
+  verificationDigest: string | null;
+  heldReason: string | null;
+  eligibleAt: string | null;
+  transaction: string | null;
+  paidAt: string | null;
+}
+
+export interface ComputeSettlementJobSummary {
+  id: string;
+  status: 'queued' | 'leased' | 'completed' | 'failed' | 'cancelled';
+  settlementStatus: string;
+  providerId: string | null;
+  resultDigest: string | null;
+  response?: Record<string, unknown> | null;
+}
+
+export interface ComputeSettlementLedgerItem {
+  quote: ComputeSettlementQuote;
+  payment: ComputePaymentReceipt | null;
+  job: ComputeSettlementJobSummary | null;
+  payout: ComputePayoutLedgerEntry | null;
+}
+
+export interface ComputeSettlementRun {
+  quote: ComputeSettlementQuote;
+  payment: ComputePaymentReceipt | null;
+  job: ComputeSettlementJobSummary;
+  payout: ComputePayoutLedgerEntry | null;
 }
 
 // ============================================================

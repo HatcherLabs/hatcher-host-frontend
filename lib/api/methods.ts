@@ -174,6 +174,9 @@ import type {
   ComputeProvider,
   ComputeProviderJob,
   ComputeSettlementReadiness,
+  ComputeSettlementLedgerItem,
+  ComputeSettlementQuote,
+  ComputeSettlementRun,
   ComputeModelAvailability,
 } from "./types";
 import type { TierConfig, AdminOverviewExtras } from "@hatcher/shared";
@@ -347,6 +350,25 @@ export const api = {
 
   getComputeSettlementReadiness: (probe = false) =>
     req<ComputeSettlementReadiness>(`/compute/settlement/readiness?probe=${probe}`),
+
+  getComputeSettlementLedger: (limit = 50) =>
+    req<ComputeSettlementLedgerItem[]>(`/compute/settlement/ledger?limit=${limit}`),
+
+  createComputeSettlementQuote: (input: {
+    model: string;
+    messages: Array<{ role: 'system' | 'user' | 'assistant' | 'tool'; content: string }>;
+    max_tokens: number;
+  }) =>
+    req<ComputeSettlementQuote>('/compute/settlement/quotes', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    }),
+
+  authorizeLocalComputeSettlement: (quoteId: string) =>
+    req<ComputeSettlementRun>(
+      `/compute/settlement/quotes/${encodeURIComponent(quoteId)}/local-authorize`,
+      { method: 'POST' },
+    ),
 
   createComputeEnrollmentToken: (label: string) =>
     req<ComputeEnrollmentToken>("/compute/enrollment-tokens", {

@@ -221,6 +221,11 @@ export type {
   ComputeProvider,
   ComputeProviderJob,
   ComputeSettlementReadiness,
+  ComputeSettlementLedgerItem,
+  ComputeSettlementQuote,
+  ComputeSettlementRun,
+  ComputePaymentReceipt,
+  ComputePayoutLedgerEntry,
   ComputeModelAvailability,
 } from "./types";
 export { api } from "./methods";

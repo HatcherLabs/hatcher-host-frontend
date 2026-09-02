@@ -1,14 +1,28 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Activity, Copy, Cpu, Loader2, RefreshCw, Server, Trash2, Wallet } from 'lucide-react';
+import {
+  Activity,
+  Copy,
+  Cpu,
+  FlaskConical,
+  Loader2,
+  RefreshCw,
+  Server,
+  ShieldCheck,
+  Trash2,
+  Wallet,
+} from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
 import { api } from '@/lib/api';
 import type {
   ComputeNetworkStats,
   ComputeProvider,
   ComputeProviderJob,
+  ComputeSettlementLedgerItem,
+  ComputeSettlementQuote,
   ComputeSettlementReadiness,
+  ComputeSettlementRun,
 } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { API_URL } from '@/lib/config';
@@ -28,6 +42,11 @@ function date(value: string | null): string {
   }).format(new Date(value));
 }
 
+function microUsdc(value: string | null | undefined): string {
+  if (!value) return '$0.000000';
+  return `$${(Number(value) / 1_000_000).toFixed(6)}`;
+}
+
 export default function ComputeProviderDashboard() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
@@ -35,27 +54,35 @@ export default function ComputeProviderDashboard() {
   const [jobs, setJobs] = useState<ComputeProviderJob[]>([]);
   const [stats, setStats] = useState<ComputeNetworkStats | null>(null);
   const [settlement, setSettlement] = useState<ComputeSettlementReadiness | null>(null);
+  const [ledger, setLedger] = useState<ComputeSettlementLedgerItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [working, setWorking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [label, setLabel] = useState('My compute node');
+  const [payoutWallet, setPayoutWallet] = useState('');
   const [enrollment, setEnrollment] = useState<{ token: string; expiresAt: string } | null>(null);
+  const [prompt, setPrompt] = useState('Reply with one short sentence confirming local inference.');
+  const [quote, setQuote] = useState<ComputeSettlementQuote | null>(null);
+  const [settlementRun, setSettlementRun] = useState<ComputeSettlementRun | null>(null);
+  const [settlementWorking, setSettlementWorking] = useState(false);
   const apiUrl = API_URL.replace(/\/+$/, '');
 
   const refresh = useCallback(async () => {
     setLoading(true);
     setError(null);
-    const [providerResult, jobResult, statsResult, settlementResult] = await Promise.all([
+    const [providerResult, jobResult, statsResult, settlementResult, ledgerResult] = await Promise.all([
       api.getComputeProviders(),
       api.getComputeProviderJobs(50),
       api.getComputeStats(),
       api.getComputeSettlementReadiness(false),
+      api.getComputeSettlementLedger(20),
     ]);
     if (providerResult.success) setProviders(providerResult.data);
     if (jobResult.success) setJobs(jobResult.data);
     if (statsResult.success) setStats(statsResult.data);
     if (settlementResult.success) setSettlement(settlementResult.data);
-    const failed = [providerResult, jobResult, statsResult, settlementResult].find(
+    if (ledgerResult.success) setLedger(ledgerResult.data);
+    const failed = [providerResult, jobResult, statsResult, settlementResult, ledgerResult].find(
       (result) => !result.success,
     );
     if (failed && !failed.success) setError(failed.error);
@@ -103,11 +130,45 @@ export default function ComputeProviderDashboard() {
     await navigator.clipboard.writeText(value);
   }
 
+  async function createQuote() {
+    setSettlementWorking(true);
+    setError(null);
+    setSettlementRun(null);
+    const result = await api.createComputeSettlementQuote({
+      model: 'compute/auto',
+      messages: [{ role: 'user', content: prompt.trim() }],
+      max_tokens: 128,
+    });
+    setSettlementWorking(false);
+    if (!result.success) {
+      setError(result.error);
+      return;
+    }
+    setQuote(result.data);
+  }
+
+  async function authorizeQuote() {
+    if (!quote) return;
+    setSettlementWorking(true);
+    setError(null);
+    const result = await api.authorizeLocalComputeSettlement(quote.id);
+    setSettlementWorking(false);
+    if (!result.success) {
+      setError(result.error);
+      return;
+    }
+    setQuote(result.data.quote);
+    setSettlementRun(result.data);
+    await refresh();
+  }
+
   if (authLoading || (!isAuthenticated && !authLoading)) return null;
 
   const enrollCommand = enrollment
-    ? `hatcher-compute enroll --token ${enrollment.token} --api-url ${apiUrl} --model local/mock-1b --mock`
+    ? `hatcher-compute enroll --token ${enrollment.token} --api-url ${apiUrl} --model local/mock-1b --mock${payoutWallet.trim() ? ` --payout-wallet ${payoutWallet.trim()}` : ''}`
     : '';
+  const payoutWalletValid =
+    payoutWallet.trim().length === 0 || /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(payoutWallet.trim());
 
   return (
     <main className={styles.page}>
@@ -129,8 +190,8 @@ export default function ComputeProviderDashboard() {
         </header>
 
         <div className={styles.notice}>
-          <strong>Safe preview:</strong> inference is local, credentials are owner-issued, and
-          settlement is disabled. Devnet x402 verification will be enabled before any mainnet path.
+          <strong>Safe preview:</strong> inference and the payment ledger are local simulations.
+          No devnet or mainnet transaction can be submitted from this page.
         </div>
         {error ? <div className={styles.error}>{error}</div> : null}
 
@@ -143,6 +204,75 @@ export default function ComputeProviderDashboard() {
 
         <div className={styles.grid}>
           <div>
+            <section className={styles.panel}>
+              <div className={styles.panelHeader}>
+                <div><h2>Local settlement lab</h2><p>Exercise quote → escrow → inference → verification.</p></div>
+                <FlaskConical size={20} aria-hidden />
+              </div>
+              <div className={styles.labGrid}>
+                <div className={styles.field}>
+                  <label htmlFor="settlement-prompt">Test prompt</label>
+                  <textarea
+                    id="settlement-prompt"
+                    value={prompt}
+                    onChange={(event) => setPrompt(event.target.value)}
+                    maxLength={4000}
+                    rows={4}
+                  />
+                </div>
+                <div className={styles.labActions}>
+                  <button
+                    className={styles.secondaryButton}
+                    onClick={() => void createQuote()}
+                    disabled={settlementWorking || !settlement?.localSimulatorEnabled || !prompt.trim()}
+                  >
+                    {settlementWorking ? <Loader2 size={15} className={styles.spinner} /> : <Wallet size={15} />}
+                    Create quote
+                  </button>
+                  {quote && quote.status === 'quoted' ? (
+                    <button
+                      className={styles.button}
+                      onClick={() => void authorizeQuote()}
+                      disabled={settlementWorking}
+                    >
+                      {settlementWorking ? <Loader2 size={15} className={styles.spinner} /> : <ShieldCheck size={15} />}
+                      Simulate escrow & run
+                    </button>
+                  ) : null}
+                </div>
+              </div>
+              {!settlement?.localSimulatorEnabled ? (
+                <p className={styles.muted}>The local settlement simulator is disabled in the API environment.</p>
+              ) : null}
+              {quote ? (
+                <div className={styles.quoteCard}>
+                  <div><span>Maximum charge</span><strong>{microUsdc(quote.amountMicrousc)} simulated USDC</strong></div>
+                  <div><span>Model</span><strong>{quote.model}</strong></div>
+                  <div><span>Quote</span><strong>{quote.status}</strong></div>
+                  <div><span>Expires</span><strong>{date(quote.expiresAt)}</strong></div>
+                </div>
+              ) : null}
+              {settlementRun ? (
+                <div className={styles.resultBox}>
+                  <div className={styles.resultHeader}>
+                    <ShieldCheck size={17} aria-hidden />
+                    <strong>Result {settlementRun.payout?.verificationStatus ?? 'pending'}</strong>
+                  </div>
+                  <div className={styles.settlementFlow}>
+                    <span>Payment <strong>{settlementRun.payment?.status ?? 'missing'}</strong></span>
+                    <span>Job <strong>{settlementRun.job.status}</strong></span>
+                    <span>Payout <strong>{settlementRun.payout?.status ?? 'missing'}</strong></span>
+                  </div>
+                  {settlementRun.payout ? (
+                    <p className={styles.muted}>
+                      Provider {microUsdc(settlementRun.payout.providerMicrousc)} · platform {microUsdc(settlementRun.payout.platformMicrousc)} · refund {microUsdc(settlementRun.payout.refundMicrousc)}.
+                      {settlementRun.payout.heldReason ? ` Held: ${settlementRun.payout.heldReason}.` : ' Eligible only; no payout was sent.'}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
+            </section>
+
             <section className={styles.panel}>
               <div className={styles.panelHeader}>
                 <div><h2>Your nodes</h2><p>Outbound polling only; no inbound firewall rule is required.</p></div>
@@ -200,7 +330,20 @@ export default function ComputeProviderDashboard() {
                 <label htmlFor="node-label">Node label</label>
                 <input id="node-label" value={label} onChange={(event) => setLabel(event.target.value)} maxLength={80} />
               </div>
-              <button className={styles.button} onClick={() => void createToken()} disabled={working}>
+              <div className={styles.field}>
+                <label htmlFor="payout-wallet">Solana payout wallet (optional in local tests)</label>
+                <input
+                  id="payout-wallet"
+                  value={payoutWallet}
+                  onChange={(event) => setPayoutWallet(event.target.value)}
+                  maxLength={44}
+                  autoComplete="off"
+                  spellCheck={false}
+                  aria-invalid={!payoutWalletValid}
+                />
+                {!payoutWalletValid ? <small className={styles.fieldError}>Enter a valid base58 Solana address.</small> : null}
+              </div>
+              <button className={styles.button} onClick={() => void createToken()} disabled={working || !payoutWalletValid}>
                 {working ? <Loader2 size={15} className={styles.spinner} /> : <Cpu size={15} />} Generate enrollment token
               </button>
               {enrollment ? (
@@ -212,16 +355,18 @@ export default function ComputeProviderDashboard() {
               <p className={styles.muted}>Install Node.js 20+ and the local preview package on any supported OS.</p>
               <code className={styles.command}>npm install --global ./hatcher-compute-node-0.1.0.tgz</code>
               {enrollment ? <><p className={styles.muted}>Enroll:</p><code className={styles.command}>{enrollCommand}</code><button className={styles.secondaryButton} style={{ marginTop: 10 }} onClick={() => void copy(enrollCommand)}><Copy size={14} /> Copy command</button></> : null}
-              <p className={styles.muted}>This first command uses the deterministic test runtime. Configure a local OpenAI-compatible server before advertising a real model.</p>
+              <p className={styles.muted}>This first command uses the deterministic test runtime. Without a payout wallet, verified work is held instead of becoming eligible.</p>
               <p className={styles.muted}>Then start the worker:</p>
               <code className={styles.command}>hatcher-compute serve</code>
             </section>
 
             <section className={styles.panel}>
-              <div className={styles.panelHeader}><div><h2>Settlement readiness</h2><p>Explicitly inactive until verified.</p></div><Wallet size={20} aria-hidden /></div>
+              <div className={styles.panelHeader}><div><h2>Settlement readiness</h2><p>Local simulator active; on-chain rail inactive.</p></div><Wallet size={20} aria-hidden /></div>
               <p className={styles.muted}>Current rail: Solana x402 v2 · planned asset: USDC · mode: {settlement?.mode ?? 'local'}.</p>
               <div className={styles.checklist}>
                 {[
+                  ['Local ledger simulator', settlement?.localSimulatorEnabled],
+                  ['Provider split', settlement?.checks.providerShareConfigured],
                   ['Devnet mode', settlement?.checks.devnetMode],
                   ['USDC mint', settlement?.checks.usdcMintConfigured],
                   ['Escrow wallet', settlement?.checks.escrowWalletConfigured],
@@ -230,7 +375,7 @@ export default function ComputeProviderDashboard() {
                   <div className={styles.check} key={String(name)}><span>{name}</span><strong data-ready={String(Boolean(ready))}>{ready ? 'ready' : 'pending'}</strong></div>
                 ))}
               </div>
-              <p className={styles.muted}>The request payer funds escrow first; provider payout is released only after a verified result. This path is not active yet.</p>
+              <p className={styles.muted}>Local records: {ledger.length}. A request payer funds escrow first; a verified result can become payout-eligible. On-chain payout remains inactive.</p>
             </section>
           </aside>
         </div>
