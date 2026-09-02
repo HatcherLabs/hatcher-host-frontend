@@ -60,6 +60,8 @@
       "tradersSub": "Tokenized agents and their onchain activity.",
       "featuresLabel": "Features",
       "featuresSub": "Runtime, workspace, tools, and integrations.",
+      "computeLabel": "Compute",
+      "computeSub": "Distributed inference and provider nodes.",
       "frameworksLabel": "Frameworks",
       "frameworksSub": "OpenClaw · Hermes.",
       "pricingLabel": "Pricing",
@@ -129,6 +131,7 @@
     "itemPublicAgents": "Public agents",
     "itemTraders": "Public traders",
     "itemFeatures": "Features",
+    "itemCompute": "Compute",
     "itemFrameworks": "Frameworks",
     "itemPricing": "Pricing",
     "itemToken": "Token",
@@ -2661,6 +2664,123 @@
     "next": "Next",
     "done": "Done",
     "skip": "Skip tour"
+  },
+  "compute": {
+    "hero": {
+      "title": "Turn spare GPUs into useful inference.",
+      "body": "Run a Hatcher node on Windows, macOS, or Linux. Serve open models to Hatcher agents and external builders. Earn USDC for verified work."
+    },
+    "actions": {
+      "joinAlpha": "Join provider alpha",
+      "useApi": "Use the inference API",
+      "readPlan": "Read the inference API plan"
+    },
+    "network": {
+      "title": "Network overview",
+      "timeRange": "Telemetry time range",
+      "alphaStatus": "Provider alpha · Network not live",
+      "notAvailable": "Not available until the provider alpha opens",
+      "telemetryNote": "Live telemetry appears when the provider alpha opens.",
+      "metrics": {
+        "active-nodes": "Active nodes",
+        "available-vram": "Available VRAM",
+        "jobs-24h": "Jobs completed · 24h",
+        "provider-payouts": "Provider payouts"
+      }
+    },
+    "execution": {
+      "title": "One network. Three execution modes.",
+      "body": "The scheduler matches each job to the smallest capable device. Large workflows can be split into independent tasks; model sharding stays experimental.",
+      "selectedMode": "Selected mode",
+      "modeSelector": "Execution mode selector",
+      "modes": {
+        "single-node": {
+          "title": "Single node",
+          "note": "Fast path for one capable GPU"
+        },
+        "distributed-tasks": {
+          "title": "Distributed tasks",
+          "note": "Independent steps run across multiple nodes"
+        },
+        "model-sharded-mesh": {
+          "title": "Model-sharded mesh",
+          "note": "Experimental · coordinated model layers"
+        }
+      },
+      "diagram": {
+        "request": "User job",
+        "scheduler": "Scheduler",
+        "routing": "Capability-aware routing",
+        "nodes": {
+          "primary": { "title": "Capable GPU", "detail": "Complete request" },
+          "large": { "title": "Large GPU task", "detail": "Generation" },
+          "small": { "title": "Small GPU task", "detail": "Independent step" },
+          "verify": { "title": "CPU verifier", "detail": "Result checks" },
+          "shardA": { "title": "Model shard A", "detail": "Coordinated layers" },
+          "shardB": { "title": "Model shard B", "detail": "Coordinated layers" },
+          "shardC": { "title": "Model shard C", "detail": "Coordinated layers" }
+        }
+      }
+    },
+    "devices": {
+      "title": "Useful work for every device class",
+      "filterLabel": "Filter device classes by operating system",
+      "columns": {
+        "device": "Device class",
+        "bestFor": "Best for",
+        "runtime": "Typical runtime",
+        "availability": "Availability"
+      },
+      "classes": {
+        "cpu-integrated": { "label": "CPU / integrated", "work": "Embeddings, preprocessing, verification" },
+        "vram-4-8": { "label": "4–8 GB VRAM", "work": "Small models and short generations" },
+        "vram-12-24": { "label": "12–24 GB VRAM", "work": "General inference and larger contexts" },
+        "multi-gpu": { "label": "Multi-GPU", "work": "Parallel tasks and model shards" }
+      },
+      "splitNote": "A request is only split when its steps are independent or the model supports safe sharding."
+    },
+    "availability": {
+      "alpha": "Alpha",
+      "later": "Later"
+    },
+    "platforms": {
+      "all": "All",
+      "windows": "Windows",
+      "macos": "macOS",
+      "linux": "Linux"
+    },
+    "estimator": {
+      "title": "Estimate provider earnings.",
+      "body": "See how hardware, availability, demand, and verified work affect a provider payout. Estimates are illustrative, never guaranteed.",
+      "deviceClass": "Device class",
+      "hours": "Available hours / day",
+      "utilization": "Utilization assumption",
+      "inputNote": "Inputs show your intended limits. Final payouts depend on accepted work and settled demand.",
+      "resultTitle": "Illustrative estimate",
+      "estimateUnavailable": "Calculated when alpha pricing is published",
+      "estimateDisclaimer": "No guaranteed earnings. Actual payouts depend on accepted work and settled demand."
+    },
+    "settlement": {
+      "consumerPays": "Consumer pays",
+      "hatcherVerifies": "Hatcher verifies",
+      "providerReceives": "Provider receives USDC",
+      "note": "x402 on Solana for external requests · AI Credits for Hatcher agents"
+    },
+    "onboarding": {
+      "title": "Run a node in three steps.",
+      "steps": {
+        "install": "1 · Install the Hatcher Node app",
+        "limits": "2 · Choose limits and a payout wallet",
+        "benchmark": "3 · Pass a benchmark and accept verified jobs"
+      }
+    },
+    "security": {
+      "title": "Outbound-only by default.",
+      "outbound": "No inbound ports required",
+      "signed": "Signed jobs and model manifests",
+      "limits": "Resource limits you control",
+      "verified": "Results verified before settlement"
+    }
   },
   "desktop": {
     "enterDesktop": "Desktop",

@@ -24,6 +24,7 @@ const LOCALIZED_ROUTES: Array<{
   { path: "/explore", changeFrequency: "daily", priority: 0.85 },
   { path: "/traders", changeFrequency: "daily", priority: 0.85 },
   { path: "/features", changeFrequency: "weekly", priority: 0.85 },
+  { path: "/compute", changeFrequency: "weekly", priority: 0.8 },
   { path: "/frameworks", changeFrequency: "weekly", priority: 0.8 },
   { path: "/create", changeFrequency: "monthly", priority: 0.8 },
   { path: "/token", changeFrequency: "weekly", priority: 0.7 },
