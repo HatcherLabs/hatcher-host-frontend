@@ -2681,6 +2681,7 @@
       "alphaStatus": "Alpha provideri · Rețeaua nu este live",
       "notAvailable": "Indisponibil până la deschiderea alpha pentru provideri",
       "telemetryNote": "Telemetria live apare când se deschide alpha pentru provideri.",
+      "localTelemetryNote": "Telemetrie live din preview-ul local. Decontarea USDC rămâne dezactivată.",
       "metrics": {
         "active-nodes": "Noduri active",
         "available-vram": "VRAM disponibil",
@@ -2715,10 +2716,22 @@
           "primary": { "title": "GPU capabil", "detail": "Cerere completă" },
           "large": { "title": "Sarcină GPU mare", "detail": "Generare" },
           "small": { "title": "Sarcină GPU mic", "detail": "Pas independent" },
-          "verify": { "title": "Verificator CPU", "detail": "Verificări rezultat" },
-          "shardA": { "title": "Shard model A", "detail": "Straturi coordonate" },
-          "shardB": { "title": "Shard model B", "detail": "Straturi coordonate" },
-          "shardC": { "title": "Shard model C", "detail": "Straturi coordonate" }
+          "verify": {
+            "title": "Verificator CPU",
+            "detail": "Verificări rezultat"
+          },
+          "shardA": {
+            "title": "Shard model A",
+            "detail": "Straturi coordonate"
+          },
+          "shardB": {
+            "title": "Shard model B",
+            "detail": "Straturi coordonate"
+          },
+          "shardC": {
+            "title": "Shard model C",
+            "detail": "Straturi coordonate"
+          }
         }
       }
     },
@@ -2732,10 +2745,22 @@
         "availability": "Disponibilitate"
       },
       "classes": {
-        "cpu-integrated": { "label": "CPU / integrat", "work": "Embeddings, preprocesare, verificare" },
-        "vram-4-8": { "label": "4–8 GB VRAM", "work": "Modele mici și generări scurte" },
-        "vram-12-24": { "label": "12–24 GB VRAM", "work": "Inferență generală și contexte mai mari" },
-        "multi-gpu": { "label": "Multi-GPU", "work": "Sarcini paralele și shard-uri de model" }
+        "cpu-integrated": {
+          "label": "CPU / integrat",
+          "work": "Embeddings, preprocesare, verificare"
+        },
+        "vram-4-8": {
+          "label": "4–8 GB VRAM",
+          "work": "Modele mici și generări scurte"
+        },
+        "vram-12-24": {
+          "label": "12–24 GB VRAM",
+          "work": "Inferență generală și contexte mai mari"
+        },
+        "multi-gpu": {
+          "label": "Multi-GPU",
+          "work": "Sarcini paralele și shard-uri de model"
+        }
       },
       "splitNote": "O cerere este împărțită doar când pașii ei sunt independenți sau modelul suportă sharding sigur."
     },

@@ -2681,6 +2681,7 @@
       "alphaStatus": "Provider alpha · Network not live",
       "notAvailable": "Not available until the provider alpha opens",
       "telemetryNote": "Live telemetry appears when the provider alpha opens.",
+      "localTelemetryNote": "Live local-preview telemetry. USDC settlement remains disabled.",
       "metrics": {
         "active-nodes": "Active nodes",
         "available-vram": "Available VRAM",
@@ -2716,8 +2717,14 @@
           "large": { "title": "Large GPU task", "detail": "Generation" },
           "small": { "title": "Small GPU task", "detail": "Independent step" },
           "verify": { "title": "CPU verifier", "detail": "Result checks" },
-          "shardA": { "title": "Model shard A", "detail": "Coordinated layers" },
-          "shardB": { "title": "Model shard B", "detail": "Coordinated layers" },
+          "shardA": {
+            "title": "Model shard A",
+            "detail": "Coordinated layers"
+          },
+          "shardB": {
+            "title": "Model shard B",
+            "detail": "Coordinated layers"
+          },
           "shardC": { "title": "Model shard C", "detail": "Coordinated layers" }
         }
       }
@@ -2732,10 +2739,22 @@
         "availability": "Availability"
       },
       "classes": {
-        "cpu-integrated": { "label": "CPU / integrated", "work": "Embeddings, preprocessing, verification" },
-        "vram-4-8": { "label": "4–8 GB VRAM", "work": "Small models and short generations" },
-        "vram-12-24": { "label": "12–24 GB VRAM", "work": "General inference and larger contexts" },
-        "multi-gpu": { "label": "Multi-GPU", "work": "Parallel tasks and model shards" }
+        "cpu-integrated": {
+          "label": "CPU / integrated",
+          "work": "Embeddings, preprocessing, verification"
+        },
+        "vram-4-8": {
+          "label": "4–8 GB VRAM",
+          "work": "Small models and short generations"
+        },
+        "vram-12-24": {
+          "label": "12–24 GB VRAM",
+          "work": "General inference and larger contexts"
+        },
+        "multi-gpu": {
+          "label": "Multi-GPU",
+          "work": "Parallel tasks and model shards"
+        }
       },
       "splitNote": "A request is only split when its steps are independent or the model supports safe sharding."
     },
