@@ -11,6 +11,7 @@ describe('route chrome classification', () => {
     expect(isImmersiveChromePath('/ro/pricing')).toBe(true);
     expect(isImmersiveChromePath('/zh/features')).toBe(true);
     expect(isImmersiveChromePath('/en/usage')).toBe(true);
+    expect(isImmersiveChromePath('/ro/tutorials')).toBe(true);
   });
 
   it('keeps localized app routes in the global chrome', () => {

@@ -42,6 +42,19 @@ describe("marketing navigation", () => {
     ).toBe(true);
   });
 
+  it("links the public tutorial library from resources navigation and the footer", () => {
+    expect(
+      NAV_GROUPS.find((group) => group.key === "resources")?.items,
+    ).toContainEqual(
+      expect.objectContaining({ key: "tutorials", href: "/tutorials" }),
+    );
+    expect(
+      FOOTER_COLUMNS.some((column) =>
+        column.items.some((item) => item.href === "/tutorials"),
+      ),
+    ).toBe(true);
+  });
+
   it("consolidates public token surfaces behind one Token navigation entry", () => {
     const navItems = NAV_GROUPS.flatMap((group) => group.items);
     expect(navItems).toContainEqual(expect.objectContaining({ key: "token", href: "/token" }));
