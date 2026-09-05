@@ -31,6 +31,7 @@ const LOCALIZED_ROUTES: Array<{
   { path: "/whitepaper", changeFrequency: "monthly", priority: 0.65 },
   { path: "/roadmap", changeFrequency: "weekly", priority: 0.6 },
   { path: "/blog", changeFrequency: "weekly", priority: 0.7 },
+  { path: "/tutorials", changeFrequency: "weekly", priority: 0.75 },
   { path: "/changelog", changeFrequency: "weekly", priority: 0.6 },
   { path: "/help", changeFrequency: "monthly", priority: 0.5 },
   { path: "/security", changeFrequency: "monthly", priority: 0.5 },
