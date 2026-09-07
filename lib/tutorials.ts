@@ -103,4 +103,17 @@ export const HATCHER_TUTORIALS: readonly HatcherTutorial[] = [
     featureHref: '/dashboard/agents',
     featureLabel: 'Open My Agents',
   },
+  {
+    slug: 'github-workflow',
+    title: 'From prompt to GitHub PR',
+    topic: 'Development',
+    duration: '1:50',
+    durationIso: 'PT1M50S',
+    description:
+      'Connect GitHub, define a bounded development task, watch the agent create a commit, and inspect the resulting pull request.',
+    videoSrc: '/tutorials/github-workflow.mp4',
+    posterSrc: '/tutorials/github-workflow.jpg',
+    featureHref: '/dashboard/agents',
+    featureLabel: 'Open My Agents',
+  },
 ] as const;
