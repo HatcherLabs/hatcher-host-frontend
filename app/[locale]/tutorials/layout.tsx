@@ -4,7 +4,7 @@ import { buildLanguagesMap } from '@/lib/seo';
 export const metadata: Metadata = {
   title: 'Hatcher Tutorials — Learn to build and operate AI agents',
   description:
-    'Step-by-step Hatcher video tutorials for creating agents, using Neural Mesh, Mission Control, Routines, Skills, files, Agent Mail, and GitHub workflows.',
+    'Step-by-step Hatcher video tutorials for creating agents, using Neural Mesh, Mission Control, Routines, Skills, files, Agent Mail, GitHub workflows, and image generation.',
   alternates: {
     canonical: '/tutorials',
     languages: buildLanguagesMap('/tutorials'),

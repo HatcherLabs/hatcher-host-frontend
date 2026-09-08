@@ -5,7 +5,7 @@ import { HATCHER_TUTORIALS } from '@/lib/tutorials';
 
 describe('tutorial library', () => {
   it('publishes every tutorial with a local video and poster', () => {
-    expect(HATCHER_TUTORIALS).toHaveLength(8);
+    expect(HATCHER_TUTORIALS).toHaveLength(9);
 
     for (const tutorial of HATCHER_TUTORIALS) {
       expect(tutorial.durationIso).toMatch(/^PT/);
