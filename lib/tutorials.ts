@@ -116,4 +116,17 @@ export const HATCHER_TUTORIALS: readonly HatcherTutorial[] = [
     featureHref: '/dashboard/agents',
     featureLabel: 'Open My Agents',
   },
+  {
+    slug: 'image-to-image',
+    title: 'Generate & edit images',
+    topic: 'Creative tools',
+    duration: '0:45',
+    durationIso: 'PT45S',
+    description:
+      'Attach a reference image, define what to preserve and transform, then preview and download the generated result.',
+    videoSrc: '/tutorials/image-to-image.mp4',
+    posterSrc: '/tutorials/image-to-image.jpg',
+    featureHref: '/dashboard/agents',
+    featureLabel: 'Open My Agents',
+  },
 ] as const;
