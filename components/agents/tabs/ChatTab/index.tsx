@@ -236,7 +236,7 @@ export function ChatTab() {
       }
     }
     const diskMarker = diskOnly.length > 0
-      ? `[Attached files uploaded to the agent knowledge/workspace: ${diskOnly.join(', ')}. Image attachments are also available to Hatcher platform actions such as Pump.fun launch.]`
+      ? `[Attached files uploaded to the agent knowledge/workspace: ${diskOnly.join(', ')}.]`
       : null;
     const finalText = [
       inlineBlocks.join('\n\n'),
