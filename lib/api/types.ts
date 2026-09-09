@@ -2932,6 +2932,64 @@ export interface ComputeEnrollmentToken {
   expiresAt: string;
 }
 
+export type ComputeBetaParticipation = 'provider' | 'builder' | 'both';
+export type ComputeBetaPlatform = 'windows' | 'macos' | 'linux';
+export type ComputeBetaVramClass =
+  | 'cpu_integrated'
+  | 'under_4gb'
+  | '4_8gb'
+  | '8_16gb'
+  | '16_24gb'
+  | '24gb_plus'
+  | 'multi_gpu'
+  | 'not_applicable';
+export type ComputeBetaStatus =
+  | 'new'
+  | 'contacted'
+  | 'accepted'
+  | 'waitlisted'
+  | 'rejected'
+  | 'withdrawn';
+
+export interface ComputeBetaApplicationInput {
+  email: string;
+  name: string;
+  company?: string | null;
+  participation: ComputeBetaParticipation;
+  platforms: ComputeBetaPlatform[];
+  gpuModel?: string | null;
+  vramClass: ComputeBetaVramClass;
+  availabilityHours?: number | null;
+  useCase: string;
+  updatesOptIn: boolean;
+  consent: true;
+  website?: string;
+}
+
+export interface ComputeBetaApplicationResult {
+  applicationId: string;
+  status: 'received';
+  alreadyApplied: boolean;
+}
+
+export interface ComputeBetaApplication {
+  id: string;
+  email: string;
+  name: string;
+  company: string | null;
+  participation: ComputeBetaParticipation;
+  platforms: ComputeBetaPlatform[];
+  gpuModel: string | null;
+  vramClass: ComputeBetaVramClass;
+  availabilityHours: number | null;
+  useCase: string;
+  status: ComputeBetaStatus;
+  updatesOptIn: boolean;
+  consentAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ComputeSettlementReadiness {
   mode: 'disabled' | 'local' | 'devnet';
   enabled: boolean;

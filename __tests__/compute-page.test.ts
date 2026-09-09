@@ -15,6 +15,13 @@ const experienceSource = readFileSync(
   new URL('../app/[locale]/compute/ComputeExperience.tsx', import.meta.url),
   'utf8',
 );
+const betaApplicationSource = readFileSync(
+  new URL('../app/[locale]/compute/ComputeBetaApplication.tsx', import.meta.url),
+  'utf8',
+);
+const englishMessages = JSON.parse(
+  readFileSync(new URL('../messages/en.json', import.meta.url), 'utf8'),
+) as { compute: { beta: Record<string, unknown> } };
 const routeChromeSource = readFileSync(
   new URL('../components/layout/routeChrome.ts', import.meta.url),
   'utf8',
@@ -70,5 +77,16 @@ describe('Hatcher Compute public page', () => {
     expect(experienceSource).toContain('estimateUnavailable');
     expect(experienceSource).toContain('estimateDisclaimer');
     expect(experienceSource).not.toMatch(/passive income|guaranteed profit|APY/i);
+  });
+
+  it('offers a privacy-aware closed beta application for providers and builders', () => {
+    expect(experienceSource).toContain('<ComputeBetaApplication />');
+    expect(experienceSource).toContain('href="#compute-beta"');
+    expect(betaApplicationSource).toContain('api.applyToComputeBeta');
+    expect(betaApplicationSource).toContain('participation: "provider"');
+    expect(betaApplicationSource).toContain('updatesOptIn: false');
+    expect(betaApplicationSource).toContain('href="/privacy"');
+    expect(JSON.stringify(englishMessages.compute.beta)).toMatch(/No USDC moves in demo mode/);
+    expect(JSON.stringify(englishMessages.compute.beta)).toMatch(/no earnings are promised/i);
   });
 });

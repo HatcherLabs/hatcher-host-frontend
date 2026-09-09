@@ -178,6 +178,10 @@ import type {
   ComputeSettlementQuote,
   ComputeSettlementRun,
   ComputeModelAvailability,
+  ComputeBetaApplicationInput,
+  ComputeBetaApplicationResult,
+  ComputeBetaApplication,
+  ComputeBetaStatus,
 } from "./types";
 import type { TierConfig, AdminOverviewExtras } from "@hatcher/shared";
 
@@ -340,6 +344,24 @@ export const api = {
     ),
 
   getComputeStats: () => req<ComputeNetworkStats>("/compute/stats"),
+
+  applyToComputeBeta: (input: ComputeBetaApplicationInput) =>
+    req<ComputeBetaApplicationResult>("/compute/beta/applications", {
+      method: "POST",
+      body: JSON.stringify(input),
+    }),
+
+  getComputeBetaApplications: (status?: ComputeBetaStatus, limit = 100) => {
+    const query = new URLSearchParams({ limit: String(limit) });
+    if (status) query.set("status", status);
+    return req<ComputeBetaApplication[]>(`/compute/beta/applications?${query.toString()}`);
+  },
+
+  updateComputeBetaApplicationStatus: (id: string, status: ComputeBetaStatus) =>
+    req<{ id: string; status: ComputeBetaStatus }>(
+      `/compute/beta/applications/${encodeURIComponent(id)}`,
+      { method: "PATCH", body: JSON.stringify({ status }) },
+    ),
 
   getComputeProviders: () => req<ComputeProvider[]>("/compute/providers"),
 

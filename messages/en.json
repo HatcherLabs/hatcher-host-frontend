@@ -2671,9 +2671,69 @@
       "body": "Run a Hatcher node on Windows, macOS, or Linux. Serve open models to Hatcher agents and external builders. Earn USDC for verified work."
     },
     "actions": {
-      "joinAlpha": "Join provider alpha",
+      "joinAlpha": "Apply for closed beta",
       "useApi": "Use the inference API",
       "readPlan": "Read the inference API plan"
+    },
+    "beta": {
+      "eyebrow": "Closed beta · Preview",
+      "title": "Help shape the first Compute network.",
+      "body": "We are selecting a small group of providers and builders to test the node client, distributed workloads, receipts, and API integration before any public network launch.",
+      "benefits": {
+        "localDemo": "Test Windows, macOS, and Linux nodes in a controlled demo.",
+        "cohorts": "Provider and API-builder cohorts with direct onboarding.",
+        "feedback": "Early access to benchmarks, workload routing, and product feedback sessions."
+      },
+      "safetyTitle": "Preview, not an earnings program",
+      "safetyBody": "No USDC moves in demo mode and no earnings are promised. Paid settlement only opens after security, demand, and treasury gates pass.",
+      "formTitle": "Closed beta application",
+      "formRequired": "Required fields are validated before submission.",
+      "fields": {
+        "name": "Name",
+        "email": "Work email",
+        "company": "Company or project · optional",
+        "participation": "I want to join as",
+        "platforms": "Provider operating systems",
+        "gpu": "GPU model · optional",
+        "gpuPlaceholder": "e.g. RTX 3060, Apple M3, integrated GPU",
+        "vram": "Device / VRAM class",
+        "availability": "Approx. hours available per day",
+        "useCase": "What would you like to test?",
+        "useCasePlaceholder": "Tell us about your hardware, agent workload, expected API usage, or what you want to validate."
+      },
+      "participation": {
+        "provider": "Compute provider",
+        "builder": "API builder",
+        "both": "Both"
+      },
+      "platforms": {
+        "windows": "Windows",
+        "macos": "macOS",
+        "linux": "Linux"
+      },
+      "vram": {
+        "cpu_integrated": "CPU / integrated GPU",
+        "under_4gb": "Under 4 GB",
+        "4_8gb": "4–8 GB",
+        "8_16gb": "8–16 GB",
+        "16_24gb": "16–24 GB",
+        "24gb_plus": "24+ GB",
+        "multi_gpu": "Multi-GPU"
+      },
+      "consent": "I agree that Hatcher may contact me about this beta.",
+      "privacy": "Privacy policy",
+      "updates": "Also send me occasional Hatcher Compute product updates.",
+      "submit": "Apply for closed beta",
+      "submitting": "Sending application…",
+      "footnote": "Applications are reviewed manually.",
+      "successTitle": "Application received.",
+      "successBody": "Thank you. We will review your fit for the provider or builder cohort and contact you if a test slot opens.",
+      "successDuplicateTitle": "Application updated.",
+      "successDuplicateBody": "We found an existing application for this email and updated its details. Your review status was preserved.",
+      "errors": {
+        "platform": "Select at least one operating system for your provider node.",
+        "consent": "Consent is required so we can contact you about the beta."
+      }
     },
     "network": {
       "title": "Network overview",

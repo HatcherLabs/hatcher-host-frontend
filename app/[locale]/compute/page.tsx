@@ -42,9 +42,9 @@ async function loadComputeMetrics(): Promise<ComputeNetworkMetricValues | null> 
 
 export function generateMetadata(): Metadata {
   return {
-    title: "Hatcher Compute — Distributed inference network",
+    title: "Hatcher Compute — Closed beta preview",
     description:
-      "Contribute GPU capacity to Hatcher Compute, serve verified open-model inference, and receive USDC for accepted work.",
+      "Apply to the Hatcher Compute closed beta for provider nodes and distributed inference API access.",
     alternates: {
       canonical: "/compute",
       languages: buildLanguagesMap("/compute"),

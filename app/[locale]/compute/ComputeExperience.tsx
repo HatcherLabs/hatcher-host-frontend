@@ -39,6 +39,7 @@ import {
   type ExecutionModeId,
 } from "./compute-data";
 import styles from "./page.module.css";
+import { ComputeBetaApplication } from "./ComputeBetaApplication";
 
 const NETWORK_ICONS: Record<ComputeNetworkMetricId, LucideIcon> = {
   "active-nodes": Network,
@@ -94,13 +95,10 @@ export function ComputeExperience({
           <h1 id="compute-title">{t("hero.title")}</h1>
           <p className={styles.heroText}>{t("hero.body")}</p>
           <div className={styles.actions}>
-            <Link
-              href="/dashboard/compute"
-              className={styles.primaryAction}
-            >
+            <a href="#compute-beta" className={styles.primaryAction}>
               {t("actions.joinAlpha")}
               <ArrowRight aria-hidden="true" />
-            </Link>
+            </a>
             <Link href="/docs/api" className={styles.secondaryAction}>
               {t("actions.useApi")}
               <ArrowRight aria-hidden="true" />
@@ -170,6 +168,8 @@ export function ComputeExperience({
           </p>
         </aside>
       </section>
+
+      <ComputeBetaApplication />
 
       <section
         className={styles.executionSection}
@@ -401,13 +401,10 @@ export function ComputeExperience({
         </div>
 
         <div className={styles.finalActions}>
-          <Link
-            href="/support?topic=compute-provider-alpha"
-            className={styles.primaryAction}
-          >
+          <a href="#compute-beta" className={styles.primaryAction}>
             {t("actions.joinAlpha")}
             <ArrowRight aria-hidden="true" />
-          </Link>
+          </a>
           <Link href="/roadmap" className={styles.secondaryAction}>
             {t("actions.readPlan")}
             <ArrowRight aria-hidden="true" />

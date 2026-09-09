@@ -2671,9 +2671,69 @@
       "body": "Rulează un nod Hatcher pe Windows, macOS sau Linux. Servește modele deschise agenților Hatcher și dezvoltatorilor externi. Primește USDC pentru munca verificată."
     },
     "actions": {
-      "joinAlpha": "Înscrie-te în alpha pentru provideri",
+      "joinAlpha": "Aplică la beta închis",
       "useApi": "Folosește API-ul de inferență",
       "readPlan": "Citește planul API-ului de inferență"
+    },
+    "beta": {
+      "eyebrow": "Beta închis · Preview",
+      "title": "Ajută-ne să construim prima rețea Compute.",
+      "body": "Selectăm un grup restrâns de provideri și developeri pentru a testa clientul de nod, workload-urile distribuite, receipt-urile și integrarea API înainte de orice lansare publică a rețelei.",
+      "benefits": {
+        "localDemo": "Testează noduri Windows, macOS și Linux într-un demo controlat.",
+        "cohorts": "Cohorte separate pentru provideri și utilizatori API, cu onboarding direct.",
+        "feedback": "Acces timpuriu la benchmark-uri, rutarea workload-urilor și sesiuni de feedback."
+      },
+      "safetyTitle": "Preview, nu program de venituri",
+      "safetyBody": "În demo nu se transferă USDC și nu promitem venituri. Decontarea plătită se deschide doar după validarea securității, cererii și trezoreriei.",
+      "formTitle": "Aplicație pentru beta închis",
+      "formRequired": "Câmpurile obligatorii sunt validate înainte de trimitere.",
+      "fields": {
+        "name": "Nume",
+        "email": "Email de lucru",
+        "company": "Companie sau proiect · opțional",
+        "participation": "Vreau să particip ca",
+        "platforms": "Sisteme de operare pentru nod",
+        "gpu": "Model GPU · opțional",
+        "gpuPlaceholder": "ex. RTX 3060, Apple M3, GPU integrat",
+        "vram": "Clasă dispozitiv / VRAM",
+        "availability": "Aprox. ore disponibile pe zi",
+        "useCase": "Ce ai vrea să testezi?",
+        "useCasePlaceholder": "Spune-ne despre hardware, workload-ul agentului, utilizarea estimată a API-ului sau ce vrei să validezi."
+      },
+      "participation": {
+        "provider": "Provider de compute",
+        "builder": "Developer API",
+        "both": "Ambele"
+      },
+      "platforms": {
+        "windows": "Windows",
+        "macos": "macOS",
+        "linux": "Linux"
+      },
+      "vram": {
+        "cpu_integrated": "CPU / GPU integrat",
+        "under_4gb": "Sub 4 GB",
+        "4_8gb": "4–8 GB",
+        "8_16gb": "8–16 GB",
+        "16_24gb": "16–24 GB",
+        "24gb_plus": "24+ GB",
+        "multi_gpu": "Multi-GPU"
+      },
+      "consent": "Sunt de acord ca Hatcher să mă contacteze în legătură cu acest beta.",
+      "privacy": "Politica de confidențialitate",
+      "updates": "Doresc și actualizări ocazionale despre Hatcher Compute.",
+      "submit": "Aplică la beta închis",
+      "submitting": "Trimitem aplicația…",
+      "footnote": "Aplicațiile sunt evaluate manual.",
+      "successTitle": "Aplicația a fost primită.",
+      "successBody": "Mulțumim. Evaluăm potrivirea pentru cohorta de provideri sau developeri și te contactăm când se deschide un loc de testare.",
+      "successDuplicateTitle": "Aplicația a fost actualizată.",
+      "successDuplicateBody": "Am găsit o aplicație pentru acest email și i-am actualizat detaliile. Statusul evaluării a fost păstrat.",
+      "errors": {
+        "platform": "Alege cel puțin un sistem de operare pentru nodul provider.",
+        "consent": "Acordul este necesar pentru a te putea contacta despre beta."
+      }
     },
     "network": {
       "title": "Prezentarea rețelei",

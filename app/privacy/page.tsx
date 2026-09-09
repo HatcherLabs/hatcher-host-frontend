@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 // it on any material edit (scope, retention, third-parties). GDPR
 // requires material changes to be communicated to users — the
 // sendPrivacyUpdated email hook in services/email.ts handles that.
-const LAST_UPDATED = 'June 16, 2026';
+const LAST_UPDATED = 'September 9, 2026';
 
 export default function PrivacyPolicyPage() {
   return (
@@ -113,6 +113,13 @@ export default function PrivacyPolicyPage() {
               <li>Apple App Store transaction identifiers and subscription product IDs for in-app purchases</li>
               <li>Invoice line items (tier, addon, amount, currency, timestamp)</li>
             </ul>
+
+            <h3 className="text-base font-medium text-[var(--text-primary)] mt-4 mb-2">Beta Program Applications</h3>
+            <ul className="list-disc pl-6 space-y-1.5">
+              <li>Name, email address, and optional company or project name</li>
+              <li>Requested cohort, operating systems, hardware class, availability, and intended test case</li>
+              <li>Contact consent and a separately recorded optional product-update preference</li>
+            </ul>
           </section>
 
           {/* 3 */}
@@ -130,7 +137,8 @@ export default function PrivacyPolicyPage() {
               </li>
               <li>
                 <strong className="text-[var(--text-primary)]">Consent (Art. 6(1)(a))</strong> — optional analytics
-                (PostHog), marketing emails, cookie banner choices. You can withdraw consent at any time.
+                (PostHog), beta-program contact, marketing emails, and cookie banner choices. You can withdraw consent
+                at any time.
               </li>
               <li>
                 <strong className="text-[var(--text-primary)]">Legal obligation (Art. 6(1)(c))</strong> — tax and
@@ -152,6 +160,7 @@ export default function PrivacyPolicyPage() {
               <li>Monitor platform health, detect abuse, prevent fraud</li>
               <li>Analyze aggregate usage to improve features</li>
               <li>Respond to support requests</li>
+              <li>Review beta applications, select test cohorts, and contact applicants about available test slots</li>
             </ul>
             <p className="mt-3">
               <strong className="text-[var(--text-primary)]">We do not</strong> sell your personal data to third
@@ -174,6 +183,7 @@ export default function PrivacyPolicyPage() {
             <ul className="list-disc pl-6 mt-2 space-y-1.5">
               <li>Passwords hashed with bcrypt before storage</li>
               <li>Integration secrets, API keys, and sensitive credentials encrypted with AES-256-GCM</li>
+              <li>Beta applicant contact details and free-text test cases encrypted at rest</li>
               <li>All traffic encrypted in transit via TLS 1.3 (HTTPS)</li>
               <li>Cloudflare provides DDoS protection and edge security</li>
               <li>Agent containers run as non-root, with CPU/memory limits and network isolation</li>
@@ -265,6 +275,7 @@ export default function PrivacyPolicyPage() {
               <li><strong className="text-[var(--text-primary)]">Chat history &amp; agent configs</strong> — until you delete them or the agent is removed.</li>
               <li><strong className="text-[var(--text-primary)]">Payment records &amp; invoices</strong> — 7 years minimum (Romanian Fiscal Code &amp; EU accounting directive).</li>
               <li><strong className="text-[var(--text-primary)]">Server &amp; access logs</strong> — 90 days then purged.</li>
+              <li><strong className="text-[var(--text-primary)]">Beta applications</strong> — up to 12 months after the beta closes, unless you ask us to delete them sooner.</li>
               <li><strong className="text-[var(--text-primary)]">Anonymized analytics</strong> — retained indefinitely for aggregate trend analysis.</li>
             </ul>
           </section>
