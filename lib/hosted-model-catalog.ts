@@ -880,6 +880,7 @@ export function getHostedModelOption(
 }
 
 export function hostedModelRoute(model: HostedModelOption): string {
+  if (model.providerKey === 'compute') return 'Hatcher Compute provider network';
   if (model.providerKey === 'openserv') return 'OpenServ primary / OpenRouter fallback';
   if (model.providerKey === 'xiaomi') return 'UsePod primary / OpenRouter fallback';
   if (model.providerKey === 'acedata') return 'AceData primary / OpenRouter fallback';
@@ -893,6 +894,7 @@ export function hostedModelPrivacy(model: HostedModelOption): HostedModelPrivacy
 }
 
 export function hostedPrivacyLabel(model: HostedModelOption): string {
+  if (model.providerKey === 'compute') return 'Independent provider node';
   if (model.providerKey === 'openserv') return 'OpenServ-hosted';
   if (model.providerKey === 'xiaomi') return 'UsePod/OpenRouter';
   if (model.providerKey === 'acedata') return 'AceData-hosted';

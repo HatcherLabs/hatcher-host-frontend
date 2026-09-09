@@ -2857,6 +2857,237 @@ export type AdminHealthResponse = {
 };
 
 // ============================================================
+// Hatcher Compute provider network
+// ============================================================
+
+export interface ComputeProvider {
+  id: string;
+  name: string;
+  status: 'online' | 'offline' | 'draining' | 'revoked';
+  platform: string;
+  architecture: string;
+  cpuModel: string;
+  gpuName: string | null;
+  vramMb: number | null;
+  memoryMb: number;
+  backend: string;
+  runtimeMode: 'mock' | 'openai_compatible';
+  supportedModels: string[];
+  payoutWallet: string | null;
+  receiptReady: boolean;
+  maxConcurrency: number;
+  version: string | null;
+  lastSeenAt: string | null;
+  totalJobs: number;
+  totalTokens: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ComputeProviderJob {
+  id: string;
+  providerId: string | null;
+  status: 'queued' | 'leased' | 'completed' | 'failed' | 'cancelled';
+  model: string;
+  promptTokens: number | null;
+  completionTokens: number | null;
+  latencyMs: number | null;
+  attempt: number;
+  settlementStatus: string;
+  receiptVerifiedAt: string | null;
+  priceUsdc: string;
+  createdAt: string;
+  completedAt: string | null;
+  provider: { name: string; gpuName: string | null } | null;
+}
+
+export interface ComputeModelAvailability {
+  id: string;
+  object: 'model';
+  created: number;
+  owned_by: 'hatcher-compute';
+  providerCount: number;
+  availableVramMb: number;
+}
+
+export interface ComputeNetworkStats {
+  phase: 'local_preview';
+  settlement: 'disabled';
+  providers: { total: number; online: number };
+  availableVramMb: number;
+  jobs: {
+    queued: number;
+    leased: number;
+    completed: number;
+    completed24h: number;
+    failed: number;
+  };
+  totalTokens: string;
+  averageLatencyMs: number;
+  settledUsdc: string;
+}
+
+export interface ComputeEnrollmentToken {
+  token: string;
+  expiresAt: string;
+}
+
+export type ComputeBetaParticipation = 'provider' | 'builder' | 'both';
+export type ComputeBetaPlatform = 'windows' | 'macos' | 'linux';
+export type ComputeBetaVramClass =
+  | 'cpu_integrated'
+  | 'under_4gb'
+  | '4_8gb'
+  | '8_16gb'
+  | '16_24gb'
+  | '24gb_plus'
+  | 'multi_gpu'
+  | 'not_applicable';
+export type ComputeBetaStatus =
+  | 'new'
+  | 'contacted'
+  | 'accepted'
+  | 'waitlisted'
+  | 'rejected'
+  | 'withdrawn';
+
+export interface ComputeBetaApplicationInput {
+  email: string;
+  name: string;
+  company?: string | null;
+  participation: ComputeBetaParticipation;
+  platforms: ComputeBetaPlatform[];
+  gpuModel?: string | null;
+  vramClass: ComputeBetaVramClass;
+  availabilityHours?: number | null;
+  useCase: string;
+  updatesOptIn: boolean;
+  consent: true;
+  website?: string;
+}
+
+export interface ComputeBetaApplicationResult {
+  applicationId: string;
+  status: 'received';
+  alreadyApplied: boolean;
+}
+
+export interface ComputeBetaApplication {
+  id: string;
+  email: string;
+  name: string;
+  company: string | null;
+  participation: ComputeBetaParticipation;
+  platforms: ComputeBetaPlatform[];
+  gpuModel: string | null;
+  vramClass: ComputeBetaVramClass;
+  availabilityHours: number | null;
+  useCase: string;
+  status: ComputeBetaStatus;
+  updatesOptIn: boolean;
+  consentAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ComputeSettlementReadiness {
+  mode: 'disabled' | 'local' | 'devnet';
+  enabled: boolean;
+  x402Version: 2;
+  network: string;
+  facilitatorUrl: string;
+  facilitatorSupportsDevnet: boolean | null;
+  localSimulatorEnabled: boolean;
+  providerShareBps: number;
+  checks: {
+    devnetMode: boolean;
+    executionEnabled: boolean;
+    usdcMintConfigured: boolean;
+    escrowWalletConfigured: boolean;
+    pricingConfigured: boolean;
+    providerShareConfigured: boolean;
+  };
+}
+
+export interface ComputeSettlementQuote {
+  id: string;
+  jobId: string | null;
+  model: string;
+  estimatedInputTokens: number;
+  maxOutputTokens: number;
+  amountMicrousc: string;
+  amountUsdc: string;
+  network: string;
+  asset: string;
+  payTo: string;
+  status: 'quoted' | 'authorized' | 'consumed' | 'expired' | 'failed';
+  expiresAt: string;
+  authorizedAt: string | null;
+  consumedAt: string | null;
+  createdAt: string;
+  simulation: boolean;
+}
+
+export interface ComputePaymentReceipt {
+  id: string;
+  status: 'verified' | 'settled' | 'refund_required' | 'refunded' | 'failed' | 'execution_failed' | 'settlement_failed' | 'authorization_abandoned';
+  protocolVersion: 2;
+  scheme: 'exact';
+  network: string;
+  asset: string;
+  payTo: string;
+  payerWallet: string | null;
+  amountMicrousc: string;
+  transaction: string | null;
+  verifiedAt: string;
+  settledAt: string | null;
+  failureReason: string | null;
+}
+
+export interface ComputePayoutLedgerEntry {
+  id: string;
+  jobId: string;
+  providerId: string;
+  payoutWallet: string | null;
+  grossMicrousc: string;
+  providerMicrousc: string;
+  platformMicrousc: string;
+  refundMicrousc: string;
+  status: 'eligible' | 'held' | 'paid' | 'refunded';
+  verificationStatus: 'passed' | 'failed';
+  verificationMethod: string;
+  verificationDigest: string | null;
+  heldReason: string | null;
+  eligibleAt: string | null;
+  transaction: string | null;
+  paidAt: string | null;
+}
+
+export interface ComputeSettlementJobSummary {
+  id: string;
+  status: 'queued' | 'leased' | 'completed' | 'failed' | 'cancelled';
+  settlementStatus: string;
+  providerId: string | null;
+  resultDigest: string | null;
+  receiptVerifiedAt: string | null;
+  response?: Record<string, unknown> | null;
+}
+
+export interface ComputeSettlementLedgerItem {
+  quote: ComputeSettlementQuote;
+  payment: ComputePaymentReceipt | null;
+  job: ComputeSettlementJobSummary | null;
+  payout: ComputePayoutLedgerEntry | null;
+}
+
+export interface ComputeSettlementRun {
+  quote: ComputeSettlementQuote;
+  payment: ComputePaymentReceipt | null;
+  job: ComputeSettlementJobSummary;
+  payout: ComputePayoutLedgerEntry | null;
+}
+
+// ============================================================
 // IronClaw native runtime control (threads / runs / outbound / LLM)
 // ============================================================
 // The IronClaw runtime returns loosely-versioned JSON; only the fields the

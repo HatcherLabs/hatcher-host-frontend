@@ -1713,14 +1713,20 @@ export default function AdminPage() {
             </p>
           </div>
 
-          <button
-            onClick={handleRefresh}
-            disabled={loading}
-            className="btn-secondary text-sm w-full sm:w-auto justify-center"
-          >
-            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-            Refresh
-          </button>
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+            <Link href="/admin/compute-beta" className="btn-secondary justify-center text-sm">
+              <Users size={14} />
+              Compute beta
+            </Link>
+            <button
+              onClick={handleRefresh}
+              disabled={loading}
+              className="btn-secondary justify-center text-sm"
+            >
+              <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+              Refresh
+            </button>
+          </div>
         </motion.div>
 
         <motion.div className="card glass-noise min-w-0 p-2 sm:p-3" variants={cardVariants}>

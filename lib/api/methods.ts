@@ -169,6 +169,19 @@ import type {
   IronClawMcpRegisterBody,
   IronClawOutboundResponse,
   IronClawThreadStreamEvent,
+  ComputeEnrollmentToken,
+  ComputeNetworkStats,
+  ComputeProvider,
+  ComputeProviderJob,
+  ComputeSettlementReadiness,
+  ComputeSettlementLedgerItem,
+  ComputeSettlementQuote,
+  ComputeSettlementRun,
+  ComputeModelAvailability,
+  ComputeBetaApplicationInput,
+  ComputeBetaApplicationResult,
+  ComputeBetaApplication,
+  ComputeBetaStatus,
 } from "./types";
 import type { TierConfig, AdminOverviewExtras } from "@hatcher/shared";
 
@@ -328,6 +341,73 @@ export const api = {
   getSession: () =>
     req<{ authenticated: boolean; user: AuthProfileData | null }>(
       "/auth/session",
+    ),
+
+  getComputeStats: () => req<ComputeNetworkStats>("/compute/stats"),
+
+  applyToComputeBeta: (input: ComputeBetaApplicationInput) =>
+    req<ComputeBetaApplicationResult>("/compute/beta/applications", {
+      method: "POST",
+      body: JSON.stringify(input),
+    }),
+
+  getComputeBetaApplications: (status?: ComputeBetaStatus, limit = 100) => {
+    const query = new URLSearchParams({ limit: String(limit) });
+    if (status) query.set("status", status);
+    return req<ComputeBetaApplication[]>(`/compute/beta/applications?${query.toString()}`);
+  },
+
+  updateComputeBetaApplicationStatus: (id: string, status: ComputeBetaStatus) =>
+    req<{ id: string; status: ComputeBetaStatus }>(
+      `/compute/beta/applications/${encodeURIComponent(id)}`,
+      { method: "PATCH", body: JSON.stringify({ status }) },
+    ),
+
+  getComputeProviders: () => req<ComputeProvider[]>("/compute/providers"),
+
+  getComputeModels: () => req<ComputeModelAvailability[]>("/compute/catalog"),
+
+  getComputeProviderJobs: (limit = 50) =>
+    req<ComputeProviderJob[]>(`/compute/provider-jobs?limit=${limit}`),
+
+  getComputeSettlementReadiness: (probe = false) =>
+    req<ComputeSettlementReadiness>(`/compute/settlement/readiness?probe=${probe}`),
+
+  getComputeSettlementLedger: (limit = 50) =>
+    req<ComputeSettlementLedgerItem[]>(`/compute/settlement/ledger?limit=${limit}`),
+
+  reconcileComputeSettlements: (limit = 50) =>
+    req<{ inspected: number; recovered: number; abandoned: number; manualReview: number }>(
+      `/compute/settlement/reconcile?limit=${limit}`,
+      { method: 'POST' },
+    ),
+
+  createComputeSettlementQuote: (input: {
+    model: string;
+    messages: Array<{ role: 'system' | 'user' | 'assistant' | 'tool'; content: string }>;
+    max_tokens: number;
+  }) =>
+    req<ComputeSettlementQuote>('/compute/settlement/quotes', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    }),
+
+  authorizeLocalComputeSettlement: (quoteId: string) =>
+    req<ComputeSettlementRun>(
+      `/compute/settlement/quotes/${encodeURIComponent(quoteId)}/local-authorize`,
+      { method: 'POST' },
+    ),
+
+  createComputeEnrollmentToken: (label: string) =>
+    req<ComputeEnrollmentToken>("/compute/enrollment-tokens", {
+      method: "POST",
+      body: JSON.stringify({ label }),
+    }),
+
+  revokeComputeProvider: (providerId: string) =>
+    req<{ id: string; status: "revoked" }>(
+      `/compute/providers/${encodeURIComponent(providerId)}`,
+      { method: "DELETE" },
     ),
 
   /** Update profile (username, email, password, or avatarUrl) */

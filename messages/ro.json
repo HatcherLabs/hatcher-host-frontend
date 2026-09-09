@@ -60,6 +60,8 @@
       "tradersSub": "Agenți tokenizați și activitatea lor onchain.",
       "featuresLabel": "Features",
       "featuresSub": "Runtime, workspace, tool-uri și integrări.",
+      "computeLabel": "Compute",
+      "computeSub": "Inferență distribuită și noduri provider.",
       "frameworksLabel": "Framework-uri",
       "frameworksSub": "OpenClaw · Hermes.",
       "pricingLabel": "Prețuri",
@@ -129,6 +131,7 @@
     "itemPublicAgents": "Agenți publici",
     "itemTraders": "Traderi publici",
     "itemFeatures": "Features",
+    "itemCompute": "Compute",
     "itemFrameworks": "Framework-uri",
     "itemPricing": "Prețuri",
     "itemToken": "Token",
@@ -2661,6 +2664,208 @@
     "next": "Înainte",
     "done": "Gata",
     "skip": "Sari peste tur"
+  },
+  "compute": {
+    "hero": {
+      "title": "Transformă GPU-urile libere în inferență utilă.",
+      "body": "Rulează un nod Hatcher pe Windows, macOS sau Linux. Servește modele deschise agenților Hatcher și dezvoltatorilor externi. Primește USDC pentru munca verificată."
+    },
+    "actions": {
+      "joinAlpha": "Aplică la beta închis",
+      "useApi": "Folosește API-ul de inferență",
+      "readPlan": "Citește planul API-ului de inferență"
+    },
+    "beta": {
+      "eyebrow": "Beta închis · Preview",
+      "title": "Ajută-ne să construim prima rețea Compute.",
+      "body": "Selectăm un grup restrâns de provideri și developeri pentru a testa clientul de nod, workload-urile distribuite, receipt-urile și integrarea API înainte de orice lansare publică a rețelei.",
+      "benefits": {
+        "localDemo": "Testează noduri Windows, macOS și Linux într-un demo controlat.",
+        "cohorts": "Cohorte separate pentru provideri și utilizatori API, cu onboarding direct.",
+        "feedback": "Acces timpuriu la benchmark-uri, rutarea workload-urilor și sesiuni de feedback."
+      },
+      "safetyTitle": "Preview, nu program de venituri",
+      "safetyBody": "În demo nu se transferă USDC și nu promitem venituri. Decontarea plătită se deschide doar după validarea securității, cererii și trezoreriei.",
+      "formTitle": "Aplicație pentru beta închis",
+      "formRequired": "Câmpurile obligatorii sunt validate înainte de trimitere.",
+      "fields": {
+        "name": "Nume",
+        "email": "Email de lucru",
+        "company": "Companie sau proiect · opțional",
+        "participation": "Vreau să particip ca",
+        "platforms": "Sisteme de operare pentru nod",
+        "gpu": "Model GPU · opțional",
+        "gpuPlaceholder": "ex. RTX 3060, Apple M3, GPU integrat",
+        "vram": "Clasă dispozitiv / VRAM",
+        "availability": "Aprox. ore disponibile pe zi",
+        "useCase": "Ce ai vrea să testezi?",
+        "useCasePlaceholder": "Spune-ne despre hardware, workload-ul agentului, utilizarea estimată a API-ului sau ce vrei să validezi."
+      },
+      "participation": {
+        "provider": "Provider de compute",
+        "builder": "Developer API",
+        "both": "Ambele"
+      },
+      "platforms": {
+        "windows": "Windows",
+        "macos": "macOS",
+        "linux": "Linux"
+      },
+      "vram": {
+        "cpu_integrated": "CPU / GPU integrat",
+        "under_4gb": "Sub 4 GB",
+        "4_8gb": "4–8 GB",
+        "8_16gb": "8–16 GB",
+        "16_24gb": "16–24 GB",
+        "24gb_plus": "24+ GB",
+        "multi_gpu": "Multi-GPU"
+      },
+      "consent": "Sunt de acord ca Hatcher să mă contacteze în legătură cu acest beta.",
+      "privacy": "Politica de confidențialitate",
+      "updates": "Doresc și actualizări ocazionale despre Hatcher Compute.",
+      "submit": "Aplică la beta închis",
+      "submitting": "Trimitem aplicația…",
+      "footnote": "Aplicațiile sunt evaluate manual.",
+      "successTitle": "Aplicația a fost primită.",
+      "successBody": "Mulțumim. Evaluăm potrivirea pentru cohorta de provideri sau developeri și te contactăm când se deschide un loc de testare.",
+      "successDuplicateTitle": "Aplicația a fost actualizată.",
+      "successDuplicateBody": "Am găsit o aplicație pentru acest email și i-am actualizat detaliile. Statusul evaluării a fost păstrat.",
+      "errors": {
+        "platform": "Alege cel puțin un sistem de operare pentru nodul provider.",
+        "consent": "Acordul este necesar pentru a te putea contacta despre beta."
+      }
+    },
+    "network": {
+      "title": "Prezentarea rețelei",
+      "timeRange": "Intervalul telemetriei",
+      "alphaStatus": "Alpha provideri · Rețeaua nu este live",
+      "notAvailable": "Indisponibil până la deschiderea alpha pentru provideri",
+      "telemetryNote": "Telemetria live apare când se deschide alpha pentru provideri.",
+      "localTelemetryNote": "Telemetrie live din preview-ul local. Decontarea USDC rămâne dezactivată.",
+      "metrics": {
+        "active-nodes": "Noduri active",
+        "available-vram": "VRAM disponibil",
+        "jobs-24h": "Joburi finalizate · 24h",
+        "provider-payouts": "Plăți către provideri"
+      }
+    },
+    "execution": {
+      "title": "O rețea. Trei moduri de execuție.",
+      "body": "Schedulerul potrivește fiecare job cu cel mai mic dispozitiv capabil. Workflow-urile mari pot fi împărțite în sarcini independente; împărțirea modelului rămâne experimentală.",
+      "selectedMode": "Mod selectat",
+      "modeSelector": "Selector mod de execuție",
+      "modes": {
+        "single-node": {
+          "title": "Un singur nod",
+          "note": "Calea rapidă pentru un GPU capabil"
+        },
+        "distributed-tasks": {
+          "title": "Sarcini distribuite",
+          "note": "Pași independenți rulați pe mai multe noduri"
+        },
+        "model-sharded-mesh": {
+          "title": "Mesh cu model împărțit",
+          "note": "Experimental · straturi de model coordonate"
+        }
+      },
+      "diagram": {
+        "request": "Job utilizator",
+        "scheduler": "Scheduler",
+        "routing": "Rutare după capabilități",
+        "nodes": {
+          "primary": { "title": "GPU capabil", "detail": "Cerere completă" },
+          "large": { "title": "Sarcină GPU mare", "detail": "Generare" },
+          "small": { "title": "Sarcină GPU mic", "detail": "Pas independent" },
+          "verify": {
+            "title": "Verificator CPU",
+            "detail": "Verificări rezultat"
+          },
+          "shardA": {
+            "title": "Shard model A",
+            "detail": "Straturi coordonate"
+          },
+          "shardB": {
+            "title": "Shard model B",
+            "detail": "Straturi coordonate"
+          },
+          "shardC": {
+            "title": "Shard model C",
+            "detail": "Straturi coordonate"
+          }
+        }
+      }
+    },
+    "devices": {
+      "title": "Muncă utilă pentru fiecare clasă de dispozitiv",
+      "filterLabel": "Filtrează clasele de dispozitive după sistemul de operare",
+      "columns": {
+        "device": "Clasă dispozitiv",
+        "bestFor": "Potrivit pentru",
+        "runtime": "Runtime tipic",
+        "availability": "Disponibilitate"
+      },
+      "classes": {
+        "cpu-integrated": {
+          "label": "CPU / integrat",
+          "work": "Embeddings, preprocesare, verificare"
+        },
+        "vram-4-8": {
+          "label": "4–8 GB VRAM",
+          "work": "Modele mici și generări scurte"
+        },
+        "vram-12-24": {
+          "label": "12–24 GB VRAM",
+          "work": "Inferență generală și contexte mai mari"
+        },
+        "multi-gpu": {
+          "label": "Multi-GPU",
+          "work": "Sarcini paralele și shard-uri de model"
+        }
+      },
+      "splitNote": "O cerere este împărțită doar când pașii ei sunt independenți sau modelul suportă sharding sigur."
+    },
+    "availability": {
+      "alpha": "Alpha",
+      "later": "Ulterior"
+    },
+    "platforms": {
+      "all": "Toate",
+      "windows": "Windows",
+      "macos": "macOS",
+      "linux": "Linux"
+    },
+    "estimator": {
+      "title": "Estimează veniturile unui provider.",
+      "body": "Vezi cum hardware-ul, disponibilitatea, cererea și munca verificată influențează plata unui provider. Estimările sunt orientative, niciodată garantate.",
+      "deviceClass": "Clasă dispozitiv",
+      "hours": "Ore disponibile / zi",
+      "utilization": "Grad de utilizare presupus",
+      "inputNote": "Setările arată limitele dorite. Plățile finale depind de munca acceptată și cererea decontată.",
+      "resultTitle": "Estimare orientativă",
+      "estimateUnavailable": "Calculată când este publicat prețul pentru alpha",
+      "estimateDisclaimer": "Veniturile nu sunt garantate. Plățile reale depind de munca acceptată și cererea decontată."
+    },
+    "settlement": {
+      "consumerPays": "Consumatorul plătește",
+      "hatcherVerifies": "Hatcher verifică",
+      "providerReceives": "Providerul primește USDC",
+      "note": "x402 pe Solana pentru cereri externe · AI Credits pentru agenții Hatcher"
+    },
+    "onboarding": {
+      "title": "Rulează un nod în trei pași.",
+      "steps": {
+        "install": "1 · Instalează aplicația Hatcher Node",
+        "limits": "2 · Alege limitele și wallet-ul de plată",
+        "benchmark": "3 · Treci benchmark-ul și acceptă joburi verificate"
+      }
+    },
+    "security": {
+      "title": "Doar conexiuni outbound, implicit.",
+      "outbound": "Nu sunt necesare porturi inbound",
+      "signed": "Joburi și manifeste de model semnate",
+      "limits": "Limite de resurse controlate de tine",
+      "verified": "Rezultate verificate înainte de decontare"
+    }
   },
   "desktop": {
     "enterDesktop": "Desktop",
