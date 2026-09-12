@@ -9,6 +9,7 @@ import { setToken } from '@/lib/api/core';
 import { cleanSensitiveAuthTokenUrl, tokenFromSensitiveAuthHash } from '@/lib/reset-password-token-url';
 import { CheckCircle2, XCircle, Loader2, Mail } from 'lucide-react';
 import { AuthShell } from '@/components/auth/v3/AuthShell';
+import { VerificationRecovery } from '@/components/auth/VerificationRecovery';
 
 function VerifyEmailInner() {
   const searchParams = useSearchParams();
@@ -89,21 +90,23 @@ function VerifyEmailInner() {
         >
           {t('errorCta')}
         </Link>
+        <VerificationRecovery />
       </AuthShell>
     );
   }
 
   // no-token
   return (
-    <AuthShell title={t('noTokenHeading')} subtitle={t('noTokenBody')}>
+    <AuthShell title={t('requestHeading')} subtitle={t('requestBody')}>
       <div className="flex justify-center mb-6">
         <div className="w-16 h-16 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
           <Mail className="w-8 h-8 text-amber-400" />
         </div>
       </div>
       <p className="text-xs text-[var(--text-muted)] text-center">
-        {t('noTokenHint')}
+        {t('requestHint')}
       </p>
+      <VerificationRecovery />
     </AuthShell>
   );
 }

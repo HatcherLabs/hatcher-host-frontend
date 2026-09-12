@@ -6,7 +6,6 @@ import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
-import { track } from '@/lib/analytics';
 import { sanitizeLocalReturnPath } from '@/lib/safe-redirect';
 import { REFERRAL_REWARD_LABEL } from '@/lib/referral-rewards';
 import { Check, X, Gift, Loader2 } from 'lucide-react';
@@ -151,7 +150,8 @@ export default function RegisterPage() {
       // no matter how the user typed it. Server normalizes too, but doing
       // it here avoids confusing casing-related mismatches.
       await register(email.trim().toLowerCase(), username, password, refCode || undefined);
-      track.register();
+      // The accepted response also covers private email conflicts. It does
+      // not prove a new account was created or an email was delivered.
       router.push('/verify-email');
     } catch {
       // register() sets the context error which we display via `displayError`.
@@ -353,8 +353,11 @@ export default function RegisterPage() {
             </div>
 
             {displayError && (
-              <div className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+              <div role="alert" className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
                 {displayError}
+                <Link href="/verify-email" className="block mt-2 underline">
+                  {t('verificationHelp')}
+                </Link>
               </div>
             )}
 

@@ -257,7 +257,7 @@ export type KnowledgeUploadPayload =
     };
 
 export const api = {
-  /** Register a new account */
+  /** Submit registration. Acceptance does not disclose whether the email exists. */
   register: (
     email: string,
     username: string,
@@ -308,6 +308,12 @@ export const api = {
     }),
 
   /** Verify email with token — returns fresh accessToken with emailVerified=true */
+  resendVerification: (email: string) =>
+    req<{ sent: boolean }>("/auth/resend-verification", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    }),
+
   verifyEmail: (token: string) =>
     req<{ verified: boolean; accessToken?: string }>("/auth/verify-email", {
       method: "POST",
