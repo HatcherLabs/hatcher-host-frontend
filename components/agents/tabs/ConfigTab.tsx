@@ -53,8 +53,8 @@ import {
   type HostedModelTag,
 } from '@/lib/hosted-model-catalog';
 import {
-  mergeHostedModelsWithLivePricing,
-  modelPricingById,
+  mergeHostedModelsWithLiveCatalog,
+  providersForHostedModels,
   parseModelPricingPayload,
   type ModelPricingPayload,
 } from '@/lib/model-pricing';
@@ -429,10 +429,6 @@ export function ConfigTab() {
     }
   }, [embedSnippet, toast]);
   const normalizedHostedModel = normalizeHostedModelForUi(configModel);
-  const liveModelPricingById = useMemo(
-    () => modelPricingById(liveModelPricing),
-    [liveModelPricing],
-  );
   const availableHostedModels = useMemo(() => {
     const computeOptions: HostedModelOption[] = computeModels.length === 0
       ? []
@@ -460,11 +456,12 @@ export function ConfigTab() {
             warning: 'Local preview: x402 USDC settlement is disabled.',
           })),
         ];
-    return mergeHostedModelsWithLivePricing(
+    return mergeHostedModelsWithLiveCatalog(
       [...HOSTED_MODELS, ...computeOptions],
-      liveModelPricingById,
+      liveModelPricing,
+      agent.framework,
     );
-  }, [computeModels, liveModelPricingById]);
+  }, [computeModels, liveModelPricing, agent.framework]);
   const selectedHostedModel = useMemo(
     () => availableHostedModels.find((m) => m.id === normalizedHostedModel)
       ?? createSavedHostedModelOption(normalizedHostedModel),
@@ -501,19 +498,19 @@ export function ConfigTab() {
     () => {
       const providers = computeModels.length > 0
         ? [
-            ...HOSTED_MODEL_PROVIDERS,
+            ...providersForHostedModels(availableHostedModels),
             {
               key: 'compute',
               name: 'Hatcher Compute',
               description: 'Owner-contributed local inference nodes.',
             },
           ]
-        : HOSTED_MODEL_PROVIDERS;
+        : providersForHostedModels(availableHostedModels);
       return providers.some((provider) => provider.key === selectedHostedProvider.key)
         ? providers
         : [...providers, selectedHostedProvider];
     },
-    [computeModels.length, selectedHostedProvider],
+    [availableHostedModels, computeModels.length, selectedHostedProvider],
   );
   const contextualHostedModelProviders = useMemo(() => {
     const providerKeys = new Set(
@@ -781,23 +778,20 @@ export function ConfigTab() {
 
   useEffect(() => {
     let cancelled = false;
-    Promise.all([api.getModelPricing(), api.getComputeModels()])
+    const refresh = () => Promise.allSettled([api.getModelPricing(), api.getComputeModels()])
       .then(([pricingResult, computeResult]) => {
         if (cancelled) return;
-        setLiveModelPricing(
-          pricingResult.success ? parseModelPricingPayload(pricingResult.data) : null,
-        );
-        setComputeModels(computeResult.success ? computeResult.data : []);
-      })
-      .catch(() => {
-        // Degrade silently to the static tier badges.
-        if (!cancelled) {
-          setLiveModelPricing(null);
-          setComputeModels([]);
+        if (pricingResult.status === 'fulfilled' && pricingResult.value.success) {
+          const parsed = parseModelPricingPayload(pricingResult.value.data);
+          if (parsed?.models.length) setLiveModelPricing(parsed);
         }
+        if (computeResult.status === 'fulfilled' && computeResult.value.success) setComputeModels(computeResult.value.data);
       });
+    void refresh();
+    const timer = window.setInterval(refresh, 5 * 60_000);
     return () => {
       cancelled = true;
+      window.clearInterval(timer);
     };
   }, []);
 

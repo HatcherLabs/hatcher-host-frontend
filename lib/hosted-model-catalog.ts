@@ -30,6 +30,7 @@ export type HostedModelOption = {
   fixedPrice?: string;
   priceLabel?: string;
   warning?: string;
+  routes?: string[];
 };
 
 export type ActiveModelDisplay = {
@@ -880,6 +881,7 @@ export function getHostedModelOption(
 }
 
 export function hostedModelRoute(model: HostedModelOption): string {
+  if (model.routes?.length) return model.routes.map((route) => route === 'usepod' ? 'UsePod' : route === 'openrouter' ? 'OpenRouter' : route).join(' / ');
   if (model.providerKey === 'compute') return 'Hatcher Compute provider network';
   if (model.providerKey === 'openserv') return 'OpenServ primary / OpenRouter fallback';
   if (model.providerKey === 'xiaomi') return 'UsePod primary / OpenRouter fallback';

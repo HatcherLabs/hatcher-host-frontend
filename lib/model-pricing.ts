@@ -1,4 +1,5 @@
 import type { HostedModelCost, HostedModelOption } from '@/lib/hosted-model-catalog';
+import { createSavedHostedModelOption, HOSTED_MODEL_PROVIDERS } from '@/lib/hosted-model-catalog';
 
 // ============================================================
 // Live hosted-model pricing (GET /models/pricing, public)
@@ -34,6 +35,11 @@ export type ModelPricing = FixedModelPricing | PerTokenModelPricing;
 export type ModelPricingEntry = {
   id: string;
   pricing: ModelPricing | null;
+  name?: string;
+  description?: string;
+  owned_by?: string;
+  context_length?: number;
+  providers?: string[];
 };
 
 export type ModelPricingPayload = {
@@ -138,7 +144,16 @@ export function parseModelPricingPayload(payload: unknown): ModelPricingPayload 
     if (!entry || typeof entry !== 'object' || Array.isArray(entry)) continue;
     const id = (entry as Record<string, unknown>).id;
     if (typeof id !== 'string' || id.trim().length === 0) continue;
-    models.push({ id: id.trim(), pricing: parseModelPricing((entry as Record<string, unknown>).pricing) });
+    const raw = entry as Record<string, unknown>;
+    models.push({
+      id: id.trim(),
+      pricing: parseModelPricing(raw.pricing),
+      ...(typeof raw.name === 'string' ? { name: raw.name } : {}),
+      ...(typeof raw.description === 'string' ? { description: raw.description } : {}),
+      ...(typeof raw.owned_by === 'string' ? { owned_by: raw.owned_by } : {}),
+      ...(isFiniteNumber(raw.context_length) && raw.context_length > 0 ? { context_length: raw.context_length } : {}),
+      ...(Array.isArray(raw.providers) ? { providers: raw.providers.filter((p): p is string => typeof p === 'string') } : {}),
+    });
   }
 
   return {
@@ -180,4 +195,49 @@ export function mergeHostedModelsWithLivePricing(
       ? { ...model, fixedPrice: label, cost }
       : { ...model, priceLabel: label, cost };
   });
+}
+
+/** The live inventory controls availability; static entries only enrich known models. */
+export function mergeHostedModelsWithLiveCatalog(
+  fallback: HostedModelOption[],
+  payload: ModelPricingPayload | null,
+  framework?: string,
+): HostedModelOption[] {
+  if (!payload?.models.length) return fallback;
+  const known = new Map(fallback.map((model) => [model.id, model]));
+  const live = new Map<string, HostedModelOption>();
+  for (const entry of payload.models) {
+    if (entry.id.startsWith('virtuals/')) continue;
+    // Hermes 0.21 requires at least 64K context for its agent loop.
+    if (framework === 'hermes' && entry.context_length && entry.context_length < 64_000) continue;
+    const base = known.get(entry.id) ?? createSavedHostedModelOption(entry.id);
+    const providerKey = entry.owned_by || base.providerKey;
+    const provider = HOSTED_MODEL_PROVIDERS.find((p) => p.key === providerKey)?.name ?? providerKey;
+    const context = entry.context_length
+      ? entry.context_length >= 1_000_000
+        ? `${Number((entry.context_length / 1_000_000).toFixed(2))}M`
+        : `${Number((entry.context_length / 1_000).toFixed(1))}K`
+      : base.context;
+    live.set(entry.id, {
+      ...base,
+      name: entry.name && entry.name !== entry.id ? entry.name : base.name,
+      description: entry.description || (known.has(entry.id) ? base.description : 'Available from the live provider catalog.'),
+      category: known.has(entry.id) ? base.category : 'Available',
+      providerKey,
+      provider,
+      context,
+      ...(entry.providers?.length ? { routes: entry.providers } : {}),
+    });
+  }
+  // Compute has a separate live discovery endpoint.
+  for (const model of fallback) if (model.providerKey === 'compute') live.set(model.id, model);
+  return mergeHostedModelsWithLivePricing([...live.values()], modelPricingById(payload));
+}
+
+export function providersForHostedModels(models: HostedModelOption[]) {
+  const providers = new Map(HOSTED_MODEL_PROVIDERS.map((provider) => [provider.key, provider]));
+  for (const model of models) if (!providers.has(model.providerKey)) {
+    providers.set(model.providerKey, { key: model.providerKey, name: model.provider, description: 'Available from the live provider catalog.' });
+  }
+  return [...providers.values()];
 }

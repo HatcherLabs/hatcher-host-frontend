@@ -11,13 +11,12 @@ import { IRONCLAW_OAUTH_EXTENSION_IDS } from '@/components/agents/ironclawExtens
 import {
   DEFAULT_HOSTED_MODEL,
   HOSTED_MODELS as HOSTED_MODEL_CATALOG,
-  HOSTED_MODEL_PROVIDERS,
   createSavedHostedModelOption,
   normalizeHostedModelForUi,
 } from '@/lib/hosted-model-catalog';
 import {
-  mergeHostedModelsWithLivePricing,
-  modelPricingById,
+  mergeHostedModelsWithLiveCatalog,
+  providersForHostedModels,
   parseModelPricingPayload,
   type ModelPricingPayload,
 } from '@/lib/model-pricing';
@@ -77,12 +76,6 @@ const FRAMEWORK_DESCRIPTION_KEYS = {
   hermes: 'frameworkHermes',
   ironclaw: 'frameworkIronClaw',
 } as const;
-
-// ChatToHatch keeps a static picker: Virtuals models are only offered in
-// the agent config tab, where the live Virtuals catalog merge provides them.
-const MODEL_PROVIDERS = HOSTED_MODEL_PROVIDERS.filter(
-  (provider) => provider.key !== 'virtuals',
-);
 
 const HOSTED_MODELS = HOSTED_MODEL_CATALOG.filter(
   (model) => model.providerKey !== 'virtuals',
@@ -294,22 +287,24 @@ export function ChatToHatch() {
   // catalog. Any failure degrades silently to the static tier badges.
   useEffect(() => {
     let cancelled = false;
-    api.getModelPricing()
+    const refresh = () => api.getModelPricing()
       .then((res) => {
         if (cancelled || !res.success) return;
-        setModelPricing(parseModelPricingPayload(res.data));
+        const parsed = parseModelPricingPayload(res.data);
+        if (parsed?.models.length) setModelPricing(parsed);
       })
-      .catch(() => {
-        if (!cancelled) setModelPricing(null);
-      });
+      .catch(() => {});
+    void refresh();
+    const timer = window.setInterval(refresh, 5 * 60_000);
     return () => {
       cancelled = true;
+      window.clearInterval(timer);
     };
   }, []);
 
   const hostedModels = useMemo(
-    () => mergeHostedModelsWithLivePricing(HOSTED_MODELS, modelPricingById(modelPricing)),
-    [modelPricing],
+    () => mergeHostedModelsWithLiveCatalog(HOSTED_MODELS, modelPricing, draft?.framework),
+    [modelPricing, draft?.framework],
   );
 
   async function handleSend() {
@@ -563,14 +558,15 @@ export function ChatToHatch() {
   const selectedModel =
     hostedModels.find((model) => model.id === selectedModelId) ??
     createSavedHostedModelOption(selectedModelId);
-  const selectedProvider = MODEL_PROVIDERS.find(
+  const liveProviders = providersForHostedModels(hostedModels);
+  const selectedProvider = liveProviders.find(
     (provider) => provider.key === selectedModel.providerKey,
   ) ?? { key: selectedModel.providerKey, name: selectedModel.provider };
-  const modelProviders = MODEL_PROVIDERS.some(
+  const modelProviders = liveProviders.some(
     (provider) => provider.key === selectedProvider.key,
   )
-    ? MODEL_PROVIDERS
-    : [...MODEL_PROVIDERS, selectedProvider];
+    ? liveProviders
+    : [...liveProviders, selectedProvider];
   const modelsForProvider = hostedModels.filter(
     (model) => model.providerKey === selectedProvider.key,
   );
