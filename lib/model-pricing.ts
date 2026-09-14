@@ -201,12 +201,15 @@ export function mergeHostedModelsWithLivePricing(
 export function mergeHostedModelsWithLiveCatalog(
   fallback: HostedModelOption[],
   payload: ModelPricingPayload | null,
+  framework?: string,
 ): HostedModelOption[] {
   if (!payload?.models.length) return fallback;
   const known = new Map(fallback.map((model) => [model.id, model]));
   const live = new Map<string, HostedModelOption>();
   for (const entry of payload.models) {
     if (entry.id.startsWith('virtuals/')) continue;
+    // Hermes 0.21 requires at least 64K context for its agent loop.
+    if (framework === 'hermes' && entry.context_length && entry.context_length < 64_000) continue;
     const base = known.get(entry.id) ?? createSavedHostedModelOption(entry.id);
     const providerKey = entry.owned_by || base.providerKey;
     const provider = HOSTED_MODEL_PROVIDERS.find((p) => p.key === providerKey)?.name ?? providerKey;

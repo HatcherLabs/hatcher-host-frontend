@@ -303,8 +303,8 @@ export function ChatToHatch() {
   }, []);
 
   const hostedModels = useMemo(
-    () => mergeHostedModelsWithLiveCatalog(HOSTED_MODELS, modelPricing),
-    [modelPricing],
+    () => mergeHostedModelsWithLiveCatalog(HOSTED_MODELS, modelPricing, draft?.framework),
+    [modelPricing, draft?.framework],
   );
 
   async function handleSend() {

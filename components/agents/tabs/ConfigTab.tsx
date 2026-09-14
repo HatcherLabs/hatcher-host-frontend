@@ -459,8 +459,9 @@ export function ConfigTab() {
     return mergeHostedModelsWithLiveCatalog(
       [...HOSTED_MODELS, ...computeOptions],
       liveModelPricing,
+      agent.framework,
     );
-  }, [computeModels, liveModelPricing]);
+  }, [computeModels, liveModelPricing, agent.framework]);
   const selectedHostedModel = useMemo(
     () => availableHostedModels.find((m) => m.id === normalizedHostedModel)
       ?? createSavedHostedModelOption(normalizedHostedModel),

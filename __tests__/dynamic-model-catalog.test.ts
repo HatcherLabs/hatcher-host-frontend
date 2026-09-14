@@ -3,6 +3,11 @@ import { HOSTED_MODELS } from '@/lib/hosted-model-catalog';
 import { mergeHostedModelsWithLiveCatalog, parseModelPricingPayload, providersForHostedModels } from '@/lib/model-pricing';
 
 describe('live model catalog', () => {
+  it('keeps small-context models available only for compatible frameworks', () => {
+    const payload = { models: [{ id: 'lab/small', context_length: 32000, pricing: null }], fetchedAt: '', billingNote: '' };
+    expect(mergeHostedModelsWithLiveCatalog([], payload, 'hermes')).toHaveLength(0);
+    expect(mergeHostedModelsWithLiveCatalog([], payload, 'openclaw')).toHaveLength(1);
+  });
   it('adds unknown providers and models without a code release and removes withdrawn choices', () => {
     const payload = parseModelPricingPayload({ models: [{
       id: 'newlab/new-model', name: 'New model', owned_by: 'newlab', context_length: 256000,
