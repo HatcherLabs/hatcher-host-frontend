@@ -22,6 +22,7 @@ import {
   HelpCircle,
   LayoutDashboard,
   ListChecks,
+  MessageSquare,
   LogOut,
   Newspaper,
   Plus,
@@ -58,6 +59,7 @@ export function Nav() {
   const tMission = useTranslations('missionControl');
 
   const WORKSPACE_MENU = useMemo(() => ([
+    { key: 'chat', label: 'Chat', sub: 'Talk directly with your choice of model', href: '/dashboard/chat', Icon: MessageSquare },
     { key: 'dashboard', label: tNav('dashboard'), sub: tMenu('sub_dashboard'), href: '/dashboard', Icon: LayoutDashboard },
     { key: 'missions', label: tMission('title'), sub: tMenu('sub_missionControl'), href: '/dashboard/missions', Icon: ListChecks },
     { key: 'approvals', label: 'Action approvals', sub: 'Review effectful agent actions', href: '/dashboard/approvals', Icon: ShieldCheck },
