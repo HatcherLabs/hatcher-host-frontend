@@ -113,6 +113,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   min-height: 34px;
   padding: 8px 10px;
   font-family: var(--font-inter), var(--font-body);
