@@ -20,6 +20,7 @@ for (const width of [1440, 390]) {
         budget: { plan: { planId: 'basic', weeklyCredits: 1250, endsAt: '2026-10-15T12:00:00Z' }, week: { spent: turns.length * 4, reserved: 0, resetsAt: '2026-09-22T12:00:00Z' }, remaining: 1250 - turns.length * 4 }, walletBalance: 500, queued: [], autoRenews: false,
       });
       if (path === '/chat/models') return reply({ models: [{ id: 'test/fast', name: 'Test Fast', contextLength: 100000, inputUsd: .000001, outputUsd: .000002 }, { id: 'test/deep', name: 'Test Deep', contextLength: 100000, inputUsd: .000002, outputUsd: .000004 }] });
+      if (path === '/chat/create/config') return reply({ tools: [{ id: 'seedream_image', label: 'Image', estimatedAiCredits: 58, configured: true }, { id: 'seedance_video', label: 'Video', estimatedAiCredits: 429, configured: true }, { id: 'suno_audio', label: 'Audio', estimatedAiCredits: 115, configured: true }] });
       if (path === '/chat/conversations' && method === 'GET') return reply({ conversations: chats });
       if (path === '/chat/conversations' && method === 'POST') { const chat = { id: 'chat-1', title: 'New chat', model: route.request().postDataJSON().model }; chats.push(chat); return reply(chat); }
       if (path.endsWith('/stream')) {
@@ -37,6 +38,11 @@ for (const width of [1440, 390]) {
     });
     await page.goto('/dashboard/chat');
     await expect(page.getByRole('heading', { name: 'What would you like to explore?' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Exit' })).toHaveAttribute('href', /dashboard/);
+    await page.getByRole('button', { name: 'Create', exact: true }).click();
+    await expect(page.getByText('Est. 58 AI Credits')).toBeVisible();
+    await page.getByRole('button', { name: /Chart/ }).click();
+    await expect(page.getByText('Chart', { exact: true })).toBeVisible();
     await page.getByRole('combobox', { name: 'Model' }).selectOption('test/deep');
     await page.getByRole('textbox', { name: 'Message', exact: true }).fill('Help me structure my next project');
     await page.getByRole('button', { name: 'Send message', exact: true }).click();

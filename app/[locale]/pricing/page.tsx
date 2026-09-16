@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { useLocale, useTranslations } from 'next-intl';
 import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 import { HatcherWalletModalProvider } from '@/components/providers/HatcherWalletModalProvider';
+import { ChatPlansOverview } from '@/components/chat/ChatPlansOverview';
 import { useAuth } from '@/lib/auth-context';
 import { loginHrefForReturn } from '@/lib/safe-redirect';
 import { CAPACITY_ADDONS } from '@/lib/capacity-addons';
@@ -336,6 +337,8 @@ function PricingPageContent() {
             );
           })}
         </div>
+
+        <ChatPlansOverview />
 
         {/* ADD-ONS SECTION */}
         <section className="mb-20">
