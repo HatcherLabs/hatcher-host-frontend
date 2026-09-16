@@ -49,7 +49,7 @@ export default function ChatPage() {
     const timer = window.setInterval(onFocus, 60000);
     return () => { window.removeEventListener('focus', onFocus); window.clearInterval(timer); };
   }, [refresh]);
-  const modelNames = useMemo(() => new Map(models.map(item => [item.id, item.name])), [models]);
+  const modelNames = useMemo(() => new Map([...models.map(item => [item.id, item.name] as const), ['market/coingecko', 'CoinGecko'], ['market/dexscreener', 'DexScreener'], ['media/seedream_image', 'Seedream'], ['media/seedance_video', 'Seedance'], ['media/suno_audio', 'Suno']]), [models]);
   const numberFormat = useMemo(() => new Intl.NumberFormat(locale), [locale]);
   const open = async (id: string, preserveError = false) => {
     const epoch = ++selection.current;
@@ -102,9 +102,27 @@ export default function ChatPage() {
     } catch (e) { setError((e as Error).message); }
     finally { setBusy(false); }
   };
+  const createMarketChart = async (text: string) => {
+    setBusy(true); setError(''); setPrompt('');
+    let id = selected;
+    try {
+      if (!id) {
+        const chat = await chatRequest<Conversation>('/conversations', { method: 'POST', body: JSON.stringify({ model }) });
+        id = chat.id; setSelected(id);
+      }
+      const result = await chatRequest<{ turn: ChatTurn }>('/chart', {
+        method: 'POST', body: JSON.stringify({ conversationId: id, prompt: text.trim() }),
+      });
+      setTurns(previous => [...previous, result.turn]);
+      setCreateMode(null);
+      await refresh();
+    } catch (e) { setError((e as Error).message); }
+    finally { setBusy(false); }
+  };
   const send = async (text = prompt) => {
     if (busy || !text.trim() || !model) return;
     if (createMode && createMode !== 'chart') return void createMedia(createMode, text);
+    if (createMode === 'chart') return void createMarketChart(text);
     setBusy(true); setError(''); setPrompt('');
     const abort = new AbortController(); controller.current = abort;
     let id = selected;
@@ -115,7 +133,7 @@ export default function ChatPage() {
       }
       const turn: ChatTurn = { id: 'sending', prompt: text.trim(), response: '', model, status: 'running', creditsCharged: null };
       setTurns(previous => [...previous, turn]);
-      await sendChat(id, text.trim(), model, abort.signal, delta => setTurns(previous => previous.map(t => t.id === 'sending' ? { ...t, response: t.response + delta } : t)), createMode === 'chart' ? 'chart' : undefined);
+      await sendChat(id, text.trim(), model, abort.signal, delta => setTurns(previous => previous.map(t => t.id === 'sending' ? { ...t, response: t.response + delta } : t)));
       setCreateMode(null);
     } catch (e) { if (!abort.signal.aborted) setError((e as Error).message); }
     finally {
@@ -196,9 +214,9 @@ export default function ChatPage() {
       </div>
       <form className={styles.composer} onSubmit={e => { e.preventDefault(); void send(); }}>
         <div className={styles.createWrap}><button type="button" className={styles.createButton} aria-label="Create" aria-expanded={createMenu} onClick={() => setCreateMenu(value => !value)}><WandSparkles size={18} /></button>{createMenu && <div className={styles.createMenu}>
-          {([['image', Image, 'Image'], ['video', Video, 'Video'], ['audio', Music2, 'Audio'], ['chart', BarChart3, 'Chart']] as const).map(([kind, Icon, label]) => { const toolId = kind === 'image' ? 'seedream_image' : kind === 'video' ? 'seedance_video' : kind === 'audio' ? 'suno_audio' : ''; const tool = createTools.find(item => item.id === toolId); return <button type="button" key={kind} disabled={kind !== 'chart' && !tool?.configured} onClick={() => { setCreateMode(kind); setCreateMenu(false); }}><Icon size={17} /><span><strong>{label}</strong><small>{kind === 'chart' ? 'Uses the selected chat model' : tool?.configured ? `Est. ${numberFormat.format(tool.estimatedAiCredits)} AI Credits` : 'Unavailable'}</small></span></button>; })}
+          {([['image', Image, 'Image'], ['video', Video, 'Video'], ['audio', Music2, 'Audio'], ['chart', BarChart3, 'Market chart']] as const).map(([kind, Icon, label]) => { const toolId = kind === 'image' ? 'seedream_image' : kind === 'video' ? 'seedance_video' : kind === 'audio' ? 'suno_audio' : ''; const tool = createTools.find(item => item.id === toolId); return <button type="button" key={kind} disabled={kind !== 'chart' && !tool?.configured} onClick={() => { setCreateMode(kind); setCreateMenu(false); }}><Icon size={17} /><span><strong>{label}</strong><small>{kind === 'chart' ? 'Live CoinGecko + DexScreener data' : tool?.configured ? `Est. ${numberFormat.format(tool.estimatedAiCredits)} AI Credits` : 'Unavailable'}</small></span></button>; })}
         </div>}</div>
-        <div className={styles.composerInput}>{createMode && <div className={styles.modeChip}><span>{createMode === 'chart' ? 'Chart' : `Create ${createMode}`}</span><button type="button" aria-label="Clear create mode" onClick={() => setCreateMode(null)}><X size={13} /></button></div>}<textarea aria-label="Message" placeholder={createMode ? `Describe the ${createMode} you want` : 'Message Hatcher Chat'} value={prompt} maxLength={16000} rows={2} onChange={e => setPrompt(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); void send(); } }} /></div>
+        <div className={styles.composerInput}>{createMode && <div className={styles.modeChip}><span>{createMode === 'chart' ? 'Live market chart' : `Create ${createMode}`}</span><button type="button" aria-label="Clear create mode" onClick={() => setCreateMode(null)}><X size={13} /></button></div>}<textarea aria-label="Message" placeholder={createMode === 'chart' ? 'Bitcoin 30d, $HATCHER 7d, or a token address' : createMode ? `Describe the ${createMode} you want` : 'Message Hatcher Chat'} value={prompt} maxLength={16000} rows={2} onChange={e => setPrompt(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); void send(); } }} /></div>
         {busy ? <button type="button" aria-label="Stop response" onClick={() => controller.current?.abort()}><Square size={17} /></button> : <button type="submit" aria-label="Send message" disabled={!prompt.trim() || !model || (!budget && (account?.walletBalance ?? 0) <= 0)}><ArrowUp size={20} /></button>}
       </form><p className={styles.footnote}>AI can make mistakes. Check important information.</p>
     </section>

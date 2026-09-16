@@ -23,6 +23,13 @@ for (const width of [1440, 390]) {
       if (path === '/chat/create/config') return reply({ tools: [{ id: 'seedream_image', label: 'Image', estimatedAiCredits: 58, configured: true }, { id: 'seedance_video', label: 'Video', estimatedAiCredits: 429, configured: true }, { id: 'suno_audio', label: 'Audio', estimatedAiCredits: 115, configured: true }] });
       if (path === '/chat/conversations' && method === 'GET') return reply({ conversations: chats });
       if (path === '/chat/conversations' && method === 'POST') { const chat = { id: 'chat-1', title: 'New chat', model: route.request().postDataJSON().model }; chats.push(chat); return reply(chat); }
+      if (path === '/chat/chart' && method === 'POST') {
+        const body = route.request().postDataJSON();
+        chats[0].title = body.prompt;
+        const turn = { id: 'chart-turn', prompt: body.prompt, response: 'Live market data from CoinGecko.\n\n```hatcher-chart\n{"type":"bar","title":"Project steps","xKey":"step","yKey":"effort","data":[{"step":"Plan","effort":2},{"step":"Build","effort":5}]}\n```', model: 'market/coingecko', status: 'completed', creditsCharged: 0 };
+        turns.push(turn);
+        return reply({ turn, source: 'CoinGecko', range: '30d' });
+      }
       if (path.endsWith('/stream')) {
         const body = route.request().postDataJSON();
         expect(body.model).toBe('test/deep');
@@ -41,13 +48,12 @@ for (const width of [1440, 390]) {
     await expect(page.getByRole('link', { name: 'Exit' })).toHaveAttribute('href', /dashboard/);
     await page.getByRole('button', { name: 'Create', exact: true }).click();
     await expect(page.getByText('Est. 58 AI Credits')).toBeVisible();
-    await page.getByRole('button', { name: /Chart/ }).click();
-    await expect(page.getByText('Chart', { exact: true })).toBeVisible();
+    await page.getByRole('button', { name: /Market chart/ }).click();
+    await expect(page.getByText('Live market chart', { exact: true })).toBeVisible();
     await page.getByRole('combobox', { name: 'Model' }).selectOption('test/deep');
     await page.getByRole('textbox', { name: 'Message', exact: true }).fill('Help me structure my next project');
     await page.getByRole('button', { name: 'Send message', exact: true }).click();
-    await expect(page.getByText('A clear answer.')).toBeVisible();
-    await expect(page.getByText('const ready = true;')).toBeVisible();
+    await expect(page.getByText('Live market data from CoinGecko.')).toBeVisible();
     await expect(page.getByText('Project steps')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Send message', exact: true })).toBeVisible();
     await page.screenshot({ path: `../chat-${width}.png`, fullPage: true });
@@ -56,7 +62,7 @@ for (const width of [1440, 390]) {
     await page.reload();
     if (width < 760) await page.getByRole('button', { name: 'Open conversations' }).click();
     await page.getByRole('button', { name: 'Help me structure my next project', exact: true }).click();
-    await expect(page.getByText('A clear answer.')).toBeVisible();
+    await expect(page.getByText('Live market data from CoinGecko.')).toBeVisible();
     await page.getByRole('button', { name: /% used/ }).click();
     await expect(page.getByRole('heading', { name: 'Choose your Chat plan' })).toBeVisible();
     await expect(page.getByText('$8.93', { exact: false })).toBeVisible();
