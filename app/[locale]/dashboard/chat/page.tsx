@@ -1,11 +1,11 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import ReactMarkdown from 'react-markdown';
 import { useLocale } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { ArrowUp, Check, Copy, Menu, Plus, Square, Trash2, X } from 'lucide-react';
 import { chatRequest, sendChat, type ChatAccount, type ChatModel, type ChatTurn, type Conversation } from '@/lib/direct-chat';
+import { RichMarkdown } from '@/components/agents/tabs/ChatTab/ArtifactRenderer';
 import styles from './page.module.css';
 
 export default function ChatPage() {
@@ -112,6 +112,7 @@ export default function ChatPage() {
           <small>Resets {new Date(budget.week.resetsAt).toLocaleString()}</small>
           {budget.week.reserved > 0 && <small>{numberFormat.format(budget.week.reserved)} credits reserved for replies</small>}
         </>}
+        <small>{numberFormat.format(account?.walletBalance ?? 0)} account AI Credits available</small>
         <button onClick={() => setShowPlans(v => !v)}>View plans</button>
         <Link href="/dashboard">Back to Hatcher</Link>
       </div>
@@ -121,10 +122,10 @@ export default function ChatPage() {
         <select aria-label="Model" value={model} disabled={busy || !models.length} onChange={e => setModel(e.target.value)}>
           {!models.length && <option value="">Models unavailable</option>}
           {models.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-        </select><button onClick={() => setShowPlans(v => !v)}>{budget ? `${used}% used` : 'Choose a plan'}</button>
+        </select><button onClick={() => setShowPlans(v => !v)}>{budget ? `${used}% used` : `${numberFormat.format(account?.walletBalance ?? 0)} credits`}</button>
       </header>
       {error && <div role="alert" className={styles.error}>{error}</div>}
-      {(showPlans || (!loading && account && !budget)) && <section className={styles.plans} aria-label="Chat plans">
+      {showPlans && <section className={styles.plans} aria-label="Chat plans">
         <h2>Choose your Chat plan</h2><p>30 days of access. Weekly usage resets. No automatic renewal.</p>
         <div className={styles.planGrid}>{account?.plans.map(plan => <article key={plan.id}><h3>{plan.name}</h3>
           <strong>{new Intl.NumberFormat(locale, { style: 'currency', currency: plan.currency }).format(plan.priceCents / 100)} <small>/ 30 days</small></strong>
@@ -134,9 +135,9 @@ export default function ChatPage() {
         {account?.queued.map(q => <p key={q.id}>Chat {q.planId} starts {new Date(q.startsAt).toLocaleDateString()}.</p>)}
       </section>}
       <div className={styles.messages} aria-busy={busy}>
-        {loading ? <p className={styles.empty}>Loading your chats…</p> : turns.length === 0 ? <div className={styles.empty}><h1>What would you like to explore?</h1><p>Choose a model and start a conversation.</p></div> : turns.map(turn => <article className={styles.turn} key={turn.id}>
+        {loading ? <p className={styles.empty}>Loading your chats…</p> : turns.length === 0 ? <div className={styles.empty}><h1>What would you like to explore?</h1><p>Use your Chat plan or account AI Credits with any available model.</p></div> : turns.map(turn => <article className={styles.turn} key={turn.id}>
           <div className={styles.prompt}>{turn.prompt}</div>
-          <div className={styles.answer}><ReactMarkdown>{turn.response || (turn.status === 'running' ? 'Thinking…' : 'No response received.')}</ReactMarkdown></div>
+          <div className={styles.answer}><RichMarkdown content={turn.response || (turn.status === 'running' ? 'Thinking…' : 'No response received.')} /></div>
           <div className={styles.actions}>
             <span>{modelNames.get(turn.model) ?? turn.model}{turn.creditsCharged !== null ? ` · ${numberFormat.format(turn.creditsCharged)} credits` : ''}</span>
             {turn.status === 'pending_usage' && <span>Usage pending</span>}
@@ -147,7 +148,7 @@ export default function ChatPage() {
       </div>
       <form className={styles.composer} onSubmit={e => { e.preventDefault(); void send(); }}>
         <textarea aria-label="Message" placeholder="Message Hatcher Chat" value={prompt} maxLength={16000} rows={2} onChange={e => setPrompt(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); void send(); } }} />
-        {busy ? <button type="button" aria-label="Stop response" onClick={() => controller.current?.abort()}><Square size={17} /></button> : <button type="submit" aria-label="Send message" disabled={!prompt.trim() || !model || !budget}><ArrowUp size={20} /></button>}
+        {busy ? <button type="button" aria-label="Stop response" onClick={() => controller.current?.abort()}><Square size={17} /></button> : <button type="submit" aria-label="Send message" disabled={!prompt.trim() || !model || (!budget && (account?.walletBalance ?? 0) <= 0)}><ArrowUp size={20} /></button>}
       </form><p className={styles.footnote}>AI can make mistakes. Check important information.</p>
     </section>
   </main>;

@@ -17,7 +17,7 @@ for (const width of [1440, 390]) {
       if (path === '/auth/me') return reply(user);
       if (path === '/chat/account') return reply({
         plans: [{ id: 'basic', name: 'Chat Basic', weeklyCredits: 1250, priceCents: 893, currency: 'usd', durationDays: 30 }, { id: 'pro', name: 'Chat Pro', weeklyCredits: 2500, priceCents: 1786, currency: 'usd', durationDays: 30 }, { id: 'max', name: 'Chat Max', weeklyCredits: 6500, priceCents: 4643, currency: 'usd', durationDays: 30 }],
-        budget: { plan: { planId: 'basic', weeklyCredits: 1250, endsAt: '2026-10-15T12:00:00Z' }, week: { spent: turns.length * 4, reserved: 0, resetsAt: '2026-09-22T12:00:00Z' }, remaining: 1250 - turns.length * 4 }, queued: [], autoRenews: false,
+        budget: { plan: { planId: 'basic', weeklyCredits: 1250, endsAt: '2026-10-15T12:00:00Z' }, week: { spent: turns.length * 4, reserved: 0, resetsAt: '2026-09-22T12:00:00Z' }, remaining: 1250 - turns.length * 4 }, walletBalance: 500, queued: [], autoRenews: false,
       });
       if (path === '/chat/models') return reply({ models: [{ id: 'test/fast', name: 'Test Fast', contextLength: 100000, inputUsd: .000001, outputUsd: .000002 }, { id: 'test/deep', name: 'Test Deep', contextLength: 100000, inputUsd: .000002, outputUsd: .000004 }] });
       if (path === '/chat/conversations' && method === 'GET') return reply({ conversations: chats });
@@ -26,7 +26,7 @@ for (const width of [1440, 390]) {
         const body = route.request().postDataJSON();
         expect(body.model).toBe('test/deep');
         chats[0].title = body.prompt;
-        turns.push({ id: body.requestId, prompt: body.prompt, response: 'A clear answer.\n\n- First step\n- Second step\n\n```js\nconst ready = true;\n```', model: body.model, status: 'completed', creditsCharged: 4 });
+        turns.push({ id: body.requestId, prompt: body.prompt, response: 'A clear answer.\n\n- First step\n- Second step\n\n```js\nconst ready = true;\n```\n\n```hatcher-chart\n{"type":"bar","title":"Project steps","xKey":"step","yKey":"effort","data":[{"step":"Plan","effort":2},{"step":"Build","effort":5}]}\n```', model: body.model, status: 'completed', creditsCharged: 4 });
         return route.fulfill({ contentType: 'text/event-stream', body: `data: ${JSON.stringify({ type: 'delta', text: turns[0].response })}\n\ndata: {"type":"done","status":"completed"}\n\n`, headers: { 'access-control-allow-origin': 'http://127.0.0.1:3048', 'access-control-allow-credentials': 'true' } });
       }
       if (path === '/chat/conversations/chat-1' && method === 'GET') return reply({ ...chats[0], turns });
@@ -42,6 +42,7 @@ for (const width of [1440, 390]) {
     await page.getByRole('button', { name: 'Send message', exact: true }).click();
     await expect(page.getByText('A clear answer.')).toBeVisible();
     await expect(page.getByText('const ready = true;')).toBeVisible();
+    await expect(page.getByText('Project steps')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Send message', exact: true })).toBeVisible();
     await page.screenshot({ path: `../chat-${width}.png`, fullPage: true });
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);

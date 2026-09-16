@@ -59,7 +59,6 @@ export function Nav() {
   const tMission = useTranslations('missionControl');
 
   const WORKSPACE_MENU = useMemo(() => ([
-    { key: 'chat', label: 'Chat', sub: 'Talk directly with your choice of model', href: '/dashboard/chat', Icon: MessageSquare },
     { key: 'dashboard', label: tNav('dashboard'), sub: tMenu('sub_dashboard'), href: '/dashboard', Icon: LayoutDashboard },
     { key: 'missions', label: tMission('title'), sub: tMenu('sub_missionControl'), href: '/dashboard/missions', Icon: ListChecks },
     { key: 'approvals', label: 'Action approvals', sub: 'Review effectful agent actions', href: '/dashboard/approvals', Icon: ShieldCheck },
@@ -135,6 +134,12 @@ export function Nav() {
           </div>
 
           <div className={styles.groups} aria-label="Primary navigation">
+            {!authLoading && isAuthenticated && (
+              <Link href="/dashboard/chat" className={styles.navLink} onClick={() => setOpenGroup(null)}>
+                <MessageSquare size={15} aria-hidden />
+                Chat
+              </Link>
+            )}
             {NAV_GROUPS.map((group) => (
               <div key={group.key} className={styles.groupAnchor}>
                 <button

@@ -17,6 +17,7 @@ import {
   LayoutDashboard,
   CalendarClock,
   ListChecks,
+  MessageSquare,
   Newspaper,
   Plus,
   ShieldCheck,
@@ -107,6 +108,14 @@ export function NavDrawer({ open, onClose }: Props) {
         )}
 
         <ul className={`${styles.list} ${styles.primaryList}`} aria-label="Primary navigation">
+          {!authLoading && isAuthenticated && (
+            <li>
+              <Link href="/dashboard/chat" className={`${styles.item} ${styles.primaryItem}`} onClick={onClose}>
+                <span className={styles.glyph}><MessageSquare size={17} strokeWidth={1.8} aria-hidden /></span>
+                <span className={styles.itemLabel}>Chat</span>
+              </Link>
+            </li>
+          )}
           {PRIMARY_NAV_LINKS.map((link) => (
             <li key={link.key}>
               <Link

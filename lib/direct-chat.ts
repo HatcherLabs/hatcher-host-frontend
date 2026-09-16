@@ -5,7 +5,7 @@ export interface ChatModel { id: string; name: string; contextLength: number; in
 export interface ChatPlan { id: string; name: string; weeklyCredits: number; priceCents: number; currency: string; durationDays: number }
 export interface Conversation { id: string; title: string; model: string }
 export interface ChatTurn { id: string; prompt: string; response: string; model: string; status: string; creditsCharged: number | null }
-export interface ChatAccount { plans: ChatPlan[]; budget: null | { plan: { planId: string; weeklyCredits: number; endsAt: string }; week: { spent: number; reserved: number; resetsAt: string }; remaining: number }; queued: Array<{ id: string; planId: string; startsAt: string }>; autoRenews: boolean }
+export interface ChatAccount { plans: ChatPlan[]; budget: null | { plan: { planId: string; weeklyCredits: number; endsAt: string }; week: { spent: number; reserved: number; resetsAt: string }; remaining: number }; walletBalance: number; queued: Array<{ id: string; planId: string; startsAt: string }>; autoRenews: boolean }
 export async function chatRequest<T>(path: string, options?: RequestInit): Promise<T> {
   const result = await req<T>(`/chat${path}`, options);
   if (!result.success) throw new Error(result.error);
