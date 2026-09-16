@@ -4,19 +4,21 @@ import { API_URL } from './config';
 export interface ChatModel { id: string; name: string; contextLength: number; inputUsd: number; outputUsd: number }
 export interface ChatPlan { id: string; name: string; weeklyCredits: number; priceCents: number; currency: string; durationDays: number }
 export interface Conversation { id: string; title: string; model: string }
-export interface ChatTurn { id: string; prompt: string; response: string; model: string; status: string; creditsCharged: number | null }
+export interface ChatTurn { id: string; prompt: string; response: string; model: string; status: string; creditsCharged: number | null; generationId?: string | null }
+export type ChatCreateKind = 'image' | 'video' | 'audio';
+export interface ChatCreateTool { id: string; label: string; estimatedAiCredits: number; configured: boolean }
 export interface ChatAccount { plans: ChatPlan[]; budget: null | { plan: { planId: string; weeklyCredits: number; endsAt: string }; week: { spent: number; reserved: number; resetsAt: string }; remaining: number }; walletBalance: number; queued: Array<{ id: string; planId: string; startsAt: string }>; autoRenews: boolean }
 export async function chatRequest<T>(path: string, options?: RequestInit): Promise<T> {
   const result = await req<T>(`/chat${path}`, options);
   if (!result.success) throw new Error(result.error);
   return result.data;
 }
-export async function sendChat(id: string, prompt: string, model: string, signal: AbortSignal, onDelta: (text: string) => void) {
+export async function sendChat(id: string, prompt: string, model: string, signal: AbortSignal, onDelta: (text: string) => void, artifactMode?: 'chart') {
   const token = getToken();
   const response = await fetch(`${API_URL}/chat/conversations/${encodeURIComponent(id)}/stream`, {
     method: 'POST', credentials: 'include', signal,
     headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-    body: JSON.stringify({ requestId: crypto.randomUUID(), prompt, model }),
+    body: JSON.stringify({ requestId: crypto.randomUUID(), prompt, model, ...(artifactMode ? { artifactMode } : {}) }),
   });
   if (!response.ok) {
     const error = await response.json().catch(() => ({})) as { error?: string };

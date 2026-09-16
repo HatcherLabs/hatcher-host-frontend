@@ -14,6 +14,7 @@ import { TIERS, TIER_ORDER, ADDONS } from '@hatcher/shared';
 import type { UserTierKey, AddonKey } from '@hatcher/shared';
 import { usePaymentDrivers } from '@/lib/payment-drivers';
 import { ConfirmPaymentModal } from '@/components/payments/ConfirmPaymentModal';
+import { ChatPlansOverview } from '@/components/chat/ChatPlansOverview';
 import { formatFeatureKey } from '@/lib/feature-labels';
 import {
   CAPACITY_ADDONS,
@@ -1638,6 +1639,8 @@ export default function BillingPage() {
           {error}
         </motion.div>
       )}
+
+      <ChatPlansOverview billing />
 
       {/* ── AI Credits Balance Card ───────────────────────── */}
       <motion.div className={`mb-8 ${cardClass}`} variants={itemVariants}>
