@@ -44,6 +44,9 @@ import type {
   AgentRoutine,
   CreateRoutineBody,
   RoutinesResponse,
+  AgentTrigger,
+  AgentTriggersResponse,
+  CreateAgentTriggerBody,
   RobinhoodHub,
   PublicTraderData,
   PublicTraderDirectoryData,
@@ -3674,6 +3677,45 @@ export const api = {
 
   archiveRoutine: (agentId: string, routineId: string) =>
     req<{ id: string; status: "archived" }>(`/agents/${agentId}/routines/${routineId}`, { method: "DELETE" }),
+
+  getTriggers: (params: { agentId?: string; type?: string; status?: string; limit?: number } = {}) => {
+    const query = new URLSearchParams();
+    if (params.agentId) query.set("agentId", params.agentId);
+    if (params.type) query.set("type", params.type);
+    if (params.status) query.set("status", params.status);
+    if (params.limit) query.set("limit", String(params.limit));
+    const suffix = query.toString();
+    return req<AgentTriggersResponse>(`/agents/triggers${suffix ? `?${suffix}` : ""}`);
+  },
+
+  createTrigger: (agentId: string, body: CreateAgentTriggerBody) =>
+    req<{ trigger: AgentTrigger; githubWebhookSecret?: string; note?: string }>(`/agents/${agentId}/triggers`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  updateTrigger: (
+    agentId: string,
+    triggerId: string,
+    body: Partial<Omit<CreateAgentTriggerBody, "type">> & { status?: "active" | "paused" },
+  ) =>
+    req<{ trigger: AgentTrigger }>(`/agents/${agentId}/triggers/${triggerId}`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+
+  testTrigger: (agentId: string, triggerId: string) =>
+    req<{ status: string; runId?: string; taskId?: string }>(`/agents/${agentId}/triggers/${triggerId}/test`, {
+      method: "POST",
+    }),
+
+  archiveTrigger: (agentId: string, triggerId: string) =>
+    req<{ archived: true }>(`/agents/${agentId}/triggers/${triggerId}`, { method: "DELETE" }),
+
+  rotateTriggerSecret: (agentId: string, triggerId: string) =>
+    req<{ githubWebhookSecret: string; note: string }>(`/agents/${agentId}/triggers/${triggerId}/rotate-secret`, {
+      method: "POST",
+    }),
 
   rejectMcpAction: (actionId: string) =>
     req<{ action: McpActionRequest }>(

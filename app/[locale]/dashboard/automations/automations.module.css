@@ -198,6 +198,22 @@
 .reviewCard { display: flex; align-items: flex-start; gap: 10px; border: 1px solid var(--border-default); border-radius: 8px; background: var(--bg-elevated); padding: 12px; color: var(--accent); }
 .reviewCard strong { color: var(--text-primary); font-size: 11px; }
 .reviewCard p { margin: 4px 0 0; color: var(--text-muted); font-size: 9px; line-height: 1.5; }
+.checkboxGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin: 0 0 17px; border: 0; padding: 0; }
+.checkboxGrid legend { grid-column: 1 / -1; margin-bottom: 1px; color: var(--text-secondary); font-size: 10px; font-weight: 800; }
+.checkboxGrid label { display: flex; min-height: 35px; align-items: center; gap: 8px; border: 1px solid var(--border-default); border-radius: 7px; background: var(--bg-elevated); padding: 0 10px; color: var(--text-secondary); font-size: 9px; text-transform: capitalize; }
+.checkboxGrid input { width: 14px; height: 14px; accent-color: var(--accent); }
+.setupPanel { display: flex; flex-direction: column; gap: 17px; }
+.setupSuccess { display: flex; align-items: center; gap: 10px; border: 1px solid var(--color-success-border); border-radius: 8px; background: var(--color-success-bg); padding: 13px; color: var(--color-success); }
+.setupSuccess span { display: flex; flex-direction: column; gap: 3px; }
+.setupSuccess strong { color: var(--text-primary); font-size: 11px; }
+.setupSuccess small { color: var(--text-secondary); font-size: 9px; }
+.copyField { display: grid; grid-template-columns: minmax(0, 1fr) 40px; }
+.copyField input { border-radius: 7px 0 0 7px; font-family: var(--font-mono, monospace); font-size: 9px; }
+.copyField button { display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--border-default); border-left: 0; border-radius: 0 7px 7px 0; background: var(--bg-surface); color: var(--text-secondary); }
+.copyField button:hover { color: var(--accent); }
+.setupInstructions { display: flex; align-items: flex-start; gap: 10px; border: 1px solid var(--border-default); border-radius: 8px; background: var(--bg-elevated); padding: 13px; color: var(--accent); }
+.setupInstructions strong { color: var(--text-primary); font-size: 11px; }
+.setupInstructions ol { margin: 8px 0 0; padding-left: 17px; color: var(--text-secondary); font-size: 9px; line-height: 1.8; }
 
 .routinesPanel { margin-bottom: 24px; border: 1px solid var(--border-default); border-radius: 10px; background: var(--bg-surface); overflow: hidden; }
 .routinesHeading, .legacyHeading { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 17px 19px; }
@@ -214,6 +230,10 @@
 .routineTop h3 { overflow: hidden; margin: 0; color: var(--text-primary); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
 .routineTop p { display: flex; align-items: center; gap: 4px; margin: 3px 0 0; color: var(--text-muted); font-size: 9px; }
 .routinePrompt { display: -webkit-box; overflow: hidden; min-height: 48px; margin: 13px 0; color: var(--text-secondary); font-size: 10px; line-height: 1.55; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+.triggerConfig { display: flex; min-width: 0; align-items: center; gap: 7px; margin: 12px 0 0; color: var(--text-muted); font-size: 9px; }
+.triggerConfig strong { flex: 0 0 auto; border: 1px solid var(--color-accent-border); border-radius: 999px; background: var(--color-accent-bg); padding: 3px 6px; color: var(--accent); font-size: 8px; }
+.triggerConfig span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.inlineError { display: flex; align-items: center; gap: 6px; margin: -5px 0 11px; color: var(--color-destructive); font-size: 9px; }
 .routineFacts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0 0 13px; border: 1px solid var(--border-line); border-radius: 7px; overflow: hidden; }
 .routineFacts div { min-width: 0; border-right: 1px solid var(--border-line); padding: 8px; }
 .routineFacts div:last-child { border-right: 0; }

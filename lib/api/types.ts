@@ -1385,6 +1385,72 @@ export interface RoutinesResponse {
   summary: { total: number; active: number; paused: number; awaitingApproval: number };
 }
 
+export type AgentTriggerType = "github" | "price_move" | "solana_onchain";
+
+export type AgentTriggerConfig =
+  | { repository: string; events: Array<"push" | "pull_request" | "issues" | "issue_comment" | "release">; branches: string[] }
+  | { mint: string; symbol?: string; condition: "above" | "below"; targetPriceUsd: number }
+  | { mint: string; symbol?: string; condition: "change_up" | "change_down"; changePercent: number; windowMinutes: number }
+  | { address: string; commitment: "confirmed" | "finalized"; includeFailed: boolean };
+
+export interface AgentTriggerRunSummary {
+  id: string;
+  eventType: string;
+  status: string;
+  payload: Record<string, unknown>;
+  error: string | null;
+  output: string | null;
+  occurredAt: string;
+  createdAt: string;
+  taskId: string | null;
+  taskRun: {
+    status: string;
+    output: string | null;
+    error: string | null;
+    startedAt: string | null;
+    finishedAt: string | null;
+  } | null;
+}
+
+export interface AgentTrigger {
+  id: string;
+  agentId: string;
+  agent: McpActionActor;
+  name: string;
+  type: AgentTriggerType;
+  status: "active" | "paused" | "archived";
+  prompt: string;
+  config: AgentTriggerConfig;
+  cooldownSeconds: number;
+  requiresApproval: boolean;
+  budgetAiCredits: number | null;
+  maxRuntimeSeconds: number | null;
+  version: number;
+  lastEventAt: string | null;
+  lastTriggeredAt: string | null;
+  lastError: string | null;
+  createdAt: string;
+  updatedAt: string;
+  webhookUrl?: string;
+  recentRuns: AgentTriggerRunSummary[];
+}
+
+export interface CreateAgentTriggerBody {
+  name: string;
+  type: AgentTriggerType;
+  prompt: string;
+  config: AgentTriggerConfig;
+  cooldownSeconds?: number;
+  requiresApproval?: boolean;
+  budgetAiCredits?: number;
+  maxRuntimeSeconds?: number;
+}
+
+export interface AgentTriggersResponse {
+  triggers: AgentTrigger[];
+  summary: { total: number; active: number; github: number; priceMove: number; onchain: number };
+}
+
 export interface CovenantDispatchBody {
   connectorId?: string;
   text: string;

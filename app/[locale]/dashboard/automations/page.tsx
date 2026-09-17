@@ -38,6 +38,7 @@ import {
   type AutomationStatus,
 } from '@/lib/automation-center';
 import styles from './automations.module.css';
+import { CreateTriggerDrawer, ManagedTriggersPanel } from './trigger-manager';
 
 type StatusFilter = 'all' | AutomationStatus;
 type KindFilter = 'all' | AutomationKind;
@@ -138,13 +139,13 @@ function SummaryRail({ items }: { items: AutomationItem[] }) {
   );
 }
 
-function TriggerSources({ webhookAgentId }: { webhookAgentId: string | null }) {
+function TriggerSources() {
   const sources = [
     { label: 'Schedule', icon: CalendarClock, live: true },
     { label: 'Webhook', icon: Webhook, live: true },
-    { label: 'On-chain', icon: Zap, live: false },
-    { label: 'GitHub', icon: Github, live: false },
-    { label: 'Price move', icon: RefreshCw, live: false },
+    { label: 'On-chain', icon: Zap, live: true },
+    { label: 'GitHub', icon: Github, live: true },
+    { label: 'Price move', icon: RefreshCw, live: true },
   ] as const;
   return (
     <aside className={styles.sources}>
@@ -158,13 +159,7 @@ function TriggerSources({ webhookAgentId }: { webhookAgentId: string | null }) {
           </div>
         ))}
       </div>
-      {webhookAgentId ? (
-        <Link href={`/dashboard/agent/${webhookAgentId}?tab=integrations`} className={styles.sourceLink}>
-          Configure webhooks <ExternalLink size={13} aria-hidden />
-        </Link>
-      ) : (
-        <p className={styles.sourceHint}>Start an OpenClaw or Hermes agent to configure a webhook.</p>
-      )}
+      <p className={styles.sourceHint}>Managed events are verified and queued as durable Mission Control tasks.</p>
     </aside>
   );
 }
@@ -403,7 +398,9 @@ export default function AutomationCenterPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [triggerDrawerOpen, setTriggerDrawerOpen] = useState(false);
   const [routineRefreshKey, setRoutineRefreshKey] = useState(0);
+  const [triggerRefreshKey, setTriggerRefreshKey] = useState(0);
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [query, setQuery] = useState('');
@@ -444,7 +441,8 @@ export default function AutomationCenterPage() {
 
   const eligibleAgents = useMemo(() => agents.filter((agent) =>
     agent.status === 'active' && ['openclaw', 'hermes', 'ironclaw'].includes(agent.framework)), [agents]);
-  const webhookAgentId = eligibleAgents.find((agent) => agent.framework !== 'ironclaw')?.id ?? null;
+  const triggerEligibleAgents = useMemo(() => agents.filter((agent) =>
+    ['active', 'sleeping'].includes(agent.status) && ['openclaw', 'hermes', 'ironclaw'].includes(agent.framework)), [agents]);
   const filtersActive = Boolean(query || statusFilter !== 'all' || kindFilter !== 'all' || agentFilter);
 
   const clearFilters = () => {
@@ -501,6 +499,9 @@ export default function AutomationCenterPage() {
           <button type="button" className={styles.refreshButton} onClick={() => void load(true)} disabled={refreshing}>
             <RefreshCw size={15} className={refreshing ? styles.spin : ''} /> Refresh
           </button>
+          <button type="button" className={styles.refreshButton} onClick={() => setTriggerDrawerOpen(true)}>
+            <Zap size={16} /> New trigger
+          </button>
           <button type="button" className={styles.createButton} onClick={() => setDrawerOpen(true)}>
             <Plus size={16} /> New routine
           </button>
@@ -513,6 +514,7 @@ export default function AutomationCenterPage() {
       )}
 
       <ManagedRoutinesPanel agents={eligibleAgents} refreshKey={routineRefreshKey} onMessage={handleRoutineMessage} />
+      <ManagedTriggersPanel refreshKey={triggerRefreshKey} onMessage={handleRoutineMessage} />
 
       <div className={styles.legacyHeading}><div><span>Runtime sources</span><h2>Agent-native automations</h2><p>Existing framework schedules, webhooks, and IronClaw automations remain available below.</p></div></div>
       <SummaryRail items={items} />
@@ -579,10 +581,11 @@ export default function AutomationCenterPage() {
             </div>
           )}
         </section>
-        <TriggerSources webhookAgentId={webhookAgentId} />
+        <TriggerSources />
       </div>
 
       <CreateAutomationDrawer agents={eligibleAgents} open={drawerOpen} onClose={() => setDrawerOpen(false)} onCreated={async (nextMessage) => { setRoutineRefreshKey((value) => value + 1); setMessage(nextMessage); }} />
+      <CreateTriggerDrawer agents={triggerEligibleAgents} open={triggerDrawerOpen} onClose={() => setTriggerDrawerOpen(false)} onCreated={async (nextMessage) => { setTriggerRefreshKey((value) => value + 1); setMessage(nextMessage); }} />
     </main>
   );
 }
