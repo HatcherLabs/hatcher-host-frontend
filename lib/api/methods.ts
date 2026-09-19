@@ -37,6 +37,9 @@ import type {
   McpConnector,
   McpActionInboxResponse,
   McpActionRequest,
+  CommerceActionInboxResponse,
+  CommerceActionRequest,
+  CommerceAgentSettings,
   OperatorActionInboxResponse,
   OperatorActionRequest,
   OperatorAuthorizationRequest,
@@ -3642,6 +3645,43 @@ export const api = {
         body: JSON.stringify(body),
       },
   ),
+
+  getCommerceActionInbox: (
+    params: { agentId?: string; status?: string; limit?: number } = {},
+  ) => {
+    const query = new URLSearchParams();
+    if (params.agentId) query.set("agentId", params.agentId);
+    if (params.status) query.set("status", params.status);
+    if (params.limit) query.set("limit", String(params.limit));
+    const suffix = query.toString();
+    return req<CommerceActionInboxResponse>(
+      `/agents/sp3nd/actions${suffix ? `?${suffix}` : ""}`,
+    );
+  },
+
+  approveCommerceAction: (actionId: string) =>
+    req<{ action: CommerceActionRequest }>(
+      `/agents/sp3nd/actions/${actionId}/approve`,
+      { method: "POST" },
+    ),
+
+  rejectCommerceAction: (actionId: string) =>
+    req<{ action: CommerceActionRequest }>(
+      `/agents/sp3nd/actions/${actionId}/reject`,
+      { method: "POST" },
+    ),
+
+  getCommerceAgentSettings: (agentId: string) =>
+    req<{ settings: CommerceAgentSettings }>(`/agents/${agentId}/sp3nd/settings`),
+
+  updateCommerceAgentSettings: (
+    agentId: string,
+    body: Pick<CommerceAgentSettings, "enabled" | "maxOrderUsdc" | "allowedCountries">,
+  ) =>
+    req<{ settings: CommerceAgentSettings }>(`/agents/${agentId}/sp3nd/settings`, {
+      method: "PUT",
+      body: JSON.stringify(body),
+    }),
 
   getAutomationPolicy: () => req<{ policy: AutomationPolicy }>("/agents/automation-policy"),
 

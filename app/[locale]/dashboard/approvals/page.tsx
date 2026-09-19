@@ -11,12 +11,14 @@ import {
   Save,
   ShieldCheck,
   ShieldX,
+  ShoppingBag,
   Trash2,
 } from 'lucide-react';
 import { Link, useRouter } from '@/i18n/routing';
 import { api } from '@/lib/api';
-import type { Agent, AutomationPolicy, McpActionGrant, McpActionInboxResponse, McpActionRequest, McpActionStatus, OperatorActionInboxResponse, OperatorActionRequest } from '@/lib/api';
+import type { Agent, AutomationPolicy, CommerceActionInboxResponse, CommerceActionRequest, CommerceAgentSettings, McpActionGrant, McpActionInboxResponse, McpActionRequest, McpActionStatus, OperatorActionInboxResponse, OperatorActionRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
+import { commerceActionLabel, commerceActionNeedsReconciliation } from '@/lib/commerce-approvals';
 import styles from './approvals.module.css';
 
 const FILTERS: Array<{ value: 'all' | McpActionStatus; label: string }> = [
@@ -34,6 +36,7 @@ const EMPTY_INBOX: McpActionInboxResponse = {
 };
 
 const EMPTY_OPERATOR_INBOX: OperatorActionInboxResponse = { actions: [], summary: { pending: 0 } };
+const EMPTY_COMMERCE_INBOX: CommerceActionInboxResponse = { actions: [], summary: { pending: 0 } };
 const DEFAULT_POLICY: AutomationPolicy = {
   id: null,
   userId: '',
@@ -200,6 +203,53 @@ function OperatorActionRow({ action, busy, onApprove, onReject }: {
   );
 }
 
+function CommerceActionRow({ action, busy, onApprove, onReject }: {
+  action: CommerceActionRequest;
+  busy: string | null;
+  onApprove: (action: CommerceActionRequest) => void;
+  onReject: (action: CommerceActionRequest) => void;
+}) {
+  const pending = action.status === 'pending';
+  const needsReconciliation = commerceActionNeedsReconciliation(action);
+  return (
+    <article className={styles.actionRow} data-status={action.status}>
+      <div className={styles.actionIdentity}>
+        <div className={styles.statusIcon} aria-hidden>
+          {pending ? <Clock3 size={15} /> : action.status === 'executed' ? <Check size={15} /> : <ShoppingBag size={15} />}
+        </div>
+        <div className={styles.actionMain}>
+          <div className={styles.actionTitleLine}>
+            <strong>{commerceActionLabel(action.action)}</strong>
+            <span className={styles.status} data-status={action.status}>{action.status.replaceAll('_', ' ')}</span>
+          </div>
+          <p>{action.agent.name}{action.externalOrderId ? ` · Order ${action.externalOrderId}` : ''}</p>
+          <span className={styles.time}>{formatDate(action.createdAt)}</span>
+        </div>
+      </div>
+      <details className={styles.payload}>
+        <summary>Purchase preview</summary>
+        <pre>{JSON.stringify(action.argumentsPreview, null, 2)}</pre>
+        <small>Private customer fields are redacted. Approval applies once and only to this exact payload.</small>
+      </details>
+      {(action.failureMessage || needsReconciliation) && (
+        <p className={styles.failure}>
+          {action.failureMessage ?? 'Payment state is ambiguous. The agent must reconcile the existing attempt; do not approve a replacement payment.'}
+        </p>
+      )}
+      {pending && (
+        <div className={styles.actions}>
+          <button type="button" onClick={() => onApprove(action)} disabled={busy !== null} className={styles.primaryButton}>
+            {busy === `commerce:${action.id}:approve` ? <Loader2 size={14} className={styles.spin} /> : <Check size={14} />} Approve once
+          </button>
+          <button type="button" onClick={() => onReject(action)} disabled={busy !== null} className={styles.rejectButton}>
+            {busy === `commerce:${action.id}:reject` ? <Loader2 size={14} className={styles.spin} /> : <ShieldX size={14} />} Reject
+          </button>
+        </div>
+      )}
+    </article>
+  );
+}
+
 function PolicyEditor({ policy, saving, onChange, onSave }: {
   policy: AutomationPolicy;
   saving: boolean;
@@ -224,6 +274,56 @@ function PolicyEditor({ policy, saving, onChange, onSave }: {
   );
 }
 
+function CommerceSettingsEditor({ settings, countries, saving, onChange, onCountriesChange, onSave }: {
+  settings: CommerceAgentSettings;
+  countries: string;
+  saving: boolean;
+  onChange: (settings: CommerceAgentSettings) => void;
+  onCountriesChange: (value: string) => void;
+  onSave: () => void;
+}) {
+  const platformReady = settings.integration.enabled && settings.integration.configured;
+  const paymentsReady = platformReady && settings.integration.purchasesEnabled;
+  return (
+    <section className={styles.policySection} aria-labelledby="commerce-policy-title">
+      <div className={styles.policyHeading}>
+        <div>
+          <span>Agent commerce policy</span>
+          <h2 id="commerce-policy-title">Physical purchases</h2>
+          <p>Allow this agent to prepare Amazon or eBay orders within an exact owner-controlled limit.</p>
+        </div>
+        <button type="button" className={styles.primaryButton} onClick={onSave} disabled={saving}>
+          {saving ? <Loader2 size={14} className={styles.spin} /> : <Save size={14} />} Save commerce policy
+        </button>
+      </div>
+      <div className={styles.policyGrid}>
+        <label>
+          <span>Agent access</span>
+          <select value={settings.enabled ? 'enabled' : 'disabled'} onChange={(event) => onChange({ ...settings, enabled: event.target.value === 'enabled' })}>
+            <option value="disabled">Disabled</option>
+            <option value="enabled">Enabled with one-time approvals</option>
+          </select>
+          <small>Creating an order and paying it each require a separate exact-payload approval.</small>
+        </label>
+        <label>
+          <span>Maximum per order (USDC)</span>
+          <input inputMode="decimal" value={settings.maxOrderUsdc} onChange={(event) => onChange({ ...settings, maxOrderUsdc: event.target.value })} />
+          <small>Platform ceiling: {settings.platformMaxOrderUsdc} USDC.</small>
+        </label>
+        <label>
+          <span>Allowed destination countries</span>
+          <input value={countries} onChange={(event) => onCountriesChange(event.target.value)} placeholder="Romania, Germany" />
+          <small>Comma-separated names. Leave blank to allow any supported destination.</small>
+        </label>
+      </div>
+      <div className={styles.policyFootnote}>
+        <ShieldCheck size={15} />
+        <span>{paymentsReady ? 'Partner connection and real payments are available.' : platformReady ? 'Partner connection is ready; real payments remain globally paused.' : 'Partner connection is not active yet. This policy can be prepared now and remains fail-closed.'}</span>
+      </div>
+    </section>
+  );
+}
+
 export default function ActionApprovalsPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
@@ -231,12 +331,16 @@ export default function ActionApprovalsPage() {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [inbox, setInbox] = useState<McpActionInboxResponse>(EMPTY_INBOX);
   const [operatorInbox, setOperatorInbox] = useState<OperatorActionInboxResponse>(EMPTY_OPERATOR_INBOX);
+  const [commerceInbox, setCommerceInbox] = useState<CommerceActionInboxResponse>(EMPTY_COMMERCE_INBOX);
   const [status, setStatus] = useState<'all' | McpActionStatus>('all');
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [policy, setPolicy] = useState<AutomationPolicy>(DEFAULT_POLICY);
   const [savingPolicy, setSavingPolicy] = useState(false);
+  const [commerceSettings, setCommerceSettings] = useState<CommerceAgentSettings | null>(null);
+  const [commerceCountries, setCommerceCountries] = useState('');
+  const [savingCommerce, setSavingCommerce] = useState(false);
   const agentId = searchParams.get('agent') ?? '';
 
   const load = useCallback(async (quiet = false) => {
@@ -248,7 +352,7 @@ export default function ActionApprovalsPage() {
       setLoading(true);
       setMessage(null);
     }
-    const [agentsResult, inboxResult, operatorResult] = await Promise.all([
+    const [agentsResult, inboxResult, operatorResult, commerceResult] = await Promise.all([
       api.getMyAgents(),
       api.getMcpActionInbox({
         ...(agentId ? { agentId } : {}),
@@ -256,6 +360,11 @@ export default function ActionApprovalsPage() {
         limit: 75,
       }),
       api.getOperatorActionInbox({
+        ...(agentId ? { agentId } : {}),
+        ...(status !== 'all' ? { status } : {}),
+        limit: 75,
+      }),
+      api.getCommerceActionInbox({
         ...(agentId ? { agentId } : {}),
         ...(status !== 'all' ? { status } : {}),
         limit: 75,
@@ -269,6 +378,8 @@ export default function ActionApprovalsPage() {
     }
     if (operatorResult.success) setOperatorInbox(operatorResult.data);
     else setMessage(operatorResult.error ?? 'Could not load Hatcher Operator approvals.');
+    if (commerceResult.success) setCommerceInbox(commerceResult.data);
+    else setMessage(commerceResult.error ?? 'Could not load commerce approvals.');
     setLoading(false);
   }, [agentId, isAuthenticated, status]);
 
@@ -285,6 +396,25 @@ export default function ActionApprovalsPage() {
       else setMessage(result.error ?? 'Could not load automation policy.');
     });
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    setCommerceSettings(null);
+    setCommerceCountries('');
+    if (!isAuthenticated || !agentId) {
+      return;
+    }
+    let cancelled = false;
+    void api.getCommerceAgentSettings(agentId).then((result) => {
+      if (cancelled) return;
+      if (!result.success) {
+        setMessage(result.error ?? 'Could not load commerce policy.');
+        return;
+      }
+      setCommerceSettings(result.data.settings);
+      setCommerceCountries(result.data.settings.allowedCountries?.join(', ') ?? '');
+    });
+    return () => { cancelled = true; };
+  }, [agentId, isAuthenticated]);
 
   const selectedAgentName = useMemo(
     () => agents.find((agent) => agent.id === agentId)?.name ?? 'All agents',
@@ -320,6 +450,26 @@ export default function ActionApprovalsPage() {
     setMessage('Execution policy saved. New runs and actions use it immediately.');
   };
 
+  const saveCommercePolicy = async () => {
+    if (!agentId || !commerceSettings) return;
+    const allowedCountries = commerceCountries
+      .split(',')
+      .map((country) => country.trim())
+      .filter(Boolean);
+    setSavingCommerce(true);
+    setMessage(null);
+    const result = await api.updateCommerceAgentSettings(agentId, {
+      enabled: commerceSettings.enabled,
+      maxOrderUsdc: commerceSettings.maxOrderUsdc,
+      allowedCountries: allowedCountries.length > 0 ? allowedCountries : null,
+    });
+    setSavingCommerce(false);
+    if (!result.success) { setMessage(result.error ?? 'Could not save commerce policy.'); return; }
+    setCommerceSettings(result.data.settings);
+    setCommerceCountries(result.data.settings.allowedCountries?.join(', ') ?? '');
+    setMessage('Commerce policy saved. Purchase actions still require one-time approval.');
+  };
+
   if (authLoading || loading) {
     return <div className={styles.center}><Loader2 size={20} className={styles.spin} /> Loading approvals</div>;
   }
@@ -340,7 +490,7 @@ export default function ActionApprovalsPage() {
           <div>
             <span className={styles.eyebrow}>Owner safety control</span>
             <h1>Action approvals</h1>
-            <p>Review outbound connector calls and inbound Hatcher Operator requests before execution.</p>
+            <p>Review purchase, connector, and Hatcher Operator requests before execution.</p>
           </div>
           <button type="button" className={styles.refreshButton} onClick={() => void load()} disabled={busy !== null}>
             <RefreshCw size={14} /> Refresh
@@ -348,12 +498,23 @@ export default function ActionApprovalsPage() {
         </header>
 
         <section className={styles.summary} aria-label="Approval summary">
-          <div><span>Pending</span><strong>{inbox.summary.pending + operatorInbox.summary.pending}</strong></div>
+          <div><span>Pending</span><strong>{inbox.summary.pending + operatorInbox.summary.pending + commerceInbox.summary.pending}</strong></div>
           <div><span>Active grants</span><strong>{inbox.summary.activeGrants}</strong></div>
           <div><span>Scope</span><strong>{selectedAgentName}</strong></div>
         </section>
 
         <PolicyEditor policy={policy} saving={savingPolicy} onChange={setPolicy} onSave={() => void savePolicy()} />
+
+        {agentId && commerceSettings && (
+          <CommerceSettingsEditor
+            settings={commerceSettings}
+            countries={commerceCountries}
+            saving={savingCommerce}
+            onChange={setCommerceSettings}
+            onCountriesChange={setCommerceCountries}
+            onSave={() => void saveCommercePolicy()}
+          />
+        )}
 
         <div className={styles.controls}>
           <label>
@@ -403,6 +564,36 @@ export default function ActionApprovalsPage() {
             </div>
           </section>
         )}
+
+        <section className={styles.section}>
+          <div className={styles.sectionHeading}>
+            <div><h2>Commerce purchase requests</h2><p>Physical orders and payments always require a one-time approval. Reusable grants are never available.</p></div>
+            <span>{commerceInbox.actions.length} records</span>
+          </div>
+          {commerceInbox.actions.length === 0 ? (
+            <div className={styles.empty}><ShoppingBag size={22} /><strong>No matching purchase activity</strong><p>Purchase requests from your agents will appear here before an order or payment is executed.</p></div>
+          ) : (
+            <div className={styles.actionList}>
+              {commerceInbox.actions.map((action) => (
+                <CommerceActionRow
+                  key={action.id}
+                  action={action}
+                  busy={busy}
+                  onApprove={(item) => void run(
+                    `commerce:${item.id}:approve`,
+                    () => api.approveCommerceAction(item.id),
+                    `${commerceActionLabel(item.action)} approved once.`,
+                  )}
+                  onReject={(item) => void run(
+                    `commerce:${item.id}:reject`,
+                    () => api.rejectCommerceAction(item.id),
+                    `${commerceActionLabel(item.action)} rejected.`,
+                  )}
+                />
+              ))}
+            </div>
+          )}
+        </section>
 
         <section className={styles.section}>
           <div className={styles.sectionHeading}>

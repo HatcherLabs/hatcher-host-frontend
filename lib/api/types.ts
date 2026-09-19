@@ -1280,6 +1280,50 @@ export interface McpActionInboxResponse {
   summary: { pending: number; activeGrants: number };
 }
 
+export type CommerceActionStatus = McpActionStatus | "reconciliation_required";
+
+export interface CommerceActionRequest {
+  id: string;
+  userId: string;
+  agentId: string;
+  action: "create_order" | "pay_order";
+  argumentsHash: string;
+  argumentsPreview: unknown;
+  status: CommerceActionStatus;
+  failureMessage: string | null;
+  externalOrderId: string | null;
+  transactionSignature: string | null;
+  resultPreview: unknown | null;
+  expiresAt: string | null;
+  resolvedAt: string | null;
+  executedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  agent: McpActionActor;
+}
+
+export interface CommerceActionInboxResponse {
+  actions: CommerceActionRequest[];
+  summary: { pending: number };
+}
+
+export interface CommerceAgentSettings {
+  enabled: boolean;
+  maxOrderUsdc: string;
+  allowedCountries: string[] | null;
+  platformMaxOrderUsdc: string;
+  integration: {
+    enabled: boolean;
+    configured: boolean;
+    purchasesEnabled: boolean;
+    network: string;
+    approvalRequired: string[];
+    paymentAsset: string;
+    supportedMarketplaces: string[];
+    collectorCryptPaymentEnabled: boolean;
+  };
+}
+
 export interface OperatorAuthorizationRequest {
   client: { id: string; name: string };
   scopes: Array<"hatcher:read" | "hatcher:chat" | "hatcher:lifecycle">;
