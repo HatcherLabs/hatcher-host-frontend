@@ -390,7 +390,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
   const terminalKeepAliveRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const qrCodeRef = useRef<string | null>(null);
   const isWhatsAppPairing = integration.pairingChannel === 'whatsapp';
-  const usesFrameworkWhatsappPairing = isWhatsAppPairing && agent.framework === 'hermes';
+  const usesFrameworkWhatsappPairing = isWhatsAppPairing && ['hermes', 'openclaw'].includes(agent.framework);
   const isOpenClawWhatsappPairing = isWhatsAppPairing && agent.framework === 'openclaw';
 
   const closeHermesPairingTerminal = () => {
@@ -424,7 +424,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
   // Poll channel status every 5s when QR is showing
   useEffect(() => {
     if (terminalOpen) return;
-    if (!qrCode && !connected) return;
+    if (!qrCode || connected) return;
     const channel = integration.pairingChannel;
     if (!channel) return;
 
@@ -485,6 +485,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
       }, 25_000);
 
       ws.onmessage = (event) => {
+        if (terminalWsRef.current !== ws) return;
         try {
           const msg = JSON.parse(String(event.data)) as {
             type?: string;
@@ -529,6 +530,8 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
               }
             })();
           } else if (msg.type === 'disconnected') {
+            qrCodeRef.current = null;
+            setQrCode(null);
             setTerminalState((prev) => {
               if (prev === 'paired' || prev === 'restarting') return prev;
               setLoading(false);
@@ -542,6 +545,8 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
               }
             }
           } else if (msg.type === 'error') {
+            qrCodeRef.current = null;
+            setQrCode(null);
             setTerminalState('error');
             setLoading(false);
             setError(msg.message || 'Pairing failed');
@@ -551,11 +556,17 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
         }
       };
       ws.onerror = () => {
+        if (terminalWsRef.current !== ws) return;
+        qrCodeRef.current = null;
+        setQrCode(null);
         setTerminalState('error');
         setLoading(false);
         setError(`Could not connect to the ${pairingFrameworkLabel} pairing terminal.`);
       };
       ws.onclose = () => {
+        if (terminalWsRef.current !== ws) return;
+        qrCodeRef.current = null;
+        setQrCode(null);
         if (terminalKeepAliveRef.current) {
           clearInterval(terminalKeepAliveRef.current);
           terminalKeepAliveRef.current = null;
