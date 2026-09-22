@@ -120,6 +120,10 @@ export interface AgentContextValue {
   handleKeyDown: (e: React.KeyboardEvent) => void;
   sendCooldown: boolean;
   wsConnected: boolean;
+  historyCursor?: string | null;
+  historyLoading?: boolean;
+  contextLimited?: boolean;
+  loadOlderChatHistory?: () => Promise<number>;
   chatSessions: ChatSessionSummary[];
   chatFolders: ChatFolderSummary[];
   activeChatSessionId: string | null;

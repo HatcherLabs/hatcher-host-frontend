@@ -20,6 +20,7 @@ interface MessageListProps {
   hasMore: boolean;
   windowStart: number;
   onLoadMore: () => void;
+  loadingEarlier?: boolean;
   agentName: string;
   agentId: string;
   framework: string;
@@ -48,6 +49,7 @@ export function MessageList({
   hasMore,
   windowStart,
   onLoadMore,
+  loadingEarlier,
   agentName,
   agentId,
   framework,
@@ -151,9 +153,10 @@ export function MessageList({
         <div className="flex justify-center py-2">
           <button
             onClick={onLoadMore}
+            disabled={loadingEarlier}
             className="text-xs px-3 py-1.5 rounded-lg border border-[var(--border-default)] text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:border-[var(--text-muted)]/40 transition-all"
           >
-            {t('loadEarlier', { count: windowStart })}
+            {loadingEarlier ? 'Loading earlier messages…' : windowStart > 0 ? t('loadEarlier', { count: windowStart }) : 'Load earlier messages'}
           </button>
         </div>
       )}
