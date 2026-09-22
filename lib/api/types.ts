@@ -2613,6 +2613,7 @@ export interface AgentPassport {
 }
 
 export interface AgentWalletTokenBalance {
+  name?: string;
   symbol: string;
   assetAddress: string | null;
   raw: string;
@@ -2643,6 +2644,7 @@ export interface AgentWalletNetworkBalance {
   nativeBalance: AgentWalletNativeBalance | null;
   tokenBalances: AgentWalletTokenBalance[];
   balanceError: string | null;
+  tokenBalanceError?: string | null;
   identity: {
     agentId: string | null;
     registry: string | null;

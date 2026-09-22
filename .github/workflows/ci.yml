@@ -47,6 +47,9 @@ jobs:
       - name: Test bounded incremental cache
         run: npm test -- __tests__/cache-handler.test.ts
 
+      - name: Test agent wallet holdings
+        run: npm test -- components/agents/tabs/SolanaHoldings.test.tsx components/agents/tabs/WalletTab.test.ts
+
       - name: Lint
         # ESLint runs against .eslintrc.json (next/core-web-vitals).
         # Next's own build runs lint internally too but we surface it
