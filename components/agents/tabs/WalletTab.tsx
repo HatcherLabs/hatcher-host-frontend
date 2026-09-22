@@ -48,6 +48,7 @@ import { XonaPartnerResourcesPanel } from './XonaPartnerResourcesPanel';
 import { Mpp32WalletPanel } from './Mpp32WalletPanel';
 import { MetaplexWalletPanel } from './MetaplexWalletPanel';
 import { VirtualsWalletPanel } from './VirtualsWalletPanel';
+import { SolanaHoldings } from './SolanaHoldings';
 
 interface ReputationState {
   upCount: number;
@@ -1073,9 +1074,11 @@ function ChainWalletPanel({
               label={token ? `${token.symbol} balance` : 'Token balance'}
               value={token ? formatBalance(token.formatted) : '-'}
               symbol={token?.symbol ?? ''}
+              error={network.tokenBalanceError}
             />
           </div>
         </div>
+        {network.id === 'solana' && <SolanaHoldings network={network} />}
       </WalletSurface>
 
       <WalletActivityPanel
