@@ -3001,19 +3001,15 @@ export const api = {
       },
     ),
 
-  /** Load chat history */
-  getChatHistory: (agentId: string, sessionId?: string) =>
+  /** Load one page of saved history; cursors are opaque server values. */
+  getChatHistory: (agentId: string, sessionId?: string, cursor?: string) =>
     req<{
-      messages: Array<{
-        role: string;
-        content: string;
-        ts: number;
-        metadata?: unknown;
-      }>;
+      messages: Array<{ id?: string; role: string; content: string; ts: number; metadata?: unknown }>;
       nextCursor?: string | null;
-    }>(
-      `/agents/${agentId}/chat/history${sessionId ? `?sessionId=${encodeURIComponent(sessionId)}` : ""}`,
-    ),
+      context?: { totalMessages: number; includedMessages: number; shortenedMessages: number; limited: boolean };
+    }>(`/agents/${agentId}/chat/history?${new URLSearchParams({
+      ...(sessionId ? { sessionId } : {}), ...(cursor ? { cursor } : {}),
+    })}`),
 
   /** Save chat messages to history */
   saveChatHistory: (

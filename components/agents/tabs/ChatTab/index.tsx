@@ -13,6 +13,7 @@ import {
 import { MESSAGES_WINDOW } from './constants';
 import { ChatHeader } from './ChatHeader';
 import { MessageList } from './MessageList';
+import { ChatContextNotice } from './ChatContextNotice';
 import { VoiceControlBar } from './VoiceControlBar';
 import { ChatErrorBar } from './ChatErrorBar';
 import { ChatInput } from './ChatInput';
@@ -254,14 +255,27 @@ export function ChatTab() {
     [messages.length, extraLoaded],
   );
   const visibleMessages = useMemo(() => messages.slice(windowStart), [messages, windowStart]);
-  const hasMore = windowStart > 0;
+  const hasMore = windowStart > 0 || Boolean(ctx.historyCursor);
+  const loadEarlier = async () => {
+    const container = messagesContainerRef.current;
+    const height = container?.scrollHeight ?? 0;
+    const top = container?.scrollTop ?? 0;
+    if (windowStart > 0) setExtraLoaded(n => n + MESSAGES_WINDOW);
+    else {
+      const count = await ctx.loadOlderChatHistory?.() ?? 0;
+      setExtraLoaded(n => n + count);
+    }
+    requestAnimationFrame(() => {
+      if (container) container.scrollTop = top + container.scrollHeight - height;
+    });
+  };
 
   const [voiceCallMode, setVoiceCallMode] = useState(false);
   const previousAutoSpeakRef = useRef(false);
   const voice = useVoice(agent.id, { preferGeneratedSpeech: voiceCallMode });
 
   // Reset extra-loaded window when switching agents
-  useEffect(() => { setExtraLoaded(0); }, [agent.id]);
+  useEffect(() => { setExtraLoaded(0); }, [agent.id, ctx.activeChatSessionId]);
 
   // Scroll to bottom on initial load (show latest messages after refresh)
   const initialScrollDone = useRef(false);
@@ -491,12 +505,14 @@ export function ChatTab() {
         )}
 
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+          <ChatContextNotice limited={Boolean(ctx.contextLimited)} />
           <MessageList
             messages={messages}
             visibleMessages={visibleMessages}
             hasMore={hasMore}
             windowStart={windowStart}
-            onLoadMore={() => setExtraLoaded((n) => n + MESSAGES_WINDOW)}
+            onLoadMore={() => void loadEarlier()}
+            loadingEarlier={ctx.historyLoading}
             agentName={agent.name}
             agentId={agent.id}
             framework={agent.framework}

@@ -1,5 +1,7 @@
 'use client';
 
+import { mergeChatHistory } from '@/components/agents/tabs/ChatTab/chatHistoryPagination';
+
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { useRouter } from '@/i18n/routing';
@@ -57,7 +59,6 @@ import { applyChatThinkingEvent } from '@/components/agents/tabs/ChatTab/chatThi
 import {
   chatMessageMetadataSignature,
   normalizeChatMessageMetadata,
-  serializeChatMessageMetadata,
 } from '@/components/agents/tabs/ChatTab/chatHistoryMetadata';
 import { useAgentIntegrations } from '@/hooks/useAgentIntegrations';
 import { useAgentActions } from '@/hooks/useAgentActions';
@@ -267,6 +268,11 @@ export default function AgentManagePage() {
 
   // Chat state
   const [messages, setMessages] = useState<Message[]>([]);
+  const [historyCursor, setHistoryCursor] = useState<string | null>(null);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [contextLimited, setContextLimited] = useState(false);
+  const historyRequestRef = useRef(0);
+  const olderRequestRef = useRef(false);
   const [chatSessions, setChatSessions] = useState<ChatSessionSummary[]>([]);
   const [chatFolders, setChatFolders] = useState<ChatFolderSummary[]>([]);
   const [activeChatSessionId, setActiveChatSessionIdState] = useState<string | null>(null);
@@ -286,7 +292,6 @@ export default function AgentManagePage() {
 
   const historyLoadedRef = useRef(false);
   const loadedChatSessionIdRef = useRef<string | null>(null);
-  const lastSavedCountRef = useRef(0);
   const lastHistorySignatureRef = useRef('');
   const activeChatSessionIdRef = useRef<string | null>(null);
 
@@ -320,7 +325,9 @@ export default function AgentManagePage() {
       historyLoadedRef.current = false;
       loadedChatSessionIdRef.current = null;
       setMessages([]);
-      lastSavedCountRef.current = 0;
+      setHistoryCursor(null);
+      setContextLimited(false);
+      historyRequestRef.current += 1;
       lastHistorySignatureRef.current = '';
     }
     setActiveChatSessionIdState(sessionId);
@@ -329,18 +336,11 @@ export default function AgentManagePage() {
 
   // ─── Data loaders ────────────────────────────────────────
 
-  const normalizeHistoryMessages = useCallback((raw: { role: string; content: string; ts: number; metadata?: unknown }[]) => {
-    const deduped: typeof raw = [];
-    for (const m of raw) {
-      const prev = deduped[deduped.length - 1];
-      if (prev && prev.role === m.role && prev.content === m.content) continue;
-      deduped.push(m);
-    }
-
-    return deduped.map((m, i) => {
+  const normalizeHistoryMessages = useCallback((raw: { id?: string; role: string; content: string; ts: number; metadata?: unknown }[]) => {
+    return raw.map((m, i) => {
       const metadata = normalizeChatMessageMetadata(m.metadata);
       return {
-        id: `hist-${m.ts ?? i}-${i}`,
+        id: m.id ? `saved-${m.id}` : `hist-${m.ts ?? i}-${i}`,
         role: m.role as 'user' | 'assistant',
         content: m.content,
         timestamp: m.ts ? new Date(m.ts) : new Date(),
@@ -414,7 +414,7 @@ export default function AgentManagePage() {
       setLoadError(null);
       setLoading(true);
       historyLoadedRef.current = false;
-      lastSavedCountRef.current = 0;
+      loadedChatSessionIdRef.current = null;
       lastHistorySignatureRef.current = '';
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -716,16 +716,16 @@ export default function AgentManagePage() {
       historyLoadedRef.current = false;
       loadedChatSessionIdRef.current = null;
       setMessages([]);
-      lastSavedCountRef.current = 0;
       lastHistorySignatureRef.current = '';
     }
   }, [id]);
 
   const loadChatHistory = useCallback(async (mode: 'initial' | 'poll' = 'poll') => {
     if (!id) return;
-    if (mode === 'poll' && (sendingRef.current || wsStreamingMsgRef.current)) return;
+    if (mode === 'poll' && (!historyLoadedRef.current || sendingRef.current || wsStreamingMsgRef.current || olderRequestRef.current)) return;
 
     const requestedSessionId = activeChatSessionIdRef.current;
+    const requestVersion = ++historyRequestRef.current;
     if (mode === 'initial') {
       historyLoadedRef.current = false;
       loadedChatSessionIdRef.current = null;
@@ -733,14 +733,16 @@ export default function AgentManagePage() {
 
     try {
       const res = await api.getChatHistory(id, requestedSessionId ?? undefined);
-      if (activeChatSessionIdRef.current !== requestedSessionId) return;
+      if (activeChatSessionIdRef.current !== requestedSessionId || historyRequestRef.current !== requestVersion) return;
+      if (mode === 'poll' && (sendingRef.current || wsStreamingMsgRef.current)) return;
       if (res.success) {
         const loaded = normalizeHistoryMessages(Array.isArray(res.data.messages) ? res.data.messages : []);
         const signature = historySignature(loaded);
+        setContextLimited(res.data.context?.limited ?? false);
 
         if (mode === 'initial') {
+          setHistoryCursor(res.data.nextCursor ?? null);
           setMessages(loaded);
-          lastSavedCountRef.current = loaded.length;
           lastHistorySignatureRef.current = signature;
         } else if (signature && signature !== lastHistorySignatureRef.current) {
           setMessages((prev) => {
@@ -751,26 +753,54 @@ export default function AgentManagePage() {
               ? loaded.some((m) => m.role === localTail.role && m.content === localTail.content)
               : true;
 
-            // Avoid replacing a just-sent local message before the save debounce
+            // Avoid replacing a just-sent local message before the transport
             // has persisted it. Scheduled assistant messages arrive on the next
             // poll once the local tail is present server-side.
-            if (hasLocalTail && completeLocal.length > loaded.length && !loadedHasTail) {
+            if (hasLocalTail && !localTail.id.startsWith('saved-') && !localTail.id.startsWith('hist-') && !loadedHasTail) {
               return prev;
             }
 
-            lastSavedCountRef.current = loaded.length;
+            // A long absence can add more than one page. Re-open the latest
+            // cursor so the gap is accessible without dropping loaded history.
+            const existingIds = new Set(completeLocal.map(m => m.id));
+            if (existingIds.size && !loaded.some(m => existingIds.has(m.id))) {
+              setHistoryCursor(res.data.nextCursor ?? null);
+            }
             lastHistorySignatureRef.current = signature;
-            return loaded;
+            return mergeChatHistory(prev.filter(m => m.id.startsWith('saved-') || m.id.startsWith('hist-')), loaded);
           });
         }
       }
     } finally {
-      if (mode === 'initial' && activeChatSessionIdRef.current === requestedSessionId) {
-        loadedChatSessionIdRef.current = requestedSessionId;
-        historyLoadedRef.current = true;
+      if (mode === 'initial' && activeChatSessionIdRef.current === requestedSessionId && historyRequestRef.current === requestVersion) {
+        loadedChatSessionIdRef.current = activeChatSessionIdRef.current;
+      historyLoadedRef.current = true;
       }
     }
   }, [historySignature, id, normalizeHistoryMessages]);
+
+  const loadOlderChatHistory = useCallback(async (): Promise<number> => {
+    if (!historyCursor || olderRequestRef.current) return 0;
+    olderRequestRef.current = true;
+    setHistoryLoading(true);
+    const sessionId = activeChatSessionIdRef.current;
+    const version = historyRequestRef.current;
+    try {
+      const res = await api.getChatHistory(id, sessionId ?? undefined, historyCursor);
+      if (activeChatSessionIdRef.current !== sessionId || version !== historyRequestRef.current) return 0;
+      if (!res.success) throw new Error(res.error || 'Could not load earlier messages');
+      const older = normalizeHistoryMessages(res.data.messages);
+      setMessages(prev => mergeChatHistory(older, prev));
+      setHistoryCursor(res.data.nextCursor ?? null);
+      return older.length;
+    } catch {
+      toast.error('Could not load earlier messages. Please try again.');
+      return 0;
+    } finally {
+      olderRequestRef.current = false;
+      setHistoryLoading(false);
+    }
+  }, [historyCursor, id, normalizeHistoryMessages, toast]);
 
   useEffect(() => {
     if (!shouldRunChatWorkloads(tab)) return;
@@ -813,10 +843,9 @@ export default function AgentManagePage() {
       );
     }
     setMessages([]);
-    lastSavedCountRef.current = 0;
     lastHistorySignatureRef.current = '';
-    loadedChatSessionIdRef.current = res.data.session.id;
-    historyLoadedRef.current = true;
+    loadedChatSessionIdRef.current = activeChatSessionIdRef.current;
+      historyLoadedRef.current = true;
   }, [id, setActiveChatSessionId, toast]);
 
   const createChatFolder = useCallback(async (name: string): Promise<boolean> => {
@@ -930,47 +959,17 @@ export default function AgentManagePage() {
       activeChatSessionIdRef.current = nextActiveId;
       setActiveChatSessionIdState(nextActiveId);
       setMessages([]);
-      lastSavedCountRef.current = 0;
       lastHistorySignatureRef.current = '';
-      loadedChatSessionIdRef.current = null;
       historyLoadedRef.current = false;
+      loadedChatSessionIdRef.current = null;
     }
 
     toast.success('Chat deleted');
     window.setTimeout(() => void loadChatSessions(), 300);
   }, [chatSessions, deletingChatSessionId, id, loadChatSessions, toast]);
 
-  // ─── Save chat history to server (debounced) ──────────────
-
-  const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
-  useEffect(() => {
-    if (messages.length === 0 || !id) return;
-    if (!historyLoadedRef.current) return;
-    const complete = messages.filter(m => !m.streaming && m.content);
-    if (complete.length === 0) return;
-    if (complete.length <= lastSavedCountRef.current) return;
-    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-    const saveSessionId = loadedChatSessionIdRef.current ?? activeChatSessionIdRef.current;
-    saveTimerRef.current = setTimeout(() => {
-      lastSavedCountRef.current = complete.length;
-      const toSave = complete.map(m => {
-        const metadata = serializeChatMessageMetadata(m);
-        return {
-          role: m.role,
-          content: m.content,
-          ts: m.timestamp?.getTime(),
-          ...(metadata ? { metadata } : {}),
-        };
-      });
-      const deduped: typeof toSave = [];
-      for (const m of toSave) {
-        const prev = deduped[deduped.length - 1];
-        if (prev && prev.role === m.role && prev.content === m.content) continue;
-        deduped.push(m);
-      }
-      api.saveChatHistory(id, deduped, saveSessionId).catch(() => {});
-    }, 2000);
-  }, [messages, id]);
+  // Chat transports persist messages on the server. Never replay loaded pages
+  // as new messages: pagination and polling are read-only.
 
   // ─── Auto-focus chat input ─────────────────────────────────
 
@@ -1486,6 +1485,7 @@ export default function AgentManagePage() {
       chatError, setChatError, chatErrorType, setChatErrorType,
       bottomRef, inputRef, sendMessage, abortChatResponse, handleKeyDown, sendCooldown,
       wsConnected: wsChat.isConnected,
+      historyCursor, historyLoading, contextLimited, loadOlderChatHistory,
       chatSessions,
       chatFolders,
       activeChatSessionId,
@@ -1549,6 +1549,7 @@ export default function AgentManagePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, agent, stats, tab, logs.logs, logs.logsLoading, logs.logFilter, logs.logSearch, logs.autoScroll, logs.filteredLogs, wsLogsConnected,
     messages, input, sending, queuedChatCount, sendCooldown, chatError, chatErrorType, abortChatResponse,
+    historyCursor, historyLoading, contextLimited, loadOlderChatHistory,
     chatSessions, chatFolders, activeChatSessionId, setActiveChatSessionId, startNewChatSession, deleteChatSession,
     createChatFolder, renameChatFolder, deleteChatFolder, moveChatSession, deletingChatSessionId, loadChatSessions,
     inflightTools, completedTools,
