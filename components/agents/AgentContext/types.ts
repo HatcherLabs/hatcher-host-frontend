@@ -184,6 +184,7 @@ export interface AgentContextValue {
   saveMsg: string | null;
   setSaveMsg: (msg: string | null) => void;
   saveConfig: (commitMessage?: string) => Promise<boolean>;
+  switchChatModel: (model: string) => Promise<void>;
 
   // LLM helpers
   llmProvider: string;

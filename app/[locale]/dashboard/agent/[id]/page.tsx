@@ -1519,7 +1519,7 @@ export default function AgentManagePage() {
       configPublicChatDailyAiCreditCap: config.configPublicChatDailyAiCreditCap,
       setConfigPublicChatDailyAiCreditCap: config.setConfigPublicChatDailyAiCreditCap,
       saving: config.saving, saveMsg: config.saveMsg, setSaveMsg: config.setSaveMsg,
-      saveConfig: config.saveConfig,
+      saveConfig: config.saveConfig, switchChatModel: config.switchChatModel,
       llmProvider, activeModelDisplay, currentProviderMeta, providerModels, hasApiKey: config.hasApiKey,
       displayUptime, isLiveUptime,
       activeFeatures, activeFeatureKeys, featuresLoading,

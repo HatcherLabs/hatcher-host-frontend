@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 import { BYOK_PROVIDERS } from '@hatcher/shared';
 import { api } from '@/lib/api';
+import { type ModelPreset, MODEL_PRESETS_STORAGE_KEY, modelPresetId, isModelPreset, sanitizeModelPreset, writeModelPresets } from '@/lib/model-presets';
 import type { ComputeModelAvailability } from '@/lib/api';
 import {
   HOSTED_MODEL_PROVIDERS,
@@ -116,18 +117,7 @@ type EnvVarEntry = {
   visible: boolean;
 };
 
-type ModelPreset = {
-  id: string;
-  name: string;
-  description: string;
-  provider: string;
-  model: string;
-  useCustomModel: boolean;
-  customModelInput: string;
-  favorite: boolean;
-  createdAt: number;
-  updatedAt: number;
-};
+
 
 type ConfigSubtab = 'general' | 'ai-models' | 'public-access' | 'advanced';
 
@@ -142,7 +132,7 @@ const CONFIG_SUBTABS: Array<{
   { id: 'advanced', label: 'Advanced', description: 'Env vars and history' },
 ];
 
-const MODEL_PRESETS_STORAGE_KEY = 'hatcher-model-presets-v1';
+
 
 const HOSTED_TAG_OPTIONS: HostedModelTag[] = [
   'fast',
@@ -204,34 +194,6 @@ function formatContextTokens(tokens: number): string {
   return `${Math.round(tokens / 1_000).toLocaleString()}K`;
 }
 
-function modelPresetId(): string {
-  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return crypto.randomUUID();
-  return `preset-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-}
-
-function isModelPreset(value: unknown): value is ModelPreset {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
-  const source = value as Record<string, unknown>;
-  return typeof source.id === 'string'
-    && typeof source.name === 'string'
-    && typeof source.provider === 'string'
-    && typeof source.model === 'string';
-}
-
-function sanitizeModelPreset(value: ModelPreset): ModelPreset {
-  return {
-    id: value.id,
-    name: value.name,
-    description: value.description ?? '',
-    provider: value.provider,
-    model: value.model,
-    useCustomModel: Boolean(value.useCustomModel),
-    customModelInput: value.customModelInput ?? '',
-    favorite: Boolean(value.favorite),
-    createdAt: Number(value.createdAt) || Date.now(),
-    updatedAt: Number(value.updatedAt) || Date.now(),
-  };
-}
 
 function tagIcon(tag: HostedModelTag) {
   switch (tag) {
@@ -665,7 +627,7 @@ export function ConfigTab() {
 
   const persistModelPresets = useCallback((next: ModelPreset[]) => {
     setModelPresets(next);
-    window.localStorage.setItem(MODEL_PRESETS_STORAGE_KEY, JSON.stringify(next.map(sanitizeModelPreset)));
+    writeModelPresets(next);
   }, []);
 
   const createPresetFromCurrent = useCallback(() => {
