@@ -280,7 +280,25 @@ export function useAgentConfig(
     useCustomModel, customModelInput, byokKeyInput, hasApiKey,
     configIsPublic, configPublicChatEnabled, configPublicChatDailyAiCreditCap]);
 
+  // A chat model switch persists only model fields, never unsaved Config form edits.
+  const switchChatModel = useCallback(async (model: string): Promise<void> => {
+    if (!agent || saving) throw new Error('Please wait for the current update.');
+    const saved = resolveLoadedModelConfig(agent.config as Record<string, unknown>);
+    if (saved.provider !== HOSTED_PROVIDER) throw new Error('Manage your own provider in Model & Provider settings.');
+    setSaving(true);
+    try {
+      const response = await api.updateAgent(id, {
+        config: { provider: HOSTED_PROVIDER, model, byok: null,
+          settings: { model, modelProvider: HOSTED_PROVIDER } },
+        commitMessage: 'Switch model from chat',
+      });
+      if (!response.success) throw new Error(response.error || 'Could not switch model.');
+      const restarting = (response.data as unknown as { restarting?: boolean }).restarting;
+      setAgent(restarting ? { ...response.data, status: 'starting' } : response.data);
+    } finally { setSaving(false); }
+  }, [agent, id, saving, setAgent]);
   return {
+    switchChatModel,
     configName, setConfigName,
     configDesc, setConfigDesc,
     configBio, setConfigBio,

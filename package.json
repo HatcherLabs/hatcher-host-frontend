@@ -63,6 +63,7 @@
     "axe-core": "^4.11.3",
     "eslint": "^9.39.4",
     "eslint-config-next": "15.5.21",
+    "jsdom": "^30.1.1",
     "postcss": "^8.5.18",
     "protobufjs": "8.7.0",
     "tailwindcss": "^3.4.17",

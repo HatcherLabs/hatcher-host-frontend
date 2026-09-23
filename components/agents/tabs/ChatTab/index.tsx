@@ -12,6 +12,8 @@ import {
 } from '../../AgentContext';
 import { MESSAGES_WINDOW } from './constants';
 import { ChatHeader } from './ChatHeader';
+import { ChatModelSwitcher } from './ChatModelSwitcher';
+import { resolveLoadedModelConfig } from '@/hooks/useAgentConfig';
 import { MessageList } from './MessageList';
 import { ChatContextNotice } from './ChatContextNotice';
 import { VoiceControlBar } from './VoiceControlBar';
@@ -211,6 +213,7 @@ export function ChatTab() {
   // a tool-call requirement. Disk-only attachments get a short marker so
   // the agent knows to look under knowledge/ if it has a file reader.
   const sendWithAttachments = useCallback((overrideText?: string) => {
+    if (ctx.saving || ['starting', 'restarting'].includes(agent.status)) return;
     const base = (overrideText ?? input).trim();
     if (attachments.length === 0) {
       sendMessage(overrideText);
@@ -246,7 +249,7 @@ export function ChatTab() {
     ].filter(Boolean).join('\n\n');
     sendMessage(finalText, chatAttachments.length ? { attachments: chatAttachments } : undefined);
     setAttachments([]);
-  }, [attachments, input, sendMessage]);
+  }, [attachments, input, sendMessage, ctx.saving, agent.status]);
 
   // Virtual windowing: only render the last N messages for performance
   const [extraLoaded, setExtraLoaded] = useState(0);
@@ -462,6 +465,11 @@ export function ChatTab() {
         showThinking={showThinking}
         showToolCalls={showToolCalls}
         activeModel={activeModelDisplay}
+        modelSwitcher={<ChatModelSwitcher activeModel={activeModelDisplay} framework={agent.framework}
+          currentModel={resolveLoadedModelConfig(agent.config as Record<string, unknown>).model}
+          hosted={resolveLoadedModelConfig(agent.config as Record<string, unknown>).provider === 'openrouter'}
+          disabled={sending || queuedChatCount > 0 || ctx.saving || ['starting', 'restarting'].includes(agent.status)}
+          onSelect={ctx.switchChatModel} onOpenSettings={() => setTab('config')} />}
         onOpenModelSettings={() => setTab('config')}
         onOpenMobilePanel={() => setMobilePanelOpen(true)}
         onToggleAutoSpeak={voice.toggleAutoSpeak}
@@ -550,7 +558,7 @@ export function ChatTab() {
           <ChatInput
             agent={agent}
             isAuthenticated={isAuthenticated}
-            agentStarting={agent.status === 'starting'}
+            agentStarting={ctx.saving || ['starting', 'restarting'].includes(agent.status)}
             input={input}
             setInput={setInput}
             sending={sending}

@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { Bot, Brain, Menu, Phone, Volume2, VolumeX, Wrench } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { FRAMEWORKS, type AgentFramework } from '@hatcher/shared';
@@ -17,6 +18,7 @@ interface ChatHeaderProps {
   showThinking: boolean;
   showToolCalls: boolean;
   activeModel: ActiveModelDisplay;
+  modelSwitcher?: ReactNode;
   onOpenModelSettings: () => void;
   onOpenMobilePanel: () => void;
   onToggleAutoSpeak: () => void;
@@ -36,6 +38,7 @@ export function ChatHeader({
   showThinking,
   showToolCalls,
   activeModel,
+  modelSwitcher,
   onOpenModelSettings,
   onOpenMobilePanel,
   onToggleAutoSpeak,
@@ -47,7 +50,7 @@ export function ChatHeader({
   const frameworkMeta = FRAMEWORKS[agent.framework];
 
   return (
-    <div className="flex items-center justify-between mb-2 px-1">
+    <div className="flex flex-wrap items-center justify-between gap-2 mb-2 px-1">
       <div className="flex items-center gap-2">
         <button
           type="button"
@@ -69,7 +72,7 @@ export function ChatHeader({
             {t('live')}
           </span>
         )}
-        <button
+        {modelSwitcher ?? (<button
           type="button"
           onClick={onOpenModelSettings}
           className="hidden max-w-[260px] items-center gap-1 truncate rounded-full border border-[var(--border-default)] bg-[var(--bg-elevated)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-secondary)] transition-colors hover:border-[var(--color-accent)]/40 hover:text-[var(--text-primary)] sm:inline-flex"
@@ -77,7 +80,7 @@ export function ChatHeader({
         >
           <span className="text-[var(--color-accent)]">{activeModel.provider}</span>
           <span className="truncate">{activeModel.name}</span>
-        </button>
+        </button>)}
       </div>
       <div className="flex items-center gap-2">
         <button
