@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { usePathname, useRouter } from '@/i18n/routing';
 import { useAuth } from '@/lib/auth-context';
 import { track } from '@/lib/analytics';
+import { resolveAgentViewMode } from '@/components/agents/navigationModel';
 import { GuidedTour, type TourStep } from '@/components/ui/GuidedTour';
 import {
   AGENTS_DASHBOARD_PATH,
@@ -42,9 +43,9 @@ export function DashboardTour() {
     },
   ], [t]);
 
-  // First-run trigger (evaluated in an effect: localStorage is client-only)
+  // Easy mode uses inline guidance; manual restarts below still work.
   useEffect(() => {
-    setEligible(shouldStartDashboardTour({
+    setEligible(resolveAgentViewMode(localStorage.getItem('hatcher-view-mode')) === 'advanced' && shouldStartDashboardTour({
       isAuthenticated,
       isLoading,
       agentCount: user?.agentCount,

@@ -206,29 +206,20 @@ export default function AgentManagePage() {
   const { isAuthenticated, isLoading: authLoading, user } = useAuth();
   const { toast } = useToast();
   const t = useTranslations('dashboard.agentDetail');
+  const ts = useTranslations('simpleExperience');
   const tHeader = useTranslations('dashboard.agentDetail.header');
   const tNotFound = useTranslations('dashboard.agentDetail.notFound');
   const tStatusPoll = useTranslations('dashboard.agentDetail.statusPoll');
-  const tMission = useTranslations('missionControl');
   const tDesktop = useTranslations('desktop');
 
   // View mode (easy = operational tabs only, advanced = everything).
-  // Default to advanced so the full dashboard is visible for new workspaces.
+  // Start with everyday tasks; retain explicitly saved view preferences.
   const [viewMode, setViewModeRaw] = useState<'easy' | 'advanced'>(DEFAULT_AGENT_VIEW_MODE);
   useEffect(() => {
     const mode = resolveAgentViewMode(localStorage.getItem('hatcher-view-mode'));
     setViewModeRaw(mode);
     localStorage.setItem('hatcher-view-mode', mode);
   }, []);
-  const setViewMode = useCallback((mode: 'easy' | 'advanced') => {
-    setViewModeRaw(mode);
-    localStorage.setItem('hatcher-view-mode', mode);
-    // If switching to Easy and the current tab isn't visible in Easy, go to Chat.
-    if (mode === 'easy') {
-      setTabRaw(prev => EASY_AGENT_TABS.includes(prev) ? prev : 'chat');
-    }
-  }, []);
-
   // Core state
   const [agent, setAgent] = useState<Agent | null>(null);
   const [ownedAgents, setOwnedAgents] = useState<Agent[]>([]);
@@ -254,6 +245,14 @@ export default function AgentManagePage() {
     url.searchParams.set('tab', t);
     window.history.replaceState({}, '', url.pathname + url.search);
   }, []);
+  const setViewMode = useCallback((mode: 'easy' | 'advanced') => {
+    setViewModeRaw(mode);
+    localStorage.setItem('hatcher-view-mode', mode);
+    // Keep the address in sync so refresh preserves the visible conversation.
+    if (mode === 'easy' && !EASY_AGENT_TABS.includes(tab)) {
+      setTab('chat');
+    }
+  }, [tab, setTab]);
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get('tab') === 'workspace') {
       setTab('files');
@@ -526,33 +525,13 @@ export default function AgentManagePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [agent?.status, id]);
 
-  // ─── Guided onboarding ────────────────────────────────────
-
+  // Legacy creation links still open the first conversation. The chat empty
+  // state supplies editable suggestions without sending a message automatically.
   useEffect(() => {
-    if (typeof window === 'undefined' || !id) return;
     const params = new URLSearchParams(window.location.search);
-    if (params.get('new') !== '1') return;
-    const onboardKey = `hatcher-onboarded-${id}`;
-    if (localStorage.getItem(onboardKey)) return;
-
-    setTab('chat');
-    setMessages((prev) => {
-      if (prev.some((m) => m.id === 'onboard-welcome')) return prev;
-      return [
-        ...prev,
-        {
-          id: 'onboard-welcome',
-          role: 'assistant' as const,
-          content: '\uD83D\uDC4B Welcome! Your agent is starting up. Try sending a message to test it out!',
-          timestamp: new Date(),
-        },
-      ];
-    });
-
-    localStorage.setItem(onboardKey, '1');
-    const url = new URL(window.location.href);
-    url.searchParams.delete('new');
-    window.history.replaceState({}, '', url.pathname + (url.search || ''));
+    if (!params.has('tab') && (params.get('new') === '1' || params.get('from') === 'hatch')) {
+      setTab('chat');
+    }
   }, [id, setTab]);
 
   // ─── Load stats ───────────────────────────────────────────
@@ -1666,6 +1645,7 @@ export default function AgentManagePage() {
             {/* Status pill */}
             <AgentStatusPill status={agent.status} label={statusInfo.label} pulse={statusInfo.pulse} size="md" />
 
+            {viewMode === 'advanced' && (
             <button
               type="button"
               onClick={() => setTab('config')}
@@ -1678,14 +1658,15 @@ export default function AgentManagePage() {
               </span>
               <span className="hidden text-[var(--text-muted)] md:inline">· {activeModelDisplay.provider}</span>
             </button>
+            )}
 
             <Link
               href={agentWorkspaceHref('/dashboard/missions', agent.id)}
               className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 text-xs font-semibold text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--accent)]"
-              title={tMission('title')}
+              title={ts('tasks')}
             >
               <ListChecks size={13} aria-hidden />
-              <span className="hidden md:inline">{tMission('title')}</span>
+              <span className="hidden md:inline">{ts('tasks')}</span>
             </Link>
             <Link
               href={agentWorkspaceHref('/dashboard/approvals', agent.id)}
@@ -1693,8 +1674,9 @@ export default function AgentManagePage() {
               title="Action approvals"
             >
               <ShieldCheck size={13} aria-hidden />
-              <span className="hidden md:inline">Approvals</span>
+              <span className="hidden md:inline">{ts('approvals')}</span>
             </Link>
+            {viewMode === 'advanced' && (
             <Link
               href={agentDesktopHref(agent.id)}
               className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 text-xs font-semibold text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--accent)]"
@@ -1703,6 +1685,7 @@ export default function AgentManagePage() {
               <AppWindow size={13} aria-hidden />
               <span className="hidden md:inline">{tDesktop('enterDesktop')}</span>
             </Link>
+            )}
 
             {/* Spacer */}
             <div className="flex-1" />
@@ -1711,6 +1694,7 @@ export default function AgentManagePage() {
             <div className="flex flex-shrink-0 items-center overflow-hidden rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] text-xs">
               <button
                 onClick={() => setViewMode('easy')}
+                aria-pressed={viewMode === 'easy'}
                 className={`px-3 py-2 font-semibold transition-colors ${viewMode === 'easy' ? 'bg-[var(--control-active)] text-[var(--control-active-text)]' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}
               >
                 {tHeader('easy')}
@@ -1718,6 +1702,7 @@ export default function AgentManagePage() {
               <div className="h-5 w-px bg-[var(--border-line)]" aria-hidden="true" />
               <button
                 onClick={() => setViewMode('advanced')}
+                aria-pressed={viewMode === 'advanced'}
                 className={`px-3 py-2 font-semibold transition-colors ${viewMode === 'advanced' ? 'bg-[var(--control-active)] text-[var(--control-active-text)]' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}
               >
                 {tHeader('advanced')}
@@ -1728,6 +1713,7 @@ export default function AgentManagePage() {
             <div className="flex items-center gap-1.5 flex-shrink-0">
               {isActive && (
                 <>
+                  {viewMode === 'advanced' && (
                   <button
                     onClick={() => actions.handleAction('restart')}
                     disabled={actions.actionLoading === 'restart'}
@@ -1735,8 +1721,9 @@ export default function AgentManagePage() {
                     title="Restart agent"
                   >
                     <RotateCcw size={12} className={actions.actionLoading === 'restart' ? 'animate-spin' : ''} />
-                    <span className="hidden sm:inline">{actions.actionLoading === 'restart' ? tHeader('restarting') : tHeader('restart')}</span>
+                    <span>{actions.actionLoading === 'restart' ? tHeader('restarting') : tHeader('restart')}</span>
                   </button>
+                  )}
                   <button
                     onClick={() => actions.handleAction('stop')}
                     disabled={actions.actionLoading === 'stop'}
@@ -1748,7 +1735,7 @@ export default function AgentManagePage() {
                     ) : (
                       <Square size={12} />
                     )}
-                    <span className="hidden sm:inline">{actions.actionLoading === 'stop' ? tHeader('stopping') : tHeader('stop')}</span>
+                    <span>{actions.actionLoading === 'stop' ? tHeader('stopping') : tHeader('stop')}</span>
                   </button>
                 </>
               )}
@@ -1764,7 +1751,7 @@ export default function AgentManagePage() {
                   ) : (
                     <Play size={12} />
                   )}
-                  <span className="hidden sm:inline">{actions.actionLoading === 'start' ? tHeader('starting') : tHeader('start')}</span>
+                  <span>{actions.actionLoading === 'start' ? tHeader('starting') : tHeader('start')}</span>
                 </button>
               )}
               <details className="group relative flex-shrink-0">

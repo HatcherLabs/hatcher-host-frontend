@@ -15,9 +15,9 @@ type AgentNavigationSpec = {
   frameworks?: string[];
 };
 
-export const DEFAULT_AGENT_VIEW_MODE: AgentViewMode = 'advanced';
+export const DEFAULT_AGENT_VIEW_MODE: AgentViewMode = 'easy';
 
-export const EASY_AGENT_TABS: Tab[] = ['overview', 'chat', 'logs', 'integrations', 'wallet', 'robinhood'];
+export const EASY_AGENT_TABS: Tab[] = ['overview', 'chat', 'mail', 'integrations', 'robinhood'];
 
 export const AGENT_NAVIGATION_GROUPS: AgentNavigationGroup[] = [
   'operate',

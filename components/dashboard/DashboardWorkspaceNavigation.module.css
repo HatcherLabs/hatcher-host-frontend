@@ -82,7 +82,7 @@
   .links {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     overflow: visible;
   }
 
@@ -93,7 +93,7 @@
     flex-direction: column;
     justify-content: center;
     gap: 4px;
-    font-size: 10px;
+    font-size: 11px;
     line-height: 1.15;
     text-align: center;
   }

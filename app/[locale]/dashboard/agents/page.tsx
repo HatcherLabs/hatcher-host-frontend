@@ -57,7 +57,7 @@ export default function MyAgentsPage() {
   const t  = useTranslations('dashboard.agents');
   const tc = useTranslations('dashboard.common');
   const tStatus = useTranslations('shared.agentStatus');
-  const tMission = useTranslations('missionControl');
+  const ts = useTranslations('simpleExperience');
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
@@ -342,16 +342,27 @@ export default function MyAgentsPage() {
           </div>
           <div className={styles.headerActions}>
             <Link href="/dashboard/missions" className={styles.secondaryCta}>
-              <ListChecks size={14} aria-hidden /> {tMission('title')}
+              <ListChecks size={14} aria-hidden /> {ts('tasks')}
             </Link>
             <Link href="/dashboard/approvals" className={styles.secondaryCta}>
-              <ShieldCheck size={14} aria-hidden /> Approvals
+              <ShieldCheck size={14} aria-hidden /> {ts('approvals')}
             </Link>
             <Link href="/create" className={styles.cta} data-tour="create-agent">
               {t('createCta')} <ArrowRight size={14} aria-hidden />
             </Link>
           </div>
         </header>
+
+        <section className={styles.getStarted}>
+          <div><h2>{ts('dashboardTitle')}</h2><p>{ts('dashboardBody')}</p></div>
+          <div className={styles.nextActions}>
+            <Link href={selectedAgent ? `/dashboard/agent/${selectedAgent.id}?tab=chat` : '/create'}>
+              <strong>{selectedAgent ? ts('chat') : t('createCta')}</strong><span>{ts('chatHelp')}</span>
+            </Link>
+            <Link href="/dashboard/automations"><strong>{ts('automations')}</strong><span>{ts('automationsHelp')}</span></Link>
+            <Link href="/dashboard/billing"><strong>{ts('balanceLink')}</strong><span>{ts('beforeCreate')}</span></Link>
+          </div>
+        </section>
 
         {/* Stats strip */}
         {total > 0 && (
@@ -368,10 +379,10 @@ export default function MyAgentsPage() {
               <span className={styles.statLabel}>{t('statSleeping')}</span>
               <span className={styles.statValue}>{sleepingCount}</span>
             </div>
-            <div className={styles.statBox}>
+            {viewMode === 'orchestration' && <div className={styles.statBox}>
               <span className={styles.statLabel}>{t('statMeshReady')}</span>
               <span className={styles.statValue}>{meshReadyCount}</span>
-            </div>
+            </div>}
           </div>
         )}
 
@@ -407,6 +418,19 @@ export default function MyAgentsPage() {
         {/* Toolbar */}
         {total > 0 && viewMode === 'agents' && (
           <div className={styles.toolbar}>
+              <div className={styles.searchBox}>
+                <Search size={14} />
+                <input
+                  ref={searchRef}
+                  type="text"
+                  placeholder={t('searchPlaceholder')}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
+            <details className={styles.filterOptions}>
+              <summary>{ts('filters')}</summary>
+
             <div className={styles.pills}>
               {STATUS_FILTERS.map((key) => (
                 <button
@@ -434,16 +458,6 @@ export default function MyAgentsPage() {
                   </option>
                 ))}
               </select>
-              <div className={styles.searchBox}>
-                <Search size={14} />
-                <input
-                  ref={searchRef}
-                  type="text"
-                  placeholder={t('searchPlaceholder')}
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-              </div>
               <select
                 className={styles.select}
                 value={sortOption}
@@ -469,6 +483,7 @@ export default function MyAgentsPage() {
                 </button>
               )}
             </div>
+            </details>
           </div>
         )}
 
@@ -770,10 +785,10 @@ export default function MyAgentsPage() {
 
                       <div className={styles.rowActions} onClick={(e) => e.stopPropagation()}>
                         <Link
-                          href={`/dashboard/agent/${agent.id}`}
+                          href={`/dashboard/agent/${agent.id}?tab=chat`}
                           className={`${styles.iconAction} ${styles.primary}`}
-                          title="Open workspace"
-                          aria-label="Open workspace"
+                          title={ts('chat')}
+                          aria-label={ts('chat')}
                         >
                           <ArrowRight size={14} />
                         </Link>
@@ -854,20 +869,20 @@ export default function MyAgentsPage() {
                   </div>
                 </div>
                 <div className={styles.inspectorActions}>
-                  <Link href={`/dashboard/agent/${selectedAgent.id}`} className={`${styles.actionBtn} ${styles.primary}`}>
-                    Open workspace <ArrowRight size={13} />
+                  <Link href={`/dashboard/agent/${selectedAgent.id}?tab=chat`} className={`${styles.actionBtn} ${styles.primary}`}>
+                    {ts('chat')} <ArrowRight size={13} />
                   </Link>
                   <Link
                     href={agentWorkspaceHref('/dashboard/missions', selectedAgent.id)}
                     className={styles.actionBtn}
                   >
-                    <ListChecks size={12} aria-hidden /> {tMission('title')}
+                    <ListChecks size={12} aria-hidden /> {ts('tasks')}
                   </Link>
                   <Link
                     href={agentWorkspaceHref('/dashboard/approvals', selectedAgent.id)}
                     className={styles.actionBtn}
                   >
-                    <ShieldCheck size={12} aria-hidden /> Approvals
+                    <ShieldCheck size={12} aria-hidden /> {ts('approvals')}
                   </Link>
                   {(selectedAgent.status === 'active' || selectedAgent.status === 'restarting') ? (
                     <button

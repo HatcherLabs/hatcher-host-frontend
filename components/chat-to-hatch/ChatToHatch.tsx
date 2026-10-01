@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { api, req } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { agentExampleHref, type AgentExampleId } from '@/lib/agent-examples';
@@ -242,6 +242,7 @@ function normalizeConfig(config: ParsedConfig): ParsedConfig {
 export function ChatToHatch({ example }: { example?: AgentExampleId }) {
   const router = useRouter();
   const t = useTranslations('chatToHatch');
+  const ts = useTranslations('simpleExperience');
   const tExamples = useTranslations('landingV3.examples');
   const { isAuthenticated, isLoading } = useAuth();
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -445,7 +446,7 @@ export function ChatToHatch({ example }: { example?: AgentExampleId }) {
           setHatching(false);
           return;
         }
-        router.push(`/dashboard/agent/${created.data.id}?from=hatch`);
+        router.push(`/dashboard/agent/${created.data.id}?tab=chat&from=hatch`);
         return;
       }
       setMessages((m) => [
@@ -713,10 +714,7 @@ export function ChatToHatch({ example }: { example?: AgentExampleId }) {
                           { '--fw': fwVisual.color } as React.CSSProperties
                         }
                       >
-                        <span className={styles.fwGlyph} aria-hidden>
-                          {fwVisual.mark}
-                        </span>
-                        {fwVisual.label}
+                        {ts('recommended')}
                       </span>
                       {original && (
                         <button
@@ -731,6 +729,44 @@ export function ChatToHatch({ example }: { example?: AgentExampleId }) {
                       )}
                     </div>
 
+                    <p className={styles.setupHelp}>{ts('setupHelp')}</p>
+
+                  </div>
+                </div>
+
+                {/* Name */}
+                <label className={styles.fieldLabel}>
+                  {t('labelName')}
+                  <input
+                    type="text"
+                    className={styles.fieldInput}
+                    value={draft.name}
+                    onChange={(e) => patchDraft({ name: e.target.value })}
+                    maxLength={50}
+                    placeholder={t('placeholderName')}
+                  />
+                </label>
+                {/* Description */}
+                <label className={styles.fieldLabel}>
+                  {t('labelDescription')}{' '}
+                  <span className={styles.fieldHint}>
+                    {draft.description.length}/140
+                  </span>
+                  <textarea
+                    className={styles.fieldTextarea}
+                    value={draft.description}
+                    onChange={(e) =>
+                      patchDraft({ description: e.target.value })
+                    }
+                    maxLength={140}
+                    rows={2}
+                    placeholder={t('placeholderDescription')}
+                  />
+                </label>
+
+                <details className={styles.advanced}>
+                  <summary className={styles.collapsibleHead}>{ts('advanced')}</summary>
+                  <div className={styles.advancedBody}>
                     <div
                       className={styles.frameworkChooser}
                       aria-label={t('labelFramework')}
@@ -768,7 +804,7 @@ export function ChatToHatch({ example }: { example?: AgentExampleId }) {
                       <label className={styles.selectLabel}>
                         <span>{t('labelModelProvider')}</span>
                         <span className={styles.selectHelp}>
-                          Hatcher-managed hosted route. BYOK can be adjusted later in agent config.
+                          {ts('providerHelp')}
                         </span>
                         <select
                           className={styles.selectInput}
@@ -792,7 +828,7 @@ export function ChatToHatch({ example }: { example?: AgentExampleId }) {
                       <label className={styles.selectLabel}>
                         <span>{t('labelModel')}</span>
                         <span className={styles.selectHelp}>
-                          The runtime engine used for hosted calls and AI Credits metering.
+                          {ts('modelHelp')}
                         </span>
                         <select
                           className={styles.selectInput}
@@ -816,10 +852,6 @@ export function ChatToHatch({ example }: { example?: AgentExampleId }) {
                       <span>Context: {selectedModel.context}</span>
                       <span>Cost: {selectedModel.fixedPrice ?? selectedModel.cost}</span>
                     </div>
-
-                  </div>
-                </div>
-
                 {draft.frameworkReason && (
                   <div className={styles.reasonBox}>
                     <span className={styles.reasonLabel}>
@@ -829,41 +861,11 @@ export function ChatToHatch({ example }: { example?: AgentExampleId }) {
                   </div>
                 )}
 
-                {/* Name */}
-                <label className={styles.fieldLabel}>
-                  {t('labelName')}
-                  <input
-                    type="text"
-                    className={styles.fieldInput}
-                    value={draft.name}
-                    onChange={(e) => patchDraft({ name: e.target.value })}
-                    maxLength={50}
-                    placeholder={t('placeholderName')}
-                  />
-                </label>
                 {slug && (
                   <p className={styles.slugHint}>
                     {t('slugUrl')}: <code>/agent/{slug}</code>
                   </p>
                 )}
-
-                {/* Description */}
-                <label className={styles.fieldLabel}>
-                  {t('labelDescription')}{' '}
-                  <span className={styles.fieldHint}>
-                    {draft.description.length}/140
-                  </span>
-                  <textarea
-                    className={styles.fieldTextarea}
-                    value={draft.description}
-                    onChange={(e) =>
-                      patchDraft({ description: e.target.value })
-                    }
-                    maxLength={140}
-                    rows={2}
-                    placeholder={t('placeholderDescription')}
-                  />
-                </label>
 
                 {/* Personality (collapsible — user-controlled) */}
                 <details
@@ -1120,6 +1122,9 @@ export function ChatToHatch({ example }: { example?: AgentExampleId }) {
                   </>
                 )}
 
+                  </div>
+                </details>
+
                 {/* Greeting (read-only display) */}
                 {draft.greeting && (
                   <div className={styles.greetingBox}>
@@ -1132,6 +1137,11 @@ export function ChatToHatch({ example }: { example?: AgentExampleId }) {
 
                 {draftError && <p className={styles.errorLine}>{draftError}</p>}
 
+                <div className={styles.costNote}>
+                  <p>{ts('beforeCreate')}</p>
+                  <Link href="/dashboard/billing" target="_blank" rel="noopener noreferrer">{ts('balanceLink')}</Link>
+                  {' · '}<Link href="/pricing" target="_blank" rel="noopener noreferrer">{ts('plansLink')}</Link>
+                </div>
                 <div className={styles.foot}>
                   <button
                     type="button"

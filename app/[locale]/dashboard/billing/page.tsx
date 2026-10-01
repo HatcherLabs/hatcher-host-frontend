@@ -1,5 +1,7 @@
 'use client';
 
+import { CostExplainer } from '@/components/billing/CostExplainer';
+
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
@@ -1640,6 +1642,7 @@ export default function BillingPage() {
         </motion.div>
       )}
 
+      <CostExplainer showBalanceLink={false} />
       <ChatPlansOverview billing />
 
       {/* ── AI Credits Balance Card ───────────────────────── */}

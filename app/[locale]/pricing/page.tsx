@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { useLocale, useTranslations } from 'next-intl';
 import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 import { HatcherWalletModalProvider } from '@/components/providers/HatcherWalletModalProvider';
+import { CostExplainer } from '@/components/billing/CostExplainer';
 import { ChatPlansOverview } from '@/components/chat/ChatPlansOverview';
 import { useAuth } from '@/lib/auth-context';
 import { loginHrefForReturn } from '@/lib/safe-redirect';
@@ -126,6 +127,7 @@ export default function PricingPage() {
 
 function PricingPageContent() {
   const t = useTranslations('pricing');
+  const ts = useTranslations('simpleExperience');
   const tBilling = useTranslations('dashboard.billing');
   const tTiers = useTranslations('shared.tiers');
   const tSharedAddons = useTranslations('shared.addons');
@@ -303,13 +305,18 @@ function PricingPageContent() {
                   <FeatureCheck color="var(--color-accent)">
                     {formatAiCredits(AI_CREDITS_BY_TIER[tier.key] ?? 0, locale)} AI Credits{t('priceUnit.perMonth')}
                   </FeatureCheck>
-                  <FeatureCheck color="var(--color-accent)">UsePod/OpenRouter model picker</FeatureCheck>
-                  <FeatureCheck color="var(--color-accent)">{tierCpu} / {tierRam} · {t('perAgent')}</FeatureCheck>
-                  <FeatureCheck color="var(--color-accent)">{tierStorage}</FeatureCheck>
+                  <FeatureCheck color="var(--color-accent)">{ts('modelChoice')}</FeatureCheck>
                   <FeatureCheck color="var(--color-accent)">{tierSleep}</FeatureCheck>
                   {tierFeatures.map((f) => (
                     <FeatureCheck key={f} color="var(--color-accent)">{f}</FeatureCheck>
                   ))}
+                  <details className="pt-2 text-sm">
+                    <summary className="cursor-pointer text-[var(--text-secondary)]">{ts('technicalDetails')}</summary>
+                    <div className="space-y-2 pt-3">
+                  <FeatureCheck color="var(--color-accent)">{tierCpu} / {tierRam} · {t('perAgent')}</FeatureCheck>
+                  <FeatureCheck color="var(--color-accent)">{tierStorage}</FeatureCheck>
+                    </div>
+                  </details>
                   {tierMissing.map((f) => (
                     <FeatureMissing key={f}>{f}</FeatureMissing>
                   ))}
@@ -337,6 +344,8 @@ function PricingPageContent() {
             );
           })}
         </div>
+
+        <CostExplainer />
 
         <ChatPlansOverview />
 

@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { useAgentContext } from '../AgentContext';
+import { SimpleAgentOverview } from './SimpleAgentOverview';
 import { GenericDashboard } from './GenericDashboard';
 import { HermesDashboard } from './HermesDashboard';
 import { OpenClawDashboard } from './OpenClawDashboard';
@@ -23,7 +24,8 @@ import { AgentOperationsCard } from './cards/AgentOperationsCard';
  * mobile apps.
  */
 export function DashboardTab() {
-  const { agent } = useAgentContext();
+  const { agent, viewMode } = useAgentContext();
+  if (viewMode === 'easy') return <SimpleAgentOverview />;
 
   let dashboard: ReactNode;
   switch (agent.framework) {

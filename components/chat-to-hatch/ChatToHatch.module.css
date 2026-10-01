@@ -1145,3 +1145,25 @@
   font-size: 11px;
   color: var(--red);
 }
+
+.setupHelp, .costNote { color: var(--ink-soft); font-size: 13px; line-height: 1.6; }
+.advanced { border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+.advanced > summary { cursor: pointer; }
+.advancedBody { display: grid; gap: 18px; padding-top: 20px; min-width: 0; }
+.costNote { border-top: 1px solid var(--line); padding-top: 16px; }
+.costNote p { margin: 0 0 8px; }
+.costNote a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+
+/* Keep the suggested identity compact now that technical controls are folded. */
+.previewHero { grid-template-columns: 96px minmax(0, 1fr); }
+.avatarStage { height: 96px; min-height: 0; }
+.avatarImage { height: 100%; min-height: 0; }
+.previewTopRow { flex-wrap: wrap; gap: 8px; }
+@media (max-width: 1000px) {
+  .chatCol { height: auto; min-height: 0; }
+  .log { min-height: 100px; max-height: 300px; }
+}
+@media (max-width: 520px) {
+  .previewHero { grid-template-columns: 64px minmax(0, 1fr); }
+  .avatarStage { height: 64px; }
+}
