@@ -2,6 +2,7 @@
 import { Nav } from '@/components/marketing/v3/Nav';
 import { Footer } from '@/components/marketing/v3/Footer';
 import { SectionHero } from './parts/SectionHero';
+import { SectionExamples } from './parts/SectionExamples';
 import { SectionFlow } from './parts/SectionFlow';
 import { SectionEcosystem } from './parts/SectionEcosystem';
 import { SectionFwPricing } from './parts/SectionFwPricing';
@@ -14,6 +15,7 @@ export function LandingV3() {
       <Nav />
       <main>
         <SectionHero />
+        <SectionExamples />
         <SectionFlow />
         <SectionEcosystem />
         <SectionFwPricing />

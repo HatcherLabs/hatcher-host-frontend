@@ -2570,11 +2570,11 @@
   "landingV3": {
     "hero": {
       "boxLabel": "Deploy",
-      "headline1": "Lansează agenți AI",
-      "headline2": "de producție în minute.",
-      "sub": "Descrie ce ai nevoie. Hatcher transformă cererea într-un agent hosted, cu model, tool-uri, wallet, schedulers și controale live gata de rulare.",
+      "headline1": "Propriul tău agent AI.",
+      "headline2": "Pentru sarcini de zi cu zi.",
+      "sub": "Planifică-ți ziua, redactează emailuri, urmărește piețele sau primește ajutor la programare. Descrie ce ai nevoie și creează un agent AI care să te ajute.",
       "ctaPrimary": "Creează primul agent",
-      "ctaGhost": "Explorează agenți live",
+      "ctaGhost": "Vezi ce poți face",
       "ctaSignup": "Creează cont gratuit",
       "ctaAppStoreKicker": "Descarcă din",
       "ctaAppStore": "App Store",
@@ -2586,14 +2586,14 @@
     },
     "flow": {
       "boxLabel": "Cum funcționează",
-      "title": "Trei pași de la idee la agent live",
-      "tile1Title": "Scrie ce vrei",
-      "tile1Body": "Limbaj natural. Spune-i chat-ului ce să facă agentul — fără YAML, fără flags.",
+      "title": "De la o idee la prima sarcină",
+      "tile1Title": "Spune-i ce ai nevoie",
+      "tile1Body": "Alege un exemplu de mai sus sau descrie o sarcină cu propriile cuvinte.",
       "tile1Example": "rezumă știri din industrie zilnic",
-      "tile2Title": "Verifică configul",
-      "tile2Body": "Framework, model, tool-uri, integrări — Hatcher propune; tu confirmi sau ajustezi.",
-      "tile3Title": "Pornește runtime-ul",
-      "tile3Body": "Agentul rulează într-un runtime hosted cu chat, logs, fișiere, integrări, terminal și controale live.",
+      "tile2Title": "Adaptează-l pentru tine",
+      "tile2Body": "Verifică setările propuse, alege planul și consultă creditele AI folosite de agent.",
+      "tile3Title": "Încearcă prima sarcină",
+      "tile3Body": "Începe o conversație. Conectează aplicațiile când ai nevoie de ele, apoi configurează sarcini recurente.",
       "cta": "Creează-l pe al tău",
       "ctaFeatures": "Vezi toate funcționalitățile",
       "liveLabel": "agent live"
@@ -2663,11 +2663,50 @@
     },
     "finalCta": {
       "boxLabel": "Gata",
-      "headline": "Lansează primul tău agent.",
-      "ctaPrimary": "Eclozează agent",
+      "headline": "Cu ce te va ajuta primul tău agent?",
+      "ctaPrimary": "Creează primul tău agent",
       "ctaGhost": "Vezi agenții",
       "metaFrameworks": "OpenClaw + Hermes",
       "metaNoCard": "fără card"
+    },
+    "examples": {
+      "title": "Cu ce ai vrea să te ajutăm?",
+      "body": "Un agent AI este un asistent căruia îi poți da o sarcină. Alege un exemplu și adaptează-l nevoilor tale.",
+      "cta": "Începe cu acest exemplu",
+      "ctaLabel": "Începe cu acest exemplu: {name}",
+      "note": "Acestea sunt puncte de pornire. Conectează aplicațiile necesare și alege permisiunile și programul în timpul configurării. Poți verifica și edita fiecare cerere înainte să continui.",
+      "items": {
+        "personal": {
+          "title": "Asistent personal",
+          "body": "Transformă o zi aglomerată într-un plan clar, cu sarcini și lucruri de urmărit.",
+          "prompt": "Ajută-mă să-mi planific ziua, să-mi organizez sarcinile și să urmăresc lucrurile la care trebuie să revin."
+        },
+        "trader": {
+          "title": "Asistent pentru trading",
+          "body": "Urmărește activele care te interesează, cercetează piața și înțelege riscurile înainte de a decide.",
+          "prompt": "Urmărește lista mea de criptomonede și rezumă știrile și riscurile pieței. Cere-mi aprobarea înainte de orice tranzacție."
+        },
+        "email": {
+          "title": "Asistent pentru emailuri",
+          "body": "Scrie emailuri mai ușor, cu propuneri de răspuns și mesaje de revenire în stilul tău.",
+          "prompt": "Ajută-mă să redactez răspunsuri la emailurile clienților în stilul meu. Cere-mi acordul înainte să trimiți ceva."
+        },
+        "messages": {
+          "title": "Mesaje automate",
+          "body": "Pregătește actualizări periodice pentru Telegram sau Discord, pe care le verifici și le programezi.",
+          "prompt": "Redactează o actualizare zilnică pentru grupul meu de Telegram. Lasă-mă să o verific înainte de a stabili programul."
+        },
+        "coding": {
+          "title": "Asistent la programare",
+          "body": "Primește ajutor să înțelegi codul, să găsești erori și să scrii teste pentru proiectul tău.",
+          "prompt": "Ajută-mă să repar erori, să înțeleg codul necunoscut și să scriu teste pentru proiectul meu."
+        },
+        "research": {
+          "title": "Asistent de cercetare",
+          "body": "Transformă căutările pe web într-un rezumat scurt, cu surse pe care le poți verifica.",
+          "prompt": "Găsește cele mai recente știri din domeniul meu și pregătește un rezumat scurt cu linkuri către surse."
+        }
+      }
     }
   },
   "guidedTour": {

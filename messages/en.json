@@ -2570,11 +2570,11 @@
   "landingV3": {
     "hero": {
       "boxLabel": "Deploy",
-      "headline1": "Launch production",
-      "headline2": "AI agents in minutes.",
-      "sub": "Describe what you need. Hatcher turns it into a hosted agent with models, tools, wallets, schedules, and live controls ready to run.",
+      "headline1": "Your own AI agent.",
+      "headline2": "For everyday tasks.",
+      "sub": "Plan your day, draft emails, follow markets, or get help with code. Describe what you need and create an AI agent to help.",
       "ctaPrimary": "Create your first agent",
-      "ctaGhost": "Explore live agents",
+      "ctaGhost": "See what you can do",
       "ctaSignup": "Create a free account",
       "ctaAppStoreKicker": "Download on the",
       "ctaAppStore": "App Store",
@@ -2586,14 +2586,14 @@
     },
     "flow": {
       "boxLabel": "How it works",
-      "title": "Three steps from idea to live agent",
-      "tile1Title": "Type what you want",
-      "tile1Body": "Describe the workflow in plain English. Hatcher turns it into a structured agent spec.",
+      "title": "From an idea to your first task",
+      "tile1Title": "Tell it what you need",
+      "tile1Body": "Choose an example above or describe a task in your own words.",
       "tile1Example": "summarize industry news daily",
-      "tile2Title": "Review the config",
-      "tile2Body": "Review framework, model, tools, integrations, runtime settings, and AI Credits before launch.",
-      "tile3Title": "Launch the runtime",
-      "tile3Body": "Deploy into a hosted runtime with chat, logs, files, integrations, terminal access, and live controls.",
+      "tile2Title": "Make it yours",
+      "tile2Body": "Review the suggested setup, choose your plan, and check the AI Credits your agent uses.",
+      "tile3Title": "Try your first task",
+      "tile3Body": "Start a conversation. Connect your apps when you need them, then set up recurring tasks.",
       "cta": "Create yours",
       "ctaFeatures": "See all features",
       "liveLabel": "agent live"
@@ -2663,11 +2663,50 @@
     },
     "finalCta": {
       "boxLabel": "Ready",
-      "headline": "Deploy your first agent.",
-      "ctaPrimary": "Hatch agent",
+      "headline": "What will your first agent help with?",
+      "ctaPrimary": "Create your first agent",
       "ctaGhost": "View agents",
       "metaFrameworks": "OpenClaw + Hermes",
       "metaNoCard": "no credit card"
+    },
+    "examples": {
+      "title": "What would you like help with?",
+      "body": "An AI agent is an assistant you can give a job to. Choose an example, then make it your own.",
+      "cta": "Start with this example",
+      "ctaLabel": "Start with this example: {name}",
+      "note": "These are starting points. Connect the apps you need and choose permissions and schedules during setup. You can review and edit each request before continuing.",
+      "items": {
+        "personal": {
+          "title": "Personal assistant",
+          "body": "Turn a busy day into a clear plan, with help organizing tasks and follow-ups.",
+          "prompt": "Help me plan my day, organize my tasks, and keep track of what needs a follow-up."
+        },
+        "trader": {
+          "title": "Trading assistant",
+          "body": "Follow your watchlist, research markets, and understand risks before making a decision.",
+          "prompt": "Track my crypto watchlist and summarize market news and risks. Ask for my approval before any trade."
+        },
+        "email": {
+          "title": "Email assistant",
+          "body": "Spend less time writing emails. Get drafts and follow-ups in your own tone.",
+          "prompt": "Help me draft replies to customer emails in my tone. Ask me before sending anything."
+        },
+        "messages": {
+          "title": "Message automations",
+          "body": "Prepare regular updates for Telegram or Discord, ready for you to review and schedule.",
+          "prompt": "Draft a daily update for my Telegram group. Let me review it before setting up a schedule."
+        },
+        "coding": {
+          "title": "Coding assistant",
+          "body": "Get help understanding code, finding bugs, and writing tests for your project.",
+          "prompt": "Help me fix bugs, explain unfamiliar code, and write tests for my project."
+        },
+        "research": {
+          "title": "Research assistant",
+          "body": "Turn web searches into a short briefing with links you can check.",
+          "prompt": "Find the latest news about my industry and prepare a short briefing with source links."
+        }
+      }
     }
   },
   "guidedTour": {

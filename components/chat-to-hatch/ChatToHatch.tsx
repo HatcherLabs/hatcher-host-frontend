@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { api, req } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
+import { agentExampleHref, type AgentExampleId } from '@/lib/agent-examples';
 import { generateAgentAvatar } from '@/lib/avatar-generator';
 import { IRONCLAW_OAUTH_EXTENSION_IDS } from '@/components/agents/ironclawExtensions';
 import {
@@ -238,12 +239,13 @@ function normalizeConfig(config: ParsedConfig): ParsedConfig {
   };
 }
 
-export function ChatToHatch() {
+export function ChatToHatch({ example }: { example?: AgentExampleId }) {
   const router = useRouter();
   const t = useTranslations('chatToHatch');
+  const tExamples = useTranslations('landingV3.examples');
   const { isAuthenticated, isLoading } = useAuth();
   const [messages, setMessages] = useState<Msg[]>([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState(() => example ? tExamples(`items.${example}.prompt`) : '');
   const [thinking, setThinking] = useState(false);
   const [hatching, setHatching] = useState(false);
   /** What the LLM most recently returned. Acts as the "reset to suggested"
@@ -271,9 +273,9 @@ export function ChatToHatch() {
   // back here after sign-in.
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push('/login?return=/create');
+      router.push(`/login?return=${encodeURIComponent(agentExampleHref(example))}`);
     }
-  }, [isLoading, isAuthenticated, router]);
+  }, [isLoading, isAuthenticated, router, example]);
 
   // Auto-scroll the chat log on every new message.
   useEffect(() => {
@@ -648,6 +650,7 @@ export function ChatToHatch() {
             <div className={styles.inputWrap}>
               <textarea
                 className={styles.input}
+                aria-label={t('placeholder')}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}

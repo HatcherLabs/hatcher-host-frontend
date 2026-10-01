@@ -38,7 +38,7 @@ export function SectionHero() {
           <p className={styles.sub}>{t('sub')}</p>
           <div className={styles.ctaRow}>
             <PhosphorButton href="/create" surface="dark">{t('ctaPrimary')}</PhosphorButton>
-            <PhosphorButton href="/explore" variant="ghost" surface="dark">{t('ctaGhost')}</PhosphorButton>
+            <PhosphorButton href="#examples" variant="ghost" surface="dark">{t('ctaGhost')}</PhosphorButton>
           </div>
           <Link href="/register" className={styles.signupHint}>
             {t('ctaSignup')}

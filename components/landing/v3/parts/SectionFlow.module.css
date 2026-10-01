@@ -52,7 +52,7 @@
     var(--bg-card);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
-  padding: 24px;
+  padding: 48px 24px 28px;
   position: relative;
   box-shadow: var(--shadow-soft);
   transition:

@@ -3,9 +3,9 @@ import { LandingV3 } from '@/components/landing/v3/LandingV3';
 import { buildLanguagesMap } from '@/lib/seo';
 
 export const metadata: Metadata = {
-  title: 'Hatcher — AI Agent Infrastructure',
+  title: 'Hatcher — AI Agents for Everyday Tasks',
   description:
-    'Managed AI agent infrastructure for hosted OpenClaw and Hermes agents: models, wallets, tools, integrations, and runtime controls in one place.',
+    'Create your own AI agent for daily planning, emails, messages, market research, and coding. Start with a simple example and make it yours.',
   alternates: { languages: buildLanguagesMap('/') },
 };
 
