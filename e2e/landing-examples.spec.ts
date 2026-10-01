@@ -11,6 +11,14 @@ test.beforeEach(async ({ page }) => {
   await page.route('**/models/pricing', (route) => route.fulfill({
     json: { success: true, data: { models: [] } },
   }));
+  // A simulated session has no real API credentials. Stub the authenticated
+  // navigation reads too, so a live API's 401 does not expire the test session.
+  await page.route('**/agents', (route) => route.request().method() === 'GET'
+    ? route.fulfill({ json: { success: true, data: [] } })
+    : route.abort());
+  await page.route('**/notifications/unread-count', (route) => route.fulfill({
+    json: { success: true, data: { count: 0 } },
+  }));
   await page.route('**/agents/parse-intent', (route) => route.abort());
 });
 
