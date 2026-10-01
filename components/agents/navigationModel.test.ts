@@ -9,26 +9,26 @@ import {
 const labelFor = (id: string) => id;
 
 describe('agent navigation model', () => {
-  it('defaults the agent workspace to advanced mode', () => {
-    expect(DEFAULT_AGENT_VIEW_MODE).toBe('advanced');
+  it('defaults the agent workspace to easy mode', () => {
+    expect(DEFAULT_AGENT_VIEW_MODE).toBe('easy');
   });
 
   it('keeps an explicitly saved easy mode', () => {
     expect(resolveAgentViewMode('easy')).toBe('easy');
   });
 
-  it('falls back to advanced for missing or invalid saved modes', () => {
-    expect(resolveAgentViewMode(null)).toBe('advanced');
-    expect(resolveAgentViewMode('legacy')).toBe('advanced');
+  it('retains explicit advanced mode, but uses easy for missing or invalid preferences', () => {
+    expect(resolveAgentViewMode('advanced')).toBe('advanced');
+    expect(resolveAgentViewMode(null)).toBe('easy');
+    expect(resolveAgentViewMode('legacy')).toBe('easy');
   });
 
   it('keeps easy mode focused on primary operator tasks', () => {
     expect(EASY_AGENT_TABS).toEqual([
       'overview',
       'chat',
-      'logs',
+      'mail',
       'integrations',
-      'wallet',
       'robinhood',
     ]);
   });
@@ -39,6 +39,8 @@ describe('agent navigation model', () => {
     expect(easyTabs).toContain('chat');
     expect(easyTabs).toContain('integrations');
     expect(easyTabs).not.toContain('terminal');
+    expect(easyTabs).not.toContain('logs');
+    expect(easyTabs).not.toContain('wallet');
     expect(easyTabs).not.toContain('dev');
     expect(easyTabs).not.toContain('workflows');
   });

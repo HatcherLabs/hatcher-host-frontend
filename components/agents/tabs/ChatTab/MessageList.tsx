@@ -30,6 +30,8 @@ interface MessageListProps {
   speakingMsgId: string | null;
   onSpeak: (id: string, content: string) => void;
   onSendMessage: (text: string) => void;
+  onChoosePrompt?: (text: string) => void;
+  simple?: boolean;
   messagesContainerRef: RefObject<HTMLDivElement | null>;
   bottomRef: RefObject<HTMLDivElement | null>;
   showThinking: boolean;
@@ -59,12 +61,15 @@ export function MessageList({
   speakingMsgId,
   onSpeak,
   onSendMessage,
+  onChoosePrompt,
+  simple = false,
   messagesContainerRef,
   bottomRef,
   showThinking,
   showToolCalls,
 }: MessageListProps) {
   const t = useTranslations('dashboard.agentDetail.chat');
+  const ts = useTranslations('simpleExperience');
   const [activeCategoryId, setActiveCategoryId] = useState<ChatPromptCategoryId>('jobs');
   const activeCategory = useMemo(
     () => CHAT_PROMPT_CATEGORIES.find((category) => category.id === activeCategoryId) ?? CHAT_PROMPT_CATEGORIES[0],
@@ -88,13 +93,22 @@ export function MessageList({
             <Bot size={32} className="text-[var(--color-accent)]" />
           </div>
           <p className="text-sm mb-1 text-[var(--text-secondary)]">
-            {t('emptyTitle', { agentName })}
+            {simple ? ts('firstChat') : t('emptyTitle', { agentName })}
           </p>
           <p className="text-xs mb-1 text-[var(--text-muted)]">
-            {t('emptySubtitle')}
+            {simple ? ts('firstChatHelp') : t('emptySubtitle')}
           </p>
 
-          <div className="mx-auto mt-6 w-full max-w-[48rem]">
+          {simple ? (
+            <div className="mx-auto mt-6 grid max-w-xl gap-3 px-3 text-left">
+              {(['promptPlan', 'promptEmail', 'promptResearch'] as const).map((key) => (
+                <button key={key} type="button" onClick={() => onChoosePrompt?.(ts(key))}
+                  className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] p-4 text-left text-sm text-[var(--text-secondary)] hover:border-[var(--accent)]">
+                  {ts(key)}
+                </button>
+              ))}
+            </div>
+          ) : <div className="mx-auto mt-6 w-full max-w-[48rem]">
             <div className="mb-3 flex flex-wrap justify-center gap-2">
               {CHAT_PROMPT_CATEGORIES.map((category) => {
                 const selected = category.id === activeCategory.id;
@@ -145,7 +159,7 @@ export function MessageList({
                 ))}
               </div>
             </motion.div>
-          </div>
+          </div>}
         </motion.div>
       )}
 

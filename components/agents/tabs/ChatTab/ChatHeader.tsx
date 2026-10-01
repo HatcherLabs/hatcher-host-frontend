@@ -8,6 +8,7 @@ import type { ActiveModelDisplay } from '@/lib/hosted-model-catalog';
 import { FRAMEWORK_BADGE } from '../../AgentContext';
 
 interface ChatHeaderProps {
+  simple?: boolean;
   agent: { framework: AgentFramework };
   wsConnected: boolean;
   hasVoiceSupport: boolean;
@@ -28,6 +29,7 @@ interface ChatHeaderProps {
 }
 
 export function ChatHeader({
+  simple = false,
   agent,
   wsConnected,
   hasVoiceSupport,
@@ -62,17 +64,17 @@ export function ChatHeader({
         >
           <Menu size={14} />
         </button>
-        <span className={`inline-flex items-center gap-1.5 text-[10px] px-2 py-0.5 rounded-full border font-medium ${FRAMEWORK_BADGE[agent.framework] ?? 'bg-slate-500/15 text-slate-400 border-slate-500/30'}`}>
+        {!simple && <span className={`inline-flex items-center gap-1.5 text-[10px] px-2 py-0.5 rounded-full border font-medium ${FRAMEWORK_BADGE[agent.framework] ?? 'bg-slate-500/15 text-slate-400 border-slate-500/30'}`}>
           <Bot size={10} />
           {frameworkMeta?.name ?? agent.framework}
-        </span>
+        </span>}
         {wsConnected && (
           <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border border-[var(--status-live-border)] bg-[var(--status-live-bg)] text-[var(--status-live)] font-medium" title="Real-time streaming via WebSocket">
             <span className="w-1.5 h-1.5 rounded-full bg-[var(--status-live)] animate-pulse" />
             {t('live')}
           </span>
         )}
-        {modelSwitcher ?? (<button
+        {!simple && (modelSwitcher ?? (<button
           type="button"
           onClick={onOpenModelSettings}
           className="hidden max-w-[260px] items-center gap-1 truncate rounded-full border border-[var(--border-default)] bg-[var(--bg-elevated)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-secondary)] transition-colors hover:border-[var(--color-accent)]/40 hover:text-[var(--text-primary)] sm:inline-flex"
@@ -80,10 +82,10 @@ export function ChatHeader({
         >
           <span className="text-[var(--color-accent)]">{activeModel.provider}</span>
           <span className="truncate">{activeModel.name}</span>
-        </button>)}
+        </button>))}
       </div>
       <div className="flex items-center gap-2">
-        <button
+        {!simple && <><button
           type="button"
           onClick={onToggleThinking}
           className={`flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border transition-all duration-200 cursor-pointer ${
@@ -111,6 +113,7 @@ export function ChatHeader({
           <Wrench size={11} />
           <span className="hidden lg:inline">{showToolCalls ? 'Hide tools' : 'Show tools'}</span>
         </button>
+        </>}
         {/* Voice Call button */}
         {hasVoiceSupport && sttSupported && isAuthenticated && (
           <button

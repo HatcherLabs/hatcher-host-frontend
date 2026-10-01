@@ -455,6 +455,7 @@ export function ChatTab() {
       exit="exit"
     >
       <ChatHeader
+        simple={ctx.viewMode === 'easy'}
         agent={agent}
         wsConnected={wsConnected}
         hasVoiceSupport={hasVoiceSupport}
@@ -530,6 +531,8 @@ export function ChatTab() {
             speakingMsgId={speakingMsgIdRef.current}
             onSpeak={handleSpeakMessage}
             onSendMessage={sendMessage}
+            simple={ctx.viewMode === 'easy'}
+            onChoosePrompt={(text) => { setInput(text); inputRef.current?.focus(); }}
             messagesContainerRef={messagesContainerRef}
             bottomRef={bottomRef}
             showThinking={showThinking}

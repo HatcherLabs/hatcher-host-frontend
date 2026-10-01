@@ -25,6 +25,7 @@ export function DashboardWorkspaceNavigation() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const tNav = useTranslations('nav');
+  const ts = useTranslations('simpleExperience');
   // Framed same-origin (the agent desktop's Settings window iframes the
   // dashboard page): the workspace tab row is site chrome — hide it and let
   // the framed page show content only.
@@ -36,10 +37,10 @@ export function DashboardWorkspaceNavigation() {
 
   const labels: Record<DashboardWorkspaceKey, string> = {
     agents: tNav('myAgents'),
-    missions: tNav('missionControl'),
-    approvals: 'Approvals',
-    automations: 'Automations',
-    mesh: 'Neural Mesh',
+    missions: ts('tasks'),
+    approvals: ts('approvals'),
+    automations: ts('automations'),
+    mesh: ts('mesh'),
   };
 
   return (

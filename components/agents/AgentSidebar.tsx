@@ -273,11 +273,17 @@ function AgentSwitcher({
 export const AgentSidebar = memo(function AgentSidebar({ agent, agents, agentsLoading, activeTab, onTabChange }: AgentSidebarProps) {
   const { viewMode } = useAgentContext();
   const tTabs = useTranslations('dashboard.agentDetail.tabs');
+  const ts = useTranslations('simpleExperience');
   const tSidebarGroups = useTranslations('dashboard.agentDetail.sidebarGroups');
   const tNav = useTranslations('dashboard.agentDetail.nav');
   const tSidebar = useTranslations('dashboard.agentDetail.sidebar');
-  const allTabs = getTabs(agent.framework, tTabs);
-  const tabs = viewMode === 'easy' ? allTabs.filter(t => EASY_AGENT_TABS.includes(t.id)) : allTabs;
+  const easyLabels: Partial<Record<Tab, string>> = {
+    overview: ts('overview'), mail: ts('mail'), robinhood: ts('robinhood'), integrations: ts('connections'),
+  };
+  const allTabs = getTabs(agent.framework, tTabs).map((item) => viewMode === 'easy'
+    ? { ...item, label: easyLabels[item.id] ?? item.label }
+    : item);
+  const tabs = viewMode === 'easy' ? allTabs.filter(t => EASY_AGENT_TABS.includes(t.id) || t.id === activeTab) : allTabs;
   const statusInfo = STATUS_STYLES[agent.status] ?? STATUS_STYLES.paused;
   const frameworkColor = FRAMEWORK_COLOR[agent.framework] ?? 'var(--text-muted)';
 

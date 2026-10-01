@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { usePathname } from '@/i18n/routing';
 import { useAuth } from '@/lib/auth-context';
 import { track } from '@/lib/analytics';
+import { resolveAgentViewMode } from '@/components/agents/navigationModel';
 import { GuidedTour, type TourStep } from '@/components/ui/GuidedTour';
 import {
   PENDING_RESTART_KEY,
@@ -35,9 +36,10 @@ export function AgentDetailTour() {
     description: t(step.descriptionKey),
   })), [t]);
 
-  // First-run trigger (evaluated in an effect: localStorage is client-only)
+  // Easy mode uses inline guidance. Keep the full tour available on demand,
+  // and retain first-run behavior for users who explicitly chose Advanced.
   useEffect(() => {
-    setEligible(shouldStartAgentDetailTour({
+    setEligible(resolveAgentViewMode(localStorage.getItem('hatcher-view-mode')) === 'advanced' && shouldStartAgentDetailTour({
       isAuthenticated,
       isLoading,
       profileLoaded: !!user,
