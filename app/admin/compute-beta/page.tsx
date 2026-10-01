@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { AlertTriangle, ArrowLeft, CheckCircle2, Loader2, RefreshCw, Users } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, CheckCircle2, Loader2, RefreshCw, Send, ShieldOff, UserCheck, Users } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import type { ComputeBetaApplication, ComputeBetaStatus } from '@/lib/api/types';
@@ -12,10 +12,15 @@ const STATUSES: Array<'all' | ComputeBetaStatus> = [
   'new',
   'contacted',
   'accepted',
+  'invited',
+  'onboarding',
+  'active',
   'waitlisted',
   'rejected',
   'withdrawn',
+  'revoked',
 ];
+const REVIEW_STATUSES: ComputeBetaStatus[] = ['new', 'contacted', 'accepted', 'waitlisted', 'rejected', 'withdrawn'];
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat('en', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
@@ -27,6 +32,7 @@ export default function ComputeBetaAdminPage() {
   const [filter, setFilter] = useState<'all' | ComputeBetaStatus>('all');
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [bulkWorking, setBulkWorking] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -62,6 +68,46 @@ export default function ComputeBetaAdminPage() {
     );
   }
 
+  async function acceptAll() {
+    if (!window.confirm('Accept every new, contacted, or waitlisted Compute beta application?')) return;
+    setBulkWorking(true);
+    setError(null);
+    const result = await api.acceptAllComputeBetaApplications();
+    setBulkWorking(false);
+    if (!result.success) return setError(result.error);
+    await load();
+  }
+
+  async function inviteAll() {
+    if (!window.confirm('Send a one-time closed-beta invitation to every accepted applicant?')) return;
+    setBulkWorking(true);
+    setError(null);
+    const result = await api.inviteAllAcceptedComputeBetaApplications();
+    setBulkWorking(false);
+    if (!result.success) return setError(result.error);
+    if (result.data.failed > 0) setError(`${result.data.failed} invitation(s) could not be delivered.`);
+    await load();
+  }
+
+  async function inviteOne(id: string) {
+    setUpdatingId(id);
+    setError(null);
+    const result = await api.inviteComputeBetaApplication(id);
+    setUpdatingId(null);
+    if (!result.success) return setError(result.error);
+    await load();
+  }
+
+  async function revokeOne(id: string) {
+    if (!window.confirm('Revoke this applicant\'s Compute access and every active node credential?')) return;
+    setUpdatingId(id);
+    setError(null);
+    const result = await api.revokeComputeBetaAccess(id);
+    setUpdatingId(null);
+    if (!result.success) return setError(result.error);
+    await load();
+  }
+
   const counts = useMemo(() => {
     const result: Record<string, number> = {};
     for (const application of applications) result[application.participation] = (result[application.participation] ?? 0) + 1;
@@ -83,9 +129,17 @@ export default function ComputeBetaAdminPage() {
             <h1 className="flex items-center gap-3 text-3xl font-bold"><Users className="h-7 w-7 text-[var(--color-accent)]" />Compute beta applications</h1>
             <p className="mt-2 text-sm text-[var(--text-secondary)]">Encrypted-at-rest applicant data, visible only to admins.</p>
           </div>
-          <button type="button" onClick={() => void load()} disabled={loading} className="btn-secondary inline-flex min-h-11 items-center justify-center gap-2 px-4">
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" onClick={() => void acceptAll()} disabled={bulkWorking} className="btn-secondary inline-flex min-h-11 items-center justify-center gap-2 px-4">
+              <UserCheck className="h-4 w-4" /> Accept all eligible
+            </button>
+            <button type="button" onClick={() => void inviteAll()} disabled={bulkWorking} className="btn-primary inline-flex min-h-11 items-center justify-center gap-2 px-4">
+              {bulkWorking ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />} Invite accepted
+            </button>
+            <button type="button" onClick={() => void load()} disabled={loading} className="btn-secondary inline-flex min-h-11 items-center justify-center gap-2 px-4">
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
+            </button>
+          </div>
         </header>
 
         <section className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -132,12 +186,34 @@ export default function ComputeBetaAdminPage() {
                     </dl>
                     <p className="mt-5 whitespace-pre-wrap rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-4 text-sm leading-6 text-[var(--text-secondary)]">{application.useCase}</p>
                   </div>
-                  <label className="flex min-w-44 flex-col gap-2 text-xs font-semibold text-[var(--text-secondary)]">
-                    Review status
-                    <select value={application.status} disabled={updatingId === application.id} onChange={(event) => void updateStatus(application.id, event.target.value as ComputeBetaStatus)} className="h-11 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 text-sm text-[var(--text-primary)]">
-                      {STATUSES.slice(1).map((status) => <option key={status} value={status}>{status}</option>)}
-                    </select>
-                  </label>
+                  <div className="flex min-w-48 flex-col gap-3">
+                    {REVIEW_STATUSES.includes(application.status) ? (
+                      <label className="flex flex-col gap-2 text-xs font-semibold text-[var(--text-secondary)]">
+                        Review status
+                        <select value={application.status} disabled={updatingId === application.id} onChange={(event) => void updateStatus(application.id, event.target.value as ComputeBetaStatus)} className="h-11 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 text-sm text-[var(--text-primary)]">
+                          {REVIEW_STATUSES.map((status) => <option key={status} value={status}>{status}</option>)}
+                        </select>
+                      </label>
+                    ) : (
+                      <p className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-3 text-xs font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
+                        Access state: {application.status}
+                      </p>
+                    )}
+                    {['accepted', 'invited'].includes(application.status) ? (
+                      <button type="button" disabled={updatingId === application.id} onClick={() => void inviteOne(application.id)} className="btn-primary inline-flex min-h-10 items-center justify-center gap-2 px-3 text-sm">
+                        {updatingId === application.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                        {application.status === 'invited' ? 'Resend invite' : 'Send invite'}
+                      </button>
+                    ) : null}
+                    {['onboarding', 'active'].includes(application.status) ? (
+                      <button type="button" disabled={updatingId === application.id} onClick={() => void revokeOne(application.id)} className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-red-500/30 px-3 text-sm font-semibold text-red-400 hover:bg-red-500/10">
+                        <ShieldOff className="h-4 w-4" /> Revoke access
+                      </button>
+                    ) : null}
+                    {application.invitationSentAt ? <p className="text-xs text-[var(--text-muted)]">Invite sent {formatDate(application.invitationSentAt)}</p> : null}
+                    {application.activatedAt ? <p className="text-xs text-emerald-400">Activated {formatDate(application.activatedAt)}</p> : null}
+                    {application.invitationLastError ? <p className="max-w-56 text-xs text-red-400">Delivery failed: {application.invitationLastError}</p> : null}
+                  </div>
                 </div>
               </article>
             ))}

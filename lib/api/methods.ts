@@ -187,7 +187,9 @@ import type {
   ComputeBetaApplicationInput,
   ComputeBetaApplicationResult,
   ComputeBetaApplication,
+  ComputeBetaAccess,
   ComputeBetaStatus,
+  ComputeNodePackageInfo,
 } from "./types";
 import type { TierConfig, AdminOverviewExtras } from "@hatcher/shared";
 
@@ -374,6 +376,58 @@ export const api = {
       `/compute/beta/applications/${encodeURIComponent(id)}`,
       { method: "PATCH", body: JSON.stringify({ status }) },
     ),
+
+  acceptAllComputeBetaApplications: () =>
+    req<{ accepted: number; acceptedAt: string }>("/compute/beta/applications/accept-all", {
+      method: "POST",
+    }),
+
+  inviteAllAcceptedComputeBetaApplications: () =>
+    req<{ invited: number; failed: number; results: Array<{ id: string; status: 'invited' | 'failed'; error?: string }> }>(
+      "/compute/beta/applications/invite-all",
+      { method: "POST" },
+    ),
+
+  inviteComputeBetaApplication: (id: string) =>
+    req<{ id: string; status: 'invited'; expiresAt: string }>(
+      `/compute/beta/applications/${encodeURIComponent(id)}/invite`,
+      { method: "POST" },
+    ),
+
+  revokeComputeBetaAccess: (id: string) =>
+    req<{ id: string; status: 'revoked'; revokedAt: string }>(
+      `/compute/beta/applications/${encodeURIComponent(id)}/revoke`,
+      { method: "POST" },
+    ),
+
+  getComputeBetaAccess: () => req<ComputeBetaAccess>("/compute/beta/access"),
+
+  redeemComputeBetaInvitation: (token: string) =>
+    req<ComputeBetaAccess>("/compute/beta/invitations/redeem", {
+      method: "POST",
+      body: JSON.stringify({ token }),
+    }),
+
+  getComputeNodePackageInfo: () => req<ComputeNodePackageInfo>("/compute/node-package/info"),
+
+  downloadComputeNodePackage: async (): Promise<
+    | { success: true; data: { blob: Blob; filename: string } }
+    | { success: false; error: string }
+  > => {
+    const token = getToken();
+    const response = await fetch(`${API_URL}/compute/node-package`, {
+      credentials: "include",
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    }).catch(() => null);
+    if (!response) return { success: false, error: "Network error — is the API running?" };
+    if (!response.ok) {
+      const body = await response.json().catch(() => null) as { error?: string } | null;
+      return { success: false, error: body?.error ?? `Download failed with status ${response.status}` };
+    }
+    const disposition = response.headers.get("content-disposition") ?? "";
+    const filename = disposition.match(/filename="?([^";]+)"?/i)?.[1] ?? "hatcher-compute-node.tgz";
+    return { success: true, data: { blob: await response.blob(), filename } };
+  },
 
   getComputeProviders: () => req<ComputeProvider[]>("/compute/providers"),
 

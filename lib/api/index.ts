@@ -237,5 +237,7 @@ export type {
   ComputePaymentReceipt,
   ComputePayoutLedgerEntry,
   ComputeModelAvailability,
+  ComputeBetaAccess,
+  ComputeNodePackageInfo,
 } from "./types";
 export { api } from "./methods";

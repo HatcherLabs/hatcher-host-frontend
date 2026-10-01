@@ -5,6 +5,7 @@ import {
   Activity,
   Copy,
   Cpu,
+  Download,
   FlaskConical,
   Loader2,
   RefreshCw,
@@ -14,10 +15,12 @@ import {
   Wallet,
   Workflow,
 } from 'lucide-react';
-import { useRouter } from '@/i18n/routing';
+import { Link, useRouter } from '@/i18n/routing';
 import { api } from '@/lib/api';
 import type {
   ComputeNetworkStats,
+  ComputeBetaAccess,
+  ComputeNodePackageInfo,
   ComputeProvider,
   ComputeProviderJob,
   ComputeSettlementLedgerItem,
@@ -66,24 +69,51 @@ export default function ComputeProviderDashboard() {
   const [quote, setQuote] = useState<ComputeSettlementQuote | null>(null);
   const [settlementRun, setSettlementRun] = useState<ComputeSettlementRun | null>(null);
   const [settlementWorking, setSettlementWorking] = useState(false);
+  const [access, setAccess] = useState<ComputeBetaAccess | null>(null);
+  const [packageInfo, setPackageInfo] = useState<ComputeNodePackageInfo | null>(null);
+  const [downloadWorking, setDownloadWorking] = useState(false);
   const apiUrl = API_URL.replace(/\/+$/, '');
 
   const refresh = useCallback(async () => {
     setLoading(true);
     setError(null);
-    const [providerResult, jobResult, statsResult, settlementResult, ledgerResult] = await Promise.all([
-      api.getComputeProviders(),
-      api.getComputeProviderJobs(50),
+    const [accessResult, statsResult] = await Promise.all([
+      api.getComputeBetaAccess(),
       api.getComputeStats(),
+    ]);
+    if (statsResult.success) setStats(statsResult.data);
+    if (!accessResult.success) {
+      setError(accessResult.error);
+      setLoading(false);
+      return;
+    }
+    setAccess(accessResult.data);
+    if (!['onboarding', 'active'].includes(accessResult.data.status)) {
+      setLoading(false);
+      return;
+    }
+    const providerResultPromise = accessResult.data.canProvide
+      ? api.getComputeProviders()
+      : Promise.resolve({ success: true as const, data: [] as ComputeProvider[] });
+    const jobResultPromise = accessResult.data.canProvide
+      ? api.getComputeProviderJobs(50)
+      : Promise.resolve({ success: true as const, data: [] as ComputeProviderJob[] });
+    const packageResultPromise = accessResult.data.canProvide
+      ? api.getComputeNodePackageInfo()
+      : Promise.resolve({ success: true as const, data: null });
+    const [providerResult, jobResult, packageResult, settlementResult, ledgerResult] = await Promise.all([
+      providerResultPromise,
+      jobResultPromise,
+      packageResultPromise,
       api.getComputeSettlementReadiness(false),
       api.getComputeSettlementLedger(20),
     ]);
     if (providerResult.success) setProviders(providerResult.data);
     if (jobResult.success) setJobs(jobResult.data);
-    if (statsResult.success) setStats(statsResult.data);
+    if (packageResult.success) setPackageInfo(packageResult.data);
     if (settlementResult.success) setSettlement(settlementResult.data);
     if (ledgerResult.success) setLedger(ledgerResult.data);
-    const failed = [providerResult, jobResult, statsResult, settlementResult, ledgerResult].find(
+    const failed = [providerResult, jobResult, packageResult, settlementResult, ledgerResult].find(
       (result) => !result.success,
     );
     if (failed && !failed.success) setError(failed.error);
@@ -93,7 +123,7 @@ export default function ComputeProviderDashboard() {
   useEffect(() => {
     if (authLoading) return;
     if (!isAuthenticated) {
-      router.push('/login?redirect=/dashboard/compute');
+      router.push('/login?return=/dashboard/compute');
       return;
     }
     void refresh();
@@ -129,6 +159,22 @@ export default function ComputeProviderDashboard() {
 
   async function copy(value: string) {
     await navigator.clipboard.writeText(value);
+  }
+
+  async function downloadNodePackage() {
+    setDownloadWorking(true);
+    setError(null);
+    const result = await api.downloadComputeNodePackage();
+    setDownloadWorking(false);
+    if (!result.success) return setError(result.error);
+    const url = URL.createObjectURL(result.data.blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = result.data.filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
   }
 
   async function createQuote() {
@@ -177,6 +223,20 @@ export default function ComputeProviderDashboard() {
 
   if (authLoading || (!isAuthenticated && !authLoading)) return null;
 
+  if (!loading && access && !['onboarding', 'active'].includes(access.status)) {
+    return (
+      <main className={styles.page}>
+        <div className={styles.inner}>
+          <section className={styles.panel} style={{ maxWidth: 720, margin: '10vh auto 0' }}>
+            <div className={styles.panelHeader}><div><h1>Compute beta access required</h1><p>This dashboard is limited to accepted closed-beta accounts.</p></div><ShieldCheck size={22} /></div>
+            <p className={styles.muted}>Current access state: {access.status.replaceAll('_', ' ')}. If you received an invitation, open its one-time link while signed in with the invited email address.</p>
+            <Link className={styles.button} href="/compute" style={{ marginTop: 18 }}>View the beta program</Link>
+          </section>
+        </div>
+      </main>
+    );
+  }
+
   const enrollCommand = enrollment
     ? `hatcher-compute enroll --token ${enrollment.token} --api-url ${apiUrl} --model local/mock-1b --mock${payoutWallet.trim() ? ` --payout-wallet ${payoutWallet.trim()}` : ''}`
     : '';
@@ -189,11 +249,12 @@ export default function ComputeProviderDashboard() {
         <header className={styles.header}>
           <div>
             <span className={styles.eyebrow}>Local preview control plane</span>
-            <h1 className={styles.title}>Compute providers</h1>
+            <h1 className={styles.title}>Compute network</h1>
             <p className={styles.subtitle}>
               Enroll Windows, macOS, or Linux machines, monitor leased inference jobs, and prepare
               payout wallets. No USDC is moved in this local phase.
             </p>
+            {access ? <p className={styles.muted}>Beta role: {access.participation} · access {access.status}</p> : null}
           </div>
           <div className={styles.actions}>
             <button className={styles.secondaryButton} onClick={() => void refresh()} disabled={loading}>
@@ -217,7 +278,21 @@ export default function ComputeProviderDashboard() {
 
         <div className={styles.grid}>
           <div>
-            <section className={styles.panel}>
+            {access?.canBuild ? <section className={styles.panel}>
+              <div className={styles.panelHeader}>
+                <div><h2>Builder API access</h2><p>Use your Hatcher API key with the OpenAI-compatible endpoint.</p></div>
+                <ShieldCheck size={20} aria-hidden />
+              </div>
+              <p className={styles.muted}>Base URL</p>
+              <code className={styles.command}>{apiUrl}/compute/v1</code>
+              <div className={styles.actions} style={{ marginTop: 12 }}>
+                <button className={styles.secondaryButton} onClick={() => void copy(`${apiUrl}/compute/v1`)}><Copy size={14} /> Copy URL</button>
+                <Link className={styles.secondaryButton} href="/dashboard/settings/api-keys">Manage API keys</Link>
+              </div>
+              <p className={styles.muted}>Requests remain capped and closed-beta access is checked server-side even when a valid API key is used.</p>
+            </section> : null}
+
+            {access?.canBuild ? <section className={styles.panel}>
               <div className={styles.panelHeader}>
                 <div><h2>Local settlement lab</h2><p>Exercise quote → escrow → inference → verification.</p></div>
                 <FlaskConical size={20} aria-hidden />
@@ -284,9 +359,9 @@ export default function ComputeProviderDashboard() {
                   ) : null}
                 </div>
               ) : null}
-            </section>
+            </section> : null}
 
-            <section className={styles.panel}>
+            {access?.canBuild ? <section className={styles.panel}>
               <div className={styles.panelHeader}>
                 <div><h2>Distributed workloads</h2><p>Use smaller machines safely without pretending one token stream is divisible.</p></div>
                 <Workflow size={20} aria-hidden />
@@ -298,9 +373,9 @@ export default function ComputeProviderDashboard() {
                 <div><span>Ordering</span><strong>Input order preserved</strong></div>
               </div>
               <p className={styles.muted}>Batch requests are distributed across available providers. Long text is split at useful boundaries, mapped independently, then reduced into one response. A single autoregressive generation remains on one compatible node.</p>
-            </section>
+            </section> : null}
 
-            <section className={styles.panel}>
+            {access?.canProvide ? <section className={styles.panel}>
               <div className={styles.panelHeader}>
                 <div><h2>Your nodes</h2><p>Outbound polling only; no inbound firewall rule is required.</p></div>
                 <Server size={20} aria-hidden />
@@ -329,9 +404,9 @@ export default function ComputeProviderDashboard() {
                   </article>
                 ))}
               </div>
-            </section>
+            </section> : null}
 
-            <section className={styles.panel}>
+            {access?.canProvide ? <section className={styles.panel}>
               <div className={styles.panelHeader}>
                 <div><h2>Recent provider jobs</h2><p>Real jobs handled by nodes owned by this account.</p></div>
                 <Activity size={20} aria-hidden />
@@ -345,11 +420,11 @@ export default function ComputeProviderDashboard() {
                 </table>
                 {!loading && jobs.length === 0 ? <div className={styles.empty}>Jobs will appear after this account&apos;s node completes inference.</div> : null}
               </div>
-            </section>
+            </section> : null}
           </div>
 
           <aside>
-            <section className={styles.panel}>
+            {access?.canProvide ? <section className={styles.panel}>
               <div className={styles.panelHeader}>
                 <div><h2>Enroll a node</h2><p>Generate a one-time token, then run the universal CLI.</p></div>
                 <Cpu size={20} aria-hidden />
@@ -380,13 +455,18 @@ export default function ComputeProviderDashboard() {
                   <div className={styles.tokenActions}><small>Shown once · expires {date(enrollment.expiresAt)}</small><button className={styles.secondaryButton} onClick={() => void copy(enrollment.token)}><Copy size={14} /> Copy</button></div>
                 </div>
               ) : null}
-              <p className={styles.muted}>Install Node.js 20+ and the local preview package on any supported OS.</p>
-              <code className={styles.command}>npm install --global ./hatcher-compute-node-0.2.0.tgz</code>
+              <p className={styles.muted}>Install Node.js 20+ and download the same signed preview package for Windows, macOS, or Linux.</p>
+              <button className={styles.secondaryButton} onClick={() => void downloadNodePackage()} disabled={downloadWorking || !packageInfo?.available}>
+                {downloadWorking ? <Loader2 size={15} className={styles.spinner} /> : <Download size={15} />}
+                {packageInfo?.available ? `Download v${packageInfo.version}` : 'Package not staged yet'}
+              </button>
+              {packageInfo?.sha256 ? <><p className={styles.muted}>SHA-256</p><code className={styles.command}>{packageInfo.sha256}</code></> : null}
+              <code className={styles.command}>npm install --global ./{packageInfo?.filename ?? 'hatcher-compute-node-0.3.0.tgz'}</code>
               {enrollment ? <><p className={styles.muted}>Enroll:</p><code className={styles.command}>{enrollCommand}</code><button className={styles.secondaryButton} style={{ marginTop: 10 }} onClick={() => void copy(enrollCommand)}><Copy size={14} /> Copy command</button></> : null}
               <p className={styles.muted}>This first command uses the deterministic test runtime. Without a payout wallet, verified work is held instead of becoming eligible.</p>
               <p className={styles.muted}>Then start the worker:</p>
               <code className={styles.command}>hatcher-compute serve</code>
-            </section>
+            </section> : null}
 
             <section className={styles.panel}>
               <div className={styles.panelHeader}><div><h2>Settlement readiness</h2><p>Local simulator active; on-chain rail inactive.</p></div><Wallet size={20} aria-hidden /></div>

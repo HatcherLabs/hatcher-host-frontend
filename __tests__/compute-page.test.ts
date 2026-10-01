@@ -19,6 +19,18 @@ const betaApplicationSource = readFileSync(
   new URL('../app/[locale]/compute/ComputeBetaApplication.tsx', import.meta.url),
   'utf8',
 );
+const betaAdminSource = readFileSync(
+  new URL('../app/admin/compute-beta/page.tsx', import.meta.url),
+  'utf8',
+);
+const betaJoinSource = readFileSync(
+  new URL('../app/[locale]/compute/join/page.tsx', import.meta.url),
+  'utf8',
+);
+const betaDashboardSource = readFileSync(
+  new URL('../app/[locale]/dashboard/compute/page.tsx', import.meta.url),
+  'utf8',
+);
 const englishMessages = JSON.parse(
   readFileSync(new URL('../messages/en.json', import.meta.url), 'utf8'),
 ) as { compute: { beta: Record<string, unknown> } };
@@ -88,5 +100,16 @@ describe('Hatcher Compute public page', () => {
     expect(betaApplicationSource).toContain('href="/privacy"');
     expect(JSON.stringify(englishMessages.compute.beta)).toMatch(/No USDC moves in demo mode/);
     expect(JSON.stringify(englishMessages.compute.beta)).toMatch(/no earnings are promised/i);
+  });
+
+  it('provides a gated invitation and onboarding control plane', () => {
+    expect(betaAdminSource).toContain('acceptAllComputeBetaApplications');
+    expect(betaAdminSource).toContain('inviteAllAcceptedComputeBetaApplications');
+    expect(betaAdminSource).toContain('revokeComputeBetaAccess');
+    expect(betaJoinSource).toContain('redeemComputeBetaInvitation');
+    expect(betaJoinSource).toMatch(/simulated payments/i);
+    expect(betaDashboardSource).toContain('getComputeBetaAccess');
+    expect(betaDashboardSource).toContain('downloadComputeNodePackage');
+    expect(betaDashboardSource).toContain('SHA-256');
   });
 });
