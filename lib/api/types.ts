@@ -3059,9 +3059,13 @@ export type ComputeBetaStatus =
   | 'new'
   | 'contacted'
   | 'accepted'
+  | 'invited'
+  | 'onboarding'
+  | 'active'
   | 'waitlisted'
   | 'rejected'
-  | 'withdrawn';
+  | 'withdrawn'
+  | 'revoked';
 
 export interface ComputeBetaApplicationInput {
   email: string;
@@ -3096,10 +3100,38 @@ export interface ComputeBetaApplication {
   availabilityHours: number | null;
   useCase: string;
   status: ComputeBetaStatus;
+  userId: string | null;
+  invitationExpiresAt: string | null;
+  invitationSentAt: string | null;
+  invitationLastError: string | null;
+  acceptedAt: string | null;
+  activatedAt: string | null;
+  revokedAt: string | null;
   updatesOptIn: boolean;
   consentAt: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ComputeBetaAccess {
+  applicationId: string | null;
+  participation: ComputeBetaParticipation | null;
+  status: ComputeBetaStatus | 'not_invited';
+  invitationExpiresAt: string | null;
+  invitationSentAt: string | null;
+  activatedAt: string | null;
+  revokedAt: string | null;
+  canProvide: boolean;
+  canBuild: boolean;
+  adminBypass: boolean;
+}
+
+export interface ComputeNodePackageInfo {
+  available: boolean;
+  version: string;
+  filename?: string;
+  sizeBytes?: number;
+  sha256?: string;
 }
 
 export interface ComputeSettlementReadiness {
