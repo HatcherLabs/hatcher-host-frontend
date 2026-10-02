@@ -26,6 +26,19 @@ export const HATCHER_TUTORIALS: readonly HatcherTutorial[] = [
     featureLabel: 'Create an agent',
   },
   {
+    slug: 'models-ai-credits',
+    title: 'LLM models & AI Credits',
+    topic: 'Models & usage',
+    duration: '5:28',
+    durationIso: 'PT5M28S',
+    description:
+      'Choose and save a model, understand the default, and compare quality, speed, and AI Credit usage. English narration and captions; pricing examples from 2 October 2026.',
+    videoSrc: '/tutorials/models-ai-credits.mp4',
+    posterSrc: '/tutorials/models-ai-credits.jpg',
+    featureHref: '/dashboard/agents',
+    featureLabel: 'Open My Agents',
+  },
+  {
     slug: 'neural-mesh',
     title: 'Neural Mesh',
     topic: 'Orchestration',
