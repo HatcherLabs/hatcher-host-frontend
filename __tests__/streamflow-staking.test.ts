@@ -1,6 +1,8 @@
 import {
   Keypair,
   PublicKey,
+  Transaction,
+  TransactionMessage,
   VersionedTransaction,
 } from '@solana/web3.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -516,6 +518,33 @@ describe('streamflow staking rewards', () => {
     );
   });
 
+  it.each([false, true])('sets up a missing HATCHER destination when unstaking (fallback: %s)', async (fallback) => {
+    stakingMocks.getAccountInfo.mockResolvedValue(null);
+    if (fallback) {
+      stakingMocks.simulateTransaction.mockResolvedValueOnce({
+        value: { err: { InstructionError: [1, { Custom: 6013 }] } },
+      });
+    }
+    const wallet = {
+      publicKey: Keypair.generate().publicKey,
+      sendTransaction: vi.fn(async () => 'unstake-tx'),
+    } as unknown as WalletContextState;
+
+    await unstakeHatcherWithStreamflow({
+      wallet,
+      stakePoolAddress: STAKE_POOL_ADDRESS,
+      depositNonce: 123,
+      unlockAt: new Date(Date.now() - 60_000),
+    });
+    expect(wallet.sendTransaction).toHaveBeenCalledTimes(1);
+    const sent = vi.mocked(wallet.sendTransaction).mock.calls[0][0] as VersionedTransaction;
+    const instructions = TransactionMessage.decompile(sent.message).instructions;
+    expect(instructions).toHaveLength(2);
+    expect(instructions[0].programId.toBase58()).toBe('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
+    expect(instructions[0].keys[3].pubkey).toEqual(HATCHER_MINT_PK);
+    expect(stakingMocks.prepareUnstakeInstructions).toHaveBeenCalledTimes(fallback ? 1 : 0);
+  });
+
   it('rejects unstake before the lock period has ended', async () => {
     const wallet = {
       publicKey: Keypair.generate().publicKey,
@@ -567,6 +596,57 @@ describe('streamflow staking rewards', () => {
       expect.objectContaining({ preflightCommitment: 'confirmed' }),
     );
     expect(stakingMocks.sendRawTransaction).not.toHaveBeenCalled();
+    const sent = vi.mocked(wallet.sendTransaction).mock.calls[0][0] as VersionedTransaction;
+    expect(sent.message.compiledInstructions).toHaveLength(1);
+  });
+
+  it('simulates and atomically claims into a missing Token-2022 destination account', async () => {
+    const owner = Keypair.generate().publicKey;
+    const tokenProgram = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
+    const associatedProgram = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
+    const [destination] = PublicKey.findProgramAddressSync(
+      [owner.toBuffer(), tokenProgram.toBuffer(), HATCHER_MINT_PK.toBuffer()],
+      associatedProgram,
+    );
+    stakingMocks.getAccountInfo.mockImplementation(async (...args: unknown[]) => (
+      (args[0] as PublicKey).equals(destination) ? null : { owner: tokenProgram }
+    ));
+    const wallet = {
+      publicKey: owner,
+      sendTransaction: vi.fn(async () => 'claim-with-destination-tx'),
+      signTransaction: vi.fn(),
+    } as unknown as WalletContextState;
+    const params = {
+      walletAddress: owner.toBase58(),
+      stakePoolAddress: STAKE_POOL_ADDRESS,
+      stakeEntryAddress: '3zS6NsWw2f6Fj9nJmxrnE5EepLqghdQgkvZpg6gTYQbQ',
+      depositNonce: 123,
+    };
+
+    await expect(fetchHatcherRewardStatusWithStreamflow(params)).resolves.toMatchObject({ canClaim: true });
+    const simulated = (stakingMocks.simulateTransaction.mock.calls as unknown as [Transaction][])[0][0];
+    expect(simulated.instructions).toHaveLength(2);
+    const setup = simulated.instructions[0];
+    expect(setup.programId).toEqual(associatedProgram);
+    expect(setup.data).toEqual(Buffer.from([1]));
+    expect(setup.keys.map((key) => key.pubkey)).toEqual([
+      owner, destination, owner, HATCHER_MINT_PK,
+      new PublicKey('11111111111111111111111111111111'), tokenProgram,
+    ]);
+    expect(wallet.sendTransaction).not.toHaveBeenCalled();
+    expect(wallet.signTransaction).not.toHaveBeenCalled();
+    expect(stakingMocks.sendRawTransaction).not.toHaveBeenCalled();
+
+    await expect(claimHatcherRewardsWithStreamflow({ ...params, wallet })).resolves.toEqual({
+      txIds: ['claim-with-destination-tx'],
+    });
+    expect(wallet.sendTransaction).toHaveBeenCalledTimes(1);
+    const sent = vi.mocked(wallet.sendTransaction).mock.calls[0][0] as VersionedTransaction;
+    const sentInstructions = TransactionMessage.decompile(sent.message).instructions;
+    expect(sentInstructions).toHaveLength(2);
+    expect(sentInstructions[0].programId).toEqual(associatedProgram);
+    expect(sentInstructions[0].keys.map((key) => key.pubkey)).toEqual(setup.keys.map((key) => key.pubkey));
+    expect(stakingMocks.prepareCreateRewardEntryInstructions).not.toHaveBeenCalled();
   });
 
   it('stops before submitting a claim transaction when the reward entry is missing', async () => {
