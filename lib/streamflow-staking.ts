@@ -238,6 +238,25 @@ function createAssociatedTokenAccountIdempotentInstruction(params: {
   });
 }
 
+async function prepareHatcherDestinationInstructions(
+  connection: Connection,
+  owner: PublicKey,
+  tokenProgramId: PublicKey,
+): Promise<TransactionInstruction[]> {
+  const destination = associatedTokenAddress(HATCHER_MINT, owner, tokenProgramId);
+  if (await connection.getAccountInfo(destination)) return [];
+
+  // The SDK assumes this account exists. A wallet may have closed it after staking.
+  // Keep setup atomic with the claim, and idempotent if another transaction creates it first.
+  return [createAssociatedTokenAccountIdempotentInstruction({
+    payer: owner,
+    associatedToken: destination,
+    owner,
+    mint: HATCHER_MINT,
+    tokenProgramId,
+  })];
+}
+
 async function preparePreflightedWalletTransaction(params: {
   connection: Connection;
   payer: PublicKey;
@@ -564,11 +583,14 @@ export async function unstakeHatcherWithStreamflow(params: {
     }],
   }, { invoker });
 
+  const setupInstructions = await prepareHatcherDestinationInstructions(
+    client.connection, params.wallet.publicKey, tokenProgramId,
+  );
   try {
     const prepared = await preparePreflightedWalletTransaction({
       connection: client.connection,
       payer: params.wallet.publicKey,
-      instructions: ixs,
+      instructions: [...setupInstructions, ...ixs],
     });
     const txId = await sendPreparedWalletTransaction({
       wallet: params.wallet,
@@ -589,7 +611,7 @@ export async function unstakeHatcherWithStreamflow(params: {
     const prepared = await preparePreflightedWalletTransaction({
       connection: client.connection,
       payer: params.wallet.publicKey,
-      instructions: unstakeOnlyIxs,
+      instructions: [...setupInstructions, ...unstakeOnlyIxs],
     });
     const txId = await sendPreparedWalletTransaction({
       wallet: params.wallet,
@@ -656,7 +678,10 @@ async function fetchHatcherRewardStatusFromClient(params: {
 
   const transaction = new Transaction();
   transaction.feePayer = walletAddress;
-  transaction.add(...ixs);
+  const setupInstructions = await prepareHatcherDestinationInstructions(
+    params.client.connection, walletAddress, tokenProgramId,
+  );
+  transaction.add(...setupInstructions, ...ixs);
 
   let simulation: { value: { err: unknown; logs?: string[] | null } };
   try {
@@ -828,10 +853,13 @@ export async function claimHatcherRewardsWithStreamflow(params: {
     governor: HATCHER_DYNAMIC_REWARD_GOVERNOR,
   }, { invoker });
 
+  const setupInstructions = await prepareHatcherDestinationInstructions(
+    client.connection, params.wallet.publicKey, tokenProgramId,
+  );
   const prepared = await preparePreflightedWalletTransaction({
     connection: client.connection,
     payer: params.wallet.publicKey,
-    instructions: ixs,
+    instructions: [...setupInstructions, ...ixs],
   });
   const txId = await sendPreparedWalletTransaction({
     wallet: params.wallet,

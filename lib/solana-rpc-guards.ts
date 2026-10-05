@@ -1,5 +1,11 @@
 const MAX_BATCH_SIZE = 20;
 const DEFAULT_PUBLIC_SOLANA_RPC = 'https://api.mainnet-beta.solana.com/';
+const DYNAMIC_REWARD_PROGRAM = 'RWRDyfZa6Rk9UYi85yjYYfGmoUqffLqjo6vZdFawEez';
+const HATCHER_STAKE_POOLS = new Set([
+  '7BVxRYGoTJjr3bgvDhpJggJrnUhyYoGPbnxTRAWuDmtH',
+  'G2zhUwUYBrwgm1E4ivp6QA1nNrtU4UFZ1Jwqv59mXfqQ',
+  'CriRWzZga38LmVQyWdgrMFfjz5FfFdbhPVZi8kmNeaEh',
+]);
 
 const ALLOWED_METHODS = new Set([
   'getAccountInfo',
@@ -120,10 +126,35 @@ function isAllowedRpcObject(payload: unknown): payload is { method: string; id?:
   return (
     isRpcObject(payload)
     && typeof payload.method === 'string'
-    && ALLOWED_METHODS.has(payload.method)
+    && (ALLOWED_METHODS.has(payload.method)
+      || (payload.method === 'getProgramAccounts' && isScopedRewardDiscovery(payload.params)))
   );
 }
 
-function isRpcObject(payload: unknown): payload is { method?: unknown; id?: unknown } {
+// Anchor adds an account discriminator at offset 0. Require an additional pool or
+// stake-entry filter so this proxy cannot be used for arbitrary program-wide scans.
+function isScopedRewardDiscovery(params: unknown): boolean {
+  if (!Array.isArray(params) || params.length !== 2 || params[0] !== DYNAMIC_REWARD_PROGRAM) return false;
+  const config = params[1];
+  if (!config || typeof config !== 'object' || Array.isArray(config)) return false;
+  const filters: unknown = config.filters;
+  if (!Array.isArray(filters) || filters.length === 0 || filters.length > 3) return false;
+  let scoped = false;
+  const valid = filters.every((filter: unknown) => {
+    if (!filter || typeof filter !== 'object' || !('memcmp' in filter)) return false;
+    const memcmp = filter.memcmp;
+    if (!memcmp || typeof memcmp !== 'object' || !('offset' in memcmp) || !('bytes' in memcmp)) return false;
+    if ('encoding' in memcmp && memcmp.encoding !== 'base58') return false;
+    if (typeof memcmp.bytes !== 'string') return false;
+    if (memcmp.offset === 0) return /^[1-9A-HJ-NP-Za-km-z]{1,16}$/.test(memcmp.bytes);
+    const scopedFilter = (memcmp.offset === 10 && HATCHER_STAKE_POOLS.has(memcmp.bytes))
+      || (memcmp.offset === 40 && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(memcmp.bytes));
+    scoped ||= scopedFilter;
+    return scopedFilter;
+  });
+  return valid && scoped;
+}
+
+function isRpcObject(payload: unknown): payload is { method?: unknown; id?: unknown; params?: unknown } {
   return typeof payload === 'object' && payload !== null && !Array.isArray(payload);
 }
