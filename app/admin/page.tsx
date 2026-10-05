@@ -2826,7 +2826,8 @@ export default function AdminPage() {
                     <thead>
                       <tr className="text-left text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border-default)]">
                         <th className="py-2 pr-3">When</th>
-                        <th className="py-2 pr-3">User · Agent</th>
+                        <th className="py-2 pr-3" scope="col">User</th>
+                        <th className="py-2 pr-3" scope="col">Agent</th>
                         <th className="py-2 pr-3">Feature</th>
                         <th className="py-2 pr-3 text-right">USD</th>
                         <th className="py-2 pr-3 text-right">Paid</th>
@@ -2840,12 +2841,17 @@ export default function AdminPage() {
                           <td className="py-3 pr-3 text-[var(--text-secondary)] tabular-nums whitespace-nowrap">
                             {new Date(p.createdAt).toLocaleString([], { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
                           </td>
-                          <td className="py-3 pr-3 min-w-0">
-                            <div className="text-white truncate">{p.userUsername ? `@${p.userUsername}` : p.userEmail ?? 'unknown'}</div>
-                            {p.agentName && (
-                              <div className="text-[10px] text-[var(--text-muted)] truncate">
-                                {p.agentName}{p.agentFramework ? ` · ${p.agentFramework}` : ''}
-                              </div>
+                          <td className="py-3 pr-3 min-w-[10rem] text-[var(--text-primary)]">
+                            <div className="max-w-[18rem] break-words">
+                              {p.userUsername ? `@${p.userUsername}` : p.userEmail || p.userId || 'Unknown user'}
+                            </div>
+                          </td>
+                          <td className="py-3 pr-3 min-w-[10rem] text-[var(--text-primary)]">
+                            <div className="max-w-[18rem] break-words">
+                              {p.agentName || (p.agentId ? `Agent ${p.agentId}` : 'Account-wide')}
+                            </div>
+                            {p.agentFramework && (
+                              <div className="text-[10px] text-[var(--text-muted)]">{p.agentFramework}</div>
                             )}
                           </td>
                           <td className="py-3 pr-3 text-[var(--text-secondary)] truncate">{formatFeatureKey(p.featureKey)}</td>
