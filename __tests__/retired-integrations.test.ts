@@ -9,6 +9,15 @@ function read(relativePath: string): string {
 }
 
 describe('retired integrations', () => {
+
+  it('removes OOBE wallet/admin surfaces and API contracts', () => {
+    expect(existsSync(join(root, 'components/agents/tabs/OobeWalletPanel.tsx'))).toBe(false);
+    expect(existsSync(join(root, 'app/admin/_components/OobeTab.tsx'))).toBe(false);
+    for (const file of [
+      'components/agents/tabs/WalletTab.tsx', 'app/admin/page.tsx',
+      'lib/api/methods.ts', 'lib/api/types.ts', 'lib/api/index.ts',
+    ]) expect(read(file)).not.toMatch(/oobe|synapse/i);
+  });
   it('removes Conduit and Orbis panels from the frontend and admin app', () => {
     expect(existsSync(join(root, 'app', 'admin', '_components', 'ConduitTab.tsx'))).toBe(false);
     expect(existsSync(join(root, 'components', 'agents', 'tabs', 'ConduitWalletPanel.tsx'))).toBe(false);

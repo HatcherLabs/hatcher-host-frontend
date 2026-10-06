@@ -42,7 +42,6 @@ import type {
 } from '@/lib/api';
 import { buildFallbackPassport, shortAddress } from '@/lib/agent-passport';
 import { EarnFiWalletPanel } from './EarnFiWalletPanel';
-import { OobeWalletPanel } from './OobeWalletPanel';
 import { ClawVilleWalletPanel } from './ClawVilleWalletPanel';
 import { XonaPartnerResourcesPanel } from './XonaPartnerResourcesPanel';
 import { Mpp32WalletPanel } from './Mpp32WalletPanel';
@@ -68,7 +67,7 @@ interface ReputationState {
 
 type WalletPanel = 'passport' | AgentPassportNetworkId;
 type WalletSection = 'overview' | 'networks' | 'providers' | 'security';
-type ProviderPanelId = 'xona' | 'earnfi' | 'oobe' | 'clawville' | 'mpp32' | 'metaplex' | 'virtuals';
+type ProviderPanelId = 'xona' | 'earnfi' | 'clawville' | 'mpp32' | 'metaplex' | 'virtuals';
 type AgentRuntime = 'hermes' | 'openclaw' | (string & {});
 
 const TAB_ORDER: WalletPanel[] = ['passport', 'skale', 'solana', 'base', 'cyberia', 'botchain'];
@@ -89,7 +88,6 @@ const SOLANA_PROVIDERS: ReadonlyArray<{ id: ProviderPanelId; label: string; desc
   { id: 'metaplex', label: 'Metaplex', description: 'Agent Registry identity and public metadata.', network: 'Solana' },
   { id: 'xona', label: 'Xona', description: 'xPay partner resources and agent tools.', network: 'Solana' },
   { id: 'earnfi', label: 'EarnFi', description: 'Paid task creation and verification.', network: 'Solana' },
-  { id: 'oobe', label: 'Oobe', description: 'SAP registration and x402 access.', network: 'Solana' },
   { id: 'clawville', label: 'ClawVille', description: 'Identity wallet and access state.', network: 'Solana' },
   { id: 'mpp32', label: 'MPP32', description: 'Signed AGTP intelligence and x402 settlement.', network: 'Solana' },
 ];
@@ -888,8 +886,6 @@ function ProviderPanel({ provider, agentId, solanaWallet }: { provider: Provider
       return <XonaPartnerResourcesPanel agentId={agentId} />;
     case 'earnfi':
       return <EarnFiWalletPanel agentId={agentId} />;
-    case 'oobe':
-      return <OobeWalletPanel agentId={agentId} />;
     case 'clawville':
       return <ClawVilleWalletPanel agentId={agentId} />;
     case 'mpp32':

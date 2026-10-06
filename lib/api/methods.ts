@@ -90,7 +90,6 @@ import type {
   ErrorRateResponse,
   WsCountResponse,
   LlmStatsResponse,
-  AdminOobeOverviewResponse,
   AdminEgressEventsResponse,
   AgentEgressEventsResponse,
   AdminHealthResponse,
@@ -154,16 +153,6 @@ import type {
   EarnFiPollResponse,
   EarnFiRegisterResponse,
   EarnFiSocialJobBody,
-  OobeConfigStatus,
-  OobeDiscoveryResponse,
-  OobeNetworkStatusResponse,
-  OobeRegisterSapBody,
-  OobeRegisterSapResponse,
-  OobeRpcBody,
-  OobeX402BalanceBody,
-  OobeX402BalanceResponse,
-  OobeX402CallBody,
-  OobeX402CallResponse,
   StakingBenefitDesignationResponse,
   StakingBenefitsResponse,
   StakingBoostBenefitKey,
@@ -1197,55 +1186,6 @@ export const api = {
         body: JSON.stringify(body),
       },
     ),
-
-  /** OOBE Synapse RPC + SAP identity/discovery controls. */
-  getAgentOobeConfig: (id: string) =>
-    req<OobeConfigStatus>(`/agents/${id}/oobe/config`),
-
-  getAgentOobeNetworkStatus: (id: string) =>
-    req<OobeNetworkStatusResponse>(`/agents/${id}/oobe/network-status`),
-
-  discoverAgentOobeSap: (
-    id: string,
-    opts: {
-      capability?: string;
-      protocol?: string;
-      wallet?: string;
-      limit?: number;
-    } = {},
-  ) => {
-    const params = new URLSearchParams();
-    if (opts.capability) params.set("capability", opts.capability);
-    if (opts.protocol) params.set("protocol", opts.protocol);
-    if (opts.wallet) params.set("wallet", opts.wallet);
-    if (opts.limit !== undefined) params.set("limit", String(opts.limit));
-    const query = params.toString() ? `?${params.toString()}` : "";
-    return req<OobeDiscoveryResponse>(`/agents/${id}/oobe/discover${query}`);
-  },
-
-  callAgentOobeRpc: (id: string, body: OobeRpcBody) =>
-    req<unknown>(`/agents/${id}/oobe/rpc`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
-
-  registerAgentOobeSap: (id: string, body: OobeRegisterSapBody = {}) =>
-    req<OobeRegisterSapResponse>(`/agents/${id}/oobe/register-sap`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
-
-  callAgentOobeX402: (id: string, body: OobeX402CallBody) =>
-    req<OobeX402CallResponse>(`/agents/${id}/oobe/x402/call`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
-
-  getAgentOobeX402Balance: (id: string, body: OobeX402BalanceBody) =>
-    req<OobeX402BalanceResponse>(`/agents/${id}/oobe/x402/balance`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
 
   /** Get usage analytics for an agent */
   getAgentUsage: (id: string) =>
@@ -2634,8 +2574,6 @@ export const api = {
     return req<AdminEgressEventsResponse>(`/admin/egress-events${query}`);
   },
 
-  /** Admin: OOBE Synapse RPC and SAP registration overview */
-  adminGetOobeOverview: () => req<AdminOobeOverviewResponse>("/admin/oobe"),
 
   /** List files in agent's running container */
   listContainerFiles: (agentId: string, path?: string) =>

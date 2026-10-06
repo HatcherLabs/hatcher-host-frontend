@@ -51,7 +51,6 @@ import {
 } from 'lucide-react';
 import { PieChart as RePieChart, Pie, Cell, ResponsiveContainer, Tooltip as ReTooltip, BarChart, Bar, XAxis, YAxis } from 'recharts';
 import type { AdminOverviewExtras } from '@hatcher/shared';
-import OobeTab from './_components/OobeTab';
 import RuntimeReliabilityPanel from '@/components/admin/RuntimeReliabilityPanel';
 
 
@@ -1156,11 +1155,11 @@ export default function AdminPage() {
   const [agentsPagination, setAgentsPagination] = useState<{ total: number; hasMore: boolean }>({ total: 0, hasMore: false });
   const [error, setError] = useState<string | null>(null);
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'agents' | 'users' | 'tickets' | 'purchases' | 'health' | 'analytics' | 'egress' | 'oobe' | 'audit'>(() => {
+  const [activeTab, setActiveTab] = useState<'overview' | 'agents' | 'users' | 'tickets' | 'purchases' | 'health' | 'analytics' | 'egress' | 'audit'>(() => {
     if (typeof window === 'undefined') return 'overview';
     const params = new URLSearchParams(window.location.search);
     const t = params.get('tab');
-    if (t === 'overview' || t === 'agents' || t === 'users' || t === 'tickets' || t === 'purchases' || t === 'health' || t === 'analytics' || t === 'egress' || t === 'oobe' || t === 'audit') return t;
+    if (t === 'overview' || t === 'agents' || t === 'users' || t === 'tickets' || t === 'purchases' || t === 'health' || t === 'analytics' || t === 'egress' || t === 'audit') return t;
     return 'overview';
   });
   const [payments, setPayments] = useState<AdminPayment[]>([]);
@@ -1734,10 +1733,10 @@ export default function AdminPage() {
             className="grid grid-cols-2 gap-1 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-7"
             aria-label="Admin sections"
           >
-            {(['overview', 'agents', 'users', 'tickets', 'purchases', 'health', 'analytics', 'egress', 'oobe', 'audit'] as const).map((tab) => {
-              const tabIcons: Record<string, LucideIcon> = { overview: BarChart3, agents: Bot, users: Users, tickets: Ticket, purchases: DollarSign, health: HeartPulse, analytics: TrendingUp, egress: Network, oobe: Network, audit: ScrollText };
+            {(['overview', 'agents', 'users', 'tickets', 'purchases', 'health', 'analytics', 'egress', 'audit'] as const).map((tab) => {
+              const tabIcons: Record<string, LucideIcon> = { overview: BarChart3, agents: Bot, users: Users, tickets: Ticket, purchases: DollarSign, health: HeartPulse, analytics: TrendingUp, egress: Network, audit: ScrollText };
               const TabIcon = tabIcons[tab] ?? BarChart3;
-              const tabLabels: Record<string, string> = { overview: 'Overview', agents: `Agents (${agentsPagination.total || agents.length})`, users: `Users (${users.length})`, tickets: `Tickets${tickets.length ? ` (${tickets.length})` : ''}`, purchases: 'Purchases', health: 'Health', analytics: 'Analytics', egress: 'Egress', oobe: 'OOBE', audit: 'Audit Log' };
+              const tabLabels: Record<string, string> = { overview: 'Overview', agents: `Agents (${agentsPagination.total || agents.length})`, users: `Users (${users.length})`, tickets: `Tickets${tickets.length ? ` (${tickets.length})` : ''}`, purchases: 'Purchases', health: 'Health', analytics: 'Analytics', egress: 'Egress', audit: 'Audit Log' };
               return (
                 <button
                   key={tab}
@@ -3166,7 +3165,6 @@ export default function AdminPage() {
 
           {activeTab === 'egress' && <EgressTab />}
 
-          {activeTab === 'oobe' && <OobeTab />}
 
           {activeTab === 'audit' && <AuditLogTab />}
 
