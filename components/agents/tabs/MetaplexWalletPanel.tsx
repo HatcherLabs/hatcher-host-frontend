@@ -1857,8 +1857,8 @@ export function MetaplexWalletPanel({
           </h3>
           <p className="mt-1 max-w-2xl text-xs leading-relaxed text-[var(--text-muted)]">
             {registeredAsset
-              ? 'Manage the public profile, avatar, metadata links, A2A discovery, MCP discovery, and x402-ready endpoints.'
-              : 'Publish a Solana mainnet agent identity with Hatcher metadata, A2A discovery, MCP discovery, and x402-ready endpoints.'}
+              ? 'Manage the public profile, avatar, and identity metadata links.'
+              : 'Publish a Solana mainnet agent identity with a public profile and Hatcher metadata.'}
           </p>
         </div>
         <button
@@ -2033,9 +2033,9 @@ export function MetaplexWalletPanel({
                 </span>
               </div>
               <div className="flex justify-between gap-3">
-                <span>x402 discovery</span>
+                <span>Paid execution (x402)</span>
                 <span className="font-semibold text-[var(--text-primary)]">
-                  {config?.capabilities.x402 ? 'Included' : 'Not included'}
+                  {config?.capabilities.x402 ? 'Available' : 'Not available'}
                 </span>
               </div>
               <div className="flex justify-between gap-3">
