@@ -41,7 +41,10 @@ async function fetchCommits(): Promise<Commit[]> {
     const res = await fetch(`${API}/changelog`, { cache: 'no-store' });
     if (!res.ok) return [];
     const data = await res.json();
-    return data.commits ?? [];
+    // Keep unpublished entries hidden while frontend and API deploy independently.
+    return ((data.commits ?? []) as Commit[]).filter(
+      (commit) => !/\[skip changelog\]/i.test(commit.message),
+    );
   } catch {
     return [];
   }
