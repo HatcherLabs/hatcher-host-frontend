@@ -8,7 +8,7 @@ interface Props {
 }
 
 /**
- * Wraps marketing pages (/pricing, /explore, /traders, /frameworks, /token, /stock-rewards, /blog, /roadmap,
+ * Wraps marketing pages (/pricing, /explore, /traders, /frameworks, /token, /blog, /roadmap,
  * /changelog, /help, /support hub, /privacy, /terms,
  * /compute, /cookies, /impressum) with the v3 Nav + Footer.
  *

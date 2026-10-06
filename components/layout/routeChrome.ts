@@ -6,7 +6,7 @@ const LOCALE_PREFIX_RE = new RegExp(`^/(${locales.join("|")})(/.*|$)`);
 const IMMERSIVE_PATTERNS: RegExp[] = [
   /^\/dashboard\/chat\/?$/,
   /^\/$/,
-  /^\/(?:explore|traders|features|compute|pricing|frameworks|token|stock-rewards|roadmap|usage|blog|tutorials|changelog|help|support|security|whitepaper)(?:\/|$)/,
+  /^\/(?:explore|traders|features|compute|pricing|frameworks|token|roadmap|usage|blog|tutorials|changelog|help|support|security|whitepaper)(?:\/|$)/,
   /^\/(?:login|register|forgot-password|reset-password|verify-email)(?:\/|$)/,
   /^\/(?:privacy|terms|cookies|impressum)(?:\/|$)/,
   /^\/embed(?:\/|$)/,

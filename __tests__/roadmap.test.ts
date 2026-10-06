@@ -24,7 +24,6 @@ describe('roadmap content', () => {
     expect(latestReleases.map((release) => release.id)).toEqual([
       'automation-center',
       'bot-chain',
-      'ai-stock-rewards',
       'neural-mesh',
       'embeddable-agents',
     ]);
@@ -68,7 +67,6 @@ describe('roadmap content', () => {
     expect(roadmapCopy).toContain('Inference');
     expect(roadmapCopy).toContain('BOT Chain');
     expect(roadmapCopy).toContain('Neural Mesh');
-    expect(roadmapCopy).toContain('AI stock rewards');
   });
 
   it('keeps token utility on both rails visible', () => {

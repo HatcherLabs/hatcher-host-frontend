@@ -62,13 +62,6 @@ export const latestReleases = [
       'Shared EVM agent wallets now support BOT Chain balances and secure transfers.',
   },
   {
-    id: 'ai-stock-rewards',
-    icon: 'metering',
-    title: 'AI stock rewards',
-    description:
-      'A public, finalized ledger for HATCHER creator-fee distributions in tokenized AI stocks.',
-  },
-  {
     id: 'neural-mesh',
     icon: 'route',
     title: 'Neural Mesh routing',
