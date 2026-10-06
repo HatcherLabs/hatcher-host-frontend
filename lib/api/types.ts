@@ -253,13 +253,13 @@ export interface StakingPoolConfig {
   label: string;
   durationDays: number;
   rewardShareBps: number;
-  maxStakeHatcher: number;
+  maxStakeHatcher: number | null;
   monthlyRewardBudgetHatcher: number;
   weeklyRewardBudgetHatcher: number;
   aiCreditsPerDayPerMillion: number;
   poolAddress: string | null;
   configured: boolean;
-  estimatedAprAtCap: number;
+  estimatedAprAtCap: number | null;
   currentApr: number;
   activeStakeCount: number;
   totalStakedHatcher: number;
@@ -267,7 +267,17 @@ export interface StakingPoolConfig {
 }
 
 export interface StakingConfigResponse {
-  reserveHatcher: number;
+  reserveHatcher: number | null;
+  campaignAllocationHatcher?: number;
+  funding?: {
+    dataFresh: boolean;
+    sourceHatcher: number | null;
+    preparedHatcher: number | null;
+    fullWeeksRemaining: number | null;
+    weeklyHatcher: number;
+    checkedAt: string | null;
+    status: 'healthy' | 'attention' | 'unavailable';
+  };
   monthlyEmissionHatcher: number;
   weeklyEmissionHatcher: number;
   aiCreditsPerWalletMonthlyCap: number;

@@ -203,9 +203,9 @@ function PoolSelectorCard({
           </p>
         </div>
         <div className="col-span-2 min-w-0 sm:col-span-1">
-          <p className="text-[var(--text-muted)]">APR at cap</p>
+          <p className="text-[var(--text-muted)]">Current estimated APR</p>
           <p className="break-words font-semibold text-[var(--text-primary)]">
-            {formatApr(pool.estimatedAprAtCap)}
+            {formatApr(pool.currentApr)}
           </p>
         </div>
       </div>
@@ -993,18 +993,30 @@ export function StakingClient() {
                 </p>
               </div>
               <div className="min-w-0 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-3">
-                <p className="text-xs font-semibold uppercase text-[var(--text-muted)]">Monthly rewards</p>
+                <p className="text-xs font-semibold uppercase text-[var(--text-muted)]">Weekly funding target</p>
                 <p className="mt-1 break-words text-lg font-semibold text-[var(--text-primary)]">
-                  {config ? formatStakingTokenAmount(config.monthlyEmissionHatcher) : '-'}
+                  {config ? formatStakingTokenAmount(config.weeklyEmissionHatcher) : '-'}
                 </p>
               </div>
               <div className="min-w-0 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-3">
-                <p className="text-xs font-semibold uppercase text-[var(--text-muted)]">Funding</p>
-                <p className="mt-1 break-words text-sm font-semibold text-[var(--text-primary)]">
-                  {fundingSourcesLabel}
+                <p className="text-xs font-semibold uppercase text-[var(--text-muted)]">Available reward reserve</p>
+                <p className="mt-1 break-words text-lg font-semibold text-[var(--text-primary)]">
+                  {config?.funding?.dataFresh && config.funding.sourceHatcher !== null
+                    ? formatStakingTokenAmount(config.funding.sourceHatcher)
+                    : 'Temporarily unavailable'}
                 </p>
+                {config?.funding?.dataFresh ? (
+                  <p className="mt-1 text-xs text-[var(--text-secondary)]">
+                    {config.funding.fullWeeksRemaining} full weekly top-ups remaining.
+                    {' '}{formatStakingTokenAmount(config.funding.preparedHatcher ?? 0)} HATCHER already prepared separately.
+                    {config.funding.status === 'attention' ? ' Funding needs attention.' : ''}
+                  </p>
+                ) : null}
               </div>
             </div>
+            <p className="mt-3 text-xs text-[var(--text-muted)]">
+              Funding: {fundingSourcesLabel}. Reserve estimates assume the current weekly target and exclude staked tokens and rewards already allocated to stakers.
+            </p>
           </div>
           <button
             type="button"
@@ -1229,8 +1241,8 @@ export function StakingClient() {
                 </p>
               </div>
               <div className="min-w-0">
-                <p className="text-[var(--text-muted)]">APR at cap</p>
-                <p className="font-semibold text-[var(--text-primary)]">{formatApr(selectedPool?.estimatedAprAtCap)}</p>
+                <p className="text-[var(--text-muted)]">Current estimated APR</p>
+                <p className="font-semibold text-[var(--text-primary)]">{formatApr(selectedPool?.currentApr)}</p>
               </div>
             </div>
 
