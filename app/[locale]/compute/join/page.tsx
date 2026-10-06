@@ -20,38 +20,67 @@ function ComputeInvitationContent() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (isLoading || !isAuthenticated || attempted.current || !token) return;
+    if (isLoading || !isAuthenticated || attempted.current) return;
     attempted.current = true;
     setState('activating');
-    void api.redeemComputeBetaInvitation(token).then((result) => {
-      if (!result.success) {
-        setError(result.error);
+
+    void (async () => {
+      let accessStatus: string | null = null;
+      let activationError: string | null = null;
+
+      if (token) {
+        const redeemResult = await api.redeemComputeBetaInvitation(token);
+        if (redeemResult.success) {
+          accessStatus = redeemResult.data.status;
+        } else {
+          activationError = redeemResult.error;
+          const accessResult = await api.getComputeBetaAccess();
+          if (accessResult.success) accessStatus = accessResult.data.status;
+        }
+      } else {
+        const accessResult = await api.getComputeBetaAccess();
+        if (accessResult.success) accessStatus = accessResult.data.status;
+        else activationError = accessResult.error;
+      }
+
+      // A one-time link may already have been redeemed in another tab or on a
+      // previous visit. In that case the access endpoint is authoritative and
+      // lets the user recover without seeing a misleading token error.
+      if (!accessStatus || !['onboarding', 'active'].includes(accessStatus)) {
+        setError(activationError ?? (token
+          ? 'This invitation is no longer active.'
+          : 'This invitation link is incomplete. Reopen the full link from your invitation email.'));
         setState('error');
         return;
       }
+
       setState('active');
       window.history.replaceState({}, '', window.location.pathname);
-    });
-  }, [isAuthenticated, isLoading, token]);
+      window.setTimeout(() => router.replace('/dashboard/compute'), 700);
+    })();
+  }, [isAuthenticated, isLoading, router, token]);
 
-  if (!token) {
-    return <InvitationCard state="error" error="This invitation link is incomplete." />;
-  }
   if (isLoading) return <InvitationCard state="activating" />;
   if (!isAuthenticated) {
     return (
-      <InvitationCard state="waiting">
+      <InvitationCard
+        state={token ? 'waiting' : 'error'}
+        error={token ? null : 'This invitation link is incomplete. Reopen the full link from your invitation email, or sign in to check whether access is already active.'}
+      >
         <p className="mt-4 text-sm leading-6 text-[var(--text-secondary)]">
-          Sign in with the exact email address that received the invitation. If you do not have a
-          Hatcher account yet, create one with that same address and verify it first.
+          {token
+            ? 'Sign in with the exact email address that received the invitation. If you do not have a Hatcher account yet, create one with that same address and verify it first.'
+            : 'If you already activated the beta, signing in will take you to the Compute dashboard.'}
         </p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-          <Link href={`/login?return=${encodeURIComponent(returnPath)}`} className="btn-primary inline-flex min-h-11 items-center justify-center px-5">
-            Sign in to activate
+          <Link href={`/login?return=${encodeURIComponent(token ? returnPath : '/dashboard/compute')}`} className="btn-primary inline-flex min-h-11 items-center justify-center px-5">
+            {token ? 'Sign in to activate' : 'Sign in to continue'}
           </Link>
-          <Link href={`/register?return=${encodeURIComponent(returnPath)}`} className="btn-secondary inline-flex min-h-11 items-center justify-center px-5">
-            Create account
-          </Link>
+          {token ? (
+            <Link href={`/register?return=${encodeURIComponent(returnPath)}`} className="btn-secondary inline-flex min-h-11 items-center justify-center px-5">
+              Create account
+            </Link>
+          ) : null}
         </div>
       </InvitationCard>
     );
@@ -59,9 +88,12 @@ function ComputeInvitationContent() {
   return (
     <InvitationCard state={state} error={error}>
       {state === 'active' ? (
-        <button type="button" className="btn-primary mt-6 min-h-11 px-5" onClick={() => router.replace('/dashboard/compute')}>
-          Open Compute dashboard
-        </button>
+        <div className="mt-6">
+          <button type="button" className="btn-primary min-h-11 px-5" onClick={() => router.replace('/dashboard/compute')}>
+            Open Compute dashboard
+          </button>
+          <p className="mt-3 text-xs text-[var(--text-muted)]">Opening your dashboard automatically…</p>
+        </div>
       ) : null}
     </InvitationCard>
   );

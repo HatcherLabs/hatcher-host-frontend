@@ -42,6 +42,14 @@ const sitemapSource = readFileSync(
   new URL('../app/sitemap.ts', import.meta.url),
   'utf8',
 );
+const desktopNavSource = readFileSync(
+  new URL('../components/marketing/v3/Nav.tsx', import.meta.url),
+  'utf8',
+);
+const mobileNavSource = readFileSync(
+  new URL('../components/marketing/v3/NavDrawer.tsx', import.meta.url),
+  'utf8',
+);
 
 describe('Hatcher Compute public page', () => {
   it('publishes an honest provider-alpha zero state', () => {
@@ -107,9 +115,15 @@ describe('Hatcher Compute public page', () => {
     expect(betaAdminSource).toContain('inviteAllAcceptedComputeBetaApplications');
     expect(betaAdminSource).toContain('revokeComputeBetaAccess');
     expect(betaJoinSource).toContain('redeemComputeBetaInvitation');
+    expect(betaJoinSource).toContain('getComputeBetaAccess');
+    expect(betaJoinSource).toContain("router.replace('/dashboard/compute')");
+    expect(betaJoinSource).toContain('signing in will take you to the Compute dashboard');
     expect(betaJoinSource).toMatch(/simulated payments/i);
     expect(betaDashboardSource).toContain('getComputeBetaAccess');
+    expect(betaDashboardSource).toContain('Your builder access is ready');
     expect(betaDashboardSource).toContain('downloadComputeNodePackage');
     expect(betaDashboardSource).toContain('SHA-256');
+    expect(desktopNavSource).toContain("href: '/dashboard/compute'");
+    expect(mobileNavSource).toContain('href="/dashboard/compute"');
   });
 });

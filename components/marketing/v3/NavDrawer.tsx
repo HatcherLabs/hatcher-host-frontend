@@ -16,6 +16,7 @@ import {
   GitBranch,
   LayoutDashboard,
   CalendarClock,
+  Cpu,
   ListChecks,
   MessageSquare,
   Newspaper,
@@ -186,6 +187,15 @@ export function NavDrawer({ open, onClose }: Props) {
                       <span>
                         <span className={styles.itemLabel}>Automation Center</span>
                         <span className={styles.itemSub}>Run recurring and event-triggered work</span>
+                      </span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/dashboard/compute" className={styles.item} onClick={onClose}>
+                      <span className={styles.glyph}><Cpu size={17} strokeWidth={1.8} aria-hidden /></span>
+                      <span>
+                        <span className={styles.itemLabel}>Compute network</span>
+                        <span className={styles.itemSub}>Builder API and provider nodes</span>
                       </span>
                     </Link>
                   </li>

@@ -63,12 +63,12 @@ export function Nav() {
     { key: 'missions', label: tMission('title'), sub: tMenu('sub_missionControl'), href: '/dashboard/missions', Icon: ListChecks },
     { key: 'approvals', label: 'Action approvals', sub: 'Review effectful agent actions', href: '/dashboard/approvals', Icon: ShieldCheck },
     { key: 'automations', label: 'Automation Center', sub: 'Run recurring and event-triggered work', href: '/dashboard/automations', Icon: CalendarClock },
+    { key: 'compute', label: 'Compute network', sub: 'Builder API and provider nodes', href: '/dashboard/compute', Icon: Cpu },
   ] satisfies ReadonlyArray<{ key: string; label: string; sub: string; href: string; Icon: LucideIcon }>), [tMenu, tMission, tNav]);
 
   const USER_MENU = useMemo(() => ([
     ...WORKSPACE_MENU,
     { key: 'analytics', label: tNav('analytics'), sub: tMenu('sub_analytics'), href: '/dashboard/analytics', Icon: BarChart3 },
-    { key: 'compute', label: 'Compute providers', sub: 'Nodes, jobs, and local earnings', href: '/dashboard/compute', Icon: Cpu },
     { key: 'create', label: tNav('create'), sub: tMenu('sub_create'), href: '/create', Icon: Plus },
     { key: 'billing', label: tNav('billing'), sub: tMenu('sub_billing'), href: '/dashboard/billing', Icon: CreditCard },
     { key: 'settings', label: tNav('settings'), sub: tMenu('sub_settings'), href: '/dashboard/settings', Icon: Settings },

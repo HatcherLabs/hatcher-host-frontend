@@ -269,6 +269,22 @@ export default function ComputeProviderDashboard() {
         </div>
         {error ? <div className={styles.error}>{error}</div> : null}
 
+        {access?.canBuild ? (
+          <section className={styles.panel} aria-labelledby="builder-ready-title">
+            <div className={styles.panelHeader}>
+              <div>
+                <h2 id="builder-ready-title">Your builder access is ready</h2>
+                <p>Create an API key, copy the Compute endpoint, then send your first OpenAI-compatible request.</p>
+              </div>
+              <ShieldCheck size={20} aria-hidden />
+            </div>
+            <div className={styles.actions}>
+              <Link className={styles.button} href="/dashboard/settings/api-keys">Create API key</Link>
+              <a className={styles.secondaryButton} href="#builder-api">View endpoint</a>
+            </div>
+          </section>
+        ) : null}
+
         <section className={styles.stats} aria-label="Compute provider statistics">
           <div className={styles.stat}><span>Online nodes</span><strong>{stats?.providers.online ?? 0}</strong><small>{stats?.providers.total ?? 0} enrolled</small></div>
           <div className={styles.stat}><span>Available VRAM</span><strong>{((stats?.availableVramMb ?? 0) / 1024).toFixed(1)} GB</strong><small>reported by online nodes</small></div>
@@ -278,7 +294,7 @@ export default function ComputeProviderDashboard() {
 
         <div className={styles.grid}>
           <div>
-            {access?.canBuild ? <section className={styles.panel}>
+            {access?.canBuild ? <section className={styles.panel} id="builder-api">
               <div className={styles.panelHeader}>
                 <div><h2>Builder API access</h2><p>Use your Hatcher API key with the OpenAI-compatible endpoint.</p></div>
                 <ShieldCheck size={20} aria-hidden />
