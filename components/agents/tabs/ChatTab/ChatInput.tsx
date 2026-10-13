@@ -39,6 +39,7 @@ const FRAMEWORK_COMMANDS: Record<string, Array<{ cmd: string; desc: string }>> =
 };
 
 interface ChatInputProps {
+  stoppedMessage?: string;
   agent: { name: string; status?: string; framework?: string };
   isAuthenticated: boolean;
   agentStarting?: boolean;
@@ -66,6 +67,7 @@ interface ChatInputProps {
 }
 
 export function ChatInput({
+  stoppedMessage,
   agent,
   isAuthenticated,
   agentStarting,
@@ -190,7 +192,7 @@ export function ChatInput({
       <div className="bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-lg px-4 py-3 text-center">
         <p className="text-sm text-[var(--text-muted)]">
           {t('agentNotRunning')}{' '}
-          <span className="text-[var(--text-secondary)]">{t('startFromOverview')}</span>
+          <span className="text-[var(--text-secondary)]">{stoppedMessage ?? t('startFromOverview')}</span>
         </p>
       </div>
     );

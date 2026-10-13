@@ -7,6 +7,7 @@ import { useRouter } from '@/i18n/routing';
 import { useAuth } from '@/lib/auth-context';
 import { api, clearToken } from '@/lib/api';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { GoogleSignIn } from '@/components/auth/GoogleSignIn';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/components/ui/ToastProvider';
 import { Link } from '@/i18n/routing';
@@ -196,6 +197,11 @@ export default function SettingsPage() {
   const { isAuthenticated, isLoading: authLoading, user, logout, refreshUser } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<TabId>('profile');
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('tab') === 'security') {
+      setActiveTab('security');
+    }
+  }, []);
 
   // ── Profile state ─────────────────────────────────────────
   const [username, setUsername] = useState('');
@@ -708,6 +714,11 @@ export default function SettingsPage() {
                     ════════════════════════════════════════ */}
                 {activeTab === 'security' && (
                   <>
+                    <GoogleSignIn
+                      intent="link"
+                      returnPath="/dashboard/settings?tab=security"
+                      showUnavailable={process.env.NEXT_PUBLIC_SITE_URL?.startsWith('http://localhost')}
+                    />
                     {/* Change Password */}
                     <Section title={t('security.changePasswordTitle')} icon={<Lock size={16} />}>
                       <div className="space-y-4">

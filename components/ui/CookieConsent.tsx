@@ -114,7 +114,7 @@ export function CookieConsent() {
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => setExpanded(true)}
-                className="text-[12px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors underline underline-offset-2 px-2"
+                className="text-[12px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors underline underline-offset-2 px-2"
               >
                 Customize
               </button>

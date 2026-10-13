@@ -549,7 +549,7 @@
       "recoveryRegister": "Back to sign up",
       "loadingHeading": "Verifying your email...",
       "successHeading": "Email Verified!",
-      "successBody": "Your account is now active. You can start creating agents.",
+      "successBody": "Your email is verified. Sign in to continue where you left off.",
       "successCta": "Go to Dashboard",
       "errorHeading": "Verification Failed",
       "errorBody": "The verification link is invalid or has expired.",

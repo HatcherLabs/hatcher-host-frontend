@@ -14,7 +14,7 @@ describe('Zentemis regression fixes', () => {
 
   it('keeps chat connections active and accepts recovered replies', () => {
     expect(source('hooks/useWebSocketChat.ts')).toContain("JSON.stringify({ type: 'ping' })");
-    expect(source('app/[locale]/dashboard/agent/[id]/page.tsx')).toContain('recoveredFromDisconnect');
+    expect(source('components/agents/AgentWorkspace.tsx')).toContain('recoveredFromDisconnect');
   });
 
   it('sends xterm binary protocol data separately from typed input', () => {

@@ -48,7 +48,7 @@ function dataUrlToBase64(dataUrl: string): string {
   return commaIndex >= 0 ? dataUrl.slice(commaIndex + 1) : dataUrl;
 }
 
-export function ChatTab() {
+export function ChatTab({ compact = false }: { compact?: boolean }) {
   const ctx = useAgentContext();
   const {
     agent,
@@ -69,6 +69,7 @@ export function ChatTab() {
   const speakingMsgIdRef = useRef<string | null>(null);
   const lastAutoSpokenIdRef = useRef<string | null>(null);
   const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
+  const sessionsDialog = useRef<HTMLDialogElement>(null);
   const [showThinking, setShowThinking] = useState(DEFAULT_CHAT_DISPLAY_PREFERENCES.showThinking);
   const [showToolCalls, setShowToolCalls] = useState(DEFAULT_CHAT_DISPLAY_PREFERENCES.showToolCalls);
 
@@ -414,6 +415,7 @@ export function ChatTab() {
 
   useEffect(() => {
     if (!mobilePanelOpen) return;
+    sessionsDialog.current?.showModal();
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
@@ -448,13 +450,14 @@ export function ChatTab() {
     <motion.div
       key="tab-chat"
       data-testid="agent-chat-root"
-      className="flex h-[calc(100dvh-260px)] max-h-[calc(100dvh-260px)] min-h-0 w-full min-w-0 flex-col md:h-[calc(100dvh-205px)] md:max-h-none md:min-h-[500px] 2xl:h-[calc(100dvh-185px)] 2xl:min-h-[620px]"
+      className={compact ? "flex h-full min-h-0 w-full min-w-0 flex-col" : "flex h-[calc(100dvh-260px)] max-h-[calc(100dvh-260px)] min-h-0 w-full min-w-0 flex-col md:h-[calc(100dvh-205px)] md:max-h-none md:min-h-[500px] 2xl:h-[calc(100dvh-185px)] 2xl:min-h-[620px]"}
       variants={tabContentVariants}
       initial="enter"
       animate="center"
       exit="exit"
     >
       <ChatHeader
+        compact={compact}
         simple={ctx.viewMode === 'easy'}
         agent={agent}
         wsConnected={wsConnected}
@@ -480,12 +483,12 @@ export function ChatTab() {
       />
 
       <div className="flex min-h-0 flex-1 flex-col gap-3 md:flex-row lg:gap-4">
-        <div className="hidden min-h-0 md:flex">
+        {!compact && <div className="hidden min-h-0 md:flex">
           <AgentPresenceRail />
-        </div>
+        </div>}
 
         {mobilePanelOpen && (
-          <div className="fixed inset-0 z-[11000] md:hidden" role="dialog" aria-modal="true" aria-label="Chat sessions">
+          <dialog ref={sessionsDialog} className={`fixed inset-0 m-0 h-dvh max-h-none w-screen max-w-none border-0 bg-transparent p-0 text-[var(--text-primary)] ${compact ? "" : "md:hidden"}`} aria-label="Chat sessions" onCancel={() => setMobilePanelOpen(false)}>
             <button
               type="button"
               className="absolute inset-0 bg-black/65"
@@ -510,7 +513,7 @@ export function ChatTab() {
                 onSessionSelect={() => setMobilePanelOpen(false)}
               />
             </div>
-          </div>
+          </dialog>
         )}
 
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
@@ -559,6 +562,7 @@ export function ChatTab() {
           />
 
           <ChatInput
+            stoppedMessage={compact ? "Start your agent using the button above to send a message." : undefined}
             agent={agent}
             isAuthenticated={isAuthenticated}
             agentStarting={ctx.saving || ['starting', 'restarting'].includes(agent.status)}

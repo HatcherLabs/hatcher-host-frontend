@@ -71,6 +71,7 @@ function withNextIntlConfig(config) {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  distDir: process.env.HATCHER_BUILD_DIR || '.next',
   compress: true,
   poweredByHeader: false,
   cacheHandler: resolve(__dirname, 'cache-handler.cjs'),

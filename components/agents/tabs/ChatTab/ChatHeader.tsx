@@ -9,6 +9,7 @@ import { FRAMEWORK_BADGE } from '../../AgentContext';
 
 interface ChatHeaderProps {
   simple?: boolean;
+  compact?: boolean;
   agent: { framework: AgentFramework };
   wsConnected: boolean;
   hasVoiceSupport: boolean;
@@ -30,6 +31,7 @@ interface ChatHeaderProps {
 
 export function ChatHeader({
   simple = false,
+  compact = false,
   agent,
   wsConnected,
   hasVoiceSupport,
@@ -58,7 +60,7 @@ export function ChatHeader({
           type="button"
           onClick={onOpenMobilePanel}
           data-testid="agent-chat-open-sessions"
-          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-[var(--border-default)] text-[var(--text-muted)] transition-colors hover:border-[var(--color-accent)]/40 hover:text-[var(--color-accent)] md:hidden"
+          className={`inline-flex h-7 w-7 items-center justify-center rounded-md border border-[var(--border-default)] text-[var(--text-muted)] transition-colors hover:border-[var(--color-accent)]/40 hover:text-[var(--color-accent)] ${compact ? "" : "md:hidden"}`}
           aria-label="Open chats sidebar"
           title="Chats"
         >
@@ -68,13 +70,13 @@ export function ChatHeader({
           <Bot size={10} />
           {frameworkMeta?.name ?? agent.framework}
         </span>}
-        {wsConnected && (
+        {wsConnected && !compact && (
           <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border border-[var(--status-live-border)] bg-[var(--status-live-bg)] text-[var(--status-live)] font-medium" title="Real-time streaming via WebSocket">
             <span className="w-1.5 h-1.5 rounded-full bg-[var(--status-live)] animate-pulse" />
             {t('live')}
           </span>
         )}
-        {!simple && (modelSwitcher ?? (<button
+        {(!simple || compact) && (modelSwitcher ?? (<button
           type="button"
           onClick={onOpenModelSettings}
           className="hidden max-w-[260px] items-center gap-1 truncate rounded-full border border-[var(--border-default)] bg-[var(--bg-elevated)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-secondary)] transition-colors hover:border-[var(--color-accent)]/40 hover:text-[var(--text-primary)] sm:inline-flex"

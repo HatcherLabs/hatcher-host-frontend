@@ -74,7 +74,7 @@ describe('retired integrations', () => {
     expect(existsSync(join(root, 'components', 'agents', 'tabs', 'WorkflowsTab.tsx'))).toBe(false);
     expect(read('lib/api/methods.ts')).not.toMatch(/outcome-packs|AgentWorkflows|createAgentWorkflow/i);
     expect(read('components/agents/AgentContext/types.ts')).not.toMatch(/['"]workflows['"]/);
-    expect(read('app/[locale]/dashboard/agent/[id]/page.tsx')).toMatch(/SchedulesTab/);
+    expect(read('components/agents/AgentWorkspace.tsx')).toMatch(/SchedulesTab/);
     expect(existsSync(join(root, 'components', 'agents', 'tabs', 'SchedulesTab.tsx'))).toBe(true);
   });
 

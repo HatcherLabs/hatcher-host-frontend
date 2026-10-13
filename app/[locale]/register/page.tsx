@@ -1,5 +1,6 @@
 'use client';
 
+import { rememberAuthReturn } from '@/lib/auth-return';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { Link, useRouter } from '@/i18n/routing';
 import { useSearchParams } from 'next/navigation';
@@ -10,6 +11,7 @@ import { sanitizeLocalReturnPath } from '@/lib/safe-redirect';
 import { REFERRAL_REWARD_LABEL } from '@/lib/referral-rewards';
 import { Check, X, Gift, Loader2 } from 'lucide-react';
 import { AuthShell } from '@/components/auth/v3/AuthShell';
+import { GoogleSignIn } from '@/components/auth/GoogleSignIn';
 
 type FieldStatus =
   | { state: 'idle' }
@@ -152,7 +154,8 @@ export default function RegisterPage() {
       await register(email.trim().toLowerCase(), username, password, refCode || undefined);
       // The accepted response also covers private email conflicts. It does
       // not prove a new account was created or an email was delivered.
-      router.push('/verify-email');
+      rememberAuthReturn(returnPath);
+      router.push(`/verify-email?return=${encodeURIComponent(returnPath)}`);
     } catch {
       // register() sets the context error which we display via `displayError`.
       // Stay on the form so the user can fix whatever the backend rejected.
@@ -190,6 +193,7 @@ export default function RegisterPage() {
             </div>
           )}
 
+          <GoogleSignIn returnPath={returnPath} showUnavailable={process.env.NEXT_PUBLIC_SITE_URL?.startsWith('http://localhost')} />
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">

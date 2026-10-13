@@ -29,7 +29,7 @@ import {
 import type { Tab } from './AgentContext';
 import { STATUS_STYLES, useAgentContext } from './AgentContext';
 import type { Agent } from '@/lib/api';
-import { Link } from '@/i18n/routing';
+import { Link, usePathname } from '@/i18n/routing';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { AgentStatusPill } from '@/components/ui/AgentStatusPill';
@@ -135,6 +135,7 @@ function AgentSwitcher({
   activeTab: Tab;
   variant: 'desktop' | 'mobile';
 }) {
+  const simpleEntry = usePathname().startsWith('/agents/');
   const tSidebar = useTranslations('dashboard.agentDetail.sidebar');
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -215,7 +216,7 @@ function AgentSwitcher({
             return (
               <Link
                 key={item.id}
-                href={agentDashboardHref(item.id, activeTab)}
+                href={simpleEntry ? '/agents/' + encodeURIComponent(item.id) + '?tab=' + activeTab + '&view=easy' : agentDashboardHref(item.id, activeTab)}
                 role="menuitem"
                 aria-current={isCurrent ? 'page' : undefined}
                 onClick={() => setOpen(false)}
@@ -276,6 +277,7 @@ export const AgentSidebar = memo(function AgentSidebar({ agent, agents, agentsLo
   const ts = useTranslations('simpleExperience');
   const tSidebarGroups = useTranslations('dashboard.agentDetail.sidebarGroups');
   const tNav = useTranslations('dashboard.agentDetail.nav');
+  const simpleEntry = usePathname().startsWith('/agents/');
   const tSidebar = useTranslations('dashboard.agentDetail.sidebar');
   const easyLabels: Partial<Record<Tab, string>> = {
     overview: ts('overview'), mail: ts('mail'), robinhood: ts('robinhood'), integrations: ts('connections'),
@@ -319,7 +321,7 @@ export const AgentSidebar = memo(function AgentSidebar({ agent, agents, agentsLo
       {/* Identity strip */}
       <div className="border-b border-[var(--border-default)] p-3">
         <Link
-          href="/dashboard/agents"
+          href={simpleEntry ? '/agents' : '/dashboard/agents'}
           className="mb-3 inline-flex items-center gap-1.5 rounded-lg px-1 py-1 text-xs font-medium text-[var(--text-muted)] transition-colors hover:text-[var(--accent)]"
         >
           <ChevronLeft size={12} />
@@ -356,7 +358,7 @@ export const AgentSidebar = memo(function AgentSidebar({ agent, agents, agentsLo
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <span
                   className="rounded-lg border px-2 py-0.5 text-[11px] font-semibold"
-                  style={{ color: frameworkColor, borderColor: frameworkColor + '70', background: frameworkColor + '18' }}
+                  style={{ color: 'var(--text-secondary)', borderColor: frameworkColor + '70', background: frameworkColor + '18' }}
                 >
                   {agent.framework}
                 </span>
@@ -428,7 +430,7 @@ export const AgentSidebar = memo(function AgentSidebar({ agent, agents, agentsLo
       <div className="sticky top-[var(--app-nav-height,64px)] z-30 border-b border-[var(--border-default)] bg-[var(--bg-base)] shadow-[var(--shadow-soft)] backdrop-blur-md xl:hidden">
         <div className="flex items-center gap-2 border-b border-[var(--border-line)] px-3 py-2">
           <Link
-            href="/dashboard/agents"
+            href={simpleEntry ? '/agents' : '/dashboard/agents'}
             className="flex-shrink-0 text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors"
             aria-label={tNav('allAgents')}
           >

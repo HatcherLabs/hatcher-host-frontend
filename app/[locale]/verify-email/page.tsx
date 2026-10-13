@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useRef, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
-import { setToken } from '@/lib/api/core';
+import { readAuthReturn } from '@/lib/auth-return';
+import { loginHrefForReturn, sanitizeLocalReturnPath } from '@/lib/safe-redirect';
 import { cleanSensitiveAuthTokenUrl, tokenFromSensitiveAuthHash } from '@/lib/reset-password-token-url';
 import { CheckCircle2, XCircle, Loader2, Mail } from 'lucide-react';
 import { AuthShell } from '@/components/auth/v3/AuthShell';
@@ -14,11 +15,15 @@ import { VerificationRecovery } from '@/components/auth/VerificationRecovery';
 function VerifyEmailInner() {
   const searchParams = useSearchParams();
   const t = useTranslations('auth.verifyEmail');
+  const loginText = useTranslations('auth.resetPassword');
+  const verification = useRef<ReturnType<typeof api.verifyEmail> | null>(null);
+  const [returnPath, setReturnPath] = useState('/dashboard');
   const queryToken = searchParams.get('token');
   const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'no-token'>('loading');
   const [message, setMessage] = useState('');
 
   useEffect(() => {
+    setReturnPath(sanitizeLocalReturnPath(searchParams.get('return'), readAuthReturn()));
     const token = queryToken ?? tokenFromSensitiveAuthHash(window.location.hash);
 
     if (token) {
@@ -29,24 +34,28 @@ function VerifyEmailInner() {
       );
     }
 
-    if (!token) {
+    if (!token && !verification.current) {
       setStatus('no-token');
       return;
     }
 
-    api.verifyEmail(token).then((res) => {
+    if (!verification.current) verification.current = api.verifyEmail(token!);
+    let active = true;
+    verification.current.then((res) => {
+      if (!active) return;
       if (res.success) {
-        if (res.data?.accessToken) setToken(res.data.accessToken);
         setStatus('success');
       } else {
         setStatus('error');
         setMessage(res.error ?? t('errorBody'));
       }
     }).catch(() => {
+      if (!active) return;
       setStatus('error');
       setMessage(t('errorBody'));
     });
-  }, [queryToken, t]);
+    return () => { active = false; };
+  }, [queryToken, t, searchParams]);
 
   if (status === 'loading') {
     return (
@@ -67,10 +76,10 @@ function VerifyEmailInner() {
           </div>
         </div>
         <Link
-          href="/dashboard"
+          href={loginHrefForReturn(returnPath)}
           className="inline-flex items-center justify-center gap-2 w-full h-10 rounded-lg text-sm font-medium text-[var(--bg-base)] bg-[var(--accent)] hover:bg-[var(--accent-hover)] transition-colors"
         >
-          {t('successCta')}
+          {loginText('successCta')}
         </Link>
       </AuthShell>
     );
