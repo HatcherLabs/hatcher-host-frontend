@@ -17,6 +17,7 @@ import type { UserTierKey, AddonKey } from '@hatcher/shared';
 import { usePaymentDrivers } from '@/lib/payment-drivers';
 import { ConfirmPaymentModal } from '@/components/payments/ConfirmPaymentModal';
 import { ChatPlansOverview } from '@/components/chat/ChatPlansOverview';
+import { CHAT_PLAN_DETAILS } from '@/lib/chat-plan-details';
 import { formatFeatureKey } from '@/lib/feature-labels';
 import {
   CAPACITY_ADDONS,
@@ -124,7 +125,8 @@ type BillingAddonKey = Exclude<AddonKey, RetiredAddonKey>
   | 'addon.ai_credits.50000'
   | 'addon.boost_s'
   | 'addon.boost_l'
-  | 'addon.storage_plus';
+  | 'addon.storage_plus'
+  | 'addon.chat.basic' | 'addon.chat.pro' | 'addon.chat.max';
 
 type BillingAddon = {
   key: BillingAddonKey;
@@ -220,6 +222,14 @@ const VISIBLE_ADDONS: BillingAddon[] = [
     },
   ),
   ...AI_CREDIT_ADDONS,
+  ...CHAT_PLAN_DETAILS.map(plan => ({
+    key: `addon.chat.${plan.id}` as BillingAddonKey,
+    name: plan.name,
+    description: 'Web Chat only. 30 days of access; weekly allowance resets. Does not include agents.',
+    usdPrice: plan.priceCents / 100,
+    type: 'one_time' as const,
+    perAgent: false,
+  })),
   ...CAPACITY_BILLING_ADDONS,
 ];
 
@@ -294,11 +304,14 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
           exit={{ opacity: 0, scale: 0.95, y: 10 }}
           transition={{ duration: 0.2 }}
           className="card-solid w-full max-w-md mx-4 max-h-[calc(100vh-2rem)] overflow-y-auto"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="payment-method-title"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
-            <h3 className="font-semibold text-[var(--text-primary)]">{requiresAgent ? t('selectAgent') : t('choosePayment')}</h3>
-            <button onClick={onClose} className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
+            <h3 id="payment-method-title" className="font-semibold text-[var(--text-primary)]">{requiresAgent ? t('selectAgent') : t('choosePayment')}</h3>
+            <button onClick={onClose} aria-label="Close payment methods" className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -463,6 +476,7 @@ export default function BillingPage() {
     typeof value === 'number' && value > 0 ? value.toLocaleString() : '0';
   const { isAuthenticated, isLoading: authLoading, user } = useAuth();
   const searchParams = useSearchParams();
+  const openedPurchase = useRef<string | null>(null);
   const solanaWallet = useWallet();
   const { connection: solanaConnection } = useConnection();
   const {
@@ -954,6 +968,24 @@ export default function BillingPage() {
     });
   };
 
+
+  useEffect(() => {
+    if (loading || !isAuthenticated) return;
+    const tierKey = searchParams.get('tier');
+    const addonKey = searchParams.get('addon');
+    const selection = `${tierKey ?? ''}:${addonKey ?? ''}`;
+    if (openedPurchase.current === selection) return;
+    if (tierKey && ['starter', 'pro', 'business', 'founding_member'].includes(tierKey)) {
+      const tier = TIERS[tierKey as UserTierKey];
+      openedPurchase.current = selection;
+      setPaymentModal({ isOpen: true, type: 'subscription', tierKey: tierKey as UserTierKey, title: `Choose payment for ${tier.name}`, price: tier.usdPrice });
+    } else if (addonKey) {
+      const addon = findBillingAddon(addonKey);
+      if (!addon || addon.perAgent) return;
+      openedPurchase.current = selection;
+      setPaymentModal({ isOpen: true, type: 'addon', addonKey: addon.key, title: addon.key.startsWith('addon.chat.') ? `${addon.name} · Web Chat only, no agents` : addon.name, price: addon.usdPrice });
+    }
+  }, [loading, isAuthenticated, searchParams]);
 
   // Lifetime tiers (founding_member) are always flat-priced — ignore the
   // monthly/annual toggle for them, and also skip sending billingPeriod
