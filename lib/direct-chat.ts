@@ -40,6 +40,7 @@ export interface ChatCreateTool {
   configured: boolean;
 }
 export interface ChatAccount {
+  agentAccess?: boolean;
   guestAllowance?: {
     remaining: number;
     remainingUsd: number;

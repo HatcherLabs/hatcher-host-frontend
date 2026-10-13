@@ -64,7 +64,7 @@ for (const width of [1440, 390]) {
     await page.getByRole('button', { name: 'Help me structure my next project', exact: true }).click();
     await expect(page.getByText('Live market data from CoinGecko.')).toBeVisible();
     await page.getByRole('button', { name: /% used/ }).click();
-    await expect(page.getByRole('heading', { name: 'Choose your Chat plan' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Plans & credits' })).toBeVisible();
     await expect(page.getByText('$8.93', { exact: false })).toBeVisible();
     expect(errors).toEqual([]);
   });

@@ -12,6 +12,9 @@
 
 import { TIERS, ADDONS, getTier, getAddon } from '@hatcher/shared';
 import type { AddonKey, UserTierKey } from '@hatcher/shared';
+import { CHAT_PLAN_DETAILS } from './chat-plan-details';
+
+const chatPlanForKey = (key: string) => CHAT_PLAN_DETAILS.find(plan => key === `chat.${plan.id}` || key === `addon.chat.${plan.id}`);
 
 const AI_CREDITS_BY_TIER: Record<UserTierKey, number> = {
   free: 500,
@@ -70,6 +73,8 @@ const AI_CREDIT_ADDONS: Record<string, { name: string; description: string }> = 
  */
 export function formatFeatureKey(key: string | null | undefined): string {
   if (!key) return '';
+  const chatPlan = chatPlanForKey(key);
+  if (chatPlan) return chatPlan.name;
 
   // Tier subscriptions
   if (key.startsWith('tier.')) {
@@ -98,6 +103,7 @@ export function formatFeatureKey(key: string | null | undefined): string {
  *  bodies and tooltips. Returns an empty string when no blurb fits. */
 export function describeFeatureKey(key: string | null | undefined): string {
   if (!key) return '';
+  if (chatPlanForKey(key)) return '30 days of Web Chat. Agents require a separate Agent Plan.';
   if (key.startsWith('tier.')) {
     const tierKey = key.slice('tier.'.length) as UserTierKey;
     if (tierKey in TIERS) {
@@ -117,6 +123,7 @@ export function describeFeatureKey(key: string | null | undefined): string {
 /** Typed check — true when `key` references a known tier/addon. */
 export function isKnownFeatureKey(key: string | null | undefined): boolean {
   if (!key) return false;
+  if (chatPlanForKey(key)) return true;
   if (key.startsWith('tier.')) return (key.slice('tier.'.length) as UserTierKey) in TIERS;
   if ((key as UserTierKey) in TIERS) return true;
   if (key in AI_CREDIT_ADDONS) return true;

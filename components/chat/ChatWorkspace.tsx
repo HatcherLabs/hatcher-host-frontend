@@ -49,6 +49,7 @@ import {
 import { RichMarkdown } from "@/components/agents/tabs/ChatTab/ArtifactRenderer";
 import { HatcherMark } from "@/components/brand/HatcherMark";
 import styles from "./ChatWorkspace.module.css";
+import { ChatPlanCatalog } from "./ChatPlanCatalog";
 
 const AgentWorkspace = dynamic(
   () => import("@/components/agents/AgentWorkspace"),
@@ -72,7 +73,9 @@ export default function ChatWorkspace({
   agentsEnabled?: boolean;
 }) {
   const searchParams = useSearchParams();
-  const agentId = agentsEnabled && !guest ? searchParams.get("agent") : null;
+  const [account, setAccount] = useState<ChatAccount | null>(null);
+  const canUseAgents = !guest && account !== null && account.agentAccess !== false;
+  const agentId = agentsEnabled && canUseAgents ? searchParams.get("agent") : null;
   const [agents, setAgents] = useState<Agent[]>([]);
   const [agentsLoading, setAgentsLoading] = useState(false);
   const [agentsError, setAgentsError] = useState("");
@@ -84,7 +87,7 @@ export default function ChatWorkspace({
   }, []);
   const agentList = useRef<HTMLElement>(null);
   const loadAgents = useCallback(async () => {
-    if (guest || !agentsEnabled) return;
+    if (!canUseAgents || !agentsEnabled) return;
     const sequence = ++agentsRequest.current;
     setAgentsLoading(true);
     setAgentsError("");
@@ -101,7 +104,7 @@ export default function ChatWorkspace({
     } finally {
       if (sequence === agentsRequest.current) setAgentsLoading(false);
     }
-  }, [guest, agentsEnabled]);
+  }, [canUseAgents, agentsEnabled]);
   useEffect(() => {
     void loadAgents();
     const reload = () => void loadAgents();
@@ -161,7 +164,6 @@ export default function ChatWorkspace({
   };
   const locale = useLocale();
   const { resolvedTheme, setTheme } = useTheme();
-  const [account, setAccount] = useState<ChatAccount | null>(null);
   const [models, setModels] = useState<ChatModel[]>([]);
   const [historyQuery, setHistoryQuery] = useState("");
   const messageInput = useRef<HTMLTextAreaElement>(null);
@@ -176,8 +178,7 @@ export default function ChatWorkspace({
   const [sidebar, setSidebar] = useState(false);
   const plansDialog = useRef<HTMLDialogElement>(null);
   const [showPlans, setShowPlans] = useState(false);
-  const [buying, setBuying] = useState(false);
-  const [checkoutError, setCheckoutError] = useState("");
+  const [planCategory, setPlanCategory] = useState<"chat" | "agents" | "credits">("chat");
   const [copied, setCopied] = useState("");
   const [createMode, setCreateMode] = useState<ChatCreateKind | "chart" | null>(
     null,
@@ -469,21 +470,6 @@ export default function ChatWorkspace({
       setBusy(false);
     }
   };
-  const buy = async (planId: string) => {
-    setBuying(true);
-    setCheckoutError("");
-    try {
-      const returnUrl = `${window.location.origin}${window.location.pathname}`;
-      const result = await chatRequest<{ url: string }>("/checkout", {
-        method: "POST",
-        body: JSON.stringify({ planId, returnUrl }),
-      });
-      window.location.assign(result.url);
-    } catch (e) {
-      setCheckoutError((e as Error).message);
-      setBuying(false);
-    }
-  };
   const budget = account?.budget;
   const used = budget
     ? Math.min(
@@ -568,7 +554,7 @@ export default function ChatWorkspace({
             >
               <div className={styles.sectionHeading}>
                 <h2>My agents</h2>
-                {!guest && (
+                {canUseAgents && (
                   <button
                     type="button"
                     aria-label="Create agent"
@@ -597,6 +583,11 @@ export default function ChatWorkspace({
                   >
                     Log in to your agents
                   </Link>
+                </p>
+              ) : !canUseAgents ? (
+                <p className={styles.historyHint}>
+                  {account ? "Your Web Chat plan does not include agents." : "Checking agent access…"}
+                  {account && <><br /><button type="button" className={styles.inlinePlanLink} onClick={() => { setPlanCategory("agents"); setShowPlans(true); }}>Choose an Agent Plan</button></>}
                 </p>
               ) : (
                 <>
@@ -1212,12 +1203,18 @@ export default function ChatWorkspace({
           }}
         >
           <div className={styles.plansHeading}>
-            <h2 id="chat-plans-heading">Choose your Chat plan</h2>
+            <h2 id="chat-plans-heading">Plans &amp; credits</h2>
             <button type="button" aria-label="Close plans" onClick={closePlans}>
               <X size={20} />
             </button>
           </div>
-          <p>30 days of access. Weekly usage resets. No automatic renewal.</p>
+          <div className={styles.planTabs} role="group" aria-label="Plan category">
+            {([ ["chat", "Web Chat"], ["agents", "Agent Plans"], ["credits", "AI Credits"] ] as const).map(([id, label]) =>
+              <button key={id} type="button" aria-pressed={planCategory === id} onClick={() => setPlanCategory(id)}>{label}</button>
+            )}
+          </div>
+          {planCategory !== "chat" ? <ChatPlanCatalog kind={planCategory} guest={guest} onNavigate={rememberDraft} /> : <>
+          <p className={styles.planDescription}>For Web Chat only. 30 days of access, weekly usage resets and no automatic renewal. Agent hosting is included in Agent Plans.</p>
           {!account?.plans.length && (
             <p role="status">
               {loading
@@ -1226,7 +1223,6 @@ export default function ChatWorkspace({
               <Link href="/pricing">View all pricing</Link>
             </p>
           )}
-          {checkoutError && <p role="alert" className={styles.error}>{checkoutError}</p>}
           <div className={styles.planGrid}>
             {account?.plans.map((plan) => (
               <article key={plan.id}>
@@ -1261,19 +1257,15 @@ export default function ChatWorkspace({
                 {guest ? (
                   <Link
                     className={styles.planCta}
-                    href="/register?return=%2F%3Fplans%3D1"
+                    href={`/register?return=${encodeURIComponent(`/dashboard/billing?addon=addon.chat.${plan.id}`)}`}
                     onClick={rememberDraft}
                   >
                     Create account to choose
                   </Link>
                 ) : (
-                  <button disabled={buying} onClick={() => void buy(plan.id)}>
-                    {buying
-                      ? "Opening checkout…"
-                      : budget
-                        ? "Extend access"
-                        : "Get started"}
-                  </button>
+                  <Link className={styles.planCta} href={`/dashboard/billing?addon=addon.chat.${plan.id}`} onClick={rememberDraft}>
+                    {budget ? "Extend access · choose payment" : "Choose payment method"}
+                  </Link>
                 )}
               </article>
             ))}
@@ -1290,6 +1282,8 @@ export default function ChatWorkspace({
               .
             </p>
           ))}
+          <p className={styles.paymentMethods}>Pay by card, SOL, USDC, HATCHER, ANSEM or CryptoNow. Web Chat plans do not include agent creation, hosting or agent chat.</p>
+          </>}
           <div className={styles.planFooter}>
             <p>
               Already have AI Credits? Use your account balance without a Chat
@@ -1305,7 +1299,7 @@ export default function ChatWorkspace({
           </div>
         </dialog>
       )}
-      {showCreateAgent && !guest && (
+      {showCreateAgent && canUseAgents && (
         <QuickAgentCreate
           onClose={() => setShowCreateAgent(false)}
           onCreated={(agent) => {

@@ -543,6 +543,12 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
 }
+.planTabs { display: flex; gap: 6px; margin: 18px 0; padding: 4px; border: 1px solid var(--border-default); border-radius: 10px; }
+.planTabs button { flex: 1; padding: 10px 8px; border-radius: 7px; font-size: 13px; }
+.planTabs button[aria-pressed="true"] { background: var(--bg-hover); color: var(--text-primary); font-weight: 600; }
+.planDescription, .paymentMethods { margin: 12px 0 18px; font-size: 13px; line-height: 1.7; color: var(--text-muted); }
+.paymentMethods { padding: 12px; border: 1px solid var(--border-default); border-radius: 8px; color: var(--text-secondary); }
+.inlinePlanLink { text-decoration: underline; color: var(--color-accent); }
 .planGrid article {
   border: 1px solid var(--border-default);
   border-radius: 12px;
