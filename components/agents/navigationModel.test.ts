@@ -27,8 +27,10 @@ describe('agent navigation model', () => {
     expect(EASY_AGENT_TABS).toEqual([
       'overview',
       'chat',
+      'config',
       'mail',
       'integrations',
+      'plugins',
       'robinhood',
     ]);
   });

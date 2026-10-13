@@ -549,7 +549,7 @@
       "recoveryRegister": "Înapoi la înregistrare",
       "loadingHeading": "Se verifică email-ul...",
       "successHeading": "Email verificat!",
-      "successBody": "Contul tău este acum activ. Poți începe să creezi agenți.",
+      "successBody": "Adresa de email este confirmată. Autentifică-te pentru a continua de unde ai rămas.",
       "successCta": "Mergi la panou",
       "errorHeading": "Verificare eșuată",
       "errorBody": "Link-ul de verificare este invalid sau a expirat.",

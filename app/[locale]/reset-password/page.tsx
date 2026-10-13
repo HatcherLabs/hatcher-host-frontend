@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useRef, useState, Suspense } from 'react';
 import { Link } from '@/i18n/routing';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -23,6 +23,7 @@ function ResetForm() {
   const searchParams = useSearchParams();
   const t = useTranslations('auth.resetPassword');
   const queryToken = searchParams.get('token');
+  const capturedToken = useRef<string | null>(queryToken);
 
   const [token, setToken] = useState<string | null>(queryToken);
   const [tokenSourceChecked, setTokenSourceChecked] = useState(false);
@@ -33,7 +34,8 @@ function ResetForm() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const nextToken = queryToken ?? tokenFromResetPasswordHash(window.location.hash);
+    const nextToken = queryToken ?? tokenFromResetPasswordHash(window.location.hash) ?? capturedToken.current;
+    capturedToken.current = nextToken;
     setToken(nextToken);
     setTokenSourceChecked(true);
 

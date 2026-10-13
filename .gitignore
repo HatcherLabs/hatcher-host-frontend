@@ -5,6 +5,7 @@ node_modules/
 
 # Build outputs
 .next/
+.next-release-check/
 dist/
 build/
 *.tsbuildinfo

@@ -123,6 +123,7 @@ export function AgentPresenceRail({
     moveChatSession,
     deletingChatSessionId,
     refreshChatSessions,
+    viewMode,
   } = useAgentContext();
   const [sessionsOpen, setSessionsOpen] = useState(true);
   const [refreshingSessions, setRefreshingSessions] = useState(false);
@@ -499,14 +500,14 @@ export function AgentPresenceRail({
         </div>
       </div>
 
-      <div className="shrink-0 border-t border-[var(--border-default)] px-3 py-3 md:px-4">
+      {viewMode === "advanced" && <div className="shrink-0 border-t border-[var(--border-default)] px-3 py-3 md:px-4">
         <AgentEyesLiveCard
           agentId={agent.id}
           agentName={agent.name}
           framework={agent.framework}
           status={agent.status}
         />
-      </div>
+      </div>}
     </aside>
   );
 }

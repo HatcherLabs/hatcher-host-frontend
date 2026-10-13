@@ -50,7 +50,7 @@ describe('agent workspace discovery', () => {
       'utf8',
     );
     const agentPage = readFileSync(
-      resolve(process.cwd(), 'app/[locale]/dashboard/agent/[id]/page.tsx'),
+      resolve(process.cwd(), 'components/agents/AgentWorkspace.tsx'),
       'utf8',
     );
     const workspaceNavigation = readFileSync(

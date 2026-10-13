@@ -289,7 +289,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   <ToastProvider>
                     <LayoutShell>{children}</LayoutShell>
                     <CommandPalette />
-                    <QwertiWidgetGate />
+                    {process.env.HATCHER_CHAT_ENTRY_ENABLED !== 'true' && <QwertiWidgetGate />}
                   </ToastProvider>
                 </WalletProvider>
               </AuthProvider>
