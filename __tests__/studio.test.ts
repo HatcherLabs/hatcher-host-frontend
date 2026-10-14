@@ -19,7 +19,7 @@ describe("Studio saved media", () => {
         "![A](https://cdn.example/video.mp4) ![B](https://cdn.example/video.mp4) ![C](data:image/png;base64,YQ==) ![X](javascript:alert) ![Y](data:text/html;base64,YQ==) ![Z](http://example.com/x.png)",
       ),
     ).toEqual(["https://cdn.example/video.mp4", "data:image/png;base64,YQ=="]);
-    expect(studioMediaUrls("Creating video…")).toEqual([]);
+    expect(studioMediaUrls("Creating videoâ€¦")).toEqual([]);
   });
   it("reads both legacy and selected image models in the saved library", () => {
     expect(studioKind("media/image/x-ai/grok-imagine-image-quality")).toBe(
@@ -49,4 +49,12 @@ describe("Studio saved media", () => {
       generationModels({ tools: [{ ...tool, id: "google_search" }] }),
     ).toEqual([]);
   });
+  it("recognizes OpenRouter video and music and only accepts scoped private content paths", () => {
+    expect(studioKind("media/video/google/veo-3.1-lite")).toBe("video");
+    expect(studioKind("media/audio/google/lyria-3-clip-preview")).toBe("audio");
+    expect(savedGenerationModel("media/audio/google/lyria-3-clip-preview")).toBe("google/lyria-3-clip-preview");
+    const path = "/chat/create/content/6a719c14-fcde-458a-b5c3-79c4a0d7463c";
+    expect(studioMediaUrls(`![music](${path}) ![bad](/admin) ![bad](/chat/create/content/../../admin)`)).toEqual([path]);
+  });
+
 });

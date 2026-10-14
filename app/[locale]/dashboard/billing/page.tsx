@@ -483,6 +483,7 @@ export default function BillingPage() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [purchaseNotice, setPurchaseNotice] = useState('');
   const [paymentErrorToast, setPaymentErrorToast] = useState<string | null>(null);
   const [subscribing, setSubscribing] = useState<string | null>(null);
   const [purchasingAddon, setPurchasingAddon] = useState<string | null>(null);
@@ -961,7 +962,7 @@ export default function BillingPage() {
 
 
   useEffect(() => {
-    if (loading || !isAuthenticated) return;
+    if (loading || !isAuthenticated || !accountData) return;
     const tierKey = searchParams.get('tier');
     const addonKey = searchParams.get('addon');
     const selection = `${tierKey ?? ''}:${addonKey ?? ''}`;
@@ -969,14 +970,23 @@ export default function BillingPage() {
     if (tierKey && ['starter', 'pro', 'business', 'founding_member'].includes(tierKey)) {
       const tier = TIERS[tierKey as UserTierKey];
       openedPurchase.current = selection;
+      if (accountData.tier === 'founding_member' || TIER_ORDER.indexOf(tierKey as UserTierKey) < TIER_ORDER.indexOf(accountData.tier as UserTierKey)) {
+        setPurchaseNotice('Your current plan already includes this access. Manage your existing plan below.');
+        return;
+      }
+      setBillingPeriod('monthly');
       setPaymentModal({ isOpen: true, type: 'subscription', tierKey: tierKey as UserTierKey, title: `Choose payment for ${tier.name}`, price: tier.usdPrice });
     } else if (addonKey) {
+      if (addonKey.startsWith('addon.chat.')) {
+        openedPurchase.current = selection;
+        return;
+      }
       const addon = findBillingAddon(addonKey);
       if (!addon || addon.perAgent) return;
       openedPurchase.current = selection;
       setPaymentModal({ isOpen: true, type: 'addon', addonKey: addon.key, title: addon.key.startsWith('addon.chat.') ? `${addon.name} · Web Chat only, no agents` : addon.name, price: addon.usdPrice });
     }
-  }, [loading, isAuthenticated, searchParams]);
+  }, [loading, isAuthenticated, searchParams, accountData]);
 
   // Lifetime tiers (founding_member) are always flat-priced — ignore the
   // monthly/annual toggle for them, and also skip sending billingPeriod
@@ -1667,6 +1677,7 @@ export default function BillingPage() {
 
       <CostExplainer showBalanceLink={false} />
       <ChatPlansOverview billing />
+      {purchaseNotice && <p role="status" className="mb-6 rounded-lg border border-[var(--border-default)] p-4 text-sm text-[var(--text-secondary)]">{purchaseNotice}</p>}
       {searchParams.get('addon')?.startsWith('addon.chat.') && <p role="status" className="mb-6 rounded-lg border border-[var(--border-default)] p-4 text-sm text-[var(--text-secondary)]">Web Chat is now part of Hatcher plans. Choose a plan below for Chat, hosted agents and Canvas. Previously purchased Chat allowances remain available until their expiry.</p>}
 
       {/* ── AI Credits Balance Card ───────────────────────── */}

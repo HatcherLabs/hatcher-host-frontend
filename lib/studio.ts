@@ -12,7 +12,8 @@ export const STUDIO_TOOLS: Record<ChatCreateKind, string> = {
 };
 
 export function studioKind(model: string): ChatCreateKind | null {
-  if (/^media\/image\/[^/]+\/[^/]+$/.test(model)) return "image";
+  const match = /^media\/(image|video|audio)\/[^/]+\/[^/]+$/.exec(model);
+  if (match) return match[1] as ChatCreateKind;
   return (
     (Object.keys(STUDIO_TOOLS) as ChatCreateKind[]).find(
       (kind) => model === `media/${STUDIO_TOOLS[kind]}`,
@@ -31,6 +32,7 @@ export function studioMediaUrls(response: string): string[] {
     ),
   ].filter(
     (url) =>
+      /^\/chat\/create\/content\/[0-9a-f-]{36}$/i.test(url) ||
       /^https:\/\//i.test(url) ||
       /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(url),
   );
@@ -60,5 +62,5 @@ export function generationModels(config: {
 
 export function savedGenerationModel(model: string): string {
   if (model === "media/seedream_image") return "bytedance-seed/seedream-4.5";
-  return model.replace(/^media\/(?:image\/)?/, "");
+  return model.replace(/^media\/(?:(?:image|video|audio)\/)?/, "");
 }

@@ -45,6 +45,8 @@ import {
   type ChatTurn,
   type Conversation,
 } from "@/lib/direct-chat";
+import CanvasMedia from "./CanvasMedia";
+import { studioKind, studioMediaUrls } from "@/lib/studio";
 import { RichMarkdown } from "@/components/agents/tabs/ChatTab/ArtifactRenderer";
 import { HatcherMark } from "@/components/brand/HatcherMark";
 import styles from "./ChatWorkspace.module.css";
@@ -294,6 +296,9 @@ export default function ChatWorkspace({
         ["media/seedream_image", "Seedream"],
         ["media/seedance_video", "Seedance"],
         ["media/suno_audio", "Suno"],
+        ["media/video/google/veo-3.1-lite", "Veo 3.1 Lite"],
+        ["media/video/alibaba/wan-2.6", "Wan 2.6"],
+        ["media/audio/google/lyria-3-clip-preview", "Lyria 3 Clip"],
       ]),
     [models],
   );
@@ -335,7 +340,7 @@ export default function ChatWorkspace({
           setTurns((previous) =>
             previous.map((turn) => (turn.id === turnId ? result.turn : turn)),
           );
-          if (result.done) {
+          if (result.done || result.turn.status === "failed") {
             await refresh();
             return;
           }
@@ -354,13 +359,7 @@ export default function ChatWorkspace({
   useEffect(() => {
     for (const turn of turns) {
       if (turn.status !== "generating" || !turn.generationId) continue;
-      const kind = turn.model.includes("seedream")
-        ? "image"
-        : turn.model.includes("seedance")
-          ? "video"
-          : turn.model.includes("suno")
-            ? "audio"
-            : null;
+      const kind = studioKind(turn.model);
       if (kind) void pollGeneration(turn.id, kind);
     }
   }, [turns, pollGeneration]);
@@ -383,6 +382,7 @@ export default function ChatWorkspace({
         {
           method: "POST",
           body: JSON.stringify({
+            requestId: crypto.randomUUID(),
             conversationId: id,
             kind,
             prompt: text.trim(),
@@ -933,14 +933,16 @@ export default function ChatWorkspace({
                 <article className={styles.turn} key={turn.id}>
                   <div className={styles.prompt}>{turn.prompt}</div>
                   <div className={styles.answer}>
-                    <RichMarkdown
+                    {turn.response.includes("](/chat/create/content/") ? studioMediaUrls(turn.response).map(path => (
+                      <CanvasMedia key={path} path={path} kind={studioKind(turn.model) === "video" ? "video" : "audio"} title={turn.prompt} />
+                    )) : <RichMarkdown
                       content={
                         turn.response ||
                         (turn.status === "running"
                           ? "Thinking…"
                           : "No response received.")
                       }
-                    />
+                    />}
                   </div>
                   <div className={styles.actions}>
                     <span>

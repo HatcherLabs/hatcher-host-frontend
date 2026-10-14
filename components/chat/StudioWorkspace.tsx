@@ -30,6 +30,7 @@ import {
   studioMediaUrls,
   type StudioAsset,
 } from "@/lib/studio";
+import CanvasMedia from "./CanvasMedia";
 import styles from "./StudioWorkspace.module.css";
 
 const MODES = [
@@ -219,7 +220,7 @@ export default function StudioWorkspace({
       setNotice(
         result.done
           ? "Your creation is ready."
-          : "Still generating. Check again in a little while.",
+          : result.turn.status === "failed" ? result.turn.response : "Still generating. Check again in a little while.",
       );
       await reloadBalance();
     } catch (e) {
@@ -333,7 +334,7 @@ export default function StudioWorkspace({
               </label>
               <textarea
                 id="studio-prompt"
-                maxLength={4000}
+                maxLength={kind === "audio" ? 2000 : 4000}
                 value={prompt}
                 disabled={busy}
                 onChange={(event) => setPrompt(event.target.value)}
@@ -411,9 +412,9 @@ export default function StudioWorkspace({
               )}
               {kind !== "image" && tool && (
                 <p className={styles.hint}>
-                  Status checks cost approximately{" "}
-                  {tool.statusCheckAiCredits ?? 1} additional AI Credit(s) each.
-                  You choose when to check.
+                  {tool.statusCheckAiCredits === 0
+                    ? "Status checks are free. Your completed creation is saved even if you close this page."
+                    : `Status checks cost approximately ${tool.statusCheckAiCredits ?? 1} additional AI Credit(s) each.`}
                 </p>
               )}
               {guest ? (
@@ -548,7 +549,9 @@ export default function StudioWorkspace({
               return (
                 <article key={asset.id} className={styles.asset}>
                   {urls.length ? (
-                    urls.map((url, index) => (
+                    urls.map((url, index) => url.startsWith("/chat/create/content/") && assetKind !== "image" ? (
+                      <div key={url} className={styles.preview}><CanvasMedia path={url} kind={assetKind === "video" ? "video" : "audio"} title={asset.prompt} /></div>
+                    ) : (
                       <div key={url} className={styles.preview}>
                         {/* Native images support generated data URLs and arbitrary provider hosts. */}
                         {assetKind === "image" ? (
@@ -597,7 +600,7 @@ export default function StudioWorkspace({
                       <p>
                         {asset.status === "generating"
                           ? "Your job is saved. Check when you are ready."
-                          : "Refresh the library before trying again."}
+                          : asset.status === "failed" ? asset.response : "Refresh the library before trying again."}
                       </p>
                     </div>
                   )}
@@ -616,7 +619,7 @@ export default function StudioWorkspace({
                       >
                         {checking === asset.id
                           ? "Checking…"
-                          : `Check status (~${statusTool?.statusCheckAiCredits ?? 1} credits)`}
+                          : statusTool?.statusCheckAiCredits === 0 ? "Check status (free)" : `Check status (~${statusTool?.statusCheckAiCredits ?? 1} credits)`}
                       </button>
                     )}
                     <button
