@@ -1667,7 +1667,7 @@ export default function BillingPage() {
 
       <CostExplainer showBalanceLink={false} />
       <ChatPlansOverview billing />
-      {searchParams.get('addon')?.startsWith('addon.chat.') && <p role="status" className="mb-6 rounded-lg border border-[var(--border-default)] p-4 text-sm text-[var(--text-secondary)]">Web Chat is now part of Hatcher plans. Choose a plan below for Chat, hosted agents and Studio. Previously purchased Chat allowances remain available until their expiry.</p>}
+      {searchParams.get('addon')?.startsWith('addon.chat.') && <p role="status" className="mb-6 rounded-lg border border-[var(--border-default)] p-4 text-sm text-[var(--text-secondary)]">Web Chat is now part of Hatcher plans. Choose a plan below for Chat, hosted agents and Canvas. Previously purchased Chat allowances remain available until their expiry.</p>}
 
       {/* ── AI Credits Balance Card ───────────────────────── */}
       <motion.div className={`mb-8 ${cardClass}`} variants={itemVariants}>

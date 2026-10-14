@@ -482,3 +482,38 @@
     animation: none;
   }
 }
+
+.settings label {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+.settings select {
+  min-width: 0;
+  max-width: 66%;
+  padding: 9px 28px 9px 10px;
+  border: 1px solid var(--border-default);
+  border-radius: 7px;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font: inherit;
+  cursor: pointer;
+}
+.settings select:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+.settings select:disabled {
+  cursor: default;
+  opacity: 0.65;
+}
+@media (max-width: 480px) {
+  .settings {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 9px;
+  }
+  .settings select {
+    max-width: 100%;
+    width: 100%;
+  }
+}

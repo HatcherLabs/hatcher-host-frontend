@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { studioKind, studioMediaUrls } from "@/lib/studio";
+import {
+  studioKind,
+  studioMediaUrls,
+  generationModels,
+  savedGenerationModel,
+} from "@/lib/studio";
 
 describe("Studio saved media", () => {
   it("recognizes only supported generation models", () => {
@@ -15,5 +20,33 @@ describe("Studio saved media", () => {
       ),
     ).toEqual(["https://cdn.example/video.mp4", "data:image/png;base64,YQ=="]);
     expect(studioMediaUrls("Creating video…")).toEqual([]);
+  });
+  it("reads both legacy and selected image models in the saved library", () => {
+    expect(studioKind("media/image/x-ai/grok-imagine-image-quality")).toBe(
+      "image",
+    );
+    expect(studioKind("media/image/")).toBeNull();
+    expect(savedGenerationModel("media/seedream_image")).toBe(
+      "bytedance-seed/seedream-4.5",
+    );
+    expect(
+      savedGenerationModel("media/image/x-ai/grok-imagine-image-quality"),
+    ).toBe("x-ai/grok-imagine-image-quality");
+    expect(savedGenerationModel("media/suno_audio")).toBe("suno_audio");
+  });
+  it("uses the server catalog and preserves compatibility with older APIs", () => {
+    const tool = {
+      id: "seedance_video",
+      label: "Seedance",
+      configured: true,
+      estimatedAiCredits: 300,
+    };
+    expect(generationModels({ tools: [tool] })).toEqual([
+      { ...tool, kind: "video", default: true },
+    ]);
+    expect(generationModels({ tools: [tool], models: [] })).toEqual([]);
+    expect(
+      generationModels({ tools: [{ ...tool, id: "google_search" }] }),
+    ).toEqual([]);
   });
 });

@@ -5,9 +5,9 @@ import { ChatEntry } from '@/components/chat/ChatEntry';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Hatcher — Chat, Agents & Studio',
+  title: 'Hatcher — Chat, Agents & Canvas',
   description:
-    'Start with a chat, work with your own AI agents, and create images, video and music in Studio. One Hatcher workspace with shared AI Credits.',
+    'Start with a chat, work with your own AI agents, and create images, video and music in Canvas. One Hatcher workspace with shared AI Credits.',
   alternates: { languages: buildLanguagesMap('/') },
 };
 

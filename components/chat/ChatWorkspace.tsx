@@ -77,7 +77,7 @@ export default function ChatWorkspace({
   const [account, setAccount] = useState<ChatAccount | null>(null);
   const canUseAgents = !guest && account !== null && account.agentAccess !== false;
   const agentId = agentsEnabled && canUseAgents ? searchParams.get("agent") : null;
-  const mode = agentId ? "chat" : searchParams.get("mode") === "studio" ? "studio" : agentsEnabled && searchParams.get("mode") === "agents" ? "agents" : "chat";
+  const mode = agentId ? "chat" : ["canvas", "studio"].includes(searchParams.get("mode") || "") ? "canvas" : agentsEnabled && searchParams.get("mode") === "agents" ? "agents" : "chat";
   const [studioBusy, setStudioBusy] = useState(false);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [agentsLoading, setAgentsLoading] = useState(false);
@@ -142,7 +142,7 @@ export default function ChatWorkspace({
     window.history.pushState(null, "", url.pathname + url.search);
     setSidebar(false);
   };
-  const selectMode = (next: "chat" | "agents" | "studio") => {
+  const selectMode = (next: "chat" | "agents" | "canvas") => {
     if (busy || agentBusy || studioBusy) return;
     const url = new URL(window.location.href);
     url.searchParams.delete("agent");
@@ -541,7 +541,7 @@ export default function ChatWorkspace({
             <PenLine size={17} /> Chat
           </button>
           {agentsEnabled && <button type="button" aria-current={agentId || mode === "agents" ? "page" : undefined} disabled={busy || agentBusy || studioBusy} onClick={() => selectMode("agents")}><Bot size={17} /> Agents</button>}
-          <button type="button" aria-current={mode === "studio" ? "page" : undefined} disabled={busy || agentBusy || studioBusy} onClick={() => selectMode("studio")}><WandSparkles size={17} /> Studio</button>
+          <button type="button" aria-current={mode === "canvas" ? "page" : undefined} disabled={busy || agentBusy || studioBusy} onClick={() => selectMode("canvas")}><WandSparkles size={17} /> Canvas</button>
           <button
             type="button"
             onClick={() => {
@@ -780,7 +780,7 @@ export default function ChatWorkspace({
         </div>
       </aside>
       <div className={styles.workspace}>
-        {mode === "studio" && <StudioWorkspace guest={guest} onMenu={() => setSidebar(true)} onPlans={() => setShowPlans(true)} onBusyChange={setStudioBusy} onAccountChange={refresh} />}
+        {mode === "canvas" && <StudioWorkspace guest={guest} onMenu={() => setSidebar(true)} onPlans={() => setShowPlans(true)} onBusyChange={setStudioBusy} onAccountChange={refresh} />}
         {mode === "agents" && !agentId && <AgentsHome agents={agents} guest={guest} allowed={canUseAgents} loading={agentsLoading || !account} error={agentsError} onSelect={selectAgent} onCreate={() => setShowCreateAgent(true)} onMenu={() => setSidebar(true)} onPlans={() => setShowPlans(true)} onRetry={() => void loadAgents()} />}
         {agentId && (
           <section className={styles.agentPane} aria-label="Agent workspace">
@@ -1179,12 +1179,12 @@ export default function ChatWorkspace({
                   <CreditCard size={20} />
                   <strong>One Hatcher plan</strong>
                   <span>
-                    Chat, hosted agents and Studio. One shared AI Credit balance.
+                    Chat, hosted agents and Canvas. One shared AI Credit balance.
                   </span>
                   <ArrowUpRight size={15} />
                 </button>
-                <button type="button" onClick={() => selectMode("studio")}>
-                  <WandSparkles size={20} /><strong>Make it in Studio</strong>
+                <button type="button" onClick={() => selectMode("canvas")}>
+                  <WandSparkles size={20} /><strong>Make it in Canvas</strong>
                   <span>Images, video and music. All your creations together.</span><ArrowUpRight size={15} />
                 </button>
               </div>
@@ -1226,11 +1226,11 @@ export default function ChatWorkspace({
             )}
           </div>
           <ChatPlanCatalog kind={planCategory} guest={guest} onNavigate={rememberDraft} />
-          {budget && <p className={styles.planDescription}>Your existing Web Chat allowance remains available until {new Date(budget.plan.endsAt).toLocaleDateString()}. New Hatcher plans use shared account AI Credits across Chat, agents and Studio.</p>}
+          {budget && <p className={styles.planDescription}>Your existing Web Chat allowance remains available until {new Date(budget.plan.endsAt).toLocaleDateString()}. New Hatcher plans use shared account AI Credits across Chat, agents and Canvas.</p>}
           {account?.queued.map(q => <p key={q.id}>Previously purchased Chat {q.planId} starts {new Date(q.startsAt).toLocaleDateString()}.</p>)}
           <div className={styles.planFooter}>
             <p>
-              One plan for Chat, hosted agents and Studio. Model and media usage
+              One plan for Chat, hosted agents and Canvas. Model and media usage
               draw from your shared AI Credits; agent capacity follows your plan.
               Extra credits are available whenever you need them.
             </p>

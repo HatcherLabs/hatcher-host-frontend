@@ -23,7 +23,9 @@ import {
   type Conversation,
 } from "@/lib/direct-chat";
 import {
-  STUDIO_TOOLS,
+  generationModels,
+  savedGenerationModel,
+  type GenerationModel,
   studioKind,
   studioMediaUrls,
   type StudioAsset,
@@ -71,7 +73,10 @@ export default function StudioWorkspace({
   const [kind, setKind] = useState<ChatCreateKind>("image");
   const [tab, setTab] = useState<"create" | "library">("create");
   const [prompt, setPrompt] = useState("");
-  const [tools, setTools] = useState<ChatCreateTool[]>([]);
+  const [tools, setTools] = useState<GenerationModel[]>([]);
+  const [selectedModels, setSelectedModels] = useState<
+    Partial<Record<ChatCreateKind, string>>
+  >({});
   const [balance, setBalance] = useState(0);
   const [model, setModel] = useState("");
   const [assets, setAssets] = useState<StudioAsset[]>([]);
@@ -83,7 +88,14 @@ export default function StudioWorkspace({
   const [notice, setNotice] = useState("");
   const [retry, setRetry] = useState(0);
   const locked = useRef(false);
-  const tool = tools.find((item) => item.id === STUDIO_TOOLS[kind]);
+  const availableModels = tools.filter((item) => item.kind === kind);
+  const tool =
+    availableModels.find((item) => item.id === selectedModels[kind]) ??
+    availableModels.find((item) => item.default && item.configured) ??
+    availableModels.find((item) => item.configured) ??
+    availableModels[0];
+  const requiredCredits =
+    tool?.requiredAiCredits ?? tool?.estimatedAiCredits ?? Infinity;
   const mode = MODES.find((item) => item.id === kind)!;
 
   const reloadLibrary = useCallback(async () => {
@@ -102,14 +114,16 @@ export default function StudioWorkspace({
     setLoading(true);
     setError("");
     Promise.all([
-      chatRequest<{ tools: ChatCreateTool[] }>("/create/config"),
+      chatRequest<{ tools: ChatCreateTool[]; models?: GenerationModel[] }>(
+        "/create/config",
+      ),
       chatRequest<ChatAccount>("/account"),
       chatRequest<{ models: ChatModel[] }>("/models"),
       chatRequest<Library>("/studio/library"),
     ])
       .then(([config, account, models, library]) => {
         if (!active) return;
-        setTools(config.tools);
+        setTools(generationModels(config));
         setBalance(account.walletBalance);
         setModel(
           models.models.find((item) => item.id === DEFAULT_CHAT_MODEL)?.id ??
@@ -120,7 +134,7 @@ export default function StudioWorkspace({
         setCursor(library.nextCursor);
       })
       .catch((e) => {
-        if (active) setError(e.message || "Studio could not be loaded.");
+        if (active) setError(e.message || "Canvas could not be loaded.");
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -157,6 +171,8 @@ export default function StudioWorkspace({
             requestId: crypto.randomUUID(),
             conversationId: conversation.id,
             kind,
+            // Historical image capability IDs are omitted for older API compatibility.
+            ...(tool.id === "seedream_image" ? {} : { model: tool.id }),
             prompt: prompt.trim(),
           }),
         },
@@ -168,7 +184,7 @@ export default function StudioWorkspace({
       setNotice(
         result.done
           ? "Saved to your library."
-          : "Generation started. You can leave Studio and check its status later.",
+          : "Generation started. You can leave Canvas and check its status later.",
       );
       await reloadBalance();
     } catch (e) {
@@ -239,7 +255,7 @@ export default function StudioWorkspace({
       ? assets
       : assets.filter((asset) => studioKind(asset.model) === kind);
   return (
-    <section className={styles.studio} aria-label="Hatcher Studio">
+    <section className={styles.studio} aria-label="Hatcher Canvas">
       <header className={styles.header}>
         <button
           className={styles.mobile}
@@ -250,7 +266,7 @@ export default function StudioWorkspace({
         </button>
         <div className={styles.identity}>
           <Sparkles size={18} />
-          <strong>Studio</strong>
+          <strong>Canvas</strong>
           <span>Create something worth sharing.</span>
         </div>
         <button className={styles.balance} onClick={onPlans}>
@@ -259,11 +275,11 @@ export default function StudioWorkspace({
       </header>
       <div className={styles.body}>
         <div className={styles.title}>
-          <span>HATCHER STUDIO</span>
+          <span>HATCHER CANVAS</span>
           <h1>Your ideas, in every format.</h1>
           <p>Make an image. Set a scene in motion. Find its sound.</p>
         </div>
-        <div className={styles.tabs} aria-label="Studio views">
+        <div className={styles.tabs} aria-label="Canvas views">
           <button
             aria-pressed={tab === "create"}
             onClick={() => setTab("create")}
@@ -284,7 +300,7 @@ export default function StudioWorkspace({
               disabled={busy || Boolean(checking)}
               onClick={() => setRetry((value) => value + 1)}
             >
-              Refresh Studio
+              Refresh Canvas
             </button>
           </div>
         )}
@@ -330,13 +346,53 @@ export default function StudioWorkspace({
                 <span>{prompt.length.toLocaleString()} / 4,000</span>
               </div>
               <div className={styles.settings}>
-                <span>Generation model</span>
-                <strong>
-                  {guest
-                    ? "Sign in to see available models"
-                    : tool?.label || "Unavailable"}
-                </strong>
+                <label htmlFor="generation-model">Generation model</label>
+                {guest ? (
+                  <span>Sign in to choose a model</span>
+                ) : (
+                  <select
+                    id="generation-model"
+                    value={tool?.id ?? ""}
+                    disabled={
+                      loading ||
+                      busy ||
+                      Boolean(checking) ||
+                      !availableModels.length
+                    }
+                    onChange={(event) =>
+                      setSelectedModels((previous) => ({
+                        ...previous,
+                        [kind]: event.target.value,
+                      }))
+                    }
+                  >
+                    {!availableModels.length && (
+                      <option value="">No models available</option>
+                    )}
+                    {availableModels.map((item) => (
+                      <option
+                        key={item.id}
+                        value={item.id}
+                        disabled={!item.configured}
+                      >
+                        {item.label} · ~{item.estimatedAiCredits} credits
+                        {!item.configured ? " (unavailable)" : ""}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
+              {tool?.description && (
+                <p className={styles.hint}>{tool.description}</p>
+              )}
+              {!guest &&
+                !loading &&
+                availableModels.filter((item) => item.configured).length ===
+                  1 && (
+                  <p className={styles.hint}>
+                    One model is available for this format right now.
+                  </p>
+                )}
               <div className={styles.cost}>
                 <span>Estimated generation cost</span>
                 <strong>
@@ -345,6 +401,14 @@ export default function StudioWorkspace({
                     : "—"}
                 </strong>
               </div>
+              {tool && (
+                <p className={styles.hint}>
+                  Final usage may vary.
+                  {requiredCredits > tool.estimatedAiCredits
+                    ? ` At least ${requiredCredits} credits are needed for the temporary hold; unused credits are released.`
+                    : ""}
+                </p>
+              )}
               {kind !== "image" && tool && (
                 <p className={styles.hint}>
                   Status checks cost approximately{" "}
@@ -355,7 +419,7 @@ export default function StudioWorkspace({
               {guest ? (
                 <Link
                   className={styles.primary}
-                  href="/login?return=%2F%3Fmode%3Dstudio"
+                  href="/login?return=%2F%3Fmode%3Dcanvas"
                 >
                   Sign in to create <ArrowUpRight size={16} />
                 </Link>
@@ -370,7 +434,7 @@ export default function StudioWorkspace({
                     !tool?.configured ||
                     !prompt.trim() ||
                     !model ||
-                    balance < (tool?.estimatedAiCredits ?? Infinity)
+                    balance < requiredCredits
                   }
                 >
                   {busy ? (
@@ -391,14 +455,14 @@ export default function StudioWorkspace({
                   This generation service is temporarily unavailable.
                 </p>
               )}
-              {!guest && tool && balance < tool.estimatedAiCredits && (
+              {!guest && tool && balance < requiredCredits && (
                 <button className={styles.creditLink} onClick={onPlans}>
                   Add AI Credits to generate
                 </button>
               )}
               <p className={styles.hint}>
-                Studio uses the same account AI Credits as Chat and your agents.
-                No separate Studio subscription.
+                Canvas uses the same account AI Credits as Chat and your agents.
+                No separate Canvas subscription.
               </p>
             </section>
             <div className={styles.direction}>
@@ -457,7 +521,7 @@ export default function StudioWorkspace({
               </button>
             )}
           </div>
-          {loading && <p role="status">Loading Studio…</p>}
+          {loading && <p role="status">Loading Canvas…</p>}
           {!shown.length && !loading && (
             <div className={styles.empty}>
               <ImageIcon size={25} />
@@ -477,9 +541,10 @@ export default function StudioWorkspace({
             {shown.map((asset) => {
               const assetKind = studioKind(asset.model);
               const urls = studioMediaUrls(asset.response);
-              const statusTool = tools.find(
-                (item) => item.id === STUDIO_TOOLS[assetKind || "image"],
-              );
+              const statusTool =
+                tools.find(
+                  (item) => item.id === savedGenerationModel(asset.model),
+                ) ?? tools.find((item) => asset.model === `media/${item.id}`);
               return (
                 <article key={asset.id} className={styles.asset}>
                   {urls.length ? (
@@ -538,7 +603,10 @@ export default function StudioWorkspace({
                   )}
                   <div className={styles.assetDetails}>
                     <span>
-                      {assetKind} · {asset.creditsCharged == null ? "Usage pending confirmation" : `${asset.creditsCharged} credits used`}
+                      {statusTool?.label ?? savedGenerationModel(asset.model)} ·{" "}
+                      {asset.creditsCharged == null
+                        ? "Usage pending confirmation"
+                        : `${asset.creditsCharged} credits used`}
                     </span>
                     <p>{asset.prompt}</p>
                     {asset.status === "generating" && asset.generationId && (
@@ -554,7 +622,14 @@ export default function StudioWorkspace({
                     <button
                       disabled={busy}
                       onClick={() => {
-                        if (assetKind) setKind(assetKind);
+                        if (assetKind) {
+                          setKind(assetKind);
+                          if (statusTool)
+                            setSelectedModels((previous) => ({
+                              ...previous,
+                              [assetKind]: statusTool.id,
+                            }));
+                        }
                         setPrompt(asset.prompt);
                         setTab("create");
                       }}
