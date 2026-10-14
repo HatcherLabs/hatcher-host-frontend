@@ -507,7 +507,7 @@ export default function StudioWorkspace({
           <div className={styles.libraryHeading}>
             <div>
               <h2>{tab === "library" ? "Your library" : "Recent creations"}</h2>
-              <p>Saved across Chat and Studio.</p>
+              <p>Saved across Chat and Canvas.</p>
             </div>
             {!guest && (
               <button
