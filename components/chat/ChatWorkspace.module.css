@@ -928,7 +928,8 @@
   color: var(--text-secondary);
 }
 .sideNav a:hover,
-.sideNav button:hover {
+.sideNav button:hover,
+.sideNav button[aria-current="page"] {
   background: var(--bg-hover);
   color: var(--text-primary);
 }

@@ -29,7 +29,7 @@ export function ChatPlanCatalog({ kind, guest, onNavigate }: {
   };
   return <>
     <p className={styles.planDescription}>{kind === "agents"
-      ? "Host your own OpenClaw, Hermes or IronClaw agents, plus use Web Chat with your account AI Credits. Chat-only weekly allowances are sold separately."
+      ? "One Hatcher plan for Web Chat, OpenClaw / Hermes / IronClaw agents and Studio. Included AI Credits are shared across your workspace."
       : "One shared balance for Web Chat, agent model usage, images, video and audio. Credits do not add agent hosting capacity."}</p>
     <p className={styles.paymentMethods}>Choose how to pay: card, SOL, USDC, HATCHER, ANSEM or CryptoNow.</p>
     {error ? <p role="alert">{error} <Link href="/dashboard/billing">Open billing</Link></p> : !catalog ? <p role="status">Loading current plans…</p> : null}
@@ -40,12 +40,12 @@ export function ChatPlanCatalog({ kind, guest, onNavigate }: {
         return <article key={key}>
           <h3>{tier.name}</h3>
           <strong>${tier.usdPrice.toFixed(2)} <small>{key === "founding_member" ? "lifetime" : "/ 30 days"}</small></strong>
-          <ul><li>{tier.includedAgents} hosted {tier.includedAgents === 1 ? "agent" : "agents"}</li><li>OpenClaw, Hermes and IronClaw</li><li>Agent configuration and integrations</li><li>Web Chat with account AI Credits</li></ul>
+          <ul><li>{tier.includedAgents} hosted {tier.includedAgents === 1 ? "agent" : "agents"}</li><li>OpenClaw, Hermes and IronClaw</li><li>Agent configuration and integrations</li><li>Web Chat and Studio access</li><li>{tier.aiCreditsMonthly.toLocaleString()} shared AI Credits / month</li></ul>
           <Link className={styles.planCta} href={billingHref(key)} onClick={onNavigate}>{guest ? "Create account to choose" : "Choose payment method"}</Link>
         </article>;
       }) : catalog?.addons.filter(addon => addon.key.startsWith("addon.ai_credits.")).map(addon => <article key={addon.key}>
         <h3>{addon.name}</h3><strong>${addon.usdPrice.toFixed(2)} <small>one-time</small></strong>
-        <p>Use credits across Web Chat and your agents. No Chat plan required.</p>
+        <p>Use credits across Chat, your agents and Studio. Keep the plan you already have.</p>
         <Link className={styles.planCta} href={billingHref(addon.key)} onClick={onNavigate}>{guest ? "Create account to choose" : "Choose payment method"}</Link>
       </article>)}
     </div>

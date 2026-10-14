@@ -17,7 +17,6 @@ import type { UserTierKey, AddonKey } from '@hatcher/shared';
 import { usePaymentDrivers } from '@/lib/payment-drivers';
 import { ConfirmPaymentModal } from '@/components/payments/ConfirmPaymentModal';
 import { ChatPlansOverview } from '@/components/chat/ChatPlansOverview';
-import { CHAT_PLAN_DETAILS } from '@/lib/chat-plan-details';
 import { formatFeatureKey } from '@/lib/feature-labels';
 import {
   CAPACITY_ADDONS,
@@ -222,14 +221,6 @@ const VISIBLE_ADDONS: BillingAddon[] = [
     },
   ),
   ...AI_CREDIT_ADDONS,
-  ...CHAT_PLAN_DETAILS.map(plan => ({
-    key: `addon.chat.${plan.id}` as BillingAddonKey,
-    name: plan.name,
-    description: 'Web Chat only. 30 days of access; weekly allowance resets. Does not include agents.',
-    usdPrice: plan.priceCents / 100,
-    type: 'one_time' as const,
-    perAgent: false,
-  })),
   ...CAPACITY_BILLING_ADDONS,
 ];
 
@@ -1676,6 +1667,7 @@ export default function BillingPage() {
 
       <CostExplainer showBalanceLink={false} />
       <ChatPlansOverview billing />
+      {searchParams.get('addon')?.startsWith('addon.chat.') && <p role="status" className="mb-6 rounded-lg border border-[var(--border-default)] p-4 text-sm text-[var(--text-secondary)]">Web Chat is now part of Hatcher plans. Choose a plan below for Chat, hosted agents and Studio. Previously purchased Chat allowances remain available until their expiry.</p>}
 
       {/* ── AI Credits Balance Card ───────────────────────── */}
       <motion.div className={`mb-8 ${cardClass}`} variants={itemVariants}>
