@@ -15,6 +15,7 @@ for (const width of [1440, 390]) {
       if (method === 'OPTIONS') return route.fulfill({ status: 204, headers: { 'access-control-allow-origin': 'http://127.0.0.1:3048', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'content-type', 'access-control-allow-methods': 'GET,POST,DELETE,PATCH' } });
       if (path === '/auth/session') return reply({ authenticated: true, user });
       if (path === '/auth/me') return reply(user);
+      if (path === '/features') return reply({ tiers: { starter: { name: 'Starter', usdPrice: 6.99, includedAgents: 1, aiCreditsMonthly: 3000 } }, tierOrder: ['starter'], addons: [], founding: { remaining: 0 } });
       if (path === '/chat/account') return reply({
         plans: [{ id: 'basic', name: 'Chat Basic', weeklyCredits: 1250, priceCents: 893, currency: 'usd', durationDays: 30 }, { id: 'pro', name: 'Chat Pro', weeklyCredits: 2500, priceCents: 1786, currency: 'usd', durationDays: 30 }, { id: 'max', name: 'Chat Max', weeklyCredits: 6500, priceCents: 4643, currency: 'usd', durationDays: 30 }],
         budget: { plan: { planId: 'basic', weeklyCredits: 1250, endsAt: '2026-10-15T12:00:00Z' }, week: { spent: turns.length * 4, reserved: 0, resetsAt: '2026-09-22T12:00:00Z' }, remaining: 1250 - turns.length * 4 }, walletBalance: 500, queued: [], autoRenews: false,
@@ -65,7 +66,7 @@ for (const width of [1440, 390]) {
     await expect(page.getByText('Live market data from CoinGecko.')).toBeVisible();
     await page.getByRole('button', { name: /% used/ }).click();
     await expect(page.getByRole('heading', { name: 'Plans & credits' })).toBeVisible();
-    await expect(page.getByText('$8.93', { exact: false })).toBeVisible();
+    await expect(page.getByText('$6.99', { exact: false })).toBeVisible();
     expect(errors).toEqual([]);
   });
 }

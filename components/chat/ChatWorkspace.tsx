@@ -13,7 +13,6 @@ import {
   ArrowUp,
   CalendarDays,
   Bot,
-  Coins,
   CreditCard,
   Globe,
   ArrowUpRight,
@@ -46,10 +45,14 @@ import {
   type ChatTurn,
   type Conversation,
 } from "@/lib/direct-chat";
+import CanvasMedia from "./CanvasMedia";
+import { studioKind, studioMediaUrls } from "@/lib/studio";
 import { RichMarkdown } from "@/components/agents/tabs/ChatTab/ArtifactRenderer";
 import { HatcherMark } from "@/components/brand/HatcherMark";
 import styles from "./ChatWorkspace.module.css";
 import { ChatPlanCatalog } from "./ChatPlanCatalog";
+import { AgentsHome } from "./AgentsHome";
+const StudioWorkspace = dynamic(() => import("./StudioWorkspace"));
 
 const AgentWorkspace = dynamic(
   () => import("@/components/agents/AgentWorkspace"),
@@ -76,6 +79,8 @@ export default function ChatWorkspace({
   const [account, setAccount] = useState<ChatAccount | null>(null);
   const canUseAgents = !guest && account !== null && account.agentAccess !== false;
   const agentId = agentsEnabled && canUseAgents ? searchParams.get("agent") : null;
+  const mode = agentId ? "chat" : ["canvas", "studio"].includes(searchParams.get("mode") || "") ? "canvas" : agentsEnabled && searchParams.get("mode") === "agents" ? "agents" : "chat";
+  const [studioBusy, setStudioBusy] = useState(false);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [agentsLoading, setAgentsLoading] = useState(false);
   const [agentsError, setAgentsError] = useState("");
@@ -124,7 +129,7 @@ export default function ChatWorkspace({
     );
   }, []);
   const selectAgent = (id: string | null) => {
-    if (busy || agentBusy) return;
+    if (busy || agentBusy || studioBusy) return;
     const url = new URL(window.location.href);
     if (id) {
       url.searchParams.set("agent", id);
@@ -133,15 +138,24 @@ export default function ChatWorkspace({
       url.searchParams.delete("agent");
       url.searchParams.delete("tab");
     }
+    url.searchParams.delete("mode");
     url.searchParams.delete("agents");
     url.searchParams.delete("view");
     window.history.pushState(null, "", url.pathname + url.search);
     setSidebar(false);
   };
-  const exploreAgents = () => {
-    setSidebar(true);
-    requestAnimationFrame(() => agentList.current?.focus());
+  const selectMode = (next: "chat" | "agents" | "canvas") => {
+    if (busy || agentBusy || studioBusy) return;
+    const url = new URL(window.location.href);
+    url.searchParams.delete("agent");
+    url.searchParams.delete("tab");
+    url.searchParams.delete("agents");
+    if (next === "chat") url.searchParams.delete("mode");
+    else url.searchParams.set("mode", next);
+    window.history.pushState(null, "", url.pathname + url.search);
+    setSidebar(false);
   };
+  const exploreAgents = () => selectMode("agents");
   useEffect(() => {
     if (
       searchParams.get("agents") === "1" ||
@@ -178,7 +192,7 @@ export default function ChatWorkspace({
   const [sidebar, setSidebar] = useState(false);
   const plansDialog = useRef<HTMLDialogElement>(null);
   const [showPlans, setShowPlans] = useState(false);
-  const [planCategory, setPlanCategory] = useState<"chat" | "agents" | "credits">("chat");
+  const [planCategory, setPlanCategory] = useState<"agents" | "credits">("agents");
   const [copied, setCopied] = useState("");
   const [createMode, setCreateMode] = useState<ChatCreateKind | "chart" | null>(
     null,
@@ -282,6 +296,9 @@ export default function ChatWorkspace({
         ["media/seedream_image", "Seedream"],
         ["media/seedance_video", "Seedance"],
         ["media/suno_audio", "Suno"],
+        ["media/video/google/veo-3.1-lite", "Veo 3.1 Lite"],
+        ["media/video/alibaba/wan-2.6", "Wan 2.6"],
+        ["media/audio/google/lyria-3-clip-preview", "Lyria 3 Clip"],
       ]),
     [models],
   );
@@ -323,7 +340,7 @@ export default function ChatWorkspace({
           setTurns((previous) =>
             previous.map((turn) => (turn.id === turnId ? result.turn : turn)),
           );
-          if (result.done) {
+          if (result.done || result.turn.status === "failed") {
             await refresh();
             return;
           }
@@ -342,13 +359,7 @@ export default function ChatWorkspace({
   useEffect(() => {
     for (const turn of turns) {
       if (turn.status !== "generating" || !turn.generationId) continue;
-      const kind = turn.model.includes("seedream")
-        ? "image"
-        : turn.model.includes("seedance")
-          ? "video"
-          : turn.model.includes("suno")
-            ? "audio"
-            : null;
+      const kind = studioKind(turn.model);
       if (kind) void pollGeneration(turn.id, kind);
     }
   }, [turns, pollGeneration]);
@@ -371,6 +382,7 @@ export default function ChatWorkspace({
         {
           method: "POST",
           body: JSON.stringify({
+            requestId: crypto.randomUUID(),
             conversationId: id,
             kind,
             prompt: text.trim(),
@@ -501,7 +513,7 @@ export default function ChatWorkspace({
         </div>
         <button
           className={styles.newChat}
-          disabled={busy || agentBusy}
+          disabled={busy || agentBusy || studioBusy}
           onClick={() => {
             selectAgent(null);
             setModel(
@@ -522,12 +534,14 @@ export default function ChatWorkspace({
         <nav className={styles.sideNav} aria-label="Explore Hatcher">
           <button
             type="button"
-            aria-current={!agentId ? "page" : undefined}
-            disabled={busy || agentBusy}
+            aria-current={!agentId && mode === "chat" ? "page" : undefined}
+            disabled={busy || agentBusy || studioBusy}
             onClick={() => selectAgent(null)}
           >
-            <PenLine size={17} /> Web Chat
+            <PenLine size={17} /> Chat
           </button>
+          {agentsEnabled && <button type="button" aria-current={agentId || mode === "agents" ? "page" : undefined} disabled={busy || agentBusy || studioBusy} onClick={() => selectMode("agents")}><Bot size={17} /> Agents</button>}
+          <button type="button" aria-current={mode === "canvas" ? "page" : undefined} disabled={busy || agentBusy || studioBusy} onClick={() => selectMode("canvas")}><WandSparkles size={17} /> Canvas</button>
           <button
             type="button"
             onClick={() => {
@@ -559,7 +573,7 @@ export default function ChatWorkspace({
                     type="button"
                     aria-label="Create agent"
                     title="Create agent"
-                    disabled={busy || agentBusy}
+                    disabled={busy || agentBusy || studioBusy}
                     onClick={() => {
                       setShowCreateAgent(true);
                       setSidebar(false);
@@ -586,8 +600,8 @@ export default function ChatWorkspace({
                 </p>
               ) : !canUseAgents ? (
                 <p className={styles.historyHint}>
-                  {account ? "Your Web Chat plan does not include agents." : "Checking agent access…"}
-                  {account && <><br /><button type="button" className={styles.inlinePlanLink} onClick={() => { setPlanCategory("agents"); setShowPlans(true); }}>Choose an Agent Plan</button></>}
+                  {account ? "Your legacy Web Chat plan does not include agent hosting." : "Checking agent access…"}
+                  {account && <><br /><button type="button" className={styles.inlinePlanLink} onClick={() => { setPlanCategory("agents"); setShowPlans(true); }}>Explore Hatcher plans</button></>}
                 </p>
               ) : (
                 <>
@@ -607,7 +621,7 @@ export default function ChatWorkspace({
                       key={agent.id}
                       className={styles.agentRow}
                       aria-current={agentId === agent.id ? "page" : undefined}
-                      disabled={busy || agentBusy}
+                      disabled={busy || agentBusy || studioBusy}
                       onClick={() => selectAgent(agent.id)}
                     >
                       <Bot size={17} />
@@ -626,7 +640,7 @@ export default function ChatWorkspace({
                   )}
                   <button
                     className={styles.createAgentLink}
-                    disabled={busy || agentBusy}
+                    disabled={busy || agentBusy || studioBusy}
                     onClick={() => {
                       setShowCreateAgent(true);
                       setSidebar(false);
@@ -672,7 +686,7 @@ export default function ChatWorkspace({
                     aria-current={
                       !agentId && selected === chat.id ? "page" : undefined
                     }
-                    disabled={busy || agentBusy}
+                    disabled={busy || agentBusy || studioBusy}
                     onClick={() => {
                       selectAgent(null);
                       void open(chat.id);
@@ -733,7 +747,7 @@ export default function ChatWorkspace({
                 {budget
                   ? account?.plans.find((p) => p.id === budget.plan.planId)
                       ?.name
-                  : "Your Chat plan"}
+                  : "Your Hatcher workspace"}
               </strong>
               {budget && (
                 <>
@@ -766,6 +780,8 @@ export default function ChatWorkspace({
         </div>
       </aside>
       <div className={styles.workspace}>
+        {mode === "canvas" && <StudioWorkspace guest={guest} onMenu={() => setSidebar(true)} onPlans={() => setShowPlans(true)} onBusyChange={setStudioBusy} onAccountChange={refresh} />}
+        {mode === "agents" && !agentId && <AgentsHome agents={agents} guest={guest} allowed={canUseAgents} loading={agentsLoading || !account} error={agentsError} onSelect={selectAgent} onCreate={() => setShowCreateAgent(true)} onMenu={() => setSidebar(true)} onPlans={() => setShowPlans(true)} onRetry={() => void loadAgents()} />}
         {agentId && (
           <section className={styles.agentPane} aria-label="Agent workspace">
             <header className={styles.header}>
@@ -798,7 +814,7 @@ export default function ChatWorkspace({
           </section>
         )}
         <section
-          hidden={Boolean(agentId)}
+          hidden={Boolean(agentId) || mode !== "chat"}
           className={`${styles.chat} ${!loading && turns.length === 0 ? styles.welcome : ""}`}
         >
           <header className={styles.header}>
@@ -917,14 +933,16 @@ export default function ChatWorkspace({
                 <article className={styles.turn} key={turn.id}>
                   <div className={styles.prompt}>{turn.prompt}</div>
                   <div className={styles.answer}>
-                    <RichMarkdown
+                    {turn.response.includes("](/chat/create/content/") ? studioMediaUrls(turn.response).map(path => (
+                      <CanvasMedia key={path} path={path} kind={studioKind(turn.model) === "video" ? "video" : "audio"} title={turn.prompt} />
+                    )) : <RichMarkdown
                       content={
                         turn.response ||
                         (turn.status === "running"
                           ? "Thinking…"
                           : "No response received.")
                       }
-                    />
+                    />}
                   </div>
                   <div className={styles.actions}>
                     <span>
@@ -1161,20 +1179,16 @@ export default function ChatWorkspace({
                 )}
                 <button type="button" onClick={() => setShowPlans(true)}>
                   <CreditCard size={20} />
-                  <strong>Find your Chat plan</strong>
+                  <strong>One Hatcher plan</strong>
                   <span>
-                    {account?.plans[0]
-                      ? `From ${new Intl.NumberFormat(locale, { style: "currency", currency: account.plans[0].currency }).format(account.plans[0].priceCents / 100)} / 30 days. Or use AI Credits.`
-                      : "Compare plans and account AI Credits."}
+                    Chat, hosted agents and Canvas. One shared AI Credit balance.
                   </span>
                   <ArrowUpRight size={15} />
                 </button>
-                <Link href="/token" onClick={rememberDraft}>
-                  <Coins size={20} />
-                  <strong>Put HATCHER to work</strong>
-                  <span>Discover staking, AI Credits, and token utility.</span>
-                  <ArrowUpRight size={15} />
-                </Link>
+                <button type="button" onClick={() => selectMode("canvas")}>
+                  <WandSparkles size={20} /><strong>Make it in Canvas</strong>
+                  <span>Images, video and music. All your creations together.</span><ArrowUpRight size={15} />
+                </button>
               </div>
             </div>
           )}
@@ -1209,86 +1223,18 @@ export default function ChatWorkspace({
             </button>
           </div>
           <div className={styles.planTabs} role="group" aria-label="Plan category">
-            {([ ["chat", "Web Chat"], ["agents", "Agent Plans"], ["credits", "AI Credits"] ] as const).map(([id, label]) =>
+            {([ ["agents", "Hatcher Plans"], ["credits", "AI Credits"] ] as const).map(([id, label]) =>
               <button key={id} type="button" aria-pressed={planCategory === id} onClick={() => setPlanCategory(id)}>{label}</button>
             )}
           </div>
-          {planCategory !== "chat" ? <ChatPlanCatalog kind={planCategory} guest={guest} onNavigate={rememberDraft} /> : <>
-          <p className={styles.planDescription}>For Web Chat only. 30 days of access, weekly usage resets and no automatic renewal. Agent hosting is included in Agent Plans.</p>
-          {!account?.plans.length && (
-            <p role="status">
-              {loading
-                ? "Loading current plans…"
-                : "Plans could not be loaded."}{" "}
-              <Link href="/pricing">View all pricing</Link>
-            </p>
-          )}
-          <div className={styles.planGrid}>
-            {account?.plans.map((plan) => (
-              <article key={plan.id}>
-                <h3>{plan.name}</h3>
-                <strong>
-                  {new Intl.NumberFormat(locale, {
-                    style: "currency",
-                    currency: plan.currency,
-                  }).format(plan.priceCents / 100)}{" "}
-                  <small>/ 30 days</small>
-                </strong>
-                <p>
-                  <strong>
-                    {numberFormat.format(plan.weeklyCredits * 5)} credits / 30
-                    days
-                  </strong>
-                  <br />
-                  {numberFormat.format(plan.weeklyCredits)} each week · resets
-                  every 7 days
-                  <br />
-                  {plan.id === "pro"
-                    ? "2× more usage than Basic"
-                    : plan.id === "max"
-                      ? "5.2× more usage than Basic"
-                      : "Full model selector, history and charts"}
-                </p>
-                <ul>
-                  <li>All available chat models</li>
-                  <li>Charts and rich artifacts</li>
-                  <li>Account AI Credits fallback</li>
-                </ul>
-                {guest ? (
-                  <Link
-                    className={styles.planCta}
-                    href={`/register?return=${encodeURIComponent(`/dashboard/billing?addon=addon.chat.${plan.id}`)}`}
-                    onClick={rememberDraft}
-                  >
-                    Create account to choose
-                  </Link>
-                ) : (
-                  <Link className={styles.planCta} href={`/dashboard/billing?addon=addon.chat.${plan.id}`} onClick={rememberDraft}>
-                    {budget ? "Extend access · choose payment" : "Choose payment method"}
-                  </Link>
-                )}
-              </article>
-            ))}
-          </div>
-          {budget && (
-            <p>
-              Purchases start after your current paid access ends. Your current
-              weekly limit stays the same.
-            </p>
-          )}
-          {account?.queued.map((q) => (
-            <p key={q.id}>
-              Chat {q.planId} starts {new Date(q.startsAt).toLocaleDateString()}
-              .
-            </p>
-          ))}
-          <p className={styles.paymentMethods}>Pay by card, SOL, USDC, HATCHER, ANSEM or CryptoNow. Web Chat plans do not include agent creation, hosting or agent chat.</p>
-          </>}
+          <ChatPlanCatalog kind={planCategory} guest={guest} onNavigate={rememberDraft} />
+          {budget && <p className={styles.planDescription}>Your existing Web Chat allowance remains available until {new Date(budget.plan.endsAt).toLocaleDateString()}. New Hatcher plans use shared account AI Credits across Chat, agents and Canvas.</p>}
+          {account?.queued.map(q => <p key={q.id}>Previously purchased Chat {q.planId} starts {new Date(q.startsAt).toLocaleDateString()}.</p>)}
           <div className={styles.planFooter}>
             <p>
-              Already have AI Credits? Use your account balance without a Chat
-              plan. Media and agents use account AI Credits. Agent capacity
-              follows your Hatcher plan.
+              One plan for Chat, hosted agents and Canvas. Model and media usage
+              draw from your shared AI Credits; agent capacity follows your plan.
+              Extra credits are available whenever you need them.
             </p>
             <Link href="/pricing" onClick={rememberDraft}>
               Compare all Hatcher plans <ArrowUpRight size={14} />

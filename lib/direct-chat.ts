@@ -38,6 +38,7 @@ export interface ChatCreateTool {
   label: string;
   estimatedAiCredits: number;
   configured: boolean;
+  statusCheckAiCredits?: number;
 }
 export interface ChatAccount {
   agentAccess?: boolean;
