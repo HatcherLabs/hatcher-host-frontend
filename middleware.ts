@@ -99,7 +99,8 @@ function isTrackablePath(pathname: string): boolean {
 export default function middleware(req: NextRequest): NextResponse {
   const { pathname } = req.nextUrl;
   // Consolidate the public www duplicate without affecting local/preview hosts.
-  if (req.nextUrl.hostname === 'www.hatcher.host') {
+  const requestHostname = (req.headers.get('host') || req.nextUrl.host).split(':')[0].toLowerCase();
+  if (requestHostname === 'www.hatcher.host') {
     const target = new URL(`${req.nextUrl.pathname}${req.nextUrl.search}`, 'https://hatcher.host');
     return NextResponse.redirect(target, 308);
   }

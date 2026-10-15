@@ -110,3 +110,10 @@ test('private routes remain excluded in every language', async ({ request }) => 
   expect(robots).toContain('Disallow: /ro/dashboard$');
   expect(robots).not.toContain('Disallow: /tutorials');
 });
+test('www redirects behind the reverse proxy and preserves path/query', async ({ request }) => {
+  const response = await request.get('/ro/pricing?utm_source=seo-test', {
+    maxRedirects: 0, headers: { Host: 'www.hatcher.host' },
+  });
+  expect(response.status()).toBe(308);
+  expect(response.headers().location).toBe('https://hatcher.host/ro/pricing?utm_source=seo-test');
+});
