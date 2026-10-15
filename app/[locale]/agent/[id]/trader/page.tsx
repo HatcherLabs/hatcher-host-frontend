@@ -1,26 +1,8 @@
 import type { Metadata } from 'next';
-import { API_URL } from '@/lib/config';
+import { notFound } from 'next/navigation';
+import { fetchPublicProfile } from '@/lib/public-profile';
 import type { PublicTraderData } from '@/lib/api';
 import { PublicTraderPageClient } from './PublicTraderPageClient';
-
-type PublicTraderEnvelope = {
-  success: boolean;
-  data?: PublicTraderData;
-};
-
-async function fetchTrader(id: string): Promise<PublicTraderData | null> {
-  try {
-    const response = await fetch(
-      `${API_URL}/agents/${encodeURIComponent(id)}/public-trader`,
-      { next: { revalidate: 30 } },
-    );
-    if (!response.ok) return null;
-    const body = (await response.json()) as PublicTraderEnvelope;
-    return body.success ? body.data ?? null : null;
-  } catch {
-    return null;
-  }
-}
 
 export async function generateMetadata({
   params,
@@ -28,14 +10,10 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const trader = await fetchTrader(id);
-  if (!trader) {
-    return {
-      title: 'Trader page unavailable',
-      description: 'This public Hatcher trader page is not available.',
-      robots: { index: false, follow: false },
-    };
-  }
+  const result = await fetchPublicProfile<PublicTraderData>(`/agents/${encodeURIComponent(id)}/public-trader`);
+  if (result.status === 'missing') notFound();
+  if (result.status === 'unavailable') throw new Error('Public trader lookup temporarily unavailable');
+  const trader = result.data;
 
   const symbol = trader.token?.symbol ?? 'agent token';
   const title = `${trader.agent.name} · $${symbol} trader`;

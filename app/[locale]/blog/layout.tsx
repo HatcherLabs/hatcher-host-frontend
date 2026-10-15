@@ -1,7 +1,7 @@
+import { localizedMetadata } from '@/lib/seo';
 import type { Metadata } from 'next';
-import { buildLanguagesMap } from '@/lib/seo';
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: 'Blog',
   description:
     'Guides, tutorials, and insights about AI agents, deployment, and the Hatcher platform.',
@@ -27,9 +27,10 @@ export const metadata: Metadata = {
     description: 'Guides, tutorials, and insights about AI agents and the Hatcher platform.',
     images: ['https://hatcher.host/og?title=Hatcher+Blog&subtitle=Guides%2C+tutorials%2C+and+insights+about+AI+agents%2C+deployment%2C+and+the+Hatcher+platform.&tag=Blog'],
   },
-  alternates: { canonical: 'https://hatcher.host/blog', languages: buildLanguagesMap('/blog') },
 };
 
 export default function BlogLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
+
+export const generateMetadata = localizedMetadata('/blog', pageMetadata);

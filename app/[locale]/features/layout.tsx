@@ -1,7 +1,7 @@
+import { localizedMetadata } from '@/lib/seo';
 import type { Metadata } from 'next';
-import { buildLanguagesMap } from '@/lib/seo';
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: 'Hatcher Features - AI agents, skills, iOS, Android',
   description:
     'Explore Hatcher features: agent email, skills, GitHub workflows, mobile apps, and managed OpenClaw or Hermes agents.',
@@ -16,10 +16,6 @@ export const metadata: Metadata = {
     'Solana Mobile',
     'AI agent hosting',
   ],
-  alternates: {
-    canonical: '/features',
-    languages: buildLanguagesMap('/features'),
-  },
   openGraph: {
     title: 'Hatcher Features',
     description: 'Everything Hatcher agents can do across web and mobile.',
@@ -38,3 +34,5 @@ export const metadata: Metadata = {
 export default function FeaturesLayout({ children }: { children: React.ReactNode }) {
   return children;
 }
+
+export const generateMetadata = localizedMetadata('/features', pageMetadata);

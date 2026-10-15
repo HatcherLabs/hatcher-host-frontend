@@ -1,3 +1,4 @@
+import { localizedMetadata } from '@/lib/seo';
 import type { Metadata } from 'next';
 import { Link } from '@/i18n/routing';
 import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
@@ -15,7 +16,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: 'Security | Hatcher',
   description:
     'How Hatcher protects agent credentials, wallets, containers, network access, logs, and platform infrastructure.',
@@ -288,3 +289,5 @@ export default function SecurityPage() {
     </MarketingShell>
   );
 }
+
+export const generateMetadata = localizedMetadata('/security', pageMetadata);

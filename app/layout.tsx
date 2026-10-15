@@ -101,8 +101,6 @@ export const metadata: Metadata = {
       'Managed AI agent infrastructure for hosted OpenClaw and Hermes agents: models, wallets, tools, integrations, and runtime controls in one place.',
     images: [SOCIAL_PREVIEW_URL],
   },
-  robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
-  alternates: { canonical: SITE_URL },
   icons: {
     icon: [
       { url: ICON_PATHS.svg, type: 'image/svg+xml' },

@@ -1,7 +1,7 @@
+import { localizedMetadata } from '@/lib/seo';
 import type { Metadata } from "next";
 import { MarketingShell } from "@/components/marketing/v3/MarketingShell";
 import { API_URL } from "@/lib/config";
-import { buildLanguagesMap } from "@/lib/seo";
 import { ComputeExperience } from "./ComputeExperience";
 import type { ComputeNetworkMetricValues } from "./compute-data";
 
@@ -40,15 +40,11 @@ async function loadComputeMetrics(): Promise<ComputeNetworkMetricValues | null> 
   }
 }
 
-export function generateMetadata(): Metadata {
+function pageMetadata(): Metadata {
   return {
     title: "Hatcher Compute — Closed beta preview",
     description:
       "Apply to the Hatcher Compute closed beta for provider nodes and distributed inference API access.",
-    alternates: {
-      canonical: "/compute",
-      languages: buildLanguagesMap("/compute"),
-    },
   };
 }
 
@@ -60,3 +56,5 @@ export default async function ComputePage() {
     </MarketingShell>
   );
 }
+
+export const generateMetadata = localizedMetadata('/compute', pageMetadata());

@@ -1,10 +1,10 @@
+import { localizedMetadata } from '@/lib/seo';
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Search, Sparkles, TrendingUp } from "lucide-react";
 import { API_URL } from "@/lib/config";
 import { Link } from "@/i18n/routing";
 import { MarketingShell } from "@/components/marketing/v3/MarketingShell";
-import { buildLanguagesMap } from "@/lib/seo";
 import { shouldSkipStaticApiFetch } from "@/lib/static-api-fetch";
 import { PublicAgentsExplorer } from "@/components/explore/PublicAgentsExplorer";
 import {
@@ -20,13 +20,9 @@ type ExploreResponse = {
   };
 };
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: "Explore Public AI Agents",
   description: "Chat with public Hatcher agents shared by the community.",
-  alternates: {
-    canonical: "/explore",
-    languages: buildLanguagesMap("/explore"),
-  },
   openGraph: {
     title: "Explore Public AI Agents · Hatcher",
     description:
@@ -177,3 +173,5 @@ function ExploreStat({
     </div>
   );
 }
+
+export const generateMetadata = localizedMetadata('/explore', pageMetadata);

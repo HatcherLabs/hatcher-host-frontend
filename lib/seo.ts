@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 /**
  * SEO helpers for hreflang / alternate language link generation.
  *
@@ -27,4 +28,22 @@ export function buildLanguagesMap(path: string): Record<string, string> {
   languages['x-default'] = `${SITE_URL}${suffix}`;
 
   return languages;
+}
+
+/** Canonicals and hreflang must refer to the same locale-specific URL. */
+export function buildPageAlternates(path: string, locale: string = defaultLocale) {
+  const languages = buildLanguagesMap(path);
+  return { canonical: languages[locale] ?? languages[defaultLocale], languages };
+}
+
+export function localizedMetadata(path: string, metadata: Metadata) {
+  return async ({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> => {
+    const { locale } = await params;
+    const alternates = buildPageAlternates(path, locale);
+    return {
+      ...metadata,
+      alternates,
+      ...(metadata.openGraph ? { openGraph: { ...metadata.openGraph, url: alternates.canonical } } : {}),
+    };
+  };
 }

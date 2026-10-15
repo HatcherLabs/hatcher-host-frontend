@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/privacy' },
   title: 'Privacy Policy | Hatcher',
   description:
     'GDPR-aligned Privacy Policy for Hatcher — what we collect, why, how long we keep it, how to exercise your data subject rights.',

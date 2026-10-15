@@ -1,7 +1,7 @@
+import { localizedMetadata } from '@/lib/seo';
 import type { Metadata } from 'next';
-import { buildLanguagesMap } from '@/lib/seo';
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: 'Sign In',
   description:
     'Sign in to your Hatcher account to manage your AI agents, view analytics, configure integrations, and monitor performance.',
@@ -25,9 +25,10 @@ export const metadata: Metadata = {
     images: ['https://hatcher.host/og?title=Sign+In&subtitle=Sign+in+to+manage+your+AI+agents&tag=Hatcher'],
   },
   robots: { index: false, follow: true },
-  alternates: { canonical: 'https://hatcher.host/login', languages: buildLanguagesMap('/login') },
 };
 
 export default function LoginLayout({ children }: { children: React.ReactNode }) {
   return children;
 }
+
+export const generateMetadata = localizedMetadata('/login', pageMetadata);

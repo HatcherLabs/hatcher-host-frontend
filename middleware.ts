@@ -98,8 +98,16 @@ function isTrackablePath(pathname: string): boolean {
 
 export default function middleware(req: NextRequest): NextResponse {
   const { pathname } = req.nextUrl;
+  // Consolidate the public www duplicate without affecting local/preview hosts.
+  if (req.nextUrl.hostname === 'www.hatcher.host') {
+    const target = new URL(`${req.nextUrl.pathname}${req.nextUrl.search}`, 'https://hatcher.host');
+    return NextResponse.redirect(target, 308);
+  }
   const nonce = createNonce();
   const unprefixedPathname = stripLocalePrefix(pathname);
+  const privateRoute = ['/dashboard', '/settings', '/admin', '/chat', '/login', '/register', '/forgot-password', '/reset-password', '/verify-email', '/oauth', '/embed'].some(
+    (path) => unprefixedPathname === path || unprefixedPathname.startsWith(`${path}/`),
+  );
   const isEmbedRoute = unprefixedPathname.startsWith('/embed');
   const isQwertiWidgetRoute = unprefixedPathname === '/';
   // Desktop route: the Browser app iframes arbitrary https sites, so only
@@ -135,8 +143,10 @@ export default function middleware(req: NextRequest): NextResponse {
   // Non-locale paths (admin, legal pages, og, skill) bypass the intl middleware.
   // They live at app/ root (not under [locale]) so next-intl must not rewrite them.
   if (isNonLocalePath(pathname)) {
+    const response = NextResponse.next({ request: { headers: requestHeaders } });
+    if (privateRoute) response.headers.set('X-Robots-Tag', 'noindex, nofollow');
     return withSecurityHeaders(
-      NextResponse.next({ request: { headers: requestHeaders } }),
+      response,
       nonce,
       isEmbedRoute,
       isQwertiWidgetRoute,
@@ -158,6 +168,7 @@ export default function middleware(req: NextRequest): NextResponse {
   // Step 1: Run next-intl first so it can handle locale detection/rewrites/redirects
   // and set the HATCHER_LOCALE cookie.
   const response = intlMiddleware(req);
+  if (privateRoute) response.headers.set('X-Robots-Tag', 'noindex, nofollow');
   applyRequestHeaderOverrides(response, requestHeaders);
   normalizeInternalRedirect(response);
 
@@ -274,7 +285,7 @@ function redirectDefaultLocalePath(req: NextRequest): NextResponse | null {
   if (pathname !== prefix && !pathname.startsWith(`${prefix}/`)) return null;
 
   const target = new URL(`${stripLocalePrefix(pathname)}${search}`, PUBLIC_SITE_URL);
-  const response = NextResponse.redirect(target);
+  const response = NextResponse.redirect(target, 308);
   response.cookies.set('HATCHER_LOCALE', defaultLocale, {
     path: '/',
     maxAge: 60 * 60 * 24 * 365,

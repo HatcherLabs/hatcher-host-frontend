@@ -1,7 +1,7 @@
+import { localizedMetadata } from '@/lib/seo';
 import type { Metadata } from 'next';
-import { buildLanguagesMap } from '@/lib/seo';
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: 'Hatcher Whitepaper - $HATCHER Token and Agent Economy',
   description:
     'Read the Hatcher whitepaper covering the hosted AI agent platform, $HATCHER token utility, AI Credits, partner compute, security model, and roadmap.',
@@ -35,12 +35,10 @@ export const metadata: Metadata = {
       'https://hatcher.host/og?title=Hatcher+Whitepaper&subtitle=Hosted+AI+agents%2C+%24HATCHER+utility%2C+AI+Credits%2C+partner+compute%2C+and+the+agent+economy.&tag=Whitepaper',
     ],
   },
-  alternates: {
-    canonical: 'https://hatcher.host/whitepaper',
-    languages: buildLanguagesMap('/whitepaper'),
-  },
 };
 
 export default function WhitepaperLayout({ children }: { children: React.ReactNode }) {
   return children;
 }
+
+export const generateMetadata = localizedMetadata('/whitepaper', pageMetadata);

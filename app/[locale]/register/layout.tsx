@@ -1,7 +1,7 @@
+import { localizedMetadata } from '@/lib/seo';
 import type { Metadata } from 'next';
-import { buildLanguagesMap } from '@/lib/seo';
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: 'Sign Up — Create Free Account',
   description:
     'Create a free Hatcher account and deploy your first AI agent in minutes. No credit card required. Free tier includes AI Credits and access to all platforms.',
@@ -17,9 +17,10 @@ export const metadata: Metadata = {
     title: 'Sign Up Free | Hatcher',
     description: 'Create a free account and deploy your first AI agent in minutes.',
   },
-  alternates: { canonical: 'https://hatcher.host/register', languages: buildLanguagesMap('/register') },
 };
 
 export default function RegisterLayout({ children }: { children: React.ReactNode }) {
   return children;
 }
+
+export const generateMetadata = localizedMetadata('/register', pageMetadata);

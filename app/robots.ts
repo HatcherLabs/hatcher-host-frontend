@@ -1,3 +1,4 @@
+import { locales } from '@/i18n/config';
 import { MetadataRoute } from 'next';
 
 export const dynamic = 'force-static';
@@ -8,7 +9,11 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/dashboard/', '/settings/', '/admin/', '/api/', '/chat/'],
+        disallow: ['', ...locales.map((locale) => `/${locale}`)].flatMap((prefix) =>
+          ['/dashboard', '/settings', '/admin', '/api', '/chat', '/oauth'].flatMap((path) =>
+            [`${prefix}${path}$`, `${prefix}${path}/`],
+          ),
+        ),
       },
     ],
     sitemap: 'https://hatcher.host/sitemap.xml',
