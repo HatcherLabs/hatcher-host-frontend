@@ -1,11 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "@/i18n/routing";
 import { useAuth } from "@/lib/auth-context";
 import { guestChatRequest } from "@/lib/direct-chat";
 import ChatWorkspace from "./ChatWorkspace";
 
-export function ChatEntry() {
+export function ChatEntry({ introduction }: { introduction?: ReactNode }) {
   const { isAuthenticated, isLoading, user } = useAuth();
   const [imported, setImported] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -36,6 +36,7 @@ export function ChatEntry() {
           Chat with AI, work with your own agents, and create images, video and music in Canvas.
         </p>
         <Link href="/platform" className="text-sm underline">Explore the Hatcher platform</Link>
+        {introduction}
         <p role={error ? "alert" : "status"}>
           {error || "Opening your workspace…"}
         </p>
@@ -51,5 +52,5 @@ export function ChatEntry() {
         )}
       </main>
     );
-  return <ChatWorkspace key={user?.id || "guest"} guest={!isAuthenticated} agentsEnabled />;
+  return <ChatWorkspace key={user?.id || "guest"} guest={!isAuthenticated} guestIntroduction={introduction} agentsEnabled />;
 }

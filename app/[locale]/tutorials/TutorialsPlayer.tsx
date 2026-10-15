@@ -2,12 +2,14 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { useLocale } from 'next-intl';
 import { ArrowRight, Clock3, ExternalLink, Play, PlayCircle } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { HATCHER_TUTORIALS } from '@/lib/tutorials';
 import styles from './page.module.css';
 
 export function TutorialsPlayer() {
+  const locale = useLocale();
   const [activeIndex, setActiveIndex] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
   const active = HATCHER_TUTORIALS[activeIndex];
@@ -31,7 +33,7 @@ export function TutorialsPlayer() {
   };
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} lang="en">
       <div className={styles.container}>
         <section className={styles.hero} aria-labelledby="tutorials-title">
           <h1 id="tutorials-title">Learn Hatcher by doing.</h1>
@@ -57,6 +59,7 @@ export function TutorialsPlayer() {
               poster={active.posterSrc}
             >
               <source src={active.videoSrc} type="video/mp4" />
+              {active.slug === 'models-ai-credits' && <track kind="captions" src="/tutorials/models-ai-credits.vtt" srcLang="en" label="English" />}
               Your browser does not support HTML video.
             </video>
           </div>
@@ -78,6 +81,10 @@ export function TutorialsPlayer() {
                 <Play aria-hidden="true" />
                 Watch now
               </button>
+              <Link href={`/tutorials/${active.slug}`} locale={locale === 'en' ? undefined : 'en'} className={styles.secondaryAction}>
+                Video &amp; written guide
+                <ArrowRight aria-hidden="true" />
+              </Link>
               <Link href={active.featureHref} className={styles.secondaryAction}>
                 {active.featureLabel}
                 <ExternalLink aria-hidden="true" />
@@ -137,6 +144,9 @@ export function TutorialsPlayer() {
                     <PlayCircle aria-hidden="true" />
                   </span>
                 </button>
+                <Link href={`/tutorials/${tutorial.slug}`} locale={locale === 'en' ? undefined : 'en'} className={styles.guideLink}>
+                  {tutorial.title}: video &amp; written guide <ArrowRight size={15} aria-hidden="true" />
+                </Link>
               </li>
             ))}
           </ol>

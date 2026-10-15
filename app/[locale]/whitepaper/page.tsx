@@ -180,7 +180,7 @@ function TextLink({ href, children }: { href: string; children: React.ReactNode 
 
 export default function WhitepaperPage() {
   return (
-    <MarketingShell>
+    <MarketingShell contentLanguage="en">
       <main className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
         <section className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-end">
           <div>

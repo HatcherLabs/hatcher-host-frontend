@@ -2,6 +2,8 @@ import { MetadataRoute } from "next";
 import { BLOG_POSTS } from "@/lib/blog";
 import { API_URL } from "@/lib/config";
 import { shouldSkipStaticApiFetch } from "@/lib/static-api-fetch";
+import { HATCHER_TUTORIALS } from "@/lib/tutorials";
+import { buildLanguagesMap, contentLocales } from "@/lib/seo";
 import { routing } from "@/i18n/routing";
 
 export const dynamic = "force-static";
@@ -53,22 +55,13 @@ function absUrl(locale: string, path: string): string {
   return `${SITE_URL}${prefix}${suffix}`;
 }
 
-function buildLanguagesMap(path: string): Record<string, string> {
-  const languages: Record<string, string> = {};
-  for (const locale of routing.locales) {
-    languages[locale] = absUrl(locale, path);
-  }
-  languages["x-default"] = absUrl(routing.defaultLocale, path);
-  return languages;
-}
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Localized public routes — one entry per locale per route
   const localizedEntries: MetadataRoute.Sitemap = [];
   for (const route of LOCALIZED_ROUTES) {
     const languages = buildLanguagesMap(route.path);
-    for (const locale of routing.locales) {
+    for (const locale of contentLocales(route.path)) {
       localizedEntries.push({
         url: absUrl(locale, route.path),
         changeFrequency: route.changeFrequency,
@@ -125,6 +118,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...localizedEntries,
     ...blogPostEntries,
+    ...HATCHER_TUTORIALS.map((tutorial) => ({
+      url: `${SITE_URL}/tutorials/${tutorial.slug}`,
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    })),
     ...legalEntries,
     ...agentEntries,
   ];

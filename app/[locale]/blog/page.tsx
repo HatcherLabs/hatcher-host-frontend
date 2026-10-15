@@ -26,7 +26,7 @@ export default function BlogPage() {
   const gridPosts = showFeatured ? filtered.slice(1) : filtered;
 
   return (
-    <MarketingShell>
+    <MarketingShell contentLanguage="en">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
         {/* Header */}
         <div className="mb-14 max-w-2xl">

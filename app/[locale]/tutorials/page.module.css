@@ -461,3 +461,22 @@
     transition: none;
   }
 }
+
+.guideLink { display: flex; align-items: center; gap: 8px; width: fit-content; margin: 0 8px 24px; color: var(--accent); font-size: 14px; text-underline-offset: 4px; }
+.guideLink:hover { text-decoration: underline; }
+.watchHeader { max-width: 850px; padding: 32px 0 24px; }
+.watchHeader nav { color: var(--text-secondary); font-size: 13px; margin-bottom: 18px; }
+.watchHeader a, .writtenGuide a:not(.primaryAction) { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
+.watchHeader h1 { margin: 0; font-size: clamp(30px, 4.5vw, 54px); line-height: 1.08; letter-spacing: -0.035em; }
+.watchHeader p { color: var(--text-secondary); line-height: 1.6; }
+.watchHeader .meta { display: block; margin: 12px 0 0; font-size: 12px; }
+.watchVideo { display: block; width: min(100%, 960px); aspect-ratio: 16 / 9; background: #050809; border: 1px solid var(--border-default); }
+.writtenGuide { max-width: 780px; padding-top: 20px; color: var(--text-secondary); font-size: 16px; line-height: 1.75; }
+.writtenGuide section { margin: 32px 0; }
+.writtenGuide h2, .writtenGuide h3 { color: var(--text-primary); line-height: 1.35; }
+.writtenGuide h2 { font-size: 25px; margin-bottom: 18px; }
+.writtenGuide h3 { font-size: 18px; margin-bottom: 6px; }
+.writtenGuide ol { padding-left: 24px; list-style: decimal; }
+.writtenGuide li { padding-left: 6px; margin: 16px 0; }
+.writtenGuide p { margin: 6px 0 16px; }
+.guideNote { border-left: 2px solid var(--accent); padding: 12px 18px; background: var(--bg-card); }

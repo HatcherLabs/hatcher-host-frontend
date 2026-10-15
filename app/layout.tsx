@@ -136,106 +136,6 @@ const websiteJsonLd = {
   name: 'Hatcher',
   url: 'https://hatcher.host',
   description: 'AI Agent Hosting Platform',
-  potentialAction: {
-    '@type': 'SearchAction',
-    target: `${SITE_URL}/frameworks?q={search_term_string}`,
-    'query-input': 'required name=search_term_string',
-  },
-};
-
-const softwareApplicationJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'SoftwareApplication',
-  name: 'Hatcher',
-  url: 'https://hatcher.host',
-  applicationCategory: 'DeveloperApplication',
-  operatingSystem: 'Web',
-  description:
-    'Managed AI agent hosting platform. Deploy OpenClaw and Hermes agents with workspace controls, UsePod/OpenRouter routing, integrations, and BYOK support.',
-  offers: [
-    {
-      '@type': 'Offer',
-      name: 'Free Tier',
-      price: '0',
-      priceCurrency: 'USD',
-      description: '1 agent, 500 AI Credits/month, 1 CPU/1GB RAM, 2GB workspace, all integrations.',
-    },
-    {
-      '@type': 'Offer',
-      name: 'Starter Plan',
-      price: '6.99',
-      priceCurrency: 'USD',
-      billingIncrement: 'P1M',
-      description: '1 agent, 3,000 AI Credits/month, 1 CPU/1.5GB RAM, 10GB workspace.',
-    },
-    {
-      '@type': 'Offer',
-      name: 'Pro Plan',
-      price: '19.99',
-      priceCurrency: 'USD',
-      billingIncrement: 'P1M',
-      description: '3 agents, 15,000 AI Credits/month, 1.5 CPU/4GB RAM per agent, 25GB workspace.',
-    },
-    {
-      '@type': 'Offer',
-      name: 'Business Plan',
-      price: '49.99',
-      priceCurrency: 'USD',
-      billingIncrement: 'P1M',
-      description: '5 agents, 40,000 AI Credits/month, 4 CPU/6GB RAM, 50GB workspace, always active, priority support.',
-    },
-    {
-      '@type': 'Offer',
-      name: 'Founding Member',
-      price: '99',
-      priceCurrency: 'USD',
-      description: '10 agents, 25,000 AI Credits/month, 4 CPU/6GB RAM, 40GB workspace, lifetime access, 20 spots only.',
-    },
-  ],
-  creator: {
-    '@type': 'Organization',
-    name: 'Hatcher Labs',
-    url: SITE_URL,
-  },
-};
-
-const faqJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: [
-    {
-      '@type': 'Question',
-      name: 'Is it really free?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Yes. The free plan gives you 1 agent, 500 AI Credits/month, 2GB workspace, File Manager, Full Logs, and access to all platforms. No credit card required.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Do I need to know how to code?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Not at all! Creating an agent is like filling out a form — choose a name, describe what you want it to do, pick platforms, and launch.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'What is "Bring Your Own Key"?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Connect your own OpenAI, Anthropic, Google, OpenRouter, or other supported LLM key. BYOK usage is paid directly to your provider and does not spend Hatcher AI Credits.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Where does my agent run?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'On our cloud servers 24/7. No need to keep your computer on or install anything.',
-      },
-    },
-  ],
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -263,18 +163,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           nonce={nonce}
           suppressHydrationWarning
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
-        />
-        <script
-          type="application/ld+json"
-          nonce={nonce}
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationJsonLd) }}
-        />
-        <script
-          type="application/ld+json"
-          nonce={nonce}
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
         />
       </head>
       <body>

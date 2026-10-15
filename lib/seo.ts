@@ -9,6 +9,15 @@ import { defaultLocale, locales } from '@/i18n/config';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://hatcher.host';
 
+// These routes currently have English editorial content, even with localized navigation.
+// Add languages only when their primary content has actually been translated.
+const ENGLISH_CONTENT_ROUTES = ['/tutorials', '/security', '/features', '/compute', '/whitepaper', '/blog'];
+
+export function contentLocales(path: string): readonly string[] {
+  return ENGLISH_CONTENT_ROUTES.some((route) => path === route || path.startsWith(`${route}/`))
+    ? [defaultLocale] : locales;
+}
+
 /**
  * Returns a `languages` map suitable for Next.js `alternates.languages`.
  *
@@ -19,7 +28,7 @@ export function buildLanguagesMap(path: string): Record<string, string> {
   const suffix = path === '/' ? '' : path;
   const languages: Record<string, string> = {};
 
-  for (const locale of locales) {
+  for (const locale of contentLocales(path)) {
     const prefix = locale === defaultLocale ? '' : `/${locale}`;
     languages[locale] = `${SITE_URL}${prefix}${suffix}`;
   }

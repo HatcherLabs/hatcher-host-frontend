@@ -1,3 +1,4 @@
+import { TIERS } from '@hatcher/shared';
 import { localizedMetadata } from '@/lib/seo';
 import type { Metadata } from "next";
 import { LandingV3 } from "@/components/landing/v3/LandingV3";
@@ -24,6 +25,16 @@ export default function PlatformPage() {
         </Link>
       </div>
       <LandingV3 />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        '@context': 'https://schema.org', '@type': 'SoftwareApplication',
+        name: 'Hatcher', url: 'https://hatcher.host/platform',
+        applicationCategory: 'DeveloperApplication', operatingSystem: 'Web',
+        description: 'Managed AI agent hosting with workspace controls, models, tools, and integrations.',
+        offers: Object.values(TIERS).map((tier) => ({
+          '@type': 'Offer', name: tier.name, price: tier.usdPrice,
+          priceCurrency: 'USD', url: 'https://hatcher.host/pricing',
+        })),
+      }).replace(/</g, '\\u003c') }} />
     </>
   );
 }
