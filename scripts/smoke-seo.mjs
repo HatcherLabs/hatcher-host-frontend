@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import { get as httpGet } from 'node:http';
+import { get as httpsGet } from 'node:https';
 
 const base = process.argv[2] || 'http://localhost:3100';
 async function get(path, options = {}) {
@@ -34,3 +36,19 @@ assert.ok(robots.includes('Disallow: /ro/dashboard$'));
 assert.ok(robots.includes('Disallow: /dashboard/'));
 assert.ok(!robots.includes('Disallow: /tutorials'));
 console.log('SEO smoke passed: canonical URLs, 10 video dates, browser/Googlebot 404s, private noindex, localized robots');
+// Next's internal URL can use localhost behind nginx; the Host header remains public.
+// Native HTTP preserves Host; Node fetch can replace this header with the URL host.
+const www = await new Promise((resolve, reject) => {
+  const url = new URL('/ro/pricing?utm_source=seo-test', base);
+  const request = (url.protocol === 'https:' ? httpsGet : httpGet)(url, {
+    headers: { Host: 'www.hatcher.host' },
+  }, (response) => {
+    response.resume();
+    resolve({ status: response.statusCode, location: response.headers.location });
+  });
+  request.on('error', reject);
+  request.setTimeout(20_000, () => request.destroy(new Error('www check timed out')));
+});
+assert.equal(www.status, 308, 'www permanent redirect behind proxy');
+assert.equal(www.location, 'https://hatcher.host/ro/pricing?utm_source=seo-test');
+console.log('Proxy Host canonical redirect passed');
