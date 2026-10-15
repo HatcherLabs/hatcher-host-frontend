@@ -72,7 +72,7 @@ test.describe('SEO routing hygiene', () => {
 
 test('public pages have locale-correct canonical URLs', async ({ request }) => {
   for (const path of ['/', '/ro', '/security', '/docs', '/privacy', '/terms', '/cookies', '/impressum', '/ro/pricing', '/de/features', '/platform', '/tutorials']) {
-    const response = await request.get(path);
+    const response = await request.get(path, { headers: { Cookie: 'HATCHER_LOCALE=en' } });
     expect(response.status(), path).toBe(200);
     const html = await response.text();
     const links = [...html.matchAll(/<link[^>]*rel="canonical"[^>]*href="([^"]+)"/g)].map((match) => match[1]);
@@ -103,7 +103,7 @@ test('all tutorial video objects have publication dates', async ({ request }) =>
 
 test('private routes remain excluded in every language', async ({ request }) => {
   for (const path of ['/dashboard', '/ro/dashboard', '/settings', '/de/settings', '/login', '/reset-password', '/admin']) {
-    const response = await request.get(path);
+    const response = await request.get(path, { headers: { Cookie: 'HATCHER_LOCALE=en' } });
     expect(response.headers()['x-robots-tag'], path).toContain('noindex');
   }
   const robots = await (await request.get('/robots.txt')).text();
