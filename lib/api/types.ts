@@ -48,7 +48,9 @@ export interface Payment {
   id: string;
   agentId: string | null;
   featureKey: string;
-  usdAmount: number;
+  usdAmount: number | null;
+  originalAmount?: number | string | null;
+  originalCurrency?: string | null;
   hatchAmount: number;
   txSignature: string;
   status: "pending" | "confirmed" | "failed" | "refunded";
@@ -2632,7 +2634,9 @@ export interface AdminPayment {
   agentName: string | null;
   agentFramework: string | null;
   featureKey: string;
-  usdAmount: number;
+  usdAmount: number | null;
+  originalAmount?: number | string | null;
+  originalCurrency?: string | null;
   hatchAmount: number;
   paymentToken: string | null;
   tokenAmount: number | null;
@@ -3141,3 +3145,7 @@ export interface IronClawLlmResponse {
   providers?: Array<Record<string, unknown>> | null;
   active?: { provider_id?: string; model?: string } | null;
 }
+
+export type AdminOverviewExtras = import('@hatcher/shared').AdminOverviewExtras & {
+  revenueByCurrency?: Array<{ currency: string; amount: number; payments: number }>;
+};

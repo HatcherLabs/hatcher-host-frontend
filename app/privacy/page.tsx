@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 // it on any material edit (scope, retention, third-parties). GDPR
 // requires material changes to be communicated to users — the
 // sendPrivacyUpdated email hook in services/email.ts handles that.
-const LAST_UPDATED = 'September 9, 2026';
+const LAST_UPDATED = 'October 15, 2026';
 
 export default function PrivacyPolicyPage() {
   return (
@@ -100,10 +100,12 @@ export default function PrivacyPolicyPage() {
               <li>Integration tokens (Telegram bot token, Discord, Twitter, etc.) — encrypted at rest with AES-256-GCM</li>
             </ul>
 
+            <p>When you choose Google sign-in, we receive your Google account identifier, email address, email verification status, and profile information made available by Google. We use these to authenticate or link your Hatcher account.</p>
             <h3 className="text-base font-medium text-[var(--text-primary)] mt-4 mb-2">Usage Data</h3>
             <ul className="list-disc pl-6 space-y-1.5">
               <li>IP address (truncated after 24h), browser type, device information</li>
               <li>Pages visited, features used, session duration</li>
+              <li>Mobile app/device identifiers and Firebase messaging tokens for notifications; mobile analytics events processed by Firebase</li>
               <li>API usage patterns, interaction counts, search counts</li>
             </ul>
 
@@ -112,6 +114,7 @@ export default function PrivacyPolicyPage() {
               <li>Transaction signatures for on-chain payments (SOL, USDC, $HATCHER)</li>
               <li>Stripe handles all card data — we never see or store card numbers, CVC, or expiry</li>
               <li>Apple App Store transaction identifiers and subscription product IDs for in-app purchases</li>
+              <li>Google Play purchase tokens, order and product IDs, purchase status, amounts, currency, renewal and refund information. Purchase tokens are encrypted at rest; Google processes payment card details.</li>
               <li>Invoice line items (tier, addon, amount, currency, timestamp)</li>
             </ul>
 
@@ -238,6 +241,7 @@ export default function PrivacyPolicyPage() {
                   <tr><td className="px-3 py-2">Xiaomi MiMo</td><td className="px-3 py-2">LLM inference via UsePod/OpenRouter route</td><td className="px-3 py-2">AI prompts, chat messages, voice transcripts, agent configs, session context, and generated outputs when selected</td><td className="px-3 py-2">UsePod/OpenRouter infrastructure</td></tr>
                   <tr><td className="px-3 py-2">AceData</td><td className="px-3 py-2">LLM inference and data/media tools (direct partner route)</td><td className="px-3 py-2">AI prompts, chat messages, voice transcripts, agent configs, session context, files/tool-call content, and generated outputs when selected</td><td className="px-3 py-2">Partner infrastructure</td></tr>
                   <tr><td className="px-3 py-2">OpenServ</td><td className="px-3 py-2">Partner-hosted AI inference and agent services</td><td className="px-3 py-2">AI prompts, chat messages, voice transcripts, agent configs, session context, and generated outputs when selected</td><td className="px-3 py-2">Partner infrastructure</td></tr>
+                  <tr><td className="px-3 py-2">Google / Firebase</td><td className="px-3 py-2">Google sign-in, Play billing, mobile notifications and analytics</td><td className="px-3 py-2">Account identifiers, email, purchase/order identifiers and status, amounts and currency, device and notification identifiers, app events</td><td className="px-3 py-2">Global</td></tr>
                   <tr><td className="px-3 py-2">Apple</td><td className="px-3 py-2">In-app purchase processing</td><td className="px-3 py-2">App Store transaction identifiers and subscription status</td><td className="px-3 py-2">Global</td></tr>
                   <tr><td className="px-3 py-2">Stripe</td><td className="px-3 py-2">Card payments</td><td className="px-3 py-2">Email, billing address, card token</td><td className="px-3 py-2">Ireland / USA</td></tr>
                   <tr><td className="px-3 py-2">Resend</td><td className="px-3 py-2">Transactional email</td><td className="px-3 py-2">Email address, email content</td><td className="px-3 py-2">EU / USA</td></tr>

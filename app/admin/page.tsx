@@ -50,7 +50,8 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { PieChart as RePieChart, Pie, Cell, ResponsiveContainer, Tooltip as ReTooltip, BarChart, Bar, XAxis, YAxis } from 'recharts';
-import type { AdminOverviewExtras } from '@hatcher/shared';
+import type { AdminOverviewExtras } from '@/lib/api/types';
+import { paymentAmount } from '@/lib/payment-display';
 import RuntimeReliabilityPanel from '@/components/admin/RuntimeReliabilityPanel';
 
 
@@ -1187,7 +1188,7 @@ export default function AdminPage() {
     tier: string; isAdmin: boolean; aiCreditsBalance: number; emailVerified: boolean;
     createdAt: string;
     features: Array<{ id: string; featureKey: string; type: string; expiresAt: string | null; createdAt: string; txSignature: string; usdPrice: number }>;
-    payments: Array<{ id: string; featureKey: string; usdAmount: number; txSignature: string; status: string; createdAt: string; agentId: string | null }>;
+    payments: Array<{ id: string; featureKey: string; usdAmount: number | null; originalAmount?: number | string | null; originalCurrency?: string | null; txSignature: string; status: string; createdAt: string; agentId: string | null }>;
     agents: Array<{ id: string; name: string; framework: string; status: string; createdAt: string }>;
     referralReceived: AdminUserReferralReceived | null;
     referralsGiven: AdminUserReferralGiven[];
@@ -1843,6 +1844,11 @@ export default function AdminPage() {
                       />
                     </RePieChart>
                   </ResponsiveContainer>
+                  {(extras.revenueByCurrency?.length ?? 0) > 0 && <div className="mt-2 border-t border-[var(--border-primary)] pt-2 text-xs">
+                    <div className="font-medium">Google Play · customer payments</div>
+                    {extras.revenueByCurrency!.map(row => <div key={row.currency} className="mt-1">{new Intl.NumberFormat('en-US', { style: 'currency', currency: row.currency }).format(row.amount)} · {row.payments} payments</div>)}
+                    <p className="mt-1 text-[var(--text-muted)]">Before Google fees and taxes. Non-USD payments are shown separately and excluded from USD totals.</p>
+                  </div>}
                 </div>
 
                 <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
@@ -2828,7 +2834,7 @@ export default function AdminPage() {
                         <th className="py-2 pr-3" scope="col">User</th>
                         <th className="py-2 pr-3" scope="col">Agent</th>
                         <th className="py-2 pr-3">Feature</th>
-                        <th className="py-2 pr-3 text-right">USD</th>
+                        <th className="py-2 pr-3 text-right">Amount</th>
                         <th className="py-2 pr-3 text-right">Paid</th>
                         <th className="py-2 pr-3">Reason</th>
                         <th className="py-2 pr-3">Status · Tx</th>
@@ -2854,9 +2860,11 @@ export default function AdminPage() {
                             )}
                           </td>
                           <td className="py-3 pr-3 text-[var(--text-secondary)] truncate">{formatFeatureKey(p.featureKey)}</td>
-                          <td className="py-3 pr-3 text-right tabular-nums text-[var(--text-primary)]">${p.usdAmount.toFixed(2)}</td>
+                          <td className="py-3 pr-3 text-right tabular-nums text-[var(--text-primary)]">{paymentAmount(p)}</td>
                           <td className="py-3 pr-3 text-right tabular-nums text-[var(--text-muted)] whitespace-nowrap">
-                            {p.paymentToken === 'sol' && p.tokenAmount != null
+                            {p.paymentToken === 'google_play'
+                              ? 'Google Play'
+                              : p.paymentToken === 'sol' && p.tokenAmount != null
                               ? `${p.tokenAmount.toFixed(4)} SOL`
                               : p.paymentToken === 'usdc' && p.tokenAmount != null
                                 ? `${p.tokenAmount.toFixed(2)} USDC`
@@ -2884,7 +2892,8 @@ export default function AdminPage() {
                                 p.status === 'pending' ? 'bg-amber-500/10 text-amber-400' :
                                 'bg-red-500/10 text-red-400'
                               }`}>{p.status}</span>
-                              {p.txSignature && !p.txSignature.startsWith('stripe_') && (
+                              {p.paymentToken === 'google_play' && <span className="text-[10px] text-[var(--text-muted)] break-all">{p.txSignature.replace('google-play:', '')}</span>}
+                              {p.txSignature && p.paymentToken !== 'google_play' && !p.txSignature.startsWith('stripe_') && (
                                 <a
                                   href={`https://solscan.io/tx/${p.txSignature}`}
                                   target="_blank"
@@ -3429,7 +3438,7 @@ export default function AdminPage() {
                               <span className="font-medium text-[var(--text-primary)]">{formatFeatureKey(p.featureKey)}</span>
                               <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${p.status === 'confirmed' ? 'bg-emerald-500/10 text-emerald-400' : p.status === 'pending' ? 'bg-amber-500/10 text-amber-400' : 'bg-red-500/10 text-red-400'}`}>{p.status}</span>
                             </div>
-                            <div className="text-[var(--text-muted)]">${p.usdAmount.toFixed(2)} · {new Date(p.createdAt).toLocaleDateString()}</div>
+                            <div className="text-[var(--text-muted)]">{paymentAmount(p)} · {new Date(p.createdAt).toLocaleDateString()}</div>
                           </div>
                         ))}
                       </div>

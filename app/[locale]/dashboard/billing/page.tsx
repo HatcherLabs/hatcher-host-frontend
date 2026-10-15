@@ -1,5 +1,7 @@
 'use client';
 
+import { paymentAmount } from '@/lib/payment-display';
+
 import { CostExplainer } from '@/components/billing/CostExplainer';
 
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
@@ -2517,7 +2519,7 @@ export default function BillingPage() {
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-[var(--text-muted)]">{formatDate(payment.createdAt)}</span>
                   <span className="text-sm font-semibold text-[var(--text-secondary)] tabular-nums" style={{ fontFamily: 'var(--font-mono, "JetBrains Mono"), monospace' }}>
-                    ${Number(payment.usdAmount).toFixed(2)}
+                    {paymentAmount(payment)}
                   </span>
                 </div>
               </motion.div>
@@ -2551,7 +2553,7 @@ export default function BillingPage() {
                     </td>
                     <td className="px-6 py-4 text-sm text-right whitespace-nowrap">
                       <span className="text-[var(--text-secondary)] tabular-nums" style={{ fontFamily: 'var(--font-mono, "JetBrains Mono"), monospace' }}>
-                        ${Number(payment.usdAmount).toFixed(2)}
+                        {paymentAmount(payment)}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right whitespace-nowrap">
