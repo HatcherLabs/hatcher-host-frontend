@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { api, type Agent } from "@/lib/api";
+import { APP_STORE_URL, GOOGLE_PLAY_URL } from "@/lib/mobile-app-links";
 import { loginHrefForReturn } from "@/lib/safe-redirect";
 import NextImage from "next/image";
 import { useTheme } from "next-themes";
@@ -27,6 +28,7 @@ import {
   Sun,
   Music2,
   Plus,
+  Smartphone,
   Square,
   Trash2,
   Video,
@@ -719,6 +721,16 @@ export default function ChatWorkspace({
               ))}
           </div>
         </div>
+        <nav className={styles.mobileApps} aria-label="Mobile apps">
+          <Smartphone size={16} aria-hidden="true" />
+          <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer">
+            App Store<span className="sr-only"> (opens in a new tab)</span>
+          </a>
+          <span aria-hidden="true">·</span>
+          <a href={GOOGLE_PLAY_URL} target="_blank" rel="noopener noreferrer">
+            Google Play<span className="sr-only"> (opens in a new tab)</span>
+          </a>
+        </nav>
         <div className={styles.usage}>
           {guest ? (
             <>
