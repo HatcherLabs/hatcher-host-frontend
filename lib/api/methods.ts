@@ -180,7 +180,8 @@ import type {
   ComputeBetaStatus,
   ComputeNodePackageInfo,
 } from "./types";
-import type { TierConfig, AdminOverviewExtras } from "@hatcher/shared";
+import type { TierConfig } from "@hatcher/shared";
+import type { AdminOverviewExtras } from "./types";
 
 const API_BASE = API_URL;
 
