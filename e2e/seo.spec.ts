@@ -1,3 +1,4 @@
+import { HATCHER_TUTORIALS } from '../lib/tutorials';
 import { expect, test } from '@playwright/test';
 
 test.use({ storageState: { cookies: [], origins: [] } });
@@ -77,14 +78,14 @@ test('public pages have locale-correct canonical URLs', async ({ request }) => {
     const html = await response.text();
     const links = [...html.matchAll(/<link[^>]*rel="canonical"[^>]*href="([^"]+)"/g)].map((match) => match[1]);
     expect(links, path).toHaveLength(1);
-    expect(links[0].replace(/\/$/, ''), path).toBe(`https://hatcher.host${path === '/' ? '' : path}`);
+    expect(links[0].replace(/\/$/, ''), path).toBe(`https://hatcher.host${path === '/' ? '' : path === '/de/features' ? '/features' : path}`);
     expect(html, path).not.toMatch(/<meta[^>]*name="robots"[^>]*content="noindex/);
   }
 });
 
 test('missing public routes send 404 and noindex to browsers and Googlebot', async ({ request }) => {
   for (const userAgent of ['Mozilla/5.0 Chrome/130.0.0.0 Safari/537.36', 'Googlebot']) {
-    for (const path of ['/seo-audit-missing-20261015', '/blog/seo-audit-missing-20261015', '/agent/seo-audit-missing-20261015', '/agent/seo-audit-missing-20261015/trader']) {
+    for (const path of ['/seo-audit-missing-20261015', '/blog/seo-audit-missing-20261015', '/agent/seo-audit-missing-20261015', '/agent/seo-audit-missing-20261015/trader', '/tutorials/not-a-tutorial']) {
       const response = await request.get(path, { headers: { 'User-Agent': userAgent } });
       expect(response.status(), `${path} ${userAgent}`).toBe(404);
       expect(await response.text()).toMatch(/<meta[^>]*name="robots"[^>]*content="noindex/);
@@ -92,13 +93,46 @@ test('missing public routes send 404 and noindex to browsers and Googlebot', asy
   }
 });
 
-test('all tutorial video objects have publication dates', async ({ request }) => {
-  const response = await request.get('/tutorials');
-  const html = await response.text();
-  const schemas = [...html.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>(.*?)<\/script>/g)].map((match) => JSON.parse(match[1]));
-  const videos = schemas.flatMap((schema) => schema['@graph'] || []).filter((item) => item['@type'] === 'VideoObject');
-  expect(videos).toHaveLength(10);
-  for (const video of videos) expect(Number.isFinite(Date.parse(video.uploadDate))).toBe(true);
+test('each tutorial is a primary video page with dates, canonical and written guide', async ({ request }) => {
+  for (const tutorial of HATCHER_TUTORIALS) {
+    const path = `/tutorials/${tutorial.slug}`;
+    const response = await request.get(path);
+    expect(response.status(), path).toBe(200);
+    const html = await response.text();
+    const schemas = [...html.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>(.*?)<\/script>/g)].map((match) => JSON.parse(match[1]));
+    const videos = schemas.flatMap((schema) => schema['@graph'] || []).filter((item) => item['@type'] === 'VideoObject');
+    expect(videos).toHaveLength(1);
+    expect(videos[0].uploadDate).toBe(tutorial.uploadDate);
+    expect(videos[0].contentUrl).toBe(`https://hatcher.host${tutorial.videoSrc}`);
+    expect(html).toContain(`rel="canonical" href="https://hatcher.host${path}"`);
+    expect(html).toContain('Written guide');
+  }
+});
+
+test('English content does not advertise untranslated alternates', async ({ request }) => {
+  for (const path of ['/ro/tutorials', '/ro/security', '/de/features', '/de/blog', '/ro/tutorials/skills']) {
+    const response = await request.get(path);
+    const html = await response.text();
+    expect(response.headers().link || '').not.toContain('hreflang');
+    expect(html).not.toMatch(/hrefLang="(?:ro|de)"|hreflang="(?:ro|de)"/);
+  }
+});
+
+test('catalog links to videos while old hash bookmarks still select the player', async ({ page }) => {
+  await page.goto('/tutorials#skills');
+  await expect(page.locator('#active-tutorial-title')).toHaveText('Install and use Skills');
+  await page.getByRole('link', { name: 'Install and use Skills: video & written guide', exact: true }).click();
+  await expect(page).toHaveURL(/\/tutorials\/skills$/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Install and use Skills');
+  await expect(page.locator('video')).toHaveAttribute('controls', '');
+});
+
+test('video sitemap is discoverable and schemas stay relevant to the page', async ({ request }) => {
+  const xml = await (await request.get('/video-sitemap.xml')).text();
+  expect((xml.match(/<video:video>/g) || []).length).toBe(10);
+  expect(await (await request.get('/robots.txt')).text()).toContain('Sitemap: https://hatcher.host/video-sitemap.xml');
+  expect(await (await request.get('/privacy')).text()).not.toMatch(/"@type":"(?:FAQPage|SearchAction|SoftwareApplication)"/);
+  expect(await (await request.get('/platform')).text()).toContain('"@type":"SoftwareApplication"');
 });
 
 test('private routes remain excluded in every language', async ({ request }) => {

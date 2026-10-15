@@ -5,6 +5,7 @@ import { Footer } from "./Footer";
 
 interface Props {
   children: ReactNode;
+  contentLanguage?: string;
 }
 
 /**
@@ -15,11 +16,11 @@ interface Props {
  * Pages wrapped here MUST be in LayoutShell's IMMERSIVE_PATTERNS so the
  * legacy global Header/Footer don't double-stack.
  */
-export function MarketingShell({ children }: Props) {
+export function MarketingShell({ children, contentLanguage }: Props) {
   return (
     <div>
       <Nav />
-      <main>{children}</main>
+      <main lang={contentLanguage}>{children}</main>
       <Footer />
     </div>
   );

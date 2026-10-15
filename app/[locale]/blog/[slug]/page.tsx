@@ -1,3 +1,4 @@
+import { buildPageAlternates } from '@/lib/seo';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
@@ -37,7 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: post.excerpt,
       images: [ogImageUrl],
     },
-    alternates: { canonical: `https://hatcher.host/blog/${post.slug}` },
+    alternates: buildPageAlternates(`/blog/${post.slug}`),
   };
 }
 
@@ -73,7 +74,7 @@ export default async function BlogArticlePage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
       />
-      <article className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+      <article lang="en" className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
         {/* Back link */}
         <Link
           href="/blog"

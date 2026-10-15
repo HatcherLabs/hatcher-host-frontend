@@ -5,30 +5,19 @@ import { TutorialsPlayer } from './TutorialsPlayer';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://hatcher.host';
 
 export default function TutorialsPage() {
-  const videoSchema = {
+  const schema = {
     '@context': 'https://schema.org',
-    '@graph': HATCHER_TUTORIALS.map((tutorial) => ({
-      '@type': 'VideoObject',
-      name: tutorial.title,
-      description: tutorial.description,
-      thumbnailUrl: `${SITE_URL}${tutorial.posterSrc}`,
-      contentUrl: `${SITE_URL}${tutorial.videoSrc}`,
-      duration: tutorial.durationIso,
-      uploadDate: tutorial.uploadDate,
-      isFamilyFriendly: true,
-      inLanguage: 'en',
+    '@type': 'ItemList',
+    name: 'Hatcher video tutorials',
+    itemListElement: HATCHER_TUTORIALS.map((tutorial, index) => ({
+      '@type': 'ListItem', position: index + 1, name: tutorial.title,
+      url: `${SITE_URL}/tutorials/${tutorial.slug}`,
     })),
   };
-
   return (
-    <MarketingShell>
+    <MarketingShell contentLanguage="en">
       <TutorialsPlayer />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(videoSchema).replace(/</g, '\\u003c'),
-        }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, '\\u003c') }} />
     </MarketingShell>
   );
 }

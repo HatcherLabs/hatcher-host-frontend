@@ -189,7 +189,7 @@ export default function FeaturesPage() {
   );
 
   return (
-    <MarketingShell>
+    <MarketingShell contentLanguage="en">
       <div className={styles.page}>
         <section className={styles.hero}>
           <div className={styles.heroCopy}>

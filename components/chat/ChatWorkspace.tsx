@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { api, type Agent } from "@/lib/api";
@@ -73,9 +73,11 @@ const QuickAgentCreate = dynamic(() =>
 export default function ChatWorkspace({
   guest = false,
   agentsEnabled = false,
+  guestIntroduction,
 }: {
   guest?: boolean;
   agentsEnabled?: boolean;
+  guestIntroduction?: ReactNode;
 }) {
   const searchParams = useSearchParams();
   const [account, setAccount] = useState<ChatAccount | null>(null);
@@ -1204,6 +1206,7 @@ export default function ChatWorkspace({
               </div>
             </div>
           )}
+          {guest && turns.length === 0 && guestIntroduction}
           <p className={styles.footnote}>
             AI can make mistakes. Check important information.{" "}
             {guest && (

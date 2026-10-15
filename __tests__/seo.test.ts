@@ -6,7 +6,6 @@ import { fetchPublicProfile } from '@/lib/public-profile';
 
 vi.mock('@/lib/config', () => ({ API_URL: 'https://api.example.test' }));
 vi.mock('@/components/marketing/v3/MarketingShell', () => ({ MarketingShell: 'div' }));
-vi.mock('@/app/[locale]/tutorials/TutorialsPlayer', () => ({ TutorialsPlayer: 'div' }));
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -21,18 +20,24 @@ describe('Search Console regressions', () => {
     expect(metadata.alternates?.canonical).toBe('https://hatcher.host/de/docs');
   });
 
-  it('renders a real publication timestamp for every VideoObject', async () => {
-    const { default: Page } = await import('@/app/[locale]/tutorials/page');
-    const page = Page();
-    const schema = JSON.parse(page.props.children[1].props.dangerouslySetInnerHTML.__html);
-    expect(schema['@graph']).toHaveLength(10);
-    for (const video of schema['@graph']) {
-      expect(video.uploadDate).toMatch(/^2026-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$/);
-      expect(Date.parse(video.uploadDate)).toBeLessThan(Date.parse('2026-10-11'));
-      expect(video.name).toBeTruthy();
-      expect(video.thumbnailUrl).toMatch(/^https:\/\/hatcher.host\/tutorials\//);
+  it('does not advertise English-only content as translated', () => {
+    for (const path of ['/tutorials', '/tutorials/skills', '/security', '/features', '/compute', '/whitepaper', '/blog/example']) {
+      const alternates = buildPageAlternates(path, 'ro');
+      expect(alternates.canonical).toBe(`https://hatcher.host${path}`);
+      expect(Object.keys(alternates.languages)).toEqual(['en', 'x-default']);
     }
-    expect(HATCHER_TUTORIALS).toHaveLength(10);
+    expect(buildPageAlternates('/platform', 'ro').canonical).toBe('https://hatcher.host/ro/platform');
+  });
+
+  it('publishes individual video pages in the sitemap, without untranslated variants', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('{}')));
+    const entries = await sitemap();
+    for (const tutorial of HATCHER_TUTORIALS) {
+      expect(entries.map((entry) => entry.url)).toContain(`https://hatcher.host/tutorials/${tutorial.slug}`);
+    }
+    expect(entries.map((entry) => entry.url)).not.toContain('https://hatcher.host/ro/tutorials');
+    expect(entries.map((entry) => entry.url)).not.toContain('https://hatcher.host/de/security');
+    expect(entries.map((entry) => entry.url)).toContain('https://hatcher.host/ro/platform');
   });
 
   it('includes public agent slugs from the actual paginated API envelope', async () => {

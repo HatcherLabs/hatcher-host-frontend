@@ -51,7 +51,7 @@ function pageMetadata(): Metadata {
 export default async function ComputePage() {
   const networkMetrics = await loadComputeMetrics();
   return (
-    <MarketingShell>
+    <MarketingShell contentLanguage="en">
       <ComputeExperience networkMetrics={networkMetrics} />
     </MarketingShell>
   );

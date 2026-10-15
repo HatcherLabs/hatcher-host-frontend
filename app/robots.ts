@@ -16,7 +16,7 @@ export default function robots(): MetadataRoute.Robots {
         ),
       },
     ],
-    sitemap: 'https://hatcher.host/sitemap.xml',
+    sitemap: ['https://hatcher.host/sitemap.xml', 'https://hatcher.host/video-sitemap.xml'],
     host: 'https://hatcher.host',
   };
 }

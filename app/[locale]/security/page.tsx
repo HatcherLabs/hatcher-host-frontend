@@ -106,7 +106,7 @@ const BLAST_RADIUS = [
 
 export default function SecurityPage() {
   return (
-    <MarketingShell>
+    <MarketingShell contentLanguage="en">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         <section className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
           <div>
