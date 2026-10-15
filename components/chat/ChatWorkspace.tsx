@@ -48,6 +48,7 @@ import {
   type Conversation,
 } from "@/lib/direct-chat";
 import CanvasMedia from "./CanvasMedia";
+import ChatModelPicker from './ChatModelPicker';
 import { studioKind, studioMediaUrls } from "@/lib/studio";
 import { RichMarkdown } from "@/components/agents/tabs/ChatTab/ArtifactRenderer";
 import { HatcherMark } from "@/components/brand/HatcherMark";
@@ -839,19 +840,7 @@ export default function ChatWorkspace({
             >
               <Menu size={20} />
             </button>
-            <select
-              aria-label="Model"
-              value={model}
-              disabled={busy || !models.length}
-              onChange={(e) => setModel(e.target.value)}
-            >
-              {!models.length && <option value="">Models unavailable</option>}
-              {models.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.name}
-                </option>
-              ))}
-            </select>
+            <ChatModelPicker models={models} value={model} disabled={busy} onChange={setModel} />
             <div className={styles.headerActions}>
               <Link
                 href="/platform"
