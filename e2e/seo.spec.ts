@@ -69,3 +69,44 @@ test.describe('SEO routing hygiene', () => {
     expect(body).toContain('Disallow: /admin/');
   });
 });
+
+test('public pages have locale-correct canonical URLs', async ({ request }) => {
+  for (const path of ['/', '/ro', '/security', '/docs', '/privacy', '/terms', '/cookies', '/impressum', '/ro/pricing', '/de/features', '/platform', '/tutorials']) {
+    const response = await request.get(path, { headers: { Cookie: 'HATCHER_LOCALE=en' } });
+    expect(response.status(), path).toBe(200);
+    const html = await response.text();
+    const links = [...html.matchAll(/<link[^>]*rel="canonical"[^>]*href="([^"]+)"/g)].map((match) => match[1]);
+    expect(links, path).toHaveLength(1);
+    expect(links[0].replace(/\/$/, ''), path).toBe(`https://hatcher.host${path === '/' ? '' : path}`);
+    expect(html, path).not.toMatch(/<meta[^>]*name="robots"[^>]*content="noindex/);
+  }
+});
+
+test('missing public routes send 404 and noindex to browsers and Googlebot', async ({ request }) => {
+  for (const userAgent of ['Mozilla/5.0 Chrome/130.0.0.0 Safari/537.36', 'Googlebot']) {
+    for (const path of ['/seo-audit-missing-20261015', '/blog/seo-audit-missing-20261015', '/agent/seo-audit-missing-20261015', '/agent/seo-audit-missing-20261015/trader']) {
+      const response = await request.get(path, { headers: { 'User-Agent': userAgent } });
+      expect(response.status(), `${path} ${userAgent}`).toBe(404);
+      expect(await response.text()).toMatch(/<meta[^>]*name="robots"[^>]*content="noindex/);
+    }
+  }
+});
+
+test('all tutorial video objects have publication dates', async ({ request }) => {
+  const response = await request.get('/tutorials');
+  const html = await response.text();
+  const schemas = [...html.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>(.*?)<\/script>/g)].map((match) => JSON.parse(match[1]));
+  const videos = schemas.flatMap((schema) => schema['@graph'] || []).filter((item) => item['@type'] === 'VideoObject');
+  expect(videos).toHaveLength(10);
+  for (const video of videos) expect(Number.isFinite(Date.parse(video.uploadDate))).toBe(true);
+});
+
+test('private routes remain excluded in every language', async ({ request }) => {
+  for (const path of ['/dashboard', '/ro/dashboard', '/settings', '/de/settings', '/login', '/reset-password', '/admin']) {
+    const response = await request.get(path, { headers: { Cookie: 'HATCHER_LOCALE=en' } });
+    expect(response.headers()['x-robots-tag'], path).toContain('noindex');
+  }
+  const robots = await (await request.get('/robots.txt')).text();
+  expect(robots).toContain('Disallow: /ro/dashboard$');
+  expect(robots).not.toContain('Disallow: /tutorials');
+});

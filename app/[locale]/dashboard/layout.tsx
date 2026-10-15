@@ -6,6 +6,7 @@ import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { buildLanguagesMap } from '@/lib/seo';
 
 export const metadata: Metadata = {
+  robots: { index: false, follow: false },
   title: 'Dashboard',
   description:
     'Manage your AI agents, monitor performance, and track usage on Hatcher — the managed hosting platform for autonomous AI agents.',

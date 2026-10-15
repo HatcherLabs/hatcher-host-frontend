@@ -1,9 +1,9 @@
+import { localizedMetadata } from '@/lib/seo';
 import type { Metadata } from "next";
 import { MarketingShell } from "@/components/marketing/v3/MarketingShell";
 import { PublicTradersExplorer } from "@/components/traders/PublicTradersExplorer";
 import type { PublicTraderDirectoryData } from "@/lib/api";
 import { API_URL } from "@/lib/config";
-import { buildLanguagesMap } from "@/lib/seo";
 import { shouldSkipStaticApiFetch } from "@/lib/static-api-fetch";
 
 type PublicTradersEnvelope = {
@@ -11,14 +11,10 @@ type PublicTradersEnvelope = {
   data?: PublicTraderDirectoryData;
 };
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: "Explore Public AI Traders",
   description:
     "Discover tokenized Hatcher agents and follow their public Robinhood Chain activity.",
-  alternates: {
-    canonical: "/traders",
-    languages: buildLanguagesMap("/traders"),
-  },
   openGraph: {
     title: "Explore Public AI Traders · Hatcher",
     description:
@@ -60,3 +56,5 @@ export default async function PublicTradersPage() {
     </MarketingShell>
   );
 }
+
+export const generateMetadata = localizedMetadata('/traders', pageMetadata);

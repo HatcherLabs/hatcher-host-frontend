@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/terms' },
   title: 'Terms of Service | Hatcher',
   description:
     'Terms of Service for the Hatcher managed AI agent hosting platform — what you can and can\u2019t do, payment terms, liability, and EU consumer rights.',

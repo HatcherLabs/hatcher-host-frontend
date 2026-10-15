@@ -1,8 +1,8 @@
+import { localizedMetadata } from '@/lib/seo';
 import type { Metadata } from "next";
 import { Activity, ArrowUpRight, LockKeyhole } from "lucide-react";
 import { MarketingShell } from "@/components/marketing/v3/MarketingShell";
 import { Link } from "@/i18n/routing";
-import { buildLanguagesMap } from "@/lib/seo";
 import styles from "./page.module.css";
 
 interface UsageMetric {
@@ -22,15 +22,11 @@ interface PlatformUsage {
   daily: Array<UsageMetric & { date: string }>;
 }
 
-export function generateMetadata(): Metadata {
+function pageMetadata(): Metadata {
   return {
     title: "Platform usage — Hatcher",
     description:
       "Daily, monthly, and lifetime token volume across the Hatcher platform.",
-    alternates: {
-      canonical: "/usage",
-      languages: buildLanguagesMap("/usage"),
-    },
   };
 }
 
@@ -268,3 +264,5 @@ export default async function UsagePage() {
     </MarketingShell>
   );
 }
+
+export const generateMetadata = localizedMetadata('/usage', pageMetadata());

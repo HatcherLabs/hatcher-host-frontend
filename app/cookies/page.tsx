@@ -4,6 +4,7 @@ import { Cookie, ShieldCheck, BarChart3, Wrench } from 'lucide-react';
 import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/cookies' },
   title: 'Cookie Policy | Hatcher',
   description:
     'Detailed breakdown of the cookies and local-storage mechanisms used by Hatcher — what they do, which are strictly necessary, and how to opt out.',

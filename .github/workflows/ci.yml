@@ -44,6 +44,9 @@ jobs:
       - name: Test production service isolation
         run: ./scripts/test-service-isolation-permissions.sh
 
+      - name: Test search metadata and tutorial schema
+        run: npm test -- __tests__/seo.test.ts __tests__/tutorials.test.ts
+
       - name: Test bounded incremental cache
         run: npm test -- __tests__/cache-handler.test.ts
 

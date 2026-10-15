@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { Link } from "@/i18n/routing";
 import { useAuth } from "@/lib/auth-context";
 import { guestChatRequest } from "@/lib/direct-chat";
 import ChatWorkspace from "./ChatWorkspace";
@@ -30,6 +31,11 @@ export function ChatEntry() {
   if (isLoading || (isAuthenticated && imported !== user?.id))
     return (
       <main className="min-h-dvh flex flex-col items-center justify-center gap-4 bg-[var(--bg-base)] text-[var(--text-primary)]">
+        <h1 className="text-2xl font-semibold">Hatcher — Chat, Agents &amp; Canvas</h1>
+        <p className="max-w-lg px-4 text-center text-sm text-[var(--text-secondary)]">
+          Chat with AI, work with your own agents, and create images, video and music in Canvas.
+        </p>
+        <Link href="/platform" className="text-sm underline">Explore the Hatcher platform</Link>
         <p role={error ? "alert" : "status"}>
           {error || "Opening your workspace…"}
         </p>

@@ -1,14 +1,10 @@
+import { localizedMetadata } from '@/lib/seo';
 import type { Metadata } from 'next';
-import { buildLanguagesMap } from '@/lib/seo';
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: 'Hatcher Tutorials — Learn to build and operate AI agents',
   description:
     'Step-by-step Hatcher video tutorials for creating agents, using Neural Mesh, Mission Control, Routines, Skills, files, Agent Mail, GitHub workflows, and image generation.',
-  alternates: {
-    canonical: '/tutorials',
-    languages: buildLanguagesMap('/tutorials'),
-  },
   openGraph: {
     title: 'Hatcher Tutorials',
     description:
@@ -35,3 +31,5 @@ export const metadata: Metadata = {
 export default function TutorialsLayout({ children }: { children: React.ReactNode }) {
   return children;
 }
+
+export const generateMetadata = localizedMetadata('/tutorials', pageMetadata);

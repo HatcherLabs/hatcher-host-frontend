@@ -5,11 +5,13 @@ import { shouldSkipStaticApiFetch } from "@/lib/static-api-fetch";
 import { routing } from "@/i18n/routing";
 
 export const dynamic = "force-static";
+export const revalidate = 3600;
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://hatcher.host";
 
 interface ExploreAgent {
   id: string;
+  slug?: string;
   updatedAt?: string;
 }
 
@@ -20,6 +22,9 @@ const LOCALIZED_ROUTES: Array<{
   priority: number;
 }> = [
   { path: "/", changeFrequency: "daily", priority: 1.0 },
+  { path: "/platform", changeFrequency: "weekly", priority: 0.9 },
+  { path: "/usage", changeFrequency: "daily", priority: 0.5 },
+  { path: "/staking", changeFrequency: "weekly", priority: 0.5 },
   { path: "/pricing", changeFrequency: "weekly", priority: 0.9 },
   { path: "/explore", changeFrequency: "daily", priority: 0.85 },
   { path: "/traders", changeFrequency: "daily", priority: 0.85 },
@@ -58,7 +63,6 @@ function buildLanguagesMap(path: string): Record<string, string> {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const now = new Date();
 
   // Localized public routes — one entry per locale per route
   const localizedEntries: MetadataRoute.Sitemap = [];
@@ -67,7 +71,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     for (const locale of routing.locales) {
       localizedEntries.push({
         url: absUrl(locale, route.path),
-        lastModified: now,
         changeFrequency: route.changeFrequency,
         priority: route.priority,
         alternates: { languages },
@@ -86,7 +89,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Legal pages — English only
   const legalEntries: MetadataRoute.Sitemap = LEGAL_ROUTES.map((path) => ({
     url: `${SITE_URL}${path}`,
-    lastModified: now,
     changeFrequency: "monthly" as const,
     priority: 0.3,
   }));
@@ -95,19 +97,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let agentEntries: MetadataRoute.Sitemap = [];
   if (!shouldSkipStaticApiFetch(API_URL)) {
     try {
-      const res = await fetch(`${API_URL}/agents/explore`, {
-        next: { revalidate: 3600 },
-      });
-      if (res.ok) {
-        const json = (await res.json()) as { agents: ExploreAgent[] };
-        if (json.agents?.length) {
-          agentEntries = json.agents.map((agent) => ({
-            url: `${SITE_URL}/agent/${agent.id}`,
-            lastModified: agent.updatedAt ? new Date(agent.updatedAt) : now,
-            changeFrequency: "daily" as const,
-            priority: 0.5,
-          }));
-        }
+      for (let offset = 0; offset < 10_000;) {
+        const res = await fetch(`${API_URL}/agents/explore?limit=100&offset=${offset}`, {
+          next: { revalidate: 3600 },
+          signal: AbortSignal.timeout(5_000),
+        });
+        if (!res.ok) break;
+        const json = await res.json() as {
+          success: boolean;
+          data?: { agents: ExploreAgent[]; pagination?: { hasMore: boolean } };
+        };
+        const agents = json.success ? json.data?.agents ?? [] : [];
+        agentEntries.push(...agents.map((agent) => ({
+          url: `${SITE_URL}/agent/${encodeURIComponent(agent.slug || agent.id)}`,
+          ...(agent.updatedAt ? { lastModified: new Date(agent.updatedAt) } : {}),
+          changeFrequency: "daily" as const,
+          priority: 0.5,
+        })));
+        if (!agents.length || !json.data?.pagination?.hasMore) break;
+        offset += agents.length;
       }
     } catch {
       // Skip dynamic pages if API is unavailable

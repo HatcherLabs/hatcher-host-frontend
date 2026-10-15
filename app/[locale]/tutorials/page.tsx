@@ -14,6 +14,7 @@ export default function TutorialsPage() {
       thumbnailUrl: `${SITE_URL}${tutorial.posterSrc}`,
       contentUrl: `${SITE_URL}${tutorial.videoSrc}`,
       duration: tutorial.durationIso,
+      uploadDate: tutorial.uploadDate,
       isFamilyFriendly: true,
       inLanguage: 'en',
     })),
