@@ -1,0 +1,24 @@
+.trigger { display:flex; align-items:center; gap:8px; min-width:0; max-width:330px; padding:9px 12px; color:var(--text-primary); background:var(--bg-secondary); border:1px solid var(--border-primary); border-radius:10px; font-size:14px; }
+.trigger span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.trigger svg { flex-shrink:0; }
+.dialog { width:min(540px, calc(100vw - 28px)); max-height:85dvh; padding:22px; border:1px solid var(--border-primary); border-radius:20px; color:var(--text-primary); background:var(--bg-base); box-shadow:0 20px 65px #0004; }
+.dialog::backdrop { background:#0008; }
+.heading { display:flex; justify-content:space-between; gap:16px; align-items:flex-start; margin-bottom:18px; }
+.heading h2 { font-size:20px; font-weight:650; margin:0 0 6px; }
+.heading p, .empty { font-size:13px; color:var(--text-secondary); }
+.heading button { padding:5px; border-radius:6px; }
+.list { overflow-y:auto; max-height:47dvh; overscroll-behavior:contain; }
+.row, .recommended { display:flex; align-items:center; justify-content:space-between; gap:16px; width:100%; text-align:left; padding:13px 12px; border-radius:10px; }
+.row:hover, .heading button:hover { background:var(--bg-secondary); }
+.row span, .recommended span { display:flex; flex-direction:column; gap:5px; min-width:0; }
+.row strong, .recommended strong { font-size:14px; font-weight:550; overflow-wrap:anywhere; }
+.row small, .recommended small { font-size:12px; color:var(--text-secondary); }
+.row svg, .recommended svg { flex-shrink:0; }
+.recommended { margin-bottom:12px; border:1px solid var(--border-primary); background:var(--bg-secondary); }
+.recommended small:first-child { font-size:10px; letter-spacing:.08em; }
+.back { display:flex; align-items:center; gap:7px; font-size:13px; margin-bottom:12px; }
+.search { display:flex; align-items:center; gap:9px; border:1px solid var(--border-primary); border-radius:10px; padding:10px 12px; margin-bottom:8px; }
+.search input { width:100%; background:transparent; border:0; outline:none; color:inherit; font-size:14px; }
+.empty { padding:20px 12px; }
+.dialog button:focus-visible, .trigger:focus-visible, .search:focus-within { outline:2px solid var(--text-primary); outline-offset:2px; }
+@media(max-width:760px) { .trigger { max-width:210px; font-size:12px; padding:8px; } .dialog { padding:18px; } }
