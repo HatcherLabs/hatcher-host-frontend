@@ -44,7 +44,7 @@ describe('Qwerti landing widget', () => {
     expect(landingPage).not.toContain('QWERTI_WIDGET_SCRIPT_SRC');
 
     const rootLayout = readFileSync(resolve(process.cwd(), 'app/layout.tsx'), 'utf8');
-    expect(rootLayout).toContain('<QwertiWidgetGate />');
+    expect(rootLayout).not.toContain('<QwertiWidgetGate />');
 
     const globalsCss = readFileSync(resolve(process.cwd(), 'app/globals.css'), 'utf8');
     expect(globalsCss).toContain("body[data-qwerti-hidden] [class*='qwerti-']");

@@ -19,6 +19,10 @@ export interface ChatPlan {
   durationDays: number;
 }
 export interface Conversation {
+  createdAt?: string;
+  updatedAt?: string;
+  isPinned?: boolean;
+  archivedAt?: string | null;
   id: string;
   title: string;
   model: string;
@@ -74,6 +78,7 @@ export async function sendChat(
   onDelta: (text: string) => void,
   artifactMode?: "chart",
   guest = false,
+  webSearch: "auto" | "off" = "auto",
 ) {
   const token = getToken();
   const response = await fetch(
@@ -90,6 +95,7 @@ export async function sendChat(
         requestId: crypto.randomUUID(),
         prompt,
         model,
+        webSearch,
         ...(artifactMode ? { artifactMode } : {}),
       }),
     },

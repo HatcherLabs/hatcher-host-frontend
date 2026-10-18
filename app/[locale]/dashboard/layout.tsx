@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { DashboardWorkspaceNavigation } from '@/components/dashboard/DashboardWorkspaceNavigation';
 import { AgentDetailTour } from '@/components/onboarding/AgentDetailTour';
 import { DashboardTour } from '@/components/onboarding/DashboardTour';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
@@ -24,7 +23,6 @@ export const metadata: Metadata = {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <ErrorBoundary>
-      <DashboardWorkspaceNavigation />
       <DashboardTour />
       <AgentDetailTour />
       {children}

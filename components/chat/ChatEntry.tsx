@@ -1,11 +1,13 @@
 "use client";
 import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "@/i18n/routing";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { guestChatRequest } from "@/lib/direct-chat";
 import ChatWorkspace from "./ChatWorkspace";
 
 export function ChatEntry({ introduction }: { introduction?: ReactNode }) {
+  const t = useTranslations("chatEntry");
   const { isAuthenticated, isLoading, user } = useAuth();
   const [imported, setImported] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -33,24 +35,24 @@ export function ChatEntry({ introduction }: { introduction?: ReactNode }) {
       <main className="min-h-dvh flex flex-col items-center justify-center gap-4 bg-[var(--bg-base)] text-[var(--text-primary)]">
         <h1 className="text-2xl font-semibold">Hatcher — Chat, Agents &amp; Canvas</h1>
         <p className="max-w-lg px-4 text-center text-sm text-[var(--text-secondary)]">
-          Chat with AI, work with your own agents, and create images, video and music in Canvas.
+          {t("description")}
         </p>
-        <Link href="/platform" className="text-sm underline">Explore the Hatcher platform</Link>
+        <Link href="/platform" className="text-sm underline">{t("fullWebsite")}</Link>
         {introduction}
         <p role={error ? "alert" : "status"}>
-          {error || "Opening your workspace…"}
+          {error || t("opening")}
         </p>
         {error && (
           <>
             <button onClick={() => setRetry((value) => value + 1)}>
-              Retry importing guest chats
+              {t("retryImport")}
             </button>
             <button onClick={() => setImported(user?.id ?? null)}>
-              Continue to my chats
+              {t("continueChats")}
             </button>
           </>
         )}
       </main>
     );
-  return <ChatWorkspace key={user?.id || "guest"} guest={!isAuthenticated} guestIntroduction={introduction} agentsEnabled />;
+  return <ChatWorkspace key={user?.id || "guest"} guest={!isAuthenticated} guestIntroduction={introduction} />;
 }

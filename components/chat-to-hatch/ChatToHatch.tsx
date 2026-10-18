@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { readHandoff } from '@/lib/chat-workspace';
 import { useRouter } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
@@ -244,9 +245,20 @@ export function ChatToHatch({ example }: { example?: AgentExampleId }) {
   const t = useTranslations('chatToHatch');
   const ts = useTranslations('simpleExperience');
   const tExamples = useTranslations('landingV3.examples');
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState(() => example ? tExamples(`items.${example}.prompt`) : '');
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const ticket = url.searchParams.get('handoff');
+    if (!ticket || !user) return;
+    const draft = readHandoff(user.id, ticket, 'create');
+    if (draft) {
+      setInput(draft.text);
+      url.searchParams.delete('handoff');
+      window.history.replaceState(null, '', url.pathname + url.search);
+    }
+  }, [user]);
   const [thinking, setThinking] = useState(false);
   const [hatching, setHatching] = useState(false);
   /** What the LLM most recently returned. Acts as the "reset to suggested"
