@@ -49,6 +49,8 @@ import {
   pageEntranceVariants,
   shouldRunChatWorkloads,
 } from '@/components/agents/AgentContext';
+import { AgentWorkspaceTabs } from '@/components/agents/AgentWorkspaceTabs';
+import { useWorkspace } from '@/components/workspace/WorkspaceContext';
 import { AgentSidebar } from '@/components/agents/AgentSidebar';
 import { PortAgentModal } from '@/components/agents/PortAgentModal';
 import { shouldMountTerminalTab } from '@/components/agents/terminalPersistence';
@@ -204,6 +206,8 @@ const RobinhoodTab = dynamic(
 // ─── Main Component ─────────────────────────────────────────
 
 export default function AgentWorkspace({ id, embedded = false, onAgentChange, onBusyChange }: { id: string; embedded?: boolean; onAgentChange?: (agent: Agent) => void; onBusyChange?: (busy: boolean) => void }) {
+  const workspace = useWorkspace();
+  const inWorkspace = Boolean(workspace);
   const simpleEntry = usePathname().startsWith('/agents/');
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading, user } = useAuth();
@@ -392,14 +396,14 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
   }, [id, isAuthenticated]);
 
   const loadOwnedAgents = useCallback(async () => {
-    if (!isAuthenticated || embedded) return;
+    if (!isAuthenticated || embedded || inWorkspace) return;
     setOwnedAgentsLoading(true);
     const res = await api.getMyAgents();
     setOwnedAgentsLoading(false);
     if (res.success && Array.isArray(res.data)) {
       setOwnedAgents(res.data);
     }
-  }, [isAuthenticated, embedded]);
+  }, [isAuthenticated, embedded, inWorkspace]);
 
   const loadFeatures = useCallback(async () => {
     setFeaturesLoading(true);
@@ -1649,26 +1653,27 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
   return (
     <AgentContext.Provider value={contextValue!}>
       <motion.div
-        className="flex flex-col xl:flex-row"
-        style={{ minHeight: 'calc(100dvh - 64px)' }}
+        className={inWorkspace ? "flex flex-col" : "flex flex-col xl:flex-row"}
+        style={{ minHeight: inWorkspace && tab === 'chat' ? 0 : 'calc(100dvh - 64px)', height: inWorkspace && tab === 'chat' ? 'calc(100dvh - 52px)' : undefined }}
         variants={pageEntranceVariants}
         initial="hidden"
         animate="visible"
       >
         {/* ─── Sidebar (desktop) / Horizontal tabs (mobile) ── */}
-        <AgentSidebar
+        {!inWorkspace && <AgentSidebar
           agent={agent}
           agents={ownedAgents}
           agentsLoading={ownedAgentsLoading}
           activeTab={tab}
           onTabChange={setTab}
-        />
+        />}
 
         {/* ─── Main Content ─────────────────────────────────── */}
-        <div className="flex-1 min-w-0 flex flex-col bg-[var(--bg-base)]">
+        <div className="flex-1 min-h-0 min-w-0 flex flex-col bg-[var(--bg-base)]">
+          {inWorkspace && <AgentWorkspaceTabs />}
           {/* Top action bar */}
           <div
-            className="relative z-40 flex flex-wrap items-center gap-3 overflow-visible border-b border-[var(--border-default)] bg-[color-mix(in_srgb,var(--bg-surface)_92%,transparent)] px-4 py-3.5 backdrop-blur-md sm:px-6"
+            className="relative z-40 flex shrink-0 flex-wrap items-center gap-3 overflow-visible border-b border-[var(--border-default)] bg-[color-mix(in_srgb,var(--bg-surface)_92%,transparent)] px-4 py-3.5 backdrop-blur-md sm:px-6"
             style={{ fontFamily: 'var(--font-inter)' }}
           >
             <Link href="/" className="inline-flex items-center gap-1.5 text-xs text-[var(--text-secondary)]"><ArrowLeft size={13} />Chat</Link>
@@ -1857,8 +1862,8 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
           )}
 
           {/* ─── Tab Content ──────────────────────────────────── */}
-          <div className="flex-1 min-w-0 bg-[var(--bg-base)]">
-            <div className={`${tab === 'chat' || tab === 'terminal' || tab === 'mail' || tab === 'dev' ? 'w-full max-w-none px-4 sm:px-6 lg:px-8 2xl:px-10' : 'max-w-[1280px] mx-auto px-4 sm:px-6'} py-6`}>
+          <div className="flex-1 min-h-0 min-w-0 bg-[var(--bg-base)]">
+            <div style={{ height: inWorkspace && tab === 'chat' ? '100%' : undefined }} className={`${tab === 'chat' || tab === 'terminal' || tab === 'mail' || tab === 'dev' ? 'w-full max-w-none px-4 sm:px-6 lg:px-8 2xl:px-10' : 'max-w-[1280px] mx-auto px-4 sm:px-6'} py-6`}>
             <AnimatePresence mode="wait">
               {tab === 'overview' && <OverviewTab />}
               {tab === 'config' && (viewMode === 'easy' ? <SimpleConfigTab key={agent.id} /> : <ConfigTab />)}

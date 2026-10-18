@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server';
 import { TIERS } from '@hatcher/shared';
 import { localizedMetadata } from '@/lib/seo';
 import type { Metadata } from "next";
@@ -8,20 +9,17 @@ const pageMetadata: Metadata = {
   description:
     "Explore Hatcher agents, integrations, hosting, plans and token utility.",
 };
-export default function PlatformPage() {
+export default async function PlatformPage() {
+  const t = await getTranslations("chatEntry");
   return (
     <>
       <div className="flex items-center justify-between gap-4 border-b border-[var(--border-default)] bg-[var(--bg-surface)] px-6 py-3 text-xs text-[var(--text-secondary)]">
-        <span>Explore the Hatcher platform</span>
+        <span>{t("fullWebsite")}</span>
         <Link
-          href={
-            process.env.HATCHER_CHAT_ENTRY_ENABLED === "true"
-              ? "/"
-              : "/dashboard/chat"
-          }
+          href="/"
           className="font-semibold text-[var(--text-primary)] underline underline-offset-4"
         >
-          Back to chat
+          {t("backToChat")}
         </Link>
       </div>
       <LandingV3 />

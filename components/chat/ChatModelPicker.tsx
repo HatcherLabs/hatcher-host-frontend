@@ -1,56 +1,223 @@
-'use client';
-
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Check, ChevronDown, ChevronRight, Search, X } from 'lucide-react';
-import { DEFAULT_CHAT_MODEL, type ChatModel } from '@/lib/direct-chat';
-import { groupChatModels } from '@/lib/chat-model-groups';
-import styles from './ChatModelPicker.module.css';
-
-export default function ChatModelPicker({ models, value, disabled, onChange }: {
-  models: ChatModel[]; value: string; disabled: boolean; onChange: (id: string) => void;
+"use client";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Check, ChevronDown, Search, Star, X } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useAuth } from "@/lib/auth-context";
+import { DEFAULT_CHAT_MODEL, type ChatModel } from "@/lib/direct-chat";
+import { groupChatModels, modelProvider } from "@/lib/chat-model-groups";
+import styles from "./ChatExperience.module.css";
+export default function ChatModelPicker({
+  models,
+  value,
+  disabled,
+  onChange,
+}: {
+  models: ChatModel[];
+  value: string;
+  disabled: boolean;
+  onChange: (id: string) => void;
 }) {
+  const t = useTranslations("chatExperience");
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
-  const [provider, setProvider] = useState<string | null>(null);
-  const [search, setSearch] = useState('');
+  const [provider, setProvider] = useState("");
+  const [query, setQuery] = useState("");
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [recent, setRecent] = useState<string[]>([]);
   const dialog = useRef<HTMLDialogElement>(null);
+  const search = useRef<HTMLInputElement>(null);
+  const key = `hatcher.chat.models.v2:${user?.id ?? "guest"}`;
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(key) || "{}");
+      setFavorites(
+        Array.isArray(saved.favorites)
+          ? saved.favorites.filter((x: unknown) => typeof x === "string")
+          : [],
+      );
+      setRecent(
+        Array.isArray(saved.recent)
+          ? saved.recent.filter((x: unknown) => typeof x === "string")
+          : [],
+      );
+    } catch {
+      setFavorites([]);
+      setRecent([]);
+    }
+  }, [key]);
+  useEffect(() => {
+    if (open) {
+      dialog.current?.showModal();
+      search.current?.focus();
+    } else dialog.current?.close();
+  }, [open]);
   const groups = useMemo(() => groupChatModels(models), [models]);
-  const group = groups.find(item => item.id === provider);
-  const selected = models.find(item => item.id === value);
-  const recommended = models.find(item => item.id === DEFAULT_CHAT_MODEL);
-  const filtered = group?.models.filter(item => `${item.name} ${item.id}`.toLowerCase().includes(search.toLowerCase().trim())) ?? [];
-  useEffect(() => { if (open) dialog.current?.showModal(); else dialog.current?.close(); }, [open]);
-  function choose(id: string) { if (!disabled) { onChange(id); setOpen(false); } }
-  return <>
-    <button type="button" className={styles.trigger} disabled={disabled || !models.length} aria-haspopup="dialog"
-      aria-label={`Choose model: ${selected?.name ?? 'Models unavailable'}`} onClick={() => { setProvider(null); setSearch(''); setOpen(true); }}>
-      <span>{selected?.name ?? 'Models unavailable'}</span><ChevronDown size={15} />
-    </button>
-    <dialog ref={dialog} className={styles.dialog} aria-labelledby="chat-model-picker-title" onClose={() => setOpen(false)}
-      onClick={event => { if (event.target === dialog.current) { const box = dialog.current.getBoundingClientRect(); if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) setOpen(false); } }}>
-      <div className={styles.heading}>
-        <div><h2 id="chat-model-picker-title">{group ? group.name : 'Choose a provider'}</h2>
-          <p>{group ? 'Choose a model for this conversation.' : 'Start with a provider, then choose its model.'}</p></div>
-        <button type="button" aria-label="Close model picker" onClick={() => setOpen(false)}><X size={20} /></button>
-      </div>
-      {group ? <>
-        <button type="button" className={styles.back} onClick={() => { setProvider(null); setSearch(''); }}><ArrowLeft size={15} /> All providers</button>
-        <label className={styles.search}><Search size={17} /><input aria-label="Search models" placeholder={`Search ${group.name.split(' · ')[0]} models`} value={search} onChange={e => setSearch(e.target.value)} /></label>
-        <div className={styles.list}>
-          {filtered.map(model => <button type="button" key={model.id} className={styles.row} disabled={disabled} onClick={() => choose(model.id)}>
-            <span><strong>{model.name}</strong>{model.id === DEFAULT_CHAT_MODEL && <small>Recommended · default</small>}</span>
-            {value === model.id ? <Check size={18} aria-label="Selected" /> : <ChevronRight size={16} />}
-          </button>)}
-          {!filtered.length && <p className={styles.empty}>No matching models. Try another name.</p>}
+  const selected = models.find((m) => m.id === value);
+  const matching = models.filter(
+    (m) =>
+      (!provider || modelProvider(m.id) === provider) &&
+      `${m.name} ${m.id}`.toLowerCase().includes(query.trim().toLowerCase()),
+  );
+  const save = (fav: string[], rec: string[]) => {
+    try {
+      localStorage.setItem(
+        key,
+        JSON.stringify({ favorites: fav, recent: rec }),
+      );
+    } catch {}
+  };
+  const choose = (id: string) => {
+    if (disabled) return;
+    const next = [id, ...recent.filter((v) => v !== id)].slice(0, 5);
+    setRecent(next);
+    save(favorites, next);
+    onChange(id);
+    setOpen(false);
+  };
+  const toggleFavorite = (id: string) => {
+    const next = favorites.includes(id)
+      ? favorites.filter((v) => v !== id)
+      : [...favorites, id];
+    setFavorites(next);
+    save(next, recent);
+  };
+  const sections =
+    query || provider
+      ? [{ key: "allModels", models: matching }]
+      : [
+          {
+            key: "recommended",
+            models: models.filter((m) => m.id === DEFAULT_CHAT_MODEL),
+          },
+          {
+            key: "favorites",
+            models: models.filter((m) => favorites.includes(m.id)),
+          },
+          {
+            key: "recentModels",
+            models: recent
+              .map((id) => models.find((m) => m.id === id))
+              .filter((m): m is ChatModel => Boolean(m)),
+          },
+        ];
+  return (
+    <>
+      <button
+        type="button"
+        className={styles.modelTrigger}
+        disabled={disabled || !models.length}
+        aria-haspopup="dialog"
+        aria-label={t("chooseModel")}
+        onClick={() => {
+          setProvider("");
+          setQuery("");
+          setOpen(true);
+        }}
+      >
+        <span>{selected?.name || t("modelsUnavailable")}</span>
+        <ChevronDown size={14} />
+      </button>
+      <dialog
+        ref={dialog}
+        className={`${styles.dialog} ${styles.modelDialog}`}
+        onClose={() => setOpen(false)}
+        onClick={(e) => {
+          if (e.target === dialog.current) {
+            const b = dialog.current.getBoundingClientRect();
+            if (
+              e.clientX < b.left ||
+              e.clientX > b.right ||
+              e.clientY < b.top ||
+              e.clientY > b.bottom
+            )
+              setOpen(false);
+          }
+        }}
+      >
+        <div className={styles.dialogHeading}>
+          <h2>{t("chooseModel")}</h2>
+          <button aria-label={t("close")} onClick={() => setOpen(false)}>
+            <X size={19} />
+          </button>
         </div>
-      </> : <>
-        {recommended && <button type="button" className={styles.recommended} disabled={disabled} onClick={() => choose(recommended.id)}>
-          <span><small>NOT SURE WHERE TO START?</small><strong>{recommended.name}</strong><small>Recommended · default for everyday chat</small></span>
-          {value === recommended.id ? <Check size={18} /> : <ChevronRight size={18} />}
-        </button>}
-        <div className={styles.list}>{groups.map(item => <button type="button" className={styles.row} key={item.id} onClick={() => { setProvider(item.id); setSearch(''); }}>
-          <span><strong>{item.name}</strong><small>{item.models.length} {item.models.length === 1 ? 'model' : 'models'}</small></span><ChevronRight size={17} />
-        </button>)}</div>
-      </>}
-    </dialog>
-  </>;
+        <label className={styles.modelSearch}>
+          <Search size={17} />
+          <input
+            ref={search}
+            aria-label={t("searchModels")}
+            placeholder={t("searchModels")}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </label>
+        <select
+          aria-label={t("provider")}
+          value={provider}
+          onChange={(e) => setProvider(e.target.value)}
+        >
+          <option value="">{t("allProviders")}</option>
+          {groups.map((g) => (
+            <option key={g.id} value={g.id}>
+              {g.name}
+            </option>
+          ))}
+        </select>
+        <div className={styles.modelList}>
+          {sections.map(
+            (section) =>
+              section.models.length > 0 && (
+                <section key={section.key}>
+                  <h3 className={styles.groupLabel}>{t(section.key)}</h3>
+                  {section.models.map((m) => (
+                    <div className={styles.modelRow} key={m.id}>
+                      <button onClick={() => choose(m.id)} disabled={disabled}>
+                        <span>
+                          <strong>{m.name}</strong>
+                          <small>
+                            {modelProvider(m.id)} ·{" "}
+                            {Math.round(m.contextLength / 1000)}k {t("context")}
+                          </small>
+                        </span>
+                        {value === m.id && <Check size={16} />}
+                      </button>
+                      <button
+                        aria-label={t(
+                          favorites.includes(m.id)
+                            ? "removeFavorite"
+                            : "addFavorite",
+                          { name: m.name },
+                        )}
+                        aria-pressed={favorites.includes(m.id)}
+                        onClick={() => toggleFavorite(m.id)}
+                      >
+                        <Star
+                          size={16}
+                          fill={
+                            favorites.includes(m.id) ? "currentColor" : "none"
+                          }
+                        />
+                      </button>
+                    </div>
+                  ))}
+                </section>
+              ),
+          )}
+          {(query || provider) && !matching.length && (
+            <p className={styles.hint}>{t("noModels")}</p>
+          )}
+          {!query && !provider && (
+            <div className={styles.providerGrid}>
+              <h3 className={styles.groupLabel}>{t("browseProviders")}</h3>
+              {groups.map((g) => (
+                <button key={g.id} onClick={() => setProvider(g.id)}>
+                  {g.name}
+                  <small>{g.models.length}</small>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </dialog>
+    </>
+  );
 }

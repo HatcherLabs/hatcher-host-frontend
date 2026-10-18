@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useCallback, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { readHandoff } from '@/lib/chat-workspace';
+import { useAuth as useHandoffAuth } from '@/lib/auth-context';
+import { useWorkspace } from '@/components/workspace/WorkspaceContext';
 import { ArrowLeft } from 'lucide-react';
 import { useVoice } from '@/hooks/useVoice';
 import { api } from '@/lib/api';
@@ -49,6 +52,7 @@ function dataUrlToBase64(dataUrl: string): string {
 }
 
 export function ChatTab({ compact = false }: { compact?: boolean }) {
+  const workspace = useWorkspace();
   const ctx = useAgentContext();
   const {
     agent,
@@ -64,6 +68,14 @@ export function ChatTab({ compact = false }: { compact?: boolean }) {
     setTab,
     wsConnected,
   } = ctx;
+
+  const { user: handoffUser } = useHandoffAuth();
+  useEffect(() => {
+    const url = new URL(window.location.href); const id = url.searchParams.get('handoff');
+    if (!id || !handoffUser || !agent?.id) return;
+    const draft = readHandoff(handoffUser.id, id, `agent:${agent.id}`);
+    if (draft) { setInput(draft.text); url.searchParams.delete('handoff'); window.history.replaceState(null, '', url.pathname + url.search); }
+  }, [handoffUser, agent?.id, setInput]);
 
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const speakingMsgIdRef = useRef<string | null>(null);
@@ -450,7 +462,7 @@ export function ChatTab({ compact = false }: { compact?: boolean }) {
     <motion.div
       key="tab-chat"
       data-testid="agent-chat-root"
-      className={compact ? "flex h-full min-h-0 w-full min-w-0 flex-col" : "flex h-[calc(100dvh-260px)] max-h-[calc(100dvh-260px)] min-h-0 w-full min-w-0 flex-col md:h-[calc(100dvh-205px)] md:max-h-none md:min-h-[500px] 2xl:h-[calc(100dvh-185px)] 2xl:min-h-[620px]"}
+      className={compact || workspace ? "flex h-full min-h-0 w-full min-w-0 flex-col" : "flex h-[calc(100dvh-260px)] max-h-[calc(100dvh-260px)] min-h-0 w-full min-w-0 flex-col md:h-[calc(100dvh-205px)] md:max-h-none md:min-h-[500px] 2xl:h-[calc(100dvh-185px)] 2xl:min-h-[620px]"}
       variants={tabContentVariants}
       initial="enter"
       animate="center"
@@ -475,7 +487,7 @@ export function ChatTab({ compact = false }: { compact?: boolean }) {
           disabled={sending || queuedChatCount > 0 || ctx.saving || ['starting', 'restarting'].includes(agent.status)}
           onSelect={ctx.switchChatModel} onOpenSettings={() => setTab('config')} />}
         onOpenModelSettings={() => setTab('config')}
-        onOpenMobilePanel={() => setMobilePanelOpen(true)}
+        onOpenMobilePanel={() => workspace?.chatTarget ? workspace.openSidebar() : setMobilePanelOpen(true)}
         onToggleAutoSpeak={voice.toggleAutoSpeak}
         onToggleThinking={toggleThinking}
         onToggleToolCalls={toggleToolCalls}

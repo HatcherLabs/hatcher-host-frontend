@@ -6,6 +6,8 @@ import { Footer as FooterV3 } from '@/components/marketing/v3/Footer';
 import { ScrollToTop } from '@/components/ui/ScrollToTop';
 import { isImmersiveChromePath } from './routeChrome';
 import { useIsFramed } from './useIsFramed';
+import { WorkspaceShell } from '@/components/workspace/WorkspaceShell';
+import { isWorkspacePath } from '@/components/workspace/navigation';
 
 export function LayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -15,6 +17,10 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
   // children must not reparent when the flag flips after hydration, or the
   // page would remount and refetch.
   const framed = useIsFramed();
+
+  if (isWorkspacePath(pathname) && !framed) {
+    return <WorkspaceShell>{children}</WorkspaceShell>;
+  }
 
   if (immersive) {
     // No skip-link, no header, no footer — the page owns the screen.

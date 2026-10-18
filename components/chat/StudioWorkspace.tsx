@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   ArrowUpRight,
   Download,
@@ -71,8 +72,15 @@ export default function StudioWorkspace({
   onBusyChange: (busy: boolean) => void;
   onAccountChange: () => void | Promise<void>;
 }) {
+  const routeParams = useSearchParams();
   const [kind, setKind] = useState<ChatCreateKind>("image");
   const [tab, setTab] = useState<"create" | "library">("create");
+  useEffect(() => {
+    const nextKind = routeParams.get("kind");
+    if (nextKind === "image" || nextKind === "video" || nextKind === "audio") setKind(nextKind);
+    setTab(routeParams.get("view") === "library" ? "library" : "create");
+  }, [routeParams]);
+
   const [prompt, setPrompt] = useState("");
   const [tools, setTools] = useState<GenerationModel[]>([]);
   const [selectedModels, setSelectedModels] = useState<
@@ -220,7 +228,9 @@ export default function StudioWorkspace({
       setNotice(
         result.done
           ? "Your creation is ready."
-          : result.turn.status === "failed" ? result.turn.response : "Still generating. Check again in a little while.",
+          : result.turn.status === "failed"
+            ? result.turn.response
+            : "Still generating. Check again in a little while.",
       );
       await reloadBalance();
     } catch (e) {
@@ -549,44 +559,53 @@ export default function StudioWorkspace({
               return (
                 <article key={asset.id} className={styles.asset}>
                   {urls.length ? (
-                    urls.map((url, index) => url.startsWith("/chat/create/content/") && assetKind !== "image" ? (
-                      <div key={url} className={styles.preview}><CanvasMedia path={url} kind={assetKind === "video" ? "video" : "audio"} title={asset.prompt} /></div>
-                    ) : (
-                      <div key={url} className={styles.preview}>
-                        {/* Native images support generated data URLs and arbitrary provider hosts. */}
-                        {assetKind === "image" ? (
-                          // eslint-disable-next-line @next/next/no-img-element -- Generated media supports data URLs.
-                          <img src={url} alt={asset.prompt} loading="lazy" />
-                        ) : assetKind === "video" ? (
-                          <video
-                            controls
-                            preload="metadata"
-                            src={url}
-                            aria-label={asset.prompt}
+                    urls.map((url, index) =>
+                      url.startsWith("/chat/create/content/") &&
+                      assetKind !== "image" ? (
+                        <div key={url} className={styles.preview}>
+                          <CanvasMedia
+                            path={url}
+                            kind={assetKind === "video" ? "video" : "audio"}
+                            title={asset.prompt}
                           />
-                        ) : (
-                          <audio
-                            controls
-                            preload="none"
-                            src={url}
-                            aria-label={asset.prompt}
-                          />
-                        )}
-                        <a
-                          href={url}
-                          target="_blank"
-                          rel="noreferrer"
-                          download={
-                            url.startsWith("data:")
-                              ? `hatcher-${asset.id}.png`
-                              : undefined
-                          }
-                          aria-label={`Open or download ${assetKind} ${index + 1}`}
-                        >
-                          <Download size={16} />
-                        </a>
-                      </div>
-                    ))
+                        </div>
+                      ) : (
+                        <div key={url} className={styles.preview}>
+                          {/* Native images support generated data URLs and arbitrary provider hosts. */}
+                          {assetKind === "image" ? (
+                            // eslint-disable-next-line @next/next/no-img-element -- Generated media supports data URLs.
+                            <img src={url} alt={asset.prompt} loading="lazy" />
+                          ) : assetKind === "video" ? (
+                            <video
+                              controls
+                              preload="metadata"
+                              src={url}
+                              aria-label={asset.prompt}
+                            />
+                          ) : (
+                            <audio
+                              controls
+                              preload="none"
+                              src={url}
+                              aria-label={asset.prompt}
+                            />
+                          )}
+                          <a
+                            href={url}
+                            target="_blank"
+                            rel="noreferrer"
+                            download={
+                              url.startsWith("data:")
+                                ? `hatcher-${asset.id}.png`
+                                : undefined
+                            }
+                            aria-label={`Open or download ${assetKind} ${index + 1}`}
+                          >
+                            <Download size={16} />
+                          </a>
+                        </div>
+                      ),
+                    )
                   ) : (
                     <div className={styles.pending}>
                       <Film size={25} />
@@ -600,7 +619,9 @@ export default function StudioWorkspace({
                       <p>
                         {asset.status === "generating"
                           ? "Your job is saved. Check when you are ready."
-                          : asset.status === "failed" ? asset.response : "Refresh the library before trying again."}
+                          : asset.status === "failed"
+                            ? asset.response
+                            : "Refresh the library before trying again."}
                       </p>
                     </div>
                   )}
@@ -619,7 +640,9 @@ export default function StudioWorkspace({
                       >
                         {checking === asset.id
                           ? "Checking…"
-                          : statusTool?.statusCheckAiCredits === 0 ? "Check status (free)" : `Check status (~${statusTool?.statusCheckAiCredits ?? 1} credits)`}
+                          : statusTool?.statusCheckAiCredits === 0
+                            ? "Check status (free)"
+                            : `Check status (~${statusTool?.statusCheckAiCredits ?? 1} credits)`}
                       </button>
                     )}
                     <button

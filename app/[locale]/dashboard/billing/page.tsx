@@ -484,6 +484,13 @@ export default function BillingPage() {
   const [foundingInfo, setFoundingInfo] = useState<{ maxSlots: number; taken: number; remaining: number } | null>(null);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    if (loading || authLoading) return;
+    const anchor = window.location.hash.slice(1);
+    if (!['subscription', 'plans', 'ai-credits', 'addons', 'payments'].includes(anchor)) return;
+    const frame = requestAnimationFrame(() => document.getElementById(anchor)?.scrollIntoView());
+    return () => cancelAnimationFrame(frame);
+  }, [loading, authLoading]);
   const [error, setError] = useState<string | null>(null);
   const [purchaseNotice, setPurchaseNotice] = useState('');
   const [paymentErrorToast, setPaymentErrorToast] = useState<string | null>(null);
@@ -1683,7 +1690,7 @@ export default function BillingPage() {
       {searchParams.get('addon')?.startsWith('addon.chat.') && <p role="status" className="mb-6 rounded-lg border border-[var(--border-default)] p-4 text-sm text-[var(--text-secondary)]">Web Chat is now part of Hatcher plans. Choose a plan below for Chat, hosted agents and Canvas. Previously purchased Chat allowances remain available until their expiry.</p>}
 
       {/* ── AI Credits Balance Card ───────────────────────── */}
-      <motion.div className={`mb-8 ${cardClass}`} variants={itemVariants}>
+      <motion.div id="ai-credits" className={`mb-8 ${cardClass}`} variants={itemVariants}>
         <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
           <div className="flex items-center gap-2">
             <Wallet className="w-4 h-4 text-[var(--color-info)]" />
@@ -1933,7 +1940,7 @@ export default function BillingPage() {
       </motion.div>
 
       {/* ── Current Tier Card ──────────────────────────────── */}
-      <motion.div className={`mb-8 ${cardClass}`} variants={itemVariants}>
+      <motion.div id="subscription" className={`mb-8 ${cardClass}`} variants={itemVariants}>
         <div className="p-4 sm:p-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
             <div className="flex items-center gap-4">
@@ -2155,7 +2162,7 @@ export default function BillingPage() {
 
       {/* ── Upgrade Tier ─────────────────────────────────── */}
       {currentTier !== 'founding_member' && (
-        <motion.div className={`mb-8 ${cardClass}`} variants={itemVariants}>
+        <motion.div id="plans" className={`mb-8 ${cardClass}`} variants={itemVariants}>
           <div className="px-4 sm:px-6 py-4 flex items-center justify-between gap-3 flex-wrap border-b border-[var(--border-default)]">
             <div className="flex items-center gap-2">
               <ArrowUpRight className="w-4 h-4 text-[var(--color-accent)]" />
@@ -2476,7 +2483,7 @@ export default function BillingPage() {
       </motion.div>
 
       {/* ── Payment History ──────────────────────────────── */}
-      <motion.div className={`overflow-hidden ${cardClass}`} variants={itemVariants}>
+      <motion.div id="payments" className={`overflow-hidden ${cardClass}`} variants={itemVariants}>
         <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
           <div className="flex items-center gap-2">
             <Receipt className="w-4 h-4 text-[var(--text-muted)]" />
