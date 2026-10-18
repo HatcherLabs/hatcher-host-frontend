@@ -286,7 +286,11 @@ function redirectDefaultLocalePath(req: NextRequest): NextResponse | null {
   if (pathname !== prefix && !pathname.startsWith(`${prefix}/`)) return null;
 
   const target = new URL(`${stripLocalePrefix(pathname)}${search}`, PUBLIC_SITE_URL);
-  const response = NextResponse.redirect(target, 308);
+  target.searchParams.delete('_locale');
+  // This redirect changes a preference cookie, so browsers must visit it again
+  // after another language is selected instead of reusing a permanent redirect.
+  const response = NextResponse.redirect(target, 307);
+  response.headers.set('Cache-Control', 'private, no-store');
   response.cookies.set('HATCHER_LOCALE', defaultLocale, {
     path: '/',
     maxAge: 60 * 60 * 24 * 365,
