@@ -5,8 +5,8 @@ import { buildLocaleUrl, stripLocalePrefix } from './localeUrls';
 describe('locale URLs', () => {
   it('uses explicit default-locale URLs so middleware can reset stale locale cookies', () => {
     expect(stripLocalePrefix('/ro/pricing', 'ro')).toBe('/pricing');
-    expect(buildLocaleUrl('/pricing', 'en')).toBe('/en/pricing');
-    expect(buildLocaleUrl('/', 'en')).toBe('/en');
+    expect(buildLocaleUrl('/pricing', 'en')).toBe('/en/pricing?_locale=en');
+    expect(buildLocaleUrl('/', 'en')).toBe('/en?_locale=en');
   });
 
   it('uses prefixed URLs for non-default locales', () => {

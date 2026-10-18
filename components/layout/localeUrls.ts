@@ -14,7 +14,8 @@ export function buildLocaleUrl(cleanPath: string, targetLocale: Locale): string 
   // back to the unprefixed URL while resetting HATCHER_LOCALE=en, which avoids
   // stale non-default locale cookies sending / back to /ro, /de, etc.
   if (targetLocale === defaultLocale) {
-    return `/en${path}`;
+    // Bypass permanent /en redirects cached by older frontend versions.
+    return `/en${path}?_locale=en`;
   }
 
   return `/${targetLocale}${path}`;
