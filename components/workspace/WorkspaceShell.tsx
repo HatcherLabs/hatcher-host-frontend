@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import NextLink from "next/link";
 import { useTranslations } from "next-intl";
 import { ArrowLeft, BarChart3, Bot, ChevronDown, ChevronRight, Compass, CreditCard, Globe, HelpCircle, ListChecks, LogIn, LogOut, Menu, MessageSquare, Network, PanelLeftClose, PanelLeftOpen, Plus, Search, Send, Settings, ShieldCheck, WandSparkles, X, type LucideIcon } from "lucide-react";
 import { Link, usePathname, useRouter } from "@/i18n/routing";
@@ -192,15 +193,17 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
     help: [{ label: t("help"), href: "/help" }, { label: nav("support"), href: "/support" }, { label: nav("docs"), href: "/docs" }, { label: footer("itemSecurity"), href: "/security" }],
   };
   function contextLink(item: { label: string; href: string; Icon?: LucideIcon }) {
+    // These routes live outside app/[locale] and must keep their shared URL.
+    const ContextLink = /^\/(?:privacy|terms|cookies|impressum|admin)(?:\/|$)/.test(item.href) ? NextLink : Link;
     const active = pathname === item.href.split(/[?#]/)[0] && !item.href.includes("#") && (!item.href.includes("?") || item.href.split("?")[1].split("&").every(pair => { const [key, val] = pair.split("="); return params.get(key) === val; }));
-    return <Link key={item.href} href={destination(item.href)} className={styles.row} aria-current={active ? "page" : undefined} onClick={e => {
+    return <ContextLink key={item.href} href={destination(item.href)} className={styles.row} aria-current={active ? "page" : undefined} onClick={e => {
       navigateFromSidebar();
       const [path, anchor] = item.href.split("#");
       if (anchor && path === pathname && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) {
         const target = document.getElementById(anchor);
         if (target) { e.preventDefault(); history.pushState(null, "", `#${anchor}`); target.scrollIntoView({ block: "start" }); }
       }
-    }}>{item.Icon && <item.Icon size={17} />}<span>{item.label}</span>{!item.Icon && <ChevronRight size={14} />}</Link>;
+    }}>{item.Icon && <item.Icon size={17} />}<span>{item.label}</span>{!item.Icon && <ChevronRight size={14} />}</ContextLink>;
   }
   async function signOut() { try { await logout(); router.push("/"); } catch { toast.error(t("logoutError")); } }
 
