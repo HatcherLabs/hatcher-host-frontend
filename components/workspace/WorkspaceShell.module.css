@@ -72,8 +72,11 @@
 .sidebarFooter { border-top:1px solid var(--border-default); padding:12px 0; flex-shrink:0; }
 .utilities { display:flex; align-items:center; justify-content:space-between; gap:4px; }
 .utilities > button { min-height:36px; }
-.storeLinks { display:flex; justify-content:center; gap:16px; font-size:10px; color:var(--text-muted); padding:10px 0 0; }
-.storeLinks a:hover { text-decoration:underline; }
+.storeLinks { display:flex; justify-content:center; gap:8px; padding-top:6px; }
+.storeLinks a { display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; border-radius:10px; color:var(--text-secondary); transition:background-color 150ms,color 150ms; }
+.storeLinks a:hover { background:var(--bg-hover); color:var(--text-primary); }
+.storeLinks a:focus-visible { outline:2px solid var(--text-primary); outline-offset:2px; }
+.storeLinks svg { flex-shrink:0; }
 .content { display:flex; flex-direction:column; min-width:0; min-height:0; }
 .header { height:var(--app-nav-height); flex-shrink:0; display:flex; align-items:center; gap:12px; padding:0 20px; border-bottom:1px solid var(--border-default); background:var(--bg-surface); z-index:50; }
 .headerSlot { display:flex; align-items:center; flex:1; min-width:0; gap:12px; }
@@ -145,7 +148,6 @@
   .agentChatContent { padding:12px 14px max(12px,env(safe-area-inset-bottom)); }
   .row,.primary,.agentSwitcher select { min-height:44px; }
   .sidebarFooter :global(button) { min-height:40px; }
-  .storeLinks a { display:flex; align-items:center; min-height:44px; }
   .agentActionMenu > summary { width:44px; height:44px; }
   .main :global([data-tour="chat-input"] textarea) { font-size:16px; }
 }

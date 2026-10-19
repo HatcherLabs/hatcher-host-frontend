@@ -1,3 +1,4 @@
+import type { AgentPitConnection } from './agentpit';
 // ============================================================
 // API Methods — all backend API calls
 // ============================================================
@@ -3416,10 +3417,16 @@ export const api = {
       { method: "POST" },
     ),
 
+  getAgentPitConnection: (agentId: string) =>
+    req<AgentPitConnection>(`/agents/${agentId}/agentpit`),
+  setAgentPitStrategy: (agentId: string, enabled: boolean) =>
+    req<AgentPitConnection["autopilot"]>(`/agents/${agentId}/agentpit/strategy`, {method: "PATCH", body: JSON.stringify({enabled})}),
+  renameAgentPitAccount: (agentId: string, name: string) =>
+    req<{renamed: boolean}>(`/agents/${agentId}/agentpit/name`, {method: 'PATCH', body: JSON.stringify({name})}),
   beginAgentPitConnect: (agentId: string) =>
     req<{ status: string; connectorId?: string; verificationUrl?: string; userCode?: string; expiresAt?: string; interval?: number }>(`/agents/${agentId}/agentpit/connect`, { method: "POST" }),
   pollAgentPitConnect: (agentId: string) =>
-    req<{ status: string; connectorId?: string; interval?: number }>(`/agents/${agentId}/agentpit/connect/poll`, { method: "POST" }),
+    req<{ status: string; connectorId?: string; interval?: number; error?: string }>(`/agents/${agentId}/agentpit/connect/poll`, { method: "POST" }),
 
   // ─── Remote MCP Connectors ─────────────────────────────────
   getMcpConnectors: (agentId: string) =>

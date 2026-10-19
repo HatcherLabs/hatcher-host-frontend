@@ -45,7 +45,7 @@ function selectedTools(connector: McpConnector): string {
 }
 
 export function ConnectorsTab() {
-  const { agent } = useAgentContext();
+  const { agent, openChatWithDraft } = useAgentContext();
   const [connectors, setConnectors] = useState<McpConnector[]>([]);
   const [busy, setBusy] = useState<BusyAction | null>('load');
   const [error, setError] = useState<string | null>(null);
@@ -160,7 +160,15 @@ export function ConnectorsTab() {
         </Link>
       </div>
 
-      <AgentPitConnectCard agentId={agent.id} connected={connectors.some(c => c.serverUrl === 'https://api.agentpit.dev/mcp' && c.status === 'ready')} onConnected={loadConnectors} />
+      <AgentPitConnectCard
+        key={agent.id}
+        agentId={agent.id}
+        connected={connectors.some(c => c.serverUrl === 'https://api.agentpit.dev/mcp' && c.status === 'ready')}
+        onConnected={loadConnectors}
+        onDiscuss={() => {
+          openChatWithDraft('Check my AgentPit paper portfolio and automatic strategy status. Help me adapt AGENTPIT_STRATEGY.md within the paper limits. Do not create another schedule or resume a paused strategy.');
+        }}
+      />
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_420px]">
         <div className="space-y-4">

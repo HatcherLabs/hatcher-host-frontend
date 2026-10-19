@@ -105,6 +105,7 @@ const ConfigTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
+const AgentPitTab = dynamic(() => import('@/components/agents/tabs/AgentPitTab').then(mod => ({ default: mod.AgentPitTab })), { loading: () => <TabSkeleton /> });
 const IntegrationsTab = dynamic(
   () => import('@/components/agents/tabs/IntegrationsTab').then(mod => ({ default: mod.IntegrationsTab })),
   { loading: () => <TabSkeleton /> }
@@ -238,7 +239,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const statusPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const validTabs: Tab[] = ['overview','config','integrations','connectors','skills','plugins','files','logs','terminal','dev','memory','sessions','knowledge','schedules','chat','mail','stats','wallet','robinhood'];
+  const validTabs: Tab[] = ['overview','config','integrations','connectors','skills','plugins','files','logs','terminal','dev','memory','sessions','knowledge','schedules','chat','mail','stats','wallet','robinhood','agentpit'];
   // 'skills' kept in validTabs for backwards compat (deep links), but redirects to plugins tab
   const searchParams = useSearchParams();
   const rawTab = searchParams.get('tab');
@@ -467,16 +468,31 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
     [activeChatSessionId, id]
   );
   const hydratedDraftKeyRef = useRef<string | null>(null);
+  const pendingChatDraftRef = useRef<{ agentId: string; text: string } | null>(null);
+  const openChatWithDraft = useCallback((draft: string) => {
+    if (!input.trim()) {
+      // The first chat visit resolves its session asynchronously. Carry the
+      // requested draft into that session without replacing an existing draft.
+      pendingChatDraftRef.current = activeChatSessionIdRef.current ? null : { agentId: id, text: draft };
+      setInput(draft);
+    }
+    setTab('chat');
+  }, [id, input, setTab]);
+
 
   useEffect(() => {
     if (!chatDraftStorageKey || typeof window === 'undefined') return;
     hydratedDraftKeyRef.current = chatDraftStorageKey;
     try {
-      setInput(window.localStorage.getItem(chatDraftStorageKey) ?? '');
+      const saved = window.localStorage.getItem(chatDraftStorageKey) ?? '';
+      const pending = pendingChatDraftRef.current;
+      setInput(saved || (pending?.agentId === id ? pending.text : ''));
     } catch {
-      setInput('');
+      const pending = pendingChatDraftRef.current;
+      setInput(pending?.agentId === id ? pending.text : '');
     }
-  }, [chatDraftStorageKey]);
+    if (activeChatSessionId) pendingChatDraftRef.current = null;
+  }, [chatDraftStorageKey, id, activeChatSessionId]);
 
   useEffect(() => {
     if (
@@ -1483,7 +1499,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
       setLogFilter: logs.setLogFilter, logSearch: logs.logSearch, setLogSearch: logs.setLogSearch,
       autoScroll: logs.autoScroll, setAutoScroll: logs.setAutoScroll,
       filteredLogs: logs.filteredLogs, logsEndRef: logs.logsEndRef, loadLogs: logs.loadLogs, wsLogsConnected,
-      messages, setMessages, input, setInput, sending, queuedChatCount,
+      messages, setMessages, input, setInput, openChatWithDraft, sending, queuedChatCount,
       chatError, setChatError, chatErrorType, setChatErrorType,
       bottomRef, inputRef, sendMessage, abortChatResponse, handleKeyDown, sendCooldown,
       wsConnected: wsChat.isConnected,
@@ -1550,7 +1566,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, agent, stats, tab, logs.logs, logs.logsLoading, logs.logFilter, logs.logSearch, logs.autoScroll, logs.filteredLogs, wsLogsConnected,
-    messages, input, sending, queuedChatCount, sendCooldown, chatError, chatErrorType, abortChatResponse,
+    messages, input, openChatWithDraft, sending, queuedChatCount, sendCooldown, chatError, chatErrorType, abortChatResponse,
     historyCursor, historyLoading, contextLimited, loadOlderChatHistory,
     chatSessions, chatFolders, activeChatSessionId, setActiveChatSessionId, startNewChatSession, deleteChatSession,
     createChatFolder, renameChatFolder, deleteChatFolder, moveChatSession, deletingChatSessionId, loadChatSessions,
@@ -1873,6 +1889,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
               {tab === 'overview' && <OverviewTab />}
               {tab === 'config' && (viewMode === 'easy' ? <SimpleConfigTab key={agent.id} /> : <ConfigTab />)}
               {tab === 'integrations' && <IntegrationsTab />}
+              {tab === 'agentpit' && <AgentPitTab />}
               {tab === 'connectors' && <ConnectorsTab />}
               {(tab === 'skills' || tab === 'plugins') && (
                 agent?.framework === 'ironclaw' ? <IronClawExtensionsTab /> : <PluginsTab />

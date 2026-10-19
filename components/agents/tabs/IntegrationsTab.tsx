@@ -38,6 +38,8 @@ import {
   type IntegrationDef,
 } from '../AgentContext';
 import { api } from '@/lib/api';
+import { AgentPitConnectCard } from './AgentPitConnectCard';
+const agentPitConnected = () => {};
 import type { CovenantConnector, CovenantTask, CreateCovenantConnectorResponse } from '@/lib/api/types';
 import { API_URL } from '@/lib/config';
 
@@ -2165,6 +2167,9 @@ export function IntegrationsTab() {
 
   return (
     <motion.div key="tab-integrations" className="space-y-6" variants={tabContentVariants} initial="enter" animate="center" exit="exit">
+      <AgentPitConnectCard onOpenPortfolio={() => ctx.setTab('agentpit')} key={agent.id} agentId={agent.id} connected={false} onConnected={agentPitConnected} onDiscuss={() => {
+        ctx.openChatWithDraft('I connected AgentPit. Check my paper portfolio and help me choose a strategy. Ask me before placing trades or starting a schedule.');
+      }} />
       {featuresLoading ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => <Skeleton key={i} className="h-24 w-full" />)}
