@@ -10,7 +10,7 @@ import { buildAgentNavigationTabs, agentDesktopHref, EASY_AGENT_TABS } from "./n
 import { useAgentContext, type Tab } from "./AgentContext";
 
 const ICONS: Partial<Record<Tab, LucideIcon>> = { chat:MessageSquare, overview:LayoutDashboard, files:Folder, knowledge:BookOpen, integrations:Plug, config:Settings, logs:FileText, terminal:Terminal, wallet:Wallet, mail:Mail, stats:BarChart3, connectors:Network, schedules:ListChecks };
-const PRIMARY: Tab[] = ["chat", "overview", "files", "knowledge", "integrations"];
+const PRIMARY: Tab[] = ["chat", "overview", "files", "knowledge", "integrations", "agentpit"];
 
 export function AgentWorkspaceTabs() {
   const { agent, tab, setTab, viewMode, setViewMode } = useAgentContext();
@@ -19,6 +19,7 @@ export function AgentWorkspaceTabs() {
   const u = useTranslations("unifiedWorkspace");
   const w = useTranslations("workspace");
   const allTabs = buildAgentNavigationTabs(agent.framework, id => {
+    if (id === "agentpit") return "AgentPit";
     if (id === "config") return w("settings");
     if (id === "overview") return u("overview");
     if (agent.framework === "ironclaw" && id === "plugins") return t("ironclawCapabilities");

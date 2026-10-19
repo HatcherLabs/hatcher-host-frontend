@@ -17,7 +17,7 @@ type AgentNavigationSpec = {
 
 export const DEFAULT_AGENT_VIEW_MODE: AgentViewMode = 'easy';
 
-export const EASY_AGENT_TABS: Tab[] = ['overview', 'chat', 'config', 'mail', 'integrations', 'plugins', 'robinhood'];
+export const EASY_AGENT_TABS: Tab[] = ['overview', 'chat', 'config', 'mail', 'integrations', 'plugins', 'robinhood', 'agentpit'];
 
 export const AGENT_NAVIGATION_GROUPS: AgentNavigationGroup[] = [
   'operate',
@@ -45,6 +45,7 @@ const AGENT_NAVIGATION: AgentNavigationSpec[] = [
   { id: 'plugins', group: 'configure', frameworks: ['openclaw', 'hermes', 'ironclaw', 'custom'] },
   { id: 'wallet', group: 'assets' },
   { id: 'robinhood', group: 'assets' },
+  { id: 'agentpit', group: 'assets', frameworks: ['openclaw', 'hermes', 'ironclaw', 'custom'] },
   { id: 'files', group: 'assets' },
   { id: 'memory', group: 'assets', frameworks: ['openclaw', 'hermes', 'ironclaw', 'custom'] },
   { id: 'sessions', group: 'assets', frameworks: ['openclaw'] },
