@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import NextLink from "next/link";
 import { ArrowRight, BookOpen, Bot, Box, Cpu, Layers, LifeBuoy, MessageSquare, ShieldCheck, WandSparkles } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { useAuth } from "@/lib/auth-context";
@@ -28,6 +29,6 @@ export function PlatformOverview() {
     <header className={styles.heading}><h1>{t("platformTitle")}</h1><p>{t("platformDescription")}</p></header>
     <div className={styles.products}>{products.map(({Icon,title,description,href}) => <Link key={href} href={href} className={styles.product}><span className={styles.icon}><Icon size={27} strokeWidth={1.6}/></span><span><h2>{title}</h2><p>{description}</p></span><ArrowRight size={19}/></Link>)}</div>
     <div className={styles.sections}>{sections.map(section => <section key={section.title}><h2>{section.title}</h2>{section.items.map(({Icon,label,href,...item}) => <Link href={href} key={href} className={styles.resource}><Icon size={21} strokeWidth={1.6}/><span><strong>{label}</strong>{"description" in item && <small>{item.description}</small>}</span><ArrowRight size={16}/></Link>)}</section>)}</div>
-    <footer className={styles.footer}><Link href="/">{entry("backToChat")}</Link><Link href="/privacy">{footer("itemPrivacy")}</Link><Link href="/terms">{footer("itemTerms")}</Link></footer>
+    <footer className={styles.footer}><Link href="/">{entry("backToChat")}</Link><NextLink href="/privacy">{footer("itemPrivacy")}</NextLink><NextLink href="/terms">{footer("itemTerms")}</NextLink></footer>
   </article>;
 }
