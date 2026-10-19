@@ -38,6 +38,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
   const t = useTranslations("workspace");
   const u = useTranslations("unifiedWorkspace");
   const entry = useTranslations("chatEntry");
+  const mobile = useTranslations("landingV3.hero");
   const tour = useTranslations("guidedTour");
   const route = pathname + (params.toString() ? `?${params}` : "");
   const [visits, setVisits] = useState<string[]>([]);
@@ -261,8 +262,12 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
             {!isAuthenticated ? <Link href={loginHrefForReturn(pathname)} className={styles.primary} onClick={closeSidebar}><LogIn size={16}/>{entry("signIn")}</Link> : <AiCreditStatus variant="drawer" onNavigate={closeSidebar} />}
             <div className={styles.utilities}><LocaleSwitcher align="start" side="top" /><ThemeToggle /><a href={SOCIAL_LINKS.x} target="_blank" rel="noopener noreferrer" className={styles.socialLink} aria-label="Hatcher on X" title="X"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M18.9 2H22l-6.8 7.8L23.2 22H17l-4.9-7.4L5.6 22H2.4l8.2-9.4L.8 2h6.4l4.5 6.8L18.9 2ZM17.8 20h1.7L6.3 4H4.5l13.3 16Z"/></svg></a><a href={SOCIAL_LINKS.telegram} target="_blank" rel="noopener noreferrer" className={styles.socialLink} aria-label="Hatcher on Telegram" title="Telegram"><Send size={17}/></a>{isAuthenticated && <button className={styles.iconButton} onClick={() => void signOut()} aria-label={t("signOut")}><LogOut size={16}/></button>}</div>
             <div className={styles.storeLinks}>
-              <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer" aria-label="App Store" title="App Store"><AppStoreIcon /></a>
-              <a href={GOOGLE_PLAY_URL} target="_blank" rel="noopener noreferrer" aria-label="Google Play" title="Google Play"><GooglePlayIcon /></a>
+              <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer">
+                <AppStoreIcon /><span><small>{mobile("ctaAppStoreKicker")}</small><strong>{mobile("ctaAppStore")}</strong></span>
+              </a>
+              <a href={GOOGLE_PLAY_URL} target="_blank" rel="noopener noreferrer">
+                <GooglePlayIcon /><span><small>{mobile("ctaPlayStoreKicker")}</small><strong>{mobile("ctaPlayStore")}</strong></span>
+              </a>
             </div>
           </div>
         </aside>
