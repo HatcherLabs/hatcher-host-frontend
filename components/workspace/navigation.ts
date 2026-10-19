@@ -8,14 +8,18 @@ export type WorkspaceSection =
   | "approvals"
   | "analytics"
   | "plans"
-  | "settings";
+  | "settings"
+  | "discover"
+  | "website"
+  | "help"
+  | "compute"
+  | "mesh";
 
 export function isWorkspacePath(pathname: string): boolean {
   const path = stripLocaleForChrome(pathname);
-  return (
-    (path === "/" || /^\/(dashboard(?:\/|$)|create(?:\/|$)|settings(?:\/|$))/.test(path)) &&
-    !/^\/dashboard\/agent\/[^/]+\/desktop(?:\/|$)/.test(path)
-  );
+  return !/^\/(?:embed|demo|api|_next|og|skill|\.well-known)(?:\/|$)/.test(path)
+    && !/^\/dashboard\/agent\/[^/]+\/desktop(?:\/|$)/.test(path)
+    && path !== "/oauth/authorize";
 }
 
 export function workspaceSection(
@@ -26,18 +30,23 @@ export function workspaceSection(
   const path = stripLocaleForChrome(pathname);
   if (path === "/" || /^\/dashboard\/chats?(?:\/|$)/.test(path))
     return mode === "canvas" || mode === "studio" ? "canvas" : "chats";
-  if (path.includes("/missions")) return "missions";
+  if (/^\/(?:explore|traders|agent)(?:\/|$)/.test(path)) return "discover";
+  if (/^\/(?:help|support)(?:\/|$)/.test(path)) return "help";
+  if (path === "/dashboard/compute") return "compute";
+  if (path === "/dashboard/mesh") return "mesh";
+  if (path.includes("/missions") || path.includes("/automations")) return "missions";
   if (path.includes("/approvals")) return "approvals";
   if (path.includes("/analytics")) return "analytics";
-  if (path.includes("/billing")) return "plans";
+  if (path.includes("/billing") || path === "/pricing") return "plans";
   if (path.includes("/settings")) return "settings";
-  return "agents";
+  if (/^\/(?:dashboard|agents|create)(?:\/|$)/.test(path)) return "agents";
+  return "website";
 }
 
 export function workspaceAgentId(pathname: string): string | null {
   return (
     stripLocaleForChrome(pathname).match(
-      /^\/dashboard\/agent\/([^/]+)$/,
+      /^\/(?:dashboard\/agent|agents)\/([^/]+)$/,
     )?.[1] ?? null
   );
 }

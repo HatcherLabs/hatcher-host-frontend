@@ -22,6 +22,7 @@ import { AgentEyesLiveCard } from "./AgentEyesLiveCard";
 import { groupChatSessionsByFolder } from "./chatFolders";
 
 interface AgentPresenceRailProps {
+  compact?: boolean;
   className?: string;
   onSessionSelect?: () => void;
 }
@@ -106,6 +107,7 @@ function ChatSessionRow({
 }
 
 export function AgentPresenceRail({
+  compact = false,
   className = "",
   onSessionSelect,
 }: AgentPresenceRailProps) {
@@ -500,7 +502,7 @@ export function AgentPresenceRail({
         </div>
       </div>
 
-      {viewMode === "advanced" && <div className="shrink-0 border-t border-[var(--border-default)] px-3 py-3 md:px-4">
+      {viewMode === "advanced" && !compact && <div className="shrink-0 border-t border-[var(--border-default)] px-3 py-3 md:px-4">
         <AgentEyesLiveCard
           agentId={agent.id}
           agentName={agent.name}

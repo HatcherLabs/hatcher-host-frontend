@@ -437,8 +437,8 @@
         "40 GB Arbeitsbereich",
         "Dateimanager + Vollständige Logs",
         "Prioritäts-Support",
-        "Founding-Discord-Rolle + Telegram-Tag",
-        "Preis für immer festgeschrieben"
+        "Preis für immer festgeschrieben",
+        "Telegram-Tag für Gründungsmitglieder"
       ],
       "ctaSoldOut": "Ausverkauft",
       "ctaClaim": "Platz sichern"
@@ -708,7 +708,7 @@
           "Dateimanager + Vollständige Logs inklusive",
           "Prioritäts-Support",
           "Alle Integrationen",
-          "Founding-Discord-Rolle + Telegram-Tag"
+          "Telegram-Tag für Gründungsmitglieder"
         ],
         "missing": []
       }
@@ -848,14 +848,13 @@
         },
         {
           "q": "Was ist der Gründungsmitglied-Tarif?",
-          "a": "Gründungsmitglied ist eine einmalige Zahlung von $99, die Ihnen lebenslangen Zugang zu Hatcher gibt: 10 Agenten, 25.000 AI Credits monatlich, 4 CPU / 6 GB RAM, 40 GB Arbeitsbereich, immer aktive Agenten, Dateimanager, vollständige Logs, Prioritäts-Support und Founding-Discord-Rolle + Telegram-Tag. Keine monatlichen Gebühren, jemals. Begrenzt auf 20 Plätze — sobald sie weg sind, ist dieser Tarif weg."
+          "a": "Gründungsmitglied ist eine einmalige Zahlung von $99, die Ihnen lebenslangen Zugang zu Hatcher gibt: 10 Agenten, 25.000 AI Credits monatlich, 4 CPU / 6 GB RAM, 40 GB Arbeitsbereich, immer aktive Agenten, Dateimanager, vollständige Logs, Prioritäts-Support und Telegram-Tag für Gründungsmitglieder. Keine monatlichen Gebühren, jemals. Begrenzt auf 20 Plätze — sobald sie weg sind, ist dieser Tarif weg."
         }
       ]
     },
     "help": {
       "text": "Hilfe bei der Planauswahl?",
       "emailLabel": "E-Mail senden",
-      "discordLabel": "Discord",
       "telegramLabel": "Telegram"
     },
     "cta": {
@@ -2160,7 +2159,6 @@
     "ticketResponse": "Reichen Sie ein Support-Ticket ein und unser Team meldet sich innerhalb von 24 Stunden.",
     "quickLinks": {
       "documentation": "Dokumentation",
-      "discord": "Discord-Community",
       "telegram": "Telegram-Gruppe",
       "submitTicket": "Ticket einreichen",
       "emailSupport": "E-Mail-Support"
@@ -2186,7 +2184,6 @@
       "followUsDesc": "Updates und Ankündigungen"
     },
     "directContact": "Oder senden Sie uns direkt eine E-Mail an",
-    "joinDiscord": "Unserem Discord beitreten",
     "telegramLabel": "Telegram",
     "communitySupport": "für Community-Support",
     "submitTicketHeading": "Ticket einreichen",
@@ -2221,8 +2218,7 @@
     "eyebrow": "Dokumentation",
     "heading": "Dokumentation",
     "subheading": "Alles, was Sie benötigen, um KI-Agenten mit Hatcher zu erstellen, deployen und verwalten.",
-    "searchPlaceholder": "Dokumentation suchen...",
-    "searchComingSoon": "Suche kommt bald",
+    "searchPlaceholder": "Anleitungen suchen",
     "apiReferenceHeading": "API-Referenz",
     "apiReferenceBody": "Vollständige Endpunkt-Dokumentation mit Beispielen in cURL, JavaScript und Python. Auth, Ratenlimits und Fehlercodes.",
     "apiReferenceLink": "Endpunkte erkunden",
@@ -2292,7 +2288,10 @@
       {
         "label": "Unterstützte Zahlungsmethoden"
       }
-    ]
+    ],
+    "workspaceTitle": "Arbeitsbereich-Leitfaden",
+    "workspaceBody": "Chats, Agenten, Tarife und Einstellungen in der Seitenleiste. Navigation auf Desktop und Mobilgeräten.",
+    "noResults": "Keine passenden Anleitungen."
   },
   "shared": {
     "tiers": {
@@ -2908,5 +2907,33 @@
     "copied": "Kopiert",
     "pendingApprovals": "{count} ausstehende Freigaben",
     "backToChat": "Zurück zum Chat"
+  },
+  "unifiedWorkspace": {
+    "manageAgents": "Agenten verwalten",
+    "website": "Website",
+    "discover": "Entdecken",
+    "compute": "Compute",
+    "mesh": "Neural Mesh",
+    "overview": "Übersicht",
+    "resources": "Ressourcen",
+    "legal": "Rechtliches",
+    "workspaceTools": "Arbeitsbereich-Werkzeuge",
+    "automations": "Automatisierungen",
+    "openMenu": "Menü öffnen",
+    "closeMenu": "Menü schließen",
+    "agentNavigation": "Agentennavigation",
+    "advanced": "Erweitert",
+    "desktop": "Desktop",
+    "agentActions": "Agentenaktionen",
+    "chatOptions": "Chat-Optionen",
+    "platformTitle": "Die Hatcher-Plattform",
+    "platformDescription": "Chatten, Inhalte erstellen und KI-Agenten in einem Arbeitsbereich ausführen.",
+    "chatDescription": "Starte ein Gespräch. Erhalte Antworten, entwickle Ideen und löse Probleme mit KI.",
+    "agentsDescription": "Ein Assistent für deine Arbeit. Erstelle, konfiguriere und betreibe KI-Agenten für deine Aufgaben.",
+    "canvasDescription": "Erstelle Bilder, Videos und Audio. Verwandle Ideen mit KI in Inhalte.",
+    "exploreTitle": "Hatcher entdecken",
+    "railTasks": "Aufgaben",
+    "railPlans": "Tarife",
+    "railHelp": "Hilfe"
   }
 }

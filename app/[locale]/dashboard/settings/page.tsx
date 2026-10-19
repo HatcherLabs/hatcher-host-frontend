@@ -1,4 +1,6 @@
 'use client';
+import { WorkspacePortal } from '@/components/workspace/WorkspacePortal';
+import { useWorkspace } from '@/components/workspace/WorkspaceContext';
 
 import { useState, useEffect, useRef } from 'react';
 import NextLink from 'next/link';
@@ -196,6 +198,7 @@ export default function SettingsPage() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading, user, logout, refreshUser } = useAuth();
   const { toast } = useToast();
+  const workspace = useWorkspace();
   const [activeTab, setActiveTab] = useState<TabId>('profile');
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get('tab') === 'security') {
@@ -432,17 +435,11 @@ export default function SettingsPage() {
   // ── Render ────────────────────────────────────────────────
   return (
     <motion.div
-      className="min-h-screen p-4 sm:p-6 lg:p-10 relative"
+      className="min-h-full p-5 sm:p-8 relative"
       variants={pageVariants}
       initial="hidden"
       animate="visible"
     >
-      {/* Background glow */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 60% 40% at 30% 0%, var(--accent-glow), transparent 60%)' }}
-      />
-
       <div className="max-w-4xl mx-auto relative">
         {/* ── Page header ─────────────────────────────────── */}
         <div className="mb-8">
@@ -453,8 +450,8 @@ export default function SettingsPage() {
 
         <div className="flex flex-col lg:flex-row gap-6">
           {/* ── Sidebar tabs ──────────────────────────────── */}
-          <nav className="lg:w-52 flex-shrink-0">
-            <div className="card glass-noise p-2 space-y-0.5 lg:sticky lg:top-6">
+          <WorkspacePortal><nav aria-label={t("heading")} className={workspace ? "w-full" : "lg:w-52 flex-shrink-0"}>
+            <div className={workspace ? "space-y-1" : "card glass-noise p-2 space-y-0.5 lg:sticky lg:top-6"}>
               {/* User info */}
               <div className="flex items-center gap-3 px-3 py-3 mb-1 border-b border-[var(--border-default)]">
                 {avatarUrl ? (
@@ -476,7 +473,8 @@ export default function SettingsPage() {
               {TABS.map(({ id, icon: Icon }) => (
                 <button
                   key={id}
-                  onClick={() => setActiveTab(id)}
+                  aria-current={activeTab === id ? "page" : undefined}
+                  onClick={() => { setActiveTab(id); workspace?.closeSidebar(); }}
                   className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer text-left ${
                     activeTab === id
                       ? id === 'danger'
@@ -490,7 +488,7 @@ export default function SettingsPage() {
                 </button>
               ))}
             </div>
-          </nav>
+          </nav></WorkspacePortal>
 
           {/* ── Tab content ───────────────────────────────── */}
           <div className="flex-1 min-w-0">

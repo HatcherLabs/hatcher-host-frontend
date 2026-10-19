@@ -581,20 +581,52 @@ export default function ChatWorkspace({
       openSidebar={workspace?.openSidebar ?? (() => undefined)}
     />
   );
+  const suggestions = (
+              <div className={experience.suggestions}>
+                {[
+                  {
+                    key: "research",
+                    Icon: Search,
+                    prompt:
+                      "Help me research an idea. Ask me what I have in mind.",
+                  },
+                  {
+                    key: "write",
+                    Icon: PenLine,
+                    prompt:
+                      "Help me write something. Ask me about my audience and what I want to say.",
+                  },
+                  {
+                    key: "plan",
+                    Icon: CalendarDays,
+                    prompt:
+                      "Help me plan my week. Start by asking about my priorities.",
+                  },
+                ].map((item) => (
+                  <button
+                    key={item.key}
+                    onClick={() => {
+                      setPrompt(t(item.key));
+                      messageInput.current?.focus();
+                    }}
+                  >
+                    <item.Icon size={15} />
+                    {t(item.key)}
+                  </button>
+                ))}
+              </div>);
   const header = (
     <>
       <div className={experience.headerIdentity}>
         <span className={experience.conversationHeading}>
           {mode === "canvas" ? t("canvas") : selectedTitle || t("newChatTitle")}
         </span>
-        {mode === "chat" && (
-          <ChatModelPicker
+        {mode === "chat" && <span className={experience.desktopModel}><ChatModelPicker
             models={models}
             value={model}
             disabled={busy}
             onChange={setModel}
-          />
-        )}
+          /></span>}
       </div>
       <div className={experience.headerActions}>
         {mode === "chat" && !guest && turns.length > 0 && (
@@ -663,8 +695,10 @@ export default function ChatWorkspace({
               </p>
             ) : turns.length === 0 ? (
               <div className={experience.welcome}>
+                <span className={experience.welcomeMark} aria-hidden="true">H.</span>
                 <h1>{t("welcome")}</h1>
                 <p>{t("welcomeDescription")}</p>
+                {suggestions}
               </div>
             ) : (
               turns.map((turn) => (
@@ -838,6 +872,7 @@ export default function ChatWorkspace({
                 }}
               />
               <div className={experience.composerToolbar}>
+                <span className={experience.mobileModel}><ChatModelPicker models={models} value={model} disabled={busy} onChange={setModel}/></span>
                 <div className={experience.toolAnchor}>
                   <button
                     type="button"
@@ -960,41 +995,6 @@ export default function ChatWorkspace({
                 )}
               </div>
             </form>
-            {!loading && turns.length === 0 && (
-              <div className={experience.suggestions}>
-                {[
-                  {
-                    key: "research",
-                    Icon: Search,
-                    prompt:
-                      "Help me research an idea. Ask me what I have in mind.",
-                  },
-                  {
-                    key: "write",
-                    Icon: PenLine,
-                    prompt:
-                      "Help me write something. Ask me about my audience and what I want to say.",
-                  },
-                  {
-                    key: "plan",
-                    Icon: CalendarDays,
-                    prompt:
-                      "Help me plan my week. Start by asking about my priorities.",
-                  },
-                ].map((item) => (
-                  <button
-                    key={item.key}
-                    onClick={() => {
-                      setPrompt(t(item.key));
-                      messageInput.current?.focus();
-                    }}
-                  >
-                    <item.Icon size={15} />
-                    {t(item.key)}
-                  </button>
-                ))}
-              </div>
-            )}
             {guest && <p className={experience.footnote}>{entry("guestAllowance", { remaining: account?.guestAllowance?.remaining ?? 0 })} · <Link href={loginHrefForReturn("/")} onClick={rememberDraft}>{entry("signInContinue")}</Link></p>}
             {guest && turns.length === 0 && guestIntroduction && <details className={experience.guestAbout}><summary>{entry("aboutHatcher")}</summary>{guestIntroduction}</details>}
             <p className={experience.footnote}>

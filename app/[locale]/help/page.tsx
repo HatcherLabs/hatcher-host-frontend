@@ -241,7 +241,6 @@ export default function HelpPage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
               { label: t('quickLinks.documentation'), href: DOCS_URL, icon: BookOpen, color: 'var(--color-accent)', external: true },
-              { label: t('quickLinks.discord'), href: 'https://discord.gg/7tY3HjKjMc', icon: MessageCircle, color: '#7289da', external: true },
               { label: t('quickLinks.telegram'), href: 'https://t.me/HatcherLabs', icon: MessageCircle, color: '#29a9eb', external: true },
               { label: t('quickLinks.submitTicket'), href: '/support', icon: Ticket, color: '#f59e0b', external: false },
               { label: t('quickLinks.emailSupport'), href: 'mailto:support@hatcher.host', icon: Mail, color: '#486a79', external: true },
@@ -421,18 +420,6 @@ export default function HelpPage() {
                 <div>
                   <p className="text-xs font-medium text-[var(--text-primary)] group-hover:text-[var(--color-accent)] transition-colors">contact@hatcher.host</p>
                   <p className="text-[10px] text-[var(--text-muted)]">{t('generalInquiries')}</p>
-                </div>
-              </a>
-              <a
-                href="https://discord.gg/7tY3HjKjMc"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2.5 p-3 rounded-lg bg-[var(--bg-card)] hover:bg-[var(--bg-card)] transition-colors group"
-              >
-                <MessageCircle size={14} className="text-[#7289da] flex-shrink-0" />
-                <div>
-                  <p className="text-xs font-medium text-[var(--text-primary)] group-hover:text-[var(--color-accent)] transition-colors">Discord</p>
-                  <p className="text-[10px] text-[var(--text-muted)]">{t('communitySupport')}</p>
                 </div>
               </a>
               <a

@@ -437,8 +437,8 @@
         "Espaço de trabalho de 40 GB",
         "Gerenciador de arquivos + registros completos",
         "Suporte prioritário",
-        "Função Discord fundadora + tag Telegram",
-        "Preço bloqueado para sempre"
+        "Preço bloqueado para sempre",
+        "Tag Telegram de Membro Fundador"
       ],
       "ctaSoldOut": "Esgotado",
       "ctaClaim": "Garanta sua vaga"
@@ -708,7 +708,7 @@
           "Gerenciador de arquivos + registros completos incluídos",
           "Suporte prioritário",
           "Todas as integrações",
-          "Função Discord fundadora + tag Telegram"
+          "Tag Telegram de Membro Fundador"
         ],
         "missing": []
       }
@@ -848,14 +848,13 @@
         },
         {
           "q": "Qual é o nível de Membro Fundador?",
-          "a": "Membro Fundador é um pagamento único do $99 que lhe dá acesso vitalício ao Hatcher: 10 agentes, 25.000 AI Credits/mês, 4 CPU / 6 GB de RAM, 40 GB de espaço de trabalho, agentes sempre ativos, gerenciador de arquivos, logs completos, suporte prioritário e função fundadora do Discord + tag Telegram. Sem taxas mensais, nunca. Limitado a 20 vagas – quando elas acabarem, este nível desaparecerá."
+          "a": "Membro Fundador é um pagamento único do $99 que lhe dá acesso vitalício ao Hatcher: 10 agentes, 25.000 AI Credits/mês, 4 CPU / 6 GB de RAM, 40 GB de espaço de trabalho, agentes sempre ativos, gerenciador de arquivos, logs completos, suporte prioritário e tag Telegram de Membro Fundador. Sem taxas mensais, nunca. Limitado a 20 vagas – quando elas acabarem, este nível desaparecerá."
         }
       ]
     },
     "help": {
       "text": "Precisa de ajuda para escolher um plano?",
       "emailLabel": "Envie-nos um e-mail",
-      "discordLabel": "Discord",
       "telegramLabel": "Telegram"
     },
     "cta": {
@@ -2160,7 +2159,6 @@
     "ticketResponse": "Envie um ticket de suporte e nossa equipe entrará em contato com você em 24 horas.",
     "quickLinks": {
       "documentation": "Documentação",
-      "discord": "Comunidade Discord",
       "telegram": "Grupo Telegram",
       "submitTicket": "Enviar tíquete",
       "emailSupport": "Suporte por e-mail"
@@ -2186,7 +2184,6 @@
       "followUsDesc": "Atualizações e anúncios"
     },
     "directContact": "Ou envie-nos um e-mail diretamente para",
-    "joinDiscord": "Junte-se ao nosso Discord",
     "telegramLabel": "Telegram",
     "communitySupport": "para apoio comunitário",
     "submitTicketHeading": "Envie um tíquete",
@@ -2221,8 +2218,7 @@
     "eyebrow": "Documentação",
     "heading": "Documentação",
     "subheading": "Tudo o que você precisa para criar, implantar e gerenciar agentes de IA com Hatcher.",
-    "searchPlaceholder": "Pesquisar documentação...",
-    "searchComingSoon": "Pesquisa em breve",
+    "searchPlaceholder": "Buscar guias",
     "apiReferenceHeading": "Referência API",
     "apiReferenceBody": "Documentação completa de endpoint com exemplos em cURL, JavaScript e Python. Autenticação, limites de taxa e códigos de erro.",
     "apiReferenceLink": "Explorar terminais",
@@ -2292,7 +2288,10 @@
       {
         "label": "Métodos de pagamento suportados"
       }
-    ]
+    ],
+    "workspaceTitle": "Guia do espaço de trabalho",
+    "workspaceBody": "Encontre chats, agentes, planos e configurações na barra lateral, no computador e no celular.",
+    "noResults": "Nenhum guia encontrado."
   },
   "shared": {
     "tiers": {
@@ -2908,5 +2907,33 @@
     "copied": "Copiado",
     "pendingApprovals": "{count} aprovações pendentes",
     "backToChat": "Voltar ao chat"
+  },
+  "unifiedWorkspace": {
+    "manageAgents": "Gerenciar agentes",
+    "website": "Site",
+    "discover": "Descobrir",
+    "compute": "Compute",
+    "mesh": "Neural Mesh",
+    "overview": "Visão geral",
+    "resources": "Recursos",
+    "legal": "Informações legais",
+    "workspaceTools": "Ferramentas",
+    "automations": "Automações",
+    "openMenu": "Abrir menu",
+    "closeMenu": "Fechar menu",
+    "agentNavigation": "Navegação do agente",
+    "advanced": "Avançado",
+    "desktop": "Área de trabalho",
+    "agentActions": "Ações do agente",
+    "chatOptions": "Opções do chat",
+    "platformTitle": "A plataforma Hatcher",
+    "platformDescription": "Converse, crie e execute agentes de IA em um só espaço.",
+    "chatDescription": "Comece uma conversa. Encontre respostas, desenvolva ideias e resolva problemas com IA.",
+    "agentsDescription": "Um assistente para seu trabalho. Crie, configure e execute agentes de IA para suas tarefas.",
+    "canvasDescription": "Crie imagens, vídeos e áudio. Transforme ideias em conteúdo com IA.",
+    "exploreTitle": "Explore o Hatcher",
+    "railTasks": "Tarefas",
+    "railPlans": "Planos",
+    "railHelp": "Ajuda"
   }
 }

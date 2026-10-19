@@ -525,7 +525,7 @@ export default function PlatformGuidePage() {
             {guide.warnings.map((warning, i) => (
               <div key={i} className="flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
                 <AlertTriangle size={16} className="text-amber-400 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-amber-300/80 leading-relaxed">{warning}</p>
+                <p className="text-sm text-amber-800 dark:text-amber-300 leading-relaxed">{warning}</p>
               </div>
             ))}
           </motion.div>

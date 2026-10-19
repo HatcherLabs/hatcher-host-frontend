@@ -246,7 +246,7 @@ export function MailTab() {
 
   return (
     <motion.div
-      className="space-y-4"
+      className="min-w-0 space-y-4"
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.18 }}
@@ -282,11 +282,11 @@ export function MailTab() {
         </div>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="space-y-4">
+      <div className="grid min-w-0 grid-cols-1 gap-4 min-[1400px]:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="min-w-0 space-y-4">
           <GlassCard>
-            <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
-              <div>
+            <div className="grid min-w-0 grid-cols-1 gap-4 min-[1700px]:grid-cols-[minmax(0,1fr)_320px]">
+              <div className="min-w-0">
                 <p
                   className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--text-muted)]"
                   style={{ fontFamily: 'var(--font-mono)' }}
@@ -317,10 +317,10 @@ export function MailTab() {
 
               {agent.framework === 'ironclaw' ? (
                 <div className="rounded-[3px] border border-amber-500/25 bg-amber-500/10 p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-amber-300" style={{ fontFamily: 'var(--font-mono)' }}>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-amber-800 dark:text-amber-300" style={{ fontFamily: 'var(--font-mono)' }}>
                     {t('ironclawManualTitle')}
                   </p>
-                  <p className="mt-2 text-xs leading-5 text-amber-100/80">
+                  <p className="mt-2 text-xs leading-5 text-amber-900 dark:text-amber-100">
                     {t('ironclawManualBody')}
                   </p>
                 </div>
@@ -365,7 +365,7 @@ export function MailTab() {
 
           <GlassCard className="p-0 overflow-hidden">
             <div className="flex flex-col gap-3 border-b border-[var(--border-default)] p-4 md:flex-row md:items-center md:justify-between">
-              <div>
+              <div className="min-w-0">
                 <p
                   className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--text-muted)]"
                   style={{ fontFamily: 'var(--font-mono)' }}
@@ -446,7 +446,7 @@ export function MailTab() {
           </GlassCard>
         </div>
 
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
           <GlassCard>
             <p
               className="mb-3 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--text-muted)]"
@@ -460,7 +460,7 @@ export function MailTab() {
                 {t('noSelection')}
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="min-w-0 space-y-4">
                 <div className="flex flex-wrap items-center gap-2">
                   <DirectionBadge direction={selectedMessage.direction} />
                   <StatusBadge status={selectedMessage.status} />
@@ -511,7 +511,7 @@ export function MailTab() {
           <GlassCard>
             <div className="mb-4 flex items-start gap-2">
               <Send size={16} className="mt-0.5 text-[var(--accent)]" />
-              <div>
+              <div className="min-w-0">
                 <p
                   className="text-sm font-bold text-[var(--text-primary)]"
                   style={{ fontFamily: 'var(--font-mono)' }}

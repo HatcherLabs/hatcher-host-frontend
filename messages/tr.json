@@ -437,8 +437,8 @@
         "40 GB çalışma alanı",
         "Dosya Yöneticisi + Tam Loglar",
         "Öncelikli destek",
-        "Role Discord kurma + Telegram etiketi",
-        "Sonsuza dek sabit fiyat"
+        "Sonsuza dek sabit fiyat",
+        "Kurucu Üye Telegram etiketi"
       ],
       "ctaSoldOut": "Tükenmişti",
       "ctaClaim": "Yerinizi alın"
@@ -708,7 +708,7 @@
           "Dosya Yöneticisi + Tam Loglar dahil",
           "Öncelikli destek",
           "Tüm entegrasyonlar",
-          "Role Discord kurma + Telegram etiketi"
+          "Kurucu Üye Telegram etiketi"
         ],
         "missing": []
       }
@@ -848,14 +848,13 @@
         },
         {
           "q": "Kurucu Üye seviyesi nedir?",
-          "a": "Kurucu Üye, ömür boyu erişim sağlayan tek seferlik $99 ödemedir ve size ömür boyu Hatcher erişim sağlar: 10 ajan, ayda 25.000 AI Credits, 4 CPU / 6 GB RAM, 40 GB çalışma alanı, her zaman aktif ajanlar, Dosya Yöneticisi, Tam Loglar, öncelikli destek ve Founding Discord rolü + Telegram etiketi. Aylık ücret yok, asla. 20 yerle sınırlı — onlar gittikten sonra bu seviye de yok oluyor."
+          "a": "Kurucu Üye, ömür boyu erişim sağlayan tek seferlik $99 ödemedir ve size ömür boyu Hatcher erişim sağlar: 10 ajan, ayda 25.000 AI Credits, 4 CPU / 6 GB RAM, 40 GB çalışma alanı, her zaman aktif ajanlar, Dosya Yöneticisi, Tam Loglar, öncelikli destek ve Kurucu Üye Telegram etiketi. Aylık ücret yok, asla. 20 yerle sınırlı — onlar gittikten sonra bu seviye de yok oluyor."
         }
       ]
     },
     "help": {
       "text": "Plan için yardıma mı ihtiyacınız var?",
       "emailLabel": "Bize e-posta gönderin",
-      "discordLabel": "Discord",
       "telegramLabel": "Telegram"
     },
     "cta": {
@@ -2160,7 +2159,6 @@
     "ticketResponse": "Destek talebi gönderin, ekibimiz 24 saat içinde size geri dönecektir.",
     "quickLinks": {
       "documentation": "Dokümantasyon",
-      "discord": "Discord Topluluk",
       "telegram": "Telegram Grubu",
       "submitTicket": "Bilet Gönder",
       "emailSupport": "E-posta Destek"
@@ -2186,7 +2184,6 @@
       "followUsDesc": "Güncellemeler ve duyurular"
     },
     "directContact": "Ya da doğrudan bize e-posta gönderin.",
-    "joinDiscord": "Ekibimize katılın Discord",
     "telegramLabel": "Telegram",
     "communitySupport": "Topluluk desteği için",
     "submitTicketHeading": "Bir Bilet Gönderin",
@@ -2221,8 +2218,7 @@
     "eyebrow": "Dokümantasyon",
     "heading": "Dokümantasyon",
     "subheading": "Hatcher ile yapay zeka ajanları oluşturmak, dağıtmak ve yönetmek için ihtiyacınız olan her şey.",
-    "searchPlaceholder": "Arama belgeleri...",
-    "searchComingSoon": "Arama yakında",
+    "searchPlaceholder": "Rehber ara",
     "apiReferenceHeading": "API Referans",
     "apiReferenceBody": "cURL, JavaScript ve Python örnekleriyle tam uç nokta dokümantasyonu. Doğrulama, hız sınırları ve hata kodları.",
     "apiReferenceLink": "Uç noktaları keşfedin",
@@ -2292,7 +2288,10 @@
       {
         "label": "Desteklenen ödeme yöntemleri"
       }
-    ]
+    ],
+    "workspaceTitle": "Çalışma alanı rehberi",
+    "workspaceBody": "Masaüstü ve mobilde sohbetlere, ajanlara, planlara ve ayarlara kenar çubuğundan ulaşın.",
+    "noResults": "Eşleşen rehber bulunamadı."
   },
   "shared": {
     "tiers": {
@@ -2908,5 +2907,33 @@
     "copied": "Kopyalandı",
     "pendingApprovals": "{count} bekleyen onay",
     "backToChat": "Sohbete dön"
+  },
+  "unifiedWorkspace": {
+    "manageAgents": "Ajanları yönet",
+    "website": "Web sitesi",
+    "discover": "Keşfet",
+    "compute": "Compute",
+    "mesh": "Neural Mesh",
+    "overview": "Genel bakış",
+    "resources": "Kaynaklar",
+    "legal": "Yasal bilgiler",
+    "workspaceTools": "Çalışma alanı araçları",
+    "automations": "Otomasyonlar",
+    "openMenu": "Menüyü aç",
+    "closeMenu": "Menüyü kapat",
+    "agentNavigation": "Ajan gezinmesi",
+    "advanced": "Gelişmiş",
+    "desktop": "Masaüstü",
+    "agentActions": "Ajan işlemleri",
+    "chatOptions": "Sohbet seçenekleri",
+    "platformTitle": "Hatcher platformu",
+    "platformDescription": "Tek bir çalışma alanında sohbet edin, içerik üretin ve yapay zekâ ajanlarını çalıştırın.",
+    "chatDescription": "Bir sohbet başlatın. Yapay zekâyla yanıt bulun, fikir geliştirin ve sorunları çözün.",
+    "agentsDescription": "İşiniz için bir asistan. Görevleriniz için yapay zekâ ajanları oluşturun, yapılandırın ve çalıştırın.",
+    "canvasDescription": "Görsel, video ve ses oluşturun. Yapay zekâyla fikirlerinizi içeriğe dönüştürün.",
+    "exploreTitle": "Hatcher’ı keşfedin",
+    "railTasks": "Görevler",
+    "railPlans": "Planlar",
+    "railHelp": "Yardım"
   }
 }

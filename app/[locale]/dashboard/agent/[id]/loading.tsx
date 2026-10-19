@@ -2,11 +2,11 @@ export default function AgentManagementLoading() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <div className="w-16 h-16 rounded-2xl shimmer" />
-        <div className="flex-1 space-y-2">
-          <div className="h-7 shimmer rounded-lg w-48" />
-          <div className="h-4 shimmer rounded-lg w-32" />
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="w-16 h-16 shrink-0 rounded-2xl shimmer" />
+        <div className="min-w-0 flex-1 space-y-2">
+          <div className="h-7 shimmer rounded-lg w-48 max-w-full" />
+          <div className="h-4 shimmer rounded-lg w-32 max-w-full" />
         </div>
         <div className="flex gap-2">
           <div className="h-10 shimmer rounded-xl w-24" />
@@ -15,7 +15,7 @@ export default function AgentManagementLoading() {
       </div>
 
       {/* Tab bar */}
-      <div className="flex gap-1 border-b border-[var(--border-default)] pb-px">
+      <div className="flex gap-1 overflow-hidden border-b border-[var(--border-default)] pb-px">
         {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="h-9 shimmer rounded-lg w-24" />
         ))}

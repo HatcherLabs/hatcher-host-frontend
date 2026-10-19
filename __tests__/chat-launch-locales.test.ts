@@ -9,12 +9,12 @@ describe('public chat launch', () => {
       expect(isWorkspacePath('/' + locale)).toBe(true);
       expect(workspaceSection('/' + locale, null)).toBe('chats');
       expect(workspaceSection('/' + locale, null, 'canvas')).toBe('canvas');
-      expect(isWorkspacePath('/' + locale + '/platform')).toBe(false);
+      expect(isWorkspacePath('/' + locale + '/platform')).toBe(true);
     }
   });
   it.each(locales)('has complete UI messages and matching placeholders for %s', (locale) => {
     const english = read('en'), translated = read(locale);
-    for (const namespace of ['workspace','chatExperience','chatEntry']) {
+    for (const namespace of ['workspace','unifiedWorkspace','chatExperience','chatEntry']) {
       expect(Object.keys(translated[namespace]).sort()).toEqual(Object.keys(english[namespace]).sort());
       for (const [key, value] of Object.entries(english[namespace])) {
         const text = translated[namespace][key];

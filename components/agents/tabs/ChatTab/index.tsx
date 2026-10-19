@@ -1,6 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useCallback, useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
+import { useTranslations } from 'next-intl';
+import { WorkspacePortal } from '@/components/workspace/WorkspacePortal';
 import { motion } from 'framer-motion';
 import { readHandoff } from '@/lib/chat-workspace';
 import { useAuth as useHandoffAuth } from '@/lib/auth-context';
@@ -15,6 +18,7 @@ import {
 } from '../../AgentContext';
 import { MESSAGES_WINDOW } from './constants';
 import { ChatHeader } from './ChatHeader';
+import { AgentChatOptions } from '../../AgentChatOptions';
 import { ChatModelSwitcher } from './ChatModelSwitcher';
 import { resolveLoadedModelConfig } from '@/hooks/useAgentConfig';
 import { MessageList } from './MessageList';
@@ -468,7 +472,8 @@ export function ChatTab({ compact = false }: { compact?: boolean }) {
       animate="center"
       exit="exit"
     >
-      <ChatHeader
+      {workspace ? <WorkspacePortal region="tools"><AgentChatOptions><ChatHeader
+        unified={!!workspace}
         compact={compact}
         simple={ctx.viewMode === 'easy'}
         agent={agent}
@@ -492,12 +497,35 @@ export function ChatTab({ compact = false }: { compact?: boolean }) {
         onToggleThinking={toggleThinking}
         onToggleToolCalls={toggleToolCalls}
         onStartVoiceCall={startVoiceCall}
-      />
+      /></AgentChatOptions></WorkspacePortal> : <ChatHeader
+        unified={!!workspace}
+        compact={compact}
+        simple={ctx.viewMode === 'easy'}
+        agent={agent}
+        wsConnected={wsConnected}
+        hasVoiceSupport={hasVoiceSupport}
+        sttSupported={voice.sttSupported}
+        ttsSupported={voice.ttsSupported}
+        isAuthenticated={isAuthenticated}
+        autoSpeak={voice.autoSpeak}
+        showThinking={showThinking}
+        showToolCalls={showToolCalls}
+        activeModel={activeModelDisplay}
+        modelSwitcher={<ChatModelSwitcher activeModel={activeModelDisplay} framework={agent.framework}
+          currentModel={resolveLoadedModelConfig(agent.config as Record<string, unknown>).model}
+          hosted={resolveLoadedModelConfig(agent.config as Record<string, unknown>).provider === 'openrouter'}
+          disabled={sending || queuedChatCount > 0 || ctx.saving || ['starting', 'restarting'].includes(agent.status)}
+          onSelect={ctx.switchChatModel} onOpenSettings={() => setTab('config')} />}
+        onOpenModelSettings={() => setTab('config')}
+        onOpenMobilePanel={() => setMobilePanelOpen(true)}
+        onToggleAutoSpeak={voice.toggleAutoSpeak}
+        onToggleThinking={toggleThinking}
+        onToggleToolCalls={toggleToolCalls}
+        onStartVoiceCall={startVoiceCall}
+      />}
 
       <div className="flex min-h-0 flex-1 flex-col gap-3 md:flex-row lg:gap-4">
-        {!compact && <div className="hidden min-h-0 md:flex">
-          <AgentPresenceRail />
-        </div>}
+        {workspace ? (workspace.chatTarget && createPortal(<AgentPresenceRail compact onSessionSelect={workspace.closeSidebar} />, workspace.chatTarget)) : !compact && <div className="hidden min-h-0 md:flex"><AgentPresenceRail /></div>}
 
         {mobilePanelOpen && (
           <dialog ref={sessionsDialog} className={`fixed inset-0 m-0 h-dvh max-h-none w-screen max-w-none border-0 bg-transparent p-0 text-[var(--text-primary)] ${compact ? "" : "md:hidden"}`} aria-label="Chat sessions" onCancel={() => setMobilePanelOpen(false)}>

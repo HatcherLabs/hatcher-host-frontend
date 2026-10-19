@@ -10,6 +10,10 @@ export interface WorkspaceState {
   refreshAgents: () => Promise<void>;
   chatTarget: HTMLElement | null;
   headerTarget: HTMLElement | null;
+  navigationTarget: HTMLElement | null;
+  actionsTarget: HTMLElement | null;
+  toolsTarget: HTMLElement | null;
+  settingsTarget: HTMLElement | null;
   openSidebar: () => void;
   closeSidebar: () => void;
 }

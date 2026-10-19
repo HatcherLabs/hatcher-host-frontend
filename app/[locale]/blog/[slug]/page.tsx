@@ -78,7 +78,7 @@ export default async function BlogArticlePage({ params }: Props) {
         {/* Back link */}
         <Link
           href="/blog"
-          className="inline-flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-purple-400 transition-colors duration-200 mb-8"
+          className="inline-flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors duration-200 mb-8"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -89,16 +89,16 @@ export default async function BlogArticlePage({ params }: Props) {
         {/* Header */}
         <header className="mb-10">
           <div className="flex items-center gap-2 mb-4">
-            <span className="px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">
+            <span className="px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded-full bg-purple-500/10 text-[var(--accent)] border border-purple-500/20">
               {post.category}
             </span>
             <span className="text-xs text-[var(--text-muted)]">{post.readTime} {t('readLabel')}</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight mb-4">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[var(--text-primary)] leading-tight mb-4">
             {post.title}
           </h1>
           <div className="flex items-center gap-3 text-sm text-[var(--text-secondary)]">
-            <span className="font-medium text-white">{post.author}</span>
+            <span className="font-medium text-[var(--text-primary)]">{post.author}</span>
             <span className="text-[var(--text-muted)]">&middot;</span>
             <time dateTime={post.date}>
               {new Date(post.date).toLocaleDateString('en-US', {
@@ -112,17 +112,17 @@ export default async function BlogArticlePage({ params }: Props) {
 
         {/* Article content */}
         <div
-          className="prose prose-invert prose-purple max-w-none
-            prose-headings:font-semibold prose-headings:text-white
+          className="prose dark:prose-invert max-w-none min-w-0 [overflow-wrap:anywhere] [&_table]:block [&_table]:max-w-full [&_table]:overflow-x-auto [&_pre]:max-w-full [&_pre]:overflow-x-auto
+            prose-headings:font-semibold prose-headings:text-[var(--text-primary)]
             prose-h2:text-xl prose-h2:mt-10 prose-h2:mb-4
             prose-h3:text-lg prose-h3:mt-8 prose-h3:mb-3
-            prose-p:text-[#c4c4cc] prose-p:leading-relaxed
-            prose-a:text-purple-400 prose-a:no-underline hover:prose-a:underline
-            prose-li:text-[#c4c4cc]
-            prose-strong:text-white
+            prose-p:text-[var(--text-secondary)] prose-p:leading-relaxed
+            prose-a:text-[var(--accent)] prose-a:no-underline hover:prose-a:underline
+            prose-li:text-[var(--text-secondary)]
+            prose-strong:text-[var(--text-primary)]
             prose-blockquote:border-purple-500/40 prose-blockquote:bg-purple-500/5 prose-blockquote:rounded-lg prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:not-italic prose-blockquote:text-[var(--text-secondary)]
-            prose-table:border-collapse prose-th:text-left prose-th:text-xs prose-th:uppercase prose-th:tracking-wider prose-th:text-[var(--text-muted)] prose-th:pb-2 prose-th:border-b prose-th:border-white/10
-            prose-td:py-2 prose-td:pr-6 prose-td:text-sm prose-td:text-[#c4c4cc] prose-td:border-b prose-td:border-[var(--border-default)]"
+            prose-table:border-collapse prose-th:text-left prose-th:text-xs prose-th:uppercase prose-th:tracking-wider prose-th:text-[var(--text-muted)] prose-th:pb-2 prose-th:border-b prose-th:border-[var(--border-default)]
+            prose-td:py-2 prose-td:pr-6 prose-td:text-sm prose-td:text-[var(--text-secondary)] prose-td:border-b prose-td:border-[var(--border-default)]"
           dangerouslySetInnerHTML={{ __html: post.content }} // SAFE: content from hardcoded lib/blog.ts, not user input
         />
 
@@ -132,7 +132,7 @@ export default async function BlogArticlePage({ params }: Props) {
         {/* Related articles */}
         {related.length > 0 && (
           <section>
-            <h2 className="text-lg font-semibold text-white mb-6">{t('relatedArticles')}</h2>
+            <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-6">{t('relatedArticles')}</h2>
             <div className="grid gap-4 sm:grid-cols-3">
               {related.map((r) => (
                 <Link
@@ -140,10 +140,10 @@ export default async function BlogArticlePage({ params }: Props) {
                   href={`/blog/${r.slug}`}
                   className="group rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] hover:bg-[var(--bg-card)] hover:border-purple-500/20 p-4 transition-all duration-300"
                 >
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-purple-400 mb-1.5 block">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--accent)] mb-1.5 block">
                     {r.category}
                   </span>
-                  <span className="text-sm font-medium text-white group-hover:text-purple-300 transition-colors duration-200 leading-snug block">
+                  <span className="text-sm font-medium text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors duration-200 leading-snug block">
                     {r.title}
                   </span>
                   <span className="text-[11px] text-[var(--text-muted)] mt-2 block">{r.readTime} read</span>

@@ -1,100 +1,46 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
-import { buildAgentNavigationTabs } from "./navigationModel";
+import { AppWindow, BarChart3, BookOpen, ChevronDown, FileText, Folder, LayoutDashboard, ListChecks, Mail, MessageSquare, Network, Plug, Settings, ShieldCheck, Terminal, Wallet, type LucideIcon } from "lucide-react";
+import { Link } from "@/i18n/routing";
+import { WorkspacePortal } from "@/components/workspace/WorkspacePortal";
+import { useWorkspace } from "@/components/workspace/WorkspaceContext";
+import styles from "@/components/workspace/WorkspaceShell.module.css";
+import { buildAgentNavigationTabs, agentDesktopHref, EASY_AGENT_TABS } from "./navigationModel";
 import { useAgentContext, type Tab } from "./AgentContext";
 
+const ICONS: Partial<Record<Tab, LucideIcon>> = { chat:MessageSquare, overview:LayoutDashboard, files:Folder, knowledge:BookOpen, integrations:Plug, config:Settings, logs:FileText, terminal:Terminal, wallet:Wallet, mail:Mail, stats:BarChart3, connectors:Network, schedules:ListChecks };
+const PRIMARY: Tab[] = ["chat", "overview", "files", "knowledge", "integrations"];
+
 export function AgentWorkspaceTabs() {
-  const { agent, tab, setTab, viewMode } = useAgentContext();
+  const { agent, tab, setTab, viewMode, setViewMode } = useAgentContext();
+  const workspace = useWorkspace();
   const t = useTranslations("dashboard.agentDetail.tabs");
-  const nav = useRef<HTMLElement>(null);
-  const allTabs = buildAgentNavigationTabs(
-    agent.framework,
-    (id) => {
-      if (agent.framework === "ironclaw" && id === "plugins")
-        return t("ironclawCapabilities");
-      if (agent.framework === "ironclaw" && id === "schedules")
-        return t("ironclawAutomations");
-      return t(id === "overview" ? "dashboard" : id);
-    },
-    viewMode,
-  );
-  const primary = ["overview", "chat", "files", "logs", "config"];
-  const tabs = primary.flatMap((id) =>
-    allTabs.filter((item) => item.id === id),
-  );
-  const moreTabs = allTabs.filter((item) => !primary.includes(item.id));
-  useEffect(() => {
-    nav.current
-      ?.querySelector('[aria-selected="true"]')
-      ?.scrollIntoView({ block: "nearest", inline: "nearest" });
-  }, [tab]);
-  function onKey(event: React.KeyboardEvent<HTMLButtonElement>, index: number) {
-    let next: number;
-    if (event.key === "ArrowRight") next = (index + 1) % tabs.length;
-    else if (event.key === "ArrowLeft")
-      next = (index + tabs.length - 1) % tabs.length;
-    else if (event.key === "Home") next = 0;
-    else if (event.key === "End") next = tabs.length - 1;
-    else return;
-    event.preventDefault();
-    setTab(tabs[next].id as Tab);
-    nav.current
-      ?.querySelectorAll<HTMLButtonElement>('[role="tab"]')
-      [next]?.focus();
-  }
-  return (
-    <div className="min-w-0 shrink-0 border-b border-[var(--border-default)] bg-[var(--bg-base)] px-4 sm:px-6">
-      <div className="flex items-baseline gap-3 pb-1 pt-5">
-        <h1 className="truncate text-lg font-semibold tracking-tight">
-          {agent.name}
-        </h1>
-        <span className="text-xs capitalize text-[var(--text-muted)]">
-          {agent.framework}
-        </span>
-      </div>
-      <nav
-        ref={nav}
-        role="tablist"
-        aria-label="Agent navigation"
-        data-tour="agent-nav"
-        className="flex gap-6 overflow-x-auto"
-        style={{ scrollbarWidth: "thin" }}
-      >
-        {tabs.map((item, index) => (
-          <button
-            key={item.id}
-            type="button"
-            role="tab"
-            aria-selected={tab === item.id}
-            tabIndex={tab === item.id ? 0 : -1}
-            data-tour={`agent-tab-${item.id}`}
-            onKeyDown={(event) => onKey(event, index)}
-            onClick={() => setTab(item.id)}
-            className={`shrink-0 border-b-2 py-3 text-xs transition-colors ${tab === item.id ? "border-[var(--accent)] font-semibold text-[var(--text-primary)]" : "border-transparent text-[var(--text-muted)] hover:text-[var(--text-primary)]"}`}
-          >
-            {item.label}
-          </button>
-        ))}
-        {moreTabs.length > 0 && (
-          <select
-            aria-label="More agent tools"
-            value={moreTabs.some((item) => item.id === tab) ? tab : ""}
-            onChange={(event) => setTab(event.target.value as Tab)}
-            className="my-2 max-w-[180px] shrink-0 rounded-md border-0 bg-[var(--bg-base)] px-2 text-xs text-[var(--text-secondary)]"
-          >
-            <option value="" disabled>
-              More
-            </option>
-            {moreTabs.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.label}
-              </option>
-            ))}
-          </select>
-        )}
-      </nav>
-    </div>
-  );
+  const u = useTranslations("unifiedWorkspace");
+  const w = useTranslations("workspace");
+  const allTabs = buildAgentNavigationTabs(agent.framework, id => {
+    if (id === "config") return w("settings");
+    if (id === "overview") return u("overview");
+    if (agent.framework === "ironclaw" && id === "plugins") return t("ironclawCapabilities");
+    if (agent.framework === "ironclaw" && id === "schedules") return t("ironclawAutomations");
+    return t(id);
+  }, "advanced");
+  const primary = PRIMARY.flatMap(id => allTabs.filter(item => item.id === id));
+  const more = allTabs.filter(item => !PRIMARY.includes(item.id) && item.id !== "config");
+  const renderTab = (item: typeof allTabs[number]) => {
+    const Icon = ICONS[item.id] ?? Plug;
+    return <button key={item.id} type="button" className={styles.row} aria-current={tab === item.id ? "page" : undefined} data-tour={`agent-tab-${item.id}`} onClick={() => {
+      if (viewMode === "easy" && !EASY_AGENT_TABS.includes(item.id)) setViewMode("advanced");
+      setTab(item.id); workspace?.closeSidebar();
+    }}><Icon size={18} strokeWidth={1.7}/><span>{item.label}</span></button>;
+  };
+  return <>
+    <WorkspacePortal region="header"><div className={styles.agentHeadline}><i className={styles.statusDot} data-status={agent.status}/><strong>{agent.name}</strong><span>/ {allTabs.find(item => item.id === tab)?.label ?? t("chat")}</span></div></WorkspacePortal>
+    <WorkspacePortal><nav className={styles.agentNavigation} aria-label={u("agentNavigation")} data-tour="agent-nav">
+      {primary.map(renderTab)}
+      <details className={styles.group} open={more.some(item => item.id === tab)}><summary>{u("advanced")}<ChevronDown size={15}/></summary>{more.map(renderTab)}<Link className={styles.row} href={agentDesktopHref(agent.id)} onClick={() => workspace?.closeSidebar()}><AppWindow size={18}/><span>{u("desktop")}</span></Link></details>
+      <div className={styles.contextExtras}><Link className={styles.row} href={`/dashboard/missions?agent=${encodeURIComponent(agent.id)}`} onClick={() => workspace?.closeSidebar()}><ListChecks size={18}/><span>{w("missions")}</span></Link><Link className={styles.row} href={`/dashboard/approvals?agent=${encodeURIComponent(agent.id)}`} onClick={() => workspace?.closeSidebar()}><ShieldCheck size={18}/><span>{w("approvals")}</span></Link></div>
+    </nav></WorkspacePortal>
+    <WorkspacePortal region="settings">{allTabs.filter(item => item.id === "config").map(renderTab)}</WorkspacePortal>
+  </>;
 }

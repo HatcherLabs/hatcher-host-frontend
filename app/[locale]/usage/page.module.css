@@ -268,7 +268,7 @@
   height: 1rem;
 }
 
-@media (max-width: 760px) {
+@container workspace (max-width: 760px) {
   .page {
     padding-top: 7.5rem;
   }

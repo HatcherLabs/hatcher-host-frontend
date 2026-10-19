@@ -622,7 +622,7 @@ data = res.json()['data']`,
 
             <div className="mt-4 flex items-start gap-2 rounded-lg border border-amber-500/20 bg-amber-500/5 p-3">
               <AlertTriangle size={16} className="text-amber-400 flex-shrink-0 mt-0.5" />
-              <p className="text-xs text-amber-300/80 leading-relaxed">
+              <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
                 Never expose your API key in client-side code or public repositories.
                 Use environment variables and server-side requests to keep your key safe.
               </p>

@@ -1,0 +1,27 @@
+.page { max-width:1040px; margin:0 auto; padding:56px 56px 24px; }
+.heading { margin-bottom:34px; }
+.heading h1 { font-size:32px; line-height:1.2; font-weight:650; letter-spacing:-1px; }
+.heading p { font-size:17px; color:var(--text-secondary); margin-top:10px; line-height:1.65; }
+.products { display:flex; flex-direction:column; }
+.product { display:flex; align-items:center; gap:24px; padding:26px 4px; border-bottom:1px solid var(--border-default); }
+.product:last-child { border-bottom:0; }
+.product > span:nth-child(2) { flex:1; min-width:0; }
+.icon { display:grid; place-items:center; background:var(--tech-accent-soft); color:var(--accent); width:58px; height:58px; border-radius:50%; flex-shrink:0; }
+.product h2 { font-size:20px; font-weight:600; letter-spacing:-.45px; }
+.product p { font-size:14px; line-height:1.65; color:var(--text-secondary); margin-top:4px; max-width:600px; }
+.product > svg { margin-left:auto; flex-shrink:0; color:var(--text-muted); transition:transform 140ms; }
+.product:hover > svg,.resource:hover > svg:last-child { transform:translateX(3px); color:var(--accent); }
+.product:hover h2,.resource:hover strong { color:var(--accent); }
+.sections { display:grid; grid-template-columns:1fr 1fr; gap:48px; margin-top:38px; }
+.sections h2 { font-size:18px; font-weight:600; letter-spacing:-.3px; margin-bottom:14px; }
+.resource { display:flex; align-items:center; gap:14px; padding:17px 2px; border-bottom:1px solid var(--border-default); }
+.resource:last-child { border:0; }
+.resource > svg { color:var(--accent); flex-shrink:0; }
+.resource > span { flex:1; min-width:0; }
+.resource strong { display:block; font-size:14px; font-weight:500; }
+.resource small { display:block; font-size:12px; line-height:1.5; color:var(--text-secondary); margin-top:5px; }
+.footer { display:flex; flex-wrap:wrap; gap:22px; margin-top:52px; padding-top:24px; border-top:1px solid var(--border-default); font-size:11px; color:var(--text-muted); }
+.footer a:first-child { margin-right:auto; }
+.footer a:hover { color:var(--accent); }
+@container workspace (max-width:800px) { .page { padding:36px 28px 24px; } .sections { gap:30px; } }
+@media(max-width:600px) { .page { padding:28px 20px 24px; } .heading { margin-bottom:18px; } .heading h1 { font-size:27px; } .heading p { font-size:15px; } .product { gap:14px; padding:22px 0; } .icon { width:42px; height:42px; } .icon svg { width:22px; } .product h2 { font-size:18px; } .product p { font-size:13px; } .sections { grid-template-columns:1fr; gap:28px; margin-top:28px; } .footer { gap:16px; margin-top:32px; } }

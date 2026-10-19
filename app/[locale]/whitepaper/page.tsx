@@ -252,8 +252,8 @@ export default function WhitepaperPage() {
           </aside>
         </section>
 
-        <section className="mt-10 rounded-lg border border-amber-300/20 bg-amber-300/10 p-5 text-sm leading-6 text-amber-100/90">
-          <p className="font-semibold text-amber-100">Important notice</p>
+        <section className="mt-10 rounded-lg border border-amber-300/20 bg-amber-300/10 p-5 text-sm leading-6 text-amber-900 dark:text-amber-100">
+          <p className="font-semibold">Important notice</p>
           <p className="mt-2">
             This document is an informational product and ecosystem overview. It is not an offer to sell securities, an
             investment prospectus, legal advice, tax advice, or financial advice. $HATCHER is described as an ecosystem

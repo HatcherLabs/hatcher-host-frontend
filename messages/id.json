@@ -437,8 +437,8 @@
         "Ruang kerja 40 GB",
         "Manajer File + Log Lengkap",
         "Dukungan prioritas",
-        "Pendiri peran Discord + tag Telegram",
-        "Harga terkunci selamanya"
+        "Harga terkunci selamanya",
+        "Tag Telegram Anggota Pendiri"
       ],
       "ctaSoldOut": "Terjual habis",
       "ctaClaim": "Klaim tempat Anda"
@@ -708,7 +708,7 @@
           "Manajer File + Log Lengkap disertakan",
           "Dukungan prioritas",
           "Semua integrasi",
-          "Pendiri peran Discord + tag Telegram"
+          "Tag Telegram Anggota Pendiri"
         ],
         "missing": []
       }
@@ -848,14 +848,13 @@
         },
         {
           "q": "Apa yang dimaksud dengan tingkatan Anggota Pendiri?",
-          "a": "Anggota Pendiri adalah pembayaran satu kali $99 yang memberi Anda akses seumur hidup ke Hatcher: 10 agen, 25.000 AI Credits/bulan, 4 CPU / 6 GB RAM, ruang kerja 40 GB, agen selalu aktif, Manajer File, Log Lengkap, dukungan prioritas, dan peran Pendiri Discord + tag Telegram. Tidak ada biaya bulanan, selamanya. Terbatas pada 20 tempat — setelah hilang, tingkatan ini hilang."
+          "a": "Anggota Pendiri adalah pembayaran satu kali $99 yang memberi Anda akses seumur hidup ke Hatcher: 10 agen, 25.000 AI Credits/bulan, 4 CPU / 6 GB RAM, ruang kerja 40 GB, agen selalu aktif, Manajer File, Log Lengkap, dukungan prioritas, dan tag Telegram Anggota Pendiri. Tidak ada biaya bulanan, selamanya. Terbatas pada 20 tempat — setelah hilang, tingkatan ini hilang."
         }
       ]
     },
     "help": {
       "text": "Butuh bantuan memilih paket?",
       "emailLabel": "Kirim email kepada kami",
-      "discordLabel": "Discord",
       "telegramLabel": "Telegram"
     },
     "cta": {
@@ -2160,7 +2159,6 @@
     "ticketResponse": "Kirimkan tiket dukungan dan tim kami akan menghubungi Anda kembali dalam waktu 24 jam.",
     "quickLinks": {
       "documentation": "Dokumentasi",
-      "discord": "Komunitas Discord",
       "telegram": "Grup Telegram",
       "submitTicket": "Kirim Tiket",
       "emailSupport": "Dukungan Email"
@@ -2186,7 +2184,6 @@
       "followUsDesc": "Pembaruan dan pengumuman"
     },
     "directContact": "Atau email kami langsung di",
-    "joinDiscord": "Bergabunglah dengan Discord kami",
     "telegramLabel": "Telegram",
     "communitySupport": "untuk dukungan masyarakat",
     "submitTicketHeading": "Kirimkan Tiket",
@@ -2221,8 +2218,7 @@
     "eyebrow": "Dokumentasi",
     "heading": "Dokumentasi",
     "subheading": "Semua yang Anda perlukan untuk membangun, menerapkan, dan mengelola agen AI dengan Hatcher.",
-    "searchPlaceholder": "Telusuri dokumentasi...",
-    "searchComingSoon": "Pencarian segera hadir",
+    "searchPlaceholder": "Cari panduan",
     "apiReferenceHeading": "Referensi API",
     "apiReferenceBody": "Dokumentasi titik akhir lengkap dengan contoh dalam cURL, JavaScript, dan Python. Otentikasi, batas kecepatan, dan kode kesalahan.",
     "apiReferenceLink": "Jelajahi titik akhir",
@@ -2292,7 +2288,10 @@
       {
         "label": "Metode pembayaran yang didukung"
       }
-    ]
+    ],
+    "workspaceTitle": "Panduan ruang kerja",
+    "workspaceBody": "Temukan chat, agen, paket, dan pengaturan di bilah sisi pada desktop dan ponsel.",
+    "noResults": "Tidak ada panduan yang cocok."
   },
   "shared": {
     "tiers": {
@@ -2908,5 +2907,33 @@
     "copied": "Disalin",
     "pendingApprovals": "{count} persetujuan tertunda",
     "backToChat": "Kembali ke chat"
+  },
+  "unifiedWorkspace": {
+    "manageAgents": "Kelola agen",
+    "website": "Situs web",
+    "discover": "Jelajahi",
+    "compute": "Compute",
+    "mesh": "Neural Mesh",
+    "overview": "Ringkasan",
+    "resources": "Sumber daya",
+    "legal": "Informasi hukum",
+    "workspaceTools": "Alat ruang kerja",
+    "automations": "Otomatisasi",
+    "openMenu": "Buka menu",
+    "closeMenu": "Tutup menu",
+    "agentNavigation": "Navigasi agen",
+    "advanced": "Lanjutan",
+    "desktop": "Desktop",
+    "agentActions": "Tindakan agen",
+    "chatOptions": "Opsi obrolan",
+    "platformTitle": "Platform Hatcher",
+    "platformDescription": "Mengobrol, membuat konten, dan menjalankan agen AI dalam satu ruang kerja.",
+    "chatDescription": "Mulai percakapan. Dapatkan jawaban, kembangkan ide, dan selesaikan masalah dengan AI.",
+    "agentsDescription": "Asisten untuk pekerjaan Anda. Buat, atur, dan jalankan agen AI untuk tugas Anda.",
+    "canvasDescription": "Buat gambar, video, dan audio. Ubah ide menjadi konten dengan AI.",
+    "exploreTitle": "Jelajahi Hatcher",
+    "railTasks": "Tugas",
+    "railPlans": "Paket",
+    "railHelp": "Bantuan"
   }
 }

@@ -22,6 +22,8 @@ import { FRAMEWORKS, getBYOKProvider } from '@hatcher/shared';
 import type { UserTierKey } from '@hatcher/shared';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/components/ui/ToastProvider';
+import { AgentWorkspaceActions } from './AgentWorkspaceActions';
+import workspaceStyles from '@/components/workspace/WorkspaceShell.module.css';
 import { AgentStatusPill } from '@/components/ui/AgentStatusPill';
 import {
   ArrowLeft,
@@ -1654,7 +1656,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
     <AgentContext.Provider value={contextValue!}>
       <motion.div
         className={inWorkspace ? "flex flex-col" : "flex flex-col xl:flex-row"}
-        style={{ minHeight: inWorkspace && tab === 'chat' ? 0 : 'calc(100dvh - 64px)', height: inWorkspace && tab === 'chat' ? 'calc(100dvh - 52px)' : undefined }}
+        style={{ minHeight: inWorkspace && tab === 'chat' ? 0 : 'calc(var(--workspace-height, 100dvh) - 64px)', height: inWorkspace && tab === 'chat' ? 'calc(var(--workspace-height, 100dvh) - var(--app-nav-height, 56px))' : undefined }}
         variants={pageEntranceVariants}
         initial="hidden"
         animate="visible"
@@ -1669,9 +1671,10 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
         />}
 
         {/* ─── Main Content ─────────────────────────────────── */}
-        <div className="flex-1 min-h-0 min-w-0 flex flex-col bg-[var(--bg-base)]">
+        <div className="flex-1 min-h-0 min-w-0 flex flex-col bg-[var(--bg-surface)]">
           {inWorkspace && <AgentWorkspaceTabs />}
-          {/* Top action bar */}
+          {/* Agent actions live in the shared header, away from the conversation. */}
+          <AgentWorkspaceActions>
           <div
             className="relative z-40 flex shrink-0 flex-wrap items-center gap-3 overflow-visible border-b border-[var(--border-default)] bg-[color-mix(in_srgb,var(--bg-surface)_92%,transparent)] px-4 py-3.5 backdrop-blur-md sm:px-6"
             style={{ fontFamily: 'var(--font-inter)' }}
@@ -1852,6 +1855,8 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
             </div>
           </div>
 
+          </AgentWorkspaceActions>
+
           {actions.deleteError && (
             <p
               className="text-xs px-6 py-2 border-b border-[var(--color-destructive-border)] text-[var(--color-destructive)] bg-[var(--color-destructive-bg)]"
@@ -1862,8 +1867,8 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
           )}
 
           {/* ─── Tab Content ──────────────────────────────────── */}
-          <div className="flex-1 min-h-0 min-w-0 bg-[var(--bg-base)]">
-            <div style={{ height: inWorkspace && tab === 'chat' ? '100%' : undefined }} className={`${tab === 'chat' || tab === 'terminal' || tab === 'mail' || tab === 'dev' ? 'w-full max-w-none px-4 sm:px-6 lg:px-8 2xl:px-10' : 'max-w-[1280px] mx-auto px-4 sm:px-6'} py-6`}>
+          <div className="flex-1 min-h-0 min-w-0 bg-[var(--bg-surface)]">
+            <div style={{ height: inWorkspace && tab === 'chat' ? '100%' : undefined }} className={inWorkspace && tab === 'chat' ? workspaceStyles.agentChatContent : `${tab === 'terminal' || tab === 'mail' || tab === 'dev' ? 'w-full max-w-none px-4 sm:px-6 lg:px-8' : 'max-w-[1280px] mx-auto px-4 sm:px-6'} py-6`}>
             <AnimatePresence mode="wait">
               {tab === 'overview' && <OverviewTab />}
               {tab === 'config' && (viewMode === 'easy' ? <SimpleConfigTab key={agent.id} /> : <ConfigTab />)}
