@@ -10,6 +10,7 @@ import {
   useAgentContext,
 } from '../AgentContext';
 import { api } from '@/lib/api';
+import { AgentPitConnectCard } from './AgentPitConnectCard';
 import { Link } from '@/i18n/routing';
 import { agentWorkspaceHref } from '@/lib/agent-workspace';
 import type {
@@ -158,6 +159,8 @@ export function ConnectorsTab() {
           <Shield size={14} aria-hidden /> Review action approvals
         </Link>
       </div>
+
+      <AgentPitConnectCard agentId={agent.id} connected={connectors.some(c => c.serverUrl === 'https://api.agentpit.dev/mcp' && c.status === 'ready')} onConnected={loadConnectors} />
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_420px]">
         <div className="space-y-4">

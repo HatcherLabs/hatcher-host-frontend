@@ -3416,6 +3416,11 @@ export const api = {
       { method: "POST" },
     ),
 
+  beginAgentPitConnect: (agentId: string) =>
+    req<{ status: string; connectorId?: string; verificationUrl?: string; userCode?: string; expiresAt?: string; interval?: number }>(`/agents/${agentId}/agentpit/connect`, { method: "POST" }),
+  pollAgentPitConnect: (agentId: string) =>
+    req<{ status: string; connectorId?: string; interval?: number }>(`/agents/${agentId}/agentpit/connect/poll`, { method: "POST" }),
+
   // ─── Remote MCP Connectors ─────────────────────────────────
   getMcpConnectors: (agentId: string) =>
     req<{ connectors: McpConnector[] }>(`/agents/${agentId}/mcp/connectors`),
