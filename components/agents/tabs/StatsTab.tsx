@@ -134,8 +134,8 @@ const FRAMEWORK_THEME: Record<string, { primary: string; primaryDim: string; pri
     label: 'Hermes',
   },
   ironclaw: {
-    primary: '#00e676',
-    primaryDim: 'color-mix(in srgb, #00e676 40%, transparent)',
+    primary: 'var(--color-success)',
+    primaryDim: 'color-mix(in srgb, var(--color-success) 40%, transparent)',
     primaryBg: 'rgba(0, 230, 118, 0.1)',
     gradient: 'linear-gradient(90deg, #00e676, #34d399)',
     gradientDim: 'linear-gradient(90deg, #00e676, var(--text-muted))',

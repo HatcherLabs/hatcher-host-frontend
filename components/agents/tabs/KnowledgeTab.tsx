@@ -200,7 +200,7 @@ export function KnowledgeTab() {
   return (
     <motion.div variants={tabContentVariants} initial="hidden" animate="visible" exit="exit" className="space-y-4 p-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <BookOpen size={20} style={{ color: 'var(--color-accent)' }} />
           <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>

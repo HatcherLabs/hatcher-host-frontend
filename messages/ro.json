@@ -389,8 +389,8 @@
         "40 GB spațiu de lucru",
         "File Manager + Jurnale complete",
         "Suport prioritar",
-        "Rol Discord Founding + tag Telegram",
-        "Preț blocat pentru totdeauna"
+        "Preț blocat pentru totdeauna",
+        "Tag Telegram pentru Founding Member"
       ],
       "ctaSoldOut": "Epuizat",
       "ctaClaim": "Revendică locul tău"
@@ -672,7 +672,7 @@
           "File Manager + Jurnale complete incluse",
           "Suport prioritar",
           "Toate integrările",
-          "Rol Discord Founding + tag Telegram"
+          "Tag Telegram pentru Founding Member"
         ],
         "missing": []
       }
@@ -812,14 +812,13 @@
         },
         {
           "q": "Ce este planul Founding Member?",
-          "a": "Founding Member este o plată o singură dată de $99 care îți oferă acces pe viață la Hatcher: 10 agenți, 25.000 AI Credits lunar, 4 CPU / 6 GB RAM, 40 GB spațiu de lucru, agenți mereu activi, File Manager, Jurnale complete, suport prioritar și rol Discord Founding + tag Telegram. Fără taxe lunare, niciodată. Limitat la 20 de locuri — odată ce s-au epuizat, acest plan dispare."
+          "a": "Founding Member este o plată o singură dată de $99 care îți oferă acces pe viață la Hatcher: 10 agenți, 25.000 AI Credits lunar, 4 CPU / 6 GB RAM, 40 GB spațiu de lucru, agenți mereu activi, File Manager, Jurnale complete, suport prioritar și tag Telegram pentru Founding Member. Fără taxe lunare, niciodată. Limitat la 20 de locuri — odată ce s-au epuizat, acest plan dispare."
         }
       ]
     },
     "help": {
       "text": "Ai nevoie de ajutor la alegerea unui plan?",
       "emailLabel": "Scrie-ne",
-      "discordLabel": "Discord",
       "telegramLabel": "Telegram"
     },
     "cta": {
@@ -2124,7 +2123,6 @@
     "ticketResponse": "Trimite un tichet de suport și echipa noastră îți va răspunde în 24 de ore.",
     "quickLinks": {
       "documentation": "Documentație",
-      "discord": "Comunitate Discord",
       "telegram": "Grup Telegram",
       "submitTicket": "Trimite tichet",
       "emailSupport": "Suport email"
@@ -2150,7 +2148,6 @@
       "followUsDesc": "Actualizări și anunțuri"
     },
     "directContact": "Sau scrie-ne direct la",
-    "joinDiscord": "Alătură-te Discord-ului nostru",
     "telegramLabel": "Telegram",
     "communitySupport": "pentru suport comunitate",
     "submitTicketHeading": "Trimite un tichet",
@@ -2185,8 +2182,7 @@
     "eyebrow": "Documentație",
     "heading": "Documentație",
     "subheading": "Tot ce ai nevoie pentru a construi, deploya și gestiona agenți AI cu Hatcher.",
-    "searchPlaceholder": "Caută în documentație...",
-    "searchComingSoon": "Căutarea vine în curând",
+    "searchPlaceholder": "Caută ghiduri",
     "apiReferenceHeading": "Referință API",
     "apiReferenceBody": "Documentație completă a endpoint-urilor cu exemple în cURL, JavaScript și Python. Autentificare, limite de rate și coduri de eroare.",
     "apiReferenceLink": "Explorează endpoint-urile",
@@ -2256,7 +2252,10 @@
       {
         "label": "Metode de plată acceptate"
       }
-    ]
+    ],
+    "workspaceTitle": "Ghidul interfeței",
+    "workspaceBody": "Găsește chaturile, agenții, planurile și setările în meniul lateral. Află cum navighezi pe desktop și mobil.",
+    "noResults": "Niciun ghid găsit."
   },
   "shared": {
     "tiers": {
@@ -3224,5 +3223,33 @@
     "copied": "Copiat",
     "pendingApprovals": "{count} aprobări în așteptare",
     "backToChat": "Înapoi la chat"
+  },
+  "unifiedWorkspace": {
+    "manageAgents": "Administrează agenții",
+    "website": "Website",
+    "discover": "Descoperă",
+    "compute": "Compute",
+    "mesh": "Neural Mesh",
+    "overview": "Prezentare",
+    "resources": "Resurse",
+    "legal": "Informații legale",
+    "workspaceTools": "Instrumente",
+    "automations": "Automatizări",
+    "openMenu": "Deschide meniul",
+    "closeMenu": "Închide meniul",
+    "agentNavigation": "Navigarea agentului",
+    "advanced": "Avansat",
+    "desktop": "Desktop",
+    "agentActions": "Acțiunile agentului",
+    "chatOptions": "Opțiuni de chat",
+    "platformTitle": "Platforma Hatcher",
+    "platformDescription": "Conversează, creează și rulează agenți AI într-un singur spațiu.",
+    "chatDescription": "Începe o conversație. Obține răspunsuri, dezvoltă idei și rezolvă probleme cu AI.",
+    "agentsDescription": "Un asistent pentru munca ta. Creează, configurează și rulează agenți AI pentru sarcinile tale.",
+    "canvasDescription": "Creează imagini, videoclipuri și audio. Transformă ideile în conținut cu AI.",
+    "exploreTitle": "Explorează Hatcher",
+    "railTasks": "Sarcini",
+    "railPlans": "Planuri",
+    "railHelp": "Ajutor"
   }
 }

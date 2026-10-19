@@ -437,8 +437,8 @@
         "40 GB 工作区",
         "文件管理器 + 完整日志",
         "优先支持",
-        "Founding Discord 角色 + Telegram 标签",
-        "永久锁定价格"
+        "永久锁定价格",
+        "创始会员 Telegram 标签"
       ],
       "ctaSoldOut": "已售罄",
       "ctaClaim": "认领您的名额"
@@ -708,7 +708,7 @@
           "已包含文件管理器 + 完整日志",
           "优先支持",
           "所有集成",
-          "Founding Discord 角色 + Telegram 标签"
+          "创始会员 Telegram 标签"
         ],
         "missing": []
       }
@@ -848,14 +848,13 @@
         },
         {
           "q": "什么是创始会员套餐？",
-          "a": "创始会员是一次性$99付款，提供Hatcher终身访问权限：10个智能体、每月25,000 AI Credits、4 CPU / 6 GB RAM、40 GB工作区、智能体始终在线、文件管理器、完整日志、优先支持，以及 Founding Discord 角色 + Telegram 标签。永不收月费。限量20个名额——售完即止。"
+          "a": "创始会员是一次性$99付款，提供Hatcher终身访问权限：10个智能体、每月25,000 AI Credits、4 CPU / 6 GB RAM、40 GB工作区、智能体始终在线、文件管理器、完整日志、优先支持，以及 创始会员 Telegram 标签。永不收月费。限量20个名额——售完即止。"
         }
       ]
     },
     "help": {
       "text": "需要帮助选择套餐？",
       "emailLabel": "发送邮件",
-      "discordLabel": "Discord",
       "telegramLabel": "Telegram"
     },
     "cta": {
@@ -2160,7 +2159,6 @@
     "ticketResponse": "提交支持工单，我们的团队将在24小时内回复。",
     "quickLinks": {
       "documentation": "文档",
-      "discord": "Discord 社区",
       "telegram": "Telegram 群组",
       "submitTicket": "提交工单",
       "emailSupport": "邮件支持"
@@ -2186,7 +2184,6 @@
       "followUsDesc": "更新和公告"
     },
     "directContact": "或直接发送邮件至",
-    "joinDiscord": "加入我们的 Discord",
     "telegramLabel": "Telegram",
     "communitySupport": "社区支持",
     "submitTicketHeading": "提交工单",
@@ -2221,8 +2218,7 @@
     "eyebrow": "文档",
     "heading": "文档",
     "subheading": "使用Hatcher构建、部署和管理AI智能体所需的一切。",
-    "searchPlaceholder": "搜索文档...",
-    "searchComingSoon": "搜索功能即将上线",
+    "searchPlaceholder": "搜索指南",
     "apiReferenceHeading": "API 参考",
     "apiReferenceBody": "完整端点文档，含cURL、JavaScript和Python示例。认证、速率限制和错误代码。",
     "apiReferenceLink": "浏览端点",
@@ -2292,7 +2288,10 @@
       {
         "label": "支持的付款方式"
       }
-    ]
+    ],
+    "workspaceTitle": "工作区指南",
+    "workspaceBody": "通过侧边栏查找聊天、智能体、套餐和设置，了解桌面和手机上的导航方式。",
+    "noResults": "没有匹配的指南。"
   },
   "shared": {
     "tiers": {
@@ -2908,5 +2907,33 @@
     "copied": "已复制",
     "pendingApprovals": "{count} 项待审批",
     "backToChat": "返回聊天"
+  },
+  "unifiedWorkspace": {
+    "manageAgents": "管理智能体",
+    "website": "网站",
+    "discover": "发现",
+    "compute": "算力",
+    "mesh": "Neural Mesh",
+    "overview": "概览",
+    "resources": "资源",
+    "legal": "法律信息",
+    "workspaceTools": "工作区工具",
+    "automations": "自动化",
+    "openMenu": "打开菜单",
+    "closeMenu": "关闭菜单",
+    "agentNavigation": "智能体导航",
+    "advanced": "高级",
+    "desktop": "桌面",
+    "agentActions": "智能体操作",
+    "chatOptions": "聊天选项",
+    "platformTitle": "Hatcher 平台",
+    "platformDescription": "在同一个工作区中聊天、创作并运行 AI 智能体。",
+    "chatDescription": "开始对话。借助 AI 获取答案、构思创意并解决问题。",
+    "agentsDescription": "让助手帮你工作。为任务创建、配置并运行 AI 智能体。",
+    "canvasDescription": "生成图像、视频和音频。借助 AI 将创意变成内容。",
+    "exploreTitle": "探索 Hatcher",
+    "railTasks": "任务",
+    "railPlans": "套餐",
+    "railHelp": "帮助"
   }
 }

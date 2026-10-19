@@ -1,8 +1,8 @@
 .page {
-  min-height: 100vh;
+  min-height: 100%;
   overflow-x: hidden;
   color: var(--text-primary);
-  background: var(--bg-base);
+  background: var(--bg-surface);
 }
 
 .page h1,
@@ -369,7 +369,7 @@
   grid-template-columns: minmax(0, 560px) minmax(560px, 1fr);
   gap: clamp(44px, 6vw, 88px);
   align-items: center;
-  padding: clamp(68px, 8vw, 112px) 0 72px;
+  padding: 36px 0;
 }
 
 .heroCopy {
@@ -1318,7 +1318,7 @@
   }
 }
 
-@media (max-width: 1100px) {
+@container workspace (max-width: 1100px) {
   .hero {
     grid-template-columns: 1fr;
     min-height: auto;
@@ -1371,7 +1371,7 @@
   }
 }
 
-@media (max-width: 820px) {
+@container workspace (max-width: 820px) {
   .hero,
   .executionSection,
   .estimatorSection,
@@ -1433,9 +1433,9 @@
   }
 }
 
-@media (max-width: 560px) {
+@container workspace (max-width: 560px) {
   .hero {
-    padding: 52px 0 62px;
+    padding: 28px 0 36px;
   }
 
   .heroCopy {
@@ -1573,7 +1573,7 @@
   }
 }
 
-@media (max-width: 380px) {
+@container workspace (max-width: 380px) {
   .hero,
   .executionSection,
   .estimatorSection,

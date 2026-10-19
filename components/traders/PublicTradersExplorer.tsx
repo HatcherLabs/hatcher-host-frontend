@@ -254,7 +254,7 @@ export function PublicTradersExplorer({
             </Link>
           </div>
 
-          <div className="mt-7 grid gap-3 lg:grid-cols-[minmax(360px,1fr)_180px_170px_170px_auto]">
+          <div className="mt-7 grid min-w-0 gap-3 sm:grid-cols-2 2xl:grid-cols-[minmax(220px,1fr)_180px_170px_170px_auto]">
             <label className="relative block">
               <span className="sr-only">Search public traders</span>
               <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]" />

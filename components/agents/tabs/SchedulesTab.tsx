@@ -172,8 +172,8 @@ function LogViewer({ agentId, jobId, onClose }: { agentId: string; jobId: string
   return (
     <GlassCard>
       <div className="flex items-center justify-between mb-3">
-        <h4 className="text-sm font-medium text-white">Execution Logs</h4>
-        <button onClick={onClose} className="p-1 text-[var(--text-muted)] hover:text-white transition-colors">
+        <h4 className="text-sm font-medium text-[var(--text-primary)]">Execution Logs</h4>
+        <button onClick={onClose} className="p-1 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
           <X size={14} />
         </button>
       </div>
@@ -416,7 +416,7 @@ export function SchedulesTab() {
       <GlassCard>
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-semibold text-white">Schedules</h3>
+            <h3 className="text-sm font-semibold text-[var(--text-primary)]">Schedules</h3>
           </div>
           {!showForm && (
             <button
@@ -433,7 +433,7 @@ export function SchedulesTab() {
       {/* Create Form */}
       {showForm && (
         <GlassCard>
-          <h4 className="text-sm font-medium text-white mb-4">Create Scheduled Task</h4>
+          <h4 className="text-sm font-medium text-[var(--text-primary)] mb-4">Create Scheduled Task</h4>
           <div className="space-y-3">
             {/* Name */}
             <div>
@@ -443,7 +443,7 @@ export function SchedulesTab() {
                 value={formName}
                 onChange={e => setFormName(e.target.value)}
                 placeholder="e.g. Morning briefing"
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-white placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/50"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/50"
               />
             </div>
 
@@ -454,10 +454,10 @@ export function SchedulesTab() {
                 <select
                   value={formPreset}
                   onChange={e => setFormPreset(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-white appearance-none focus:outline-none focus:border-[var(--color-accent)]/50"
+                  className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-[var(--text-primary)] appearance-none focus:outline-none focus:border-[var(--color-accent)]/50"
                 >
                   {CRON_PRESETS.map(p => (
-                    <option key={p.label} value={p.value} className="bg-[var(--bg-elevated)] text-white">
+                    <option key={p.label} value={p.value} className="bg-[var(--bg-elevated)] text-[var(--text-primary)]">
                       {p.label}
                     </option>
                   ))}
@@ -475,7 +475,7 @@ export function SchedulesTab() {
                   value={formCustomCron}
                   onChange={e => setFormCustomCron(e.target.value)}
                   placeholder="e.g. */30 * * * *"
-                  className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-white placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/50 font-mono"
+                  className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/50 font-mono"
                 />
                 <div className="mt-1.5 space-y-0.5">
                   <p className="text-[10px] text-[var(--text-muted)]">Common patterns:</p>
@@ -490,7 +490,7 @@ export function SchedulesTab() {
                         key={ex.value}
                         type="button"
                         onClick={() => setFormCustomCron(ex.value)}
-                        className="px-2 py-0.5 text-[10px] rounded bg-[var(--bg-card)] border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--color-accent)]/40 hover:text-white transition-colors"
+                        className="px-2 py-0.5 text-[10px] rounded bg-[var(--bg-card)] border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--color-accent)]/40 hover:text-[var(--text-primary)] transition-colors"
                       >
                         {ex.label}
                       </button>
@@ -544,7 +544,7 @@ export function SchedulesTab() {
               </button>
               <button
                 onClick={() => { setShowForm(false); setFormError(null); }}
-                className="px-4 py-2 text-xs font-medium rounded-lg text-[var(--text-secondary)] hover:text-white transition-colors"
+                className="px-4 py-2 text-xs font-medium rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
               >
                 Cancel
               </button>
@@ -623,7 +623,7 @@ export function SchedulesTab() {
                       setFormCustomCron(suggestion.cron);
                     }
                   }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-[var(--text-muted)] hover:text-white hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/5 transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/5 transition-all"
                 >
                   <suggestion.icon size={12} />
                   {suggestion.label}

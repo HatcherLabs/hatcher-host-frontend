@@ -8,6 +8,7 @@ import type { ActiveModelDisplay } from '@/lib/hosted-model-catalog';
 import { FRAMEWORK_BADGE } from '../../AgentContext';
 
 interface ChatHeaderProps {
+  unified?: boolean;
   simple?: boolean;
   compact?: boolean;
   agent: { framework: AgentFramework };
@@ -30,6 +31,7 @@ interface ChatHeaderProps {
 }
 
 export function ChatHeader({
+  unified = false,
   simple = false,
   compact = false,
   agent,
@@ -56,7 +58,7 @@ export function ChatHeader({
   return (
     <div className="flex flex-wrap items-center justify-between gap-2 mb-2 px-1">
       <div className="flex items-center gap-2">
-        <button
+        {!unified && <button
           type="button"
           onClick={onOpenMobilePanel}
           data-testid="agent-chat-open-sessions"
@@ -65,7 +67,7 @@ export function ChatHeader({
           title="Chats"
         >
           <Menu size={14} />
-        </button>
+        </button>}
         {!simple && <span className={`inline-flex items-center gap-1.5 text-[10px] px-2 py-0.5 rounded-full border font-medium ${FRAMEWORK_BADGE[agent.framework] ?? 'bg-slate-500/15 text-slate-400 border-slate-500/30'}`}>
           <Bot size={10} />
           {frameworkMeta?.name ?? agent.framework}
@@ -76,7 +78,7 @@ export function ChatHeader({
             {t('live')}
           </span>
         )}
-        {(!simple || compact) && (modelSwitcher ?? (<button
+        {(!simple || compact || unified) && (modelSwitcher ?? (<button
           type="button"
           onClick={onOpenModelSettings}
           className="hidden max-w-[260px] items-center gap-1 truncate rounded-full border border-[var(--border-default)] bg-[var(--bg-elevated)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-secondary)] transition-colors hover:border-[var(--color-accent)]/40 hover:text-[var(--text-primary)] sm:inline-flex"

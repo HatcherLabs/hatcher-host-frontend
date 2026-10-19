@@ -11,9 +11,13 @@ describe("workspace navigation", () => {
     expect(isWorkspacePath("/ro/dashboard/agents")).toBe(true);
     expect(isWorkspacePath("/create")).toBe(true);
     expect(isWorkspacePath("/settings")).toBe(true);
-    expect(isWorkspacePath("/pricing")).toBe(false);
+    expect(isWorkspacePath("/pricing")).toBe(true);
     expect(isWorkspacePath("/ro/dashboard/agent/abc/desktop")).toBe(false);
-    expect(isWorkspacePath("/dashboard-other")).toBe(false);
+    expect(isWorkspacePath("/platform")).toBe(true);
+    expect(isWorkspacePath("/ro/features")).toBe(true);
+    expect(isWorkspacePath("/privacy")).toBe(true);
+    expect(isWorkspacePath("/embed/agent/abc")).toBe(false);
+    expect(isWorkspacePath("/oauth/authorize")).toBe(false);
   });
   it("keeps Web Chat separate from agent conversations", () => {
     expect(workspaceSection("/ro/dashboard/agent/abc", "chat")).toBe("agents");
@@ -28,6 +32,10 @@ describe("workspace navigation", () => {
     );
     expect(workspaceAgentId("/ro/dashboard/agent/abc")).toBe("abc");
     expect(workspaceAgentId("/dashboard/agents/new")).toBe(null);
+    expect(workspaceSection("/platform", null)).toBe("website");
+    expect(workspaceSection("/explore", null)).toBe("discover");
+    expect(workspaceSection("/support", null)).toBe("help");
+    expect(workspaceSection("/pricing", null)).toBe("plans");
   });
   it("preserves session identifiers in chat deep links", () => {
     const href = chatHref("agent-1", "session/a?b=2");

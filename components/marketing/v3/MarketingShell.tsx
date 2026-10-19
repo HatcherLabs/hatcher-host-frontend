@@ -1,7 +1,8 @@
-// components/marketing/v3/MarketingShell.tsx
+"use client";
 import type { ReactNode } from "react";
 import { Nav } from "./Nav";
 import { Footer } from "./Footer";
+import { useWorkspace } from "@/components/workspace/WorkspaceContext";
 
 interface Props {
   children: ReactNode;
@@ -9,14 +10,12 @@ interface Props {
 }
 
 /**
- * Wraps marketing pages (/pricing, /explore, /traders, /frameworks, /token, /blog, /roadmap,
- * /changelog, /help, /support hub, /privacy, /terms,
- * /compute, /cookies, /impressum) with the v3 Nav + Footer.
- *
- * Pages wrapped here MUST be in LayoutShell's IMMERSIVE_PATTERNS so the
- * legacy global Header/Footer don't double-stack.
+ * Public pages inherit the workspace navigation. Standalone/framed rendering
+ * retains the public navigation when there is no workspace provider.
  */
 export function MarketingShell({ children, contentLanguage }: Props) {
+  const workspace = useWorkspace();
+  if (workspace) return <div data-site-page lang={contentLanguage}>{children}</div>;
   return (
     <div>
       <Nav />

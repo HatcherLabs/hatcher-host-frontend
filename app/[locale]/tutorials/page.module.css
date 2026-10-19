@@ -372,7 +372,7 @@
   line-height: 1.55;
 }
 
-@media (max-width: 980px) {
+@container workspace (max-width: 980px) {
   .featured {
     grid-template-columns: 1fr;
   }
@@ -391,7 +391,7 @@
   }
 }
 
-@media (max-width: 720px) {
+@container workspace (max-width: 720px) {
   .container {
     width: min(100% - 28px, 1180px);
     padding-bottom: 64px;

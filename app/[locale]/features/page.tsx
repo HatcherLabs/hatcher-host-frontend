@@ -216,7 +216,6 @@ export default function FeaturesPage() {
             </div>
           </div>
 
-          <StorePhone />
         </section>
 
         <section className={styles.section}>

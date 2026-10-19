@@ -389,8 +389,8 @@
         "40 GB workspace",
         "File Manager + Full Logs",
         "Priority support",
-        "Founding Discord role + Telegram tag",
-        "Locked-in price forever"
+        "Locked-in price forever",
+        "Founding Member Telegram tag"
       ],
       "ctaSoldOut": "Sold out",
       "ctaClaim": "Claim your spot"
@@ -672,7 +672,7 @@
           "File Manager + Full Logs included",
           "Priority support",
           "All integrations",
-          "Founding Discord role + Telegram tag"
+          "Founding Member Telegram tag"
         ],
         "missing": []
       }
@@ -812,14 +812,13 @@
         },
         {
           "q": "What is the Founding Member tier?",
-          "a": "Founding Member is a one-time $99 payment that gives you lifetime access to Hatcher: 10 agents, 25,000 AI Credits/month, 4 CPU / 6 GB RAM, 40 GB workspace, always active agents, File Manager, Full Logs, priority support, and Founding Discord role + Telegram tag. No monthly fees, ever. Limited to 20 spots — once they are gone, this tier is gone."
+          "a": "Founding Member is a one-time $99 payment that gives you lifetime access to Hatcher: 10 agents, 25,000 AI Credits/month, 4 CPU / 6 GB RAM, 40 GB workspace, always active agents, File Manager, Full Logs, priority support, and a Founding Member Telegram tag. No monthly fees, ever. Limited to 20 spots — once they are gone, this tier is gone."
         }
       ]
     },
     "help": {
       "text": "Need help choosing a plan?",
       "emailLabel": "Email us",
-      "discordLabel": "Discord",
       "telegramLabel": "Telegram"
     },
     "cta": {
@@ -2124,7 +2123,6 @@
     "ticketResponse": "Submit a support ticket and our team will get back to you within 24 hours.",
     "quickLinks": {
       "documentation": "Documentation",
-      "discord": "Discord Community",
       "telegram": "Telegram Group",
       "submitTicket": "Submit Ticket",
       "emailSupport": "Email Support"
@@ -2150,7 +2148,6 @@
       "followUsDesc": "Updates and announcements"
     },
     "directContact": "Or email us directly at",
-    "joinDiscord": "Join our Discord",
     "telegramLabel": "Telegram",
     "communitySupport": "for community support",
     "submitTicketHeading": "Submit a Ticket",
@@ -2185,8 +2182,7 @@
     "eyebrow": "Documentation",
     "heading": "Documentation",
     "subheading": "Everything you need to build, deploy, and manage AI agents with Hatcher.",
-    "searchPlaceholder": "Search documentation...",
-    "searchComingSoon": "Search coming soon",
+    "searchPlaceholder": "Search guides",
     "apiReferenceHeading": "API Reference",
     "apiReferenceBody": "Full endpoint documentation with examples in cURL, JavaScript, and Python. Auth, rate limits, and error codes.",
     "apiReferenceLink": "Explore endpoints",
@@ -2256,7 +2252,10 @@
       {
         "label": "Supported payment methods"
       }
-    ]
+    ],
+    "workspaceTitle": "Workspace guide",
+    "workspaceBody": "Find chats, agents, plans and settings in the sidebar. Learn how navigation works on desktop and mobile.",
+    "noResults": "No matching guides."
   },
   "shared": {
     "tiers": {
@@ -3224,5 +3223,33 @@
     "copied": "Copied",
     "pendingApprovals": "{count} pending approvals",
     "backToChat": "Back to chat"
+  },
+  "unifiedWorkspace": {
+    "manageAgents": "Manage agents",
+    "website": "Website",
+    "discover": "Discover",
+    "compute": "Compute",
+    "mesh": "Neural Mesh",
+    "overview": "Overview",
+    "resources": "Resources",
+    "legal": "Legal",
+    "workspaceTools": "Workspace tools",
+    "automations": "Automations",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "agentNavigation": "Agent navigation",
+    "advanced": "Advanced",
+    "desktop": "Desktop",
+    "agentActions": "Agent actions",
+    "chatOptions": "Chat options",
+    "platformTitle": "The Hatcher platform",
+    "platformDescription": "Chat, create and run AI agents in one workspace.",
+    "chatDescription": "Start a conversation. Get answers, brainstorm ideas and solve problems with AI.",
+    "agentsDescription": "Give your work an assistant. Create, configure and run AI agents for your tasks.",
+    "canvasDescription": "Create images, video and audio. Turn ideas into content with AI.",
+    "exploreTitle": "Explore Hatcher",
+    "railTasks": "Tasks",
+    "railPlans": "Plans",
+    "railHelp": "Help"
   }
 }

@@ -437,8 +437,8 @@
         "40 GBワークスペース",
         "ファイルマネージャー+フルログ",
         "優先支援",
-        "創設Discord役割+Telegramタグ",
-        "永久に固定された価格"
+        "永久に固定された価格",
+        "創設メンバーのTelegramタグ"
       ],
       "ctaSoldOut": "完売",
       "ctaClaim": "自分の場所を確保しましょう"
@@ -708,7 +708,7 @@
           "ファイルマネージャー+完全なログが含まれています",
           "優先支援",
           "すべての統合",
-          "創設Discord役割+Telegramタグ"
+          "創設メンバーのTelegramタグ"
         ],
         "missing": []
       }
@@ -848,14 +848,13 @@
         },
         {
           "q": "創設メンバーの階層とは何ですか?",
-          "a": "創設メンバーは一度限りの$99支払いで、生涯にわたり10人のエージェント、月25,000の月AI Credits、4つのCPU/6 GB RAM、40 GBのワークスペース、常にアクティブなエージェント、ファイルマネージャー、フルログ、優先サポート、創設者役割+TelegramのタグHatcher Discord生涯アクセス権を提供します。月額料金は一切かかりません。20枠まで制限されており、全員がなくなったらこの階層は終わりです。"
+          "a": "創設メンバーは一度限りの$99支払いで、生涯にわたり10人のエージェント、月25,000の月AI Credits、4つのCPU/6 GB RAM、40 GBのワークスペース、常にアクティブなエージェント、ファイルマネージャー、フルログ、優先サポート、創設メンバーのTelegramタグを含むHatcherの生涯アクセス権を提供します。月額料金は一切かかりません。20枠まで制限されており、全員がなくなったらこの階層は終わりです。"
         }
       ]
     },
     "help": {
       "text": "プラン選びをお探しですか?",
       "emailLabel": "メールでお問い合わせください",
-      "discordLabel": "Discord",
       "telegramLabel": "Telegram"
     },
     "cta": {
@@ -2160,7 +2159,6 @@
     "ticketResponse": "サポートチケットを提出すれば、24時間以内にチームからご連絡いたします。",
     "quickLinks": {
       "documentation": "文書",
-      "discord": "Discord コミュニティ",
       "telegram": "Telegramグループ",
       "submitTicket": "チケットを送信",
       "emailSupport": "メールサポート"
@@ -2186,7 +2184,6 @@
       "followUsDesc": "最新情報とお知らせ"
     },
     "directContact": "または直接メールでお問い合わせください。",
-    "joinDiscord": "ぜひ私たちのDiscordに参加してください",
     "telegramLabel": "Telegram",
     "communitySupport": "地域社会の支援のために",
     "submitTicketHeading": "チケットを提出してください",
@@ -2221,8 +2218,7 @@
     "eyebrow": "文書",
     "heading": "文書",
     "subheading": "HatcherでAIエージェントを構築、展開、管理するために必要なすべてが揃っています。",
-    "searchPlaceholder": "ドキュメント検索...",
-    "searchComingSoon": "捜索はまもなく行われます",
+    "searchPlaceholder": "ガイドを検索",
     "apiReferenceHeading": "API 参考文献",
     "apiReferenceBody": "cURL、JavaScript、Pythonによる例を含む完全なエンドポイントドキュメント。認証、レート制限、エラーコード。",
     "apiReferenceLink": "エンドポイントの探索",
@@ -2292,7 +2288,10 @@
       {
         "label": "対応する支払い方法"
       }
-    ]
+    ],
+    "workspaceTitle": "ワークスペースガイド",
+    "workspaceBody": "サイドバーからチャット、エージェント、プラン、設定へ。パソコンとモバイルの操作方法を紹介します。",
+    "noResults": "該当するガイドはありません。"
   },
   "shared": {
     "tiers": {
@@ -2908,5 +2907,33 @@
     "copied": "コピーしました",
     "pendingApprovals": "承認待ち：{count}件",
     "backToChat": "チャットに戻る"
+  },
+  "unifiedWorkspace": {
+    "manageAgents": "エージェントを管理",
+    "website": "ウェブサイト",
+    "discover": "見つける",
+    "compute": "コンピュート",
+    "mesh": "Neural Mesh",
+    "overview": "概要",
+    "resources": "リソース",
+    "legal": "法的情報",
+    "workspaceTools": "ワークスペースのツール",
+    "automations": "自動化",
+    "openMenu": "メニューを開く",
+    "closeMenu": "メニューを閉じる",
+    "agentNavigation": "エージェントのナビゲーション",
+    "advanced": "詳細設定",
+    "desktop": "デスクトップ",
+    "agentActions": "エージェントの操作",
+    "chatOptions": "チャットの設定",
+    "platformTitle": "Hatcher プラットフォーム",
+    "platformDescription": "ひとつのワークスペースで会話、制作、AI エージェントの実行を。",
+    "chatDescription": "会話を始めましょう。AI と答えを探し、アイデアを広げ、問題を解決できます。",
+    "agentsDescription": "仕事を手伝うアシスタント。タスクに合わせて AI エージェントを作成、設定、実行できます。",
+    "canvasDescription": "画像、動画、音声を作成。AI でアイデアをコンテンツに変えましょう。",
+    "exploreTitle": "Hatcher を探索",
+    "railTasks": "タスク",
+    "railPlans": "プラン",
+    "railHelp": "ヘルプ"
   }
 }

@@ -64,7 +64,7 @@ export function EmptyState({
       <motion.h2
         className="text-xl font-semibold mb-2"
         style={{
-          color: '#F0EEFC',
+          color: 'var(--text-primary)',
           fontFamily: 'var(--font-display), system-ui, sans-serif',
         }}
         initial={{ opacity: 0, y: 8 }}
