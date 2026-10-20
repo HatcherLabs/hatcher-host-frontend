@@ -161,9 +161,9 @@ export function AgentPitTab() {
   const [notice, setNotice] = useState("");
   const [changingStrategy, setChangingStrategy] = useState(false);
   const sequence = useRef(0);
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (quiet = false) => {
     const current = ++sequence.current;
-    setLoading(true);
+    if (!quiet) setLoading(true);
     setError("");
     try {
       const result = await api.getAgentPitConnection(agent.id);
@@ -187,11 +187,18 @@ export function AgentPitTab() {
     };
   }, [refresh, invalidateRequests]);
   useEffect(() => {
+    if (changingStrategy || data?.status !== "connected") return;
+    const update = () => { if (document.visibilityState === "visible") void refresh(true); };
+    const timer = window.setInterval(update, 30_000);
+    window.addEventListener("focus", update);
+    return () => { window.clearInterval(timer); window.removeEventListener("focus", update); };
+  }, [changingStrategy, data?.status, refresh]);
+  useEffect(() => {
     setName(data?.account?.name ?? "");
   }, [data?.account?.name]);
   const discuss = () =>
     openChatWithDraft(
-      "Read my current AgentPit paper portfolio and automatic strategy status. Help me adapt the strategy in AGENTPIT_STRATEGY.md to my preferences, within the enforced paper limits. Explain the current schedule and do not create a duplicate. If paused, leave it paused while we discuss.",
+      "Read my current AgentPit paper portfolio and automatic strategy status. Help me adapt the strategy in AGENTPIT_STRATEGY.md to my preferences. I choose the risk, trade sizes and markets; Hatcher adds no paper risk limits. Save the agreed strategy before researching or trading. Explain the current schedule and do not create a duplicate. If paused, leave it paused while we discuss.",
     );
   async function changeStrategy(enabled: boolean) {
     invalidateRequests();
@@ -343,20 +350,20 @@ export function AgentPitTab() {
               <div>
                 <h3 className="font-semibold">Automatic paper strategy</h3>
                 <p className="mt-1 text-sm text-[var(--text-secondary)]">
-                  {data.autopilot?.status === "active" ? "Enabled · Every hour" : data.autopilot?.status === "paused" ? "Paused" : data.autopilot?.status === "starting" ? "Starting…" : data.autopilot?.status === "error" ? "Needs attention" : "Ready to start"}
+                  {data.autopilot?.status === "active" ? `Enabled · ${data.autopilot.schedule}` : data.autopilot?.status === "paused" ? "Paused" : data.autopilot?.status === "starting" ? "Starting…" : data.autopilot?.status === "error" ? "Needs attention" : "Ready to start"}
                 </p>
               </div>
               <button type="button" className={button} disabled={changingStrategy || data.autopilot?.status === "starting"}
                 onClick={() => void changeStrategy(data.autopilot?.status !== "active")}>
                 {changingStrategy && <Loader2 size={15} className="animate-spin" />}
-                {changingStrategy ? "Updating…" : data.autopilot?.status === "active" ? "Pause strategy" : data.autopilot?.status === "paused" ? "Resume strategy" : data.autopilot?.status === "error" ? "Retry strategy" : "Start default strategy"}
+                {changingStrategy ? "Updating…" : data.autopilot?.status === "active" ? "Pause strategy" : data.autopilot?.status === "paused" ? "Resume strategy" : data.autopilot?.status === "error" ? "Retry strategy" : "Start strategy"}
               </button>
             </div>
             <p className="mt-4 text-sm text-[var(--text-secondary)]">
-              Favorites looks for well-supported outcomes near settlement. The first review starts immediately, then runs hourly. A review can skip trading when no suitable market is found.
+              Your agent follows the strategy you agree on in chat. Starting reuses an existing AgentPit schedule, or creates an hourly review. A review may trade or choose to wait.
             </p>
             <p className="mt-2 text-xs leading-relaxed text-[var(--text-muted)]">
-              Up to 2,000 apUSD or 2% of cash per buy · 6 buys per day · 10 positions · 40,000 apUSD cash reserve. Reviews use your AI Credits. Supports Hermes and OpenClaw.
+              You choose the risk, trade sizes, markets and cash reserve. Hatcher imposes no paper risk limits. Reviews use your AI Credits.
             </p>
             <p className="mt-2 text-xs text-[var(--text-muted)]">Use Discuss strategy to adjust preferences. Pause stops future orders; an order already submitted can still finish.</p>
             {data.autopilot?.lastRun && <p className="mt-3 text-xs text-[var(--text-secondary)]">Last review {time(data.autopilot.lastRun)}{data.autopilot.status === "active" && data.autopilot.nextRun ? ` · Next review ${time(data.autopilot.nextRun)}` : ""}</p>}

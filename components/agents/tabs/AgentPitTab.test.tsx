@@ -156,3 +156,11 @@ it("renders activity as data and never links to an unsafe provider URL", async (
   expect(document.body.textContent).toContain("buy · Yes · 100 shares");
   expect(document.querySelector('a[href^="javascript:"]')).toBeNull();
 });
+
+it("shows the native cadence and owner-defined risk preferences", async () => {
+  mocks.status.mockResolvedValue({success: true, data: {...connected, autopilot: {status: "active", schedule: "*/15 * * * *", maxTradeUsd: null}}});
+  render(<AgentPitTab />); await act(async () => {});
+  expect(document.body.textContent).toContain("Enabled · */15 * * * *");
+  expect(document.body.textContent).toContain("Hatcher imposes no paper risk limits");
+  expect(document.body.textContent).not.toContain("2,000 apUSD");
+});

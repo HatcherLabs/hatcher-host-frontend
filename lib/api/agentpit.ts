@@ -23,9 +23,10 @@ export interface AgentPitConnection {
     status: "starting" | "active" | "paused" | "error";
     strategy: string;
     schedule: string;
-    maxTradeUsd: number;
-    maxPositions: number;
-    minCashUsd: number;
+    maxTradeUsd: number | null;
+    maxPositions: number | null;
+    minCashUsd: number | null;
+    riskLimits?: string;
     jobId: string | null;
     initialRunRequestedAt: string | null;
     error: string | null;

@@ -217,7 +217,7 @@ export function AgentPitConnectCard({
             <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-[var(--text-secondary)]">
               {ready
                 ? "Your paper portfolio is connected. Open AgentPit to check or pause your strategy."
-                : "Connect a $100,000 simulated portfolio. Hermes and OpenClaw start the default Favorites strategy immediately, then review hourly. Reviews use AI Credits; you can pause or adapt the strategy anytime."}
+                : "Connect a $100,000 simulated portfolio. Hermes and OpenClaw start a paper strategy immediately, then review hourly. Reviews use AI Credits; you choose the risk and can pause or adapt the strategy anytime."}
             </p>
           </div>
         </div>
