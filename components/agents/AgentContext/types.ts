@@ -87,6 +87,7 @@ export interface AgentContextValue {
   // Tab
   tab: Tab;
   setTab: (tab: Tab) => void;
+  openModelSettings: () => void;
 
   // Logs
   logs: LogEntry[];

@@ -278,6 +278,17 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
       setTab('chat');
     }
   }, [tab, setTab, embedded, id, router]);
+  const openModelSettings = useCallback(() => {
+    if (embedded) {
+      router.push(`/dashboard/agent/${encodeURIComponent(id)}?tab=config&view=advanced&configTab=ai-models`);
+      return;
+    }
+    setViewMode('advanced');
+    setTab('config');
+    const url = new URL(window.location.href);
+    url.searchParams.set('configTab', 'ai-models');
+    window.history.replaceState({}, '', url.pathname + url.search);
+  }, [embedded, id, router, setViewMode, setTab]);
   useEffect(() => {
     if (!embedded && new URLSearchParams(window.location.search).get('tab') === 'workspace') {
       setTab('files');
@@ -1550,7 +1561,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
     if (!agent) return null;
     return {
       agent, id, stats, isActive, isNotActive, statusInfo, frameworkMeta,
-      tab, setTab,
+      tab, setTab, openModelSettings,
       logs: logs.logs, logsLoading: logs.logsLoading, logFilter: logs.logFilter,
       setLogFilter: logs.setLogFilter, logSearch: logs.logSearch, setLogSearch: logs.setLogSearch,
       autoScroll: logs.autoScroll, setAutoScroll: logs.setAutoScroll,
@@ -1638,7 +1649,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
     actions.actionLoading, actions.actionError, actions.actionSuccess,
     llmProvider, activeModelDisplay, currentProviderMeta, providerModels, config.hasApiKey,
     displayUptime, isLiveUptime, isActive, isNotActive, statusInfo, frameworkMeta,
-    isAuthenticated, userTier, viewMode]);
+    isAuthenticated, userTier, viewMode, openModelSettings]);
 
   useEffect(() => { if (agent) onAgentChange?.(agent); }, [agent, onAgentChange]);
   useEffect(() => {
@@ -1746,7 +1757,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
         <div className="flex-1 min-h-0 min-w-0 flex flex-col bg-[var(--bg-surface)]">
           {inWorkspace && <AgentWorkspaceTabs />}
           {/* Agent actions live in the shared header, away from the conversation. */}
-          <AgentWorkspaceActions>
+          <AgentWorkspaceActions onClone={() => setPortModalOpen(true)}>
           <div
             className="relative z-40 flex shrink-0 flex-wrap items-center gap-3 overflow-visible border-b border-[var(--border-default)] bg-[color-mix(in_srgb,var(--bg-surface)_92%,transparent)] px-4 py-3.5 backdrop-blur-md sm:px-6"
             style={{ fontFamily: 'var(--font-inter)' }}
@@ -1759,7 +1770,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
             {viewMode === 'advanced' && (
             <button
               type="button"
-              onClick={() => setTab('config')}
+              onClick={openModelSettings}
               className="inline-flex max-w-full items-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2 text-left text-xs font-semibold text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--accent)] sm:max-w-[420px]"
               title={`${activeModelDisplay.provider} · ${activeModelDisplay.name} · ${activeModelDisplay.route}`}
             >

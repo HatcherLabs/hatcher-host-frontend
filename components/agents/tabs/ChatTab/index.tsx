@@ -490,8 +490,8 @@ export function ChatTab({ compact = false }: { compact?: boolean }) {
           currentModel={resolveLoadedModelConfig(agent.config as Record<string, unknown>).model}
           hosted={resolveLoadedModelConfig(agent.config as Record<string, unknown>).provider === 'openrouter'}
           disabled={sending || queuedChatCount > 0 || ctx.saving || ['starting', 'restarting'].includes(agent.status)}
-          onSelect={ctx.switchChatModel} onOpenSettings={() => setTab('config')} />}
-        onOpenModelSettings={() => setTab('config')}
+          onSelect={ctx.switchChatModel} onOpenSettings={ctx.openModelSettings} />}
+        onOpenModelSettings={ctx.openModelSettings}
         onOpenMobilePanel={() => workspace?.chatTarget ? workspace.openSidebar() : setMobilePanelOpen(true)}
         onToggleAutoSpeak={voice.toggleAutoSpeak}
         onToggleThinking={toggleThinking}
@@ -515,8 +515,8 @@ export function ChatTab({ compact = false }: { compact?: boolean }) {
           currentModel={resolveLoadedModelConfig(agent.config as Record<string, unknown>).model}
           hosted={resolveLoadedModelConfig(agent.config as Record<string, unknown>).provider === 'openrouter'}
           disabled={sending || queuedChatCount > 0 || ctx.saving || ['starting', 'restarting'].includes(agent.status)}
-          onSelect={ctx.switchChatModel} onOpenSettings={() => setTab('config')} />}
-        onOpenModelSettings={() => setTab('config')}
+          onSelect={ctx.switchChatModel} onOpenSettings={ctx.openModelSettings} />}
+        onOpenModelSettings={ctx.openModelSettings}
         onOpenMobilePanel={() => setMobilePanelOpen(true)}
         onToggleAutoSpeak={voice.toggleAutoSpeak}
         onToggleThinking={toggleThinking}
