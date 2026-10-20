@@ -76,7 +76,7 @@ function ChatSessionRow({
         className="min-w-0 flex-1 px-2.5 py-2 text-left"
       >
         <div className="flex min-w-0 items-center justify-between gap-2">
-          <span className="truncate text-xs font-semibold text-[var(--text-primary)]">
+          <span className="line-clamp-2 break-words text-xs font-semibold text-[var(--text-primary)]" title={session.title}>
             {session.title}
           </span>
           <span className="flex shrink-0 items-center gap-1 text-[10px] text-[var(--text-muted)]">
@@ -84,7 +84,7 @@ function ChatSessionRow({
             {formatRelative(session.updatedAt)}
           </span>
         </div>
-        <div className="mt-1 truncate text-[11px] text-[var(--text-muted)]">
+        <div className="mt-1 line-clamp-2 break-words text-[11px] text-[var(--text-muted)]">
           {session.preview || `${session.messageCount} turns`}
         </div>
       </button>

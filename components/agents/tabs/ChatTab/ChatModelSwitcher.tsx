@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Check, ChevronDown, Loader2, Search, Star, X } from 'lucide-react';
 import { api } from '@/lib/api';
 import { HOSTED_MODELS, type ActiveModelDisplay } from '@/lib/hosted-model-catalog';
-import { mergeHostedModelsWithLiveCatalog, parseModelPricingPayload, type ModelPricingPayload } from '@/lib/model-pricing';
+import { formatCreditsPer1M, mergeHostedModelsWithLiveCatalog, parseModelPricingPayload, type ModelPricingPayload } from '@/lib/model-pricing';
+import styles from '@/components/chat/ChatExperience.module.css';
 import { MODEL_PRESETS_CHANGED, MODEL_PRESETS_STORAGE_KEY, modelPresetId, readModelPresets, writeModelPresets, type ModelPreset } from '@/lib/model-presets';
 
 interface Props {
@@ -28,6 +30,14 @@ export function ChatModelSwitcher({ activeModel, currentModel, hosted, framework
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const searchInput = useRef<HTMLInputElement>(null);
+  const dialog = useRef<HTMLDialogElement>(null);
+  const [pricingState, setPricingState] = useState<'loading' | 'ready' | 'unavailable'>('loading');
+  const closePicker = useCallback(() => {
+    // Release the native modal's focus trap before focusing its trigger.
+    dialog.current?.close();
+    setOpen(false);
+    trigger.current?.focus();
+  }, []);
 
   useEffect(() => {
     const sync = () => setPresets(readModelPresets());
@@ -41,22 +51,25 @@ export function ChatModelSwitcher({ activeModel, currentModel, hosted, framework
   useEffect(() => {
     if (!open) return;
     let cancelled = false;
+    dialog.current?.showModal();
     searchInput.current?.focus();
+    setCatalog(null);
+    setPricingState('loading');
     void api.getModelPricing().then(response => {
-      if (!cancelled && response.success) setCatalog(parseModelPricingPayload(response.data));
-    }).catch(() => { /* The bundled catalog remains available. */ });
+      if (cancelled) return;
+      const data = response.success ? parseModelPricingPayload(response.data) : null;
+      setCatalog(data);
+      setPricingState(data ? 'ready' : 'unavailable');
+    }).catch(() => { if (!cancelled) setPricingState('unavailable'); });
     const outside = (event: PointerEvent) => {
-      if (!root.current?.contains(event.target as Node)) setOpen(false);
-    };
-    const escape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') { setOpen(false); trigger.current?.focus(); }
+      if (!root.current?.contains(event.target as Node) && !dialog.current?.contains(event.target as Node)) closePicker();
     };
     document.addEventListener('pointerdown', outside);
-    document.addEventListener('keydown', escape);
-    return () => { cancelled = true; document.removeEventListener('pointerdown', outside); document.removeEventListener('keydown', escape); };
-  }, [open]);
+    return () => { cancelled = true; document.removeEventListener('pointerdown', outside); };
+  }, [open, closePicker]);
 
   const favorites = useMemo(() => new Set(presets.filter(p => p.provider === 'openrouter' && p.favorite).map(p => p.model)), [presets]);
+  const prices = useMemo(() => new Map(catalog?.models.map(model => [model.id, model.pricing]) ?? []), [catalog]);
   const models = useMemo(() => {
     const all = mergeHostedModelsWithLiveCatalog(HOSTED_MODELS, catalog, framework).filter(model => model.providerKey !== 'compute');
     const query = search.trim().toLowerCase();
@@ -82,7 +95,7 @@ export function ChatModelSwitcher({ activeModel, currentModel, hosted, framework
     if (disabled || pending || !hosted || model === currentModel) return;
     setPending(model);
     setError(null);
-    try { await onSelect(model); setOpen(false); trigger.current?.focus(); }
+    try { await onSelect(model); closePicker(); }
     catch (cause) { setError(cause instanceof Error ? cause.message : 'Could not switch model. Please try again.'); }
     finally { setPending(null); }
   };
@@ -95,16 +108,24 @@ export function ChatModelSwitcher({ activeModel, currentModel, hosted, framework
         <span className="truncate">{pending ? 'Switching model…' : activeModel.name}</span>
         {pending ? <Loader2 size={12} className="shrink-0 animate-spin" /> : <ChevronDown size={12} className="shrink-0" />}
       </button>
-      {open && (
-        <div role="dialog" aria-label="Choose chat model" className="absolute left-0 top-full z-50 mt-2 w-[min(360px,calc(100vw-3rem))] rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)] p-3 shadow-xl max-sm:fixed max-sm:left-4 max-sm:top-28">
+      {open && createPortal(
+        <dialog ref={dialog} data-agent-model-picker role="dialog" aria-label="Choose chat model" aria-modal="true" className={`${styles.dialog} ${styles.modelDialog}`}
+          onCancel={event => { event.preventDefault(); closePicker(); }}
+          onClick={event => {
+            if (event.target !== dialog.current) return;
+            const box = event.currentTarget.getBoundingClientRect();
+            if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) {
+              closePicker();
+            }
+          }}>
           <div className="mb-3 flex items-center justify-between gap-2">
             <span className="text-sm font-semibold text-[var(--text-primary)]">Chat model</span>
-            <button type="button" aria-label="Close model selector" onClick={() => { setOpen(false); trigger.current?.focus(); }} className="rounded p-1 text-[var(--text-muted)]"><X size={16} /></button>
+            <button type="button" aria-label="Close model selector" onClick={closePicker} className="rounded p-1 text-[var(--text-muted)]"><X size={16} /></button>
           </div>
           <p className="mb-3 text-xs text-[var(--text-muted)]">Applies to this agent. Switching may briefly restart it. Your chats stay saved.</p>
           {!hosted && <p className="mb-3 text-xs text-[var(--text-muted)]">This agent uses your own provider. Change its model in Model &amp; Provider settings.</p>}
           {disabled && <p role="status" className="mb-3 text-xs text-[var(--text-muted)]">Wait for the current reply or agent update before switching.</p>}
-          <label className="mb-2 flex items-center gap-2 rounded-lg border border-[var(--border-default)] px-2 py-2">
+          <label className={styles.modelSearch}>
             <Search size={14} className="text-[var(--text-muted)]" />
             <input ref={searchInput} aria-label="Search models" value={search} onChange={event => setSearch(event.target.value)} placeholder="Search models" className="min-w-0 flex-1 bg-transparent text-xs text-[var(--text-primary)] outline-none" />
           </label>
@@ -112,13 +133,19 @@ export function ChatModelSwitcher({ activeModel, currentModel, hosted, framework
             <Star size={13} fill={favoritesOnly ? 'currentColor' : 'none'} /> Favorites ({favorites.size})
           </button>
           {error && <p role="alert" className="mb-2 text-xs text-[var(--color-destructive)]">{error}</p>}
-          <div className="max-h-[min(320px,40dvh)] overflow-y-auto">
+          <p className="mb-2 text-xs text-[var(--text-muted)]">AI Credits · input / output per 1M tokens, or per request where shown.</p>
+          {pricingState === 'unavailable' && <p role="status" className="mb-2 text-xs text-[var(--text-muted)]">Live prices are unavailable. Reopen the selector to retry.</p>}
+          <div className={styles.modelList}>
             {models.length === 0 && <p className="p-3 text-xs text-[var(--text-muted)]">{favoritesOnly ? 'Star a model to add it to your favorites.' : 'No models match your search.'}</p>}
             {models.map(model => (
               <div key={model.id} className="flex items-center gap-1 rounded-lg hover:bg-[var(--bg-panel)]">
                 <button type="button" disabled={disabled || !!pending || !hosted || model.id === currentModel} onClick={() => void select(model.id)} aria-label={`Use ${model.name}`}
-                  className="flex min-w-0 flex-1 items-center gap-2 p-2 text-left disabled:opacity-50">
-                  <span className="min-w-0 flex-1"><span className="block truncate text-xs font-medium text-[var(--text-primary)]">{model.name}</span><span className="block truncate text-[10px] text-[var(--text-muted)]">{model.provider}</span></span>
+                  className="flex min-w-0 flex-1 items-center gap-2 p-2 text-left disabled:!opacity-100">
+                  <span className="min-w-0 flex-1">
+                    <span className="block break-words text-sm font-medium text-[var(--text-primary)]">{model.name}</span>
+                    <span className="block break-words text-xs text-[var(--text-muted)]">{model.provider}</span>
+                    <span className="mt-1 block text-xs text-[var(--text-secondary)]">{prices.get(model.id) ? formatCreditsPer1M(prices.get(model.id)!) : pricingState === 'loading' ? 'Loading price…' : 'Price unavailable / variable'}</span>
+                  </span>
                   {model.id === currentModel && <Check size={14} aria-label="Current model" className="text-[var(--color-accent)]" />}
                 </button>
                 <button type="button" aria-label={`${favorites.has(model.id) ? 'Remove' : 'Add'} ${model.name} ${favorites.has(model.id) ? 'from' : 'to'} favorites`} aria-pressed={favorites.has(model.id)} onClick={() => toggleFavorite(model)} className="shrink-0 rounded p-2 text-[var(--text-secondary)] hover:text-[var(--color-warning)]">
@@ -128,10 +155,11 @@ export function ChatModelSwitcher({ activeModel, currentModel, hosted, framework
             ))}
           </div>
           <div className="mt-2 border-t border-[var(--border-default)] pt-2">
+            {catalog?.billingNote && <p className="mb-2 text-xs text-[var(--text-muted)]">{catalog.billingNote}</p>}
             <p className="mb-2 text-[10px] text-[var(--text-muted)]">Favorites are saved in this browser and shared with Model &amp; Provider presets.</p>
-            <button type="button" onClick={() => { setOpen(false); onOpenSettings(); }} className="text-xs text-[var(--color-accent)]">Model &amp; Provider settings</button>
+            <button type="button" onClick={() => { closePicker(); onOpenSettings(); }} className="text-xs text-[var(--color-accent)]">Model &amp; Provider settings</button>
           </div>
-        </div>
+        </dialog>, document.body,
       )}
     </div>
   );
