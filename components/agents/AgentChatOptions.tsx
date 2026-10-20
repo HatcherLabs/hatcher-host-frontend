@@ -10,9 +10,11 @@ export function AgentChatOptions({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDetailsElement>(null);
   useEffect(() => {
     const close = (event: PointerEvent) => {
+      if ((event.target as Element)?.closest?.('[data-agent-model-picker]')) return;
       if (!ref.current?.contains(event.target as Node)) ref.current?.removeAttribute("open");
     };
     const escape = (event: KeyboardEvent) => {
+      if (document.querySelector('[data-agent-model-picker][open]')) return;
       if (event.key === "Escape" && ref.current?.open) {
         ref.current.open = false;
         ref.current.querySelector("summary")?.focus();

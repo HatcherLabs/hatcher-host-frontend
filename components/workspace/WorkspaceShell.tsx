@@ -20,6 +20,7 @@ import { NAV_GROUPS, FOOTER_COLUMNS, SOCIAL_LINKS } from "@/components/marketing
 import { WorkspaceContext } from "./WorkspaceContext";
 import { workspaceAgentId, workspaceSection, type WorkspaceSection } from "./navigation";
 import styles from "./WorkspaceShell.module.css";
+import { SidebarResizer } from "./SidebarResizer";
 
 const NAV: { key: WorkspaceSection; href: string; Icon: LucideIcon }[] = [
   { key: "chats", href: "/", Icon: MessageSquare },
@@ -271,6 +272,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </aside>
+        {!collapsed && !isMobile && <SidebarResizer />}
       </div>
       <div className={styles.content} inert={mobileOpen && isMobile}>
         <header className={styles.header}>
