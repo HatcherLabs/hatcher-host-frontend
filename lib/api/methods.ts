@@ -2711,7 +2711,13 @@ export const api = {
     }
   },
 
-  /** Streaming chat — falls back to non-streaming if stream unavailable */
+  abortChatTurn: (agentId: string, turnId: string, sessionId?: string | null) =>
+    req<{ accepted: boolean }>(`/agents/${agentId}/chat/abort`, {
+      method: "POST",
+      body: JSON.stringify({ turnId, ...(sessionId ? { sessionId } : {}) }),
+    }),
+
+  /** Streaming chat; accepted work survives browser disconnects. */
   chatStream: async (
     agentId: string,
     message: string,
@@ -2728,6 +2734,7 @@ export const api = {
     /** Named `usage` SSE event emitted before [DONE] when the turn
      *  consumed hosted AI credits. */
     onUsage?: (usage: ChatUsagePayload) => void,
+    turnId?: string,
   ) => {
     const token = getToken();
 
@@ -2744,62 +2751,18 @@ export const api = {
         signal,
         body: JSON.stringify({
           message,
+          ...(turnId ? { turnId } : {}),
           history,
           ...(sessionId ? { sessionId } : {}),
           ...(attachments?.length ? { attachments } : {}),
-          abortOnDisconnect: true,
+          abortOnDisconnect: false,
         }),
       });
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") throw err;
-      // Streaming endpoint failed — fall back to regular chat
-      try {
-        const fallback = await fetch(`${API_BASE}/agents/${agentId}/chat`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-          credentials: "include",
-          signal,
-          body: JSON.stringify({
-            message,
-            history,
-            ...(sessionId ? { sessionId } : {}),
-            ...(attachments?.length ? { attachments } : {}),
-          }),
-        });
-        if (!fallback.ok) {
-          onError(`HTTP ${fallback.status}`);
-          return;
-        }
-        const data = (await fallback.json()) as {
-          data?: {
-            content?: string;
-            model?: string;
-            messages?: Array<{ content?: string }>;
-          };
-        };
-        const payload = data.data;
-        const messages =
-          payload?.messages
-            ?.map((item) => item.content)
-            .filter((item): item is string => Boolean(item?.trim())) ?? [];
-        const firstContent = messages[0] ?? payload?.content;
-        if (firstContent) {
-          onToken(firstContent);
-          onDone(payload?.model ?? "unknown");
-          for (const extra of messages.slice(1)) onMessage?.(extra);
-        } else {
-          onError("Empty response");
-        }
-      } catch (fallbackErr) {
-        if (fallbackErr instanceof Error && fallbackErr.name === "AbortError")
-          throw fallbackErr;
-        onError(
-          fallbackErr instanceof Error ? fallbackErr.message : "Network error",
-        );
-      }
+      // A network failure cannot prove the request was rejected. Reconnect to
+      // its preview instead of replaying a potentially billed turn.
+      onError("Connection lost. Reconnecting to the existing response.");
       return;
     }
 

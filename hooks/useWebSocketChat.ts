@@ -35,8 +35,24 @@ export interface LiveChatMessage {
   metadata?: Record<string, unknown>;
 }
 
+export interface ChatTurnSnapshot {
+  id: string;
+  agentId: string;
+  sessionId: string;
+  startedAt: number;
+  revision: number;
+  status: 'active' | 'completed' | 'aborted' | 'error';
+  content: string;
+  metadata: unknown;
+  thinkingActive: boolean;
+  messageId?: string;
+  error?: string;
+}
+
 interface UseWebSocketChatOptions {
   agentId: string;
+  sessionId?: string | null;
+  onResume?: (snapshot: ChatTurnSnapshot | null, sessionId: string) => void;
   /** Whether the hook should attempt to connect (e.g. only when authenticated) */
   enabled?: boolean;
   onToken: (token: string) => void;
@@ -59,6 +75,8 @@ interface UseWebSocketChatOptions {
 }
 
 interface UseWebSocketChatReturn {
+  /** Mark a locally streaming HTTP turn so previews cannot duplicate tokens. */
+  trackLocalTurn: (turnId: string | null) => void;
   /** Send a chat message through the WebSocket */
   send: (
     message: string,
@@ -84,6 +102,8 @@ const CHAT_KEEPALIVE_MS = 25_000;
 
 export function useWebSocketChat({
   agentId,
+  sessionId,
+  onResume,
   enabled = true,
   onToken,
   onDone,
@@ -102,6 +122,12 @@ export function useWebSocketChat({
   const [connectionState, setConnectionState] = useState<ConnectionState>('disconnected');
   const enabledRef = useRef(enabled);
   const agentIdRef = useRef(agentId);
+  const sessionIdRef = useRef(sessionId);
+  const onResumeRef = useRef(onResume);
+  const localTurnIdRef = useRef<string | null>(null);
+  const resumedTurnIdRef = useRef<string | null>(null);
+  sessionIdRef.current = sessionId;
+  onResumeRef.current = onResume;
 
   // Keep refs in sync for callbacks
   enabledRef.current = enabled;
@@ -146,6 +172,7 @@ export function useWebSocketChat({
       }
       wsRef.current = null;
     }
+    localTurnIdRef.current = null;
   }, []);
 
   const connect = useCallback(() => {
@@ -159,7 +186,6 @@ export function useWebSocketChat({
     wsRef.current = ws;
 
     ws.onopen = () => {
-      reconnectAttemptsRef.current = 0;
       keepAliveTimerRef.current = setInterval(() => {
         if (wsRef.current !== ws || ws.readyState !== WebSocket.OPEN) return;
         ws.send(JSON.stringify({ type: 'ping' }));
@@ -167,6 +193,7 @@ export function useWebSocketChat({
     };
 
     ws.onmessage = (event) => {
+      if (wsRef.current !== ws) return;
       let msg: { type: string; payload: Record<string, unknown> };
       try {
         msg = JSON.parse(event.data as string);
@@ -175,6 +202,16 @@ export function useWebSocketChat({
       }
 
       switch (msg.type) {
+        case 'chat_resume': {
+          if (msg.payload.sessionId !== sessionIdRef.current) break;
+          const snapshot = msg.payload.snapshot as ChatTurnSnapshot | null;
+          // The original socket already receives individual tokens. After a
+          // reconnect its id is cleared and absolute snapshots take over.
+          if (localTurnIdRef.current) break;
+          resumedTurnIdRef.current = snapshot?.id ?? null;
+          onResumeRef.current?.(snapshot, msg.payload.sessionId as string);
+          break;
+        }
         case 'chat_token':
           onTokenRef.current(msg.payload.token as string);
           break;
@@ -243,6 +280,7 @@ export function useWebSocketChat({
           }
           break;
         case 'chat_message':
+          if ((msg.payload.metadata as Record<string, unknown> | undefined)?.turnId === resumedTurnIdRef.current) break;
           if (onMessageRef.current) {
             onMessageRef.current(msg.payload as unknown as LiveChatMessage);
           }
@@ -261,7 +299,11 @@ export function useWebSocketChat({
           }
           break;
         case 'agent_status':
+          reconnectAttemptsRef.current = 0;
           setConnectionState('connected');
+          if (sessionIdRef.current) {
+            ws.send(JSON.stringify({ type: 'resume', sessionId: sessionIdRef.current }));
+          }
           if (onStatusChangeRef.current) {
             onStatusChangeRef.current(
               msg.payload.agentId as string,
@@ -277,11 +319,13 @@ export function useWebSocketChat({
     };
 
     ws.onclose = (event) => {
+      if (wsRef.current !== ws) return;
       if (keepAliveTimerRef.current) {
         clearInterval(keepAliveTimerRef.current);
         keepAliveTimerRef.current = null;
       }
       wsRef.current = null;
+      localTurnIdRef.current = null;
 
       // Don't reconnect if explicitly closed or auth failure
       if (event.code === 1000 || event.code === 1008) {
@@ -314,6 +358,14 @@ export function useWebSocketChat({
     return cleanup;
   }, [agentId, enabled, connect, cleanup]);
 
+  useEffect(() => {
+    resumedTurnIdRef.current = null;
+    const ws = wsRef.current;
+    if (sessionId && ws?.readyState === WebSocket.OPEN && connectionState === 'connected') {
+      ws.send(JSON.stringify({ type: 'resume', sessionId }));
+    }
+  }, [sessionId, connectionState]);
+
   const send = useCallback(
     (
       message: string,
@@ -325,8 +377,12 @@ export function useWebSocketChat({
         return false;
       }
       try {
+        const turnId = crypto.randomUUID();
+        localTurnIdRef.current = turnId;
+        resumedTurnIdRef.current = null;
         wsRef.current.send(JSON.stringify({
           message,
+          turnId,
           ...(sessionId ? { sessionId } : {}),
           ...(history?.length ? { history } : {}),
           ...(attachments?.length ? { attachments } : {}),
@@ -349,7 +405,11 @@ export function useWebSocketChat({
       return false;
     }
     try {
-      wsRef.current.send(JSON.stringify({ type: 'abort' }));
+      wsRef.current.send(JSON.stringify({
+        type: 'abort',
+        ...(localTurnIdRef.current || resumedTurnIdRef.current
+          ? { turnId: localTurnIdRef.current || resumedTurnIdRef.current, sessionId: sessionIdRef.current } : {}),
+      }));
       return true;
     } catch {
       return false;
@@ -362,6 +422,13 @@ export function useWebSocketChat({
   }, [connect]);
 
   return {
+    trackLocalTurn: (turnId) => {
+      localTurnIdRef.current = turnId;
+      const ws = wsRef.current;
+      if (!turnId && sessionIdRef.current && ws?.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'resume', sessionId: sessionIdRef.current }));
+      }
+    },
     send,
     connectionState,
     isConnected: connectionState === 'connected',

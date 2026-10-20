@@ -17,7 +17,8 @@ import type {
   ChatSessionSummary,
 } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { useWebSocketChat, type ChatThinkingEvent, type ChatToolEvent, type ChatUsageEvent } from '@/hooks/useWebSocketChat';
+import { useWebSocketChat, type ChatThinkingEvent, type ChatToolEvent, type ChatUsageEvent, type ChatTurnSnapshot } from '@/hooks/useWebSocketChat';
+import { mergeRecoveredChatTurn } from '@/lib/chat-turn-recovery';
 import { FRAMEWORKS, getBYOKProvider } from '@hatcher/shared';
 import type { UserTierKey } from '@hatcher/shared';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -317,6 +318,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
   const loadedChatSessionIdRef = useRef<string | null>(null);
   const lastHistorySignatureRef = useRef('');
   const activeChatSessionIdRef = useRef<string | null>(null);
+  const recoveredTurnRef = useRef<ChatTurnSnapshot | null>(null);
 
   // Features / integrations
   const [activeFeatures, setActiveFeatures] = useState<AgentFeature[]>([]);
@@ -332,6 +334,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
   const wsLogsRetryCountRef = useRef(0);
   const wsStreamingMsgRef = useRef(false);
   const chatAbortControllerRef = useRef<AbortController | null>(null);
+  const httpTurnIdRef = useRef<string | null>(null);
   // Tool-call indicators surfaced from the agent container during streaming.
   // Cleared on each new message; populated by ws-chat tool events.
   const [inflightTools, setInflightTools] = useState<Array<{ callId: string; name: string; argsPreview?: string }>>([]);
@@ -345,6 +348,11 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
 
   const setActiveChatSessionId = useCallback((sessionId: string) => {
     if (activeChatSessionIdRef.current !== sessionId) {
+      if (recoveredTurnRef.current?.status === 'active') {
+        sendingRef.current = false;
+        setSending(false);
+      }
+      recoveredTurnRef.current = null;
       historyLoadedRef.current = false;
       loadedChatSessionIdRef.current = null;
       setMessages([]);
@@ -738,6 +746,26 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
     }
   }, [id]);
 
+  const applyRecoveredTurn = useCallback((snapshot: ChatTurnSnapshot) => {
+    if (snapshot.sessionId !== activeChatSessionIdRef.current) return;
+    setMessages((prev) => mergeRecoveredChatTurn(prev, snapshot));
+    const active = snapshot.status === 'active';
+    sendingRef.current = active;
+    setSending(active);
+    wsStreamingMsgRef.current = active;
+    if (snapshot.error) {
+      setChatError(snapshot.error);
+      setChatErrorType('generic');
+    } else {
+      setChatError(null);
+      setChatErrorType(null);
+    }
+    if (!active) {
+      setInflightTools([]);
+      setCompletedTools([]);
+    }
+  }, []);
+
   const loadChatHistory = useCallback(async (mode: 'initial' | 'poll' = 'poll') => {
     if (!id) return;
     if (mode === 'poll' && (!historyLoadedRef.current || sendingRef.current || wsStreamingMsgRef.current || olderRequestRef.current)) return;
@@ -761,6 +789,9 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
         if (mode === 'initial') {
           setHistoryCursor(res.data.nextCursor ?? null);
           setMessages(loaded);
+          if (recoveredTurnRef.current?.sessionId === requestedSessionId) {
+            applyRecoveredTurn(recoveredTurnRef.current);
+          }
           lastHistorySignatureRef.current = signature;
         } else if (signature && signature !== lastHistorySignatureRef.current) {
           setMessages((prev) => {
@@ -795,7 +826,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
       historyLoadedRef.current = true;
       }
     }
-  }, [historySignature, id, normalizeHistoryMessages]);
+  }, [applyRecoveredTurn, historySignature, id, normalizeHistoryMessages]);
 
   const loadOlderChatHistory = useCallback(async (): Promise<number> => {
     if (!historyCursor || olderRequestRef.current) return 0;
@@ -1085,6 +1116,23 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
 
   const wsChat = useWebSocketChat({
     agentId: id,
+    sessionId: activeChatSessionId,
+    onResume: (snapshot, sessionId) => {
+      if (sessionId !== activeChatSessionIdRef.current) return;
+      const previous = recoveredTurnRef.current;
+      recoveredTurnRef.current = snapshot;
+      if (snapshot) {
+        if (historyLoadedRef.current) applyRecoveredTurn(snapshot);
+      } else if (previous?.status === 'active') {
+        // The worker may have restarted. Stop showing an immortal spinner;
+        // reconcile durable history without resubmitting the user's request.
+        wsStreamingMsgRef.current = false;
+        sendingRef.current = false;
+        setSending(false);
+        setMessages((prev) => prev.filter((message) => message.id !== `recovery-${previous.id}`));
+        void loadChatHistory('poll');
+      }
+    },
     // Keep the socket alive while a response is in flight even if the user
     // switches to another tab — closing it mid-stream used to lose the
     // (already billed) answer. It closes on the next render after onDone/
@@ -1129,7 +1177,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
       setChatError(null);
       setChatErrorType(null);
       setMessages((prev) => {
-        if (prev.some((m) => m.id === message.id)) return prev;
+        if (prev.some((m) => m.id === message.id || m.id === `saved-${message.id}`)) return prev;
         if (recoveredFromDisconnect) {
           for (let i = prev.length - 1; i >= 0; i--) {
             if (prev[i]?.role === 'assistant' && prev[i]?.streaming) {
@@ -1257,12 +1305,14 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
   }, []);
 
   const abortChatResponse = useCallback(() => {
+    const turnId = httpTurnIdRef.current ?? recoveredTurnRef.current?.id;
+    if (turnId) void api.abortChatTurn(id, turnId, activeChatSessionIdRef.current);
     chatAbortControllerRef.current?.abort();
     chatAbortControllerRef.current = null;
     abortWsChat();
     finishAbortedChat();
     window.setTimeout(() => void loadChatSessions(), 500);
-  }, [abortWsChat, finishAbortedChat, loadChatSessions]);
+  }, [abortWsChat, finishAbortedChat, id, loadChatSessions]);
 
   // ─── Chat send ────────────────────────────────────────────
 
@@ -1327,6 +1377,9 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
     }
 
     try {
+      const turnId = crypto.randomUUID();
+      httpTurnIdRef.current = turnId;
+      wsChat.trackLocalTurn(turnId);
       await api.chatStream(
         id,
         text,
@@ -1406,6 +1459,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
         handleChatToolEvent,
         handleChatThinkingEvent,
         handleChatUsage,
+        turnId,
       );
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
@@ -1418,6 +1472,8 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
       setMessages((prev) => prev.filter((m) => !(m.streaming && m.content === '')));
       setSending(false);
     } finally {
+      httpTurnIdRef.current = null;
+      wsChat.trackLocalTurn(null);
       if (chatAbortControllerRef.current === abortController) {
         chatAbortControllerRef.current = null;
       }
