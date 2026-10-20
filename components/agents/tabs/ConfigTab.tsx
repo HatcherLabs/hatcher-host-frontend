@@ -917,32 +917,32 @@ export function ConfigTab() {
       initial="initial"
       animate="animate"
       exit="exit"
-      className="space-y-6 max-w-6xl"
+      className="space-y-4 sm:space-y-6 max-w-6xl"
     >
-      <GlassCard className="p-2">
-        <div className="grid gap-1 sm:grid-cols-2 xl:grid-cols-4">
+      <GlassCard className="p-1 sm:p-2">
+        <nav aria-label="Agent settings sections" className="flex gap-1 overflow-x-auto sm:grid sm:grid-cols-4">
           {CONFIG_SUBTABS.map((item) => {
             const active = activeConfigSubtab === item.id;
             return (
               <button
                 key={item.id}
                 type="button"
+                aria-pressed={active}
                 onClick={() => setConfigSubtab(item.id)}
-                className={`rounded-lg px-3 py-3 text-left transition-colors ${
+                className={`shrink-0 rounded-lg px-3 py-2.5 text-left transition-colors ${
                   active
-                    ? 'bg-[var(--accent-primary)]/10 text-[var(--text-primary)]'
+                    ? 'bg-[var(--control-active)] text-[var(--control-active-text)]'
                     : 'text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]'
                 }`}
               >
-                <span className="flex items-center gap-2 text-sm font-semibold">
-                  <SlidersHorizontal className={`h-4 w-4 ${active ? 'text-[var(--accent-primary)]' : 'text-[var(--text-tertiary)]'}`} />
+                <span className="flex items-center gap-2 whitespace-nowrap text-xs font-semibold sm:whitespace-normal sm:text-sm">
                   {item.label}
                 </span>
-                <span className="mt-1 block text-xs text-[var(--text-tertiary)]">{item.description}</span>
+                <span className={`mt-1 hidden text-xs md:block ${active ? 'opacity-75' : 'text-[var(--text-tertiary)]'}`}>{item.description}</span>
               </button>
             );
           })}
-        </div>
+        </nav>
       </GlassCard>
 
       {activeConfigSubtab === 'general' && (
@@ -1248,12 +1248,12 @@ export function ConfigTab() {
           <div className="grid gap-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-panel)] p-3 text-sm">
             <div className="flex items-center justify-between gap-3">
               <span className="text-[var(--text-tertiary)]">Saved model</span>
-              <span className="min-w-0 truncate text-right font-semibold text-[var(--text-primary)]">{savedModelName}</span>
+              <span className="min-w-0 break-words text-right font-semibold text-[var(--text-primary)]">{savedModelName}</span>
             </div>
             <div className="flex items-center justify-between gap-3">
               <span className="text-[var(--text-tertiary)]">Draft selection</span>
               <span className="flex min-w-0 items-center justify-end gap-2 text-right font-semibold text-[var(--text-primary)]">
-                <span className="truncate">{currentModelName}</span>
+                <span className="min-w-0 break-words">{currentModelName}</span>
                 {hasPendingModelChange && (
                   <span className="flex-shrink-0 rounded border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-1.5 py-0.5 text-[10px] font-medium text-[var(--color-warning)]">
                     Unsaved
@@ -1263,7 +1263,7 @@ export function ConfigTab() {
             </div>
             <div className="flex items-center justify-between gap-3">
               <span className="text-[var(--text-tertiary)]">Route</span>
-              <span className="min-w-0 truncate text-right text-[var(--text-secondary)]">{currentModelRoute}</span>
+              <span className="min-w-0 break-words text-right text-[var(--text-secondary)]">{currentModelRoute}</span>
             </div>
             <div className="flex items-center justify-between gap-3">
               <span className="text-[var(--text-tertiary)]">Billing</span>
