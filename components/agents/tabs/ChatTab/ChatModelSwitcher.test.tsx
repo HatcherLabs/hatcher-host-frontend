@@ -10,14 +10,14 @@ import { MODEL_PRESETS_STORAGE_KEY, readModelPresets, writeModelPresets } from '
 vi.mock('@/lib/api', () => ({ api: { getModelPricing: vi.fn(async () => ({ success: false })) } }));
 vi.mock('next-intl', () => ({ useTranslations: () => (key: string) => key }));
 vi.mock('@/lib/hosted-model-catalog', () => ({ HOSTED_MODELS: [
-  { id: 'model-a', name: 'Alpha', provider: 'Provider A' },
-  { id: 'model-b', name: 'Beta', provider: 'Provider B' },
+  { id: 'model-a', name: 'Alpha', provider: 'Provider A', providerKey: 'provider-a' },
+  { id: 'model-b', name: 'Beta', provider: 'Provider B', providerKey: 'provider-b' },
 ] }));
 vi.mock('@/lib/model-pricing', async importOriginal => ({ ...await importOriginal<object>(), mergeHostedModelsWithLiveCatalog: (models: unknown) => models }));
 
 let host: HTMLDivElement;
 let root: Root;
-const activeModel = { id: 'model-a', name: 'Alpha', provider: 'Provider A', route: '', privacy: '', tags: [] };
+const activeModel = { id: 'model-a', name: 'Alpha', provider: 'Provider A', providerKey: 'provider-a', route: '', privacy: '', tags: [] };
 const props = () => ({ activeModel, currentModel: 'model-a', hosted: true, framework: 'hermes', disabled: false, onSelect: vi.fn(async () => {}), onOpenSettings: vi.fn() });
 function button(label: string): HTMLButtonElement {
   const found = Array.from(document.body.querySelectorAll('button')).find(b => b.getAttribute('aria-label') === label || b.textContent?.trim() === label);
@@ -38,6 +38,22 @@ beforeEach(() => {
 afterEach(async () => { await act(async () => root.unmount()); host.remove(); vi.restoreAllMocks(); });
 
 describe('chat model switcher', () => {
+  it('groups by provider and combines provider, search and favorite filters without changing the agent', async () => {
+    const p = await render(); await click('Switch model: Alpha');
+    expect(document.querySelectorAll('[data-model-provider-group]')).toHaveLength(2);
+    expect(document.querySelector('[data-model-provider-group]')?.hasAttribute('open')).toBe(true);
+    const provider = document.querySelector('select')!;
+    await act(async () => { provider.value = 'provider-b'; provider.dispatchEvent(new Event('change', { bubbles: true })); });
+    expect(document.querySelectorAll('[data-model-provider-group]')).toHaveLength(1);
+    expect(document.querySelector('[data-model-provider-group]')?.textContent).toContain('Provider B');
+    expect(document.querySelector('[aria-label="Use Alpha"]')).toBeNull();
+    expect(button('Use Beta')).toBeTruthy();
+    await click('Add Beta to favorites'); await click('Favorites (1)');
+    expect(button('Use Beta')).toBeTruthy();
+    await act(async () => { provider.value = 'provider-a'; provider.dispatchEvent(new Event('change', { bubbles: true })); });
+    expect(document.body.textContent).toContain('No favorites match these filters');
+    expect(p.onSelect).not.toHaveBeenCalled();
+  });
   it('keeps the parent options open while using the portaled modal and restores focus on Escape', async () => {
     await act(async () => root.render(<AgentChatOptions><ChatModelSwitcher {...props()} /></AgentChatOptions>));
     host.querySelector('details')!.open = true;

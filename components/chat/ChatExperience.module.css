@@ -1063,3 +1063,15 @@
 :global(html[data-workspace-compact]) .footnote { display:none; }
 :global(html[data-workspace-compact]) .chatLayout { justify-content:flex-end; }
 :global(html[data-workspace-compact]) .composerArea { padding:4px 12px; }
+
+.modelDialog[data-agent-model-picker][open] {
+  display: flex;
+  flex-direction: column;
+}
+.modelDialog[data-agent-model-picker] > * {
+  flex-shrink: 0;
+}
+.modelDialog[data-agent-model-picker] .modelList {
+  flex: 1 1 auto;
+  min-height: 120px;
+}

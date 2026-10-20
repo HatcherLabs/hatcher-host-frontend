@@ -9,6 +9,17 @@ describe('chat provider choices', () => {
     expect(groups.flatMap(g => g.models).map(m => m.id).sort()).toEqual(models.map(m => m.id).sort());
     expect(groups.find(g => g.id === 'deepseek')?.models[0].id).toBe('deepseek/deepseek-v4-flash');
   });
+  it('uses hosted provider metadata for partner routes and keeps model ids unchanged', () => {
+    const models = [
+      { id: 'openai/partner-route', name: 'Partner model', providerKey: 'acedata', provider: 'AceData' },
+      { id: 'custom-local', name: 'Local model', providerKey: 'compute', provider: 'Hatcher Compute' },
+      { id: 'openai/o1', name: 'OpenAI model', providerKey: 'openai', provider: 'OpenAI' },
+    ];
+    const groups = groupChatModels(models);
+    expect(groups.map(g => g.name)).toEqual(['OpenAI · ChatGPT', 'AceData', 'Hatcher Compute']);
+    expect(groups.find(g => g.id === 'acedata')?.models[0].id).toBe('openai/partner-route');
+    expect(groups.flatMap(g => g.models)).toHaveLength(3);
+  });
   it('only displays providers actually available in the guest catalog', () => {
     expect(groupChatModels([{ id: 'deepseek/deepseek-v4-flash', name: 'DeepSeek V4 Flash' }]).map(g => g.id)).toEqual(['deepseek']);
     expect(groupChatModels([])).toEqual([]);

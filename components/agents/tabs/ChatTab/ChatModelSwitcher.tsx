@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Check, ChevronDown, Loader2, Search, Star, X } from 'lucide-react';
 import { api } from '@/lib/api';
+import { groupChatModels } from '@/lib/chat-model-groups';
+import { ModelProviderSection } from '@/components/chat/ModelProviderSection';
 import { HOSTED_MODELS, type ActiveModelDisplay } from '@/lib/hosted-model-catalog';
 import { formatCreditsPer1M, mergeHostedModelsWithLiveCatalog, parseModelPricingPayload, type ModelPricingPayload } from '@/lib/model-pricing';
 import styles from '@/components/chat/ChatExperience.module.css';
@@ -22,6 +24,7 @@ interface Props {
 export function ChatModelSwitcher({ activeModel, currentModel, hosted, framework, disabled, onSelect, onOpenSettings }: Props) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const [provider, setProvider] = useState('');
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [presets, setPresets] = useState<ModelPreset[]>([]);
   const [catalog, setCatalog] = useState<ModelPricingPayload | null>(null);
@@ -70,13 +73,16 @@ export function ChatModelSwitcher({ activeModel, currentModel, hosted, framework
 
   const favorites = useMemo(() => new Set(presets.filter(p => p.provider === 'openrouter' && p.favorite).map(p => p.model)), [presets]);
   const prices = useMemo(() => new Map(catalog?.models.map(model => [model.id, model.pricing]) ?? []), [catalog]);
+  const allModels = useMemo(() => mergeHostedModelsWithLiveCatalog(HOSTED_MODELS, catalog, framework).filter(model => model.providerKey !== 'compute'), [catalog, framework]);
+  const providers = useMemo(() => groupChatModels(allModels), [allModels]);
   const models = useMemo(() => {
-    const all = mergeHostedModelsWithLiveCatalog(HOSTED_MODELS, catalog, framework).filter(model => model.providerKey !== 'compute');
+    const all = allModels;
     const query = search.trim().toLowerCase();
-    return all.filter(model => (!favoritesOnly || favorites.has(model.id))
+    return all.filter(model => (!provider || model.providerKey === provider) && (!favoritesOnly || favorites.has(model.id))
       && (!query || `${model.name} ${model.provider} ${model.id}`.toLowerCase().includes(query)))
       .sort((a, b) => Number(favorites.has(b.id)) - Number(favorites.has(a.id)) || a.name.localeCompare(b.name));
-  }, [catalog, search, favoritesOnly, favorites, framework]);
+  }, [allModels, search, provider, favoritesOnly, favorites]);
+  const groups = useMemo(() => groupChatModels(models).map(group => ({ ...group, models: group.models.sort((a, b) => Number(favorites.has(b.id)) - Number(favorites.has(a.id))) })), [models, favorites]);
 
   const toggleFavorite = (model: { id: string; name: string }) => {
     const next = readModelPresets();
@@ -129,6 +135,13 @@ export function ChatModelSwitcher({ activeModel, currentModel, hosted, framework
             <Search size={14} className="text-[var(--text-muted)]" />
             <input ref={searchInput} aria-label="Search models" value={search} onChange={event => setSearch(event.target.value)} placeholder="Search models" className="min-w-0 flex-1 bg-transparent text-xs text-[var(--text-primary)] outline-none" />
           </label>
+          <label className="mb-2 flex items-center gap-2 text-xs text-[var(--text-secondary)]">
+            Provider
+            <select aria-label="Filter models by provider" value={provider} onChange={event => setProvider(event.target.value)} className="min-w-0 flex-1 rounded-lg border border-[var(--border-default)] bg-[var(--bg-panel)] p-2 text-sm text-[var(--text-primary)]">
+              <option value="">All providers</option>
+              {providers.map(group => <option key={group.id} value={group.id}>{group.name} ({group.models.length})</option>)}
+            </select>
+          </label>
           <button type="button" aria-pressed={favoritesOnly} onClick={() => setFavoritesOnly(value => !value)} className="mb-2 flex items-center gap-1.5 rounded-md px-2 py-1 text-xs text-[var(--text-secondary)]">
             <Star size={13} fill={favoritesOnly ? 'currentColor' : 'none'} /> Favorites ({favorites.size})
           </button>
@@ -136,8 +149,11 @@ export function ChatModelSwitcher({ activeModel, currentModel, hosted, framework
           <p className="mb-2 text-xs text-[var(--text-muted)]">AI Credits · input / output per 1M tokens, or per request where shown.</p>
           {pricingState === 'unavailable' && <p role="status" className="mb-2 text-xs text-[var(--text-muted)]">Live prices are unavailable. Reopen the selector to retry.</p>}
           <div className={styles.modelList}>
-            {models.length === 0 && <p className="p-3 text-xs text-[var(--text-muted)]">{favoritesOnly ? 'Star a model to add it to your favorites.' : 'No models match your search.'}</p>}
-            {models.map(model => (
+            {models.length === 0 && <p className="p-3 text-xs text-[var(--text-muted)]">{favoritesOnly ? 'No favorites match these filters. Star a model or change the filters.' : 'No models match your search.'}</p>}
+            {groups.map(group => (
+              <ModelProviderSection key={`${group.id}:${search}:${provider}:${favoritesOnly}`} name={group.name} count={group.models.length}
+                expanded={!!search.trim() || !!provider || favoritesOnly || group.models.some(model => model.id === currentModel)}>
+              {group.models.map(model => (
               <div key={model.id} className="flex items-center gap-1 rounded-lg hover:bg-[var(--bg-panel)]">
                 <button type="button" disabled={disabled || !!pending || !hosted || model.id === currentModel} onClick={() => void select(model.id)} aria-label={`Use ${model.name}`}
                   className="flex min-w-0 flex-1 items-center gap-2 p-2 text-left disabled:!opacity-100">
@@ -152,6 +168,8 @@ export function ChatModelSwitcher({ activeModel, currentModel, hosted, framework
                   <Star size={15} fill={favorites.has(model.id) ? 'currentColor' : 'none'} />
                 </button>
               </div>
+              ))}
+              </ModelProviderSection>
             ))}
           </div>
           <div className="mt-2 border-t border-[var(--border-default)] pt-2">
