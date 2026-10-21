@@ -100,7 +100,7 @@ function usd(value: number | null | undefined, price = false): string {
 }
 
 function Stat({ label, value, detail }: { label: string; value: string; detail: string }) {
-  return <article className={styles.stat}><h3>{label}</h3><strong>{value}</strong><p>{detail}</p></article>;
+  return <article className={styles.stat}><h3>{label}</h3><strong className={value.length > 9 ? styles.longValue : undefined}>{value}</strong><p>{detail}</p></article>;
 }
 
 function formatCompact(value: number): string {
@@ -343,7 +343,7 @@ export default async function UsagePage() {
           </div>
           <p className={styles.sourceNote}>{market ? <>
             <a href={market.sourceUrl} target="_blank" rel="noopener noreferrer">DEX Screener</a>
-            {` · ${market.pairCount} pools · Price and market cap from the most liquid pool. Snapshot ${timestamp(market.generatedAt)}.`}
+            {` · ${market.pairCount} ${market.pairCount === 1 ? 'pool' : 'pools'} · Price and market cap from the most liquid pool. Snapshot ${timestamp(market.generatedAt)}.`}
           </> : 'Market data is temporarily unavailable.'}</p>
         </section>
 
