@@ -56,8 +56,19 @@ describe('platform dashboard rendering', () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('network error')));
     const html = renderToStaticMarkup(createElement('div', null, await UsagePage()));
     expect(html).toContain('Usage data is temporarily unavailable');
-    expect(html).toContain('On-chain burn data is temporarily unavailable');
+    expect(html).toContain('Burn transaction history is temporarily unavailable');
     expect(html).toContain('<strong>—</strong>');
     expect(html).not.toContain('<strong>0</strong>');
+  });
+
+  it('still displays verified supply and total burns when history is unavailable', async () => {
+    vi.stubGlobal('fetch', vi.fn(async (_url, options) => options?.method === 'POST'
+      ? Response.json({ result: { value: { amount: '959344785746508', decimals: 6 } } })
+      : new Response('{}', { status: 503 })));
+    const html = renderToStaticMarkup(await UsagePage());
+    expect(html).toContain('40.7M');
+    expect(html).toContain('4.07%');
+    expect(html).toContain('Supply verified on Solana');
+    expect(html).toContain('Burn transaction history is temporarily unavailable');
   });
 });
