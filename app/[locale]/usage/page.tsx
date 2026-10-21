@@ -3,6 +3,9 @@ import type { Metadata } from "next";
 import { Activity, ArrowUpRight, LockKeyhole } from "lucide-react";
 import { MarketingShell } from "@/components/marketing/v3/MarketingShell";
 import { Link } from "@/i18n/routing";
+import { HATCH_TOKEN_MINT } from '@/lib/config';
+import { loadTokenMarket } from '@/lib/token-market';
+import type { TokenBurnSummary } from '@/lib/token-burns';
 import styles from "./page.module.css";
 
 interface UsageMetric {
@@ -20,13 +23,20 @@ interface PlatformUsage {
   month: UsageMetric;
   today: UsageMetric;
   daily: Array<UsageMetric & { date: string }>;
+  activity?: {
+    monthStart: string;
+    totalUsers: number;
+    monthlyActiveUsers: number;
+    totalAgents: number;
+    monthlyActiveAgents: number;
+  } | null;
 }
 
 function pageMetadata(): Metadata {
   return {
     title: "Platform usage — Hatcher",
     description:
-      "Daily, monthly, and lifetime token volume across the Hatcher platform.",
+      "Monthly active users and agents, AI usage, and public $HATCHER market and burn statistics.",
   };
 }
 
@@ -40,6 +50,7 @@ async function loadPlatformUsage(): Promise<PlatformUsage | null> {
   try {
     const response = await fetch(`${apiUrl}/analytics/platform-usage`, {
       next: { revalidate: 300 },
+      signal: AbortSignal.timeout(8_000),
     });
     if (!response.ok) return null;
     const payload = (await response.json()) as {
@@ -50,6 +61,45 @@ async function loadPlatformUsage(): Promise<PlatformUsage | null> {
   } catch {
     return null;
   }
+}
+
+async function loadBurns(): Promise<TokenBurnSummary | null> {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.hatcher.host';
+  try {
+    const response = await fetch(`${apiUrl}/prices/hatch/burns`, {
+      next: { revalidate: 300 }, signal: AbortSignal.timeout(8_000),
+    });
+    if (!response.ok) return null;
+    const payload = await response.json();
+    const data = payload?.data;
+    return payload.success && data?.mint === HATCH_TOKEN_MINT
+      && typeof data.generatedAt === 'string' && Number.isFinite(Date.parse(data.generatedAt))
+      && Array.isArray(data.burns) && data.periodTotals ? data : null;
+  } catch {
+    return null;
+  }
+}
+
+function timestamp(value: string): string {
+  return new Date(value).toLocaleString('en', {
+    dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC',
+  }) + ' UTC';
+}
+
+function number(value: number | null | undefined): string {
+  return typeof value === 'number' && Number.isFinite(value) && value >= 0
+    ? formatCompact(value) : '—';
+}
+
+function usd(value: number | null | undefined, price = false): string {
+  return typeof value === 'number' && Number.isFinite(value) && value >= 0
+    ? new Intl.NumberFormat('en', { style: 'currency', currency: 'USD',
+      maximumSignificantDigits: price ? 5 : 4, notation: price ? 'standard' : 'compact' }).format(value)
+    : '—';
+}
+
+function Stat({ label, value, detail }: { label: string; value: string; detail: string }) {
+  return <article className={styles.stat}><h3>{label}</h3><strong>{value}</strong><p>{detail}</p></article>;
 }
 
 function formatCompact(value: number): string {
@@ -169,7 +219,11 @@ function UsageChart({ daily }: { daily: PlatformUsage["daily"] }) {
 }
 
 export default async function UsagePage() {
-  const usage = await loadPlatformUsage();
+  const [usage, market, burns] = await Promise.all([loadPlatformUsage(), loadTokenMarket(), loadBurns()]);
+  const activity = usage?.activity;
+  const currentMonth = new Date().toISOString().slice(0, 7);
+  const activityIsCurrent = activity?.monthStart.slice(0, 7) === currentMonth;
+  const supplyKnown = typeof burns?.currentSupply === 'number' && Number.isFinite(burns.currentSupply);
 
   return (
     <MarketingShell>
@@ -180,15 +234,36 @@ export default async function UsagePage() {
           </div>
           <h1>Hatcher in numbers</h1>
           <p>
-            A transparent view of aggregate token volume across the platform,
-            updated every few minutes.
+            Platform activity, AI usage, and $HATCHER statistics in one place.
+            Activity and market data update every few minutes.
           </p>
           <div className={styles.privacyNote}>
             <LockKeyhole aria-hidden="true" />
-            Aggregate counts only. Prompts, chats, users, agents, providers, and
-            costs are never exposed here.
+            Aggregate counts only. User and agent identities, prompts, chats,
+            provider details, and costs stay private.
           </div>
         </section>
+
+        <section className={styles.section} aria-labelledby="activity-title">
+          <div className={styles.chartHeader}>
+            <div><p>Calendar month · UTC</p><h2 id="activity-title">Platform activity</h2></div>
+          </div>
+          <div className={styles.statsGrid}>
+            <Stat label="Active users this month" value={number(activityIsCurrent ? activity?.monthlyActiveUsers : null)}
+              detail="Unique accounts with authenticated activity this calendar month." />
+            <Stat label="Active agents this month" value={number(activityIsCurrent ? activity?.monthlyActiveAgents : null)}
+              detail="Unique agents with a recorded AI call, assistant reply, or task run this month." />
+            <Stat label="Total users" value={number(activity?.totalUsers)} detail="Currently registered accounts." />
+            <Stat label="Total agents" value={number(activity?.totalAgents)} detail="Existing agents, including sleeping and paused. Retired agents are excluded." />
+          </div>
+          <p className={styles.sourceNote}>
+            {activity && activityIsCurrent && usage ? `Month to date, from ${timestamp(activity.monthStart)}. Updated ${timestamp(usage.generatedAt)}.`
+              : 'Monthly activity is temporarily unavailable. Missing values are shown as —.'}
+            {' '}Each user and agent is counted once. An idle running agent does not count as active.
+          </p>
+        </section>
+
+        <div className={styles.sectionHeading}><p>Input, output &amp; calls</p><h2>AI usage</h2></div>
 
         {usage ? (
           <>
@@ -250,6 +325,52 @@ export default async function UsagePage() {
             </p>
           </section>
         )}
+
+        <section className={styles.section} aria-labelledby="token-title">
+          <div className={styles.chartHeader}>
+            <div><p>Solana utility token</p><h2 id="token-title">$HATCHER market</h2></div>
+            <Link className={styles.sourceLink} href="/token">Token hub <ArrowUpRight size={15} aria-hidden /></Link>
+          </div>
+          <div className={styles.statsGrid}>
+            <Stat label="Price" value={usd(market?.priceUsd, true)} detail="USD per $HATCHER." />
+            <Stat label="Market cap" value={usd(market?.marketCapUsd)} detail="Reported by DEX Screener." />
+            <Stat label="24h volume" value={usd(market?.volume24hUsd)} detail="Across tracked HATCHER base-token pools." />
+            <Stat label="Liquidity" value={usd(market?.liquidityUsd)} detail="Across those same pools." />
+          </div>
+          <p className={styles.sourceNote}>{market ? <>
+            <a href={market.sourceUrl} target="_blank" rel="noopener noreferrer">DEX Screener</a>
+            {` · ${market.pairCount} pools · Price and market cap from the most liquid pool. Snapshot ${timestamp(market.generatedAt)}.`}
+          </> : 'Market data is temporarily unavailable.'}</p>
+        </section>
+
+        <section className={styles.section} aria-labelledby="burn-title">
+          <div className={styles.chartHeader}>
+            <div><p>On-chain supply</p><h2 id="burn-title">$HATCHER burns</h2></div>
+            <a className={styles.sourceLink} href={`https://solscan.io/token/${HATCH_TOKEN_MINT}`} target="_blank" rel="noopener noreferrer">View mint <ArrowUpRight size={15} aria-hidden /></a>
+          </div>
+          <div className={styles.statsGrid}>
+            <Stat label="Current supply" value={number(burns?.currentSupply)} detail="$HATCHER on Solana." />
+            <Stat label="Total burned" value={number(supplyKnown ? burns?.totalBurned : null)} detail="Original 1B supply minus current on-chain supply." />
+            <Stat label="Original supply burned" value={supplyKnown && typeof burns?.burnedShareOfOriginalSupply === 'number'
+              ? new Intl.NumberFormat('en', { style: 'percent', maximumFractionDigits: 2 }).format(burns.burnedShareOfOriginalSupply) : '—'} detail="Share of the original token supply." />
+            <Stat label="Burned in last 30 days" value={number(burns?.periodTotals.month)} detail="Rolling 30 days, within the scanned transaction history." />
+          </div>
+          <p className={styles.sourceNote}>{burns
+            ? `Last 24h: ${number(burns.periodTotals.day)} HATCHER · Last 7d: ${number(burns.periodTotals.week)} HATCHER. On-chain snapshot ${timestamp(burns.generatedAt)}. Burn data refreshes every 6 hours.`
+            : 'On-chain burn data is temporarily unavailable.'}</p>
+          {burns && <>
+            <h3 className={styles.feedTitle}>Recent verified burns</h3>
+            <ul className={styles.burnList}>{burns.burns.slice(0, 5).map(burn => (
+              <li key={burn.id}><span>{number(burn.amount)} HATCHER</span>
+                <span>{burn.blockTime ? timestamp(new Date(burn.blockTime * 1000).toISOString()) : 'Time unavailable'}</span>
+                <a href={`https://solscan.io/tx/${encodeURIComponent(burn.signature)}`} target="_blank" rel="noopener noreferrer">Transaction <ArrowUpRight size={14} aria-hidden /></a>
+              </li>
+            ))}</ul>
+            <p className={styles.sourceNote}>{burns.burns.length ? '' : 'No burns found in the scanned history. '}
+              Period totals and recent burns cover {number(burns.scannedTransactions)} scanned transactions and may not include all historical burns.
+            </p>
+          </>}
+        </section>
 
         <section className={styles.cta}>
           <div>
