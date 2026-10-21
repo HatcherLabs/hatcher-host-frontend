@@ -113,6 +113,11 @@
   overflow-wrap: anywhere;
   font-variant-numeric: tabular-nums;
 }
+.stat strong.longValue {
+  font-size: clamp(1.1rem, 1.8vw, 1.65rem);
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
 .stat p,
 .sourceNote {
   color: var(--text-muted);
