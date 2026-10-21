@@ -5,6 +5,7 @@ import { MarketingShell } from "@/components/marketing/v3/MarketingShell";
 import { Link } from "@/i18n/routing";
 import { HATCH_TOKEN_MINT } from '@/lib/config';
 import { loadTokenMarket } from '@/lib/token-market';
+import { loadTokenSupply } from '@/lib/token-supply';
 import type { TokenBurnSummary } from '@/lib/token-burns';
 import styles from "./page.module.css";
 
@@ -219,11 +220,14 @@ function UsageChart({ daily }: { daily: PlatformUsage["daily"] }) {
 }
 
 export default async function UsagePage() {
-  const [usage, market, burns] = await Promise.all([loadPlatformUsage(), loadTokenMarket(), loadBurns()]);
+  const [usage, market, burns, supply] = await Promise.all([
+    loadPlatformUsage(), loadTokenMarket(), loadBurns(), loadTokenSupply(),
+  ]);
   const activity = usage?.activity;
   const currentMonth = new Date().toISOString().slice(0, 7);
   const activityIsCurrent = activity?.monthStart.slice(0, 7) === currentMonth;
-  const supplyKnown = typeof burns?.currentSupply === 'number' && Number.isFinite(burns.currentSupply);
+  const onchain = supply ?? (typeof burns?.currentSupply === 'number'
+    && Number.isFinite(burns.currentSupply) && burns.currentSupply >= 0 ? burns : null);
 
   return (
     <MarketingShell>
@@ -349,15 +353,16 @@ export default async function UsagePage() {
             <a className={styles.sourceLink} href={`https://solscan.io/token/${HATCH_TOKEN_MINT}`} target="_blank" rel="noopener noreferrer">View mint <ArrowUpRight size={15} aria-hidden /></a>
           </div>
           <div className={styles.statsGrid}>
-            <Stat label="Current supply" value={number(burns?.currentSupply)} detail="$HATCHER on Solana." />
-            <Stat label="Total burned" value={number(supplyKnown ? burns?.totalBurned : null)} detail="Original 1B supply minus current on-chain supply." />
-            <Stat label="Original supply burned" value={supplyKnown && typeof burns?.burnedShareOfOriginalSupply === 'number'
-              ? new Intl.NumberFormat('en', { style: 'percent', maximumFractionDigits: 2 }).format(burns.burnedShareOfOriginalSupply) : '—'} detail="Share of the original token supply." />
+            <Stat label="Current supply" value={number(onchain?.currentSupply)} detail="$HATCHER on Solana." />
+            <Stat label="Total burned" value={number(onchain?.totalBurned)} detail="Original 1B supply minus current on-chain supply." />
+            <Stat label="Original supply burned" value={typeof onchain?.burnedShareOfOriginalSupply === 'number'
+              ? new Intl.NumberFormat('en', { style: 'percent', maximumFractionDigits: 2 }).format(onchain.burnedShareOfOriginalSupply) : '—'} detail="Share of the original token supply." />
             <Stat label="Burned in last 30 days" value={number(burns?.periodTotals.month)} detail="Rolling 30 days, within the scanned transaction history." />
           </div>
+          {onchain && <p className={styles.sourceNote}>Supply verified on Solana · Snapshot {timestamp(onchain.generatedAt)}.</p>}
           <p className={styles.sourceNote}>{burns
             ? `Last 24h: ${number(burns.periodTotals.day)} HATCHER · Last 7d: ${number(burns.periodTotals.week)} HATCHER. On-chain snapshot ${timestamp(burns.generatedAt)}. Burn data refreshes every 6 hours.`
-            : 'On-chain burn data is temporarily unavailable.'}</p>
+            : 'Burn transaction history is temporarily unavailable.'}</p>
           {burns && <>
             <h3 className={styles.feedTitle}>Recent verified burns</h3>
             <ul className={styles.burnList}>{burns.burns.slice(0, 5).map(burn => (
