@@ -1,4 +1,14 @@
 {
+  "usernameSetup": {
+    "title": "选择用户名",
+    "description": "为你的 Hatcher 账户设置专属名称。此名称会显示在个人资料和共享智能体中。",
+    "label": "用户名",
+    "format": "3–30 个字符：英文字母、数字、下划线或连字符。",
+    "continue": "保存并继续",
+    "saving": "正在保存…",
+    "signout": "退出登录",
+    "failed": "无法保存用户名，请重试。"
+  },
   "workspace": {
     "chats": "聊天",
     "agents": "智能体",

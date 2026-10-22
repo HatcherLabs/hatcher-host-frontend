@@ -168,6 +168,17 @@ function OperatorActionRow({ action, busy, onApprove, onReject }: {
   onReject: (action: OperatorActionRequest) => void;
 }) {
   const pending = action.status === 'pending';
+  const [payload, setPayload] = useState<string | null>(null);
+  const [payloadError, setPayloadError] = useState<string | null>(null);
+  const [loadingPayload, setLoadingPayload] = useState(false);
+  const review = async () => {
+    setLoadingPayload(true);
+    setPayloadError(null);
+    const response = await api.getOperatorActionPayload(action.id);
+    if (response.success) setPayload(JSON.stringify(response.data.arguments, null, 2));
+    else setPayloadError(response.error ?? 'Could not load the complete request.');
+    setLoadingPayload(false);
+  };
   return (
     <article className={styles.actionRow} data-status={action.status}>
       <div className={styles.actionIdentity}>
@@ -179,19 +190,24 @@ function OperatorActionRow({ action, busy, onApprove, onReject }: {
             <strong>{action.tool}</strong>
             <span className={styles.status} data-status={action.status}>{action.status.replace('_', ' ')}</span>
           </div>
-          <p>{action.agent.name} · {action.principalLabel}</p>
+          <p>{action.agent?.name ?? 'Hatcher account'} · {action.principalLabel}</p>
           <span className={styles.time}>{formatDate(action.createdAt)}</span>
         </div>
       </div>
       <details className={styles.payload}>
         <summary>Payload preview</summary>
-        <pre>{JSON.stringify(action.argumentsPreview, null, 2)}</pre>
-        <small>The encrypted payload is bound to this approval by SHA-256 and cannot be changed after approval.</small>
+        <pre>{payload ?? JSON.stringify(action.argumentsPreview, null, 2)}</pre>
+        <small>Review the complete request before approving. It cannot be changed after approval.</small>
       </details>
+      {!payload && <button type="button" className={styles.secondaryButton} disabled={loadingPayload} onClick={() => void review()}>
+        {loadingPayload ? 'Loading request…' : 'Review complete request'}
+      </button>}
+      {payload && <pre className={styles.payload} style={{ maxHeight: 360, overflow: 'auto', whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{payload}</pre>}
+      {payloadError && <p className={styles.failure}>{payloadError}</p>}
       {action.failureMessage && <p className={styles.failure}>{action.failureMessage}</p>}
       {pending && (
         <div className={styles.actions}>
-          <button type="button" onClick={() => onApprove(action)} disabled={busy !== null} className={styles.primaryButton}>
+          <button type="button" onClick={() => onApprove(action)} disabled={busy !== null || payload === null} className={styles.primaryButton}>
             {busy === `operator:${action.id}:approve` ? <Loader2 size={14} className={styles.spin} /> : <Check size={14} />} Approve once
           </button>
           <button type="button" onClick={() => onReject(action)} disabled={busy !== null} className={styles.rejectButton}>

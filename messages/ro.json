@@ -1,4 +1,14 @@
 {
+  "usernameSetup": {
+    "title": "Alege-ți username-ul",
+    "description": "Personalizează-ți contul Hatcher. Acest nume apare în profil și la agenții partajați.",
+    "label": "Username",
+    "format": "3–30 de caractere: litere, cifre, underscore sau cratimă.",
+    "continue": "Salvează și continuă",
+    "saving": "Se salvează…",
+    "signout": "Deconectare",
+    "failed": "Nu am putut salva username-ul. Încearcă din nou."
+  },
   "common": {
     "appName": "Hatcher",
     "tagline": "Hosting gestionat pentru agenți AI · Crypto-nativ"

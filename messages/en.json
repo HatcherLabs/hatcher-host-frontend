@@ -1,4 +1,14 @@
 {
+  "usernameSetup": {
+    "title": "Choose your username",
+    "description": "Make your Hatcher account your own. This name appears on your profile and shared agents.",
+    "label": "Username",
+    "format": "3–30 characters: letters, numbers, underscores or hyphens.",
+    "continue": "Save and continue",
+    "saving": "Saving…",
+    "signout": "Sign out",
+    "failed": "We could not save your username. Please try again."
+  },
   "common": {
     "appName": "Hatcher",
     "tagline": "Managed AI agent hosting · Crypto-native"
