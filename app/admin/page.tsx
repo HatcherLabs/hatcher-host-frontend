@@ -1,5 +1,8 @@
 'use client';
 
+import type { AdminAccountState } from '@/lib/admin-account-state';
+import { AccountBillingState } from '@/components/admin/AccountBillingState';
+
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
@@ -212,7 +215,7 @@ type AdminReferralCreditGrant = {
   expiresAt: string | null;
 };
 
-type AdminUserRow = {
+type AdminUserRow = AdminAccountState & {
   id: string;
   email: string;
   username: string;
@@ -1171,6 +1174,7 @@ export default function AdminPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [userSearchQuery, setUserSearchQuery] = useState('');
   const [userTierFilter, setUserTierFilter] = useState<string>('all');
+  const [accountKindFilter, setAccountKindFilter] = useState('all');
   const [userSortBy, setUserSortBy] = useState<'createdAt' | 'agentCount' | 'paymentCount' | 'aiCreditsBalance' | 'referralGivenCount'>('createdAt');
   const [userSortDir, setUserSortDir] = useState<'asc' | 'desc'>('desc');
   const [frameworkFilter, setFrameworkFilter] = useState<string>('all');
@@ -1183,7 +1187,7 @@ export default function AdminPage() {
   const [healthLoading, setHealthLoading] = useState(false);
 
   // ── User detail slide-over ─────────────────────────────────
-  type UserDetail = {
+  type UserDetail = AdminAccountState & {
     id: string; email: string; username: string; walletAddress: string | null;
     tier: string; isAdmin: boolean; aiCreditsBalance: number; emailVerified: boolean;
     createdAt: string;
@@ -1395,8 +1399,13 @@ export default function AdminPage() {
   const filteredUsers = useMemo(() => {
     let result = users;
 
+    if (accountKindFilter !== 'all') {
+      result = result.filter(u => accountKindFilter === 'registered'
+        ? u.accountKind !== 'ios_guest'
+        : u.accountKind === 'ios_guest' && (accountKindFilter !== 'linked' || u.guestState === 'linked'));
+    }
     if (userTierFilter !== 'all') {
-      result = result.filter((u) => u.tier === userTierFilter);
+      result = result.filter((u) => (u.effectiveTier ?? u.tier) === userTierFilter);
     }
 
     if (userSearchQuery.trim()) {
@@ -1423,7 +1432,7 @@ export default function AdminPage() {
     });
 
     return result;
-  }, [users, userTierFilter, userSearchQuery, userSortBy, userSortDir]);
+  }, [users, userTierFilter, accountKindFilter, userSearchQuery, userSortBy, userSortDir]);
 
   // ── Filtered agents with framework filter ──────────────────
   const frameworkFilteredAgents = useMemo(() => {
@@ -2008,8 +2017,8 @@ export default function AdminPage() {
                       <PieChart size={16} className="text-[#FBBF24]" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-semibold text-[var(--text-primary)]">Tier Distribution</h3>
-                      <p className="text-[10px] text-[var(--text-muted)]">{stats.totalUsers} total users</p>
+                      <h3 className="text-sm font-semibold text-[var(--text-primary)]">Stored base tiers</h3>
+                      <p className="text-[10px] text-[var(--text-muted)]">Store subscriptions appear in effective plans under Users.</p>
                     </div>
                   </div>
                   <div className="space-y-3">
@@ -2114,12 +2123,12 @@ export default function AdminPage() {
                               <Users size={12} className="text-[#A855F7]" />
                             </div>
                             <div className="min-w-0 flex-1">
-                              <p className="text-xs font-medium text-[var(--text-primary)] truncate">{u.username}</p>
-                              <p className="text-[10px] text-[var(--text-muted)] truncate">{u.email}</p>
+                              <p className="text-xs font-medium text-[var(--text-primary)] truncate">{u.accountKind === 'ios_guest' ? 'iOS Guest' : u.username}</p>
+                              <p className="text-[10px] text-[var(--text-muted)] truncate">{u.accountKind === 'ios_guest' ? u.id : u.email}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0 ml-2">
-                            <TierBadge tier={u.tier} />
+                            {u.guestState === 'linked' ? <span className="text-xs text-[var(--text-muted)]">Transferred</span> : <TierBadge tier={u.effectiveTier ?? u.tier} />}
                             <span className="text-[10px] text-[var(--text-muted)] w-16 text-right">{timeAgo(u.createdAt)}</span>
                           </div>
                         </button>
@@ -2491,6 +2500,12 @@ export default function AdminPage() {
                   </div>
                 </div>
 
+                <label className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
+                  Account type
+                  <select aria-label="Account type" value={accountKindFilter} onChange={event => setAccountKindFilter(event.target.value)} className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] px-3 py-2 text-[var(--text-primary)]">
+                    <option value="all">All accounts</option><option value="registered">Registered users</option><option value="guest">iOS guests</option><option value="linked">Linked guests</option>
+                  </select>
+                </label>
                 {/* Search */}
                 <div className="flex items-center gap-2 rounded-xl px-4 py-2.5 bg-[var(--bg-elevated)] border border-[var(--border-default)] transition-all duration-200 focus-within:border-[rgba(6,182,212,0.4)] max-w-md">
                   <Search size={16} className="text-[var(--text-muted)]" />
@@ -2525,7 +2540,7 @@ export default function AdminPage() {
                           { key: 'user', label: 'User', sortable: false },
                           { key: 'referredBy', label: 'Referred by', sortable: false },
                           { key: 'referralGivenCount', label: 'Refs', sortable: true },
-                          { key: 'tier', label: 'Tier', sortable: false },
+                          { key: 'tier', label: 'Effective plan', sortable: false },
                           { key: 'agentCount', label: 'Agents', sortable: true },
                           { key: 'paymentCount', label: 'Payments', sortable: true },
                           { key: 'aiCreditsBalance', label: 'AI Credits', sortable: true },
@@ -2566,14 +2581,15 @@ export default function AdminPage() {
                                 <span className="text-xs font-bold text-[var(--color-accent)]">{u.username[0]?.toUpperCase()}</span>
                               </div>
                               <div>
-                                <span className="text-xs font-medium text-[var(--text-primary)] block">{u.username}</span>
-                                <span className="text-[10px] text-[var(--text-muted)]">{u.email}</span>
+                                <span className="text-xs font-medium text-[var(--text-primary)] block">{u.accountKind === 'ios_guest' ? 'iOS Guest' : u.username}</span>
+                                <span className="text-[10px] text-[var(--text-muted)]">{u.accountKind === 'ios_guest' ? u.id : u.email}</span>
                               </div>
                               {u.isAdmin && (
                                 <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-400 uppercase">Admin</span>
                               )}
-                              {u.emailVerified === false && (
-                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 uppercase">Unverified</span>
+                              {u.accountKind === 'ios_guest' && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--bg-elevated)] text-[var(--text-muted)]">{u.guestState === 'linked' ? 'Linked guest' : 'Guest · no email'}</span>}
+                              {u.accountKind !== 'ios_guest' && u.emailVerified === false && (
+                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 uppercase">Email unverified</span>
                               )}
                             </div>
                           </td>
@@ -2630,7 +2646,9 @@ export default function AdminPage() {
 
                           {/* Tier */}
                           <td className="py-3.5 pr-4">
-                            <TierBadge tier={u.tier} />
+                            {u.guestState === 'linked' ? <span className="text-xs text-[var(--text-muted)]">Transferred</span> : <TierBadge tier={u.effectiveTier ?? u.tier} />}
+                            {u.applePlans?.map(p => <div key={p.productId + p.expiresAt} className="mt-1 text-[10px] text-[var(--text-muted)]">Apple confirmed · {p.environment}</div>)}
+                            {u.guestState === 'linked' && <div className="mt-1 text-[10px] text-[var(--text-muted)]">Transferred to account</div>}
                           </td>
 
                           {/* Agent count */}
@@ -3222,18 +3240,18 @@ export default function AdminPage() {
                       <div className="w-10 h-10 rounded-full bg-[var(--color-accent)]/20 flex items-center justify-center text-sm font-bold text-[var(--color-accent)]">
                         {userDetail.username[0]?.toUpperCase()}
                       </div>
-                      <div>
-                        <div className="font-semibold text-[var(--text-primary)]">{userDetail.username}</div>
-                        <div className="text-xs text-[var(--text-muted)]">{userDetail.email}</div>
+                      <div className="min-w-0">
+                        <div className="font-semibold text-[var(--text-primary)]">{userDetail.accountKind === 'ios_guest' ? 'iOS Guest' : userDetail.username}</div>
+                        <div className="text-xs text-[var(--text-muted)] break-all">{userDetail.accountKind === 'ios_guest' ? userDetail.id : userDetail.email}</div>
                       </div>
                       <div className="ml-auto flex items-center gap-1.5">
                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold border ${userDetail.emailVerified ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'}`}>
-                          {userDetail.emailVerified ? '✓ Verified' : '⚠ Unverified'}
+                          {userDetail.accountKind === 'ios_guest' ? (userDetail.guestState === 'linked' ? 'Linked guest' : 'Guest · no email') : userDetail.emailVerified ? '✓ Email verified' : '⚠ Email unverified'}
                         </span>
                       </div>
                     </div>
                     {/* Ban/Unban action */}
-                    {!userDetail.isAdmin && (
+                    {!userDetail.isAdmin && userDetail.guestState !== 'linked' && (
                       <div className="mt-3">
                         <button
                           onClick={() => handleBanUser(userDetail.id)}
@@ -3251,8 +3269,8 @@ export default function AdminPage() {
 
                     <div className="grid grid-cols-2 gap-2 text-xs mt-3">
                       <div className="p-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
-                        <div className="text-[var(--text-muted)] mb-0.5">Tier</div>
-                        <div className="font-semibold text-[var(--text-primary)]"><TierBadge tier={userDetail.tier} /></div>
+                        <div className="text-[var(--text-muted)] mb-0.5">Effective plan</div>
+                        <div className="font-semibold text-[var(--text-primary)]">{userDetail.guestState === 'linked' ? 'Transferred' : <TierBadge tier={userDetail.effectiveTier ?? userDetail.tier} />}</div>
                       </div>
                       <div className="p-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
                         <div className="text-[var(--text-muted)] mb-0.5">AI Credits</div>
@@ -3268,6 +3286,8 @@ export default function AdminPage() {
                       </div>
                     </div>
                   </div>
+
+                  <AccountBillingState account={userDetail} onOpenAccount={loadUserDetail} />
 
                   {/* Referral Activity */}
                   <div>

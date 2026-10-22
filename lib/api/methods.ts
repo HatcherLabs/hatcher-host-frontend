@@ -1,3 +1,4 @@
+import type { AdminAccountState } from '@/lib/admin-account-state';
 import type { AgentPitConnection } from './agentpit';
 // ============================================================
 // API Methods — all backend API calls
@@ -2346,7 +2347,7 @@ export const api = {
   /** Admin: list all users with agent/payment counts */
   adminGetUsers: (skip = 0, take = 2000) =>
     req<{
-      users: Array<{
+      users: Array<AdminAccountState & {
         id: string;
         email: string;
         username: string;
