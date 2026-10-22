@@ -2630,6 +2630,8 @@ export interface AdminPayment {
   userId: string;
   userEmail: string | null;
   userUsername: string | null;
+  userAccountKind?: 'registered' | 'ios_guest';
+  paymentEnvironment?: 'Sandbox' | 'Production' | null;
   agentId: string | null;
   agentName: string | null;
   agentFramework: string | null;

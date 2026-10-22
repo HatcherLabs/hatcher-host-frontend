@@ -2865,9 +2865,10 @@ export default function AdminPage() {
                             {new Date(p.createdAt).toLocaleString([], { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
                           </td>
                           <td className="py-3 pr-3 min-w-[10rem] text-[var(--text-primary)]">
-                            <div className="max-w-[18rem] break-words">
-                              {p.userUsername ? `@${p.userUsername}` : p.userEmail || p.userId || 'Unknown user'}
-                            </div>
+                            <button type="button" onClick={() => loadUserDetail(p.userId)} className="max-w-[18rem] break-words text-left underline underline-offset-2 hover:text-[var(--color-accent)]">
+                              {p.userAccountKind === 'ios_guest' ? 'iOS Guest' : p.userUsername ? `@${p.userUsername}` : p.userEmail || p.userId || 'Unknown user'}
+                            </button>
+                            {p.userAccountKind === 'ios_guest' && <div className="mt-1 max-w-[18rem] break-all text-[10px] text-[var(--text-muted)]">{p.userId}</div>}
                           </td>
                           <td className="py-3 pr-3 min-w-[10rem] text-[var(--text-primary)]">
                             <div className="max-w-[18rem] break-words">
@@ -2880,7 +2881,9 @@ export default function AdminPage() {
                           <td className="py-3 pr-3 text-[var(--text-secondary)] truncate">{formatFeatureKey(p.featureKey)}</td>
                           <td className="py-3 pr-3 text-right tabular-nums text-[var(--text-primary)]">{paymentAmount(p)}</td>
                           <td className="py-3 pr-3 text-right tabular-nums text-[var(--text-muted)] whitespace-nowrap">
-                            {p.paymentToken === 'google_play'
+                            {p.paymentToken === 'app_store'
+                              ? `App Store${p.paymentEnvironment ? ` · ${p.paymentEnvironment}` : ''}`
+                              : p.paymentToken === 'google_play'
                               ? 'Google Play'
                               : p.paymentToken === 'sol' && p.tokenAmount != null
                               ? `${p.tokenAmount.toFixed(4)} SOL`
