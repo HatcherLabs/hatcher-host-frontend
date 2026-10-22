@@ -1,4 +1,14 @@
 {
+  "usernameSetup": {
+    "title": "Wähle deinen Benutzernamen",
+    "description": "Gib deinem Hatcher-Konto einen eigenen Namen. Er erscheint in deinem Profil und bei geteilten Agenten.",
+    "label": "Benutzername",
+    "format": "3–30 Zeichen: Buchstaben, Zahlen, Unterstriche oder Bindestriche.",
+    "continue": "Speichern und weiter",
+    "saving": "Wird gespeichert…",
+    "signout": "Abmelden",
+    "failed": "Der Benutzername konnte nicht gespeichert werden. Versuche es erneut."
+  },
   "workspace": {
     "chats": "Chats",
     "agents": "Agenten",

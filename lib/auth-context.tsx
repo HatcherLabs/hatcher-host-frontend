@@ -5,11 +5,13 @@ import { api, getToken, setToken, clearToken, isAuthenticated } from './api';
 import type { AuthProfileData } from './api';
 import { clearTerminalCredentialMounts } from './terminal-credentials';
 import { logoutWithImmediateCleanup } from './logout';
+import { UsernameSetup } from '@/components/auth/UsernameSetup';
 
 interface UserProfile {
   id: string;
   email: string;
   username: string;
+  needsUsername?: boolean;
   walletAddress: string | null;
   isAdmin: boolean;
   tier: string;
@@ -50,6 +52,7 @@ function mapProfile(profile: AuthProfileData): UserProfile {
     id: profile.id,
     email: profile.email,
     username: profile.username,
+    needsUsername: profile.needsUsername ?? false,
     walletAddress: profile.walletAddress ?? null,
     isAdmin: profile.isAdmin ?? false,
     tier: profile.tier ?? 'free',
@@ -185,6 +188,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   return (
     <AuthContext.Provider value={{ isAuthenticated: authed, isLoading, error, user, login, register, logout, clearError, refreshUser }}>
       {children}
+      <UsernameSetup />
     </AuthContext.Provider>
   );
 }

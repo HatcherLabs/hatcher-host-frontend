@@ -223,6 +223,7 @@ export type AuthProfileData = {
   id: string;
   email: string;
   username: string;
+  needsUsername?: boolean;
   walletAddress: string | null;
   apiKey: string | null;
   hatchCredits: number;
@@ -3740,6 +3741,9 @@ export const api = {
   getOperatorAuthorizationRequest: (query: string) =>
     req<OperatorAuthorizationRequest>(`/oauth/authorize/request?${query}`),
 
+  getOperatorConnections: () => req<{ serverUrl: string; connections: Array<{ clientId: string; name: string; scopes: string[]; connectedAt: string }> }>('/oauth/connections'),
+  revokeOperatorConnection: (clientId: string) => req<{ disconnected: boolean }>(`/oauth/connections/${encodeURIComponent(clientId)}`, { method: 'DELETE' }),
+
   decideOperatorAuthorization: (body: Record<string, string>) =>
     req<{ redirectUrl: string }>("/oauth/authorize/decision", {
       method: "POST",
@@ -3758,6 +3762,11 @@ export const api = {
       `/agents/operator/actions${suffix ? `?${suffix}` : ""}`,
     );
   },
+
+  getOperatorActionPayload: (actionId: string) =>
+    req<{ arguments: unknown; argumentsHash: string }>(
+      `/agents/operator/actions/${encodeURIComponent(actionId)}/payload`,
+    ),
 
   approveOperatorAction: (actionId: string) =>
     req<{ action: OperatorActionRequest }>(

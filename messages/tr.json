@@ -1,4 +1,14 @@
 {
+  "usernameSetup": {
+    "title": "Kullanıcı adınızı seçin",
+    "description": "Hatcher hesabınızı kişiselleştirin. Bu ad profilinizde ve paylaşılan ajanlarda görünür.",
+    "label": "Kullanıcı adı",
+    "format": "3–30 karakter: Latin harfleri, rakamlar, alt çizgi veya kısa çizgi.",
+    "continue": "Kaydet ve devam et",
+    "saving": "Kaydediliyor…",
+    "signout": "Çıkış yap",
+    "failed": "Kullanıcı adınız kaydedilemedi. Lütfen tekrar deneyin."
+  },
   "workspace": {
     "chats": "Sohbetler",
     "agents": "Ajanlar",

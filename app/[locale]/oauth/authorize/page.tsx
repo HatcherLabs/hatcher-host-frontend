@@ -7,6 +7,7 @@ import { useRouter } from '@/i18n/routing';
 import { useAuth } from '@/lib/auth-context';
 import { api, type OperatorAuthorizationRequest } from '@/lib/api';
 import styles from './authorize.module.css';
+import { operatorScopeCopy } from '@/lib/operator-scopes';
 
 const SCOPE_COPY: Record<string, { title: string; description: string }> = {
   'hatcher:read': { title: 'View agents and usage', description: 'Read owned agent status, safe metadata, and API usage.' },
@@ -86,7 +87,7 @@ export default function OperatorAuthorizePage() {
             <div className={styles.permissions}>
               <h2>Requested access</h2>
               {request.scopes.map((scope) => {
-                const copy = SCOPE_COPY[scope] ?? { title: scope, description: 'Access requested by this client.' };
+                const copy = SCOPE_COPY[scope] ?? operatorScopeCopy(scope);
                 return <div className={styles.permission} key={scope}><Check size={15} /><div><strong>{copy.title}</strong><p>{copy.description}</p></div></div>;
               })}
             </div>

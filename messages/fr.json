@@ -1,4 +1,14 @@
 {
+  "usernameSetup": {
+    "title": "Choisissez votre nom d’utilisateur",
+    "description": "Personnalisez votre compte Hatcher. Ce nom apparaît sur votre profil et vos agents partagés.",
+    "label": "Nom d’utilisateur",
+    "format": "3 à 30 caractères : lettres, chiffres, tirets bas ou traits d’union.",
+    "continue": "Enregistrer et continuer",
+    "saving": "Enregistrement…",
+    "signout": "Se déconnecter",
+    "failed": "Impossible d’enregistrer votre nom d’utilisateur. Réessayez."
+  },
   "workspace": {
     "chats": "Discussions",
     "agents": "Agents",

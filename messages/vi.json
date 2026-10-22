@@ -1,4 +1,14 @@
 {
+  "usernameSetup": {
+    "title": "Chọn tên người dùng",
+    "description": "Cá nhân hóa tài khoản Hatcher của bạn. Tên này xuất hiện trên hồ sơ và các tác nhân được chia sẻ.",
+    "label": "Tên người dùng",
+    "format": "3–30 ký tự: chữ cái không dấu, chữ số, dấu gạch dưới hoặc gạch nối.",
+    "continue": "Lưu và tiếp tục",
+    "saving": "Đang lưu…",
+    "signout": "Đăng xuất",
+    "failed": "Không thể lưu tên người dùng. Vui lòng thử lại."
+  },
   "workspace": {
     "chats": "Trò chuyện",
     "agents": "Tác nhân",

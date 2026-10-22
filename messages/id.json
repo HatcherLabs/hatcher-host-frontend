@@ -1,4 +1,14 @@
 {
+  "usernameSetup": {
+    "title": "Pilih nama pengguna",
+    "description": "Personalisasikan akun Hatcher Anda. Nama ini tampil di profil dan agen yang dibagikan.",
+    "label": "Nama pengguna",
+    "format": "3–30 karakter: huruf, angka, garis bawah, atau tanda hubung.",
+    "continue": "Simpan dan lanjutkan",
+    "saving": "Menyimpan…",
+    "signout": "Keluar",
+    "failed": "Nama pengguna tidak dapat disimpan. Silakan coba lagi."
+  },
   "workspace": {
     "chats": "Chat",
     "agents": "Agen",

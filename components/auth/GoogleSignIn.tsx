@@ -18,25 +18,31 @@ export function GoogleSignIn({
   onBeforeRedirect?: () => void;
 }) {
   const [available, setAvailable] = useState<boolean | null>(null);
+  const [appleAvailable, setAppleAvailable] = useState(false);
   const [error, setError] = useState('');
   const [linked, setLinked] = useState(false);
   useEffect(() => {
     const controller = new AbortController();
     fetch(`${apiBase}/auth/providers`, { credentials: 'include', signal: controller.signal })
       .then((response) => response.json())
-      .then((data) => setAvailable(data.success && data.data?.google === true))
+      .then((data) => {
+        setAvailable(data.success && data.data?.google === true);
+        setAppleAvailable(intent === 'login' && data.success && data.data?.apple === true);
+      })
       .catch(() => {
         if (!controller.signal.aborted) setAvailable(false);
       });
     const code = new URLSearchParams(window.location.search).get('auth_error');
-    if (code) setError(GOOGLE_AUTH_ERRORS[code] ?? GOOGLE_AUTH_ERRORS.google_failed);
+    if (code) setError(code.startsWith('apple_')
+      ? ({ apple_unavailable: 'Apple sign-in is not available yet.', apple_link_required: 'Sign in to your existing Hatcher account and link Apple in the app.', apple_account_mismatch: 'This Apple account is connected to a different Hatcher account.' }[code] ?? 'Apple sign-in could not be completed. Please try again.')
+      : GOOGLE_AUTH_ERRORS[code] ?? GOOGLE_AUTH_ERRORS.google_failed);
     setLinked(new URLSearchParams(window.location.search).get('auth_success') === 'google_linked');
     return () => controller.abort();
-  }, [apiBase]);
-  if (!showUnavailable && available !== true && !error) return null;
+  }, [apiBase, intent]);
+  if (!showUnavailable && available !== true && !appleAvailable && !error) return null;
   return (
     <div className="mb-5">
-      <button
+      {(available === true || showUnavailable) && <button
         type="button"
         disabled={available !== true}
         className="w-full flex items-center justify-center gap-3 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] px-4 py-3 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--bg-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
@@ -63,7 +69,15 @@ export function GoogleSignIn({
           />
         </svg>
         {intent === 'link' ? 'Connect Google' : 'Continue with Google'}
-      </button>
+      </button>}
+      {appleAvailable && <button type="button"
+        className="mt-3 flex w-full items-center justify-center gap-3 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] px-4 py-3 text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-hover)]"
+        onClick={() => {
+          onBeforeRedirect?.();
+          window.location.assign(`${apiBase}/auth/apple/web/start?return=${encodeURIComponent(returnPath)}`);
+        }}>
+        <svg aria-hidden="true" width="18" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.54c.03 3.2 2.82 4.27 2.85 4.28-.02.08-.45 1.52-1.48 3.01-.9 1.29-1.83 2.58-3.29 2.61-1.43.03-1.89-.84-3.53-.84-1.64 0-2.15.81-3.5.87-1.41.05-2.48-1.4-3.38-2.69C2.88 17.14 1.47 12.32 3.36 9.07a5.24 5.24 0 0 1 4.44-2.68c1.39-.03 2.7.93 3.54.93.85 0 2.43-1.15 4.09-.98.7.03 2.65.28 3.9 2.1-.1.06-2.33 1.35-2.28 4.1ZM14.37 4.6c.75-.9 1.25-2.16 1.11-3.41-1.08.04-2.39.72-3.16 1.62-.7.8-1.32 2.08-1.16 3.3 1.2.09 2.43-.61 3.21-1.51Z" /></svg> Continue with Apple
+      </button>}
       {available === false && showUnavailable ? (
         <p className="mt-2 text-xs text-[var(--text-muted)]">
           Google sign-in is being set up. Email is available.

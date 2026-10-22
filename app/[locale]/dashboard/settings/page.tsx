@@ -446,6 +446,7 @@ export default function SettingsPage() {
           <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">{t('eyebrow')}</p>
           <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]" style={displayFont}>{t('heading')}</h1>
           <p className="text-sm mt-2 text-[var(--text-secondary)]">{t('subheading')}</p>
+          <Link href="/dashboard/settings/connections" className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-[var(--color-accent)]">Connected AI apps <ArrowRight size={14} /></Link>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6">

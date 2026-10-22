@@ -1346,7 +1346,7 @@ export interface OperatorAuthorizationRequest {
 export interface OperatorActionRequest {
   id: string;
   userId: string;
-  agentId: string;
+  agentId: string | null;
   principalId: string;
   principalLabel: string;
   tool: string;
@@ -1361,7 +1361,7 @@ export interface OperatorActionRequest {
   executedAt: string | null;
   createdAt: string;
   updatedAt: string;
-  agent: McpActionActor;
+  agent: McpActionActor | null;
 }
 
 export interface OperatorActionInboxResponse {
