@@ -77,7 +77,8 @@ export default function StudioWorkspace({
   const [tab, setTab] = useState<"create" | "library">("create");
   useEffect(() => {
     const nextKind = routeParams.get("kind");
-    if (nextKind === "image" || nextKind === "video" || nextKind === "audio") setKind(nextKind);
+    if (nextKind === "image" || nextKind === "video" || nextKind === "audio")
+      setKind(nextKind);
     setTab(routeParams.get("view") === "library" ? "library" : "create");
   }, [routeParams]);
 
@@ -103,6 +104,8 @@ export default function StudioWorkspace({
     availableModels.find((item) => item.default && item.configured) ??
     availableModels.find((item) => item.configured) ??
     availableModels[0];
+  const maxPromptChars =
+    tool?.maxPromptChars ?? (kind === "audio" ? 2000 : 4000);
   const requiredCredits =
     tool?.requiredAiCredits ?? tool?.estimatedAiCredits ?? Infinity;
   const mode = MODES.find((item) => item.id === kind)!;
@@ -158,6 +161,7 @@ export default function StudioWorkspace({
       locked.current ||
       !tool?.configured ||
       !prompt.trim() ||
+      prompt.trim().length > maxPromptChars ||
       !model ||
       guest
     )
@@ -200,7 +204,7 @@ export default function StudioWorkspace({
       setError(
         `${(e as Error).message} Check your library before starting another generation.`,
       );
-      await reloadLibrary().catch(() => undefined);
+      await Promise.allSettled([reloadLibrary(), reloadBalance()]);
     } finally {
       locked.current = false;
       setBusy(false);
@@ -344,7 +348,7 @@ export default function StudioWorkspace({
               </label>
               <textarea
                 id="studio-prompt"
-                maxLength={kind === "audio" ? 2000 : 4000}
+                maxLength={maxPromptChars}
                 value={prompt}
                 disabled={busy}
                 onChange={(event) => setPrompt(event.target.value)}
@@ -354,7 +358,10 @@ export default function StudioWorkspace({
                 <button disabled={busy} onClick={() => setPrompt(mode.prompt)}>
                   Try an example
                 </button>
-                <span>{prompt.length.toLocaleString()} / 4,000</span>
+                <span>
+                  {prompt.length.toLocaleString()} /{" "}
+                  {maxPromptChars.toLocaleString()}
+                </span>
               </div>
               <div className={styles.settings}>
                 <label htmlFor="generation-model">Generation model</label>
@@ -393,6 +400,18 @@ export default function StudioWorkspace({
                   </select>
                 )}
               </div>
+              {kind === "audio" && (
+                <p className={styles.hint}>
+                  Choose Clip for 30 seconds or Pro for a full song. Include
+                  musical style and original lyrics. Failed requests are not
+                  retried automatically.
+                </p>
+              )}
+              {prompt.length > maxPromptChars && (
+                <p role="alert">
+                  Shorten the prompt or choose a model with a larger limit.
+                </p>
+              )}
               {tool?.description && (
                 <p className={styles.hint}>{tool.description}</p>
               )}
@@ -444,6 +463,7 @@ export default function StudioWorkspace({
                     Boolean(checking) ||
                     !tool?.configured ||
                     !prompt.trim() ||
+                    prompt.trim().length > maxPromptChars ||
                     !model ||
                     balance < requiredCredits
                   }
