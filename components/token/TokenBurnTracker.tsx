@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Activity, Clock, ExternalLink, Flame, RefreshCw } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { TokenBurnSummary } from '@/lib/token-burns';
+import { isTokenBurnSummary } from '@/lib/token-burn-summary';
 
 type BurnTrackerState = {
   data: TokenBurnSummary | null;
@@ -30,11 +31,11 @@ export function TokenBurnTracker() {
     }));
 
     try {
-      const response = await fetch(`/api/token/burns${refresh ? `?refresh=${Date.now()}` : ''}`, {
-        cache: 'no-store',
+      const response = await fetch(`/api/token/burns?tracker=2${refresh ? `&refresh=${Date.now()}` : ''}`, {
+        cache: 'no-store', signal: AbortSignal.timeout(10_000),
       });
       const payload = await response.json();
-      if (!response.ok) {
+      if (!response.ok || !isTokenBurnSummary(payload)) {
         throw new Error(payload?.message ?? 'Burn tracker unavailable');
       }
       setState({
@@ -67,7 +68,7 @@ export function TokenBurnTracker() {
       },
       {
         label: t('burnsTxLabel'),
-        value: data ? data.burnCount.toLocaleString() : '-',
+        value: data && (data.burnCount > 0 || data.historyComplete !== false) ? data.burnCount.toLocaleString() : '—',
         helper: t('burnsTxHelper', { count: data?.scannedTransactions ?? 0 }),
       },
       {
@@ -79,7 +80,7 @@ export function TokenBurnTracker() {
       },
       {
         label: t('burnsLatestLabel'),
-        value: data?.latestBurnAt ? formatRelativeDate(data.latestBurnAt) : t('burnsNoBurnsShort'),
+        value: data?.latestBurnAt ? formatRelativeDate(data.latestBurnAt) : !data || data.historyComplete === false ? '—' : t('burnsNoBurnsShort'),
         helper: data?.generatedAt ? t('burnsUpdated', { time: formatDateTime(data.generatedAt) }) : t('burnsUpdating'),
       },
     ];
@@ -122,7 +123,7 @@ export function TokenBurnTracker() {
         </div>
 
         {state.error && (
-          <div className="mb-6 rounded-[4px] border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+          <div className="mb-6 rounded-[4px] border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-[var(--text-primary)]">
             {t('burnsError')}
           </div>
         )}
@@ -162,9 +163,9 @@ export function TokenBurnTracker() {
               </h3>
             </div>
             <div className="mt-5 space-y-4">
-              <PeriodRow label={t('burns24h')} value={periodTotals?.day ?? 0} max={maxPeriodTotal(periodTotals)} />
-              <PeriodRow label={t('burns7d')} value={periodTotals?.week ?? 0} max={maxPeriodTotal(periodTotals)} />
-              <PeriodRow label={t('burns30d')} value={periodTotals?.month ?? 0} max={maxPeriodTotal(periodTotals)} />
+              <PeriodRow label={t('burns24h')} value={periodTotals?.day ?? null} max={maxPeriodTotal(periodTotals)} />
+              <PeriodRow label={t('burns7d')} value={periodTotals?.week ?? null} max={maxPeriodTotal(periodTotals)} />
+              <PeriodRow label={t('burns30d')} value={periodTotals?.month ?? null} max={maxPeriodTotal(periodTotals)} />
             </div>
             <p className="mt-5 text-xs leading-relaxed text-[var(--text-tertiary)]">
               {t('burnsSourceNote')}
@@ -233,7 +234,7 @@ export function TokenBurnTracker() {
                 ))
               ) : (
                 <div className="p-8 text-center">
-                  <p className="text-sm font-medium text-[var(--text-primary)]">{t('burnsNoBurns')}</p>
+                  <p className="text-sm font-medium text-[var(--text-primary)]">{!state.data || state.data.historyComplete === false ? t('burnsError') : t('burnsNoBurns')}</p>
                   <p className="mt-2 text-xs leading-relaxed text-[var(--text-tertiary)]">
                     {t('burnsNoBurnsBody')}
                   </p>
@@ -247,8 +248,8 @@ export function TokenBurnTracker() {
   );
 }
 
-function PeriodRow({ label, value, max }: { label: string; value: number; max: number }) {
-  const width = max > 0 ? Math.max(5, Math.round((value / max) * 100)) : 0;
+function PeriodRow({ label, value, max }: { label: string; value: number | null; max: number }) {
+  const width = value !== null && max > 0 ? Math.max(5, Math.round((value / max) * 100)) : 0;
   return (
     <div>
       <div className="mb-2 flex items-center justify-between gap-3 text-xs">
@@ -272,11 +273,11 @@ function PeriodRow({ label, value, max }: { label: string; value: number; max: n
 
 function maxPeriodTotal(periodTotals: TokenBurnSummary['periodTotals'] | undefined): number {
   if (!periodTotals) return 0;
-  return Math.max(periodTotals.day, periodTotals.week, periodTotals.month);
+  return Math.max(periodTotals.day ?? 0, periodTotals.week ?? 0, periodTotals.month ?? 0);
 }
 
-function formatTokenAmount(value: number): string {
-  if (!Number.isFinite(value)) return '0';
+function formatTokenAmount(value: number | null): string {
+  if (value === null || !Number.isFinite(value)) return '—';
   return new Intl.NumberFormat('en-US', {
     maximumFractionDigits: value >= 1_000 ? 0 : 3,
   }).format(value);

@@ -45,7 +45,7 @@ jobs:
         run: ./scripts/test-service-isolation-permissions.sh
 
       - name: Test public platform dashboard and token data
-        run: npm test -- __tests__/platform-dashboard.test.ts __tests__/platform-usage-page.test.ts __tests__/token-market-route.test.ts
+        run: npm test -- __tests__/platform-dashboard.test.ts __tests__/platform-usage-page.test.ts __tests__/token-market-route.test.ts __tests__/token-burns.test.ts __tests__/token-burn-api.test.ts
 
       - name: Test search metadata and tutorial schema
         run: npm test -- __tests__/seo.test.ts __tests__/tutorials.test.ts

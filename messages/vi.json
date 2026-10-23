@@ -2069,7 +2069,7 @@
     "burnBadge": "10% của mỗi khoản thanh toán $HATCHER được đốt trên chuỗi trong cùng một giao dịch.",
     "burnsEyebrow": "Bỏng trên dây chuyền",
     "burnsHeading": "Trình theo dõi vết bỏng",
-    "burnsBody": "Dữ liệu ghi trực tiếp được tính toán từ hướng dẫn ghi Solana Token-2022 cho xưởng đúc $HATCHER. Trình theo dõi làm mới trên chuỗi cứ sau 6 giờ hoặc khi bạn yêu cầu làm mới thủ công.",
+    "burnsBody": "Các giao dịch đốt được xác minh on-chain từ thanh toán $HATCHER và quá trình quét giới hạn ví đốt. Lịch sử có thể chưa đầy đủ. Dữ liệu mới có khoảng mỗi phút; hãy làm mới để tải dữ liệu mới nhất.",
     "burnsRefresh": "Làm mới trên chuỗi",
     "burnsRefreshing": "Làm mới",
     "burnsError": "Dữ liệu ghi tạm thời không khả dụng. Ảnh chụp nhanh được lưu trong bộ nhớ đệm cuối cùng sẽ được hiển thị khi có sẵn.",

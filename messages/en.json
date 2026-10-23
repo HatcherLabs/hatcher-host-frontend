@@ -2033,7 +2033,7 @@
     "burnBadge": "10% of every $HATCHER payment is burned on-chain, in the same transaction.",
     "burnsEyebrow": "On-chain burns",
     "burnsHeading": "Burn Tracker",
-    "burnsBody": "Live burn data is calculated from Solana Token-2022 burn instructions for the $HATCHER mint. The tracker refreshes on-chain every 6 hours, or when you request a manual refresh.",
+    "burnsBody": "Verified on-chain burns from $HATCHER payments and a bounded burn-wallet scan. History may be incomplete. New snapshots are available approximately every minute; refresh to load the latest.",
     "burnsRefresh": "Refresh on-chain",
     "burnsRefreshing": "Refreshing",
     "burnsError": "Burn data is temporarily unavailable. The last cached snapshot will be shown when available.",
