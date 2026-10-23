@@ -2069,7 +2069,7 @@
     "burnBadge": "El 10% de cada pago de $HATCHER se quema en la cadena, en la misma transacción.",
     "burnsEyebrow": "Quemaduras en cadena",
     "burnsHeading": "Rastreador de quemaduras",
-    "burnsBody": "Los datos de grabación en vivo se calculan a partir de las instrucciones de grabación de Solana Token-2022 para $HATCHER mint. El rastreador se actualiza en cadena cada 6 horas o cuando solicita una actualización manual.",
+    "burnsBody": "Burns verificados on-chain de pagos en $HATCHER y un análisis limitado de la cartera de burn. El historial puede estar incompleto. Hay nuevos datos aproximadamente cada minuto; actualiza para cargarlos.",
     "burnsRefresh": "Actualizar en cadena",
     "burnsRefreshing": "refrescante",
     "burnsError": "Los datos de grabación no están disponibles temporalmente. La última instantánea almacenada en caché se mostrará cuando esté disponible.",

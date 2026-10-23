@@ -2033,7 +2033,7 @@
     "burnBadge": "10% din fiecare plată $HATCHER este ars on-chain, în aceeași tranzacție.",
     "burnsEyebrow": "Burn-uri on-chain",
     "burnsHeading": "Burn Tracker",
-    "burnsBody": "Datele live despre burn-uri sunt calculate din instrucțiunile Solana Token-2022 burn pentru mint-ul $HATCHER. Trackerul se actualizează on-chain la fiecare 6 ore sau când ceri refresh manual.",
+    "burnsBody": "Burn-uri verificate on-chain din plățile $HATCHER și o scanare limitată a portofelului de burn. Istoricul poate fi incomplet. Date noi sunt disponibile aproximativ la fiecare minut; apasă refresh pentru ultima actualizare.",
     "burnsRefresh": "Refresh on-chain",
     "burnsRefreshing": "Se actualizează",
     "burnsError": "Datele despre burn-uri sunt temporar indisponibile. Ultimul snapshot cached va fi afișat când există.",

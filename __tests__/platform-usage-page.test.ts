@@ -22,9 +22,9 @@ function mockData(monthStart = '2026-10-01T00:00:00.000Z') {
     } });
     if (url.includes('/burns')) return Response.json({ success: true, data: {
       mint: HATCH_TOKEN_MINT, generatedAt: '2026-10-21T10:00:00.000Z', currentSupply: 900_000_000,
-      totalBurned: 100_000_000, burnedShareOfOriginalSupply: 0.1, scannedTransactions: 50,
+      totalBurned: 100_000_000, burnedShareOfOriginalSupply: 0.1, scannedTransactions: 50, burnCount: 1,
       periodTotals: { day: 100, week: 200, month: 300 }, burns: [{ id: 'burn',
-        signature: 'verified-signature', amount: 100, blockTime: 1792576800 }],
+        signature: 'verified-signature', explorerUrl: 'https://solscan.io/tx/verified-signature', amount: 100, blockTime: 1792576800 }],
     } });
     return Response.json([]);
   }));

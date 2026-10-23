@@ -7,6 +7,7 @@ import { HATCH_TOKEN_MINT } from '@/lib/config';
 import { loadTokenMarket } from '@/lib/token-market';
 import { loadTokenSupply } from '@/lib/token-supply';
 import type { TokenBurnSummary } from '@/lib/token-burns';
+import { isTokenBurnSummary } from '@/lib/token-burn-summary';
 import styles from "./page.module.css";
 
 interface UsageMetric {
@@ -67,15 +68,13 @@ async function loadPlatformUsage(): Promise<PlatformUsage | null> {
 async function loadBurns(): Promise<TokenBurnSummary | null> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.hatcher.host';
   try {
-    const response = await fetch(`${apiUrl}/prices/hatch/burns`, {
-      next: { revalidate: 300 }, signal: AbortSignal.timeout(8_000),
+    const response = await fetch(`${apiUrl}/prices/hatch/burns?tracker=2`, {
+      next: { revalidate: 60 }, signal: AbortSignal.timeout(8_000),
     });
     if (!response.ok) return null;
     const payload = await response.json();
     const data = payload?.data;
-    return payload.success && data?.mint === HATCH_TOKEN_MINT
-      && typeof data.generatedAt === 'string' && Number.isFinite(Date.parse(data.generatedAt))
-      && Array.isArray(data.burns) && data.periodTotals ? data : null;
+    return payload.success && isTokenBurnSummary(data) ? data : null;
   } catch {
     return null;
   }
@@ -361,7 +360,7 @@ export default async function UsagePage() {
           </div>
           {onchain && <p className={styles.sourceNote}>Supply verified on Solana · Snapshot {timestamp(onchain.generatedAt)}.</p>}
           <p className={styles.sourceNote}>{burns
-            ? `Last 24h: ${number(burns.periodTotals.day)} HATCHER · Last 7d: ${number(burns.periodTotals.week)} HATCHER. On-chain snapshot ${timestamp(burns.generatedAt)}. Burn data refreshes every 6 hours.`
+            ? `Last 24h: ${number(burns.periodTotals.day)} HATCHER · Last 7d: ${number(burns.periodTotals.week)} HATCHER. On-chain snapshot ${timestamp(burns.generatedAt)}. Burn data refreshes approximately every minute.`
             : 'Burn transaction history is temporarily unavailable.'}</p>
           {burns && <>
             <h3 className={styles.feedTitle}>Recent verified burns</h3>
@@ -371,7 +370,7 @@ export default async function UsagePage() {
                 <a href={`https://solscan.io/tx/${encodeURIComponent(burn.signature)}`} target="_blank" rel="noopener noreferrer">Transaction <ArrowUpRight size={14} aria-hidden /></a>
               </li>
             ))}</ul>
-            <p className={styles.sourceNote}>{burns.burns.length ? '' : 'No burns found in the scanned history. '}
+            <p className={styles.sourceNote}>{burns.burns.length ? '' : burns.historyComplete === false ? 'Burn history is still being verified. ' : 'No burns found in the scanned history. '}
               Period totals and recent burns cover {number(burns.scannedTransactions)} scanned transactions and may not include all historical burns.
             </p>
           </>}

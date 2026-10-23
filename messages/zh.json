@@ -2069,7 +2069,7 @@
     "burnBadge": "每笔 $HATCHER 付款的10%在同一笔交易中链上销毁。",
     "burnsEyebrow": "链上销毁",
     "burnsHeading": "销毁追踪器",
-    "burnsBody": "实时销毁数据来自 $HATCHER mint 的 Solana Token-2022 burn 指令。追踪器每6小时链上刷新一次，也可以手动刷新。",
+    "burnsBody": "来自 $HATCHER 支付和销毁钱包有限扫描的链上已验证销毁记录。历史记录可能不完整。约每分钟提供新的数据快照；请刷新以加载最新数据。",
     "burnsRefresh": "链上刷新",
     "burnsRefreshing": "正在刷新",
     "burnsError": "销毁数据暂时不可用。如有缓存快照，将显示最近一次缓存。",

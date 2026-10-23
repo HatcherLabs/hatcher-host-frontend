@@ -2069,7 +2069,7 @@
     "burnBadge": "10% dari setiap pembayaran $HATCHER dibakar secara on-chain, dalam transaksi yang sama.",
     "burnsEyebrow": "Luka bakar pada rantai",
     "burnsHeading": "Pelacak Pembakaran",
-    "burnsBody": "Data pembakaran langsung dihitung dari instruksi pembakaran Solana Token-2022 untuk mint $HATCHER. Pelacak menyegarkan secara on-chain setiap 6 jam, atau saat Anda meminta penyegaran manual.",
+    "burnsBody": "Pembakaran terverifikasi on-chain dari pembayaran $HATCHER dan pemindaian terbatas dompet pembakaran. Riwayat mungkin tidak lengkap. Data baru tersedia sekitar setiap menit; segarkan untuk memuatnya.",
     "burnsRefresh": "Segarkan secara on-chain",
     "burnsRefreshing": "Menyegarkan",
     "burnsError": "Data pembakaran untuk sementara tidak tersedia. Snapshot cache terakhir akan ditampilkan bila tersedia.",

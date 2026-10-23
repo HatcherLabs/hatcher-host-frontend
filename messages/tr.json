@@ -2069,7 +2069,7 @@
     "burnBadge": "Her $HATCHER ödemenin %10'u aynı işlemde zincir üzerinde yakılır.",
     "burnsEyebrow": "Zincir üzerinde yanıklar",
     "burnsHeading": "Yanık İzleyici",
-    "burnsBody": "Canlı yanma verisi, $HATCHER darphanesi için Solana Token-2022 yanma talimatlarından hesaplanır. İzleyici, zincir üzerinde her 6 saatte bir yeniliyor ya da manuel yenileme talep ettiğinizde.",
+    "burnsBody": "$HATCHER ödemelerinden ve yakım cüzdanının sınırlı taramasından zincir üzerinde doğrulanmış yakımlar. Geçmiş eksik olabilir. Yeni veriler yaklaşık her dakika kullanılabilir; yüklemek için yenileyin.",
     "burnsRefresh": "Zincirde yenileme",
     "burnsRefreshing": "Ferahlatıcı",
     "burnsError": "Yanma verileri geçici olarak erişilebilir değildir. Son önbelleklenmiş anlık fotoğraf mevcut olduğunda gösterilecektir.",
