@@ -15,7 +15,7 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { TIERS, TIER_ORDER, ADDONS } from '@hatcher/shared';
-import type { UserTierKey, AddonKey } from '@hatcher/shared';
+import type { UserTierKey, AddonKey, TierConfig } from '@hatcher/shared';
 import { usePaymentDrivers } from '@/lib/payment-drivers';
 import { ConfirmPaymentModal } from '@/components/payments/ConfirmPaymentModal';
 import { ChatPlansOverview } from '@/components/chat/ChatPlansOverview';
@@ -94,11 +94,8 @@ const AI_CREDITS_BY_TIER: Record<UserTierKey, number> = {
   founding_member: 25000,
 };
 
-// Displayed resource numbers per tier. Kept local (not read from @hatcher/shared
-// TIERS) because the shared package can lag behind runtime capacity changes —
-// e.g. business is 4 CPU / 6144 MB since 2026-07 (and founding_member matched
-// it at 4 / 6144 on 2026-07-29), while the published package still says the
-// old numbers until its next release.
+// Fallback if the live catalog is unavailable. The API catalog takes precedence
+// so temporary runtime headroom and later capacity changes appear automatically.
 const TIER_RESOURCE_OVERRIDES: Record<UserTierKey, { includedAgents: number; cpuLimit: number; memoryMb: number; storageMb: number; autoSleep: boolean; autoSleepMinutes: number; fileManager: boolean; fullLogs: boolean }> = {
   free: { includedAgents: 1, cpuLimit: 1, memoryMb: 1024, storageMb: 2048, autoSleep: true, autoSleepMinutes: 720, fileManager: true, fullLogs: true },
   starter: { includedAgents: 1, cpuLimit: 1, memoryMb: 1536, storageMb: 10240, autoSleep: false, autoSleepMinutes: 0, fileManager: true, fullLogs: true },
@@ -480,6 +477,7 @@ export default function BillingPage() {
   } = usePaymentDrivers();
 
   const [accountData, setAccountData] = useState<AccountFeatures | null>(null);
+  const [tierCatalog, setTierCatalog] = useState<Record<string, TierConfig>>({});
   const [capacitySummary, setCapacitySummary] = useState<CapacityAddonsSummaryResponse | null>(null);
   const [foundingInfo, setFoundingInfo] = useState<{ maxSlots: number; taken: number; remaining: number } | null>(null);
   const [payments, setPayments] = useState<Payment[]>([]);
@@ -635,7 +633,10 @@ export default function BillingPage() {
     if (balRes.success) setAiCreditBalance(balRes.data.balance);
     if (payRes.success) setPayments(payRes.data.payments);
     if (histRes.success) setAiCreditHistory(histRes.data.usage);
-    if (catalogRes.success) setFoundingInfo(catalogRes.data.founding);
+    if (catalogRes.success) {
+      setFoundingInfo(catalogRes.data.founding);
+      setTierCatalog(catalogRes.data.tiers);
+    }
     if (recurringRes.success) setRecurringAuthorizations(recurringRes.data.authorizations);
     if (agentsRes.success && agentsRes.data) {
       const agents = (agentsRes.data as unknown as Array<{ id: string; name: string }>);
@@ -811,7 +812,10 @@ export default function BillingPage() {
         const agents = (agentsRes.data as unknown as Array<{ id: string; name: string }>);
         setUserAgents(agents.map(a => ({ id: a.id, name: a.name })));
       }
-      if (catalogRes.success) setFoundingInfo(catalogRes.data.founding);
+      if (catalogRes.success) {
+        setFoundingInfo(catalogRes.data.founding);
+        setTierCatalog(catalogRes.data.tiers);
+      }
       if (recurringRes.success) setRecurringAuthorizations(recurringRes.data.authorizations);
       if (!acctRes.success) setError(acctRes.error ?? 'Failed to load account');
       setLoading(false);
@@ -2206,7 +2210,7 @@ export default function BillingPage() {
             <div className="grid sm:grid-cols-2 gap-4">
               {TIER_ORDER.filter(k => k !== 'free' && TIER_ORDER.indexOf(k) > TIER_ORDER.indexOf(currentTier)).map((tierKey) => {
                 const tier = TIERS[tierKey];
-                const tierResources = TIER_RESOURCE_OVERRIDES[tierKey];
+                const tierResources = tierCatalog[tierKey] ?? TIER_RESOURCE_OVERRIDES[tierKey];
                 const isSubscribing = subscribing === tierKey;
 
                 return (
