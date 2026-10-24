@@ -1,17 +1,19 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
+import dynamic from 'next/dynamic';
 import { Bot, Brain, Menu, Phone, Volume2, VolumeX, Wrench } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { FRAMEWORKS, type AgentFramework } from '@hatcher/shared';
 import type { ActiveModelDisplay } from '@/lib/hosted-model-catalog';
 import { FRAMEWORK_BADGE } from '../../AgentContext';
+const RuntimeHistoryDialog = dynamic(() => import('./RuntimeHistoryDialog'), { ssr: false });
 
 interface ChatHeaderProps {
   unified?: boolean;
   simple?: boolean;
   compact?: boolean;
-  agent: { framework: AgentFramework };
+  agent: { framework: AgentFramework; id?: string };
   wsConnected: boolean;
   hasVoiceSupport: boolean;
   sttSupported: boolean;
@@ -54,6 +56,7 @@ export function ChatHeader({
 }: ChatHeaderProps) {
   const t = useTranslations('dashboard.agentDetail.chat');
   const frameworkMeta = FRAMEWORKS[agent.framework];
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-2 mb-2 px-1">
@@ -89,6 +92,8 @@ export function ChatHeader({
         </button>))}
       </div>
       <div className="flex items-center gap-2">
+        {isAuthenticated && agent.id && ['hermes', 'openclaw'].includes(agent.framework) && <button type="button" onClick={() => setHistoryOpen(true)} className="rounded-full border border-[var(--border-default)] px-2.5 py-1 text-[10px] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]">Full history</button>}
+        {historyOpen && agent.id && <RuntimeHistoryDialog agentId={agent.id} onClose={() => setHistoryOpen(false)} />}
         {!simple && <><button
           type="button"
           onClick={onToggleThinking}
