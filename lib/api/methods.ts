@@ -2961,6 +2961,9 @@ export const api = {
     ),
 
   /** Load one page of saved history; cursors are opaque server values. */
+  getRuntimeHistory: (agentId: string, options: { sessionId?: string; cursor?: string; search?: string } = {}) =>
+    req<import('@/lib/runtime-history').RuntimeHistoryPage>(`/agents/${agentId}/runtime/history?${new URLSearchParams(options)}`),
+
   getChatHistory: (agentId: string, sessionId?: string, cursor?: string) =>
     req<{
       messages: Array<{ id?: string; role: string; content: string; ts: number; metadata?: unknown }>;
