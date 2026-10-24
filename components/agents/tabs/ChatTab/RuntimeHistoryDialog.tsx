@@ -84,13 +84,13 @@ export default function RuntimeHistoryDialog({ agentId, onClose }: { agentId: st
   }
 
   return <dialog ref={dialog} onCancel={onClose} onClose={onClose} aria-labelledby="runtime-history-title"
-    className="fixed inset-0 m-auto h-[90dvh] w-[96vw] max-w-6xl overflow-hidden rounded-2xl border border-[var(--border-default)] bg-[var(--bg-primary)] p-0 text-[var(--text-primary)] shadow-xl backdrop:bg-black/50">
+    className="fixed inset-0 m-auto h-[90dvh] w-[96vw] max-w-6xl overflow-hidden rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface)] p-0 text-[var(--text-primary)] shadow-xl backdrop:bg-black/50">
     <div className="flex h-full flex-col">
       <header className="flex items-start justify-between gap-4 border-b border-[var(--border-default)] p-4">
         <div><h2 id="runtime-history-title" className="font-semibold">Full history</h2><p className="mt-1 text-xs text-[var(--text-muted)]">Saved messages, analysis and tool results. Reading history does not run the agent.</p></div>
         <button type="button" onClick={onClose} aria-label="Close full history" className="rounded-lg p-2 hover:bg-[var(--bg-elevated)]"><X size={18} /></button>
       </header>
-      {error && <p role="alert" className="border-b border-[var(--border-default)] p-3 text-sm text-[var(--color-error)]">{error}</p>}
+      {error && <p role="alert" className="border-b border-[var(--border-default)] p-3 text-sm text-[var(--color-destructive)]">{error}</p>}
       <div className="flex min-h-0 flex-1">
         <aside className={`${selected ? 'hidden md:flex' : 'flex'} w-full flex-col border-r border-[var(--border-default)] md:w-72 md:shrink-0`}>
           <form className="flex gap-2 p-3" onSubmit={event => { event.preventDefault(); search.current = query; void loadSessions(); }}>
