@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { AppWindow, BarChart3, BookOpen, Brain, ChevronDown, FileText, Folder, LayoutDashboard, ListChecks, Mail, MessageSquare, Network, Plug, Settings, ShieldCheck, Terminal, Wallet, type LucideIcon } from "lucide-react";
+import { Archive, AppWindow, BarChart3, BookOpen, Brain, ChevronDown, FileText, Folder, LayoutDashboard, ListChecks, Mail, MessageSquare, Network, Plug, Settings, ShieldCheck, Terminal, Wallet, type LucideIcon } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { Link } from "@/i18n/routing";
 import { WorkspacePortal } from "@/components/workspace/WorkspacePortal";
@@ -10,7 +10,7 @@ import styles from "@/components/workspace/WorkspaceShell.module.css";
 import { buildAgentNavigationTabs, agentDesktopHref, EASY_AGENT_TABS } from "./navigationModel";
 import { useAgentContext, type Tab } from "./AgentContext";
 
-const ICONS: Partial<Record<Tab, LucideIcon>> = { chat:MessageSquare, overview:LayoutDashboard, files:Folder, knowledge:BookOpen, integrations:Plug, config:Settings, logs:FileText, terminal:Terminal, wallet:Wallet, mail:Mail, stats:BarChart3, connectors:Network, schedules:ListChecks };
+const ICONS: Partial<Record<Tab, LucideIcon>> = { backups:Archive, chat:MessageSquare, overview:LayoutDashboard, files:Folder, knowledge:BookOpen, integrations:Plug, config:Settings, logs:FileText, terminal:Terminal, wallet:Wallet, mail:Mail, stats:BarChart3, connectors:Network, schedules:ListChecks };
 const PRIMARY: Tab[] = ["chat", "overview", "files", "knowledge", "integrations", "agentpit"];
 
 export function AgentWorkspaceTabs() {

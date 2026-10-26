@@ -47,6 +47,7 @@ const AGENT_NAVIGATION: AgentNavigationSpec[] = [
   { id: 'robinhood', group: 'assets' },
   { id: 'agentpit', group: 'assets', frameworks: ['openclaw', 'hermes', 'ironclaw', 'custom'] },
   { id: 'files', group: 'assets' },
+  { id: 'backups', group: 'assets', frameworks: ['openclaw', 'hermes', 'ironclaw'] },
   { id: 'memory', group: 'assets', frameworks: ['openclaw', 'hermes', 'ironclaw', 'custom'] },
   { id: 'sessions', group: 'assets', frameworks: ['openclaw'] },
   { id: 'terminal', group: 'advanced' },

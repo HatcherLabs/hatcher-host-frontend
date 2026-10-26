@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import NextLink from "next/link";
 import { useTranslations } from "next-intl";
-import { ArrowLeft, BarChart3, Bot, ChevronDown, ChevronRight, Compass, CreditCard, Globe, HelpCircle, ListChecks, LogIn, LogOut, Menu, MessageSquare, Network, PanelLeftClose, PanelLeftOpen, Plus, Search, Send, Settings, ShieldCheck, WandSparkles, X, type LucideIcon } from "lucide-react";
+import { Archive, ArrowLeft, BarChart3, Bot, ChevronDown, ChevronRight, Compass, CreditCard, Globe, HelpCircle, ListChecks, LogIn, LogOut, Menu, MessageSquare, Network, PanelLeftClose, PanelLeftOpen, Plus, Search, Send, Settings, ShieldCheck, WandSparkles, X, type LucideIcon } from "lucide-react";
 import { Link, usePathname, useRouter } from "@/i18n/routing";
 import { APP_STORE_URL, GOOGLE_PLAY_URL } from "@/lib/mobile-app-links";
 import { loginHrefForReturn } from "@/lib/safe-redirect";
@@ -37,6 +37,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
   const params = useSearchParams();
   const router = useRouter();
   const t = useTranslations("workspace");
+  const backups = useTranslations("agentBackups");
   const u = useTranslations("unifiedWorkspace");
   const entry = useTranslations("chatEntry");
   const mobile = useTranslations("landingV3.hero");
@@ -191,7 +192,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
     canvas: [{ label: t("canvasImages"), href: "/?mode=canvas&kind=image" }, { label: t("canvasVideo"), href: "/?mode=canvas&kind=video" }, { label: t("canvasAudio"), href: "/?mode=canvas&kind=audio" }, { label: t("canvasLibrary"), href: "/?mode=canvas&view=library" }],
     missions: [{ label: t("allMissions"), href: "/dashboard/missions", Icon: ListChecks }, { label: t("approvals"), href: "/dashboard/approvals", Icon: ShieldCheck }, { label: u("automations"), href: "/dashboard/automations" }],
     plans: [{ label: t("comparePlans"), href: "/pricing" }, ...(isAuthenticated ? [{ label: t("subscription"), href: "/dashboard/billing#subscription" }, { label: "AI Credits", href: "/dashboard/billing#ai-credits" }, { label: t("addons"), href: "/dashboard/billing#addons" }, { label: t("payments"), href: "/dashboard/billing#payments" }] : [])],
-    settings: [{ label: t("account"), href: "/dashboard/settings" }, { label: t("apiKeys"), href: "/dashboard/settings/api-keys" }, ...(user?.isAdmin ? [{ label: "Admin", href: "/admin" }] : [])],
+    settings: [{ label: backups("title"), href: "/dashboard/backups", Icon: Archive }, { label: t("account"), href: "/dashboard/settings" }, { label: t("apiKeys"), href: "/dashboard/settings/api-keys" }, ...(user?.isAdmin ? [{ label: "Admin", href: "/admin" }] : [])],
     discover: [{ label: groups("publicAgentsLabel"), href: "/explore" }, { label: groups("tradersLabel"), href: "/traders" }],
     help: [{ label: t("help"), href: "/help" }, { label: nav("support"), href: "/support" }, { label: nav("docs"), href: "/docs" }, { label: footer("itemSecurity"), href: "/security" }],
   };
@@ -245,7 +246,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
               {agentsError && <div role="alert" className={styles.empty}>{t("loadError")}<button onClick={() => void refreshAgents()}>{t("retry")}</button></div>}
               {!agentsLoading && !agentsError && !filteredAgents.length && <p className={styles.empty}>{t(search ? "noResults" : "noAgents")}</p>}
               {filteredAgents.map(a => <Link key={a.id} href={`/dashboard/agent/${encodeURIComponent(a.id)}?tab=chat`} className={styles.agentRow} onClick={navigateFromSidebar}><span className={styles.agentGlyph}><Bot size={18} /></span><span className={styles.rowBody}><strong>{a.name}</strong><small><i className={styles.statusDot} data-status={a.status} />{status.has(a.status) ? status(a.status) : a.status}</small></span></Link>)}
-              <details className={styles.group} open><summary>{u("workspaceTools")}<ChevronDown size={15} /></summary>{contextLink({label:u("manageAgents"),href:"/dashboard/agents",Icon:Bot})}{contextLink({label:t("missions"),href:"/dashboard/missions",Icon:ListChecks})}{contextLink({label:t("approvals"),href:"/dashboard/approvals",Icon:ShieldCheck})}{contextLink({label:t("analytics"),href:"/dashboard/analytics",Icon:BarChart3})}{contextLink({label:u("compute"),href:"/dashboard/compute"})}{contextLink({label:u("mesh"),href:"/dashboard/mesh",Icon:Network})}</details>
+              <details className={styles.group} open><summary>{u("workspaceTools")}<ChevronDown size={15} /></summary>{contextLink({label:u("manageAgents"),href:"/dashboard/agents",Icon:Bot})}{contextLink({label:backups("title"),href:"/dashboard/backups",Icon:Archive})}{contextLink({label:t("missions"),href:"/dashboard/missions",Icon:ListChecks})}{contextLink({label:t("approvals"),href:"/dashboard/approvals",Icon:ShieldCheck})}{contextLink({label:t("analytics"),href:"/dashboard/analytics",Icon:BarChart3})}{contextLink({label:u("compute"),href:"/dashboard/compute"})}{contextLink({label:u("mesh"),href:"/dashboard/mesh",Icon:Network})}</details>
             </>}
             {!contextual && (contextLinks[sidebarSection === "approvals" ? "missions" : sidebarSection] ?? []).map(contextLink)}
             {sidebarSection === "website" && <>
