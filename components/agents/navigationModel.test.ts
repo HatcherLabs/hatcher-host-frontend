@@ -32,6 +32,7 @@ describe('agent navigation model', () => {
       'integrations',
       'plugins',
       'robinhood',
+      'agentpit',
     ]);
   });
 
@@ -90,7 +91,9 @@ describe('agent navigation model', () => {
       'plugins',
       'wallet',
       'robinhood',
+      'agentpit',
       'files',
+      'backups',
       'memory',
       'terminal',
       'dev',

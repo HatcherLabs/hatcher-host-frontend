@@ -94,6 +94,8 @@ function TabSkeleton() {
   );
 }
 
+const BackupsTab = dynamic(() => import('@/components/agents/tabs/BackupsTab').then(mod => ({ default: mod.BackupsTab })), { loading: () => <TabSkeleton /> });
+
 const OverviewTab = dynamic(
   () => import('@/components/agents/tabs/OverviewTab').then(mod => ({ default: mod.OverviewTab })),
   { loading: () => <TabSkeleton /> }
@@ -240,7 +242,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const statusPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const validTabs: Tab[] = ['overview','config','integrations','connectors','skills','plugins','files','logs','terminal','dev','memory','sessions','knowledge','schedules','chat','mail','stats','wallet','robinhood','agentpit'];
+  const validTabs: Tab[] = ['backups','overview','config','integrations','connectors','skills','plugins','files','logs','terminal','dev','memory','sessions','knowledge','schedules','chat','mail','stats','wallet','robinhood','agentpit'];
   // 'skills' kept in validTabs for backwards compat (deep links), but redirects to plugins tab
   const searchParams = useSearchParams();
   const rawTab = searchParams.get('tab');
@@ -1954,6 +1956,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
             <div style={{ height: inWorkspace && tab === 'chat' ? '100%' : undefined }} className={inWorkspace && tab === 'chat' ? workspaceStyles.agentChatContent : `${tab === 'terminal' || tab === 'mail' || tab === 'dev' ? 'w-full max-w-none px-4 sm:px-6 lg:px-8' : 'max-w-[1280px] mx-auto px-4 sm:px-6'} py-6`}>
             <AnimatePresence mode="wait">
               {tab === 'overview' && <OverviewTab />}
+              {tab === 'backups' && <BackupsTab />}
               {tab === 'config' && (viewMode === 'easy' ? <SimpleConfigTab key={agent.id} /> : <ConfigTab />)}
               {tab === 'integrations' && <IntegrationsTab />}
               {tab === 'agentpit' && <AgentPitTab />}

@@ -60,6 +60,7 @@ function getTabs(framework: string | undefined, tTabs: ReturnType<typeof useTran
 function iconForTab(tab: Tab): React.ReactNode {
   const icons: Record<Tab, React.ReactNode> = {
     overview: <LayoutDashboard size={16} />,
+    backups: <Box size={16} />,
     chat: <MessageSquare size={16} />,
     mail: <Mail size={16} />,
     terminal: <TerminalSquare size={16} />,

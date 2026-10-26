@@ -13,7 +13,7 @@ import type { ChatMessageUsage } from '../tabs/ChatTab/types';
 
 // ─── Types ───────────────────────────────────────────────────
 
-export type Tab = 'overview' | 'config' | 'integrations' | 'connectors' | 'skills' | 'plugins' | 'files' | 'logs' | 'terminal' | 'dev' | 'memory' | 'sessions' | 'knowledge' | 'schedules' | 'chat' | 'mail' | 'stats' | 'wallet' | 'robinhood' | 'agentpit';
+export type Tab = 'backups' | 'overview' | 'config' | 'integrations' | 'connectors' | 'skills' | 'plugins' | 'files' | 'logs' | 'terminal' | 'dev' | 'memory' | 'sessions' | 'knowledge' | 'schedules' | 'chat' | 'mail' | 'stats' | 'wallet' | 'robinhood' | 'agentpit';
 
 export interface Message {
   id: string;
