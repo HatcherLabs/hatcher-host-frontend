@@ -62,6 +62,7 @@ export type HostingDetail = {
 export type HostingCatalog = {
   enabled: boolean;
   salesEnabled: boolean;
+  offsiteBackups?: boolean;
   plans: HostingPlan[];
   availability: string;
   sla: null;

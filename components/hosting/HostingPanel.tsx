@@ -440,6 +440,23 @@ export function HostingPanel() {
                   </button>
                 </div>
               )}
+              {project.subscriptionId && (
+                <button
+                  className={styles.secondary}
+                  disabled={busy}
+                  onClick={() =>
+                    void perform(async () => {
+                      const result = await hostingRequest<{ url: string }>(
+                        "/projects/" + selected + "/billing-portal",
+                        {},
+                      );
+                      window.location.assign(result.url);
+                    })
+                  }
+                >
+                  Update payment method
+                </button>
+              )}
               <div className={styles.columns}>
                 <section className={styles.card}>
                   <div className={styles.row}>
@@ -717,6 +734,7 @@ export function HostingPanel() {
                     <label>
                       Agent
                       <select
+                        aria-label="Agent"
                         value={agent}
                         onChange={(e) => setAgent(e.target.value)}
                         required
@@ -732,6 +750,7 @@ export function HostingPanel() {
                     <label>
                       Permission
                       <select
+                        aria-label="Permission"
                         value={role}
                         onChange={(e) => setRole(e.target.value)}
                       >
@@ -774,8 +793,10 @@ export function HostingPanel() {
                   </h3>
                   <p className={styles.muted}>
                     A backup briefly stops the application for a consistent
-                    snapshot. One encrypted snapshot is retained on this server;
-                    it does not protect against loss of the server.
+                    snapshot.{" "}
+                    {catalog.offsiteBackups
+                      ? "One encrypted snapshot is retained locally and copied to private external storage. The external copy is marked verified after an integrity check. Keep your own exports too."
+                      : "One encrypted snapshot is retained on this server; it does not protect against loss of the server."}
                   </p>
                   <label>
                     <input
@@ -884,6 +905,12 @@ export function HostingPanel() {
                         {new Date(b.createdAt).toLocaleString()}
                         <small>
                           {b.status} · {(b.bytes / 1024 / 1024).toFixed(1)} MiB
+                          {b.status === "ready" &&
+                            (b.offsiteVerifiedAt
+                              ? " · External copy verified"
+                              : catalog.offsiteBackups
+                                ? " · External copy pending"
+                                : " · Local only")}
                         </small>
                       </span>
                       <button
