@@ -3280,7 +3280,7 @@
     "encrypted": "Encrypted at rest",
     "recovery": "After restoration",
     "paused": "Agent remains stopped",
-    "scope": "Includes the persistent workspace, native databases and agent records. Payments, credits and external actions remain unchanged.",
+    "scope": "Includes agent databases, settings and history. Payments, credits and external actions remain unchanged.",
     "allBackups": "View all account backups",
     "automatic": "Automatic backups",
     "automaticDescription": "Back up when your agent is idle. Active work is never forcibly stopped.",
@@ -3351,6 +3351,12 @@
       "staging": "Preparing restore",
       "safety_backup": "Creating safety backup",
       "committed": "Finalizing restore"
-    }
+    },
+    "profile": "Backup content",
+    "essential": "Essential agent",
+    "full": "Full workspace",
+    "essentialScope": "Essential keeps identity, configuration, memories, conversations, skills and plugins. Project files, downloads, caches and old snapshots are excluded.",
+    "fullScope": "Full also includes all files in the persistent workspace.",
+    "essentialRestoreWarning": "This is an essential backup: projects and downloaded files are not included. Replacing an agent restores only the files in this backup."
   }
 }

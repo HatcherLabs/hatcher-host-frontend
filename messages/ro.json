@@ -3280,7 +3280,7 @@
     "encrypted": "Criptată pe server",
     "recovery": "După restaurare",
     "paused": "Agentul rămâne oprit",
-    "scope": "Include fișierele persistente, bazele de date native și înregistrările agentului. Plățile, creditele și acțiunile externe rămân neschimbate.",
+    "scope": "Include bazele de date, configurările și istoricul agentului. Plățile, creditele și acțiunile externe rămân neschimbate.",
     "allBackups": "Toate backupurile contului",
     "automatic": "Backupuri automate",
     "automaticDescription": "Backupul așteaptă ca agentul să fie liber. Activitatea în curs nu este oprită forțat.",
@@ -3351,6 +3351,12 @@
       "staging": "Se pregătește restaurarea",
       "safety_backup": "Se creează copia de siguranță",
       "committed": "Se finalizează restaurarea"
-    }
+    },
+    "profile": "Conținutul backupului",
+    "essential": "Agent esențial",
+    "full": "Workspace complet",
+    "essentialScope": "Esențial păstrează identitatea, configurările, memoriile, conversațiile, abilitățile și pluginurile. Exclude proiectele, descărcările, cache-urile și copiile istorice.",
+    "fullScope": "Complet include și toate fișierele din workspace-ul persistent.",
+    "essentialRestoreWarning": "Acesta este un backup esențial: proiectele și fișierele descărcate nu sunt incluse. Înlocuirea agentului restaurează doar fișierele din acest backup."
   }
 }

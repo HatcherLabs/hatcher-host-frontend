@@ -23,6 +23,8 @@ export function BackupsPanel({ agent }: { agent?: { id: string; name: string; fr
   const [inventory, setInventory] = useState<BackupInventory | null>(null);
   const [schedule, setSchedule] = useState<BackupSchedule>(DEFAULT_SCHEDULE);
   const [scheduleLoaded, setScheduleLoaded] = useState(false);
+  const supportsEssential = agent?.framework === 'hermes' || agent?.framework === 'openclaw';
+  const [profile, setProfile] = useState<'full' | 'essential'>(supportsEssential ? 'essential' : 'full');
   const [allAgents, setAllAgents] = useState(!agent);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -56,10 +58,10 @@ export function BackupsPanel({ agent }: { agent?: { id: string; name: string; fr
     if (!agentId) return;
     let cancelled = false;
     void backupRequest<BackupSchedule | null>(`/agents/${agentId}/backup-schedule`).then(value => {
-      if (!cancelled) { setSchedule(value || { ...DEFAULT_SCHEDULE, timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }); setScheduleLoaded(true); }
+      if (!cancelled) { setSchedule(value || { ...DEFAULT_SCHEDULE, profile: supportsEssential ? 'essential' : 'full', timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }); setScheduleLoaded(true); }
     }).catch(failure => { if (!cancelled) setError(failure.message); });
     return () => { cancelled = true; };
-  }, [agentId]);
+  }, [agentId, supportsEssential]);
   useEffect(() => {
     if (action) dialog.current?.showModal(); else dialog.current?.close();
     if (action) setError('');
@@ -78,7 +80,7 @@ export function BackupsPanel({ agent }: { agent?: { id: string; name: string; fr
     event.preventDefault();
     await perform(async () => {
       const { enabled, frequency, timeZone, hour, minute, weekday, retainCount } = schedule;
-      const saved = await backupRequest<BackupSchedule>(`/agents/${agentId}/backup-schedule`, { enabled, frequency, timeZone, hour, minute, weekday, retainCount }, 'PUT');
+      const saved = await backupRequest<BackupSchedule>(`/agents/${agentId}/backup-schedule`, { enabled, frequency, timeZone, hour, minute, weekday, retainCount, profile: schedule.profile ?? 'full' }, 'PUT');
       setSchedule(saved); setNotice(t('scheduleSaved'));
     });
   }
@@ -113,16 +115,18 @@ export function BackupsPanel({ agent }: { agent?: { id: string; name: string; fr
   return <div className={styles.root}>
     <header className={styles.header}><div><p className={styles.eyebrow}><ShieldCheck size={15}/>{t('eyebrow')}</p><h2>{t('title')}</h2><p>{t('description')}</p></div>
       <div className={styles.actions}><button type="button" disabled={busy} onClick={() => setAction({ kind: 'import' })}><Upload size={16}/>{t('import')}</button>
-        {agent && <button type="button" className={styles.primary} disabled={busy || hasActive} onClick={() => void perform(async () => { await backupRequest(`/agents/${agent.id}/backups`, {}); setNotice(t('createQueued')); })}><Archive size={16}/>{t('create')}</button>}</div>
+        {supportsEssential && <label>{t('profile')} <select aria-label={t('profile')} disabled={busy || hasActive} value={profile} onChange={event => setProfile(event.target.value as 'full' | 'essential')}><option value="essential">{t('essential')}</option><option value="full">{t('full')}</option></select></label>}
+        {agent && <button type="button" className={styles.primary} disabled={busy || hasActive} onClick={() => void perform(async () => { await backupRequest(`/agents/${agent.id}/backups`, { profile }); setNotice(t('createQueued')); })}><Archive size={16}/>{t('create')}</button>}</div>
     </header>
     {error && <p role="alert" className={styles.error}>{error}</p>}
     {notice && <p role="status" className={styles.notice}>{notice}</p>}
     <div className={styles.summary}><div><span>{t('storage')}</span><strong>{inventory ? `${backupSize(inventory.usedBytes)} / ${backupSize(inventory.maxBytes)}` : '—'}</strong></div><div><span>{t('protection')}</span><strong>{t('encrypted')}</strong></div><div><span>{t('recovery')}</span><strong>{t('paused')}</strong></div></div>
-    <p className={styles.scope}>{t('scope')} <Link href="/dashboard/backups">{t('allBackups')} <ExternalLink size={12}/></Link></p>
+    <p className={styles.scope}>{t('scope')} {supportsEssential && t(profile === 'essential' ? 'essentialScope' : 'fullScope')} <Link href="/dashboard/backups">{t('allBackups')} <ExternalLink size={12}/></Link></p>
     {agent?.framework === 'ironclaw' && <p className={styles.scope}>{t('stoppedRuntime')}</p>}
     {agent && <form className={styles.card} onSubmit={saveSchedule}>
       <div className={styles.cardHeader}><div><h3><Clock size={18}/>{t('automatic')}</h3><p>{t('automaticDescription')}</p></div><label className={styles.toggle}><input type="checkbox" checked={schedule.enabled} disabled={!scheduleLoaded || busy} onChange={event => setSchedule({ ...schedule, enabled: event.target.checked })}/>{t('enabled')}</label></div>
       <fieldset disabled={!scheduleLoaded || busy} className={styles.scheduleFields}>
+        {supportsEssential && <label>{t('profile')}<select value={schedule.profile ?? 'full'} onChange={event => setSchedule({ ...schedule, profile: event.target.value as 'full' | 'essential' })}><option value="essential">{t('essential')}</option><option value="full">{t('full')}</option></select></label>}
         <label>{t('frequency')}<select aria-label={t('frequency')} value={schedule.frequency} onChange={event => setSchedule({ ...schedule, frequency: event.target.value as 'daily' | 'weekly' })}><option value="daily">{t('daily')}</option><option value="weekly">{t('weekly')}</option></select></label>
         {schedule.frequency === 'weekly' && <label>{t('weekday')}<select aria-label={t('weekday')} value={schedule.weekday} onChange={event => setSchedule({ ...schedule, weekday: Number(event.target.value) })}>{Array.from({ length: 7 }, (_, day) => <option key={day} value={day}>{new Intl.DateTimeFormat(locale, { weekday: 'long', timeZone: 'UTC' }).format(new Date(Date.UTC(2026, 0, 4 + day)))}</option>)}</select></label>}
         <label>{t('time')}<input type="time" required value={`${String(schedule.hour).padStart(2, '0')}:${String(schedule.minute).padStart(2, '0')}`} onChange={event => { const [hour, minute] = event.target.value.split(':').map(Number); setSchedule({ ...schedule, hour: hour!, minute: minute! }); }}/></label>
@@ -139,11 +143,11 @@ export function BackupsPanel({ agent }: { agent?: { id: string; name: string; fr
     </div>)}
     <section className={styles.card} aria-label={t('history')}>
       <div className={styles.cardHeader}><h3>{t('history')}</h3>{agent && <label className={styles.toggle}><input type="checkbox" checked={allAgents} onChange={event => setAllAgents(event.target.checked)}/>{t('allAgents')}</label>}</div>
-      {!inventory ? <p role="status" className={styles.empty}>{t('loading')}</p> : !inventory.backups.length ? <div className={styles.empty}><Archive size={28}/><h4>{t('emptyTitle')}</h4><p>{t('emptyDescription')}</p></div> : <div className={styles.tableWrap}><table><thead><tr><th>{t('backup')}</th><th>{t('size')}</th><th>{t('state')}</th><th><span className="sr-only">{t('actions')}</span></th></tr></thead><tbody>{inventory.backups.map(backup => <tr key={backup.id}><td><strong>{backup.name}</strong><small>{date(backup.createdAt)} · {displayStatus(backup.kind)}</small>{backup.error && <small className={styles.error}>{backup.error}</small>}</td><td>{backupSize(backup.sizeBytes)}</td><td><span className={styles.badge} data-status={backup.status}>{displayStatus(backup.status)}</span></td><td><div className={styles.rowActions}><button type="button" disabled={busy || backup.status !== 'ready'} onClick={() => setAction({ kind: 'download', backup })} aria-label={`${t('download')} ${backup.name}`} title={t('download')}><Download size={16}/></button><button type="button" disabled={busy || backup.status !== 'ready' || hasActive} onClick={() => setAction({ kind: 'restore', backup })} aria-label={`${t('restore')} ${backup.name}`} title={t('restore')}><RotateCcw size={16}/></button><button type="button" disabled={busy || ['pending', 'validating'].includes(backup.status)} onClick={() => setAction({ kind: 'delete', backup })} aria-label={`${t('delete')} ${backup.name}`} title={t('delete')}><Trash2 size={16}/></button></div></td></tr>)}</tbody></table></div>}
+      {!inventory ? <p role="status" className={styles.empty}>{t('loading')}</p> : !inventory.backups.length ? <div className={styles.empty}><Archive size={28}/><h4>{t('emptyTitle')}</h4><p>{t('emptyDescription')}</p></div> : <div className={styles.tableWrap}><table><thead><tr><th>{t('backup')}</th><th>{t('size')}</th><th>{t('state')}</th><th><span className="sr-only">{t('actions')}</span></th></tr></thead><tbody>{inventory.backups.map(backup => <tr key={backup.id}><td><strong>{backup.name}</strong><small>{date(backup.createdAt)} · {displayStatus(backup.kind)} · {t(backup.profile === 'essential' ? 'essential' : 'full')}</small>{backup.error && <small className={styles.error}>{backup.error}</small>}</td><td>{backupSize(backup.sizeBytes)}</td><td><span className={styles.badge} data-status={backup.status}>{displayStatus(backup.status)}</span></td><td><div className={styles.rowActions}><button type="button" disabled={busy || backup.status !== 'ready'} onClick={() => setAction({ kind: 'download', backup })} aria-label={`${t('download')} ${backup.name}`} title={t('download')}><Download size={16}/></button><button type="button" disabled={busy || backup.status !== 'ready' || hasActive} onClick={() => setAction({ kind: 'restore', backup })} aria-label={`${t('restore')} ${backup.name}`} title={t('restore')}><RotateCcw size={16}/></button><button type="button" disabled={busy || ['pending', 'validating'].includes(backup.status)} onClick={() => setAction({ kind: 'delete', backup })} aria-label={`${t('delete')} ${backup.name}`} title={t('delete')}><Trash2 size={16}/></button></div></td></tr>)}</tbody></table></div>}
     </section>
     <dialog ref={dialog} className={styles.dialog} onCancel={event => { if (busy) event.preventDefault(); else setAction(null); }} aria-labelledby="backup-action-title">
       {action && <form onSubmit={submitAction}><h3 id="backup-action-title">{t(action.kind)}</h3><p>{t(`${action.kind}Description`)}</p>
-        {action.kind === 'restore' && <><label>{t('destination')}<select value={mode} disabled={busy} onChange={event => setMode(event.target.value as 'replace' | 'new')}><option value="new">{t('newAgent')}</option>{agent && agent.framework === action.backup.framework && <option value="replace">{t('replaceAgent', { name: agent.name })}</option>}</select></label>{mode === 'new' && <label>{t('agentName')}<input required maxLength={100} value={name} disabled={busy} onChange={event => setName(event.target.value)}/></label>}<p className={styles.scope}>{t('restoreWarning')}</p></>}
+        {action.kind === 'restore' && <><label>{t('destination')}<select value={mode} disabled={busy} onChange={event => setMode(event.target.value as 'replace' | 'new')}><option value="new">{t('newAgent')}</option>{agent && agent.framework === action.backup.framework && <option value="replace">{t('replaceAgent', { name: agent.name })}</option>}</select></label>{mode === 'new' && <label>{t('agentName')}<input required maxLength={100} value={name} disabled={busy} onChange={event => setName(event.target.value)}/></label>}<p className={styles.scope}>{t('restoreWarning')} {action.backup.profile === 'essential' && t('essentialRestoreWarning')}</p></>}
         {action.kind === 'import' && <label>{t('file')}<input type="file" accept=".hbk" required disabled={busy} onChange={event => setFile(event.target.files?.[0] || null)}/></label>}
         {action.kind !== 'delete' && <label>{t('accountPassword')}<input type="password" required autoComplete="current-password" value={accountPassword} disabled={busy} onChange={event => setAccountPassword(event.target.value)}/></label>}
         {(action.kind === 'import' || action.kind === 'download') && <label>{t('archivePassword')}<input type="password" required minLength={12} maxLength={512} autoComplete={action.kind === 'download' ? 'new-password' : 'off'} value={archivePassword} disabled={busy} onChange={event => setArchivePassword(event.target.value)}/></label>}

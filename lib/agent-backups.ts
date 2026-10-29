@@ -1,6 +1,7 @@
 import { req } from './api/core';
 
 export interface AgentBackup {
+  profile?: 'full' | 'essential';
   id: string; agentId: string; name: string; framework: string; kind: string; status: string;
   sizeBytes: number; sha256: string | null; error: string | null; createdAt: string; completedAt: string | null;
 }
@@ -9,6 +10,7 @@ export interface BackupOperation {
   error: string | null; resultAgentId: string | null; safetyBackupId: string | null; createdAt: string;
 }
 export interface BackupSchedule {
+  profile?: 'full' | 'essential';
   enabled: boolean; frequency: 'daily' | 'weekly'; timeZone: string; hour: number; minute: number;
   weekday: number; retainCount: number; nextRunAt?: string; lastRunAt?: string | null; lastError?: string | null;
 }
