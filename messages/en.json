@@ -3358,5 +3358,25 @@
     "essentialScope": "Essential keeps identity, configuration, memories, conversations, skills and plugins. Project files, downloads, caches and old snapshots are excluded.",
     "fullScope": "Full also includes all files in the persistent workspace.",
     "essentialRestoreWarning": "This is an essential backup: projects and downloaded files are not included. Replacing an agent restores only the files in this backup."
+  },
+  "agentResources": {
+    "label": "Agent resources",
+    "loading": "Loading…",
+    "unavailable": "Unavailable",
+    "notRunning": "Not running",
+    "cores": "{used} / {limit} vCPU",
+    "allocated": "{limit} allocated",
+    "storage": "Storage",
+    "available": "{amount} available",
+    "full": "Storage limit reached",
+    "warning": "Storage above 80%",
+    "details": "Storage details",
+    "runtimeScope": "Includes workspace, memories, sessions and runtime files counted toward your agent's quota.",
+    "workspaceScope": "Workspace usage against your agent's storage quota, including Storage+.",
+    "backupSeparate": "Backup storage is separate from this quota.",
+    "measured": "Last measured: {time}. Storage refreshes periodically.",
+    "pending": "Waiting for the first storage measurement.",
+    "unsupported": "Storage measurement is not available for this runtime.",
+    "refreshFailed": "Metrics could not refresh. Storage shown is the last measurement."
   }
 }

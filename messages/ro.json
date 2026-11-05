@@ -3358,5 +3358,25 @@
     "essentialScope": "Esențial păstrează identitatea, configurările, memoriile, conversațiile, abilitățile și pluginurile. Exclude proiectele, descărcările, cache-urile și copiile istorice.",
     "fullScope": "Complet include și toate fișierele din workspace-ul persistent.",
     "essentialRestoreWarning": "Acesta este un backup esențial: proiectele și fișierele descărcate nu sunt incluse. Înlocuirea agentului restaurează doar fișierele din acest backup."
+  },
+  "agentResources": {
+    "label": "Resursele agentului",
+    "loading": "Se încarcă…",
+    "unavailable": "Indisponibil",
+    "notRunning": "Agentul nu rulează",
+    "cores": "{used} / {limit} vCPU",
+    "allocated": "{limit} alocați",
+    "storage": "Stocare",
+    "available": "{amount} disponibili",
+    "full": "Limita de stocare a fost atinsă",
+    "warning": "Stocare peste 80%",
+    "details": "Detalii despre stocare",
+    "runtimeScope": "Include workspace-ul, memoria, sesiunile și fișierele runtime contorizate în cota agentului.",
+    "workspaceScope": "Spațiul utilizat în workspace, raportat la cota agentului, inclusiv Storage+.",
+    "backupSeparate": "Spațiul pentru backupuri este separat de această cotă.",
+    "measured": "Ultima măsurătoare: {time}. Stocarea se actualizează periodic.",
+    "pending": "Se așteaptă prima măsurătoare a stocării.",
+    "unsupported": "Măsurarea stocării nu este disponibilă pentru acest runtime.",
+    "refreshFailed": "Metricile nu au putut fi actualizate. Stocarea afișată este ultima măsurătoare."
   }
 }
