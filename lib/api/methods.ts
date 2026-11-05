@@ -1,4 +1,5 @@
 import type { AdminAccountState } from '@/lib/admin-account-state';
+import type { AgentResources } from '@/lib/agent-resources';
 import type { AgentPitConnection } from './agentpit';
 // ============================================================
 // API Methods — all backend API calls
@@ -1970,6 +1971,8 @@ export const api = {
     }) as Promise<ConfigPatchResult>,
 
   /** Get agent monitoring data (health, resources, response times, errors) */
+  getAgentResources: (id: string) => req<AgentResources>(`/agents/${id}/resources`),
+
   getAgentMonitoring: (id: string) =>
     req<{
       health: "healthy" | "unhealthy" | "stopped";

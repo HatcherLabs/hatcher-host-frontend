@@ -24,6 +24,7 @@ import type { UserTierKey } from '@hatcher/shared';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/components/ui/ToastProvider';
 import { AgentWorkspaceActions } from './AgentWorkspaceActions';
+import { AgentResourceStrip } from './AgentResourceStrip';
 import workspaceStyles from '@/components/workspace/WorkspaceShell.module.css';
 import { AgentStatusPill } from '@/components/ui/AgentStatusPill';
 import {
@@ -1941,6 +1942,8 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
           </div>
 
           </AgentWorkspaceActions>
+
+          <AgentResourceStrip key={agent.id} agentId={agent.id} status={agent.status} />
 
           {actions.deleteError && (
             <p

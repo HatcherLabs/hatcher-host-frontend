@@ -11,6 +11,7 @@ import {
 import { Link } from "@/i18n/routing";
 import { useAgentContext } from "@/components/agents/AgentContext";
 import { AgentStatusPill } from "@/components/ui/AgentStatusPill";
+import { AgentResourceStrip } from "@/components/agents/AgentResourceStrip";
 import styles from "./ChatWorkspace.module.css";
 
 const ChatTab = dynamic(() =>
@@ -91,6 +92,7 @@ export function EmbeddedAgentPanel() {
           </Link>
         </div>
       </div>
+      <AgentResourceStrip key={agent.id} agentId={agent.id} status={agent.status} />
       {actionError && (
         <p className={styles.error} role="alert">
           {actionError}
