@@ -6,6 +6,9 @@ import type { ChatTurn } from "@/lib/direct-chat";
 import { resultTitle } from "@/lib/chat-workspace";
 import { RichMarkdown } from "@/components/agents/tabs/ChatTab/ArtifactRenderer";
 import styles from "./ChatExperience.module.css";
+import CanvasMedia from "./CanvasMedia";
+import { privateCanvasMedia } from "@/lib/studio";
+import { downloadCanvasMedia, loadCanvasMedia } from "@/lib/canvas-media";
 export function ChatResultPanel({
   turn,
   onClose,
@@ -14,6 +17,8 @@ export function ChatResultPanel({
   onClose: () => void;
 }) {
   const t = useTranslations("chatExperience");
+  const [downloading, setDownloading] = useState(false);
+  const media = privateCanvasMedia(turn.model, turn.response);
   const [expanded, setExpanded] = useState(false);
   const [mobile, setMobile] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -69,7 +74,27 @@ export function ChatResultPanel({
   }, [mobile, expanded, onClose]);
   const code = turn.response.match(/```([^\n]*)\n([\s\S]*?)```/);
   const content = view === "code" && code ? code[2] : turn.response;
-  const download = () => {
+  const download = async () => {
+    if (downloading) return;
+    if (view === "preview" && media.length) {
+      setDownloading(true);
+      setError("");
+      try {
+        for (const item of media) {
+          const blob = await loadCanvasMedia(
+            item.path,
+            item.kind,
+            new AbortController().signal,
+          );
+          downloadCanvasMedia(blob, item.path);
+        }
+      } catch (failure) {
+        setError((failure as Error).message);
+      } finally {
+        setDownloading(false);
+      }
+      return;
+    }
     const ext =
       view === "code" && code
         ? {
@@ -88,7 +113,7 @@ export function ChatResultPanel({
     a.href = url;
     a.download = `hatcher-result.${ext}`;
     a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
   };
   return (
     <>
@@ -123,7 +148,11 @@ export function ChatResultPanel({
             >
               {copied ? <Check size={16} /> : <Copy size={16} />}
             </button>
-            <button aria-label={t("downloadResult")} onClick={download}>
+            <button
+              aria-label={t("downloadResult")}
+              disabled={downloading}
+              onClick={() => void download()}
+            >
               <Download size={16} />
             </button>
             <button
@@ -162,7 +191,18 @@ export function ChatResultPanel({
         {error && <p role="alert">{error}</p>}
         <div className={styles.resultBody}>
           {view === "preview" ? (
-            <RichMarkdown content={turn.response} />
+            media.length ? (
+              media.map((item) => (
+                <CanvasMedia
+                  key={item.path}
+                  path={item.path}
+                  kind={item.kind}
+                  title={turn.prompt}
+                />
+              ))
+            ) : (
+              <RichMarkdown content={turn.response} />
+            )
           ) : (
             <pre>
               <code>{content}</code>

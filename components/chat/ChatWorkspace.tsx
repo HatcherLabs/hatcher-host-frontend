@@ -49,8 +49,9 @@ import {
   type Conversation,
 } from "@/lib/direct-chat";
 import CanvasMedia from "./CanvasMedia";
+import { privateCanvasMedia } from "@/lib/studio";
 import ChatModelPicker from "./ChatModelPicker";
-import { studioKind, studioMediaUrls } from "@/lib/studio";
+import { studioKind } from "@/lib/studio";
 import { RichMarkdown } from "@/components/agents/tabs/ChatTab/ArtifactRenderer";
 import { ChatHistory } from "./ChatHistory";
 import { ChatHandoff } from "./ChatHandoff";
@@ -705,20 +706,9 @@ export default function ChatWorkspace({
                 <article className={experience.turn} key={turn.id}>
                   <div className={experience.prompt}>{turn.prompt}</div>
                   <div className={experience.answer}>
-                    {(studioKind(turn.model) === "video" ||
-                      studioKind(turn.model) === "audio") &&
-                    studioMediaUrls(turn.response).length ? (
-                      studioMediaUrls(turn.response).map((url) => (
-                        <CanvasMedia
-                          key={url}
-                          path={url}
-                          kind={
-                            studioKind(turn.model) === "video"
-                              ? "video"
-                              : "audio"
-                          }
-                          title={turn.prompt}
-                        />
+                    {privateCanvasMedia(turn.model, turn.response).length ? (
+                      privateCanvasMedia(turn.model, turn.response).map((item) => (
+                        <CanvasMedia key={item.path} path={item.path} kind={item.kind} title={turn.prompt} />
                       ))
                     ) : (
                       <RichMarkdown
