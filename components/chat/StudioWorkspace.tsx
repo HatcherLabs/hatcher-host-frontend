@@ -580,12 +580,11 @@ export default function StudioWorkspace({
                 <article key={asset.id} className={styles.asset}>
                   {urls.length ? (
                     urls.map((url, index) =>
-                      url.startsWith("/chat/create/content/") &&
-                      assetKind !== "image" ? (
+                      url.startsWith("/chat/create/content/") ? (
                         <div key={url} className={styles.preview}>
                           <CanvasMedia
                             path={url}
-                            kind={assetKind === "video" ? "video" : "audio"}
+                            kind={assetKind ?? "image"}
                             title={asset.prompt}
                           />
                         </div>

@@ -1,107 +1,102 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import { getToken } from "@/lib/api/core";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  downloadCanvasMedia,
+  loadCanvasMedia,
+  type CanvasMediaKind,
+} from "@/lib/canvas-media";
 import styles from "./CanvasMedia.module.css";
-import { API_URL } from "@/lib/config";
 
-/** Load private media on demand; keep authentication out of downloadable URLs. */
+/** Load private media with authentication for both preview and download. */
 export default function CanvasMedia({
   path,
   kind,
   title,
 }: {
   path: string;
-  kind: "video" | "audio";
+  kind: CanvasMediaKind;
   title: string;
 }) {
   const [url, setUrl] = useState<string>();
-  const [extension, setExtension] = useState(kind === "video" ? "mp4" : "mp3");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const objectUrl = useRef<string | undefined>(undefined);
+  const media = useRef<Blob | undefined>(undefined);
   const request = useRef<AbortController | undefined>(undefined);
-  useEffect(() => {
-    setUrl(undefined);
-    setError("");
-    setBusy(false);
-    return () => {
-      request.current?.abort();
-      if (objectUrl.current) URL.revokeObjectURL(objectUrl.current);
-      objectUrl.current = undefined;
-    };
-  }, [path, kind]);
-  async function load() {
-    if (busy) return;
-    if (!/^\/chat\/create\/content\/[0-9a-f-]{36}$/i.test(path)) return;
+  const load = useCallback(async () => {
+    if (request.current) return;
     setBusy(true);
     setError("");
     const controller = new AbortController();
     request.current = controller;
     try {
-      const token = getToken();
-      const response = await fetch(`${API_URL}${path}`, {
-        credentials: "include",
-        signal: controller.signal,
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-      if (!response.ok)
-        throw new Error(
-          response.status === 401
-            ? "Sign in again to play this creation."
-            : "Unable to load this creation. Please retry.",
-        );
-      const blob = await response.blob();
-      if (!blob.type.startsWith(kind + "/"))
-        throw new Error("This media format is unavailable.");
+      const blob = await loadCanvasMedia(path, kind, controller.signal);
       if (controller.signal.aborted) return;
-      setExtension(
-        blob.type === "audio/wav" ? "wav" : kind === "video" ? "mp4" : "mp3",
-      );
+      media.current = blob;
       if (objectUrl.current) URL.revokeObjectURL(objectUrl.current);
       objectUrl.current = URL.createObjectURL(blob);
       setUrl(objectUrl.current);
     } catch (failure) {
       if (!controller.signal.aborted) setError((failure as Error).message);
     } finally {
+      if (request.current === controller) request.current = undefined;
       if (!controller.signal.aborted) setBusy(false);
     }
+  }, [path, kind]);
+  useEffect(() => {
+    setUrl(undefined);
+    setError("");
+    setBusy(false);
+    if (kind === "image") void load();
+    return () => {
+      request.current?.abort();
+      request.current = undefined;
+      if (objectUrl.current) URL.revokeObjectURL(objectUrl.current);
+      objectUrl.current = undefined;
+      media.current = undefined;
+    };
+  }, [path, kind, load]);
+  function download() {
+    if (!media.current) return;
+    try {
+      downloadCanvasMedia(media.current, path);
+    } catch (failure) {
+      setError((failure as Error).message);
+    }
   }
+  const playbackError = () =>
+    setError(
+      "This browser could not play the file. Try downloading it; do not generate it again.",
+    );
   return (
     <div className={styles.root}>
       {url ? (
         <>
-          {kind === "video" ? (
+          {kind === "image" ? (
+            // eslint-disable-next-line @next/next/no-img-element -- Authenticated private media is loaded as a blob.
+            <img src={url} alt={title} />
+          ) : kind === "video" ? (
             <video
               controls
+              controlsList="nodownload"
               preload="metadata"
-              onError={() =>
-                setError(
-                  "This browser could not play the file. Try downloading it; do not generate it again.",
-                )
-              }
+              onError={playbackError}
               src={url}
               aria-label={title}
             />
           ) : (
             <audio
               controls
+              controlsList="nodownload"
               preload="metadata"
-              onError={() =>
-                setError(
-                  "This browser could not play the file. Try downloading it; do not generate it again.",
-                )
-              }
+              onError={playbackError}
               src={url}
               aria-label={title}
             />
           )}
-          <a
-            className={styles.action}
-            href={url}
-            download={`hatcher-${path.split("/").pop()}.${extension}`}
-          >
-            Download {kind === "audio" ? "music" : "video"}
-          </a>
+          <button className={styles.action} onClick={download}>
+            Download {kind === "audio" ? "music" : kind}
+          </button>
         </>
       ) : (
         <button
@@ -109,9 +104,7 @@ export default function CanvasMedia({
           disabled={busy}
           onClick={() => void load()}
         >
-          {busy
-            ? "Loading…"
-            : `Play or download ${kind === "audio" ? "music" : "video"}`}
+          {busy ? "Loading…" : `Load ${kind === "audio" ? "music" : kind}`}
         </button>
       )}
       {error && <p role="alert">{error}</p>}
