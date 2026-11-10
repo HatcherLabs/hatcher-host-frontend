@@ -1,7 +1,7 @@
 import { req, getToken } from "./api/core";
 import { API_URL } from "./config";
 
-export const DEFAULT_CHAT_MODEL = "deepseek/deepseek-v4-flash";
+export const DEFAULT_CHAT_MODEL = "deepseek/deepseek-v4.1-flash";
 
 export interface ChatModel {
   id: string;
