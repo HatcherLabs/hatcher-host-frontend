@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   studioKind,
+  privateCanvasMedia,
   studioMediaUrls,
   generationModels,
   savedGenerationModel,
@@ -57,4 +58,15 @@ describe("Studio saved media", () => {
     expect(studioMediaUrls(`![music](${path}) ![bad](/admin) ![bad](/chat/create/content/../../admin)`)).toEqual([path]);
   });
 
+});
+
+describe("private sidebar media", () => {
+  const path = "/chat/create/content/6a719c14-fcde-458a-b5c3-79c4a0d7463c";
+  it.each(["image", "audio", "video"] as const)("loads saved Venice %s using its actual media type", kind => {
+    expect(privateCanvasMedia(`media/${kind}/venice/test`, `![result](${path})`)).toEqual([{kind, path}]);
+  });
+  it("does not authenticate arbitrary external or traversal URLs", () => {
+    expect(privateCanvasMedia("media/video/venice/test", "![x](https://evil.example/a) ![x](/chat/create/content/../../admin)")).toEqual([]);
+    expect(privateCanvasMedia("text/model", `![x](${path})`)).toEqual([]);
+  });
 });

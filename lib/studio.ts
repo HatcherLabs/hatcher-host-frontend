@@ -65,3 +65,12 @@ export function savedGenerationModel(model: string): string {
   if (model === "media/seedream_image") return "bytedance-seed/seedream-4.5";
   return model.replace(/^media\/(?:(?:image|video|audio)\/)?/, "");
 }
+
+/** Private Canvas output must use authenticated media loading in every preview surface. */
+export function privateCanvasMedia(model: string, response: string) {
+  const kind = studioKind(model);
+  if (!kind) return [];
+  return studioMediaUrls(response)
+    .filter((path) => /^\/chat\/create\/content\/[0-9a-f-]{36}$/i.test(path))
+    .map((path) => ({ kind, path }));
+}
