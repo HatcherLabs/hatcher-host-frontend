@@ -1,4 +1,5 @@
 'use client';
+import { ensureBrowserAdmission } from '@/lib/browser-admission';
 
 import { useEffect, useState } from 'react';
 import { API_URL } from '@/lib/config';
@@ -46,7 +47,8 @@ export function GoogleSignIn({
         type="button"
         disabled={available !== true}
         className="w-full flex items-center justify-center gap-3 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] px-4 py-3 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--bg-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
-        onClick={() => {
+        onClick={async () => {
+          try { await ensureBrowserAdmission('oauth'); } catch (error) { setError(error instanceof Error ? error.message : 'Security check failed.'); return; }
           onBeforeRedirect?.();
           window.location.assign(
             `${apiBase}/auth/google/start?return=${encodeURIComponent(returnPath)}&intent=${intent}`,
@@ -72,7 +74,8 @@ export function GoogleSignIn({
       </button>}
       {appleAvailable && <button type="button"
         className="mt-3 flex w-full items-center justify-center gap-3 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] px-4 py-3 text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-hover)]"
-        onClick={() => {
+        onClick={async () => {
+          try { await ensureBrowserAdmission('oauth'); } catch (error) { setError(error instanceof Error ? error.message : 'Security check failed.'); return; }
           onBeforeRedirect?.();
           window.location.assign(`${apiBase}/auth/apple/web/start?return=${encodeURIComponent(returnPath)}`);
         }}>

@@ -57,7 +57,7 @@ export function buildCsp(
   const qwertiFont = isQwertiWidgetRoute ? ` ${QWERTI_WIDGET_ORIGIN}` : '';
   const parts = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'wasm-unsafe-eval' https://s3.tradingview.com${qwertiScript}${scriptDev}`,
+    `script-src 'self' 'nonce-${nonce}' 'wasm-unsafe-eval' https://s3.tradingview.com https://challenges.cloudflare.com${qwertiScript}${scriptDev}`,
     "worker-src 'self' blob:",
     styleSrc,
     styleSrcElem,
@@ -65,10 +65,10 @@ export function buildCsp(
     `font-src 'self' https://fonts.gstatic.com${qwertiFont}`,
     `img-src 'self' data: blob: https:`,
     "media-src 'self' data: blob: https:",
-    `connect-src 'self' blob: https://api.hatcher.host wss://api.hatcher.host https://*.solana.com wss://*.solana.com https://*.helius-rpc.com wss://*.helius-rpc.com https://api.dexscreener.com${qwertiConnect}${apiConnect}${devConnect}`,
+    `connect-src 'self' https://challenges.cloudflare.com blob: https://api.hatcher.host wss://api.hatcher.host https://*.solana.com wss://*.solana.com https://*.helius-rpc.com wss://*.helius-rpc.com https://api.dexscreener.com${qwertiConnect}${apiConnect}${devConnect}`,
     // The agent desktop's Browser app iframes arbitrary sites, so the desktop
     // route (and ONLY that route) additionally allows any https origin.
-    `frame-src 'self' https://www.tradingview.com https://s.tradingview.com https://tradingview.com https://www.tradingview-widget.com https://www.geckoterminal.com https://geckoterminal.com https://dexscreener.com https://www.dexscreener.com${isDesktopRoute ? ' https:' : ''}`,
+    `frame-src 'self' https://challenges.cloudflare.com https://www.tradingview.com https://s.tradingview.com https://tradingview.com https://www.tradingview-widget.com https://www.geckoterminal.com https://geckoterminal.com https://dexscreener.com https://www.dexscreener.com${isDesktopRoute ? ' https:' : ''}`,
     "base-uri 'self'",
     "form-action 'self'",
     // Framing policy (owner-approved, 2026-07-30): 'self', not 'none' —
