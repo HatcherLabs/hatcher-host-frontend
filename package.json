@@ -38,7 +38,7 @@
     "codemirror": "^6.0.2",
     "framer-motion": "^12.38.0",
     "lucide-react": "^0.468.0",
-    "next": "15.5.27",
+    "next": "15.5.29",
     "next-intl": "^4.11.0",
     "next-themes": "^0.4.6",
     "posthog-js": "^1.364.1",
@@ -62,7 +62,7 @@
     "autoprefixer": "^10.4.20",
     "axe-core": "^4.11.3",
     "eslint": "^9.39.4",
-    "eslint-config-next": "15.5.27",
+    "eslint-config-next": "15.5.29",
     "jsdom": "^26.1.0",
     "postcss": "^8.5.18",
     "protobufjs": "8.7.0",
@@ -81,7 +81,7 @@
     "@typescript-eslint/typescript-estree": {
       "brace-expansion": "^5.0.8"
     },
-    "dompurify": "3.4.13",
+    "dompurify": "3.4.17",
     "fast-uri": "^3.1.4",
     "postcss": "$postcss",
     "sharp": "0.35.5",
