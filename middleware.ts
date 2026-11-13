@@ -50,6 +50,7 @@ const NON_LOCALE_PREFIXES = [
   '/skill',
   '/embed',
   '/demo',
+  '/mobile-security',
   '/.well-known',
 ];
 
@@ -106,7 +107,7 @@ export default function middleware(req: NextRequest): NextResponse {
   }
   const nonce = createNonce();
   const unprefixedPathname = stripLocalePrefix(pathname);
-  const privateRoute = ['/dashboard', '/settings', '/admin', '/chat', '/login', '/register', '/forgot-password', '/reset-password', '/verify-email', '/oauth', '/embed'].some(
+  const privateRoute = ['/dashboard', '/settings', '/admin', '/chat', '/login', '/register', '/forgot-password', '/reset-password', '/verify-email', '/oauth', '/embed', '/mobile-security'].some(
     (path) => unprefixedPathname === path || unprefixedPathname.startsWith(`${path}/`),
   );
   const isEmbedRoute = unprefixedPathname.startsWith('/embed');
