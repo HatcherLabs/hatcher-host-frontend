@@ -8,7 +8,6 @@ import { useAuth } from '@/lib/auth-context';
 import { track } from '@/lib/analytics';
 import { AuthShell } from '@/components/auth/v3/AuthShell';
 import { sanitizeLocalReturnPath } from '@/lib/safe-redirect';
-import { IncentivSignIn } from '@/components/auth/IncentivSignIn';
 import { GoogleSignIn } from '@/components/auth/GoogleSignIn';
 
 export default function LoginPage() {
@@ -59,7 +58,6 @@ export default function LoginPage() {
         </>
       }
     >
-      <IncentivSignIn returnPath={returnPath} />
       <GoogleSignIn returnPath={returnPath} showUnavailable={process.env.NEXT_PUBLIC_SITE_URL?.startsWith('http://localhost')} />
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>

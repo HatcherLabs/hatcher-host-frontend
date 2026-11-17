@@ -22,7 +22,7 @@ test('Incentiv connect → sign → cookie session; desktop and mobile layout', 
     if (path.endsWith('/auth/incentiv/config')) data = { enabled: true, chainId: 24101, portal: 'https://portal.incentiv.io' };
     else if (path.endsWith('/auth/providers')) data = { google: false, apple: false };
     else if (path.endsWith('/auth/browser-admission')) data = { enabled: false };
-    else if (path.endsWith('/auth/session')) data = { authenticated: false, user: null };
+    else if (path.endsWith('/auth/session')) data = verified ? { authenticated: true, user: { id: 'test-wallet-user', username: 'wallet_tester', email: null, needsUsername: false } } : { authenticated: false, user: null };
     else if (path.endsWith('/auth/incentiv/challenge')) {
       expect(route.request().postDataJSON()).toEqual({ address: ADDRESS });
       data = { challengeId: CHALLENGE_ID, message: MESSAGE, address: ADDRESS, expiresAt: new Date(Date.now() + 300000).toISOString() };
@@ -40,8 +40,7 @@ test('Incentiv connect → sign → cookie session; desktop and mobile layout', 
     if (input.intent === 'SIGN') expect(input.payload).toBe(MESSAGE);
     await route.fulfill({ contentType: 'text/html', body: '<script>window.opener.postMessage(' + JSON.stringify(result) + ', ' + JSON.stringify(origin) + ');</script>' });
   });
-  await context.route(url => url.pathname === '/incentiv-test-success', route => route.fulfill({ contentType: 'text/html', body: '<h1>Signed in fixture</h1>' }));
-  await page.goto('/de/login?return=/incentiv-test-success');
+  await page.goto('/incentiv-preview');
   const connect = page.getByRole('button', { name: 'Continue with Incentiv' });
   await expect(connect).toBeEnabled();
   await page.screenshot({ path: testInfo.outputPath('incentiv-desktop.png'), fullPage: true });
@@ -52,7 +51,7 @@ test('Incentiv connect → sign → cookie session; desktop and mobile layout', 
   await connect.click();
   await expect(page.getByRole('button', { name: 'Sign in with wallet' })).toBeEnabled();
   await page.getByRole('button', { name: 'Sign in with wallet' }).click();
-  await expect(page.getByRole('heading', { name: 'Signed in fixture' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Your Hatcher session is active' })).toBeVisible();
   expect(verified).toBe(true);
   expect(pageErrors).toEqual([]);
 });
@@ -79,10 +78,19 @@ test('a rejected signature leaves the user signed out and allows retry', async (
     const result = input.intent === 'CONNECT' ? { type: 'CONNECT_RESOLVED', address: ADDRESS } : { type: 'REJECTED', reason: 'Cancelled by user' };
     await route.fulfill({ contentType: 'text/html', body: '<script>window.opener.postMessage(' + JSON.stringify(result) + ', ' + JSON.stringify(origin) + ');</script>' });
   });
-  await page.goto('/de/login');
+  await page.goto('/incentiv-preview');
   await page.getByRole('button', { name: 'Continue with Incentiv' }).click();
   await page.getByRole('button', { name: 'Sign in with wallet' }).click();
   await expect(page.locator('p[role=alert]')).toContainText('rejected');
   await expect(page.getByRole('button', { name: 'Continue with Incentiv' })).toBeEnabled();
   expect(verificationCalls).toBe(0);
+});
+
+test('wallet preview is absent from public login and registration', async ({ page, context }) => {
+  await context.route(url => url.pathname.includes('/auth/'), route => route.fulfill({ json: { success: true, data: { enabled: true, authenticated: false, user: null } } }));
+  for (const path of ['/de/login', '/de/register']) {
+    await page.goto(path);
+    await expect(page.getByRole('button', { name: 'Continue with Incentiv' })).toHaveCount(0);
+    await expect(page.locator('a[href*="incentiv-preview"]')).toHaveCount(0);
+  }
 });
