@@ -3378,5 +3378,18 @@
     "pending": "Se așteaptă prima măsurătoare a stocării.",
     "unsupported": "Măsurarea stocării nu este disponibilă pentru acest runtime.",
     "refreshFailed": "Metricile nu au putut fi actualizate. Stocarea afișată este ultima măsurătoare."
+  },
+  "incentivLogin": {
+    "continue": "Continuă cu Incentiv",
+    "sign": "Autentifică-te cu wallet-ul",
+    "waiting": "Se așteaptă aprobarea…",
+    "loading": "Se încarcă wallet-ul…",
+    "description": "Fără email sau parolă. Semnează un mesaj pentru a continua.",
+    "connected": "Conectat: {address}. Semnează pentru a intra — fără tranzacție sau gas.",
+    "change": "Folosește alt wallet",
+    "expired": "Autentificarea a expirat. Conectează-te din nou.",
+    "unavailable": "Autentificarea cu wallet nu s-a încărcat. Reîncarcă pagina.",
+    "connectionFailed": "Niciun wallet conectat. Încearcă din nou.",
+    "failed": "Autentificarea a eșuat. Încearcă din nou."
   }
 }

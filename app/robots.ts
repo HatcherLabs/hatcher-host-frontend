@@ -10,7 +10,7 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: '*',
         allow: '/',
         disallow: ['', ...locales.map((locale) => `/${locale}`)].flatMap((prefix) =>
-          ['/dashboard', '/settings', '/admin', '/api', '/chat', '/oauth'].flatMap((path) =>
+          ['/dashboard', '/settings', '/admin', '/api', '/chat', '/oauth', '/incentiv-preview'].flatMap((path) =>
             [`${prefix}${path}$`, `${prefix}${path}/`],
           ),
         ),

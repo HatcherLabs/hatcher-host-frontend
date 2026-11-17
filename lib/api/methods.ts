@@ -223,7 +223,7 @@ export type ConfigPatchResult =
 
 export type AuthProfileData = {
   id: string;
-  email: string;
+  email: string | null;
   username: string;
   needsUsername?: boolean;
   walletAddress: string | null;
