@@ -344,12 +344,11 @@ export default function SettingsPage() {
   // ── Save profile ──────────────────────────────────────────
   async function handleSaveProfile() {
     if (!user) return;
-    if (!username.trim() || !email.trim()) { toast('error', 'Username and email are required'); return; }
+    if (!username.trim()) { toast('error', 'Username is required'); return; }
     setSavingProfile(true);
     try {
       const updates: { username?: string; email?: string; avatarUrl?: string | null } = {};
       if (username !== user.username) updates.username = username;
-      if (email !== user.email) updates.email = email;
       if (avatarUrl !== user.avatarUrl) updates.avatarUrl = avatarUrl;
       if (!Object.keys(updates).length) { toast('info', 'No changes to save'); return; }
       const res = await api.updateProfile(updates);
@@ -578,7 +577,7 @@ export default function SettingsPage() {
                       {/* Edit fields */}
                       <div className="space-y-4">
                         <Field label={t('profile.usernameLabel')} value={username} onChange={setUsername} placeholder="your_username" hint={t('profile.usernameHint')} />
-                        <Field label={t('profile.emailLabel')} value={email} onChange={setEmail} type="email" placeholder="you@example.com" />
+                        <div><p className="text-xs text-[var(--text-muted)]">{t('profile.emailLabel')}</p><p className="text-sm text-[var(--text-primary)]">{email || 'Signed in with your wallet — no email required'}</p></div>
                         <button
                           onClick={handleSaveProfile}
                           disabled={savingProfile}

@@ -9,7 +9,7 @@ import { UsernameSetup } from '@/components/auth/UsernameSetup';
 
 interface UserProfile {
   id: string;
-  email: string;
+  email: string | null;
   username: string;
   needsUsername?: boolean;
   walletAddress: string | null;

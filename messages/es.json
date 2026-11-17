@@ -2945,5 +2945,18 @@
     "railTasks": "Tareas",
     "railPlans": "Planes",
     "railHelp": "Ayuda"
+  },
+  "incentivLogin": {
+    "continue": "Continue with Incentiv",
+    "sign": "Sign in with wallet",
+    "waiting": "Waiting for approval…",
+    "loading": "Loading wallet…",
+    "description": "No email or password. Sign a message to continue.",
+    "connected": "Connected: {address}. Sign to finish — no transaction or gas.",
+    "change": "Use a different wallet",
+    "expired": "Sign-in expired. Please connect again.",
+    "unavailable": "Wallet sign-in could not load. Please refresh and try again.",
+    "connectionFailed": "No wallet connected. Please try again.",
+    "failed": "Wallet sign-in failed. Please try again."
   }
 }
