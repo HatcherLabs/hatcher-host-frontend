@@ -108,6 +108,9 @@ export default function middleware(req: NextRequest): NextResponse {
   }
   const nonce = createNonce();
   const unprefixedPathname = stripLocalePrefix(pathname);
+  if (/^\/(?:explore|traders|agent|embed\/agent)(?:\/|$)/.test(unprefixedPathname)) {
+    return new NextResponse('Not found', { status: 404, headers: { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
+  }
   const privateRoute = ['/dashboard', '/settings', '/admin', '/chat', '/login', '/register', '/forgot-password', '/reset-password', '/verify-email', '/oauth', '/embed', '/mobile-security', '/incentiv-preview'].some(
     (path) => unprefixedPathname === path || unprefixedPathname.startsWith(`${path}/`),
   );

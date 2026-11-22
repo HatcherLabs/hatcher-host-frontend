@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import NextLink from "next/link";
 import { useTranslations } from "next-intl";
-import { Archive, ArrowLeft, BarChart3, Bot, ChevronDown, ChevronRight, Compass, CreditCard, Globe, HelpCircle, ListChecks, LogIn, LogOut, Menu, MessageSquare, Network, PanelLeftClose, PanelLeftOpen, Plus, Search, Send, Settings, ShieldCheck, WandSparkles, X, type LucideIcon } from "lucide-react";
+import { Archive, ArrowLeft, BarChart3, Bot, ChevronDown, ChevronRight, CreditCard, Globe, HelpCircle, ListChecks, LogIn, LogOut, Menu, MessageSquare, Network, PanelLeftClose, PanelLeftOpen, Plus, Search, Send, Settings, ShieldCheck, WandSparkles, X, type LucideIcon } from "lucide-react";
 import { Link, usePathname, useRouter } from "@/i18n/routing";
 import { APP_STORE_URL, GOOGLE_PLAY_URL } from "@/lib/mobile-app-links";
 import { loginHrefForReturn } from "@/lib/safe-redirect";
@@ -27,7 +27,6 @@ const NAV: { key: WorkspaceSection; href: string; Icon: LucideIcon }[] = [
   { key: "agents", href: "/dashboard/agents", Icon: Bot },
   { key: "canvas", href: "/?mode=canvas", Icon: WandSparkles },
   { key: "missions", href: "/dashboard/missions", Icon: ListChecks },
-  { key: "discover", href: "/explore", Icon: Compass },
   { key: "website", href: "/platform", Icon: Globe },
 ];
 const AGENT_SECTIONS = new Set<WorkspaceSection>(["agents", "analytics", "compute", "mesh"]);
@@ -193,7 +192,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
     missions: [{ label: t("allMissions"), href: "/dashboard/missions", Icon: ListChecks }, { label: t("approvals"), href: "/dashboard/approvals", Icon: ShieldCheck }, { label: u("automations"), href: "/dashboard/automations" }],
     plans: [{ label: t("comparePlans"), href: "/pricing" }, ...(isAuthenticated ? [{ label: t("subscription"), href: "/dashboard/billing#subscription" }, { label: "AI Credits", href: "/dashboard/billing#ai-credits" }, { label: t("addons"), href: "/dashboard/billing#addons" }, { label: t("payments"), href: "/dashboard/billing#payments" }] : [])],
     settings: [{ label: "Sites & apps", href: "/dashboard/hosting", Icon: Globe }, { label: backups("title"), href: "/dashboard/backups", Icon: Archive }, { label: t("account"), href: "/dashboard/settings" }, { label: t("apiKeys"), href: "/dashboard/settings/api-keys" }, ...(user?.isAdmin ? [{ label: "Admin", href: "/admin" }] : [])],
-    discover: [{ label: groups("publicAgentsLabel"), href: "/explore" }, { label: groups("tradersLabel"), href: "/traders" }],
+    discover: [],
     help: [{ label: t("help"), href: "/help" }, { label: nav("support"), href: "/support" }, { label: nav("docs"), href: "/docs" }, { label: footer("itemSecurity"), href: "/security" }],
   };
   function contextLink(item: { label: string; href: string; Icon?: LucideIcon }) {
