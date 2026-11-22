@@ -1,5 +1,1 @@
-import { AgentPageClient } from './AgentPageClient';
-
-export default function MissingPublicAgent() {
-  return <AgentPageClient />;
-}
+export default function AgentNotFound() { return <main>Page not found</main>; }

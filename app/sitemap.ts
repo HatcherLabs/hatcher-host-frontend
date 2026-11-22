@@ -1,7 +1,5 @@
 import { MetadataRoute } from "next";
 import { BLOG_POSTS } from "@/lib/blog";
-import { API_URL } from "@/lib/config";
-import { shouldSkipStaticApiFetch } from "@/lib/static-api-fetch";
 import { HATCHER_TUTORIALS } from "@/lib/tutorials";
 import { buildLanguagesMap, contentLocales } from "@/lib/seo";
 import { routing } from "@/i18n/routing";
@@ -11,11 +9,6 @@ export const revalidate = 3600;
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://hatcher.host";
 
-interface ExploreAgent {
-  id: string;
-  slug?: string;
-  updatedAt?: string;
-}
 
 // Public routes that get localized sitemap entries
 const LOCALIZED_ROUTES: Array<{
@@ -28,8 +21,6 @@ const LOCALIZED_ROUTES: Array<{
   { path: "/usage", changeFrequency: "daily", priority: 0.5 },
   { path: "/staking", changeFrequency: "weekly", priority: 0.5 },
   { path: "/pricing", changeFrequency: "weekly", priority: 0.9 },
-  { path: "/explore", changeFrequency: "daily", priority: 0.85 },
-  { path: "/traders", changeFrequency: "daily", priority: 0.85 },
   { path: "/features", changeFrequency: "weekly", priority: 0.85 },
   { path: "/compute", changeFrequency: "weekly", priority: 0.8 },
   { path: "/frameworks", changeFrequency: "weekly", priority: 0.8 },
@@ -86,35 +77,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.3,
   }));
 
-  // Fetch public agents for dynamic pages (English only)
-  let agentEntries: MetadataRoute.Sitemap = [];
-  if (!shouldSkipStaticApiFetch(API_URL)) {
-    try {
-      for (let offset = 0; offset < 10_000;) {
-        const res = await fetch(`${API_URL}/agents/explore?limit=100&offset=${offset}`, {
-          next: { revalidate: 3600 },
-          signal: AbortSignal.timeout(5_000),
-        });
-        if (!res.ok) break;
-        const json = await res.json() as {
-          success: boolean;
-          data?: { agents: ExploreAgent[]; pagination?: { hasMore: boolean } };
-        };
-        const agents = json.success ? json.data?.agents ?? [] : [];
-        agentEntries.push(...agents.map((agent) => ({
-          url: `${SITE_URL}/agent/${encodeURIComponent(agent.slug || agent.id)}`,
-          ...(agent.updatedAt ? { lastModified: new Date(agent.updatedAt) } : {}),
-          changeFrequency: "daily" as const,
-          priority: 0.5,
-        })));
-        if (!agents.length || !json.data?.pagination?.hasMore) break;
-        offset += agents.length;
-      }
-    } catch {
-      // Skip dynamic pages if API is unavailable
-    }
-  }
-
   return [
     ...localizedEntries,
     ...blogPostEntries,
@@ -124,6 +86,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     })),
     ...legalEntries,
-    ...agentEntries,
+
   ];
 }
