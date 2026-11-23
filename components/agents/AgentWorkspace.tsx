@@ -1600,6 +1600,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
       configProvider: config.configProvider, setConfigProvider: config.setConfigProvider,
       customModelInput: config.customModelInput, setCustomModelInput: config.setCustomModelInput,
       useCustomModel: config.useCustomModel, setUseCustomModel: config.setUseCustomModel,
+      byokBaseUrl: config.byokBaseUrl, setByokBaseUrl: config.setByokBaseUrl,
       byokKeyInput: config.byokKeyInput, setByokKeyInput: config.setByokKeyInput,
       showByokKey: config.showByokKey, setShowByokKey: config.setShowByokKey,
       configIsPublic: config.configIsPublic, setConfigIsPublic: config.setConfigIsPublic,

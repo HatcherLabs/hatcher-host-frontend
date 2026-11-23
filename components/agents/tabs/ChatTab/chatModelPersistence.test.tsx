@@ -35,4 +35,20 @@ describe('chat model persistence', () => {
     await expect(config.switchChatModel('new-model')).rejects.toThrow('own provider');
     expect(api.updateAgent).not.toHaveBeenCalled();
   });
+  it('requires a fresh key when changing a saved custom endpoint', async () => {
+    const current = { ...agent, config: { provider: 'custom', model: 'first', byok: {
+      provider: 'custom', model: 'first', apiKey: '***', baseUrl: 'https://first.example/v1',
+    } } } as unknown as Agent;
+    await act(async () => root.render(<Harness current={current} />));
+    expect(config.byokBaseUrl).toBe('https://first.example/v1');
+    await act(async () => config.setByokBaseUrl('https://second.example/v1'));
+    await act(async () => { expect(await config.saveConfig()).toBe(false); });
+    expect(api.updateAgent).not.toHaveBeenCalled();
+    await act(async () => config.setByokKeyInput('new-provider-key'));
+    vi.mocked(api.updateAgent).mockResolvedValue({ success: true, data: current });
+    await act(async () => { expect(await config.saveConfig()).toBe(true); });
+    expect(api.updateAgent).toHaveBeenCalledWith(agent.id, expect.objectContaining({ config: expect.objectContaining({
+      byok: { provider: 'custom', model: 'first', apiKey: 'new-provider-key', baseUrl: 'https://second.example/v1' },
+    }) }));
+  });
 });

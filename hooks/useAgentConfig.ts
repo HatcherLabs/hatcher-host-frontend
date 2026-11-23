@@ -155,6 +155,7 @@ export function useAgentConfig(
   const [configProvider, setConfigProvider] = useState(HOSTED_PROVIDER);
   const [customModelInput, setCustomModelInput] = useState('');
   const [useCustomModel, setUseCustomModel] = useState(false);
+  const [byokBaseUrl, setByokBaseUrl] = useState('');
   const [byokKeyInput, setByokKeyInput] = useState('');
   const [showByokKey, setShowByokKey] = useState(false);
   const [configIsPublic, setConfigIsPublic] = useState(false);
@@ -184,6 +185,8 @@ export function useAgentConfig(
     setConfigSystemPrompt((char as Record<string, unknown>).systemPrompt as string ?? '');
     setConfigSkills(Array.isArray((char as Record<string, unknown>).skills) ? ((char as Record<string, unknown>).skills as string[]).join(', ') : '');
     const { provider: normalizedProvider, model: loadedModel } = resolveLoadedModelConfig(char as Record<string, unknown>);
+    const byok = (char as Record<string, unknown>).byok as { baseUrl?: string } | undefined;
+    setByokBaseUrl(byok?.baseUrl ?? '');
     setConfigModel(loadedModel);
     setConfigProvider(normalizedProvider);
     const customState = resolveInitialCustomModelState(normalizedProvider, loadedModel);
@@ -198,6 +201,10 @@ export function useAgentConfig(
   const hasApiKey = (() => {
     const char = agent?.config ?? {};
     const byok = (char as Record<string, unknown>).byok as Record<string, unknown> | undefined;
+    if (configProvider === 'custom' || byok?.provider === 'custom') {
+      return byok?.provider === configProvider && byok?.baseUrl === byokBaseUrl.trim() && Boolean(byok?.apiKey);
+    }
+    if (byok?.provider && byok.provider !== configProvider) return false;
     if (typeof byok?.apiKey === 'string' && byok.apiKey.length > 0) return true;
     const secrets = (char as Record<string, unknown>).secrets as Record<string, unknown> | undefined;
     return !!(secrets && Object.keys(secrets).length > 0);
@@ -227,6 +234,10 @@ export function useAgentConfig(
         return false;
       }
     }
+    if (normalizedProvider === 'custom' && (!byokBaseUrl.trim() || !(useCustomModel ? customModelInput : configModel).trim())) {
+      setSaveMsg('Error: Enter a public HTTPS Base URL and provider model ID.');
+      return false;
+    }
     setSaving(true);
     setSaveMsg(null);
     const updateData: Record<string, unknown> = {
@@ -254,10 +265,11 @@ export function useAgentConfig(
       provider: normalizedProvider || undefined,
       publicChat: publicChatPatch.publicChat,
       ...(isHostedProvider ? { byok: null } : {}),
-      ...(!isHostedProvider && byokKeyInput.trim() ? {
+      ...(!isHostedProvider && (byokKeyInput.trim() || normalizedProvider === 'custom') ? {
         byok: {
-          provider: normalizedProvider as 'openai' | 'anthropic' | 'google' | 'groq' | 'xai' | 'openrouter' | 'venice',
-          apiKey: byokKeyInput.trim(),
+          provider: normalizedProvider,
+          ...(byokKeyInput.trim() ? { apiKey: byokKeyInput.trim() } : {}),
+          ...(normalizedProvider === 'custom' ? { baseUrl: byokBaseUrl.trim() } : {}),
           model: savedModel,
         },
       } : {}),
@@ -277,7 +289,7 @@ export function useAgentConfig(
     setSaveMsg('Error: ' + res.error);
     return false;
   }, [agent, id, setAgent, configName, configDesc, configSystemPrompt, configSkills, configModel, configProvider,
-    useCustomModel, customModelInput, byokKeyInput, hasApiKey,
+    useCustomModel, customModelInput, byokKeyInput, byokBaseUrl, hasApiKey,
     configIsPublic, configPublicChatEnabled, configPublicChatDailyAiCreditCap]);
 
   // A chat model switch persists only model fields, never unsaved Config form edits.
@@ -312,7 +324,7 @@ export function useAgentConfig(
     configProvider, setConfigProvider,
     customModelInput, setCustomModelInput,
     useCustomModel, setUseCustomModel,
-    byokKeyInput, setByokKeyInput,
+    byokBaseUrl, setByokBaseUrl, byokKeyInput, setByokKeyInput,
     showByokKey, setShowByokKey,
     configIsPublic, setConfigIsPublic,
     configPublicChatEnabled, setConfigPublicChatEnabled,
