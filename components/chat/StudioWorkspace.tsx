@@ -109,6 +109,11 @@ export default function StudioWorkspace({
     availableModels.find((item) => item.default && item.configured) ??
     availableModels.find((item) => item.configured) ??
     availableModels[0];
+  const imageVideo = availableModels.find(item => item.configured && item.requiresImage &&
+    item.id === (tool?.id + "-image-to-video")) ??
+    availableModels.find(item => item.configured && item.requiresImage && item.id === tool?.id.replace("-text-to-video", "-image-to-video")) ??
+    availableModels.find(item => item.configured && item.requiresImage && item.provider === tool?.provider) ??
+    availableModels.find(item => item.configured && item.requiresImage);
   const aspectRatio = tool?.aspectRatios?.includes(ratio) ? ratio : undefined;
   const missingImage = Boolean(
     tool?.requiresImage && !sourceImage && !sourceAssetId,
@@ -413,16 +418,19 @@ export default function StudioWorkspace({
                         value={item.id}
                         disabled={!item.configured}
                       >
-                        {item.label} · ~{item.estimatedAiCredits} credits
+                        {item.label}{item.provider ? " · " + (item.provider === "venice" ? "Venice" : item.provider === "openrouter" ? "OpenRouter" : item.provider) : ""} · ~{item.estimatedAiCredits} credits
                         {!item.configured ? " (unavailable)" : ""}
                       </option>
                     ))}
                   </select>
                 )}
               </div>
+              {kind === "video" && tool?.requiresImage && !tool.aspectRatios?.length && (
+                <p className={styles.hint}>Video format follows the starting image.</p>
+              )}
               {Boolean(tool?.aspectRatios && tool.aspectRatios.length > 1) && (
                 <label>
-                  Aspect ratio
+                  {kind === "video" ? "Video format" : "Aspect ratio"}
                   <select
                     disabled={busy}
                     value={aspectRatio ?? ""}
@@ -430,13 +438,13 @@ export default function StudioWorkspace({
                   >
                     <option value="">Model default</option>
                     {tool?.aspectRatios?.map((value) => (
-                      <option key={value}>{value}</option>
+                      <option key={value} value={value}>{kind === "video" && value === "9:16" ? "9:16 · Portrait" : kind === "video" && value === "16:9" ? "16:9 · Landscape" : value}</option>
                     ))}
                   </select>
                 </label>
               )}
-              {tool?.requiresImage &&
-                (tool.characterReference
+              {(tool?.requiresImage || (kind === "video" && imageVideo)) &&
+                (tool?.characterReference
                   ? ["start", "character"]
                   : ["start"]
                 ).map((role) => (
@@ -444,7 +452,7 @@ export default function StudioWorkspace({
                     {role === "start"
                       ? sourceAssetId
                         ? "Starting image selected from library"
-                        : "Starting image"
+                        : tool?.requiresImage ? "Starting image" : `Upload a starting image with ${imageVideo?.label}`
                       : "Character sheet (optional)"}
                     <input
                       type="file"
@@ -467,7 +475,12 @@ export default function StudioWorkspace({
                         setError("");
                         setReadingImage(true);
                         const reader = new FileReader();
-                        reader.onload = () => setImage(String(reader.result));
+                        reader.onload = () => {
+                          if (role === "start" && !tool?.requiresImage && imageVideo) {
+                            setSelectedModels(previous => ({ ...previous, video: imageVideo.id }));
+                          }
+                          setImage(String(reader.result));
+                        };
                         reader.onerror = () =>
                           setError("Could not read the image.");
                         reader.onloadend = () => setReadingImage(false);
