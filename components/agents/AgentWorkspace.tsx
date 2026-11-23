@@ -1645,7 +1645,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
     config.configName, config.configDesc, config.configBio, config.configLore, config.configTopics,
     config.configStyle, config.configAdjectives, config.configSystemPrompt, config.configSkills,
     config.configModel, config.configProvider, config.customModelInput, config.useCustomModel,
-    config.byokKeyInput, config.showByokKey, config.saving, config.saveMsg,
+    config.byokBaseUrl, config.byokKeyInput, config.showByokKey, config.saving, config.saveMsg,
     integrations.integrationSecrets, integrations.expandedIntegrations, integrations.visibleFields,
     integrations.savingIntegration, integrations.integrationSaveMsg,
     activeFeatures, activeFeatureKeys, featuresLoading,
