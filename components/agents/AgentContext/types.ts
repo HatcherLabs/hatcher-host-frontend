@@ -172,6 +172,8 @@ export interface AgentContextValue {
   setCustomModelInput: (value: string) => void;
   useCustomModel: boolean;
   setUseCustomModel: (value: boolean) => void;
+  byokBaseUrl: string;
+  setByokBaseUrl: (value: string) => void;
   byokKeyInput: string;
   setByokKeyInput: (value: string) => void;
   showByokKey: boolean;

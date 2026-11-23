@@ -33,7 +33,7 @@ import {
   SlidersHorizontal,
 } from 'lucide-react';
 import { BYOK_PROVIDERS } from '@hatcher/shared';
-import { api } from '@/lib/api';
+import { api, req } from '@/lib/api';
 import { groupChatModels } from '@/lib/chat-model-groups';
 import { ModelProviderSection } from '@/components/chat/ModelProviderSection';
 import { type ModelPreset, MODEL_PRESETS_STORAGE_KEY, modelPresetId, isModelPreset, sanitizeModelPreset, writeModelPresets } from '@/lib/model-presets';
@@ -297,6 +297,7 @@ export function ConfigTab() {
     setCustomModelInput,
     useCustomModel,
     setUseCustomModel,
+    byokBaseUrl, setByokBaseUrl,
     byokKeyInput,
     setByokKeyInput,
     showByokKey,
@@ -315,6 +316,7 @@ export function ConfigTab() {
     hasApiKey,
   } = useAgentContext();
 
+  const [testingConnection, setTestingConnection] = useState(false);
   const hostedProvider = 'openrouter';
   const tIronclawModel = useTranslations('dashboard.agentDetail.ironclaw.model');
   const { toast } = useToast();
@@ -489,6 +491,9 @@ export function ConfigTab() {
         ],
       });
     }
+    providers.push({ key: 'custom', name: 'Custom (OpenAI-compatible)',
+      description: 'Connect a public HTTPS Chat Completions endpoint with your provider API key.',
+      requiresApiKey: true, requiresBaseUrl: true, models: [] });
     return providers;
   }, []);
 
@@ -515,7 +520,7 @@ export function ConfigTab() {
   const currentModelName = isHostedMode ? selectedHostedModel.name : selectedByokModelName || 'No model selected';
   const currentModelRoute = isHostedMode
     ? hostedModelRoute(selectedHostedModel)
-    : selectedByokProvider?.defaultBaseUrl ?? 'Provider default endpoint';
+    : configProvider === 'custom' ? byokBaseUrl.trim() || 'Enter Base URL' : selectedByokProvider?.defaultBaseUrl ?? 'Provider default endpoint';
 
   const selectHostedModel = useCallback((modelId: string) => {
     const model = getHostedModelOption(modelId, availableHostedModels);
@@ -1739,6 +1744,15 @@ export function ConfigTab() {
               </div>
             </label>
 
+            {configProvider === 'custom' && (
+              <label className="block">
+                <span className="block text-sm font-medium mb-2">Base URL</span>
+                <input type="url" className="config-input" value={byokBaseUrl}
+                  onChange={event => { setByokBaseUrl(event.target.value); setByokKeyInput(''); }}
+                  placeholder="https://api.example.com/v1" />
+              </label>
+            )}
+
             <label className="block">
               <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Provider model ID</span>
               <input
@@ -1769,7 +1783,7 @@ export function ConfigTab() {
                     </div>
                     <p className="mt-1 text-sm text-[var(--text-secondary)]">{selectedByokProvider.description}</p>
                     <p className="mt-2 break-all text-xs text-[var(--text-tertiary)]">
-                      Route: {selectedByokProvider.defaultBaseUrl ?? 'Provider default endpoint'}
+                      Route: {currentModelRoute}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2 text-xs text-[var(--text-secondary)]">
@@ -1826,6 +1840,24 @@ export function ConfigTab() {
                 </p>
               )}
             </label>
+            {configProvider === 'custom' && (
+              <button type="button" className="config-input" disabled={testingConnection || !byokBaseUrl.trim() || !byokKeyInput.trim() || !selectedByokModelName}
+                onClick={async () => {
+                  setTestingConnection(true);
+                  try {
+                    const result = await req<{ valid: boolean; error?: string }>('/agents/validate-key', {
+                      method: 'POST', body: JSON.stringify({ provider: 'custom', baseUrl: byokBaseUrl.trim(),
+                        model: (useCustomModel ? customModelInput : configModel).trim(), apiKey: byokKeyInput.trim() }),
+                    });
+                    if (result.success && result.data.valid) toast.success('The provider returned a chat completion.');
+                    else toast.error(result.success ? result.data.error ?? 'Connection test failed.' : result.error);
+                  } catch {
+                    toast.error('Could not complete the connection test.');
+                  } finally {
+                    setTestingConnection(false);
+                  }
+                }}>{testingConnection ? 'Testing…' : 'Test connection'}</button>
+            )}
           </div>
         )}
       </GlassCard>
