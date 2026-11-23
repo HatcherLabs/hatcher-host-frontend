@@ -45,6 +45,9 @@ export interface GenerationModel extends ChatCreateTool {
   default?: boolean;
   requiredAiCredits?: number;
   maxPromptChars?: number;
+  aspectRatios?: string[];
+  characterReference?: boolean;
+  requiresImage?: boolean;
 }
 
 /** Allow the UI to roll out alongside older APIs without pretending new models exist. */

@@ -82,6 +82,11 @@ export default function StudioWorkspace({
     setTab(routeParams.get("view") === "library" ? "library" : "create");
   }, [routeParams]);
 
+  const [sourceAssetId, setSourceAssetId] = useState("");
+  const [characterImage, setCharacterImage] = useState("");
+  const [sourceImage, setSourceImage] = useState("");
+  const [ratio, setRatio] = useState("");
+  const [readingImage, setReadingImage] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [tools, setTools] = useState<GenerationModel[]>([]);
   const [selectedModels, setSelectedModels] = useState<
@@ -104,6 +109,10 @@ export default function StudioWorkspace({
     availableModels.find((item) => item.default && item.configured) ??
     availableModels.find((item) => item.configured) ??
     availableModels[0];
+  const aspectRatio = tool?.aspectRatios?.includes(ratio) ? ratio : undefined;
+  const missingImage = Boolean(
+    tool?.requiresImage && !sourceImage && !sourceAssetId,
+  );
   const maxPromptChars =
     tool?.maxPromptChars ?? (kind === "audio" ? 2000 : 4000);
   const requiredCredits =
@@ -127,7 +136,7 @@ export default function StudioWorkspace({
     setError("");
     Promise.all([
       chatRequest<{ tools: ChatCreateTool[]; models?: GenerationModel[] }>(
-        "/create/config",
+        "/create/config?videoInputs=1",
       ),
       chatRequest<ChatAccount>("/account"),
       chatRequest<{ models: ChatModel[] }>("/models"),
@@ -159,6 +168,8 @@ export default function StudioWorkspace({
   async function generate() {
     if (
       locked.current ||
+      missingImage ||
+      readingImage ||
       !tool?.configured ||
       !prompt.trim() ||
       prompt.trim().length > maxPromptChars ||
@@ -186,6 +197,15 @@ export default function StudioWorkspace({
             kind,
             // Historical image capability IDs are omitted for older API compatibility.
             ...(tool.id === "seedream_image" ? {} : { model: tool.id }),
+            aspectRatio,
+            sourceImage:
+              tool.requiresImage && sourceImage ? sourceImage : undefined,
+            sourceAssetId:
+              tool.requiresImage && sourceAssetId ? sourceAssetId : undefined,
+            characterImage:
+              tool.characterReference && characterImage
+                ? characterImage
+                : undefined,
             prompt: prompt.trim(),
           }),
         },
@@ -400,6 +420,71 @@ export default function StudioWorkspace({
                   </select>
                 )}
               </div>
+              {Boolean(tool?.aspectRatios && tool.aspectRatios.length > 1) && (
+                <label>
+                  Aspect ratio
+                  <select
+                    disabled={busy}
+                    value={aspectRatio ?? ""}
+                    onChange={(e) => setRatio(e.target.value)}
+                  >
+                    <option value="">Model default</option>
+                    {tool?.aspectRatios?.map((value) => (
+                      <option key={value}>{value}</option>
+                    ))}
+                  </select>
+                </label>
+              )}
+              {tool?.requiresImage &&
+                (tool.characterReference
+                  ? ["start", "character"]
+                  : ["start"]
+                ).map((role) => (
+                  <label key={role}>
+                    {role === "start"
+                      ? sourceAssetId
+                        ? "Starting image selected from library"
+                        : "Starting image"
+                      : "Character sheet (optional)"}
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg"
+                      disabled={busy || readingImage}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (role === "start") setSourceAssetId("");
+                        const setImage =
+                          role === "start" ? setSourceImage : setCharacterImage;
+                        setImage("");
+                        if (!file) return;
+                        if (
+                          file.size > 2097152 ||
+                          !["image/jpeg", "image/png"].includes(file.type)
+                        ) {
+                          setError("Choose a JPEG or PNG up to 2 MiB.");
+                          return;
+                        }
+                        setError("");
+                        setReadingImage(true);
+                        const reader = new FileReader();
+                        reader.onload = () => setImage(String(reader.result));
+                        reader.onerror = () =>
+                          setError("Could not read the image.");
+                        reader.onloadend = () => setReadingImage(false);
+                        reader.readAsDataURL(file);
+                      }}
+                    />
+                    {role === "character" && characterImage && (
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() => setCharacterImage("")}
+                      >
+                        Remove character sheet
+                      </button>
+                    )}
+                  </label>
+                ))}
               {kind === "audio" && (
                 <p className={styles.hint}>
                   Choose Clip for 30 seconds or Pro for a full song. Include
@@ -465,6 +550,8 @@ export default function StudioWorkspace({
                     !prompt.trim() ||
                     prompt.trim().length > maxPromptChars ||
                     !model ||
+                    missingImage ||
+                    readingImage ||
                     balance < requiredCredits
                   }
                 >
@@ -664,6 +751,37 @@ export default function StudioWorkspace({
                             : `Check status (~${statusTool?.statusCheckAiCredits ?? 1} credits)`}
                       </button>
                     )}
+                    {assetKind === "image" &&
+                      asset.status === "completed" &&
+                      tools.some((t) => t.requiresImage && t.configured) && (
+                        <button
+                          disabled={busy}
+                          onClick={() => {
+                            const video =
+                              tools.find(
+                                (t) =>
+                                  t.requiresImage &&
+                                  t.configured &&
+                                  t.characterReference,
+                              ) ??
+                              tools.find(
+                                (t) => t.requiresImage && t.configured,
+                              )!;
+                            setSourceImage("");
+                            setSourceAssetId(asset.id);
+                            setKind("video");
+                            setRatio("9:16");
+                            setSelectedModels((previous) => ({
+                              ...previous,
+                              video: video.id,
+                            }));
+                            setPrompt("");
+                            setTab("create");
+                          }}
+                        >
+                          Animate image
+                        </button>
+                      )}
                     <button
                       disabled={busy}
                       onClick={() => {
