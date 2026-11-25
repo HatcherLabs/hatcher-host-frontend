@@ -22,7 +22,7 @@ export function IncentivPreview() {
         </section>
       ) : <IncentivSignIn returnPath="/incentiv-preview" />}
       <p className="mt-6 text-xs leading-5 text-[var(--text-muted)]">
-        This preview tests wallet authentication only. Payments are not part of this flow.
+        <a href="https://api.hatcher.host/incentiv-preview/credits" className="underline">Open the x402 credits checkout</a> to buy 5,000 Hatcher credits for 7 USDC on Incentiv Mainnet.
       </p>
     </main>
   );
