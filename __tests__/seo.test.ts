@@ -40,20 +40,13 @@ describe('Search Console regressions', () => {
     expect(entries.map((entry) => entry.url)).toContain('https://hatcher.host/ro/platform');
   });
 
-  it('includes public agent slugs from the actual paginated API envelope', async () => {
-    const fetcher = vi.fn()
-      .mockResolvedValueOnce(new Response(JSON.stringify({ success: true, data: {
-        agents: [{ id: 'one', slug: 'public-one' }], pagination: { hasMore: true },
-      } })))
-      .mockResolvedValueOnce(new Response(JSON.stringify({ success: true, data: {
-        agents: [{ id: 'two', slug: 'public-two' }], pagination: { hasMore: false },
-      } })));
+  it('keeps private agents out of the public sitemap', async () => {
+    const fetcher = vi.fn();
     vi.stubGlobal('fetch', fetcher);
-    const entries = await sitemap();
-    expect(entries.map((entry) => entry.url)).toContain('https://hatcher.host/agent/public-one');
-    expect(entries.map((entry) => entry.url)).toContain('https://hatcher.host/agent/public-two');
-    expect(entries.map((entry) => entry.url)).toContain('https://hatcher.host/platform');
-    expect(entries.some((entry) => entry.url.includes('/dashboard'))).toBe(false);
+    const urls = (await sitemap()).map((entry) => new URL(entry.url).pathname);
+    expect(fetcher).not.toHaveBeenCalled();
+    expect(urls).toContain('/platform');
+    expect(urls.some((path) => /\/(?:agent|traders|dashboard)(?:\/|$)/.test(path))).toBe(false);
   });
 
   it('treats only definitive missing profiles as not found', async () => {

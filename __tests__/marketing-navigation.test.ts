@@ -29,17 +29,15 @@ describe("marketing navigation", () => {
     }
   });
 
-  it("links the public trader directory from explore navigation and the footer", () => {
+  it("keeps the retired trader directory out of navigation and the footer", () => {
     expect(
-      NAV_GROUPS.find((group) => group.key === "explore")?.items,
-    ).toContainEqual(
-      expect.objectContaining({ key: "traders", href: "/traders" }),
-    );
+      NAV_GROUPS.flatMap((group) => group.items).some((item) => item.href === "/traders"),
+    ).toBe(false);
     expect(
       FOOTER_COLUMNS.some((column) =>
         column.items.some((item) => item.href === "/traders"),
       ),
-    ).toBe(true);
+    ).toBe(false);
   });
 
   it("links the public tutorial library from resources navigation and the footer", () => {
