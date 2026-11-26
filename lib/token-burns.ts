@@ -1,6 +1,6 @@
 import { HATCH_TOKEN_MINT } from './config';
 
-export const HATCHER_BURN_CACHE_SECONDS = 6 * 60 * 60;
+export const HATCHER_BURN_CACHE_SECONDS = 60;
 export const HATCHER_BURN_SCAN_LIMIT = 250;
 export const HATCHER_BURN_PAGE_SIZE = 1_000;
 export const HATCHER_BURN_HELIUS_SEARCH_PAGES = 1;
@@ -23,16 +23,16 @@ export type TokenBurnEvent = {
 };
 
 export type TokenBurnPeriodTotals = {
-  day: number;
-  week: number;
-  month: number;
+  day: number | null;
+  week: number | null;
+  month: number | null;
 };
 
 export type TokenBurnSummary = {
   mint: string;
   explorerUrl: string;
-  totalBurned: number;
-  totalBurnedRaw: string;
+  totalBurned: number | null;
+  totalBurnedRaw: string | null;
   burnCount: number;
   currentSupply: number | null;
   currentSupplyRaw: string | null;
@@ -44,6 +44,8 @@ export type TokenBurnSummary = {
   generatedAt: string;
   cacheTtlSeconds: number;
   source?: string;
+  historyComplete?: boolean;
+  pendingTransactions?: number;
   burns: TokenBurnEvent[];
 };
 
@@ -69,6 +71,8 @@ type RpcParsedInstruction = {
     info?: {
       mint?: string;
       source?: string;
+  historyComplete?: boolean;
+  pendingTransactions?: number;
       account?: string;
       authority?: string;
       owner?: string;
@@ -343,6 +347,8 @@ export function summarizeBurnEvents(params: {
   generatedAt?: string;
   now?: Date;
   source?: string;
+  historyComplete?: boolean;
+  pendingTransactions?: number;
 }): TokenBurnSummary {
   const mint = params.mint ?? HATCH_TOKEN_MINT;
   const nowMs = params.now?.getTime() ?? Date.now();

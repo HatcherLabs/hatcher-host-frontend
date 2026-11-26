@@ -1,7 +1,19 @@
 /** Shared Hatcher mark used by the public navigation and the chat entry point. */
-export function HatcherMark({ size = 22, className }: { size?: number; className?: string }) {
+export function HatcherMark({
+  size = 22,
+  className,
+}: {
+  size?: number;
+  className?: string;
+}) {
   return (
-    <svg width={size} height={size} viewBox="0 0 26 26" className={className} aria-hidden>
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 26 26"
+      className={className}
+      aria-hidden
+    >
       <rect width="26" height="26" rx="7" fill="var(--ink)" />
       <path
         d="M13 4.5c-4 0-7.2 3.9-7.2 8.7 0 5 3.1 8.9 7.2 8.9s7.2-3.9 7.2-8.9c0-4.8-3.2-8.7-7.2-8.7Z"

@@ -1,20 +1,20 @@
+import { localizedMetadata } from '@/lib/seo';
 import type { Metadata } from 'next';
-import { LandingV3 } from '@/components/landing/v3/LandingV3';
-import { buildLanguagesMap } from '@/lib/seo';
+import { ChatIntroduction } from '@/components/chat/ChatIntroduction';
 import { ChatEntry } from '@/components/chat/ChatEntry';
 export const dynamic = 'force-dynamic';
 
-export const metadata: Metadata = {
-  title: 'Hatcher — AI Agents for Everyday Tasks',
+const pageMetadata: Metadata = {
+  title: 'Hatcher — Chat, Agents & Canvas',
   description:
-    'Create your own AI agent for daily planning, emails, messages, market research, and coding. Start with a simple example and make it yours.',
-  alternates: { languages: buildLanguagesMap('/') },
+    'Start with a chat, work with your own AI agents, and create images, video and music in Canvas. One Hatcher workspace with shared AI Credits.',
 };
 
 // The Qwerti widget script is mounted globally by QwertiWidgetGate (root
 // layout), which only loads it on this landing route and hides its floating
 // UI on every other page.
 export default function HomePage() {
-  if (process.env.HATCHER_CHAT_ENTRY_ENABLED === 'true') return <ChatEntry />;
-  return <LandingV3 />;
+  return <ChatEntry introduction={<ChatIntroduction />} />;
 }
+
+export const generateMetadata = localizedMetadata('/', pageMetadata);

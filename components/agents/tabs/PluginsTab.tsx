@@ -1028,7 +1028,7 @@ export function PluginsTab() {
                     ? 'e.g. 42-evey/hermes-plugins'
                     : 'e.g. @openclaw/openviking'
               }
-              className="flex-1 px-3 py-1.5 text-sm rounded-lg bg-white/[0.04] border border-white/10 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/40"
+              className="min-w-0 flex-1 px-3 py-1.5 text-sm rounded-lg bg-white/[0.04] border border-white/10 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/40"
             />
             <button
               onClick={handleManualInstall}

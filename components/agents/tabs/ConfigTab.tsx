@@ -33,11 +33,12 @@ import {
   SlidersHorizontal,
 } from 'lucide-react';
 import { BYOK_PROVIDERS } from '@hatcher/shared';
-import { api } from '@/lib/api';
+import { api, req } from '@/lib/api';
+import { groupChatModels } from '@/lib/chat-model-groups';
+import { ModelProviderSection } from '@/components/chat/ModelProviderSection';
 import { type ModelPreset, MODEL_PRESETS_STORAGE_KEY, modelPresetId, isModelPreset, sanitizeModelPreset, writeModelPresets } from '@/lib/model-presets';
 import type { ComputeModelAvailability } from '@/lib/api';
 import {
-  HOSTED_MODEL_PROVIDERS,
   HOSTED_MODELS,
   createSavedHostedModelOption,
   getHostedModelOption,
@@ -55,7 +56,6 @@ import {
 } from '@/lib/hosted-model-catalog';
 import {
   mergeHostedModelsWithLiveCatalog,
-  providersForHostedModels,
   parseModelPricingPayload,
   type ModelPricingPayload,
 } from '@/lib/model-pricing';
@@ -158,23 +158,6 @@ const COST_GRADES: Array<{
   { rank: 5, cost: 'Variable', label: 'Variable', detail: 'router priced' },
 ];
 
-const PROVIDER_GLYPH: Record<string, string> = {
-  deepseek: 'D',
-  openai: '◎',
-  anthropic: 'A',
-  idle: 'ID',
-  openserv: 'OS',
-  xiaomi: 'MI',
-  acedata: 'AC',
-  google: 'G',
-  qwen: 'Q',
-  'x-ai': 'X',
-  mistralai: 'M',
-  moonshotai: 'K',
-  'z-ai': 'Z',
-  nvidia: 'N',
-  openrouter: 'OR',
-};
 
 function normalizeConfigSubtab(value: string | null): ConfigSubtab {
   return CONFIG_SUBTABS.some((tab) => tab.id === value) ? (value as ConfigSubtab) : 'general';
@@ -314,6 +297,7 @@ export function ConfigTab() {
     setCustomModelInput,
     useCustomModel,
     setUseCustomModel,
+    byokBaseUrl, setByokBaseUrl,
     byokKeyInput,
     setByokKeyInput,
     showByokKey,
@@ -332,6 +316,7 @@ export function ConfigTab() {
     hasApiKey,
   } = useAgentContext();
 
+  const [testingConnection, setTestingConnection] = useState(false);
   const hostedProvider = 'openrouter';
   const tIronclawModel = useTranslations('dashboard.agentDetail.ironclaw.model');
   const { toast } = useToast();
@@ -429,15 +414,6 @@ export function ConfigTab() {
       ?? createSavedHostedModelOption(normalizedHostedModel),
     [availableHostedModels, normalizedHostedModel],
   );
-  const selectedHostedProvider = useMemo(
-    () => HOSTED_MODEL_PROVIDERS.find((p) => p.key === selectedHostedModel.providerKey)
-      ?? {
-        key: selectedHostedModel.providerKey,
-        name: selectedHostedModel.provider,
-        description: 'Saved provider from this agent configuration.',
-      },
-    [selectedHostedModel.provider, selectedHostedModel.providerKey],
-  );
   const maxHostedContextTokens = useMemo(
     () => Math.max(...availableHostedModels.map((model) => contextToTokens(model.context)), contextToTokens(selectedHostedModel.context)),
     [availableHostedModels, selectedHostedModel.context],
@@ -456,32 +432,6 @@ export function ConfigTab() {
     : savedModelConfig.model
       ? `${savedModelConfig.model} (${savedModelConfig.provider})`
       : 'No saved model';
-  const hostedModelProviders = useMemo(
-    () => {
-      const providers = computeModels.length > 0
-        ? [
-            ...providersForHostedModels(availableHostedModels),
-            {
-              key: 'compute',
-              name: 'Hatcher Compute',
-              description: 'Owner-contributed local inference nodes.',
-            },
-          ]
-        : providersForHostedModels(availableHostedModels);
-      return providers.some((provider) => provider.key === selectedHostedProvider.key)
-        ? providers
-        : [...providers, selectedHostedProvider];
-    },
-    [availableHostedModels, computeModels.length, selectedHostedProvider],
-  );
-  const contextualHostedModelProviders = useMemo(() => {
-    const providerKeys = new Set(
-      availableHostedModels
-        .filter((model) => hostedModelPrivacy(model) === modelPrivacyFilter)
-        .map((model) => model.providerKey),
-    );
-    return hostedModelProviders.filter((provider) => providerKeys.has(provider.key));
-  }, [availableHostedModels, hostedModelProviders, modelPrivacyFilter]);
   const filteredHostedModels = useMemo(
     () => {
       const needle = modelSearch.trim().toLowerCase();
@@ -511,35 +461,7 @@ export function ConfigTab() {
     },
     [availableHostedModels, modelCostRange, modelPrivacyFilter, modelSearch, selectedProviderFilters, selectedTagFilters],
   );
-  const groupedHostedModelsByProvider = useMemo(() => {
-    const providerOrder = new Map(hostedModelProviders.map((provider, index) => [provider.key, index]));
-    const providerMetaByKey = new Map(hostedModelProviders.map((provider) => [provider.key, provider]));
-    const providers = new Map<string, {
-      key: string;
-      name: string;
-      description: string;
-      models: HostedModelOption[];
-    }>();
-
-    for (const model of filteredHostedModels) {
-      const providerMeta = providerMetaByKey.get(model.providerKey);
-      const existing = providers.get(model.providerKey);
-      if (existing) {
-        existing.models.push(model);
-        continue;
-      }
-      providers.set(model.providerKey, {
-        key: model.providerKey,
-        name: providerMeta?.name ?? model.provider,
-        description: providerMeta?.description ?? model.description,
-        models: [model],
-      });
-    }
-
-    return Array.from(providers.values()).sort(
-      (a, b) => (providerOrder.get(a.key) ?? Number.MAX_SAFE_INTEGER) - (providerOrder.get(b.key) ?? Number.MAX_SAFE_INTEGER),
-    );
-  }, [filteredHostedModels, hostedModelProviders]);
+  const groupedHostedModelsByProvider = useMemo(() => groupChatModels(filteredHostedModels), [filteredHostedModels]);
   const draftModelValue = (useCustomModel ? customModelInput : configModel).trim();
   const hasPendingModelChange = savedModelConfig.provider === hostedProvider && configProvider === hostedProvider
     ? savedHostedModel?.id !== selectedHostedModel.id
@@ -569,6 +491,9 @@ export function ConfigTab() {
         ],
       });
     }
+    providers.push({ key: 'custom', name: 'Custom (OpenAI-compatible)',
+      description: 'Connect a public HTTPS Chat Completions endpoint with your provider API key.',
+      requiresApiKey: true, requiresBaseUrl: true, models: [] });
     return providers;
   }, []);
 
@@ -595,7 +520,7 @@ export function ConfigTab() {
   const currentModelName = isHostedMode ? selectedHostedModel.name : selectedByokModelName || 'No model selected';
   const currentModelRoute = isHostedMode
     ? hostedModelRoute(selectedHostedModel)
-    : selectedByokProvider?.defaultBaseUrl ?? 'Provider default endpoint';
+    : configProvider === 'custom' ? byokBaseUrl.trim() || 'Enter Base URL' : selectedByokProvider?.defaultBaseUrl ?? 'Provider default endpoint';
 
   const selectHostedModel = useCallback((modelId: string) => {
     const model = getHostedModelOption(modelId, availableHostedModels);
@@ -613,11 +538,7 @@ export function ConfigTab() {
     setSelectedTagFilters([]);
   }, []);
 
-  const toggleProviderFilter = useCallback((providerKey: string) => {
-    setSelectedProviderFilters((prev) => (
-      prev.includes(providerKey) ? prev.filter((item) => item !== providerKey) : [...prev, providerKey]
-    ));
-  }, []);
+
 
   const toggleTagFilter = useCallback((tag: HostedModelTag) => {
     setSelectedTagFilters((prev) => (
@@ -917,32 +838,32 @@ export function ConfigTab() {
       initial="initial"
       animate="animate"
       exit="exit"
-      className="space-y-6 max-w-6xl"
+      className="space-y-4 sm:space-y-6 max-w-6xl"
     >
-      <GlassCard className="p-2">
-        <div className="grid gap-1 sm:grid-cols-2 xl:grid-cols-4">
+      <GlassCard className="p-1 sm:p-2">
+        <nav aria-label="Agent settings sections" className="flex gap-1 overflow-x-auto sm:grid sm:grid-cols-4">
           {CONFIG_SUBTABS.map((item) => {
             const active = activeConfigSubtab === item.id;
             return (
               <button
                 key={item.id}
                 type="button"
+                aria-pressed={active}
                 onClick={() => setConfigSubtab(item.id)}
-                className={`rounded-lg px-3 py-3 text-left transition-colors ${
+                className={`shrink-0 rounded-lg px-3 py-2.5 text-left transition-colors ${
                   active
-                    ? 'bg-[var(--accent-primary)]/10 text-[var(--text-primary)]'
+                    ? 'bg-[var(--control-active)] text-[var(--control-active-text)]'
                     : 'text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]'
                 }`}
               >
-                <span className="flex items-center gap-2 text-sm font-semibold">
-                  <SlidersHorizontal className={`h-4 w-4 ${active ? 'text-[var(--accent-primary)]' : 'text-[var(--text-tertiary)]'}`} />
+                <span className="flex items-center gap-2 whitespace-nowrap text-xs font-semibold sm:whitespace-normal sm:text-sm">
                   {item.label}
                 </span>
-                <span className="mt-1 block text-xs text-[var(--text-tertiary)]">{item.description}</span>
+                <span className={`mt-1 hidden text-xs md:block ${active ? 'opacity-75' : 'text-[var(--text-tertiary)]'}`}>{item.description}</span>
               </button>
             );
           })}
-        </div>
+        </nav>
       </GlassCard>
 
       {activeConfigSubtab === 'general' && (
@@ -1248,12 +1169,12 @@ export function ConfigTab() {
           <div className="grid gap-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-panel)] p-3 text-sm">
             <div className="flex items-center justify-between gap-3">
               <span className="text-[var(--text-tertiary)]">Saved model</span>
-              <span className="min-w-0 truncate text-right font-semibold text-[var(--text-primary)]">{savedModelName}</span>
+              <span className="min-w-0 break-words text-right font-semibold text-[var(--text-primary)]">{savedModelName}</span>
             </div>
             <div className="flex items-center justify-between gap-3">
               <span className="text-[var(--text-tertiary)]">Draft selection</span>
               <span className="flex min-w-0 items-center justify-end gap-2 text-right font-semibold text-[var(--text-primary)]">
-                <span className="truncate">{currentModelName}</span>
+                <span className="min-w-0 break-words">{currentModelName}</span>
                 {hasPendingModelChange && (
                   <span className="flex-shrink-0 rounded border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-1.5 py-0.5 text-[10px] font-medium text-[var(--color-warning)]">
                     Unsaved
@@ -1263,7 +1184,7 @@ export function ConfigTab() {
             </div>
             <div className="flex items-center justify-between gap-3">
               <span className="text-[var(--text-tertiary)]">Route</span>
-              <span className="min-w-0 truncate text-right text-[var(--text-secondary)]">{currentModelRoute}</span>
+              <span className="min-w-0 break-words text-right text-[var(--text-secondary)]">{currentModelRoute}</span>
             </div>
             <div className="flex items-center justify-between gap-3">
               <span className="text-[var(--text-tertiary)]">Billing</span>
@@ -1599,7 +1520,7 @@ export function ConfigTab() {
                 <div>
                   <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                     <span className="text-xs font-medium uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
-                      {modelPrivacyFilter === 'hatcher' ? 'Model families' : 'Inference partners'}
+                      {modelPrivacyFilter === 'hatcher' ? 'Model providers' : 'Inference partners'}
                     </span>
                     <div className="flex items-center gap-2">
                       {selectedProviderFilters.length > 0 && (
@@ -1609,42 +1530,14 @@ export function ConfigTab() {
                       )}
                     </div>
                   </div>
-                  <div className="flex flex-wrap gap-2" role="group" aria-label={modelPrivacyFilter === 'hatcher' ? 'Hatcher model families' : 'Inference partners'}>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedProviderFilters([])}
-                      aria-pressed={selectedProviderFilters.length === 0}
-                      className={`rounded-lg border px-2.5 py-1.5 text-xs transition-colors ${
-                        selectedProviderFilters.length === 0
-                          ? 'border-[var(--accent-primary)]/50 bg-[var(--accent-primary)]/10 text-[var(--text-primary)]'
-                          : 'border-[var(--border-subtle)] bg-[var(--bg-panel)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)]/30'
-                      }`}
-                    >
-                      All
-                    </button>
-                    {contextualHostedModelProviders.map((provider) => {
-                      const active = selectedProviderFilters.includes(provider.key);
-                      return (
-                        <button
-                          key={provider.key}
-                          type="button"
-                          onClick={() => toggleProviderFilter(provider.key)}
-                          title={provider.description}
-                          aria-pressed={active}
-                          className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs transition-colors ${
-                            active
-                              ? 'border-[var(--accent-primary)]/50 bg-[var(--accent-primary)]/10 text-[var(--text-primary)]'
-                              : 'border-[var(--border-subtle)] bg-[var(--bg-panel)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)]/30'
-                          }`}
-                        >
-                          <span className="inline-flex h-5 min-w-5 items-center justify-center rounded bg-[var(--bg-muted)] px-1 text-[9px] font-bold">
-                            {PROVIDER_GLYPH[provider.key] ?? provider.name.slice(0, 1)}
-                          </span>
-                          {provider.name}
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <select aria-label="Filter managed models by provider" value={selectedProviderFilters[0] ?? ''}
+                    onChange={event => setSelectedProviderFilters(event.target.value ? [event.target.value] : [])}
+                    className="config-input w-full">
+                    <option value="">All providers</option>
+                    {groupChatModels(availableHostedModels.filter(model => hostedModelPrivacy(model) === modelPrivacyFilter)).map(group => (
+                      <option key={group.id} value={group.id}>{group.name} ({group.models.length})</option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
@@ -1688,7 +1581,7 @@ export function ConfigTab() {
                 </p>
                 <p className="mt-0.5 text-xs text-[var(--text-tertiary)]">
                   {modelPrivacyFilter === 'hatcher'
-                    ? 'Grouped by model family. Hatcher handles provider failover automatically.'
+                    ? 'Browse by provider. Expand a group or search across models. Hatcher handles routing automatically.'
                     : 'Grouped by the partner that receives and runs the inference request.'}
                 </p>
               </div>
@@ -1707,21 +1600,9 @@ export function ConfigTab() {
                   </div>
                 ) : (
                   groupedHostedModelsByProvider.map((providerGroup) => (
-                    <div key={providerGroup.key}>
-                      <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-[var(--border-subtle)] bg-[var(--bg-muted)] px-4 py-2 shadow-sm">
-                        <span className="flex min-w-0 items-center gap-2">
-                          <span className="inline-flex h-6 min-w-6 flex-shrink-0 items-center justify-center rounded-md border border-[var(--border-subtle)] bg-[var(--bg-panel)] px-1 text-[9px] font-bold text-[var(--text-secondary)]">
-                            {PROVIDER_GLYPH[providerGroup.key] ?? providerGroup.name.slice(0, 1)}
-                          </span>
-                          <span className="min-w-0">
-                            <span className="block truncate text-xs font-semibold text-[var(--text-primary)]">{providerGroup.name}</span>
-                            <span className="block truncate text-[10px] text-[var(--text-tertiary)]">{providerGroup.description}</span>
-                          </span>
-                        </span>
-                        <span className="flex-shrink-0 text-[10px] text-[var(--text-tertiary)]">
-                          {providerGroup.models.length}
-                        </span>
-                      </div>
+                    <ModelProviderSection key={`${providerGroup.id}:${modelSearch}:${selectedProviderFilters.join(',')}:${selectedTagFilters.join(',')}:${modelCostRange.join(',')}`}
+                      name={providerGroup.name} count={providerGroup.models.length}
+                      expanded={!!modelSearch.trim() || selectedProviderFilters.length > 0 || selectedTagFilters.length > 0 || modelCostRange[0] !== 1 || modelCostRange[1] !== 5 || providerGroup.models.some(model => model.id === selectedHostedModel.id)}>
                       {providerGroup.models.map((model) => (
                         <HostedModelRow
                           key={model.id}
@@ -1731,7 +1612,7 @@ export function ConfigTab() {
                           onSelect={selectHostedModel}
                         />
                       ))}
-                    </div>
+                    </ModelProviderSection>
                   ))
                 )}
               </div>
@@ -1863,6 +1744,15 @@ export function ConfigTab() {
               </div>
             </label>
 
+            {configProvider === 'custom' && (
+              <label className="block">
+                <span className="block text-sm font-medium mb-2">Base URL</span>
+                <input type="url" className="config-input" value={byokBaseUrl}
+                  onChange={event => { setByokBaseUrl(event.target.value); setByokKeyInput(''); }}
+                  placeholder="https://api.example.com/v1" />
+              </label>
+            )}
+
             <label className="block">
               <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Provider model ID</span>
               <input
@@ -1893,7 +1783,7 @@ export function ConfigTab() {
                     </div>
                     <p className="mt-1 text-sm text-[var(--text-secondary)]">{selectedByokProvider.description}</p>
                     <p className="mt-2 break-all text-xs text-[var(--text-tertiary)]">
-                      Route: {selectedByokProvider.defaultBaseUrl ?? 'Provider default endpoint'}
+                      Route: {currentModelRoute}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2 text-xs text-[var(--text-secondary)]">
@@ -1950,6 +1840,24 @@ export function ConfigTab() {
                 </p>
               )}
             </label>
+            {configProvider === 'custom' && (
+              <button type="button" className="config-input" disabled={testingConnection || !byokBaseUrl.trim() || !byokKeyInput.trim() || !selectedByokModelName}
+                onClick={async () => {
+                  setTestingConnection(true);
+                  try {
+                    const result = await req<{ valid: boolean; error?: string }>('/agents/validate-key', {
+                      method: 'POST', body: JSON.stringify({ provider: 'custom', baseUrl: byokBaseUrl.trim(),
+                        model: (useCustomModel ? customModelInput : configModel).trim(), apiKey: byokKeyInput.trim() }),
+                    });
+                    if (result.success && result.data.valid) toast.success('The provider returned a chat completion.');
+                    else toast.error(result.success ? result.data.error ?? 'Connection test failed.' : result.error);
+                  } catch {
+                    toast.error('Could not complete the connection test.');
+                  } finally {
+                    setTestingConnection(false);
+                  }
+                }}>{testingConnection ? 'Testing…' : 'Test connection'}</button>
+            )}
           </div>
         )}
       </GlassCard>

@@ -67,6 +67,10 @@ const QUICK_LINKS_ICONS = [
 export default function DocsPage() {
   const t = useTranslations('docs');
   const [searchQuery, setSearchQuery] = useState('');
+  const quickLinks = t.raw('quickLinks') as Array<{ title: string; description: string }>;
+  const query = searchQuery.trim().toLocaleLowerCase();
+  const guides = QUICK_LINKS_ICONS.map((link, idx) => ({ ...link, ...quickLinks[idx] }))
+    .filter(({ title, description }) => `${title} ${description}`.toLocaleLowerCase().includes(query));
 
   return (
     <motion.div
@@ -91,7 +95,12 @@ export default function DocsPage() {
           </p>
         </motion.div>
 
-        {/* ── Search bar (cosmetic) ────────────────────────── */}
+        <motion.a variants={cardVariants} href={`${DOCS_URL}/workspace`} target="_blank" rel="noopener noreferrer" className="mb-8 block rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] p-5 hover:border-[var(--color-accent)]">
+          <h2 className="mb-2 text-lg font-semibold text-[var(--text-primary)]">{t('workspaceTitle')}</h2>
+          <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{t('workspaceBody')}</p>
+        </motion.a>
+
+        {/* ── Guide search ──────────────────────────────── */}
         <motion.div variants={cardVariants} className="mx-auto mb-12 max-w-xl">
           <div className="relative">
             <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--text-muted)]" />
@@ -100,13 +109,10 @@ export default function DocsPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('searchPlaceholder')}
+              aria-label={t('searchPlaceholder')}
+              aria-controls="documentation-guides"
               className="w-full rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)] py-3 pl-12 pr-4 text-[var(--text-primary)] placeholder-[#6B6890] outline-none transition-all duration-200 focus:border-[var(--color-accent)]/40 focus:ring-2 focus:ring-[var(--color-accent)]/10"
             />
-            {searchQuery && (
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-[var(--text-muted)]">
-                {t('searchComingSoon')}
-              </span>
-            )}
           </div>
         </motion.div>
 
@@ -168,12 +174,13 @@ export default function DocsPage() {
           variants={staggerContainer}
           initial="hidden"
           animate="visible"
+          id="documentation-guides"
           className="mb-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
         >
-          {QUICK_LINKS_ICONS.map((link, idx) => {
+          {!guides.length && <p role="status" className="col-span-full text-sm text-[var(--text-secondary)]">{t('noResults')}</p>}
+          {guides.map((link) => {
             const Icon = link.icon;
-            const ql = t.raw('quickLinks') as Array<{ title: string; description: string }>;
-            const { title, description } = ql[idx] ?? { title: '', description: '' };
+            const { title, description } = link;
             return (
               <motion.a
                 key={title}

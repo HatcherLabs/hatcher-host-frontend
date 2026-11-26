@@ -456,13 +456,13 @@ export function WalletTab() {
   if (loading && !wallets && !passport) {
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5 p-6">
-        <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+        <div className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
           <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-card)] p-5 shadow-[var(--shadow-soft)]">
             <div className="mb-5 flex items-center gap-3">
-              <div className="h-11 w-11 rounded-xl shimmer" />
-              <div className="space-y-2">
-                <div className="h-5 w-44 rounded-full shimmer" />
-                <div className="h-3 w-64 rounded-full shimmer" />
+              <div className="h-11 w-11 shrink-0 rounded-xl shimmer" />
+              <div className="min-w-0 flex-1 space-y-2">
+                <div className="h-5 w-44 max-w-full rounded-full shimmer" />
+                <div className="h-3 w-64 max-w-full rounded-full shimmer" />
               </div>
             </div>
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">

@@ -210,7 +210,7 @@ export function VersionBadge() {
           setOpen(true);
           void loadChangelog();
         }}
-        className="inline-flex min-h-8 min-w-8 items-center justify-center rounded-md border border-emerald-500/25 bg-emerald-500/10 px-2 py-1 text-[10px] font-semibold leading-none text-emerald-300 transition-colors hover:border-emerald-400/50 hover:bg-emerald-500/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40 sm:px-3 sm:text-[11px]"
+        className="inline-flex min-h-8 min-w-8 items-center justify-center rounded-md border border-emerald-500/25 bg-emerald-500/10 px-2 py-1 text-[10px] font-semibold leading-none text-[var(--text-primary)] transition-colors hover:border-emerald-400/50 hover:bg-emerald-500/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40 sm:px-3 sm:text-[11px]"
         style={{ fontFamily: 'var(--font-mono)' }}
         aria-label={`Open latest Hatcher changelog, version ${APP_VERSION}`}
       >

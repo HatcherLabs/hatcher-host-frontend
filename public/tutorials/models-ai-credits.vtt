@@ -1,0 +1,334 @@
+WEBVTT
+
+00:00:00.275 --> 00:00:02.731
+Your agent's model affects how it reasons how
+
+00:00:02.751 --> 00:00:05.422
+quickly it responds and how many AI Credits
+
+00:00:05.442 --> 00:00:07.803
+it uses In this guide we'll choose a
+
+00:00:07.823 --> 00:00:10.755
+model in Hatcher understand the default and compare
+
+00:00:10.775 --> 00:00:12.946
+the cost of everyday work with more demanding
+
+00:00:12.966 --> 00:00:13.621
+tasks
+
+00:00:14.756 --> 00:00:17.879
+First separate three things The framework such as
+
+00:00:17.899 --> 00:00:20.808
+OpenClaw or Hermes runs the agent and its
+
+00:00:20.828 --> 00:00:24.542
+tools The language model handles reasoning and responses
+
+00:00:24.887 --> 00:00:27.403
+The provider route delivers that model Changing the
+
+00:00:27.423 --> 00:00:30.828
+model does not automatically add skills grant permissions
+
+00:00:31.006 --> 00:00:32.233
+or change your hosting plan
+
+00:00:33.354 --> 00:00:35.786
+When creating an agent describe its job and
+
+00:00:35.806 --> 00:00:38.989
+review the generated preview Find AI route then
+
+00:00:39.009 --> 00:00:41.810
+Hosted model Choose a provider family pick a
+
+00:00:41.830 --> 00:00:44.739
+model and review its context and cost information
+
+00:00:44.759 --> 00:00:47.500
+before hatching The suggested setup is a starting
+
+00:00:47.520 --> 00:00:49.417
+point make sure it fits the work you
+
+00:00:49.437 --> 00:00:50.378
+actually want done
+
+00:00:51.511 --> 00:00:54.277
+For an existing agent open its workspace go
+
+00:00:54.297 --> 00:00:57.503
+to Config and select Model and Provider Keep
+
+00:00:57.523 --> 00:00:59.955
+Managed by Hatcher to use hosted models and
+
+00:00:59.975 --> 00:01:04.015
+AI Credits Use the search provider filters capability
+
+00:01:04.035 --> 00:01:06.642
+tags and cost range to narrow the list
+
+00:01:06.975 --> 00:01:09.920
+Check the model description context window and current
+
+00:01:09.940 --> 00:01:10.440
+pricing
+
+00:01:11.542 --> 00:01:13.950
+Selecting a model changes the draft It does
+
+00:01:13.970 --> 00:01:16.534
+not save the agent yet Compare Saved model
+
+00:01:16.554 --> 00:01:19.685
+with Draft selection then click Save AI Models
+
+00:01:20.018 --> 00:01:22.864
+Wait for the confirmation and any runtime restart
+
+00:01:23.197 --> 00:01:25.117
+Check the active model in chat before your
+
+00:01:25.137 --> 00:01:28.542
+next task Saved presets help you reuse choices
+
+00:01:28.709 --> 00:01:30.983
+but still require saving the configuration
+
+00:01:32.099 --> 00:01:35.397
+The current Hatcher catalog marks DeepSeek V4 Flash
+
+00:01:35.528 --> 00:01:38.043
+as the default hosted model It is positioned
+
+00:01:38.063 --> 00:01:41.103
+as a fast economical starting point Your agent
+
+00:01:41.123 --> 00:01:43.424
+may already have a different saved or suggested
+
+00:01:43.444 --> 00:01:46.091
+model so check it Default does not mean
+
+00:01:46.111 --> 00:01:48.290
+the strongest model and it does not mean
+
+00:01:48.325 --> 00:01:50.686
+automatic selection of the best model for every
+
+00:01:50.706 --> 00:01:51.254
+task
+
+00:01:52.390 --> 00:01:56.155
+For summaries extraction simple replies and repeated routine
+
+00:01:56.175 --> 00:01:59.449
+work start by evaluating economical options such as
+
+00:01:59.473 --> 00:02:03.274
+DeepSeek V4 Flash or Gemini Flash Lite GPT
+
+00:02:03.294 --> 00:02:06.342
+mini models are candidates for broader everyday work
+
+00:02:06.675 --> 00:02:09.774
+DeepSeek Pro offers another step toward more demanding
+
+00:02:09.794 --> 00:02:12.822
+analysis These are starting points for testing not
+
+00:02:12.842 --> 00:02:14.247
+a universal quality ranking
+
+00:02:15.378 --> 00:02:19.096
+For difficult coding planning or long instructions compare
+
+00:02:19.116 --> 00:02:22.152
+stronger options such as Claude Sonnet Claude Opus
+
+00:02:22.354 --> 00:02:26.390
+GPT's higher capability variants or Gemini Pro Codex
+
+00:02:26.437 --> 00:02:29.131
+and Qwen coding models are also worth evaluating
+
+00:02:29.151 --> 00:02:31.893
+for repository work A more capable model may
+
+00:02:31.913 --> 00:02:34.441
+follow constraints better but can cost more and
+
+00:02:34.461 --> 00:02:36.771
+take longer Always review the result
+
+00:02:37.899 --> 00:02:40.495
+The catalog also includes families such as MiMo
+
+00:02:40.720 --> 00:02:45.415
+MiniMax Kimi GLM Grok Mistral and SERV Compare
+
+00:02:45.435 --> 00:02:48.415
+their individual descriptions and prices A provider name
+
+00:02:48.435 --> 00:02:50.780
+alone does not tell you quality or cost
+
+00:02:51.101 --> 00:02:53.605
+A large context window means more room for
+
+00:02:53.625 --> 00:02:57.236
+information not guaranteed accuracy Partner routes can have
+
+00:02:57.256 --> 00:02:59.209
+different pricing and data policies
+
+00:03:00.309 --> 00:03:03.848
+AI Credits meter hosted usage Language models process
+
+00:03:03.868 --> 00:03:07.416
+tokens chunks of text Input includes your prompt
+
+00:03:07.594 --> 00:03:10.527
+instructions history and tool results sent to the
+
+00:03:10.547 --> 00:03:14.523
+model Output includes generated tokens and where billed
+
+00:03:14.773 --> 00:03:19.003
+reasoning tokens Longer conversations larger files and repeated
+
+00:03:19.023 --> 00:03:21.908
+tool loops can increase usage One user message
+
+00:03:21.928 --> 00:03:23.583
+can trigger several model calls
+
+00:03:24.675 --> 00:03:27.465
+Hatcher's billing reference is one thousand AI Credits
+
+00:03:27.485 --> 00:03:30.262
+per dollar of provider usage Credit pack checkout
+
+00:03:30.282 --> 00:03:33.143
+prices are separate Read both input and output
+
+00:03:33.163 --> 00:03:36.810
+rates usually shown per million tokens Actual charges
+
+00:03:36.830 --> 00:03:40.048
+use reported provider cost when available otherwise an
+
+00:03:40.068 --> 00:03:43.084
+estimate applies Positive model charges round up to
+
+00:03:43.104 --> 00:03:45.521
+whole credits with a one credit minimum
+
+00:03:46.666 --> 00:03:49.027
+Here is an illustrative single call using ten
+
+00:03:49.047 --> 00:03:52.238
+thousand input tokens and two thousand output tokens
+
+00:03:52.570 --> 00:03:56.086
+Using the catalog snapshot DeepSeek V4 Flash works
+
+00:03:56.106 --> 00:03:58.872
+out to about one credit after rounding GPT
+
+00:03:58.892 --> 00:04:01.717
+five point four mini is about seventeen Claude
+
+00:04:01.737 --> 00:04:04.372
+Sonnet four point six is about sixty These
+
+00:04:04.392 --> 00:04:07.396
+are list based estimates not recorded charges or
+
+00:04:07.416 --> 00:04:08.511
+a quality benchmark
+
+00:04:09.642 --> 00:04:11.726
+A cheaper call can become expensive if the
+
+00:04:11.773 --> 00:04:14.920
+agent repeats itself or needs several corrections A
+
+00:04:14.940 --> 00:04:17.761
+stronger model can sometimes finish in fewer steps
+
+00:04:17.951 --> 00:04:20.634
+but savings are not guaranteed Compare the same
+
+00:04:20.654 --> 00:04:25.583
+task instructions tools and output requirements Check correctness
+
+00:04:25.701 --> 00:04:29.634
+completion time and total credits including retries Keep
+
+00:04:29.654 --> 00:04:31.654
+the option that meets your quality target
+
+00:04:32.754 --> 00:04:36.127
+Hosted search research embeddings and media tools can
+
+00:04:36.147 --> 00:04:38.270
+add their own charges With Use your own
+
+00:04:38.290 --> 00:04:40.758
+provider supported model calls are billed to your
+
+00:04:40.778 --> 00:04:44.139
+provider account instead of Hatcher AI Credits Hosted
+
+00:04:44.159 --> 00:04:46.984
+tools may still use credits Review your remaining
+
+00:04:47.004 --> 00:04:50.317
+balance and usage history in Billing an estimate
+
+00:04:50.337 --> 00:04:53.210
+or temporary reservation is not necessarily the final
+
+00:04:53.230 --> 00:04:53.754
+charge
+
+00:04:54.875 --> 00:04:57.153
+Start with an economical model for a small
+
+00:04:57.173 --> 00:05:00.581
+representative task If it misses requirements improve the
+
+00:05:00.601 --> 00:05:03.629
+instructions and test a stronger model Use focused
+
+00:05:03.649 --> 00:05:06.320
+context and a clear output length Save your
+
+00:05:06.340 --> 00:05:09.864
+preferred configuration then monitor usage as work grows
+
+00:05:10.197 --> 00:05:11.689
+You are choosing the right model for a
+
+00:05:11.709 --> 00:05:14.495
+job not buying a guarantee of better answers
+
+00:05:15.609 --> 00:05:18.600
+Open your agent choose Model and Provider review
+
+00:05:18.620 --> 00:05:21.410
+the current prices and save your selection Start
+
+00:05:21.430 --> 00:05:23.684
+with a sensible default Spend more when the
+
+00:05:23.704 --> 00:05:26.017
+task earns it Build and manage your agents
+
+00:05:26.037 --> 00:05:27.180
+at Hatcher dot host

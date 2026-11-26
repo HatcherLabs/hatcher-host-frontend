@@ -48,7 +48,9 @@ export interface Payment {
   id: string;
   agentId: string | null;
   featureKey: string;
-  usdAmount: number;
+  usdAmount: number | null;
+  originalAmount?: number | string | null;
+  originalCurrency?: string | null;
   hatchAmount: number;
   txSignature: string;
   status: "pending" | "confirmed" | "failed" | "refunded";
@@ -1344,7 +1346,7 @@ export interface OperatorAuthorizationRequest {
 export interface OperatorActionRequest {
   id: string;
   userId: string;
-  agentId: string;
+  agentId: string | null;
   principalId: string;
   principalLabel: string;
   tool: string;
@@ -1359,7 +1361,7 @@ export interface OperatorActionRequest {
   executedAt: string | null;
   createdAt: string;
   updatedAt: string;
-  agent: McpActionActor;
+  agent: McpActionActor | null;
 }
 
 export interface OperatorActionInboxResponse {
@@ -2628,11 +2630,15 @@ export interface AdminPayment {
   userId: string;
   userEmail: string | null;
   userUsername: string | null;
+  userAccountKind?: 'registered' | 'ios_guest';
+  paymentEnvironment?: 'Sandbox' | 'Production' | null;
   agentId: string | null;
   agentName: string | null;
   agentFramework: string | null;
   featureKey: string;
-  usdAmount: number;
+  usdAmount: number | null;
+  originalAmount?: number | string | null;
+  originalCurrency?: string | null;
   hatchAmount: number;
   paymentToken: string | null;
   tokenAmount: number | null;
@@ -3141,3 +3147,7 @@ export interface IronClawLlmResponse {
   providers?: Array<Record<string, unknown>> | null;
   active?: { provider_id?: string; model?: string } | null;
 }
+
+export type AdminOverviewExtras = import('@hatcher/shared').AdminOverviewExtras & {
+  revenueByCurrency?: Array<{ currency: string; amount: number; payments: number }>;
+};

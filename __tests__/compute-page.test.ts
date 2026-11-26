@@ -75,7 +75,7 @@ describe('Hatcher Compute public page', () => {
   });
 
   it('uses the marketing shell without nesting a second main landmark', () => {
-    expect(pageSource).toContain('<MarketingShell>');
+    expect(pageSource).toMatch(/<MarketingShell(?:\s|>)/);
     expect(pageSource).not.toContain('<main');
     expect(experienceSource).toContain('useTranslations');
   });

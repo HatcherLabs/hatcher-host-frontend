@@ -7,6 +7,7 @@ import {
 import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/impressum' },
   title: 'Impressum | Hatcher',
   description:
     'Legal information for Hatcher.host — operator details, registered address, liability notice, and disclaimers for the managed AI agent hosting platform.',

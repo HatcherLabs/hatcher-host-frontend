@@ -22,6 +22,7 @@ import { AgentEyesLiveCard } from "./AgentEyesLiveCard";
 import { groupChatSessionsByFolder } from "./chatFolders";
 
 interface AgentPresenceRailProps {
+  compact?: boolean;
   className?: string;
   onSessionSelect?: () => void;
 }
@@ -75,7 +76,7 @@ function ChatSessionRow({
         className="min-w-0 flex-1 px-2.5 py-2 text-left"
       >
         <div className="flex min-w-0 items-center justify-between gap-2">
-          <span className="truncate text-xs font-semibold text-[var(--text-primary)]">
+          <span className="line-clamp-2 break-words text-xs font-semibold text-[var(--text-primary)]" title={session.title}>
             {session.title}
           </span>
           <span className="flex shrink-0 items-center gap-1 text-[10px] text-[var(--text-muted)]">
@@ -83,7 +84,7 @@ function ChatSessionRow({
             {formatRelative(session.updatedAt)}
           </span>
         </div>
-        <div className="mt-1 truncate text-[11px] text-[var(--text-muted)]">
+        <div className="mt-1 line-clamp-2 break-words text-[11px] text-[var(--text-muted)]">
           {session.preview || `${session.messageCount} turns`}
         </div>
       </button>
@@ -106,6 +107,7 @@ function ChatSessionRow({
 }
 
 export function AgentPresenceRail({
+  compact = false,
   className = "",
   onSessionSelect,
 }: AgentPresenceRailProps) {
@@ -500,7 +502,7 @@ export function AgentPresenceRail({
         </div>
       </div>
 
-      {viewMode === "advanced" && <div className="shrink-0 border-t border-[var(--border-default)] px-3 py-3 md:px-4">
+      {viewMode === "advanced" && !compact && <div className="shrink-0 border-t border-[var(--border-default)] px-3 py-3 md:px-4">
         <AgentEyesLiveCard
           agentId={agent.id}
           agentName={agent.name}

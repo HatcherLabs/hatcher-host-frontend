@@ -74,6 +74,8 @@ const nextConfig = {
   distDir: process.env.HATCHER_BUILD_DIR || '.next',
   compress: true,
   poweredByHeader: false,
+  // Resolve metadata/notFound before streaming, consistently for users and crawlers.
+  htmlLimitedBots: /.*/,
   cacheHandler: resolve(__dirname, 'cache-handler.cjs'),
   cacheMaxMemorySize: 0,
   transpilePackages: ['@hatcher/shared'],

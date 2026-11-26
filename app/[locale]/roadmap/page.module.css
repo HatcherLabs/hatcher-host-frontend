@@ -677,7 +677,7 @@
   color: #0f1112;
 }
 
-@media (max-width: 1020px) {
+@container workspace (max-width: 1020px) {
   .hero {
     grid-template-columns: minmax(0, 1fr) minmax(300px, 0.78fr);
     gap: 48px;
@@ -714,7 +714,7 @@
   }
 }
 
-@media (max-width: 780px) {
+@container workspace (max-width: 780px) {
   .hero,
   .sectionInner,
   .cta {
@@ -826,7 +826,7 @@
   }
 }
 
-@media (max-width: 520px) {
+@container workspace (max-width: 520px) {
   .hero,
   .sectionInner,
   .cta {
@@ -1183,7 +1183,7 @@
   gap: 0;
 }
 
-@media (max-width: 720px) {
+@container workspace (max-width: 720px) {
   .phaseLayout {
     padding-left: 26px;
   }

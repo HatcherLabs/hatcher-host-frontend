@@ -1,3 +1,4 @@
+import { localizedMetadata } from '@/lib/seo';
 import type { Metadata } from 'next';
 import type { LucideIcon } from 'lucide-react';
 import {
@@ -10,7 +11,6 @@ import {
 import { getTranslations } from 'next-intl/server';
 import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 import { Link } from '@/i18n/routing';
-import { buildLanguagesMap } from '@/lib/seo';
 import {
   latestReleases,
   phases,
@@ -20,15 +20,11 @@ import {
 } from './roadmap-data';
 import styles from './page.module.css';
 
-export function generateMetadata(): Metadata {
+function pageMetadata(): Metadata {
   return {
     title: 'Roadmap — Hatcher',
     description:
       'What is live on Hatcher, what ships next, and the longer-term bets — from the public inference API to the EquiFold agent economy.',
-    alternates: {
-      canonical: '/roadmap',
-      languages: buildLanguagesMap('/roadmap'),
-    },
   };
 }
 
@@ -229,3 +225,5 @@ export default async function RoadmapPage() {
     </MarketingShell>
   );
 }
+
+export const generateMetadata = localizedMetadata('/roadmap', pageMetadata());

@@ -872,9 +872,9 @@ export function DevTab() {
           ))}
         </div>
 
-        <div className="grid gap-4 p-4 lg:grid-cols-[1fr,1.2fr]">
+        <div className="grid min-w-0 grid-cols-1 gap-4 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
           <div>
-            <div className="mb-3 flex items-center justify-between gap-3">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
               <h4 className="text-sm font-semibold text-[var(--text-primary)]">
                 Allowed callers
               </h4>
@@ -954,7 +954,7 @@ export function DevTab() {
           </div>
 
           <div>
-            <div className="mb-3 flex items-center justify-between gap-3">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
               <h4 className="text-sm font-semibold text-[var(--text-primary)]">
                 Recent A2A traffic
               </h4>

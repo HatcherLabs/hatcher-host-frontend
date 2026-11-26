@@ -58,7 +58,7 @@ function shortUser(user: string): string {
  */
 export function OpenClawSessionsTab() {
   const { agent, setTab } = useAgentContext();
-  const [data, setData] = useState<{ sessions: OpenClawSessionSummary[]; totalBytes: number } | null>(null);
+  const [data, setData] = useState<{ sessions: OpenClawSessionSummary[]; totalBytes: number; sessionSizeFormat?: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [stopped, setStopped] = useState(false);
@@ -219,7 +219,7 @@ export function OpenClawSessionsTab() {
                     )}
                     <span className="flex items-center gap-1">
                       <HardDrive size={10} />
-                      {formatBytes(session.sizeBytes)}
+                      {formatBytes(session.sizeBytes)}{data?.sessionSizeFormat === 'uncompressed_text' ? ' text' : ''}
                     </span>
                   </div>
                 </div>

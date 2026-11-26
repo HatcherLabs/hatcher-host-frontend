@@ -1,3 +1,6 @@
+import type { AdminAccountState } from '@/lib/admin-account-state';
+import type { AgentResources } from '@/lib/agent-resources';
+import type { AgentPitConnection } from './agentpit';
 // ============================================================
 // API Methods — all backend API calls
 // ============================================================
@@ -180,7 +183,8 @@ import type {
   ComputeBetaStatus,
   ComputeNodePackageInfo,
 } from "./types";
-import type { TierConfig, AdminOverviewExtras } from "@hatcher/shared";
+import type { TierConfig } from "@hatcher/shared";
+import type { AdminOverviewExtras } from "./types";
 
 const API_BASE = API_URL;
 
@@ -219,8 +223,9 @@ export type ConfigPatchResult =
 
 export type AuthProfileData = {
   id: string;
-  email: string;
+  email: string | null;
   username: string;
+  needsUsername?: boolean;
   walletAddress: string | null;
   apiKey: string | null;
   hatchCredits: number;
@@ -1966,6 +1971,8 @@ export const api = {
     }) as Promise<ConfigPatchResult>,
 
   /** Get agent monitoring data (health, resources, response times, errors) */
+  getAgentResources: (id: string) => req<AgentResources>(`/agents/${id}/resources`),
+
   getAgentMonitoring: (id: string) =>
     req<{
       health: "healthy" | "unhealthy" | "stopped";
@@ -2343,7 +2350,7 @@ export const api = {
   /** Admin: list all users with agent/payment counts */
   adminGetUsers: (skip = 0, take = 2000) =>
     req<{
-      users: Array<{
+      users: Array<AdminAccountState & {
         id: string;
         email: string;
         username: string;
@@ -2709,7 +2716,13 @@ export const api = {
     }
   },
 
-  /** Streaming chat — falls back to non-streaming if stream unavailable */
+  abortChatTurn: (agentId: string, turnId: string, sessionId?: string | null) =>
+    req<{ accepted: boolean }>(`/agents/${agentId}/chat/abort`, {
+      method: "POST",
+      body: JSON.stringify({ turnId, ...(sessionId ? { sessionId } : {}) }),
+    }),
+
+  /** Streaming chat; accepted work survives browser disconnects. */
   chatStream: async (
     agentId: string,
     message: string,
@@ -2726,6 +2739,7 @@ export const api = {
     /** Named `usage` SSE event emitted before [DONE] when the turn
      *  consumed hosted AI credits. */
     onUsage?: (usage: ChatUsagePayload) => void,
+    turnId?: string,
   ) => {
     const token = getToken();
 
@@ -2742,62 +2756,18 @@ export const api = {
         signal,
         body: JSON.stringify({
           message,
+          ...(turnId ? { turnId } : {}),
           history,
           ...(sessionId ? { sessionId } : {}),
           ...(attachments?.length ? { attachments } : {}),
-          abortOnDisconnect: true,
+          abortOnDisconnect: false,
         }),
       });
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") throw err;
-      // Streaming endpoint failed — fall back to regular chat
-      try {
-        const fallback = await fetch(`${API_BASE}/agents/${agentId}/chat`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-          credentials: "include",
-          signal,
-          body: JSON.stringify({
-            message,
-            history,
-            ...(sessionId ? { sessionId } : {}),
-            ...(attachments?.length ? { attachments } : {}),
-          }),
-        });
-        if (!fallback.ok) {
-          onError(`HTTP ${fallback.status}`);
-          return;
-        }
-        const data = (await fallback.json()) as {
-          data?: {
-            content?: string;
-            model?: string;
-            messages?: Array<{ content?: string }>;
-          };
-        };
-        const payload = data.data;
-        const messages =
-          payload?.messages
-            ?.map((item) => item.content)
-            .filter((item): item is string => Boolean(item?.trim())) ?? [];
-        const firstContent = messages[0] ?? payload?.content;
-        if (firstContent) {
-          onToken(firstContent);
-          onDone(payload?.model ?? "unknown");
-          for (const extra of messages.slice(1)) onMessage?.(extra);
-        } else {
-          onError("Empty response");
-        }
-      } catch (fallbackErr) {
-        if (fallbackErr instanceof Error && fallbackErr.name === "AbortError")
-          throw fallbackErr;
-        onError(
-          fallbackErr instanceof Error ? fallbackErr.message : "Network error",
-        );
-      }
+      // A network failure cannot prove the request was rejected. Reconnect to
+      // its preview instead of replaying a potentially billed turn.
+      onError("Connection lost. Reconnecting to the existing response.");
       return;
     }
 
@@ -2994,6 +2964,9 @@ export const api = {
     ),
 
   /** Load one page of saved history; cursors are opaque server values. */
+  getRuntimeHistory: (agentId: string, options: { sessionId?: string; cursor?: string; search?: string } = {}) =>
+    req<import('@/lib/runtime-history').RuntimeHistoryPage>(`/agents/${agentId}/runtime/history?${new URLSearchParams(options)}`),
+
   getChatHistory: (agentId: string, sessionId?: string, cursor?: string) =>
     req<{
       messages: Array<{ id?: string; role: string; content: string; ts: number; metadata?: unknown }>;
@@ -3415,6 +3388,17 @@ export const api = {
       { method: "POST" },
     ),
 
+  getAgentPitConnection: (agentId: string) =>
+    req<AgentPitConnection>(`/agents/${agentId}/agentpit`),
+  setAgentPitStrategy: (agentId: string, enabled: boolean) =>
+    req<AgentPitConnection["autopilot"]>(`/agents/${agentId}/agentpit/strategy`, {method: "PATCH", body: JSON.stringify({enabled})}),
+  renameAgentPitAccount: (agentId: string, name: string) =>
+    req<{renamed: boolean}>(`/agents/${agentId}/agentpit/name`, {method: 'PATCH', body: JSON.stringify({name})}),
+  beginAgentPitConnect: (agentId: string) =>
+    req<{ status: string; connectorId?: string; verificationUrl?: string; userCode?: string; expiresAt?: string; interval?: number }>(`/agents/${agentId}/agentpit/connect`, { method: "POST" }),
+  pollAgentPitConnect: (agentId: string) =>
+    req<{ status: string; connectorId?: string; interval?: number; error?: string }>(`/agents/${agentId}/agentpit/connect/poll`, { method: "POST" }),
+
   // ─── Remote MCP Connectors ─────────────────────────────────
   getMcpConnectors: (agentId: string) =>
     req<{ connectors: McpConnector[] }>(`/agents/${agentId}/mcp/connectors`),
@@ -3764,6 +3748,9 @@ export const api = {
   getOperatorAuthorizationRequest: (query: string) =>
     req<OperatorAuthorizationRequest>(`/oauth/authorize/request?${query}`),
 
+  getOperatorConnections: () => req<{ serverUrl: string; connections: Array<{ clientId: string; name: string; scopes: string[]; connectedAt: string }> }>('/oauth/connections'),
+  revokeOperatorConnection: (clientId: string) => req<{ disconnected: boolean }>(`/oauth/connections/${encodeURIComponent(clientId)}`, { method: 'DELETE' }),
+
   decideOperatorAuthorization: (body: Record<string, string>) =>
     req<{ redirectUrl: string }>("/oauth/authorize/decision", {
       method: "POST",
@@ -3782,6 +3769,11 @@ export const api = {
       `/agents/operator/actions${suffix ? `?${suffix}` : ""}`,
     );
   },
+
+  getOperatorActionPayload: (actionId: string) =>
+    req<{ arguments: unknown; argumentsHash: string }>(
+      `/agents/operator/actions/${encodeURIComponent(actionId)}/payload`,
+    ),
 
   approveOperatorAction: (actionId: string) =>
     req<{ action: OperatorActionRequest }>(

@@ -1,7 +1,7 @@
+import { localizedMetadata } from '@/lib/seo';
 import type { Metadata } from 'next';
-import { buildLanguagesMap } from '@/lib/seo';
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: 'Pricing — Free Tier, Starter, Pro & Business Plans',
   description:
     'Hatcher pricing: Free tier included. Starter $6.99/mo, Pro $19.99/mo, Business $49.99/mo. Hosted AI and web search use AI Credits; BYOK is paid directly to your provider.',
@@ -33,9 +33,10 @@ export const metadata: Metadata = {
     description: 'Deploy AI agents free. Upgrade for more AI Credits, workspace, and dedicated resources.',
     images: ['https://hatcher.host/og?title=Hatcher+Pricing&subtitle=Free+tier+included.+Starter+%246.99%2Fmo.+Pro+%2419.99%2Fmo.+Business+%2449.99%2Fmo.+AI+Credits+for+hosted+usage.&tag=Pricing'],
   },
-  alternates: { canonical: 'https://hatcher.host/pricing', languages: buildLanguagesMap('/pricing') },
 };
 
 export default function PricingLayout({ children }: { children: React.ReactNode }) {
   return children;
 }
+
+export const generateMetadata = localizedMetadata('/pricing', pageMetadata);

@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
-import { DashboardWorkspaceNavigation } from '@/components/dashboard/DashboardWorkspaceNavigation';
 import { AgentDetailTour } from '@/components/onboarding/AgentDetailTour';
 import { DashboardTour } from '@/components/onboarding/DashboardTour';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { buildLanguagesMap } from '@/lib/seo';
 
 export const metadata: Metadata = {
+  robots: { index: false, follow: false },
   title: 'Dashboard',
   description:
     'Manage your AI agents, monitor performance, and track usage on Hatcher — the managed hosting platform for autonomous AI agents.',
@@ -23,7 +23,6 @@ export const metadata: Metadata = {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <ErrorBoundary>
-      <DashboardWorkspaceNavigation />
       <DashboardTour />
       <AgentDetailTour />
       {children}

@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { Link, useRouter } from '@/i18n/routing';
 import { useAuth } from '@/lib/auth-context';
+import { readHandoff } from '@/lib/chat-workspace';
 import { api } from '@/lib/api';
 import type { Agent, MissionTask, MissionTaskStatus, MissionTaskSummary } from '@/lib/api';
 import {
@@ -557,7 +558,7 @@ function TaskDetail({
 export default function MissionControlPage() {
   const t = useTranslations('missionControl');
   const locale = useLocale();
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
   const requestedTaskConsumedRef = useRef(false);
@@ -574,6 +575,13 @@ export default function MissionControlPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState<CreateTaskForm>(EMPTY_FORM);
+  useEffect(() => {
+    const url = new URL(window.location.href); const id = url.searchParams.get('handoff');
+    if (!id || !user) return;
+    const draft = readHandoff(user.id, id, 'mission');
+    if (draft) { setForm(current => ({ ...current, title: draft.title.slice(0, 120), prompt: draft.text, requiresApproval: true })); setCreateOpen(true); url.searchParams.delete('handoff'); window.history.replaceState(null, '', url.pathname + url.search); }
+  }, [user]);
+
 
   const taskDisplayTitle = useCallback((task: MissionTask): string => task.title, []);
 

@@ -180,7 +180,7 @@ function TextLink({ href, children }: { href: string; children: React.ReactNode 
 
 export default function WhitepaperPage() {
   return (
-    <MarketingShell>
+    <MarketingShell contentLanguage="en">
       <main className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
         <section className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-end">
           <div>
@@ -252,8 +252,8 @@ export default function WhitepaperPage() {
           </aside>
         </section>
 
-        <section className="mt-10 rounded-lg border border-amber-300/20 bg-amber-300/10 p-5 text-sm leading-6 text-amber-100/90">
-          <p className="font-semibold text-amber-100">Important notice</p>
+        <section className="mt-10 rounded-lg border border-amber-300/20 bg-amber-300/10 p-5 text-sm leading-6 text-amber-900 dark:text-amber-100">
+          <p className="font-semibold">Important notice</p>
           <p className="mt-2">
             This document is an informational product and ecosystem overview. It is not an offer to sell securities, an
             investment prospectus, legal advice, tax advice, or financial advice. $HATCHER is described as an ecosystem

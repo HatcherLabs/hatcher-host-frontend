@@ -6,6 +6,7 @@ export const routing = defineRouting({
   locales,
   defaultLocale,
   localePrefix: 'as-needed',
+  alternateLinks: false, // Content-aware alternates are emitted by lib/seo.ts and the sitemap.
   localeCookie: {
     name: 'HATCHER_LOCALE',
     maxAge: 60 * 60 * 24 * 365,

@@ -17,11 +17,15 @@ import type {
   ChatSessionSummary,
 } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { useWebSocketChat, type ChatThinkingEvent, type ChatToolEvent, type ChatUsageEvent } from '@/hooks/useWebSocketChat';
+import { useWebSocketChat, type ChatThinkingEvent, type ChatToolEvent, type ChatUsageEvent, type ChatTurnSnapshot } from '@/hooks/useWebSocketChat';
+import { mergeRecoveredChatTurn } from '@/lib/chat-turn-recovery';
 import { FRAMEWORKS, getBYOKProvider } from '@hatcher/shared';
 import type { UserTierKey } from '@hatcher/shared';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/components/ui/ToastProvider';
+import { AgentWorkspaceActions } from './AgentWorkspaceActions';
+import { AgentResourceStrip } from './AgentResourceStrip';
+import workspaceStyles from '@/components/workspace/WorkspaceShell.module.css';
 import { AgentStatusPill } from '@/components/ui/AgentStatusPill';
 import {
   ArrowLeft,
@@ -49,6 +53,8 @@ import {
   pageEntranceVariants,
   shouldRunChatWorkloads,
 } from '@/components/agents/AgentContext';
+import { AgentWorkspaceTabs } from '@/components/agents/AgentWorkspaceTabs';
+import { useWorkspace } from '@/components/workspace/WorkspaceContext';
 import { AgentSidebar } from '@/components/agents/AgentSidebar';
 import { PortAgentModal } from '@/components/agents/PortAgentModal';
 import { shouldMountTerminalTab } from '@/components/agents/terminalPersistence';
@@ -89,6 +95,8 @@ function TabSkeleton() {
   );
 }
 
+const BackupsTab = dynamic(() => import('@/components/agents/tabs/BackupsTab').then(mod => ({ default: mod.BackupsTab })), { loading: () => <TabSkeleton /> });
+
 const OverviewTab = dynamic(
   () => import('@/components/agents/tabs/OverviewTab').then(mod => ({ default: mod.OverviewTab })),
   { loading: () => <TabSkeleton /> }
@@ -101,6 +109,7 @@ const ConfigTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
+const AgentPitTab = dynamic(() => import('@/components/agents/tabs/AgentPitTab').then(mod => ({ default: mod.AgentPitTab })), { loading: () => <TabSkeleton /> });
 const IntegrationsTab = dynamic(
   () => import('@/components/agents/tabs/IntegrationsTab').then(mod => ({ default: mod.IntegrationsTab })),
   { loading: () => <TabSkeleton /> }
@@ -204,6 +213,8 @@ const RobinhoodTab = dynamic(
 // ─── Main Component ─────────────────────────────────────────
 
 export default function AgentWorkspace({ id, embedded = false, onAgentChange, onBusyChange }: { id: string; embedded?: boolean; onAgentChange?: (agent: Agent) => void; onBusyChange?: (busy: boolean) => void }) {
+  const workspace = useWorkspace();
+  const inWorkspace = Boolean(workspace);
   const simpleEntry = usePathname().startsWith('/agents/');
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading, user } = useAuth();
@@ -232,7 +243,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const statusPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const validTabs: Tab[] = ['overview','config','integrations','connectors','skills','plugins','files','logs','terminal','dev','memory','sessions','knowledge','schedules','chat','mail','stats','wallet','robinhood'];
+  const validTabs: Tab[] = ['backups','overview','config','integrations','connectors','skills','plugins','files','logs','terminal','dev','memory','sessions','knowledge','schedules','chat','mail','stats','wallet','robinhood','agentpit'];
   // 'skills' kept in validTabs for backwards compat (deep links), but redirects to plugins tab
   const searchParams = useSearchParams();
   const rawTab = searchParams.get('tab');
@@ -270,6 +281,17 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
       setTab('chat');
     }
   }, [tab, setTab, embedded, id, router]);
+  const openModelSettings = useCallback(() => {
+    if (embedded) {
+      router.push(`/dashboard/agent/${encodeURIComponent(id)}?tab=config&view=advanced&configTab=ai-models`);
+      return;
+    }
+    setViewMode('advanced');
+    setTab('config');
+    const url = new URL(window.location.href);
+    url.searchParams.set('configTab', 'ai-models');
+    window.history.replaceState({}, '', url.pathname + url.search);
+  }, [embedded, id, router, setViewMode, setTab]);
   useEffect(() => {
     if (!embedded && new URLSearchParams(window.location.search).get('tab') === 'workspace') {
       setTab('files');
@@ -310,6 +332,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
   const loadedChatSessionIdRef = useRef<string | null>(null);
   const lastHistorySignatureRef = useRef('');
   const activeChatSessionIdRef = useRef<string | null>(null);
+  const recoveredTurnRef = useRef<ChatTurnSnapshot | null>(null);
 
   // Features / integrations
   const [activeFeatures, setActiveFeatures] = useState<AgentFeature[]>([]);
@@ -325,6 +348,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
   const wsLogsRetryCountRef = useRef(0);
   const wsStreamingMsgRef = useRef(false);
   const chatAbortControllerRef = useRef<AbortController | null>(null);
+  const httpTurnIdRef = useRef<string | null>(null);
   // Tool-call indicators surfaced from the agent container during streaming.
   // Cleared on each new message; populated by ws-chat tool events.
   const [inflightTools, setInflightTools] = useState<Array<{ callId: string; name: string; argsPreview?: string }>>([]);
@@ -338,6 +362,11 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
 
   const setActiveChatSessionId = useCallback((sessionId: string) => {
     if (activeChatSessionIdRef.current !== sessionId) {
+      if (recoveredTurnRef.current?.status === 'active') {
+        sendingRef.current = false;
+        setSending(false);
+      }
+      recoveredTurnRef.current = null;
       historyLoadedRef.current = false;
       loadedChatSessionIdRef.current = null;
       setMessages([]);
@@ -392,14 +421,14 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
   }, [id, isAuthenticated]);
 
   const loadOwnedAgents = useCallback(async () => {
-    if (!isAuthenticated || embedded) return;
+    if (!isAuthenticated || embedded || inWorkspace) return;
     setOwnedAgentsLoading(true);
     const res = await api.getMyAgents();
     setOwnedAgentsLoading(false);
     if (res.success && Array.isArray(res.data)) {
       setOwnedAgents(res.data);
     }
-  }, [isAuthenticated, embedded]);
+  }, [isAuthenticated, embedded, inWorkspace]);
 
   const loadFeatures = useCallback(async () => {
     setFeaturesLoading(true);
@@ -461,16 +490,31 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
     [activeChatSessionId, id]
   );
   const hydratedDraftKeyRef = useRef<string | null>(null);
+  const pendingChatDraftRef = useRef<{ agentId: string; text: string } | null>(null);
+  const openChatWithDraft = useCallback((draft: string) => {
+    if (!input.trim()) {
+      // The first chat visit resolves its session asynchronously. Carry the
+      // requested draft into that session without replacing an existing draft.
+      pendingChatDraftRef.current = activeChatSessionIdRef.current ? null : { agentId: id, text: draft };
+      setInput(draft);
+    }
+    setTab('chat');
+  }, [id, input, setTab]);
+
 
   useEffect(() => {
     if (!chatDraftStorageKey || typeof window === 'undefined') return;
     hydratedDraftKeyRef.current = chatDraftStorageKey;
     try {
-      setInput(window.localStorage.getItem(chatDraftStorageKey) ?? '');
+      const saved = window.localStorage.getItem(chatDraftStorageKey) ?? '';
+      const pending = pendingChatDraftRef.current;
+      setInput(saved || (pending?.agentId === id ? pending.text : ''));
     } catch {
-      setInput('');
+      const pending = pendingChatDraftRef.current;
+      setInput(pending?.agentId === id ? pending.text : '');
     }
-  }, [chatDraftStorageKey]);
+    if (activeChatSessionId) pendingChatDraftRef.current = null;
+  }, [chatDraftStorageKey, id, activeChatSessionId]);
 
   useEffect(() => {
     if (
@@ -716,6 +760,26 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
     }
   }, [id]);
 
+  const applyRecoveredTurn = useCallback((snapshot: ChatTurnSnapshot) => {
+    if (snapshot.sessionId !== activeChatSessionIdRef.current) return;
+    setMessages((prev) => mergeRecoveredChatTurn(prev, snapshot));
+    const active = snapshot.status === 'active';
+    sendingRef.current = active;
+    setSending(active);
+    wsStreamingMsgRef.current = active;
+    if (snapshot.error) {
+      setChatError(snapshot.error);
+      setChatErrorType('generic');
+    } else {
+      setChatError(null);
+      setChatErrorType(null);
+    }
+    if (!active) {
+      setInflightTools([]);
+      setCompletedTools([]);
+    }
+  }, []);
+
   const loadChatHistory = useCallback(async (mode: 'initial' | 'poll' = 'poll') => {
     if (!id) return;
     if (mode === 'poll' && (!historyLoadedRef.current || sendingRef.current || wsStreamingMsgRef.current || olderRequestRef.current)) return;
@@ -739,6 +803,9 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
         if (mode === 'initial') {
           setHistoryCursor(res.data.nextCursor ?? null);
           setMessages(loaded);
+          if (recoveredTurnRef.current?.sessionId === requestedSessionId) {
+            applyRecoveredTurn(recoveredTurnRef.current);
+          }
           lastHistorySignatureRef.current = signature;
         } else if (signature && signature !== lastHistorySignatureRef.current) {
           setMessages((prev) => {
@@ -773,7 +840,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
       historyLoadedRef.current = true;
       }
     }
-  }, [historySignature, id, normalizeHistoryMessages]);
+  }, [applyRecoveredTurn, historySignature, id, normalizeHistoryMessages]);
 
   const loadOlderChatHistory = useCallback(async (): Promise<number> => {
     if (!historyCursor || olderRequestRef.current) return 0;
@@ -1063,6 +1130,23 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
 
   const wsChat = useWebSocketChat({
     agentId: id,
+    sessionId: activeChatSessionId,
+    onResume: (snapshot, sessionId) => {
+      if (sessionId !== activeChatSessionIdRef.current) return;
+      const previous = recoveredTurnRef.current;
+      recoveredTurnRef.current = snapshot;
+      if (snapshot) {
+        if (historyLoadedRef.current) applyRecoveredTurn(snapshot);
+      } else if (previous?.status === 'active') {
+        // The worker may have restarted. Stop showing an immortal spinner;
+        // reconcile durable history without resubmitting the user's request.
+        wsStreamingMsgRef.current = false;
+        sendingRef.current = false;
+        setSending(false);
+        setMessages((prev) => prev.filter((message) => message.id !== `recovery-${previous.id}`));
+        void loadChatHistory('poll');
+      }
+    },
     // Keep the socket alive while a response is in flight even if the user
     // switches to another tab — closing it mid-stream used to lose the
     // (already billed) answer. It closes on the next render after onDone/
@@ -1107,7 +1191,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
       setChatError(null);
       setChatErrorType(null);
       setMessages((prev) => {
-        if (prev.some((m) => m.id === message.id)) return prev;
+        if (prev.some((m) => m.id === message.id || m.id === `saved-${message.id}`)) return prev;
         if (recoveredFromDisconnect) {
           for (let i = prev.length - 1; i >= 0; i--) {
             if (prev[i]?.role === 'assistant' && prev[i]?.streaming) {
@@ -1235,12 +1319,14 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
   }, []);
 
   const abortChatResponse = useCallback(() => {
+    const turnId = httpTurnIdRef.current ?? recoveredTurnRef.current?.id;
+    if (turnId) void api.abortChatTurn(id, turnId, activeChatSessionIdRef.current);
     chatAbortControllerRef.current?.abort();
     chatAbortControllerRef.current = null;
     abortWsChat();
     finishAbortedChat();
     window.setTimeout(() => void loadChatSessions(), 500);
-  }, [abortWsChat, finishAbortedChat, loadChatSessions]);
+  }, [abortWsChat, finishAbortedChat, id, loadChatSessions]);
 
   // ─── Chat send ────────────────────────────────────────────
 
@@ -1305,6 +1391,9 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
     }
 
     try {
+      const turnId = crypto.randomUUID();
+      httpTurnIdRef.current = turnId;
+      wsChat.trackLocalTurn(turnId);
       await api.chatStream(
         id,
         text,
@@ -1384,6 +1473,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
         handleChatToolEvent,
         handleChatThinkingEvent,
         handleChatUsage,
+        turnId,
       );
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
@@ -1396,6 +1486,8 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
       setMessages((prev) => prev.filter((m) => !(m.streaming && m.content === '')));
       setSending(false);
     } finally {
+      httpTurnIdRef.current = null;
+      wsChat.trackLocalTurn(null);
       if (chatAbortControllerRef.current === abortController) {
         chatAbortControllerRef.current = null;
       }
@@ -1472,12 +1564,12 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
     if (!agent) return null;
     return {
       agent, id, stats, isActive, isNotActive, statusInfo, frameworkMeta,
-      tab, setTab,
+      tab, setTab, openModelSettings,
       logs: logs.logs, logsLoading: logs.logsLoading, logFilter: logs.logFilter,
       setLogFilter: logs.setLogFilter, logSearch: logs.logSearch, setLogSearch: logs.setLogSearch,
       autoScroll: logs.autoScroll, setAutoScroll: logs.setAutoScroll,
       filteredLogs: logs.filteredLogs, logsEndRef: logs.logsEndRef, loadLogs: logs.loadLogs, wsLogsConnected,
-      messages, setMessages, input, setInput, sending, queuedChatCount,
+      messages, setMessages, input, setInput, openChatWithDraft, sending, queuedChatCount,
       chatError, setChatError, chatErrorType, setChatErrorType,
       bottomRef, inputRef, sendMessage, abortChatResponse, handleKeyDown, sendCooldown,
       wsConnected: wsChat.isConnected,
@@ -1508,6 +1600,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
       configProvider: config.configProvider, setConfigProvider: config.setConfigProvider,
       customModelInput: config.customModelInput, setCustomModelInput: config.setCustomModelInput,
       useCustomModel: config.useCustomModel, setUseCustomModel: config.setUseCustomModel,
+      byokBaseUrl: config.byokBaseUrl, setByokBaseUrl: config.setByokBaseUrl,
       byokKeyInput: config.byokKeyInput, setByokKeyInput: config.setByokKeyInput,
       showByokKey: config.showByokKey, setShowByokKey: config.setShowByokKey,
       configIsPublic: config.configIsPublic, setConfigIsPublic: config.setConfigIsPublic,
@@ -1544,7 +1637,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, agent, stats, tab, logs.logs, logs.logsLoading, logs.logFilter, logs.logSearch, logs.autoScroll, logs.filteredLogs, wsLogsConnected,
-    messages, input, sending, queuedChatCount, sendCooldown, chatError, chatErrorType, abortChatResponse,
+    messages, input, openChatWithDraft, sending, queuedChatCount, sendCooldown, chatError, chatErrorType, abortChatResponse,
     historyCursor, historyLoading, contextLimited, loadOlderChatHistory,
     chatSessions, chatFolders, activeChatSessionId, setActiveChatSessionId, startNewChatSession, deleteChatSession,
     createChatFolder, renameChatFolder, deleteChatFolder, moveChatSession, deletingChatSessionId, loadChatSessions,
@@ -1552,7 +1645,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
     config.configName, config.configDesc, config.configBio, config.configLore, config.configTopics,
     config.configStyle, config.configAdjectives, config.configSystemPrompt, config.configSkills,
     config.configModel, config.configProvider, config.customModelInput, config.useCustomModel,
-    config.byokKeyInput, config.showByokKey, config.saving, config.saveMsg,
+    config.byokBaseUrl, config.byokKeyInput, config.showByokKey, config.saving, config.saveMsg,
     integrations.integrationSecrets, integrations.expandedIntegrations, integrations.visibleFields,
     integrations.savingIntegration, integrations.integrationSaveMsg,
     activeFeatures, activeFeatureKeys, featuresLoading,
@@ -1560,7 +1653,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
     actions.actionLoading, actions.actionError, actions.actionSuccess,
     llmProvider, activeModelDisplay, currentProviderMeta, providerModels, config.hasApiKey,
     displayUptime, isLiveUptime, isActive, isNotActive, statusInfo, frameworkMeta,
-    isAuthenticated, userTier, viewMode]);
+    isAuthenticated, userTier, viewMode, openModelSettings]);
 
   useEffect(() => { if (agent) onAgentChange?.(agent); }, [agent, onAgentChange]);
   useEffect(() => {
@@ -1649,26 +1742,28 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
   return (
     <AgentContext.Provider value={contextValue!}>
       <motion.div
-        className="flex flex-col xl:flex-row"
-        style={{ minHeight: 'calc(100dvh - 64px)' }}
+        className={inWorkspace ? "flex flex-col" : "flex flex-col xl:flex-row"}
+        style={{ minHeight: inWorkspace && tab === 'chat' ? 0 : 'calc(var(--workspace-height, 100dvh) - 64px)', height: inWorkspace && tab === 'chat' ? 'calc(var(--workspace-height, 100dvh) - var(--app-nav-height, 56px))' : undefined }}
         variants={pageEntranceVariants}
         initial="hidden"
         animate="visible"
       >
         {/* ─── Sidebar (desktop) / Horizontal tabs (mobile) ── */}
-        <AgentSidebar
+        {!inWorkspace && <AgentSidebar
           agent={agent}
           agents={ownedAgents}
           agentsLoading={ownedAgentsLoading}
           activeTab={tab}
           onTabChange={setTab}
-        />
+        />}
 
         {/* ─── Main Content ─────────────────────────────────── */}
-        <div className="flex-1 min-w-0 flex flex-col bg-[var(--bg-base)]">
-          {/* Top action bar */}
+        <div className="flex-1 min-h-0 min-w-0 flex flex-col bg-[var(--bg-surface)]">
+          {inWorkspace && <AgentWorkspaceTabs />}
+          {/* Agent actions live in the shared header, away from the conversation. */}
+          <AgentWorkspaceActions onClone={() => setPortModalOpen(true)}>
           <div
-            className="relative z-40 flex flex-wrap items-center gap-3 overflow-visible border-b border-[var(--border-default)] bg-[color-mix(in_srgb,var(--bg-surface)_92%,transparent)] px-4 py-3.5 backdrop-blur-md sm:px-6"
+            className="relative z-40 flex shrink-0 flex-wrap items-center gap-3 overflow-visible border-b border-[var(--border-default)] bg-[color-mix(in_srgb,var(--bg-surface)_92%,transparent)] px-4 py-3.5 backdrop-blur-md sm:px-6"
             style={{ fontFamily: 'var(--font-inter)' }}
           >
             <Link href="/" className="inline-flex items-center gap-1.5 text-xs text-[var(--text-secondary)]"><ArrowLeft size={13} />Chat</Link>
@@ -1679,7 +1774,7 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
             {viewMode === 'advanced' && (
             <button
               type="button"
-              onClick={() => setTab('config')}
+              onClick={openModelSettings}
               className="inline-flex max-w-full items-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2 text-left text-xs font-semibold text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--accent)] sm:max-w-[420px]"
               title={`${activeModelDisplay.provider} · ${activeModelDisplay.name} · ${activeModelDisplay.route}`}
             >
@@ -1847,6 +1942,10 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
             </div>
           </div>
 
+          </AgentWorkspaceActions>
+
+          <AgentResourceStrip key={agent.id} agentId={agent.id} status={agent.status} />
+
           {actions.deleteError && (
             <p
               className="text-xs px-6 py-2 border-b border-[var(--color-destructive-border)] text-[var(--color-destructive)] bg-[var(--color-destructive-bg)]"
@@ -1857,12 +1956,14 @@ export default function AgentWorkspace({ id, embedded = false, onAgentChange, on
           )}
 
           {/* ─── Tab Content ──────────────────────────────────── */}
-          <div className="flex-1 min-w-0 bg-[var(--bg-base)]">
-            <div className={`${tab === 'chat' || tab === 'terminal' || tab === 'mail' || tab === 'dev' ? 'w-full max-w-none px-4 sm:px-6 lg:px-8 2xl:px-10' : 'max-w-[1280px] mx-auto px-4 sm:px-6'} py-6`}>
+          <div className="flex-1 min-h-0 min-w-0 bg-[var(--bg-surface)]">
+            <div style={{ height: inWorkspace && tab === 'chat' ? '100%' : undefined }} className={inWorkspace && tab === 'chat' ? workspaceStyles.agentChatContent : `${tab === 'terminal' || tab === 'mail' || tab === 'dev' ? 'w-full max-w-none px-4 sm:px-6 lg:px-8' : 'max-w-[1280px] mx-auto px-4 sm:px-6'} py-6`}>
             <AnimatePresence mode="wait">
               {tab === 'overview' && <OverviewTab />}
+              {tab === 'backups' && <BackupsTab />}
               {tab === 'config' && (viewMode === 'easy' ? <SimpleConfigTab key={agent.id} /> : <ConfigTab />)}
               {tab === 'integrations' && <IntegrationsTab />}
+              {tab === 'agentpit' && <AgentPitTab />}
               {tab === 'connectors' && <ConnectorsTab />}
               {(tab === 'skills' || tab === 'plugins') && (
                 agent?.framework === 'ironclaw' ? <IronClawExtensionsTab /> : <PluginsTab />

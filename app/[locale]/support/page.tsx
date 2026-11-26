@@ -300,14 +300,6 @@ export default function SupportPage() {
               </a>
               {' '}&middot;{' '}
               <a
-                href="https://discord.gg/7tY3HjKjMc"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[var(--color-accent)] hover:underline font-medium"
-              >
-                {t('joinDiscord')}
-              </a>{' '}&middot;{' '}
-              <a
                 href="https://t.me/HatcherLabs"
                 target="_blank"
                 rel="noopener noreferrer"

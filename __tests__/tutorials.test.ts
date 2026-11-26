@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { TUTORIAL_GUIDES } from '@/lib/tutorial-guides';
 import { HATCHER_TUTORIALS } from '@/lib/tutorials';
 
 describe('tutorial library', () => {
@@ -8,6 +9,7 @@ describe('tutorial library', () => {
     expect(HATCHER_TUTORIALS).toHaveLength(10);
 
     for (const tutorial of HATCHER_TUTORIALS) {
+      expect(TUTORIAL_GUIDES[tutorial.slug].steps.length).toBeGreaterThanOrEqual(3);
       expect(tutorial.durationIso).toMatch(/^PT/);
       expect(tutorial.featureHref).toMatch(/^\//);
       expect(existsSync(resolve(process.cwd(), 'public', tutorial.videoSrc.slice(1)))).toBe(true);

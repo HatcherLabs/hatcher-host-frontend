@@ -1,7 +1,7 @@
 import { req, getToken } from "./api/core";
 import { API_URL } from "./config";
 
-export const DEFAULT_CHAT_MODEL = "deepseek/deepseek-v4-flash";
+export const DEFAULT_CHAT_MODEL = "deepseek/deepseek-v4.1-flash";
 
 export interface ChatModel {
   id: string;
@@ -19,6 +19,10 @@ export interface ChatPlan {
   durationDays: number;
 }
 export interface Conversation {
+  createdAt?: string;
+  updatedAt?: string;
+  isPinned?: boolean;
+  archivedAt?: string | null;
   id: string;
   title: string;
   model: string;
@@ -38,8 +42,10 @@ export interface ChatCreateTool {
   label: string;
   estimatedAiCredits: number;
   configured: boolean;
+  statusCheckAiCredits?: number;
 }
 export interface ChatAccount {
+  agentAccess?: boolean;
   guestAllowance?: {
     remaining: number;
     remainingUsd: number;
@@ -72,6 +78,7 @@ export async function sendChat(
   onDelta: (text: string) => void,
   artifactMode?: "chart",
   guest = false,
+  webSearch: "auto" | "off" = "auto",
 ) {
   const token = getToken();
   const response = await fetch(
@@ -88,6 +95,7 @@ export async function sendChat(
         requestId: crypto.randomUUID(),
         prompt,
         model,
+        webSearch,
         ...(artifactMode ? { artifactMode } : {}),
       }),
     },

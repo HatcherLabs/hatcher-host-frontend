@@ -262,6 +262,31 @@
   color: var(--text-primary);
   font-weight: 600;
 }
+.mobileApps {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 8px;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+.mobileApps a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  border-radius: 4px;
+}
+.mobileApps a:hover {
+  color: var(--text-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.mobileApps a:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
 .usage {
   border-top: 1px solid var(--border-default);
   padding: 18px 8px 0;
@@ -542,6 +567,42 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
+}
+.planTabs {
+  display: flex;
+  gap: 6px;
+  margin: 18px 0;
+  padding: 4px;
+  border: 1px solid var(--border-default);
+  border-radius: 10px;
+}
+.planTabs button {
+  flex: 1;
+  padding: 10px 8px;
+  border-radius: 7px;
+  font-size: 13px;
+}
+.planTabs button[aria-pressed="true"] {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.planDescription,
+.paymentMethods {
+  margin: 12px 0 18px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+.paymentMethods {
+  padding: 12px;
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  color: var(--text-secondary);
+}
+.inlinePlanLink {
+  text-decoration: underline;
+  color: var(--color-accent);
 }
 .planGrid article {
   border: 1px solid var(--border-default);
@@ -922,7 +983,8 @@
   color: var(--text-secondary);
 }
 .sideNav a:hover,
-.sideNav button:hover {
+.sideNav button:hover,
+.sideNav button[aria-current="page"] {
   background: var(--bg-hover);
   color: var(--text-primary);
 }
@@ -1066,5 +1128,41 @@
   }
   .plans {
     padding: 18px;
+  }
+}
+
+.inWorkspace {
+  height: calc(100dvh - 52px);
+  min-height: 0;
+  border: 0;
+}
+.workspaceHistory {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  color: var(--text-primary);
+}
+.workspaceHistory .sideScroll {
+  padding: 0;
+}
+.workspaceHistory .newChat {
+  margin: 0 0 12px;
+}
+.workspaceHistory button {
+  cursor: pointer;
+}
+.workspaceHistory button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.workspaceHistory button:focus-visible,
+.workspaceHistory input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+@media (max-width: 760px) {
+  .inWorkspace {
+    height: calc(100dvh - 52px);
   }
 }

@@ -37,10 +37,6 @@ export async function generateMetadata({
       template: `%s · ${t('appName')}`,
     },
     description: t('tagline'),
-    // languages are set per-route via buildLanguagesMap() in each route's metadata
-    alternates: {
-      canonical: locale === routing.defaultLocale ? '/' : `/${locale}`,
-    },
     openGraph: {
       locale: OG_LOCALE_MAP[locale] ?? 'en_US',
       alternateLocale: routing.locales

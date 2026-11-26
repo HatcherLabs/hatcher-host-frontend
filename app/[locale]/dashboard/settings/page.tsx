@@ -1,4 +1,6 @@
 'use client';
+import { WorkspacePortal } from '@/components/workspace/WorkspacePortal';
+import { useWorkspace } from '@/components/workspace/WorkspaceContext';
 
 import { useState, useEffect, useRef } from 'react';
 import NextLink from 'next/link';
@@ -196,6 +198,7 @@ export default function SettingsPage() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading, user, logout, refreshUser } = useAuth();
   const { toast } = useToast();
+  const workspace = useWorkspace();
   const [activeTab, setActiveTab] = useState<TabId>('profile');
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get('tab') === 'security') {
@@ -341,12 +344,11 @@ export default function SettingsPage() {
   // ── Save profile ──────────────────────────────────────────
   async function handleSaveProfile() {
     if (!user) return;
-    if (!username.trim() || !email.trim()) { toast('error', 'Username and email are required'); return; }
+    if (!username.trim()) { toast('error', 'Username is required'); return; }
     setSavingProfile(true);
     try {
       const updates: { username?: string; email?: string; avatarUrl?: string | null } = {};
       if (username !== user.username) updates.username = username;
-      if (email !== user.email) updates.email = email;
       if (avatarUrl !== user.avatarUrl) updates.avatarUrl = avatarUrl;
       if (!Object.keys(updates).length) { toast('info', 'No changes to save'); return; }
       const res = await api.updateProfile(updates);
@@ -432,29 +434,24 @@ export default function SettingsPage() {
   // ── Render ────────────────────────────────────────────────
   return (
     <motion.div
-      className="min-h-screen p-4 sm:p-6 lg:p-10 relative"
+      className="min-h-full p-5 sm:p-8 relative"
       variants={pageVariants}
       initial="hidden"
       animate="visible"
     >
-      {/* Background glow */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 60% 40% at 30% 0%, var(--accent-glow), transparent 60%)' }}
-      />
-
       <div className="max-w-4xl mx-auto relative">
         {/* ── Page header ─────────────────────────────────── */}
         <div className="mb-8">
           <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">{t('eyebrow')}</p>
           <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]" style={displayFont}>{t('heading')}</h1>
           <p className="text-sm mt-2 text-[var(--text-secondary)]">{t('subheading')}</p>
+          <Link href="/dashboard/settings/connections" className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-[var(--color-accent)]">Connected AI apps <ArrowRight size={14} /></Link>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6">
           {/* ── Sidebar tabs ──────────────────────────────── */}
-          <nav className="lg:w-52 flex-shrink-0">
-            <div className="card glass-noise p-2 space-y-0.5 lg:sticky lg:top-6">
+          <WorkspacePortal><nav aria-label={t("heading")} className={workspace ? "w-full" : "lg:w-52 flex-shrink-0"}>
+            <div className={workspace ? "space-y-1" : "card glass-noise p-2 space-y-0.5 lg:sticky lg:top-6"}>
               {/* User info */}
               <div className="flex items-center gap-3 px-3 py-3 mb-1 border-b border-[var(--border-default)]">
                 {avatarUrl ? (
@@ -476,7 +473,8 @@ export default function SettingsPage() {
               {TABS.map(({ id, icon: Icon }) => (
                 <button
                   key={id}
-                  onClick={() => setActiveTab(id)}
+                  aria-current={activeTab === id ? "page" : undefined}
+                  onClick={() => { setActiveTab(id); workspace?.closeSidebar(); }}
                   className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer text-left ${
                     activeTab === id
                       ? id === 'danger'
@@ -490,7 +488,7 @@ export default function SettingsPage() {
                 </button>
               ))}
             </div>
-          </nav>
+          </nav></WorkspacePortal>
 
           {/* ── Tab content ───────────────────────────────── */}
           <div className="flex-1 min-w-0">
@@ -579,7 +577,7 @@ export default function SettingsPage() {
                       {/* Edit fields */}
                       <div className="space-y-4">
                         <Field label={t('profile.usernameLabel')} value={username} onChange={setUsername} placeholder="your_username" hint={t('profile.usernameHint')} />
-                        <Field label={t('profile.emailLabel')} value={email} onChange={setEmail} type="email" placeholder="you@example.com" />
+                        <div><p className="text-xs text-[var(--text-muted)]">{t('profile.emailLabel')}</p><p className="text-sm text-[var(--text-primary)]">{email || 'Signed in with your wallet — no email required'}</p></div>
                         <button
                           onClick={handleSaveProfile}
                           disabled={savingProfile}

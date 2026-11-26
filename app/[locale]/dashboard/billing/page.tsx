@@ -1,5 +1,7 @@
 'use client';
 
+import { paymentAmount } from '@/lib/payment-display';
+
 import { CostExplainer } from '@/components/billing/CostExplainer';
 
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
@@ -13,7 +15,7 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { TIERS, TIER_ORDER, ADDONS } from '@hatcher/shared';
-import type { UserTierKey, AddonKey } from '@hatcher/shared';
+import type { UserTierKey, AddonKey, TierConfig } from '@hatcher/shared';
 import { usePaymentDrivers } from '@/lib/payment-drivers';
 import { ConfirmPaymentModal } from '@/components/payments/ConfirmPaymentModal';
 import { ChatPlansOverview } from '@/components/chat/ChatPlansOverview';
@@ -92,11 +94,8 @@ const AI_CREDITS_BY_TIER: Record<UserTierKey, number> = {
   founding_member: 25000,
 };
 
-// Displayed resource numbers per tier. Kept local (not read from @hatcher/shared
-// TIERS) because the shared package can lag behind runtime capacity changes —
-// e.g. business is 4 CPU / 6144 MB since 2026-07 (and founding_member matched
-// it at 4 / 6144 on 2026-07-29), while the published package still says the
-// old numbers until its next release.
+// Fallback if the live catalog is unavailable. The API catalog takes precedence
+// so temporary runtime headroom and later capacity changes appear automatically.
 const TIER_RESOURCE_OVERRIDES: Record<UserTierKey, { includedAgents: number; cpuLimit: number; memoryMb: number; storageMb: number; autoSleep: boolean; autoSleepMinutes: number; fileManager: boolean; fullLogs: boolean }> = {
   free: { includedAgents: 1, cpuLimit: 1, memoryMb: 1024, storageMb: 2048, autoSleep: true, autoSleepMinutes: 720, fileManager: true, fullLogs: true },
   starter: { includedAgents: 1, cpuLimit: 1, memoryMb: 1536, storageMb: 10240, autoSleep: false, autoSleepMinutes: 0, fileManager: true, fullLogs: true },
@@ -124,7 +123,8 @@ type BillingAddonKey = Exclude<AddonKey, RetiredAddonKey>
   | 'addon.ai_credits.50000'
   | 'addon.boost_s'
   | 'addon.boost_l'
-  | 'addon.storage_plus';
+  | 'addon.storage_plus'
+  | 'addon.chat.basic' | 'addon.chat.pro' | 'addon.chat.max';
 
 type BillingAddon = {
   key: BillingAddonKey;
@@ -294,11 +294,14 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
           exit={{ opacity: 0, scale: 0.95, y: 10 }}
           transition={{ duration: 0.2 }}
           className="card-solid w-full max-w-md mx-4 max-h-[calc(100vh-2rem)] overflow-y-auto"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="payment-method-title"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
-            <h3 className="font-semibold text-[var(--text-primary)]">{requiresAgent ? t('selectAgent') : t('choosePayment')}</h3>
-            <button onClick={onClose} className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
+            <h3 id="payment-method-title" className="font-semibold text-[var(--text-primary)]">{requiresAgent ? t('selectAgent') : t('choosePayment')}</h3>
+            <button onClick={onClose} aria-label="Close payment methods" className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -463,6 +466,7 @@ export default function BillingPage() {
     typeof value === 'number' && value > 0 ? value.toLocaleString() : '0';
   const { isAuthenticated, isLoading: authLoading, user } = useAuth();
   const searchParams = useSearchParams();
+  const openedPurchase = useRef<string | null>(null);
   const solanaWallet = useWallet();
   const { connection: solanaConnection } = useConnection();
   const {
@@ -473,11 +477,20 @@ export default function BillingPage() {
   } = usePaymentDrivers();
 
   const [accountData, setAccountData] = useState<AccountFeatures | null>(null);
+  const [tierCatalog, setTierCatalog] = useState<Record<string, TierConfig>>({});
   const [capacitySummary, setCapacitySummary] = useState<CapacityAddonsSummaryResponse | null>(null);
   const [foundingInfo, setFoundingInfo] = useState<{ maxSlots: number; taken: number; remaining: number } | null>(null);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    if (loading || authLoading) return;
+    const anchor = window.location.hash.slice(1);
+    if (!['subscription', 'plans', 'ai-credits', 'addons', 'payments'].includes(anchor)) return;
+    const frame = requestAnimationFrame(() => document.getElementById(anchor)?.scrollIntoView());
+    return () => cancelAnimationFrame(frame);
+  }, [loading, authLoading]);
   const [error, setError] = useState<string | null>(null);
+  const [purchaseNotice, setPurchaseNotice] = useState('');
   const [paymentErrorToast, setPaymentErrorToast] = useState<string | null>(null);
   const [subscribing, setSubscribing] = useState<string | null>(null);
   const [purchasingAddon, setPurchasingAddon] = useState<string | null>(null);
@@ -620,7 +633,10 @@ export default function BillingPage() {
     if (balRes.success) setAiCreditBalance(balRes.data.balance);
     if (payRes.success) setPayments(payRes.data.payments);
     if (histRes.success) setAiCreditHistory(histRes.data.usage);
-    if (catalogRes.success) setFoundingInfo(catalogRes.data.founding);
+    if (catalogRes.success) {
+      setFoundingInfo(catalogRes.data.founding);
+      setTierCatalog(catalogRes.data.tiers);
+    }
     if (recurringRes.success) setRecurringAuthorizations(recurringRes.data.authorizations);
     if (agentsRes.success && agentsRes.data) {
       const agents = (agentsRes.data as unknown as Array<{ id: string; name: string }>);
@@ -796,7 +812,10 @@ export default function BillingPage() {
         const agents = (agentsRes.data as unknown as Array<{ id: string; name: string }>);
         setUserAgents(agents.map(a => ({ id: a.id, name: a.name })));
       }
-      if (catalogRes.success) setFoundingInfo(catalogRes.data.founding);
+      if (catalogRes.success) {
+        setFoundingInfo(catalogRes.data.founding);
+        setTierCatalog(catalogRes.data.tiers);
+      }
       if (recurringRes.success) setRecurringAuthorizations(recurringRes.data.authorizations);
       if (!acctRes.success) setError(acctRes.error ?? 'Failed to load account');
       setLoading(false);
@@ -954,6 +973,33 @@ export default function BillingPage() {
     });
   };
 
+
+  useEffect(() => {
+    if (loading || !isAuthenticated || !accountData) return;
+    const tierKey = searchParams.get('tier');
+    const addonKey = searchParams.get('addon');
+    const selection = `${tierKey ?? ''}:${addonKey ?? ''}`;
+    if (openedPurchase.current === selection) return;
+    if (tierKey && ['starter', 'pro', 'business', 'founding_member'].includes(tierKey)) {
+      const tier = TIERS[tierKey as UserTierKey];
+      openedPurchase.current = selection;
+      if (accountData.tier === 'founding_member' || TIER_ORDER.indexOf(tierKey as UserTierKey) < TIER_ORDER.indexOf(accountData.tier as UserTierKey)) {
+        setPurchaseNotice('Your current plan already includes this access. Manage your existing plan below.');
+        return;
+      }
+      setBillingPeriod('monthly');
+      setPaymentModal({ isOpen: true, type: 'subscription', tierKey: tierKey as UserTierKey, title: `Choose payment for ${tier.name}`, price: tier.usdPrice });
+    } else if (addonKey) {
+      if (addonKey.startsWith('addon.chat.')) {
+        openedPurchase.current = selection;
+        return;
+      }
+      const addon = findBillingAddon(addonKey);
+      if (!addon || addon.perAgent) return;
+      openedPurchase.current = selection;
+      setPaymentModal({ isOpen: true, type: 'addon', addonKey: addon.key, title: addon.key.startsWith('addon.chat.') ? `${addon.name} · Web Chat only, no agents` : addon.name, price: addon.usdPrice });
+    }
+  }, [loading, isAuthenticated, searchParams, accountData]);
 
   // Lifetime tiers (founding_member) are always flat-priced — ignore the
   // monthly/annual toggle for them, and also skip sending billingPeriod
@@ -1644,9 +1690,11 @@ export default function BillingPage() {
 
       <CostExplainer showBalanceLink={false} />
       <ChatPlansOverview billing />
+      {purchaseNotice && <p role="status" className="mb-6 rounded-lg border border-[var(--border-default)] p-4 text-sm text-[var(--text-secondary)]">{purchaseNotice}</p>}
+      {searchParams.get('addon')?.startsWith('addon.chat.') && <p role="status" className="mb-6 rounded-lg border border-[var(--border-default)] p-4 text-sm text-[var(--text-secondary)]">Web Chat is now part of Hatcher plans. Choose a plan below for Chat, hosted agents and Canvas. Previously purchased Chat allowances remain available until their expiry.</p>}
 
       {/* ── AI Credits Balance Card ───────────────────────── */}
-      <motion.div className={`mb-8 ${cardClass}`} variants={itemVariants}>
+      <motion.div id="ai-credits" className={`mb-8 ${cardClass}`} variants={itemVariants}>
         <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
           <div className="flex items-center gap-2">
             <Wallet className="w-4 h-4 text-[var(--color-info)]" />
@@ -1896,7 +1944,7 @@ export default function BillingPage() {
       </motion.div>
 
       {/* ── Current Tier Card ──────────────────────────────── */}
-      <motion.div className={`mb-8 ${cardClass}`} variants={itemVariants}>
+      <motion.div id="subscription" className={`mb-8 ${cardClass}`} variants={itemVariants}>
         <div className="p-4 sm:p-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
             <div className="flex items-center gap-4">
@@ -2118,7 +2166,7 @@ export default function BillingPage() {
 
       {/* ── Upgrade Tier ─────────────────────────────────── */}
       {currentTier !== 'founding_member' && (
-        <motion.div className={`mb-8 ${cardClass}`} variants={itemVariants}>
+        <motion.div id="plans" className={`mb-8 ${cardClass}`} variants={itemVariants}>
           <div className="px-4 sm:px-6 py-4 flex items-center justify-between gap-3 flex-wrap border-b border-[var(--border-default)]">
             <div className="flex items-center gap-2">
               <ArrowUpRight className="w-4 h-4 text-[var(--color-accent)]" />
@@ -2162,7 +2210,7 @@ export default function BillingPage() {
             <div className="grid sm:grid-cols-2 gap-4">
               {TIER_ORDER.filter(k => k !== 'free' && TIER_ORDER.indexOf(k) > TIER_ORDER.indexOf(currentTier)).map((tierKey) => {
                 const tier = TIERS[tierKey];
-                const tierResources = TIER_RESOURCE_OVERRIDES[tierKey];
+                const tierResources = tierCatalog[tierKey] ?? TIER_RESOURCE_OVERRIDES[tierKey];
                 const isSubscribing = subscribing === tierKey;
 
                 return (
@@ -2439,7 +2487,7 @@ export default function BillingPage() {
       </motion.div>
 
       {/* ── Payment History ──────────────────────────────── */}
-      <motion.div className={`overflow-hidden ${cardClass}`} variants={itemVariants}>
+      <motion.div id="payments" className={`overflow-hidden ${cardClass}`} variants={itemVariants}>
         <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
           <div className="flex items-center gap-2">
             <Receipt className="w-4 h-4 text-[var(--text-muted)]" />
@@ -2482,7 +2530,7 @@ export default function BillingPage() {
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-[var(--text-muted)]">{formatDate(payment.createdAt)}</span>
                   <span className="text-sm font-semibold text-[var(--text-secondary)] tabular-nums" style={{ fontFamily: 'var(--font-mono, "JetBrains Mono"), monospace' }}>
-                    ${Number(payment.usdAmount).toFixed(2)}
+                    {paymentAmount(payment)}
                   </span>
                 </div>
               </motion.div>
@@ -2516,7 +2564,7 @@ export default function BillingPage() {
                     </td>
                     <td className="px-6 py-4 text-sm text-right whitespace-nowrap">
                       <span className="text-[var(--text-secondary)] tabular-nums" style={{ fontFamily: 'var(--font-mono, "JetBrains Mono"), monospace' }}>
-                        ${Number(payment.usdAmount).toFixed(2)}
+                        {paymentAmount(payment)}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right whitespace-nowrap">

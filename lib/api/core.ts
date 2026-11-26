@@ -1,3 +1,4 @@
+import { admissionAction, ensureBrowserAdmission, BrowserAdmissionError } from '@/lib/browser-admission';
 // ============================================================
 // API Core — token management and request wrapper
 // ============================================================
@@ -93,6 +94,8 @@ export async function req<T>(
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
   try {
+    const action = admissionAction(path, options.method);
+    if (action && !_isRetry) await ensureBrowserAdmission(action);
     const res = await fetch(`${API_BASE}${path}`, {
       ...options,
       headers,
@@ -135,7 +138,8 @@ export async function req<T>(
     }
 
     return (json ?? { success: false, error: 'Empty response' }) as { success: true; data: T } | { success: false; error: string; code?: string };
-  } catch {
+  } catch (error) {
+    if (error instanceof BrowserAdmissionError) return { success: false, error: error.message };
     return { success: false, error: 'Network error — is the API running?' };
   }
 }

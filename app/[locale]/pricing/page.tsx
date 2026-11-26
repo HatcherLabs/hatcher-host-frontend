@@ -142,7 +142,7 @@ function PricingPageContent() {
   }, []);
   return (
     <MarketingShell>
-      <div className="mx-auto max-w-7xl px-4 pt-20 sm:pt-24 pb-20 relative">
+      <div className="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-10 relative">
         {/* HERO */}
         <div className="mb-12 max-w-4xl">
           <motion.p
@@ -591,10 +591,6 @@ function PricingPageContent() {
               {t('help.emailLabel')}
             </a>
             {' '}{/* "or" — intentionally kept as a simple connector, not extracted */}or{' '}
-            <a href="https://discord.gg/7tY3HjKjMc" target="_blank" rel="noopener noreferrer" className="text-[var(--accent)] hover:underline font-medium">
-              {t('help.discordLabel')}
-            </a>
-            {' '}or{' '}
             <a href="https://t.me/HatcherLabs" target="_blank" rel="noopener noreferrer" className="text-[var(--accent)] hover:underline font-medium">
               {t('help.telegramLabel')}
             </a>

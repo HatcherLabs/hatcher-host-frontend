@@ -13,7 +13,7 @@ import type { ChatMessageUsage } from '../tabs/ChatTab/types';
 
 // ─── Types ───────────────────────────────────────────────────
 
-export type Tab = 'overview' | 'config' | 'integrations' | 'connectors' | 'skills' | 'plugins' | 'files' | 'logs' | 'terminal' | 'dev' | 'memory' | 'sessions' | 'knowledge' | 'schedules' | 'chat' | 'mail' | 'stats' | 'wallet' | 'robinhood';
+export type Tab = 'backups' | 'overview' | 'config' | 'integrations' | 'connectors' | 'skills' | 'plugins' | 'files' | 'logs' | 'terminal' | 'dev' | 'memory' | 'sessions' | 'knowledge' | 'schedules' | 'chat' | 'mail' | 'stats' | 'wallet' | 'robinhood' | 'agentpit';
 
 export interface Message {
   id: string;
@@ -87,6 +87,7 @@ export interface AgentContextValue {
   // Tab
   tab: Tab;
   setTab: (tab: Tab) => void;
+  openModelSettings: () => void;
 
   // Logs
   logs: LogEntry[];
@@ -107,6 +108,7 @@ export interface AgentContextValue {
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
   input: string;
   setInput: (value: string) => void;
+  openChatWithDraft: (draft: string) => void;
   sending: boolean;
   queuedChatCount: number;
   chatError: string | null;
@@ -170,6 +172,8 @@ export interface AgentContextValue {
   setCustomModelInput: (value: string) => void;
   useCustomModel: boolean;
   setUseCustomModel: (value: boolean) => void;
+  byokBaseUrl: string;
+  setByokBaseUrl: (value: string) => void;
   byokKeyInput: string;
   setByokKeyInput: (value: string) => void;
   showByokKey: boolean;

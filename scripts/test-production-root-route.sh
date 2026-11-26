@@ -73,6 +73,8 @@ if ! "$script_dir/smoke-production-routes.sh" "http://127.0.0.1:$port"; then
   exit 1
 fi
 
+node "$repo_root/scripts/smoke-seo.mjs" "http://127.0.0.1:$port"
+
 # ISR regeneration may finish after the stale response is served. Give the
 # background write attempt a bounded window before inspecting the runtime log.
 sleep 2

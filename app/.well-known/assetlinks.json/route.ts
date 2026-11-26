@@ -13,6 +13,8 @@ const assetLinks = [
       namespace: 'android_app',
       package_name: 'host.hatcher.app',
       sha256_cert_fingerprints: [
+        // Dedicated Seeker signing identity, also used by Solana wallet verification.
+        '4E:32:BE:63:A4:50:FB:FF:2C:46:A5:12:64:C1:7F:15:56:A9:D7:33:5A:DE:21:6C:04:FD:51:CE:3A:8D:6E:17',
         'DD:FE:E2:35:F5:B1:EF:C0:99:0E:21:BB:CF:60:B9:D5:E7:BC:0B:67:83:26:37:39:5C:9A:AC:83:9D:09:D0:5A',
       ],
     },

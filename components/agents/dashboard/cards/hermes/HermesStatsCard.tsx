@@ -20,6 +20,7 @@ interface HermesStats {
   };
   lastActiveAt: string;
   containerOffline: boolean;
+  nativeStatsUnavailable?: boolean;
 }
 
 // ─── Formatting helpers ─────────────────────────────────────────
@@ -187,8 +188,8 @@ export function HermesStatsCard() {
         <StatItem
           icon={<MessageSquare size={12} />}
           label="Sessions"
-          value={stats.containerOffline ? '—' : stats.sessions.total.toLocaleString()}
-          sub={stats.containerOffline ? 'container offline' : undefined}
+          value={stats.containerOffline || stats.nativeStatsUnavailable ? '—' : stats.sessions.total.toLocaleString()}
+          sub={stats.containerOffline ? 'container offline' : stats.nativeStatsUnavailable ? 'history unavailable' : undefined}
         />
 
         {/* Interactions */}
@@ -203,9 +204,9 @@ export function HermesStatsCard() {
         <StatItem
           icon={<Wrench size={12} />}
           label="Tool Calls"
-          value={stats.containerOffline ? '—' : stats.toolCalls.total.toLocaleString()}
+          value={stats.containerOffline || stats.nativeStatsUnavailable ? '—' : stats.toolCalls.total.toLocaleString()}
           sub={
-            !stats.containerOffline && top3Tools.length > 0 ? (
+            !stats.containerOffline && !stats.nativeStatsUnavailable && top3Tools.length > 0 ? (
               <div className="flex flex-wrap gap-1 mt-0.5">
                 {top3Tools.map(([name, count], idx) => (
                   <span

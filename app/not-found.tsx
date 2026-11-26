@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Page Not Found',
+  robots: { index: false, follow: false },
   description: 'The page you are looking for does not exist.',
 };
 

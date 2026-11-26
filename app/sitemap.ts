@@ -1,17 +1,14 @@
 import { MetadataRoute } from "next";
 import { BLOG_POSTS } from "@/lib/blog";
-import { API_URL } from "@/lib/config";
-import { shouldSkipStaticApiFetch } from "@/lib/static-api-fetch";
+import { HATCHER_TUTORIALS } from "@/lib/tutorials";
+import { buildLanguagesMap, contentLocales } from "@/lib/seo";
 import { routing } from "@/i18n/routing";
 
 export const dynamic = "force-static";
+export const revalidate = 3600;
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://hatcher.host";
 
-interface ExploreAgent {
-  id: string;
-  updatedAt?: string;
-}
 
 // Public routes that get localized sitemap entries
 const LOCALIZED_ROUTES: Array<{
@@ -20,9 +17,10 @@ const LOCALIZED_ROUTES: Array<{
   priority: number;
 }> = [
   { path: "/", changeFrequency: "daily", priority: 1.0 },
+  { path: "/platform", changeFrequency: "weekly", priority: 0.9 },
+  { path: "/usage", changeFrequency: "daily", priority: 0.5 },
+  { path: "/staking", changeFrequency: "weekly", priority: 0.5 },
   { path: "/pricing", changeFrequency: "weekly", priority: 0.9 },
-  { path: "/explore", changeFrequency: "daily", priority: 0.85 },
-  { path: "/traders", changeFrequency: "daily", priority: 0.85 },
   { path: "/features", changeFrequency: "weekly", priority: 0.85 },
   { path: "/compute", changeFrequency: "weekly", priority: 0.8 },
   { path: "/frameworks", changeFrequency: "weekly", priority: 0.8 },
@@ -48,26 +46,15 @@ function absUrl(locale: string, path: string): string {
   return `${SITE_URL}${prefix}${suffix}`;
 }
 
-function buildLanguagesMap(path: string): Record<string, string> {
-  const languages: Record<string, string> = {};
-  for (const locale of routing.locales) {
-    languages[locale] = absUrl(locale, path);
-  }
-  languages["x-default"] = absUrl(routing.defaultLocale, path);
-  return languages;
-}
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const now = new Date();
 
   // Localized public routes — one entry per locale per route
   const localizedEntries: MetadataRoute.Sitemap = [];
   for (const route of LOCALIZED_ROUTES) {
     const languages = buildLanguagesMap(route.path);
-    for (const locale of routing.locales) {
+    for (const locale of contentLocales(route.path)) {
       localizedEntries.push({
         url: absUrl(locale, route.path),
-        lastModified: now,
         changeFrequency: route.changeFrequency,
         priority: route.priority,
         alternates: { languages },
@@ -86,38 +73,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Legal pages — English only
   const legalEntries: MetadataRoute.Sitemap = LEGAL_ROUTES.map((path) => ({
     url: `${SITE_URL}${path}`,
-    lastModified: now,
     changeFrequency: "monthly" as const,
     priority: 0.3,
   }));
 
-  // Fetch public agents for dynamic pages (English only)
-  let agentEntries: MetadataRoute.Sitemap = [];
-  if (!shouldSkipStaticApiFetch(API_URL)) {
-    try {
-      const res = await fetch(`${API_URL}/agents/explore`, {
-        next: { revalidate: 3600 },
-      });
-      if (res.ok) {
-        const json = (await res.json()) as { agents: ExploreAgent[] };
-        if (json.agents?.length) {
-          agentEntries = json.agents.map((agent) => ({
-            url: `${SITE_URL}/agent/${agent.id}`,
-            lastModified: agent.updatedAt ? new Date(agent.updatedAt) : now,
-            changeFrequency: "daily" as const,
-            priority: 0.5,
-          }));
-        }
-      }
-    } catch {
-      // Skip dynamic pages if API is unavailable
-    }
-  }
-
   return [
     ...localizedEntries,
     ...blogPostEntries,
+    ...HATCHER_TUTORIALS.map((tutorial) => ({
+      url: `${SITE_URL}/tutorials/${tutorial.slug}`,
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    })),
     ...legalEntries,
-    ...agentEntries,
+
   ];
 }

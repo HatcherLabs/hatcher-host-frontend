@@ -49,6 +49,7 @@ interface TabDef {
 
 function getTabs(framework: string | undefined, tTabs: ReturnType<typeof useTranslations<'dashboard.agentDetail.tabs'>>): TabDef[] {
   return buildAgentNavigationTabs(framework, (id) => {
+    if (id === 'agentpit') return 'AgentPit';
     if (framework === 'ironclaw' && id === 'plugins') return tTabs('ironclawCapabilities');
     if (framework === 'ironclaw' && id === 'schedules') return tTabs('ironclawAutomations');
     return tTabs(id === 'overview' ? 'dashboard' : id);
@@ -59,6 +60,7 @@ function getTabs(framework: string | undefined, tTabs: ReturnType<typeof useTran
 function iconForTab(tab: Tab): React.ReactNode {
   const icons: Record<Tab, React.ReactNode> = {
     overview: <LayoutDashboard size={16} />,
+    backups: <Box size={16} />,
     chat: <MessageSquare size={16} />,
     mail: <Mail size={16} />,
     terminal: <TerminalSquare size={16} />,
@@ -75,6 +77,7 @@ function iconForTab(tab: Tab): React.ReactNode {
     knowledge: <BookOpen size={16} />,
     wallet: <Wallet size={16} />,
     robinhood: <Landmark size={16} />,
+    agentpit: <Landmark size={16} />,
     files: <FolderOpen size={16} />,
     schedules: <Clock size={16} />,
   };

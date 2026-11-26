@@ -1,7 +1,13 @@
 'use client';
 
 import { useEffect, useRef, useCallback, useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
+import { useTranslations } from 'next-intl';
+import { WorkspacePortal } from '@/components/workspace/WorkspacePortal';
 import { motion } from 'framer-motion';
+import { readHandoff } from '@/lib/chat-workspace';
+import { useAuth as useHandoffAuth } from '@/lib/auth-context';
+import { useWorkspace } from '@/components/workspace/WorkspaceContext';
 import { ArrowLeft } from 'lucide-react';
 import { useVoice } from '@/hooks/useVoice';
 import { api } from '@/lib/api';
@@ -12,6 +18,7 @@ import {
 } from '../../AgentContext';
 import { MESSAGES_WINDOW } from './constants';
 import { ChatHeader } from './ChatHeader';
+import { AgentChatOptions } from '../../AgentChatOptions';
 import { ChatModelSwitcher } from './ChatModelSwitcher';
 import { resolveLoadedModelConfig } from '@/hooks/useAgentConfig';
 import { MessageList } from './MessageList';
@@ -49,6 +56,7 @@ function dataUrlToBase64(dataUrl: string): string {
 }
 
 export function ChatTab({ compact = false }: { compact?: boolean }) {
+  const workspace = useWorkspace();
   const ctx = useAgentContext();
   const {
     agent,
@@ -64,6 +72,14 @@ export function ChatTab({ compact = false }: { compact?: boolean }) {
     setTab,
     wsConnected,
   } = ctx;
+
+  const { user: handoffUser } = useHandoffAuth();
+  useEffect(() => {
+    const url = new URL(window.location.href); const id = url.searchParams.get('handoff');
+    if (!id || !handoffUser || !agent?.id) return;
+    const draft = readHandoff(handoffUser.id, id, `agent:${agent.id}`);
+    if (draft) { setInput(draft.text); url.searchParams.delete('handoff'); window.history.replaceState(null, '', url.pathname + url.search); }
+  }, [handoffUser, agent?.id, setInput]);
 
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const speakingMsgIdRef = useRef<string | null>(null);
@@ -450,13 +466,14 @@ export function ChatTab({ compact = false }: { compact?: boolean }) {
     <motion.div
       key="tab-chat"
       data-testid="agent-chat-root"
-      className={compact ? "flex h-full min-h-0 w-full min-w-0 flex-col" : "flex h-[calc(100dvh-260px)] max-h-[calc(100dvh-260px)] min-h-0 w-full min-w-0 flex-col md:h-[calc(100dvh-205px)] md:max-h-none md:min-h-[500px] 2xl:h-[calc(100dvh-185px)] 2xl:min-h-[620px]"}
+      className={compact || workspace ? "flex h-full min-h-0 w-full min-w-0 flex-col" : "flex h-[calc(100dvh-260px)] max-h-[calc(100dvh-260px)] min-h-0 w-full min-w-0 flex-col md:h-[calc(100dvh-205px)] md:max-h-none md:min-h-[500px] 2xl:h-[calc(100dvh-185px)] 2xl:min-h-[620px]"}
       variants={tabContentVariants}
       initial="enter"
       animate="center"
       exit="exit"
     >
-      <ChatHeader
+      {workspace ? <WorkspacePortal region="tools"><AgentChatOptions><ChatHeader
+        unified={!!workspace}
         compact={compact}
         simple={ctx.viewMode === 'easy'}
         agent={agent}
@@ -473,19 +490,42 @@ export function ChatTab({ compact = false }: { compact?: boolean }) {
           currentModel={resolveLoadedModelConfig(agent.config as Record<string, unknown>).model}
           hosted={resolveLoadedModelConfig(agent.config as Record<string, unknown>).provider === 'openrouter'}
           disabled={sending || queuedChatCount > 0 || ctx.saving || ['starting', 'restarting'].includes(agent.status)}
-          onSelect={ctx.switchChatModel} onOpenSettings={() => setTab('config')} />}
-        onOpenModelSettings={() => setTab('config')}
+          onSelect={ctx.switchChatModel} onOpenSettings={ctx.openModelSettings} />}
+        onOpenModelSettings={ctx.openModelSettings}
+        onOpenMobilePanel={() => workspace?.chatTarget ? workspace.openSidebar() : setMobilePanelOpen(true)}
+        onToggleAutoSpeak={voice.toggleAutoSpeak}
+        onToggleThinking={toggleThinking}
+        onToggleToolCalls={toggleToolCalls}
+        onStartVoiceCall={startVoiceCall}
+      /></AgentChatOptions></WorkspacePortal> : <ChatHeader
+        unified={!!workspace}
+        compact={compact}
+        simple={ctx.viewMode === 'easy'}
+        agent={agent}
+        wsConnected={wsConnected}
+        hasVoiceSupport={hasVoiceSupport}
+        sttSupported={voice.sttSupported}
+        ttsSupported={voice.ttsSupported}
+        isAuthenticated={isAuthenticated}
+        autoSpeak={voice.autoSpeak}
+        showThinking={showThinking}
+        showToolCalls={showToolCalls}
+        activeModel={activeModelDisplay}
+        modelSwitcher={<ChatModelSwitcher activeModel={activeModelDisplay} framework={agent.framework}
+          currentModel={resolveLoadedModelConfig(agent.config as Record<string, unknown>).model}
+          hosted={resolveLoadedModelConfig(agent.config as Record<string, unknown>).provider === 'openrouter'}
+          disabled={sending || queuedChatCount > 0 || ctx.saving || ['starting', 'restarting'].includes(agent.status)}
+          onSelect={ctx.switchChatModel} onOpenSettings={ctx.openModelSettings} />}
+        onOpenModelSettings={ctx.openModelSettings}
         onOpenMobilePanel={() => setMobilePanelOpen(true)}
         onToggleAutoSpeak={voice.toggleAutoSpeak}
         onToggleThinking={toggleThinking}
         onToggleToolCalls={toggleToolCalls}
         onStartVoiceCall={startVoiceCall}
-      />
+      />}
 
       <div className="flex min-h-0 flex-1 flex-col gap-3 md:flex-row lg:gap-4">
-        {!compact && <div className="hidden min-h-0 md:flex">
-          <AgentPresenceRail />
-        </div>}
+        {workspace ? (workspace.chatTarget && createPortal(<AgentPresenceRail compact onSessionSelect={workspace.closeSidebar} />, workspace.chatTarget)) : !compact && <div className="hidden min-h-0 md:flex"><AgentPresenceRail /></div>}
 
         {mobilePanelOpen && (
           <dialog ref={sessionsDialog} className={`fixed inset-0 m-0 h-dvh max-h-none w-screen max-w-none border-0 bg-transparent p-0 text-[var(--text-primary)] ${compact ? "" : "md:hidden"}`} aria-label="Chat sessions" onCancel={() => setMobilePanelOpen(false)}>

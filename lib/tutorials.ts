@@ -4,6 +4,7 @@ export interface HatcherTutorial {
   topic: string;
   duration: string;
   durationIso: string;
+  uploadDate: string;
   description: string;
   videoSrc: string;
   posterSrc: string;
@@ -11,9 +12,11 @@ export interface HatcherTutorial {
   featureLabel: string;
 }
 
+// uploadDate records the first public release, not rebuild or crawl time.
 export const HATCHER_TUTORIALS: readonly HatcherTutorial[] = [
   {
     slug: 'create-first-agent',
+    uploadDate: '2026-09-05T12:53:42+03:00',
     title: 'Create your first AI agent',
     topic: 'Getting started',
     duration: '2:14',
@@ -27,6 +30,7 @@ export const HATCHER_TUTORIALS: readonly HatcherTutorial[] = [
   },
   {
     slug: 'models-ai-credits',
+    uploadDate: '2026-10-02T09:55:51+03:00',
     title: 'LLM models & AI Credits',
     topic: 'Models & usage',
     duration: '5:28',
@@ -40,6 +44,7 @@ export const HATCHER_TUTORIALS: readonly HatcherTutorial[] = [
   },
   {
     slug: 'neural-mesh',
+    uploadDate: '2026-09-05T12:53:42+03:00',
     title: 'Neural Mesh',
     topic: 'Orchestration',
     duration: '2:53',
@@ -53,6 +58,7 @@ export const HATCHER_TUTORIALS: readonly HatcherTutorial[] = [
   },
   {
     slug: 'chat-files-attachments',
+    uploadDate: '2026-09-05T12:53:42+03:00',
     title: 'Chat files & attachments',
     topic: 'Workspace',
     duration: '0:58',
@@ -66,6 +72,7 @@ export const HATCHER_TUTORIALS: readonly HatcherTutorial[] = [
   },
   {
     slug: 'mission-control',
+    uploadDate: '2026-09-05T12:53:42+03:00',
     title: 'Mission Control',
     topic: 'Operations',
     duration: '1:00',
@@ -79,6 +86,7 @@ export const HATCHER_TUTORIALS: readonly HatcherTutorial[] = [
   },
   {
     slug: 'routines-v2',
+    uploadDate: '2026-09-05T12:53:42+03:00',
     title: 'Routines V2',
     topic: 'Automation',
     duration: '2:04',
@@ -92,6 +100,7 @@ export const HATCHER_TUTORIALS: readonly HatcherTutorial[] = [
   },
   {
     slug: 'skills',
+    uploadDate: '2026-09-05T12:53:42+03:00',
     title: 'Install and use Skills',
     topic: 'Capabilities',
     duration: '1:30',
@@ -105,6 +114,7 @@ export const HATCHER_TUTORIALS: readonly HatcherTutorial[] = [
   },
   {
     slug: 'agent-mail',
+    uploadDate: '2026-09-05T12:53:42+03:00',
     title: 'Agent Mail',
     topic: 'Communication',
     duration: '1:28',
@@ -118,6 +128,7 @@ export const HATCHER_TUTORIALS: readonly HatcherTutorial[] = [
   },
   {
     slug: 'github-workflow',
+    uploadDate: '2026-09-07T11:59:03+03:00',
     title: 'From prompt to GitHub PR',
     topic: 'Development',
     duration: '1:50',
@@ -131,6 +142,7 @@ export const HATCHER_TUTORIALS: readonly HatcherTutorial[] = [
   },
   {
     slug: 'image-to-image',
+    uploadDate: '2026-09-08T12:24:07+03:00',
     title: 'Generate & edit images',
     topic: 'Creative tools',
     duration: '0:45',

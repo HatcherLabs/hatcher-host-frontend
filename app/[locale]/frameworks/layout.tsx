@@ -1,15 +1,11 @@
+import { localizedMetadata } from '@/lib/seo';
 import type { Metadata } from 'next';
-import { buildLanguagesMap } from '@/lib/seo';
 
-export const metadata: Metadata = {
+const pageMetadata: Metadata = {
   title: 'AI Frameworks — OpenClaw and Hermes',
   description:
     'Compare OpenClaw and Hermes on Hatcher: skill-heavy automation, persistent memory, integrations, and UsePod/OpenRouter-hosted LLM support. Deploy an agent in 60 seconds.',
   keywords: ['OpenClaw', 'Hermes', 'OpenRouter', 'DeepSeek', 'AI frameworks', 'agent framework comparison'],
-  alternates: {
-    canonical: '/frameworks',
-    languages: buildLanguagesMap('/frameworks'),
-  },
   openGraph: {
     title: 'AI Agent Frameworks — OpenClaw and Hermes',
     description: 'Compare OpenClaw and Hermes. Deploy an agent in 60 seconds on Hatcher.',
@@ -22,3 +18,5 @@ export const metadata: Metadata = {
 export default function FrameworksLayout({ children }: { children: React.ReactNode }) {
   return children;
 }
+
+export const generateMetadata = localizedMetadata('/frameworks', pageMetadata);

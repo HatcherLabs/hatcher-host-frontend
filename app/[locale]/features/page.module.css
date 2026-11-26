@@ -1,24 +1,24 @@
 .page {
-  min-height: 100vh;
+  min-height: 100%;
   color: var(--text-primary);
-  background: var(--bg-base);
+  background: var(--bg-surface);
   overflow-x: hidden;
 }
 
 .hero,
 .section,
 .cta {
-  width: min(1180px, calc(100% - 40px));
+  width: min(1040px, calc(100% - 48px));
   margin: 0 auto;
 }
 
 .hero {
-  min-height: min(760px, calc(100svh - 92px));
+  min-height: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(290px, 380px);
+  grid-template-columns: minmax(0, 1fr);
   gap: clamp(32px, 7vw, 88px);
   align-items: center;
-  padding: clamp(56px, 8vw, 108px) 0 72px;
+  padding: 36px 0;
 }
 
 .heroCopy {
@@ -318,7 +318,7 @@
 }
 
 .section {
-  padding: 88px 0;
+  padding: 36px 0;
 }
 
 .sectionHead {
@@ -331,8 +331,8 @@
 
 .section h2,
 .cta h2 {
-  font-size: clamp(30px, 4vw, 48px);
-  line-height: 1.08;
+  font-size: clamp(24px, 2.8cqi, 30px);
+  line-height: 1.2;
 }
 
 .explorer {
@@ -426,8 +426,8 @@
 }
 
 .featureDetail h3 {
-  font-size: clamp(28px, 4vw, 46px);
-  line-height: 1.08;
+  font-size: clamp(22px, 2.5cqi, 27px);
+  line-height: 1.2;
 }
 
 .detailLead {
@@ -1009,13 +1009,13 @@
   gap: 8px;
 }
 
-@media (max-width: 1120px) {
+@container workspace (max-width: 1120px) {
   .catalogGrid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 980px) {
+@container workspace (max-width: 980px) {
   .hero,
   .explorer,
   .featureDetail,
@@ -1025,7 +1025,7 @@
 
   .hero {
     min-height: auto;
-    padding-top: 52px;
+    padding-top: 28px;
   }
 
   .phoneStage {
@@ -1049,7 +1049,7 @@
   }
 }
 
-@media (max-width: 640px) {
+@container workspace (max-width: 640px) {
   .hero,
   .section,
   .cta {

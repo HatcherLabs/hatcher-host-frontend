@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/terms' },
   title: 'Terms of Service | Hatcher',
   description:
     'Terms of Service for the Hatcher managed AI agent hosting platform — what you can and can\u2019t do, payment terms, liability, and EU consumer rights.',
@@ -369,7 +370,6 @@ export default function TermsOfServicePage() {
             <p className="mt-4">Reach us at:</p>
             <ul className="mt-3 space-y-1.5">
               <li>All inquiries (support, legal, security, privacy): <a href="mailto:contact@hatcher.host" className="text-[var(--color-accent)] hover:underline">contact@hatcher.host</a></li>
-              <li>Discord: <a href="https://discord.gg/7tY3HjKjMc" target="_blank" rel="noopener noreferrer" className="text-[var(--color-accent)] hover:underline">discord.gg/7tY3HjKjMc</a></li>
               <li>Legal notice: <Link href="/impressum" className="text-[var(--color-accent)] hover:underline">Impressum</Link></li>
             </ul>
           </section>

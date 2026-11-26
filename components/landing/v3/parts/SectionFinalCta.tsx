@@ -14,7 +14,6 @@ export function SectionFinalCta() {
         <h2 className={styles.headline}>{t('headline')}</h2>
         <div className={styles.ctaRow}>
           <PhosphorButton href="/create">{t('ctaPrimary')}</PhosphorButton>
-          <PhosphorButton href="/explore" variant="ghost">{t('ctaGhost')}</PhosphorButton>
         </div>
         <div className={styles.meta}>
           {t('metaNoCard')}
