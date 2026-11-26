@@ -19,9 +19,9 @@ while (( $# > 0 )); do
   esac
 done
 
-if [[ "$url" == */ro/explore ]]; then
-  status="${FAKE_EXPLORE_STATUS:-200}"
-  location="${FAKE_EXPLORE_LOCATION:-}"
+if [[ "$url" == */ro/pricing ]]; then
+  status="${FAKE_PRICING_STATUS:-200}"
+  location="${FAKE_PRICING_LOCATION:-}"
 elif [[ "$url" == */sitemap.xml ]]; then
   status="${FAKE_SITEMAP_STATUS:-200}"
   location="${FAKE_SITEMAP_LOCATION:-}"
@@ -62,9 +62,9 @@ if FAKE_ROOT_LOCATION=https://hatcher.host/en HATCHER_CURL_BIN="$fake_curl" \
   exit 1
 fi
 
-if FAKE_EXPLORE_STATUS=503 HATCHER_CURL_BIN="$fake_curl" \
+if FAKE_PRICING_STATUS=503 HATCHER_CURL_BIN="$fake_curl" \
   "$script_dir/smoke-production-routes.sh" >/dev/null 2>&1; then
-  echo "smoke accepted a failing explore route" >&2
+  echo "smoke accepted a failing localized pricing route" >&2
   exit 1
 fi
 
