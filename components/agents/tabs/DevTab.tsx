@@ -7,7 +7,6 @@ import {
   AlertTriangle,
   Bot,
   CheckCircle2,
-  Github,
   GitPullRequest,
   ListChecks,
   Loader2,
@@ -20,6 +19,7 @@ import {
   TerminalSquare,
   Trash2,
 } from "lucide-react";
+import { Github } from "@/components/icons/brand-icons";
 import {
   api,
   type Agent,

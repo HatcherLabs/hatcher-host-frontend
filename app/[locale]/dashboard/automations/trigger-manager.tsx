@@ -8,7 +8,6 @@ import {
   ChevronRight,
   Copy,
   ExternalLink,
-  Github,
   Loader2,
   Pause,
   Play,
@@ -19,6 +18,7 @@ import {
   X,
   Zap,
 } from 'lucide-react';
+import { Github } from '@/components/icons/brand-icons';
 import { Link } from '@/i18n/routing';
 import { api } from '@/lib/api';
 import type {

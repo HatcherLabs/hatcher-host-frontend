@@ -10,7 +10,6 @@ import {
   Clock3,
   ExternalLink,
   FilterX,
-  Github,
   Loader2,
   MoreHorizontal,
   Pause,
@@ -24,6 +23,7 @@ import {
   X,
   Zap,
 } from 'lucide-react';
+import { Github } from '@/components/icons/brand-icons';
 import { Link } from '@/i18n/routing';
 import { api } from '@/lib/api';
 import type { Agent, AgentRoutine } from '@/lib/api';
