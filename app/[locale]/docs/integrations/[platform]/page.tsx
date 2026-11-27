@@ -10,8 +10,6 @@ import {
   MessageCircle,
   Hash,
   Phone,
-  Slack,
-  Twitter,
   ChevronDown,
   AlertTriangle,
   CheckCircle2,
@@ -23,6 +21,7 @@ import {
   Shield,
   type LucideIcon,
 } from 'lucide-react';
+import { Slack, Twitter } from '@/components/icons/brand-icons';
 import { cn } from '@/lib/utils';
 
 // ── Animation variants ─────────────────────────────────────────

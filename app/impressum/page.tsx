@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import {
-  Building2, Receipt, FileText, MapPin, Mail, Twitter, User,
+  Building2, Receipt, FileText, MapPin, Mail, User,
   Server, ShieldAlert, AlertTriangle, Scale,
 } from 'lucide-react';
+import { Twitter } from '@/components/icons/brand-icons';
 import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 
 export const metadata: Metadata = {

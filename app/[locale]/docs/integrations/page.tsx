@@ -8,14 +8,13 @@ import {
   MessageCircle,
   Hash,
   Phone,
-  Slack,
-  Twitter,
   ShieldAlert,
   Plug,
   Clock,
   DollarSign,
   Signal,
 } from 'lucide-react';
+import { Slack, Twitter } from '@/components/icons/brand-icons';
 import { cn } from '@/lib/utils';
 
 // ── Animation variants ─────────────────────────────────────────

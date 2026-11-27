@@ -14,7 +14,6 @@ import {
   Bot,
   CheckCircle2,
   Eye,
-  Github,
   Layers,
   Mail,
   Network,
@@ -24,6 +23,7 @@ import {
   Wrench,
   type LucideIcon,
 } from 'lucide-react';
+import { Github } from '@/components/icons/brand-icons';
 import styles from './page.module.css';
 
 type Tone = 'copper' | 'cyan' | 'amber' | 'rose' | 'violet' | 'blue';
