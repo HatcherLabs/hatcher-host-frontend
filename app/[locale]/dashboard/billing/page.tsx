@@ -9,6 +9,7 @@ import { useTranslations, useFormatter } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
+import { startIncentivCheckout } from '@/lib/incentiv-checkout';
 import type { Payment, SolanaPaymentIntent, SolanaRecurringAuthorization, SolanaRecurringQuote, SolanaRecurringQuoteRequest } from '@/lib/api';
 import { Link } from '@/i18n/routing';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
@@ -261,6 +262,7 @@ interface PaymentModalProps {
   onPayWithSOL: () => void;
   onPayWithHATCHER: () => void;
   onPayWithANSEM: () => void;
+  onPayWithIncentiv: () => void;
   onPayWithUSDC: () => void;
   onPayWithCryptoNow: () => void;
   onPayWithCard: () => void;
@@ -271,7 +273,7 @@ interface PaymentModalProps {
   onSelectAgent?: (agentId: string) => void;
 }
 
-function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPayWithHATCHER, onPayWithANSEM, onPayWithUSDC, onPayWithCryptoNow, onPayWithCard, loading, requiresAgent, agents, selectedAgentId, onSelectAgent }: PaymentModalProps) {
+function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPayWithHATCHER, onPayWithANSEM, onPayWithUSDC, onPayWithIncentiv, onPayWithCryptoNow, onPayWithCard, loading, requiresAgent, agents, selectedAgentId, onSelectAgent }: PaymentModalProps) {
   const t = useTranslations('dashboard.billing');
   const tc = useTranslations('dashboard.common');
   if (!isOpen) return null;
@@ -346,6 +348,22 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
               <div className="text-left">
                 <p className="text-sm font-semibold text-[var(--text-primary)]">{t('payWithSol')}</p>
                 <p className="text-[11px] text-[var(--text-muted)]">{t('solDesc')}</p>
+              </div>
+              {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)] ml-auto" />}
+            </button>
+
+            {/* Pay with USDC on Incentiv */}
+            <button
+              onClick={onPayWithIncentiv}
+              disabled={loading || needsAgentSelection}
+              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/[0.03] transition-all disabled:opacity-40"
+            >
+              <div className={paymentIconShell}>
+                <span className="font-bold text-sm">USDC</span>
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-semibold text-[var(--text-primary)]">USDC · Incentiv</p>
+                <p className="text-[11px] text-[var(--text-muted)]">x402 · Incentiv Mainnet</p>
               </div>
               {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)] ml-auto" />}
             </button>
@@ -535,8 +553,8 @@ export default function BillingPage() {
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
   const annualDiscountFactor = 0.85; // 15% off
   // Convert a monthly USD price into the currently-selected billing period.
-  const computePrice = useCallback((monthly: number, isSubscription: boolean) => {
-    if (!isSubscription || billingPeriod === 'monthly') return monthly;
+  const computePrice = useCallback((monthly: number, isSubscription: boolean, period = billingPeriod) => {
+    if (!isSubscription || period === 'monthly') return monthly;
     return Math.round(monthly * 12 * annualDiscountFactor * 100) / 100;
   }, [billingPeriod]);
 
@@ -976,9 +994,10 @@ export default function BillingPage() {
 
   useEffect(() => {
     if (loading || !isAuthenticated || !accountData) return;
-    const tierKey = searchParams.get('tier');
+    const tierKey = searchParams.get('tier') ?? searchParams.get('upgrade');
+    const period = searchParams.get('period') === 'annual' && tierKey !== 'founding_member' ? 'annual' : 'monthly';
     const addonKey = searchParams.get('addon');
-    const selection = `${tierKey ?? ''}:${addonKey ?? ''}`;
+    const selection = [tierKey, addonKey, period].join(':');
     if (openedPurchase.current === selection) return;
     if (tierKey && ['starter', 'pro', 'business', 'founding_member'].includes(tierKey)) {
       const tier = TIERS[tierKey as UserTierKey];
@@ -987,8 +1006,8 @@ export default function BillingPage() {
         setPurchaseNotice('Your current plan already includes this access. Manage your existing plan below.');
         return;
       }
-      setBillingPeriod('monthly');
-      setPaymentModal({ isOpen: true, type: 'subscription', tierKey: tierKey as UserTierKey, title: `Choose payment for ${tier.name}`, price: tier.usdPrice });
+      setBillingPeriod(period);
+      setPaymentModal({ isOpen: true, type: 'subscription', tierKey: tierKey as UserTierKey, title: `Choose payment for ${tier.name}`, price: computePrice(tier.usdPrice, true, period) });
     } else if (addonKey) {
       if (addonKey.startsWith('addon.chat.')) {
         openedPurchase.current = selection;
@@ -999,7 +1018,7 @@ export default function BillingPage() {
       openedPurchase.current = selection;
       setPaymentModal({ isOpen: true, type: 'addon', addonKey: addon.key, title: addon.key.startsWith('addon.chat.') ? `${addon.name} · Web Chat only, no agents` : addon.name, price: addon.usdPrice });
     }
-  }, [loading, isAuthenticated, searchParams, accountData]);
+  }, [loading, isAuthenticated, searchParams, accountData, computePrice]);
 
   // Lifetime tiers (founding_member) are always flat-priced — ignore the
   // monthly/annual toggle for them, and also skip sending billingPeriod
@@ -1263,6 +1282,23 @@ export default function BillingPage() {
     addonConfig.type === 'subscription' ? billingPeriod : 'monthly';
   const addonPrice = (addonConfig: { type: string; usdPrice: number }): number =>
     computePrice(addonConfig.usdPrice, addonConfig.type === 'subscription');
+
+  const openIncentivCheckout = async () => {
+    const tier = paymentModal.tierKey;
+    const addon = findBillingAddon(paymentModal.addonKey);
+    const target = paymentModal.type === 'subscription' && tier
+      ? { kind: 'tier', key: tier, billingPeriod: subscribePeriod(tier) }
+      : addon && { kind: 'addon', key: addon.key, billingPeriod: addonPeriod(addon), agentId: addon.perAgent ? selectedAgentId : undefined };
+    if (!target || ('agentId' in target && target.agentId === null)) return;
+    setPaymentLoading(true);
+    try {
+      await startIncentivCheckout(target);
+    } catch (error) {
+      setPaymentErrorToast(error instanceof Error ? error.message : 'Checkout unavailable');
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
 
   /* ── Purchase add-on (SOL payment) ────────────────────── */
   const handlePurchaseAddonSOL = async () => {
@@ -2591,6 +2627,7 @@ export default function BillingPage() {
         onPayWithSOL={paymentModal.type === 'subscription' ? handleSubscribeSOL : handlePurchaseAddonSOL}
         onPayWithHATCHER={paymentModal.type === 'subscription' ? handleSubscribeHATCHER : handlePurchaseAddonHATCHER}
         onPayWithANSEM={paymentModal.type === 'subscription' ? handleSubscribeANSEM : handlePurchaseAddonANSEM}
+        onPayWithIncentiv={openIncentivCheckout}
         onPayWithUSDC={paymentModal.type === 'subscription' ? handleSubscribeUSDC : handlePurchaseAddonUSDC}
         onPayWithCryptoNow={paymentModal.type === 'subscription' ? handleSubscribeCryptoNow : handlePurchaseAddonCryptoNow}
         onPayWithCard={paymentModal.type === 'subscription' ? handleSubscribeStripe : handlePurchaseAddonStripe}

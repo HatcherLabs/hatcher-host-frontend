@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Gauge, Loader2, Lock, Plus, X } from 'lucide-react';
+import { startIncentivCheckout } from '@/lib/incentiv-checkout';
 import { api } from '@/lib/api';
 import type { AgentCapacityAddonsResponse } from '@/lib/api';
 import { Link } from '@/i18n/routing';
@@ -62,12 +63,16 @@ export function CapacityAddonsCard() {
     return def ? tAddons(`${def.kind}.name`) : kind;
   };
 
-  const handleBuy = async (key: CapacityAddonKey) => {
+  const handleBuy = async (key: CapacityAddonKey, incentiv = false) => {
     const quantity = quantities[key] ?? 1;
     setBuyingKey(key);
     setCheckoutError(null);
     setNotice(null);
     try {
+      if (incentiv) {
+        await startIncentivCheckout({kind: 'addon', key, agentId: id, billingPeriod: 'monthly', quantity});
+        return;
+      }
       const returnUrl = `${window.location.origin}/dashboard/agent/${id}?tab=stats`;
       const res = await api.stripeCheckoutAddon(key, id, 'monthly', returnUrl, quantity);
       if (!res.success) {
@@ -237,6 +242,10 @@ export function CapacityAddonsCard() {
                       {t('buy', { price: addon.usdPrice * quantity })}
                     </button>
                   </div>
+                  <button type="button" disabled={buyingKey !== null} onClick={() => void handleBuy(addon.key, true)}
+                    className="mt-2 rounded-lg border border-[var(--border-default)] py-2 text-xs font-semibold hover:border-[var(--color-accent)] disabled:opacity-40">
+                    USDC · Incentiv x402
+                  </button>
                 </div>
               );
             })}

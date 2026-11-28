@@ -4,11 +4,10 @@ import { IncentivSignIn } from './IncentivSignIn';
 import { useAuth } from '@/lib/auth-context';
 import { Link } from '@/i18n/routing';
 
-export function IncentivPreview() {
+export function IncentivPreview({ returnPath = "/incentiv-preview" }: { returnPath?: string }) {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   return (
     <main className="mx-auto w-full max-w-lg px-6 py-16">
-      <p className="mb-3 text-xs font-medium uppercase tracking-widest text-[var(--text-muted)]">Partner preview</p>
       <h1 className="mb-4 text-3xl font-semibold text-[var(--text-primary)]">Sign in with Incentiv</h1>
       <p className="mb-8 text-sm leading-6 text-[var(--text-secondary)]">
         Connect your Incentiv wallet and approve a sign-in message. No email, password, transaction, or gas is required.
@@ -18,11 +17,11 @@ export function IncentivPreview() {
           <h2 className="font-semibold">Your Hatcher session is active</h2>
           <p className="text-sm">Signed in as {user.username}.</p>
           <Link href="/dashboard" className="block text-sm text-[var(--accent)] underline">Open Hatcher</Link>
-          <button type="button" onClick={() => void logout()} className="text-sm underline">Sign out to test again</button>
+          <button type="button" onClick={() => void logout()} className="text-sm underline">Sign out</button>
         </section>
-      ) : <IncentivSignIn returnPath="/incentiv-preview" />}
+      ) : <IncentivSignIn returnPath={returnPath} />}
       <p className="mt-6 text-xs leading-5 text-[var(--text-muted)]">
-        <a href="https://api.hatcher.host/incentiv-preview/credits" className="underline">Open the x402 credits checkout</a> to buy 5,000 Hatcher credits for 7 USDC on Incentiv Mainnet.
+        Choose a plan, agent upgrade or credits in <Link href="/dashboard/billing" className="underline">Hatcher billing</Link> and pay with USDC on Incentiv Mainnet. Agents can use the <a href="https://api.hatcher.host/payments/incentiv-x402" className="underline">x402 checkout guide</a>.
       </p>
     </main>
   );

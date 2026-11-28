@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { useLocale, useTranslations } from 'next-intl';
 import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 import { HatcherWalletModalProvider } from '@/components/providers/HatcherWalletModalProvider';
+import NextLink from 'next/link';
 import { CostExplainer } from '@/components/billing/CostExplainer';
 import { ChatPlansOverview } from '@/components/chat/ChatPlansOverview';
 import { useAuth } from '@/lib/auth-context';
@@ -171,6 +172,10 @@ function PricingPageContent() {
             {t('subheading')}
           </motion.p>
 
+          <NextLink href="/incentiv" className="mt-3 inline-block text-sm font-medium text-[var(--text-secondary)] underline">
+            USDC · Incentiv x402
+          </NextLink>
+
           {/* Monthly / Annual toggle */}
           <div className="inline-flex items-center mt-8 p-1 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
             <button
@@ -328,8 +333,8 @@ function PricingPageContent() {
                     tier.key === 'free'
                       ? isAuthenticated ? '/dashboard/agents' : '/register'
                       : isAuthenticated
-                        ? `/dashboard/billing?upgrade=${tier.key}`
-                        : loginHrefForReturn(`/dashboard/billing?upgrade=${tier.key}`)
+                        ? `/dashboard/billing?tier=${tier.key}&period=${isAnnual ? 'annual' : 'monthly'}`
+                        : loginHrefForReturn(`/dashboard/billing?tier=${tier.key}&period=${isAnnual ? 'annual' : 'monthly'}`)
                   }
                   className={cn(
                     'block text-center font-semibold px-5 py-2.5 rounded-md text-sm transition-opacity',

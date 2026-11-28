@@ -1,3 +1,4 @@
+import { previewResponse } from './fixtures/simple-experience';
 import { test, expect } from '@playwright/test';
 
 const ADDRESS = '0x1111111111111111111111111111111111111111';
@@ -86,11 +87,34 @@ test('a rejected signature leaves the user signed out and allows retry', async (
   expect(verificationCalls).toBe(0);
 });
 
-test('wallet preview is absent from public login and registration', async ({ page, context }) => {
-  await context.route(url => url.pathname.includes('/auth/'), route => route.fulfill({ json: { success: true, data: { enabled: true, authenticated: false, user: null } } }));
-  for (const path of ['/de/login', '/de/register']) {
+test('wallet login is available on public login and registration', async ({ page, context }, testInfo) => {
+  await context.route(url => url.pathname.includes('/auth/'), route => route.fulfill({ headers: { 'Access-Control-Allow-Origin': new URL(String(testInfo.project.use.baseURL)).origin, 'Access-Control-Allow-Credentials': 'true' }, json: { success: true, data: { enabled: true, authenticated: false, user: null } } }));
+  for (const path of ['/login', '/register']) {
     await page.goto(path);
-    await expect(page.getByRole('button', { name: 'Continue with Incentiv' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Continue with Incentiv' })).toBeEnabled();
     await expect(page.locator('a[href*="incentiv-preview"]')).toHaveCount(0);
   }
+});
+
+test('annual plan selection reaches the Incentiv checkout with the selected period', async ({page}, testInfo)=>{
+  const site=new URL(String(testInfo.project.use.baseURL)).origin;
+  const id='00000000-0000-4000-8000-000000000001';
+  let selected:unknown;
+  await page.route('**/*',async route=>{
+    const url=new URL(route.request().url());
+    if(url.origin===site || !['localhost','api.hatcher.host','127.0.0.1'].includes(url.hostname)) return route.continue();
+    const headers={'Access-Control-Allow-Origin':site,'Access-Control-Allow-Credentials':'true','Access-Control-Allow-Headers':'Content-Type, Authorization','Access-Control-Allow-Methods':'GET, POST, OPTIONS'};
+    if(route.request().method()==='OPTIONS') return route.fulfill({status:204,headers});
+    if(url.pathname==='/payments/incentiv-x402/orders'){
+      selected=route.request().postDataJSON();
+      return route.fulfill({status:201,headers,json:{url:url.origin+url.pathname+'/'+id}});
+    }
+    if(url.pathname.endsWith('/checkout')) return route.fulfill({headers,body:'Checkout ready'});
+    if(url.pathname==='/features' || url.pathname==='/features/') return route.fulfill({headers,json:{success:true,data:{tiers:{},founding:{remaining:3}}}});
+    return route.fulfill({headers,json:previewResponse(url.pathname,route.request().method())});
+  });
+  await page.goto('/dashboard/billing?tier=pro&period=annual');
+  await page.getByRole('button',{name:/USDC.*Incentiv/}).click();
+  await expect(page).toHaveURL(new RegExp(id+'/checkout$'));
+  expect(selected).toEqual({kind:'tier',key:'pro',billingPeriod:'annual'});
 });

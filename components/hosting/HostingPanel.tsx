@@ -13,6 +13,7 @@ import {
   RefreshCw,
   Trash2,
 } from "lucide-react";
+import { startIncentivCheckout } from "@/lib/incentiv-checkout";
 import { req } from "@/lib/api/core";
 import { API_URL } from "@/lib/config";
 import {
@@ -439,6 +440,12 @@ export function HostingPanel() {
                       : "Checkout is not open yet"}
                   </button>
                 </div>
+              )}
+              {!project.subscriptionId && catalog.salesEnabled && (
+                <button className={styles.secondary} disabled={busy}
+                  onClick={() => void perform(() => startIncentivCheckout({kind: 'hosting', projectId: project.id}))}>
+                  {active ? 'Extend by 30 days' : 'Activate for 30 days'} · USDC on Incentiv
+                </button>
               )}
               {project.subscriptionId && (
                 <button
