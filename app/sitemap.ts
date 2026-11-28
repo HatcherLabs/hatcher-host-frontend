@@ -78,6 +78,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   return [
+    { url: SITE_URL + '/incentiv', changeFrequency: 'monthly', priority: 0.7 },
     ...localizedEntries,
     ...blogPostEntries,
     ...HATCHER_TUTORIALS.map((tutorial) => ({

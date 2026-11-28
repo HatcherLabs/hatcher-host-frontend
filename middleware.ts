@@ -51,6 +51,7 @@ const NON_LOCALE_PREFIXES = [
   '/embed',
   '/demo',
   '/mobile-security',
+  '/incentiv',
   '/incentiv-preview',
   '/.well-known',
 ];
